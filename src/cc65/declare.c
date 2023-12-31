@@ -1989,7 +1989,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 
 
-static FuncDesc* ParseFuncDecl (void)
+static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
 /* Parse the argument list of a function with the enclosing parentheses */
 {
     /* Create a new function descriptor */
@@ -2009,14 +2009,17 @@ static FuncDesc* ParseFuncDecl (void)
         /* Parameter list declared as void */
         NextToken ();
         F->Flags |= FD_VOID_PARAM;
-    } else if (CurTok.Tok == TOK_IDENT &&
+    } else if (Mode != DM_NO_IDENT &&
+               CurTok.Tok == TOK_IDENT &&
                (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
         /* If the identifier is a typedef, we have a new-style parameter list;
         ** if it's some other identifier, it's an old-style parameter list.
+        ** Note: Non-empty Old-style (K&R) parameter list is not allowed in
+        ** type names.
         */
         SymEntry* Sym = FindSym (CurTok.Ident);
         if (Sym == 0 || !SymIsTypeDef (Sym)) {
-            /* Old-style (K&R) function. */
+            /* Old-style (K&R) function */
             F->Flags |= FD_OLDSTYLE;
         }
     }
@@ -2026,13 +2029,20 @@ static FuncDesc* ParseFuncDecl (void)
     if ((F->Flags & FD_OLDSTYLE) == 0) {
         /* New-style function */
         ParseAnsiParamList (F);
-        ConsumeRParen ();
     } else {
         /* Old-style function */
         ParseOldStyleParamList (F);
-        ConsumeRParen ();
+    }
+
+    if (!ConsumeRParen ()) {
+        /* Try some smart error recovery */
+        SimpleErrorSkip ();
+        NextToken ();
+    } else if (Mode == DM_IDENT_OR_EMPTY && (F->Flags & FD_OLDSTYLE) != 0) {
+        /* Parameter declaration list is only allowed in function definitions */
         ParseOldStyleParamDeclList (F);
     }
+
     PopLexicalLevel ();
 
     /* Remember the last function parameter. We need it later for several
@@ -2040,18 +2050,27 @@ static FuncDesc* ParseFuncDecl (void)
     ** more symbols are added to the table, it is easier if we remember it
     ** now, since it is currently the last entry in the symbol table.
     */
-    F->LastParam = GetSymTab()->SymTail;
+    F->LastParam = GetSymTab ()->SymTail;
+
+    /* Leave the lexical level remembering the symbol tables */
+    RememberFunctionLevel (F);
 
     /* It is allowed to use incomplete types in function prototypes, so we
     ** won't always get to know the parameter sizes here and may do that later.
     */
     F->Flags |= FD_INCOMPLETE_PARAM;
 
-    /* Leave the lexical level remembering the symbol tables */
-    RememberFunctionLevel (F);
+    /* We cannot specify fastcall for variadic functions */
+    if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
+        Error ("Variadic functions cannot be __fastcall__");
+        Qualifiers &= ~T_QUAL_FASTCALL;
+    }
 
-    /* Return the function descriptor */
-    return F;
+    /* Add the function type. Be sure to bounds check the type buffer */
+    NeedTypeSpace (D, 1);
+    D->Type[D->Index].C = T_FUNC | Qualifiers;
+    D->Type[D->Index].A.F = F;
+    ++D->Index;
 }
 
 
@@ -2090,15 +2109,37 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
-        NextToken ();
+        SymEntry* Entry;
+
         /* An empty declaration cannot contain parentheses where an identifier
         ** would show up if it were a non-empty declaration.
         */
         if (Mode == DM_IDENT_OR_EMPTY) {
             Spec->Flags |= DS_NO_EMPTY_DECL;
         }
-        DirectDecl (Spec, D, Mode);
-        ConsumeRParen ();
+
+        /* We have to disambiguate the meanings of 'type (identifier' when
+        ** the identifier can be a typedef'ed parameter type specifier or
+        ** a declarator enclosed in parentheses in some cases.
+        */
+        if (Mode == DM_IDENT_OR_EMPTY ||                /* If we are in a declaration... */
+            NextTok.Tok == TOK_LPAREN ||                /* or the next token is one more paren... */
+            NextTok.Tok == TOK_STAR ||                  /* or a '*' ... */
+            (NextTok.Tok == TOK_IDENT &&                /* or an identifier that... */
+            ((Entry = FindSym (NextTok.Ident)) == 0 ||  /* is not a typedef. */
+            !SymIsTypeDef (Entry)))) {
+            /* Parse the direct declarator in parentheses */
+            NextToken ();
+            DirectDecl (Spec, D, Mode);
+            ConsumeRParen ();
+        } else {
+            /* This is a parameter type list in parentheses */
+            ParseFuncDecl (D, Mode, Qualifiers);
+
+            /* Qualifiers now used */
+            Qualifiers = T_QUAL_NONE;
+        }
+
     } else if (CurTok.Tok == TOK_IDENT) {
         if (Mode == DM_NO_IDENT) {
             Error ("Unexpected identifier in type name");
@@ -2119,28 +2160,11 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 
     while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
         if (CurTok.Tok == TOK_LPAREN) {
-
             /* Function declarator */
-            FuncDesc* F;
-
-            /* Parse the function declarator */
-            F = ParseFuncDecl ();
-
-            /* We cannot specify fastcall for variadic functions */
-            if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
-                Error ("Variadic functions cannot be __fastcall__");
-                Qualifiers &= ~T_QUAL_FASTCALL;
-            }
-
-            /* Add the function type. Be sure to bounds check the type buffer */
-            NeedTypeSpace (D, 1);
-            D->Type[D->Index].C = T_FUNC | Qualifiers;
-            D->Type[D->Index].A.F = F;
-            ++D->Index;
+            ParseFuncDecl (D, Mode, Qualifiers);
 
             /* Qualifiers now used */
             Qualifiers = T_QUAL_NONE;
-
         } else {
             /* Array declarator */
             long Size = UNSPECIFIED;
@@ -2385,9 +2409,11 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         }
 
         /* Try some smart error recovery */
-        if (CurTok.Tok != TOK_LCURLY || !IsTypeFunc (D->Type)) {
+        if (Mode == DM_NO_IDENT) {
+            return SimpleErrorSkip ();
+        } else if (CurTok.Tok != TOK_LCURLY || !IsTypeFunc (D->Type)) {
             /* Skip to the end of the whole declaration if it is not part of a
-            ** parameter list or a type cast.
+            ** parameter list.
             */
             return SmartErrorSkip (Mode == DM_IDENT_OR_EMPTY);
         }

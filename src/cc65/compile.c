@@ -206,6 +206,14 @@ static void Parse (void)
                 } else {
                     /* Just a declaration */
                     Decl.StorageClass |= SC_DECL;
+
+                    FuncDef = GetFuncDesc (Decl.Type);
+                    if ((FuncDef->Flags & (FD_EMPTY | FD_OLDSTYLE)) == FD_OLDSTYLE) {
+                        /* A parameter list without types is only allowed in a
+                        ** function definition.
+                        */
+                        Error ("Parameter names without types in function declaration");
+                    }
                 }
             }
 

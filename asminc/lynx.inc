@@ -81,8 +81,42 @@ MATHJ       = $FC6F
 
 ; Suzy Misc
 
-SPRCTL0     = $FC80
+SPRCTL0          = $FC80
+; Sprite bits-per-pixel definitions
+BPP_MASK         = %11000000 ; Mask for settings bits per pixel
+BPP_1            = %00000000
+BPP_2            = %01000000
+BPP_3            = %10000000
+BPP_4            = %11000000
+; More sprite control 0 bit definitions
+HFLIP            = %00100000
+VFLIP            = %00010000
+; Sprite types - redefined to reflect the reality caused by the shadow error
+TYPE_SHADOW      = %00000111
+TYPE_XOR         = %00000110
+TYPE_NONCOLL     = %00000101 ; Non-colliding
+TYPE_NORMAL      = %00000100
+TYPE_BOUNDARY    = %00000011
+TYPE_BSHADOW     = %00000010 ; Background shadow
+TYPE_BACKNONCOLL = %00000001 ; Background non-colliding
+TYPE_BACKGROUND  = %00000000
+
 SPRCTL1     = $FC81
+LITERAL     = %10000000
+PACKED      = %00000000
+ALGO3       = %01000000 ; Broken, do not set this bit!
+; Sprite reload mask definitions
+RELOAD_MASK = %00110000
+RENONE      = %00000000 ; Reload nothing
+REHV        = %00010000 ; Reload hsize, vsize
+REHVS       = %00100000 ; Reload hsize, vsize, stretch
+REHVST      = %00110000 ; Reload hsize, vsize, stretch, tilt
+; More sprite control 1 bit definitions
+REUSEPAL    = %00001000
+SKIP        = %00000100
+DRAWUP      = %00000010
+DRAWLEFT    = %00000001
+
 SPRCOLL     = $FC82
 SPRINIT     = $FC83
 SUZYHREV    = $FC88

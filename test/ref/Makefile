@@ -63,7 +63,8 @@ CUSTOMSOURCES = \
 # exact error output is required
 ERRORSOURCES = \
 	custom-reference-error.c \
-	bug1889-missing-identifier.c
+	bug1889-missing-identifier.c \
+	bug2312-preprocessor-error.c
 
 SOURCES := $(filter-out $(CUSTOMSOURCES) $(ERRORSOURCES),$(wildcard *.c))
 

@@ -13,7 +13,10 @@
     and then "make" again to confirm
 */
 
-short main(int argc, char* argv[])
+typedef short return_t;
+#error /* produce an error */
+
+return_t main(int argc, char* argv[])
 {
     printf("%02x", 0x42); /* produce an error */
     n = 0;                /* produce an error */

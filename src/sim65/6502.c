@@ -361,7 +361,7 @@ static void OPC_Illegal (void)
 
 static void OPC_6502_00 (void)
 /* Opcode $00: BRK */
-{ 
+{
     Cycles = 7;
     Regs.PC += 2;
     PUSH (PCH);

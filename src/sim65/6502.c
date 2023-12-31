@@ -361,7 +361,7 @@ static void OPC_Illegal (void)
 
 static void OPC_6502_00 (void)
 /* Opcode $00: BRK */
-{
+{ 
     Cycles = 7;
     Regs.PC += 2;
     PUSH (PCH);
@@ -3228,8 +3228,13 @@ void Reset (void)
     Regs.PC = MemReadWord (0xFFFC);
 }
 
-
-
+#ifdef DB65
+/* db65 needs access to the registers*/
+CPURegs* ReadRegisters ()
+{
+    return &Regs;
+}
+#endif
 unsigned ExecuteInsn (void)
 /* Execute one CPU instruction */
 {

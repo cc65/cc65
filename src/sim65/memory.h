@@ -37,8 +37,12 @@
 #define MEMORY_H
 
 #include "inline.h"
-
+#ifndef DB65
 extern unsigned char Mem[0x10000];
+#else
+/* memory is inside DB65 - not here
+   accessed via Memxx API calls */
+#endif
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -52,6 +56,10 @@ void MemWriteByte (unsigned Addr, unsigned char Val);
 void MemWriteWord (unsigned Addr, unsigned Val);
 /* Write a word to a memory location */
 
+#ifdef DB65
+/* force MemReadByte to be a call, just like all other RAM access*/
+unsigned char MemReadByte (unsigned Addr);
+#else
 #if defined(HAVE_INLINE)
 INLINE unsigned char MemReadByte (unsigned Addr)
 /* Read a byte from a memory location */
@@ -60,6 +68,7 @@ INLINE unsigned char MemReadByte (unsigned Addr)
 }
 #else
 #define MemReadByte(Addr) Mem[Addr]
+#endif
 #endif
 
 unsigned MemReadWord (unsigned Addr);

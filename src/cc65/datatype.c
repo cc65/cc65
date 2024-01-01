@@ -539,7 +539,7 @@ const Type* AddressOf (const Type* T)
     Type* P = TypeAlloc (Size + 1);
 
     /* Create the return type... */
-    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE) | T_QUAL_CONST;
+    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE);
     memcpy (P+1, T, Size * sizeof (Type));
 
     /* ...and return it */

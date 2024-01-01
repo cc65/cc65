@@ -741,7 +741,7 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
                     /* Refine the existing composite prototype with this new
                     ** one.
                     */
-                    RefineFuncDesc (Sym->Type, T);
+                    TypeComposition (Sym->Type, T);
                 }
             }
 

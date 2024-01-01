@@ -436,7 +436,7 @@ void TypeComposition (Type* lhs, const Type* rhs)
         }
 
         /* Check for sanity */
-        CHECK (GetUnqualTypeCode (lhs) == GetUnqualTypeCode (rhs));
+        CHECK (GetUnderlyingTypeCode (lhs) == GetUnderlyingTypeCode (rhs));
 
         /* Check for special type elements */
         if (IsTypeFunc (lhs)) {

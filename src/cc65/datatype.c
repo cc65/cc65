@@ -1454,6 +1454,7 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
 
     } else if (IsTypeFunc (T)) {
 
+        int             QualCount = 0;
         struct StrBuf   ParamList = AUTO_STRBUF_INITIALIZER;
         const FuncDesc* D = GetFuncDesc (T);
 
@@ -1467,13 +1468,27 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
             SB_Clear (East);
         }
 
+        /* Add qualifiers */
+        if ((GetQualifier (T) & ~T_QUAL_NEAR) != T_QUAL_NONE) {
+            QualCount = GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NEAR);
+            if (QualCount > 0) {
+                SB_AppendChar (&Buf, ' ');
+            }
+        }
+
         if (SB_IsEmpty (West)) {
-            /* Just use the param list */
-            SB_Printf (West, "(%s)", SB_GetConstBuf (&ParamList));
+            /* Use no parentheses */
+            SB_Terminate (&Buf);
+
+            /* Append the param list to the West */
+            SB_Printf (West, "%s(%s)", SB_GetConstBuf (&Buf), SB_GetConstBuf (&ParamList));
         } else {
-            /* Append the param list to the existing West */
-            SB_Printf (&Buf, "(%s)(%s)", SB_GetConstBuf (West), SB_GetConstBuf (&ParamList));
-            SB_Printf (West, "%s", SB_GetConstBuf (&Buf));
+            /* Append the existing West */
+            SB_Append (&Buf, West);
+            SB_Terminate (&Buf);
+
+            /* Append the param list to the West */
+            SB_Printf (West, "(%s)(%s)", SB_GetConstBuf (&Buf), SB_GetConstBuf (&ParamList));
         }
         SB_Done (&ParamList);
 

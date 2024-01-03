@@ -72,8 +72,8 @@ void __fastcall__ ria_push_long (unsigned long val);
 void __fastcall__ ria_push_int (unsigned int val);
 #define ria_push_char(v) RIA.xstack = v
 
-long __fastcall__ ria_pop_long (void);
-int __fastcall__ ria_pop_int (void);
+long ria_pop_long (void);
+int ria_pop_int (void);
 #define ria_pop_char() RIA.xstack
 
 /* Set the RIA fastcall register */
@@ -118,9 +118,9 @@ long __fastcall__ ria_call_long_errno (unsigned char op);
 /* C API for the operating system. */
 
 int __cdecl__ xreg (char device, char channel, unsigned char address, ...);
-int __fastcall__ phi2 (void);
-int __fastcall__ codepage (void);
-long __fastcall__ lrand (void);
+int phi2 (void);
+int codepage (void);
+long lrand (void);
 int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length);
 int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);
 int __fastcall__ read_xram (unsigned buf, unsigned count, int fildes);

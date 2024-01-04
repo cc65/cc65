@@ -12,6 +12,8 @@
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /* Mar-2017, Christian Krueger, added support for 65SC02                     */
+/* Dec-2023, Carlo Bramini, rewritten for better maintenance and added       */
+/*           support for undocumented opcodes for 6502                       */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
@@ -44,7 +46,337 @@
 #include "6502.h"
 #include "paravirt.h"
 
+/*
 
+ 6502 opcode map:
+
+    x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF
+0x  BRK  ORA  ---  SLO  NOP  ORA  ASL  SLO  PHP  ORA  ASL  ANC  NOP  ORA  ASL  SLO
+         inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
+
+1x  BPL  ORA  ---  SLO  NOP  ORA  ASL  SLO  CLC  ORA  NOP  SLO  NOP  ORA  ASL  SLO
+    rel  iny       iny  zpx  zpx  zpx  zpy       aby       aby  abx  abx  abx  abx
+
+2x  JSR  AND  ---  RLA  BIT  AND  ROL  RLA  PLP  AND  ROL  ANC  BIT  AND  ROL  RLA
+    abs  inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
+
+3x  BMI  AND  ---  RLA  NOP  AND  ROL  RLA  SEC  AND  NOP  RLA  NOP  AND  ROL  RLA
+    rel  iny       iny  zpx  zpx  zpx  zpy       aby       aby  abx  abx  abx  abx
+
+4x  RTI  EOR  ---  SRE  NOP  EOR  LSR  SRE  PHA  EOR  LSR  ASR  JMP  EOR  LSR  SRE
+         inx       inx  zp   zp   zp   zp        imm  acc  imm  abs  abs  abs  abs
+
+5x  BVC  EOR  ---  SRE  NOP  EOR  LSR  SRE  CLI  EOR  NOP  SRE  NOP  EOR  LSR  SRE
+    rel  iny       iny  zpx  zpx  zpx  zpx       aby       aby  abx  abx  abx  abx
+
+6x  RTS  ADC  ---  RRA  NOP  ADC  ROR  RRA  PLA  ADC  ROR  ARR  JMP  ADC  ROR  RRA
+         inx       inx  zp   zp   zp   zp        imm  acc  imm  ind  abs  abs  abs
+
+7x  BVS  ADC  ---  RRA  NOP  ADC  ROR  RRA  SEI  ADC  NOP  RRA  NOP  ADC  ROR  RRA
+    rel  iny       iny  zpx  zpx  zpx  zpx       aby       aby  abx  abx  abx  abx
+
+8x  NOP  STA  NOP  SAX  STY  STA  STX  SAX  DEY  NOP  TXA  ANE  STY  STA  STX  SAX
+    imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
+
+9x  BCC  STA  ---  SHA  STY  STA  STX  SAX  TYA  STA  TXS  TAS  SHY  STA  SHX  SHA
+    rel  iny       iny  zpx  zpx  zpy  zpy       aby       aby  abx  abx  aby  aby
+
+Ax  LDY  LDA  LDX  LAX  LDY  LDA  LDX  LAX  TAY  LDA  TAX  LXA  LDY  LDA  LDX  LAX
+    imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
+
+Bx  BCS  LDA  ---  LAX  LDY  LDA  LDX  LAX  CLV  LDA  TSX  LAS  LDY  LDA  LDX  LAX
+    rel  iny       iny  zpx  zpx  zpy  zpy       aby       aby  abx  abx  aby  aby
+
+Cx  CPY  CMP  NOP  DCP  CPY  CMP  DEC  DCP  INY  CMP  DEX  SBX  CPY  CMP  DEC  DCP
+    imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
+
+Dx  BNE  CMP  ---  DCP  NOP  CMP  DEC  DCP  CLD  CMP  NOP  DCP  NOP  CMP  DEC  DCP
+    rel  iny       iny  zpx  zpx  zpx  zpx       aby  zpx  aby  abx  abx  abx  abx
+
+Ex  CPX  SBC  NOP  ISC  CPX  SBC  INC  ISC  INX  SBC  NOP  SBC  CPX  SBC  INC  ISC
+    imm  inx  imm  inx  zp   zp   zp   zp        imm       imm  abs  abs  abs  abs
+
+Fx  BEQ  SBC  ---  ISC  NOP  SBC  INC  ISC  SED  SBC  NOP  ISC  NOP  SBC  INC  ISC
+    rel  iny       iny  zpx  zpx  zpx  zpx       aby  zpx  aby  abx  abx  abx  abx
+
+--- = CPU JAM/HALT
+
+*/
+
+/*
+
+65xx ILLEGAL INSTRUCTIONS
+
+
+* SLO: shift left the contents of a memory location and then OR the result with
+       the accumulator.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X X
+SLO abs      |   0Fh  |  6     |
+SLO abs,X    |   1Fh  |  7     |
+SLO abs,Y    |   1Bh  |  7     |
+SLO zp       |   07h  |  5     |
+SLO zp,X     |   17h  |  6     |
+SLO (zp,X)   |   03h  |  8     |
+SLO (zp),Y   |   13h  |  8     |
+-------------+--------+--------+
+
+
+* RLA: rotate left the contents of a memory location and then AND the result with
+       the accumulator.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X X
+RLA abs      |   2Fh  |  6     |
+RLA abs,X    |   3Fh  |  7     |
+RLA abs,Y    |   3Bh  |  7     |
+RLA zp       |   27h  |  5     |
+RLA zp,X     |   37h  |  6     |
+RLA (zp,X)   |   23h  |  8     |
+RLA (zp),Y   |   33h  |  8     |
+-------------+--------+--------+
+
+
+* SRE: shift right the contents of a memory location and then X-OR the result
+       with the accumulator.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X X
+SRE abs      |   4Fh  |  6     |
+SRE abs,X    |   5Fh  |  7     |
+SRE abs,Y    |   5Bh  |  7     |
+SRE zp       |   47h  |  5     |
+SRE zp,X     |   57h  |  6     |
+SRE (zp,X)   |   43h  |  8     |
+SRE (zp),Y   |   53h  |  8     |
+-------------+--------+--------+
+
+
+* RRA: rotate right the contents of a memory location and then adds with carry
+       the result with the accumulator.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X X . . . X X
+RRA abs      |   6Fh  |  6     |
+RRA abs,X    |   7Fh  |  7     |
+RRA abs,Y    |   7Bh  |  7     |
+RRA zp       |   67h  |  5     |
+RRA zp,X     |   77h  |  6     |
+RRA (zp,X)   |   63h  |  8     |
+RRA (zp),Y   |   73h  |  8     |
+-------------+--------+--------+
+
+
+* SAX: calculate AND between the A and X registers (without changing the
+       contents of the registers) and stores the result in memory.
+       Flags into P register are not modified.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  . . . . . . .
+SAX abs      |   8Fh  |  4     |
+SAX zp       |   87h  |  3     |
+SAX zp,Y     |   97h  |  4     |
+SAX (zp,X)   |   83h  |  6     |
+-------------+--------+--------+
+
+
+* LAX: loads both the accumulator and the X register with the content of a memory
+       location.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X .
+LAX abs      |   AFh  |  4     |
+LAX abs,Y    |   BFh  |  4*    |    * = adds +1 if page cross is detected.
+LAX zp       |   A7h  |  3     |
+LAX zp,Y     |   B7h  |  4     |
+LAX (zp,X)   |   A3h  |  6     |
+LAX (zp),Y   |   B3h  |  5*    |
+-------------+--------+--------+
+
+
+* DCP: decrements the contents of a memory location and then compares the result
+       with the accumulator.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X X
+DCP abs      |   CFh  |  6     |
+DCP abs,X    |   DFh  |  7     |
+DCP abs,Y    |   DBh  |  7     |
+DCP zp       |   C7h  |  5     |
+DCP zp,X     |   D7h  |  6     |
+DCP (zp,X)   |   C3h  |  8     |
+DCP (zp),Y   |   D3h  |  8     |
+-------------+--------+--------+
+
+
+* ISC: increments the contents of a memory location and then subtract with carry
+       the result from the accumulator.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X X . . . X X
+ISC abs      |   EFh  |  6     |
+ISC abs,X    |   FFh  |  7     |
+ISC abs,Y    |   FBh  |  7     |
+ISC zp       |   E7h  |  5     |
+ISC zp,X     |   F7h  |  6     |
+ISC (zp,X)   |   E3h  |  8     |
+ISC (zp),Y   |   F3h  |  8     |
+-------------+--------+--------+
+
+
+* ASR: calculates the AND between the accumulator and an immediate value and then
+       shift right the result.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X X
+ASR #imm     |   4Bh  |  2     |
+-------------+--------+--------+
+
+
+* ARR: calculates the AND between the accumulator and an immediate value and then
+       rotate right the result.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X X
+ARR #imm     |   6Bh  |  2     |
+-------------+--------+--------+
+
+
+* ANE: calculates the OR of the accumulator with an unstable constant, then it does
+       an AND with the X register and an immediate value.
+       The unstable constant varies with temperature, the production batch and
+       maybe other factors. Experimental measures assume its value to 0xEF.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X .
+ANE #imm     |   8Bh  |  2     |
+-------------+--------+--------+
+
+
+* LXA: calculates the OR of the accumulator with an unstable constant, then it does
+       an AND with an immediate value. The result is copied into the X register and
+       the accumulator.
+       The unstable constant varies with temperature, the production batch and
+       maybe other factors. Experimental measures assume its value to 0xEE.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X .
+LXA #imm     |   ABh  |  2     |
+-------------+--------+--------+
+
+
+* SBX: calculates the AND of the accumulator with the X register and the subtracts
+       an immediate value.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X X
+SBX #imm     |   CBh  |  2     |
+-------------+--------+--------+
+
+
+* NOP: No-Operation.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  . . . . . . .
+NOP          |   1Ah  |  2     |
+NOP          |   3Ah  |  2     |    * = adds +1 if page cross is detected.
+NOP          |   5Ah  |  2     |
+NOP          |   7Ah  |  2     |
+NOP          |   DAh  |  2     |
+NOP          |   FAh  |  2     |
+NOP #imm     |   80h  |  2     |
+NOP #imm     |   82h  |  2     |
+NOP #imm     |   89h  |  2     |
+NOP #imm     |   C2h  |  2     |
+NOP #imm     |   E2h  |  2     |
+NOP zp       |   04h  |  3     |
+NOP zp,x     |   14h  |  4     |
+NOP zp,x     |   34h  |  4     |
+NOP zp       |   44h  |  3     |
+NOP zp,x     |   54h  |  4     |
+NOP zp       |   64h  |  3     |
+NOP zp,x     |   74h  |  4     |
+NOP zp,x     |   D4h  |  4     |
+NOP zp,x     |   F4h  |  4     |
+NOP abs      |   0Ch  |  4     |
+NOP abs,x    |   1Ch  |  4*    |
+NOP abs,x    |   3Ch  |  4*    |
+NOP abs,x    |   5Ch  |  4*    |
+NOP abs,x    |   7Ch  |  4*    |
+NOP abs,x    |   DCh  |  4*    |
+NOP abs,x    |   FCh  |  4*    |
+-------------+--------+--------+
+
+
+* TAS: calculates the AND of the accumulator with the X register and stores the result
+       into the stack pointer. Then, it calculates the AND of the result with the
+       high byte of the memory pointer plus 1 and it stores the final result in memory.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  . . . . . . .
+TAS abs,y    |   9Bh  |  5     |
+-------------+--------+--------+
+
+
+* SHY: calculates the AND of the Y register with the high byte of the memory pointer
+       plus 1 and it stores the final result in memory.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  . . . . . . .
+SHY abs,x    |   9Ch  |  5     |
+-------------+--------+--------+
+
+
+* SHX: calculates the AND of the X register with the high byte of the memory pointer
+       plus 1 and it stores the final result in memory.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  . . . . . . .
+SHX abs,y    |   9Eh  |  5     |
+-------------+--------+--------+
+
+
+* SHA: calculates the AND of the accumulator with the X register with the high byte
+       of the memory pointer plus 1 and it stores the final result in memory.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  . . . . . . .
+SHX abs,y    |   9Fh  |  5     |
+SHX (zp),y   |   93h  |  6     |
+-------------+--------+--------+
+
+
+* ANC: calculates the AND of the accumulator with an immediate value and then
+       updates the status of N and Z bits of the status register.
+       The N flag is also copied into the Carry flag.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X X
+ANC #imm     |   0Bh  |  2     |
+ANC #imm     |   2Bh  |  2     |
+-------------+--------+--------+
+
+
+* LAS: calculates the contents of a memory location with the contents of the
+stack pointer register and it stores the result in the accumulator, the X
+register, and the stack pointer.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X . . . . X .
+LAS abs,y    |   BBh  |  4*    |
+-------------+--------+--------+    * = adds +1 if page cross is detected.
+
+
+* SBC: alias of the official SBC opcode.
+
+Address mode | opcode | cycles |            N V B D I Z C
+-------------+--------+--------+    FLAGS:  X X . . . X X
+SBC #imm     |   EBh  |  2     |
+-------------+--------+--------+
+
+
+*/
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -113,117 +445,222 @@ static unsigned HaveIRQRequest;
 /* Test for page cross */
 #define PAGE_CROSS(addr,offs)   ((((addr) & 0xFF) + offs) >= 0x100)
 
-/* #imm */
-#define AC_OP_IMM(op)                                           \
-    Cycles = 2;                                                 \
-    Regs.AC = Regs.AC op MemReadByte (Regs.PC+1);               \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
-    Regs.PC += 2
+/* Address operators */
 
 /* zp */
-#define AC_OP_ZP(op)                                            \
-    Cycles = 3;                                                 \
-    Regs.AC = Regs.AC op MemReadByte (MemReadByte (Regs.PC+1)); \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+#define ADR_ZP(ad)                                              \
+    ad = MemReadByte (Regs.PC+1);                               \
     Regs.PC += 2
 
 /* zp,x */
-#define AC_OP_ZPX(op)                                           \
-    unsigned char ZPAddr;                                       \
-    Cycles = 4;                                                 \
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;                 \
-    Regs.AC = Regs.AC op MemReadByte (ZPAddr);                  \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+#define ADR_ZPX(ad)                                             \
+    ad = (MemReadByte (Regs.PC+1) + Regs.XR) & 0xFF;            \
     Regs.PC += 2
 
 /* zp,y */
-#define AC_OP_ZPY(op)                                           \
-    unsigned char ZPAddr;                                       \
-    Cycles = 4;                                                 \
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.YR;                 \
-    Regs.AC = Regs.AC op MemReadByte (ZPAddr);                  \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+#define ADR_ZPY(ad)                                             \
+    ad = (MemReadByte (Regs.PC+1) + Regs.YR) & 0xFF;            \
     Regs.PC += 2
 
 /* abs */
-#define AC_OP_ABS(op)                                           \
-    unsigned Addr;                                              \
-    Cycles = 4;                                                 \
-    Addr = MemReadWord (Regs.PC+1);                             \
-    Regs.AC = Regs.AC op MemReadByte (Addr);                    \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+#define ADR_ABS(ad)                                             \
+    ad = MemReadWord (Regs.PC+1);                               \
     Regs.PC += 3
 
 /* abs,x */
-#define AC_OP_ABSX(op)                                          \
-    unsigned Addr;                                              \
-    Cycles = 4;                                                 \
-    Addr = MemReadWord (Regs.PC+1);                             \
-    if (PAGE_CROSS (Addr, Regs.XR)) {                           \
+#define ADR_ABSX(ad)                                            \
+    ad = MemReadWord (Regs.PC+1);                               \
+    if (PAGE_CROSS (ad, Regs.XR)) {                             \
         ++Cycles;                                               \
     }                                                           \
-    Regs.AC = Regs.AC op MemReadByte (Addr + Regs.XR);          \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+    ad += Regs.XR;                                              \
     Regs.PC += 3
 
 /* abs,y */
-#define AC_OP_ABSY(op)                                          \
-    unsigned Addr;                                              \
-    Cycles = 4;                                                 \
-    Addr = MemReadWord (Regs.PC+1);                             \
-    if (PAGE_CROSS (Addr, Regs.YR)) {                           \
+#define ADR_ABSY(ad)                                            \
+    ad = MemReadWord (Regs.PC+1);                               \
+    if (PAGE_CROSS (ad, Regs.YR)) {                             \
         ++Cycles;                                               \
     }                                                           \
-    Regs.AC = Regs.AC op MemReadByte (Addr + Regs.YR);          \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+    ad += Regs.YR;                                              \
     Regs.PC += 3
 
 /* (zp,x) */
-#define AC_OP_ZPXIND(op)                                        \
-    unsigned char ZPAddr;                                       \
-    unsigned Addr;                                              \
-    Cycles = 6;                                                 \
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;                 \
-    Addr = MemReadZPWord (ZPAddr);                              \
-    Regs.AC = Regs.AC op MemReadByte (Addr);                    \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+#define ADR_ZPXIND(ad)                                          \
+    ad = (MemReadByte (Regs.PC+1) + Regs.XR) & 0xFF;            \
+    ad = MemReadZPWord (ad);                                    \
     Regs.PC += 2
 
 /* (zp),y */
-#define AC_OP_ZPINDY(op)                                        \
-    unsigned char ZPAddr;                                       \
-    unsigned Addr;                                              \
-    Cycles = 5;                                                 \
-    ZPAddr = MemReadByte (Regs.PC+1);                           \
-    Addr = MemReadZPWord (ZPAddr);                              \
-    if (PAGE_CROSS (Addr, Regs.YR)) {                           \
+#define ADR_ZPINDY(ad)                                          \
+    ad = MemReadZPWord (MemReadByte (Regs.PC+1));               \
+    if (PAGE_CROSS (ad, Regs.YR)) {                             \
         ++Cycles;                                               \
     }                                                           \
-    Addr += Regs.YR;                                            \
-    Regs.AC = Regs.AC op MemReadByte (Addr);                    \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+    ad += Regs.YR;                                              \
     Regs.PC += 2
 
 /* (zp) */
-#define AC_OP_ZPIND(op)                                         \
-    unsigned char ZPAddr;                                       \
-    unsigned Addr;                                              \
-    Cycles = 5;                                                 \
-    ZPAddr = MemReadByte (Regs.PC+1);                           \
-    Addr = MemReadZPWord (ZPAddr);                              \
-    Regs.AC = Regs.AC op MemReadByte (Addr);                    \
-    TEST_ZF (Regs.AC);                                          \
-    TEST_SF (Regs.AC);                                          \
+#define ADR_ZPIND(ad)                                           \
+    ad = MemReadZPWord (MemReadByte (Regs.PC+1));               \
     Regs.PC += 2
+
+/* Address operators (no penalty on page cross) */
+
+/* abs,x - no penalty */
+#define ADR_ABSX_NP(ad)                                         \
+    ad = MemReadWord (Regs.PC+1);                               \
+    ad += Regs.XR;                                              \
+    Regs.PC += 3
+
+/* abs,y - no penalty */
+#define ADR_ABSY_NP(ad)                                         \
+    ad = MemReadWord (Regs.PC+1);                               \
+    ad += Regs.YR;                                              \
+    Regs.PC += 3
+
+/* (zp),y - no penalty */
+#define ADR_ZPINDY_NP(ad)                                       \
+    ad = MemReadZPWord (MemReadByte (Regs.PC+1));               \
+    ad += Regs.YR;                                              \
+    Regs.PC += 2
+
+
+
+/* Memory operators */
+
+/* #imm */
+#define MEM_AD_OP_IMM(op)                                       \
+    op = MemReadByte (Regs.PC+1);                               \
+    Regs.PC += 2
+
+/* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y / (zp) */
+#define MEM_AD_OP(mode, ad, op)                                 \
+    ADR_##mode(ad);                                             \
+    op = MemReadByte (ad)
+
+/* ALU opcode helpers */
+
+/* Execution cycles for ALU opcodes */
+#define ALU_CY_ZP       3
+#define ALU_CY_ZPX      4
+#define ALU_CY_ZPY      4
+#define ALU_CY_ABS      4
+#define ALU_CY_ABSX     4
+#define ALU_CY_ABSY     4
+#define ALU_CY_ZPXIND   6
+#define ALU_CY_ZPINDY   5
+#define ALU_CY_ZPIND    5
+
+/* #imm */
+#define ALU_OP_IMM(op)                                          \
+    unsigned char immediate;                                    \
+    MEM_AD_OP_IMM(immediate);                                   \
+    Cycles = 2;                                                 \
+    op (immediate)
+
+/* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y / (zp) */
+#define ALU_OP(mode, op)                                        \
+    unsigned address, operand;                                  \
+    Cycles = ALU_CY_##mode;                                     \
+    MEM_AD_OP (mode, address, operand);                         \
+    op (operand)
+
+/* Store opcode helpers */
+
+/* Execution cycles for store opcodes */
+#define STO_CY_ZP       3
+#define STO_CY_ZPX      4
+#define STO_CY_ZPY      4
+#define STO_CY_ABS      4
+#define STO_CY_ABSX     5
+#define STO_CY_ABSY     5
+#define STO_CY_ZPXIND   6
+#define STO_CY_ZPINDY   6
+#define STO_CY_ZPIND    5
+
+/* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y / (zp) */
+#define STO_OP(mode, op)                                        \
+    unsigned address;                                           \
+    Cycles = STO_CY_##mode;                                     \
+    ADR_##mode (address);                                       \
+    MemWriteByte(address, op)
+
+/* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y / (zp) */
+#define STO_CB(mode, cb)                                        \
+    unsigned address, operand;                                  \
+    Cycles = STO_CY_##mode;                                     \
+    ADR_##mode (address);                                       \
+    cb (operand);                                               \
+    MemWriteByte(address, operand)
+
+/* Read-Modify-Write opcode helpers */
+
+/* Execution cycles for R-M-W opcodes */
+#define RMW_CY_ZP       5
+#define RMW_CY_ZPX      6
+#define RMW_CY_ZPY      6
+#define RMW_CY_ABS      6
+#define RMW_CY_ABSX     7
+#define RMW_CY_ABSY     7
+#define RMW_CY_ZPXIND   6
+#define RMW_CY_ZPINDY   5
+#define RMW_CY_ZPIND    5
+
+#define RMW_CY_ABSX_NP      RMW_CY_ABSX
+#define RMW_CY_ABSY_NP      RMW_CY_ABSY
+#define RMW_CY_ZPINDY_NP    RMW_CY_ZPINDY
+
+/* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y / (zp) */
+#define MEM_OP(mode, op)                                        \
+    unsigned address, operand;                                  \
+    Cycles = RMW_CY_##mode;                                     \
+    MEM_AD_OP (mode, address, operand);                         \
+    op (operand);                                               \
+    MemWriteByte (address, (unsigned char)operand)
+
+/* 2 x Read-Modify-Write opcode helpers (illegal opcodes) */
+
+/* Execution cycles for 2 x R-M-W opcodes */
+#define RMW2_CY_ZP       5
+#define RMW2_CY_ZPX      6
+#define RMW2_CY_ZPY      6
+#define RMW2_CY_ABS      6
+#define RMW2_CY_ABSX     7
+#define RMW2_CY_ABSY     7
+#define RMW2_CY_ZPXIND   8
+#define RMW2_CY_ZPINDY   8
+
+/* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y */
+#define ILLx2_OP(mode, op)                                      \
+    unsigned address;                                           \
+    unsigned operand;                                           \
+    Cycles = RMW2_CY_##mode;                                    \
+    MEM_AD_OP (mode, address, operand);                         \
+    op (operand);                                               \
+    MemWriteByte (address, (unsigned char)operand)
+
+/* AC opcode helpers */
+
+/* #imm */
+#define AC_OP_IMM(op)                                           \
+    unsigned char immediate;                                    \
+    MEM_AD_OP_IMM(immediate);                                   \
+    Cycles = 2;                                                 \
+    Regs.AC = Regs.AC op immediate;                             \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC)
+
+/* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y / (zp) */
+#define AC_OP(mode, op)                                         \
+    unsigned address;                                           \
+    unsigned operand;                                           \
+    Cycles = ALU_CY_##mode;                                     \
+    MEM_AD_OP(mode, address, operand);                          \
+    Regs.AC = Regs.AC op operand;                               \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC)
+
 
 /* ADC */
 #define ADC(v)                                                  \
@@ -248,7 +685,7 @@ static unsigned HaveIRQRequest;
             }                                                   \
             TEST_CF (Regs.AC);                                  \
             SET_OF ((res < -128) || (res > 127));               \
-            if (CPU != CPU_6502) {                              \
+            if (CPU == CPU_65C02) {                             \
                 ++Cycles;                                       \
             }                                                   \
         } else {                                                \
@@ -271,7 +708,7 @@ static unsigned HaveIRQRequest;
         ++Cycles;                                               \
         Offs = (signed char) MemReadByte (Regs.PC+1);           \
         OldPCH = PCH;                                           \
-        Regs.PC += 2 + (int) Offs;                              \
+        Regs.PC = (Regs.PC + 2 + (int) Offs) & 0xFFFF;          \
         if (PCH != OldPCH) {                                    \
             ++Cycles;                                           \
         }                                                       \
@@ -280,14 +717,22 @@ static unsigned HaveIRQRequest;
     }
 
 /* compares */
-#define CMP(v1, v2)                                             \
+#define COMPARE(v1, v2)                                         \
     do {                                                        \
         unsigned Result = v1 - v2;                              \
-        TEST_ZF (Result & 0xFF);                                \
+        TEST_ZF (Result);                                       \
         TEST_SF (Result);                                       \
         SET_CF (Result <= 0xFF);                                \
     } while (0)
 
+#define CPX(operand)                                            \
+    COMPARE (Regs.XR, operand)
+
+#define CPY(operand)                                            \
+    COMPARE (Regs.YR, operand)
+
+#define CMP(operand)                                            \
+    COMPARE (Regs.AC, operand)
 
 /* ROL */
 #define ROL(Val)                                                \
@@ -309,38 +754,243 @@ static unsigned HaveIRQRequest;
     TEST_ZF (Val);                                              \
     TEST_SF (Val)
 
-/* SBC */
-#define SBC(v)                                                  \
+/* ASL */
+#define ASL(Val)                                                \
+    SET_CF (Val & 0x80);                                        \
+    Val = (Val << 1) & 0xFF;                                    \
+    TEST_ZF (Val);                                              \
+    TEST_SF (Val)
+
+/* LSR */
+#define LSR(Val)                                                \
+    SET_CF (Val & 0x01);                                        \
+    Val >>= 1;                                                  \
+    TEST_ZF (Val);                                              \
+    TEST_SF (Val)
+
+/* INC */
+#define INC(Val)                                                \
+    Val = (Val + 1) & 0xFF;                                     \
+    TEST_ZF (Val);                                              \
+    TEST_SF (Val)
+
+/* DEC */
+#define DEC(Val)                                                \
+    Val = (Val - 1) & 0xFF;                                     \
+    TEST_ZF (Val);                                              \
+    TEST_SF (Val)
+
+/* SLO */
+#define SLO(Val)                                                \
+    Val <<= 1;                                                  \
+    SET_CF (Val & 0x100);                                       \
+    Regs.AC |= Val;                                             \
+    Regs.AC &= 0xFF;                                            \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC)
+
+/* RLA */
+#define RLA(Val)                                                \
+    Val <<= 1;                                                  \
+    if (GET_CF ()) {                                            \
+        Val |= 0x01;                                            \
+    }                                                           \
+    SET_CF (Val & 0x100);                                       \
+    Regs.AC &= Val;                                             \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC)
+
+/* SRE */
+#define SRE(Val)                                                \
+    SET_CF (Val & 0x01);                                        \
+    Val >>= 1;                                                  \
+    Regs.AC ^= Val;                                             \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC)
+
+/* RRA */
+#define RRA(Val)                                                \
+    if (GET_CF ()) {                                            \
+        Val |= 0x100;                                           \
+    }                                                           \
+    SET_CF (Val & 0x01);                                        \
+    Val >>= 1;                                                  \
+    ADC (Val)
+
+/* BIT */
+#define BIT(Val)                                                \
+    SET_SF (Val & 0x80);                                        \
+    SET_OF (Val & 0x40);                                        \
+    SET_ZF ((Val & Regs.AC) == 0)
+
+/* LDA */
+#define LDA(Val)                                                \
+    Regs.AC = Val;                                              \
+    TEST_SF (Val);                                              \
+    TEST_ZF (Val)
+
+/* LDX */
+#define LDX(Val)                                                \
+    Regs.XR = Val;                                              \
+    TEST_SF (Val);                                              \
+    TEST_ZF (Val)
+
+/* LDY */
+#define LDY(Val)                                                \
+    Regs.YR = Val;                                              \
+    TEST_SF (Val);                                              \
+    TEST_ZF (Val)
+
+/* LAX */
+#define LAX(Val)                                                \
+    Regs.AC = Val;                                              \
+    Regs.XR = Val;                                              \
+    TEST_SF (Val);                                              \
+    TEST_ZF (Val)
+
+/* TSB */
+#define TSB(Val)                                                \
+    SET_ZF ((Val & Regs.AC) == 0);                              \
+    Val |= Regs.AC
+
+/* TRB */
+#define TRB(Val)                                                \
+    SET_ZF ((Val & Regs.AC) == 0);                              \
+    Val &= ~Regs.AC
+
+/* DCP */
+#define DCP(Val)                                                \
+    Val = (Val - 1) & 0xFF;                                     \
+    COMPARE (Regs.AC, Val)
+
+/* ISC */
+#define ISC(Val)                                                \
+    Val = (Val + 1) & 0xFF;                                     \
+    SBC(Val)
+
+/* ASR */
+#define ASR(Val)                                                \
+    Regs.AC &= Val;                                             \
+    LSR(Regs.AC)
+
+/* ARR */
+#define ARR(Val)                                                \
     do {                                                        \
-        unsigned old = Regs.AC;                                 \
-        unsigned rhs = (v & 0xFF);                              \
+        unsigned tmp = Regs.AC & Val;                           \
+        Val = tmp >> 1;                                         \
+        if (GET_CF ()) {                                        \
+            Val |= 0x80;                                        \
+        }                                                       \
         if (GET_DF ()) {                                        \
-            unsigned lo;                                        \
-            int res;                                            \
-            lo = (old & 0x0F) - (rhs & 0x0F) + GET_CF () - 1;   \
-            if (lo & 0x80) {                                    \
-                lo = ((lo - 0x06) & 0x0F) - 0x10;               \
+            SET_SF (GET_CF ());                                 \
+            TEST_ZF (Val);                                      \
+            SET_OF ((Val ^ tmp) & 0x40);                        \
+            if (((tmp & 0x0f) + (tmp & 0x01)) > 0x05) {         \
+                Val = (Val & 0xf0) | ((Val + 0x06) & 0x0f);     \
             }                                                   \
-            Regs.AC = (old & 0xF0) - (rhs & 0xF0) + lo;         \
-            if (Regs.AC & 0x80) {                               \
-                Regs.AC -= 0x60;                                \
+            if (((tmp & 0xf0) + (tmp & 0x10)) > 0x50) {         \
+                Val = (Val & 0x0f) | ((Val + 0x60) & 0xf0);     \
+                SET_CF(1);                                      \
+            } else {                                            \
+                SET_CF(0);                                      \
             }                                                   \
-            res = Regs.AC - rhs + (!GET_CF ());                 \
-            TEST_ZF (res);                                      \
-            TEST_SF (res);                                      \
-            SET_CF (res <= 0xFF);                               \
-            SET_OF (((old^rhs) & (old^res) & 0x80));            \
-            if (CPU != CPU_6502) {                              \
+            if (CPU == CPU_65C02) {                             \
                 ++Cycles;                                       \
             }                                                   \
         } else {                                                \
-            Regs.AC -= rhs + (!GET_CF ());                      \
-            TEST_ZF (Regs.AC);                                  \
-            TEST_SF (Regs.AC);                                  \
-            SET_CF (Regs.AC <= 0xFF);                           \
-            SET_OF (((old^rhs) & (old^Regs.AC) & 0x80));        \
-            Regs.AC &= 0xFF;                                    \
+            TEST_SF (Val);                                      \
+            TEST_ZF (Val);                                      \
+            SET_CF (Val & 0x40);                                \
+            SET_OF ((Val & 0x40) ^ ((Val & 0x20) << 1));        \
         }                                                       \
+        Regs.AC = Val;                                          \
+    } while (0);
+
+/* ANE */
+#define ANE(Val)                                                \
+    Val = (Regs.AC | 0xEF) & Regs.XR & Val;                     \
+    Regs.AC = Val;                                              \
+    TEST_SF (Val);                                              \
+    TEST_ZF (Val)
+
+/* LXA */
+#define LXA(Val)                                                \
+    Val = (Regs.AC | 0xEE) & Val;                               \
+    Regs.AC = Val;                                              \
+    Regs.XR = Val;                                              \
+    TEST_SF (Val);                                              \
+    TEST_ZF (Val)
+
+/* SBX */
+#define SBX(Val)                                                \
+    do {                                                        \
+        unsigned tmp = (Regs.AC & Regs.XR) - (Val);             \
+        SET_CF (tmp < 0x100);                                   \
+        tmp &= 0xFF;                                            \
+        Regs.XR = tmp;                                          \
+        TEST_SF (tmp);                                          \
+        TEST_ZF (tmp);                                          \
+    } while (0);
+
+/* NOP */
+#define NOP(Val)                                                \
+    (void)Val
+
+/* TAS */
+#define TAS(Val)                                                \
+    Val = Regs.AC & Regs.XR;                                    \
+    Regs.SP = Val;                                              \
+    Val &= (address >> 8) + 1
+
+/* SHA */
+#define SHA(Val)                                                \
+    Val = Regs.AC & Regs.XR & ((address >> 8) + 1)
+
+/* ANC */
+#define ANC(Val)                                                \
+    Val = Regs.AC & Val;                                        \
+    Regs.AC = Val;                                              \
+    SET_CF (Val & 0x80);                                        \
+    TEST_SF (Val);                                              \
+    TEST_ZF (Val)
+
+
+/* LAS */
+#define LAS(Val)                                                \
+    Val = Regs.SP & Val;                                        \
+    Regs.AC = Val;                                              \
+    Regs.XR = Val;                                              \
+    Regs.SP = Val;                                              \
+    TEST_SF (Val);                                              \
+    TEST_ZF (Val)
+
+
+/* SBC */
+#define SBC(v)                                                  \
+    do {                                                        \
+        unsigned r_a = Regs.AC;                                 \
+        unsigned src = (v) & 0xFF;                              \
+        unsigned ccc = (Regs.SR & CF) ^ CF;                     \
+        unsigned tmp = r_a - src - ccc;                         \
+                                                                \
+        SET_CF(tmp < 0x100);                                    \
+        TEST_SF(tmp);                                           \
+        TEST_ZF(tmp);                                           \
+        SET_OF((r_a ^ tmp) & (r_a ^ src) & 0x80);               \
+                                                                \
+        if (GET_DF ()) {                                        \
+            unsigned low = (r_a & 0x0f) - (src & 0x0f) - ccc;   \
+            tmp = (r_a & 0xf0) - (src & 0xf0);                  \
+            if (low & 0x10) {                                   \
+                low -= 6;                                       \
+                tmp -= 0x10;                                    \
+            }                                                   \
+            tmp = (low & 0xf) | tmp;                            \
+            if (tmp & 0x100) {                                  \
+                tmp -= 0x60;                                    \
+            }                                                   \
+        }                                                       \
+        Regs.AC = tmp & 0xFF;                                   \
     } while (0)
 
 
@@ -368,7 +1018,7 @@ static void OPC_6502_00 (void)
     PUSH (PCL);
     PUSH (Regs.SR);
     SET_IF (1);
-    if (CPU != CPU_6502)
+    if (CPU == CPU_65C02)
     {
         SET_DF (0);
     }
@@ -380,7 +1030,27 @@ static void OPC_6502_00 (void)
 static void OPC_6502_01 (void)
 /* Opcode $01: ORA (ind,x) */
 {
-    AC_OP_ZPXIND (|);
+    AC_OP (ZPXIND, |);
+}
+
+
+
+static void OPC_6502_03 (void)
+/* Opcode $03: SLO (zp,x) */
+{
+    ILLx2_OP (ZPXIND, SLO);
+}
+
+
+
+/* Aliases of opcode $04 */
+#define OPC_6502_44 OPC_6502_04
+#define OPC_6502_64 OPC_6502_04
+
+static void OPC_6502_04 (void)
+/* Opcode $04: NOP zp */
+{
+    ALU_OP (ZP, NOP);
 }
 
 
@@ -388,14 +1058,7 @@ static void OPC_6502_01 (void)
 static void OPC_65SC02_04 (void)
 /* Opcode $04: TSB zp */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr);
-    SET_ZF ((Val & Regs.AC) == 0);
-    MemWriteByte (ZPAddr, (unsigned char)(Val | Regs.AC));
-    Regs.PC += 2;
+    MEM_OP (ZP, TSB);
 }
 
 
@@ -403,7 +1066,7 @@ static void OPC_65SC02_04 (void)
 static void OPC_6502_05 (void)
 /* Opcode $05: ORA zp */
 {
-    AC_OP_ZP (|);
+    AC_OP (ZP, |);
 }
 
 
@@ -411,16 +1074,15 @@ static void OPC_6502_05 (void)
 static void OPC_6502_06 (void)
 /* Opcode $06: ASL zp */
 {
-    unsigned char ZPAddr;
-    unsigned Val;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr) << 1;
-    MemWriteByte (ZPAddr, (unsigned char) Val);
-    TEST_ZF (Val & 0xFF);
-    TEST_SF (Val);
-    SET_CF (Val & 0x100);
-    Regs.PC += 2;
+    MEM_OP (ZP, ASL);
+}
+
+
+
+static void OPC_6502_07 (void)
+/* Opcode $07: SLO zp */
+{
+    ILLx2_OP (ZP, SLO);
 }
 
 
@@ -447,12 +1109,27 @@ static void OPC_6502_0A (void)
 /* Opcode $0A: ASL a */
 {
     Cycles = 2;
-    Regs.AC <<= 1;
-    TEST_ZF (Regs.AC & 0xFF);
-    TEST_SF (Regs.AC);
-    SET_CF (Regs.AC & 0x100);
-    Regs.AC &= 0xFF;
+    ASL(Regs.AC);
     Regs.PC += 1;
+}
+
+
+
+/* Aliases of opcode $0B */
+#define OPC_6502_2B OPC_6502_0B
+
+static void OPC_6502_0B (void)
+/* Opcode $0B: ANC #imm */
+{
+    ALU_OP_IMM (ANC);
+}
+
+
+
+static void OPC_6502_0C (void)
+/* Opcode $0C: NOP abs */
+{
+    ALU_OP (ABS, NOP);
 }
 
 
@@ -460,14 +1137,7 @@ static void OPC_6502_0A (void)
 static void OPC_65SC02_0C (void)
 /* Opcode $0C: TSB abs */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Val = MemReadByte (Addr);
-    SET_ZF ((Val & Regs.AC) == 0);
-    MemWriteByte (Addr, (unsigned char) (Val | Regs.AC));
-    Regs.PC += 3;
+    MEM_OP (ABS, TSB);
 }
 
 
@@ -475,24 +1145,23 @@ static void OPC_65SC02_0C (void)
 static void OPC_6502_0D (void)
 /* Opcode $0D: ORA abs */
 {
-    AC_OP_ABS (|);
+    AC_OP (ABS, |);
 }
 
 
 
 static void OPC_6502_0E (void)
-/* Opcode $0E: ALS abs */
+/* Opcode $0E: ASL abs */
 {
-    unsigned Addr;
-    unsigned Val;
-    Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Val = MemReadByte (Addr) << 1;
-    MemWriteByte (Addr, (unsigned char) Val);
-    TEST_ZF (Val & 0xFF);
-    TEST_SF (Val);
-    SET_CF (Val & 0x100);
-    Regs.PC += 3;
+    MEM_OP (ABS, ASL);
+}
+
+
+
+static void OPC_6502_0F (void)
+/* Opcode $0F: SLO abs */
+{
+    ILLx2_OP (ABS, SLO);
 }
 
 
@@ -508,7 +1177,7 @@ static void OPC_6502_10 (void)
 static void OPC_6502_11 (void)
 /* Opcode $11: ORA (zp),y */
 {
-    AC_OP_ZPINDY (|);
+    AC_OP (ZPINDY, |);
 }
 
 
@@ -516,7 +1185,30 @@ static void OPC_6502_11 (void)
 static void OPC_65SC02_12 (void)
 /* Opcode $12: ORA (zp) */
 {
-    AC_OP_ZPIND (|);
+    AC_OP (ZPIND, |);
+}
+
+
+
+static void OPC_6502_13 (void)
+/* Opcode $03: SLO (zp),y */
+{
+    ILLx2_OP (ZPINDY, SLO);
+}
+
+
+
+/* Aliases of opcode $14 */
+#define OPC_6502_34 OPC_6502_14
+#define OPC_6502_54 OPC_6502_14
+#define OPC_6502_74 OPC_6502_14
+#define OPC_6502_D4 OPC_6502_14
+#define OPC_6502_F4 OPC_6502_14
+
+static void OPC_6502_14 (void)
+/* Opcode $04: NOP zp,x */
+{
+    ALU_OP (ZPX, NOP);
 }
 
 
@@ -524,14 +1216,7 @@ static void OPC_65SC02_12 (void)
 static void OPC_65SC02_14 (void)
 /* Opcode $14: TRB zp */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr);
-    SET_ZF ((Val & Regs.AC) == 0);
-    MemWriteByte (ZPAddr, (unsigned char)(Val & ~Regs.AC));
-    Regs.PC += 2;
+    MEM_OP (ZP, TRB);
 }
 
 
@@ -539,7 +1224,7 @@ static void OPC_65SC02_14 (void)
 static void OPC_6502_15 (void)
 /* Opcode $15: ORA zp,x */
 {
-   AC_OP_ZPX (|);
+   AC_OP (ZPX, |);
 }
 
 
@@ -547,16 +1232,15 @@ static void OPC_6502_15 (void)
 static void OPC_6502_16 (void)
 /* Opcode $16: ASL zp,x */
 {
-    unsigned char ZPAddr;
-    unsigned Val;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (ZPAddr) << 1;
-    MemWriteByte (ZPAddr, (unsigned char) Val);
-    TEST_ZF (Val & 0xFF);
-    TEST_SF (Val);
-    SET_CF (Val & 0x100);
-    Regs.PC += 2;
+    MEM_OP (ZPX, ASL);
+}
+
+
+
+static void OPC_6502_17 (void)
+/* Opcode $17: SLO zp,x */
+{
+    ILLx2_OP (ZPX, SLO);
 }
 
 
@@ -574,7 +1258,7 @@ static void OPC_6502_18 (void)
 static void OPC_6502_19 (void)
 /* Opcode $19: ORA abs,y */
 {
-    AC_OP_ABSY (|);
+    AC_OP (ABSY, |);
 }
 
 
@@ -583,10 +1267,31 @@ static void OPC_65SC02_1A (void)
 /* Opcode $1A: INC a */
 {
     Cycles = 2;
-    Regs.AC = (Regs.AC + 1) & 0xFF;
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
+    INC(Regs.AC);
     Regs.PC += 1;
+}
+
+
+
+static void OPC_6502_1B (void)
+/* Opcode $1B: SLO abs,y */
+{
+    ILLx2_OP (ABSY, SLO);
+}
+
+
+
+/* Aliases of opcode $1C */
+#define OPC_6502_3C OPC_6502_1C
+#define OPC_6502_5C OPC_6502_1C
+#define OPC_6502_7C OPC_6502_1C
+#define OPC_6502_DC OPC_6502_1C
+#define OPC_6502_FC OPC_6502_1C
+
+static void OPC_6502_1C (void)
+/* Opcode $1C: NOP abs,x */
+{
+    ALU_OP (ABSX, NOP);
 }
 
 
@@ -594,14 +1299,7 @@ static void OPC_65SC02_1A (void)
 static void OPC_65SC02_1C (void)
 /* Opcode $1C: TRB abs */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Val = MemReadByte (Addr);
-    SET_ZF ((Val & Regs.AC) == 0);
-    MemWriteByte (Addr, (unsigned char) (Val & ~Regs.AC));
-    Regs.PC += 3;
+    MEM_OP (ABS, TRB);
 }
 
 
@@ -609,7 +1307,7 @@ static void OPC_65SC02_1C (void)
 static void OPC_6502_1D (void)
 /* Opcode $1D: ORA abs,x */
 {
-    AC_OP_ABSX (|);
+    AC_OP (ABSX, |);
 }
 
 
@@ -617,18 +1315,23 @@ static void OPC_6502_1D (void)
 static void OPC_6502_1E (void)
 /* Opcode $1E: ASL abs,x */
 {
-    unsigned Addr;
-    unsigned Val;
-    Cycles = 7;
-    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
-        --Cycles;
-    Val = MemReadByte (Addr) << 1;
-    MemWriteByte (Addr, (unsigned char) Val);
-    TEST_ZF (Val & 0xFF);
-    TEST_SF (Val);
-    SET_CF (Val & 0x100);
-    Regs.PC += 3;
+    MEM_OP (ABSX, ASL);
+}
+
+
+
+static void OPC_65C02_1E (void)
+/* Opcode $1E: ASL abs,x */
+{
+    MEM_OP (ABSX_NP, ASL);
+}
+
+
+
+static void OPC_6502_1F (void)
+/* Opcode $1F: SLO abs,x */
+{
+    ILLx2_OP (ABSX, SLO);
 }
 
 
@@ -652,23 +1355,23 @@ static void OPC_6502_20 (void)
 static void OPC_6502_21 (void)
 /* Opcode $21: AND (zp,x) */
 {
-    AC_OP_ZPXIND (&);
+    AC_OP (ZPXIND, &);
+}
+
+
+
+static void OPC_6502_23 (void)
+/* Opcode $23: RLA (zp,x) */
+{
+    ILLx2_OP (ZPXIND, RLA);
 }
 
 
 
 static void OPC_6502_24 (void)
-/* Opcode $24: BIT zp */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr);
-    SET_SF (Val & 0x80);
-    SET_OF (Val & 0x40);
-    SET_ZF ((Val & Regs.AC) == 0);
-    Regs.PC += 2;
+/* Opcode $24: BIT zp */
+    ALU_OP (ZP, BIT);
 }
 
 
@@ -676,7 +1379,7 @@ static void OPC_6502_24 (void)
 static void OPC_6502_25 (void)
 /* Opcode $25: AND zp */
 {
-    AC_OP_ZP (&);
+    AC_OP (ZP, &);
 }
 
 
@@ -684,14 +1387,15 @@ static void OPC_6502_25 (void)
 static void OPC_6502_26 (void)
 /* Opcode $26: ROL zp */
 {
-    unsigned char ZPAddr;
-    unsigned Val;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr);
-    ROL (Val);
-    MemWriteByte (ZPAddr, Val);
-    Regs.PC += 2;
+    MEM_OP (ZP, ROL);
+}
+
+
+
+static void OPC_6502_27 (void)
+/* Opcode $27: RLA zp */
+{
+    ILLx2_OP (ZP, RLA);
 }
 
 
@@ -730,15 +1434,7 @@ static void OPC_6502_2A (void)
 static void OPC_6502_2C (void)
 /* Opcode $2C: BIT abs */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    Val = MemReadByte (Addr);
-    SET_SF (Val & 0x80);
-    SET_OF (Val & 0x40);
-    SET_ZF ((Val & Regs.AC) == 0);
-    Regs.PC += 3;
+    ALU_OP (ABS, BIT);
 }
 
 
@@ -746,7 +1442,7 @@ static void OPC_6502_2C (void)
 static void OPC_6502_2D (void)
 /* Opcode $2D: AND abs */
 {
-    AC_OP_ABS (&);
+    AC_OP (ABS, &);
 }
 
 
@@ -754,14 +1450,15 @@ static void OPC_6502_2D (void)
 static void OPC_6502_2E (void)
 /* Opcode $2E: ROL abs */
 {
-    unsigned Addr;
-    unsigned Val;
-    Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Val = MemReadByte (Addr);
-    ROL (Val);
-    MemWriteByte (Addr, Val);
-    Regs.PC += 3;
+    MEM_OP (ABS, ROL);
+}
+
+
+
+static void OPC_6502_2F (void)
+/* Opcode $2F: RLA abs */
+{
+    ILLx2_OP (ABS, RLA);
 }
 
 
@@ -777,7 +1474,7 @@ static void OPC_6502_30 (void)
 static void OPC_6502_31 (void)
 /* Opcode $31: AND (zp),y */
 {
-    AC_OP_ZPINDY (&);
+    AC_OP (ZPINDY, &);
 }
 
 
@@ -785,7 +1482,15 @@ static void OPC_6502_31 (void)
 static void OPC_65SC02_32 (void)
 /* Opcode $32: AND (zp) */
 {
-    AC_OP_ZPIND (&);
+    AC_OP (ZPIND, &);
+}
+
+
+
+static void OPC_6502_33 (void)
+/* Opcode $33: RLA (zp),y */
+{
+    ILLx2_OP (ZPINDY, RLA);
 }
 
 
@@ -793,15 +1498,7 @@ static void OPC_65SC02_32 (void)
 static void OPC_65SC02_34 (void)
 /* Opcode $34: BIT zp,x */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (ZPAddr);
-    SET_SF (Val & 0x80);
-    SET_OF (Val & 0x40);
-    SET_ZF ((Val & Regs.AC) == 0);
-    Regs.PC += 2;
+    ALU_OP (ZPX, BIT);
 }
 
 
@@ -809,7 +1506,7 @@ static void OPC_65SC02_34 (void)
 static void OPC_6502_35 (void)
 /* Opcode $35: AND zp,x */
 {
-    AC_OP_ZPX (&);
+    AC_OP (ZPX, &);
 }
 
 
@@ -817,14 +1514,15 @@ static void OPC_6502_35 (void)
 static void OPC_6502_36 (void)
 /* Opcode $36: ROL zp,x */
 {
-    unsigned char ZPAddr;
-    unsigned Val;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (ZPAddr);
-    ROL (Val);
-    MemWriteByte (ZPAddr, Val);
-    Regs.PC += 2;
+    MEM_OP (ZPX, ROL);
+}
+
+
+
+static void OPC_6502_37 (void)
+/* Opcode $37: RLA zp,x */
+{
+    ILLx2_OP (ZPX, RLA);
 }
 
 
@@ -842,7 +1540,7 @@ static void OPC_6502_38 (void)
 static void OPC_6502_39 (void)
 /* Opcode $39: AND abs,y */
 {
-    AC_OP_ABSY (&);
+    AC_OP (ABSY, &);
 }
 
 
@@ -851,10 +1549,16 @@ static void OPC_65SC02_3A (void)
 /* Opcode $3A: DEC a */
 {
     Cycles = 2;
-    Regs.AC = (Regs.AC - 1) & 0xFF;
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
+    DEC (Regs.AC);
     Regs.PC += 1;
+}
+
+
+
+static void OPC_6502_3B (void)
+/* Opcode $3B: RLA abs,y */
+{
+    ILLx2_OP (ABSY, RLA);
 }
 
 
@@ -862,17 +1566,7 @@ static void OPC_65SC02_3A (void)
 static void OPC_65SC02_3C (void)
 /* Opcode $3C: BIT abs,x */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.XR))
-        ++Cycles;
-    Val  = MemReadByte (Addr + Regs.XR);
-    SET_SF (Val & 0x80);
-    SET_OF (Val & 0x40);
-    SET_ZF ((Val & Regs.AC) == 0);
-    Regs.PC += 3;
+    ALU_OP (ABSX, BIT);
 }
 
 
@@ -880,7 +1574,7 @@ static void OPC_65SC02_3C (void)
 static void OPC_6502_3D (void)
 /* Opcode $3D: AND abs,x */
 {
-    AC_OP_ABSX (&);
+    AC_OP (ABSX, &);
 }
 
 
@@ -888,16 +1582,23 @@ static void OPC_6502_3D (void)
 static void OPC_6502_3E (void)
 /* Opcode $3E: ROL abs,x */
 {
-    unsigned Addr;
-    unsigned Val;
-    Cycles = 7;
-    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
-        --Cycles;
-    Val = MemReadByte (Addr);
-    ROL (Val);
-    MemWriteByte (Addr, Val);
-    Regs.PC += 2;
+    MEM_OP (ABSX, ROL);
+}
+
+
+
+static void OPC_65C02_3E (void)
+/* Opcode $3E: ROL abs,x */
+{
+    MEM_OP (ABSX_NP, ROL);
+}
+
+
+
+static void OPC_6502_3F (void)
+/* Opcode $3B: RLA abs,x */
+{
+    ILLx2_OP (ABSX, RLA);
 }
 
 
@@ -918,16 +1619,15 @@ static void OPC_6502_40 (void)
 static void OPC_6502_41 (void)
 /* Opcode $41: EOR (zp,x) */
 {
-    AC_OP_ZPXIND (^);
+    AC_OP (ZPXIND, ^);
 }
 
 
 
-static void OPC_65C02_44 (void)
-/* Opcode $44: 'zp' 3 cycle NOP */
+static void OPC_6502_43 (void)
+/* Opcode $43: SRE (zp,x) */
 {
-    Cycles = 3;
-    Regs.PC += 2;
+    ILLx2_OP (ZPXIND, SRE);
 }
 
 
@@ -935,7 +1635,7 @@ static void OPC_65C02_44 (void)
 static void OPC_6502_45 (void)
 /* Opcode $45: EOR zp */
 {
-    AC_OP_ZP (^);
+    AC_OP (ZP, ^);
 }
 
 
@@ -943,17 +1643,15 @@ static void OPC_6502_45 (void)
 static void OPC_6502_46 (void)
 /* Opcode $46: LSR zp */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr);
-    SET_CF (Val & 0x01);
-    Val >>= 1;
-    MemWriteByte (ZPAddr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 2;
+    MEM_OP (ZP, LSR);
+}
+
+
+
+static void OPC_6502_47 (void)
+/* Opcode $47: SRE zp */
+{
+    ILLx2_OP (ZP, SRE);
 }
 
 
@@ -980,11 +1678,16 @@ static void OPC_6502_4A (void)
 /* Opcode $4A: LSR a */
 {
     Cycles = 2;
-    SET_CF (Regs.AC & 0x01);
-    Regs.AC >>= 1;
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
+    LSR (Regs.AC);
     Regs.PC += 1;
+}
+
+
+
+static void OPC_6502_4B (void)
+/* Opcode $4B: ASR imm */
+{
+    ALU_OP_IMM (ASR);
 }
 
 
@@ -1003,7 +1706,7 @@ static void OPC_6502_4C (void)
 static void OPC_6502_4D (void)
 /* Opcode $4D: EOR abs */
 {
-    AC_OP_ABS (^);
+    AC_OP (ABS, ^);
 }
 
 
@@ -1011,17 +1714,15 @@ static void OPC_6502_4D (void)
 static void OPC_6502_4E (void)
 /* Opcode $4E: LSR abs */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Val = MemReadByte (Addr);
-    SET_CF (Val & 0x01);
-    Val >>= 1;
-    MemWriteByte (Addr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 3;
+    MEM_OP (ABS, LSR);
+}
+
+
+
+static void OPC_6502_4F (void)
+/* Opcode $4F: SRE abs */
+{
+    ILLx2_OP (ABS, SRE);
 }
 
 
@@ -1037,7 +1738,7 @@ static void OPC_6502_50 (void)
 static void OPC_6502_51 (void)
 /* Opcode $51: EOR (zp),y */
 {
-    AC_OP_ZPINDY (^);
+    AC_OP (ZPINDY, ^);
 }
 
 
@@ -1045,7 +1746,15 @@ static void OPC_6502_51 (void)
 static void OPC_65SC02_52 (void)
 /* Opcode $52: EOR (zp) */
 {
-    AC_OP_ZPIND (^);
+    AC_OP (ZPIND, ^);
+}
+
+
+
+static void OPC_6502_53 (void)
+/* Opcode $43: SRE (zp),y */
+{
+    ILLx2_OP (ZPINDY, SRE);
 }
 
 
@@ -1053,7 +1762,7 @@ static void OPC_65SC02_52 (void)
 static void OPC_6502_55 (void)
 /* Opcode $55: EOR zp,x */
 {
-    AC_OP_ZPX (^);
+    AC_OP (ZPX, ^);
 }
 
 
@@ -1061,17 +1770,15 @@ static void OPC_6502_55 (void)
 static void OPC_6502_56 (void)
 /* Opcode $56: LSR zp,x */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (ZPAddr);
-    SET_CF (Val & 0x01);
-    Val >>= 1;
-    MemWriteByte (ZPAddr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 2;
+    MEM_OP (ZPX, LSR);
+}
+
+
+
+static void OPC_6502_57 (void)
+/* Opcode $57: SRE zp,x */
+{
+    ILLx2_OP (ZPX, SRE);
 }
 
 
@@ -1089,7 +1796,7 @@ static void OPC_6502_58 (void)
 static void OPC_6502_59 (void)
 /* Opcode $59: EOR abs,y */
 {
-    AC_OP_ABSY (^);
+    AC_OP (ABSY, ^);
 }
 
 
@@ -1100,6 +1807,14 @@ static void OPC_65SC02_5A (void)
     Cycles = 3;
     PUSH (Regs.YR);
     Regs.PC += 1;
+}
+
+
+
+static void OPC_6502_5B (void)
+/* Opcode $5B: SRE abs,y */
+{
+    ILLx2_OP (ABSY, SRE);
 }
 
 
@@ -1116,7 +1831,7 @@ static void OPC_65C02_5C (void)
 static void OPC_6502_5D (void)
 /* Opcode $5D: EOR abs,x */
 {
-    AC_OP_ABSX (^);
+    AC_OP (ABSX, ^);
 }
 
 
@@ -1124,19 +1839,23 @@ static void OPC_6502_5D (void)
 static void OPC_6502_5E (void)
 /* Opcode $5E: LSR abs,x */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 7;
-    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
-        --Cycles;
-    Val = MemReadByte (Addr);
-    SET_CF (Val & 0x01);
-    Val >>= 1;
-    MemWriteByte (Addr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 3;
+    MEM_OP (ABSX, LSR);
+}
+
+
+
+static void OPC_65C02_5E (void)
+/* Opcode $5E: LSR abs,x */
+{
+    MEM_OP (ABSX_NP, LSR);
+}
+
+
+
+static void OPC_6502_5F (void)
+/* Opcode $5F: SRE abs,x */
+{
+    ILLx2_OP (ABSX, SRE);
 }
 
 
@@ -1155,13 +1874,15 @@ static void OPC_6502_60 (void)
 static void OPC_6502_61 (void)
 /* Opcode $61: ADC (zp,x) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr = MemReadZPWord (ZPAddr);
-    ADC (MemReadByte (Addr));
-    Regs.PC += 2;
+    ALU_OP (ZPXIND, ADC);
+}
+
+
+
+static void OPC_6502_63 (void)
+/* Opcode $63: RRA (zp,x) */
+{
+    ILLx2_OP (ZPXIND, RRA);
 }
 
 
@@ -1169,11 +1890,7 @@ static void OPC_6502_61 (void)
 static void OPC_65SC02_64 (void)
 /* Opcode $64: STZ zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    MemWriteByte (ZPAddr, 0);
-    Regs.PC += 2;
+    STO_OP (ZP, 0);
 }
 
 
@@ -1181,11 +1898,7 @@ static void OPC_65SC02_64 (void)
 static void OPC_6502_65 (void)
 /* Opcode $65: ADC zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    ADC (MemReadByte (ZPAddr));
-    Regs.PC += 2;
+    ALU_OP (ZP, ADC);
 }
 
 
@@ -1193,14 +1906,15 @@ static void OPC_6502_65 (void)
 static void OPC_6502_66 (void)
 /* Opcode $66: ROR zp */
 {
-    unsigned char ZPAddr;
-    unsigned Val;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr);
-    ROR (Val);
-    MemWriteByte (ZPAddr, Val);
-    Regs.PC += 2;
+    MEM_OP (ZP, ROR);
+}
+
+
+
+static void OPC_6502_67 (void)
+/* Opcode $67: RRA zp */
+{
+    ILLx2_OP (ZP, RRA);
 }
 
 
@@ -1220,9 +1934,7 @@ static void OPC_6502_68 (void)
 static void OPC_6502_69 (void)
 /* Opcode $69: ADC #imm */
 {
-    Cycles = 2;
-    ADC (MemReadByte (Regs.PC+1));
-    Regs.PC += 2;
+    ALU_OP_IMM (ADC);
 }
 
 
@@ -1233,6 +1945,14 @@ static void OPC_6502_6A (void)
     Cycles = 2;
     ROR (Regs.AC);
     Regs.PC += 1;
+}
+
+
+
+static void OPC_6502_6B (void)
+/* Opcode $6B: ARR imm */
+{
+    ALU_OP_IMM (ARR);
 }
 
 
@@ -1285,11 +2005,7 @@ static void OPC_65C02_6C (void)
 static void OPC_6502_6D (void)
 /* Opcode $6D: ADC abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
-    ADC (MemReadByte (Addr));
-    Regs.PC += 3;
+    ALU_OP (ABS, ADC);
 }
 
 
@@ -1297,14 +2013,15 @@ static void OPC_6502_6D (void)
 static void OPC_6502_6E (void)
 /* Opcode $6E: ROR abs */
 {
-    unsigned Addr;
-    unsigned Val;
-    Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Val  = MemReadByte (Addr);
-    ROR (Val);
-    MemWriteByte (Addr, Val);
-    Regs.PC += 3;
+    MEM_OP (ABS, ROR);
+}
+
+
+
+static void OPC_6502_6F (void)
+/* Opcode $6F: RRA abs */
+{
+    ILLx2_OP (ABS, RRA);
 }
 
 
@@ -1320,16 +2037,7 @@ static void OPC_6502_70 (void)
 static void OPC_6502_71 (void)
 /* Opcode $71: ADC (zp),y */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr   = MemReadZPWord (ZPAddr);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    ADC (MemReadByte (Addr + Regs.YR));
-    Regs.PC += 2;
+    ALU_OP (ZPINDY, ADC);
 }
 
 
@@ -1337,13 +2045,15 @@ static void OPC_6502_71 (void)
 static void OPC_65SC02_72 (void)
 /* Opcode $72: ADC (zp) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr   = MemReadZPWord (ZPAddr);
-    ADC (MemReadByte (Addr));
-    Regs.PC += 2;
+    ALU_OP (ZPIND, ADC);
+}
+
+
+
+static void OPC_6502_73 (void)
+/* Opcode $73: RRA (zp),y */
+{
+    ILLx2_OP (ZPINDY, RRA);
 }
 
 
@@ -1351,11 +2061,7 @@ static void OPC_65SC02_72 (void)
 static void OPC_65SC02_74 (void)
 /* Opcode $74: STZ zp,x */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    MemWriteByte (ZPAddr, 0);
-    Regs.PC += 2;
+    STO_OP (ZPX, 0);
 }
 
 
@@ -1363,11 +2069,7 @@ static void OPC_65SC02_74 (void)
 static void OPC_6502_75 (void)
 /* Opcode $75: ADC zp,x */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    ADC (MemReadByte (ZPAddr));
-    Regs.PC += 2;
+    ALU_OP (ZPX, ADC);
 }
 
 
@@ -1375,14 +2077,15 @@ static void OPC_6502_75 (void)
 static void OPC_6502_76 (void)
 /* Opcode $76: ROR zp,x */
 {
-    unsigned char ZPAddr;
-    unsigned Val;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (ZPAddr);
-    ROR (Val);
-    MemWriteByte (ZPAddr, Val);
-    Regs.PC += 2;
+    MEM_OP (ZPX, ROR);
+}
+
+
+
+static void OPC_6502_77 (void)
+/* Opcode $77: RRA zp,x */
+{
+    ILLx2_OP (ZPX, RRA);
 }
 
 
@@ -1400,14 +2103,7 @@ static void OPC_6502_78 (void)
 static void OPC_6502_79 (void)
 /* Opcode $79: ADC abs,y */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    ADC (MemReadByte (Addr + Regs.YR));
-    Regs.PC += 3;
+    ALU_OP (ABSY, ADC);
 }
 
 
@@ -1420,6 +2116,14 @@ static void OPC_65SC02_7A (void)
     TEST_ZF (Regs.YR);
     TEST_SF (Regs.YR);
     Regs.PC += 1;
+}
+
+
+
+static void OPC_6502_7B (void)
+/* Opcode $7B: RRA abs,y */
+{
+    ILLx2_OP (ABSY, RRA);
 }
 
 
@@ -1441,14 +2145,7 @@ static void OPC_65SC02_7C (void)
 static void OPC_6502_7D (void)
 /* Opcode $7D: ADC abs,x */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.XR)) {
-        ++Cycles;
-    }
-    ADC (MemReadByte (Addr + Regs.XR));
-    Regs.PC += 3;
+    ALU_OP (ABSX, ADC);
 }
 
 
@@ -1456,16 +2153,37 @@ static void OPC_6502_7D (void)
 static void OPC_6502_7E (void)
 /* Opcode $7E: ROR abs,x */
 {
-    unsigned Addr;
-    unsigned Val;
-    Cycles = 7;
-    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    if (CPU != CPU_6502 && !PAGE_CROSS (Addr, Regs.XR))
-        --Cycles;
-    Val = MemReadByte (Addr);
-    ROR (Val);
-    MemWriteByte (Addr, Val);
-    Regs.PC += 3;
+    MEM_OP (ABSX, ROR);
+}
+
+
+
+static void OPC_65C02_7E (void)
+/* Opcode $7E: ROR abs,x */
+{
+    MEM_OP (ABSX_NP, ROR);
+}
+
+
+
+static void OPC_6502_7F (void)
+/* Opcode $7F: RRA abs,x */
+{
+    ILLx2_OP (ABSX, RRA);
+}
+
+
+
+/* Aliases of opcode $80 */
+#define OPC_6502_82 OPC_6502_80
+#define OPC_6502_C2 OPC_6502_80
+#define OPC_6502_E2 OPC_6502_80
+#define OPC_6502_89 OPC_6502_80
+
+static void OPC_6502_80 (void)
+/* Opcode $80: NOP imm */
+{
+    ALU_OP_IMM (NOP);
 }
 
 
@@ -1481,13 +2199,15 @@ static void OPC_65SC02_80 (void)
 static void OPC_6502_81 (void)
 /* Opcode $81: STA (zp,x) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr = MemReadZPWord (ZPAddr);
-    MemWriteByte (Addr, Regs.AC);
-    Regs.PC += 2;
+    STO_OP (ZPXIND, Regs.AC);
+}
+
+
+
+static void OPC_6502_83 (void)
+/* Opcode $83: SAX (zp,x) */
+{
+    STO_OP (ZPXIND, Regs.AC & Regs.XR);
 }
 
 
@@ -1495,11 +2215,7 @@ static void OPC_6502_81 (void)
 static void OPC_6502_84 (void)
 /* Opcode $84: STY zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    MemWriteByte (ZPAddr, Regs.YR);
-    Regs.PC += 2;
+    STO_OP (ZP, Regs.YR);
 }
 
 
@@ -1507,11 +2223,7 @@ static void OPC_6502_84 (void)
 static void OPC_6502_85 (void)
 /* Opcode $85: STA zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    MemWriteByte (ZPAddr, Regs.AC);
-    Regs.PC += 2;
+    STO_OP (ZP, Regs.AC);
 }
 
 
@@ -1519,11 +2231,15 @@ static void OPC_6502_85 (void)
 static void OPC_6502_86 (void)
 /* Opcode $86: STX zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    MemWriteByte (ZPAddr, Regs.XR);
-    Regs.PC += 2;
+    STO_OP (ZP, Regs.XR);
+}
+
+
+
+static void OPC_6502_87 (void)
+/* Opcode $87: SAX zp */
+{
+    STO_OP (ZP, Regs.AC & Regs.XR);
 }
 
 
@@ -1532,9 +2248,7 @@ static void OPC_6502_88 (void)
 /* Opcode $88: DEY */
 {
     Cycles = 2;
-    Regs.YR = (Regs.YR - 1) & 0xFF;
-    TEST_ZF (Regs.YR);
-    TEST_SF (Regs.YR);
+    DEC (Regs.YR);
     Regs.PC += 1;
 }
 
@@ -1543,13 +2257,7 @@ static void OPC_6502_88 (void)
 static void OPC_65SC02_89 (void)
 /* Opcode $89: BIT #imm */
 {
-    unsigned char Val;
-    Cycles = 2;
-    Val = MemReadByte (Regs.PC+1);
-    SET_SF (Val & 0x80);
-    SET_OF (Val & 0x40);
-    SET_ZF ((Val & Regs.AC) == 0);
-    Regs.PC += 2;
+    ALU_OP_IMM (BIT);
 }
 
 
@@ -1566,14 +2274,18 @@ static void OPC_6502_8A (void)
 
 
 
+static void OPC_6502_8B (void)
+/* Opcode $8B: ANE imm */
+{
+    ALU_OP_IMM (ANE);
+}
+
+
+
 static void OPC_6502_8C (void)
 /* Opcode $8C: STY abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    MemWriteByte (Addr, Regs.YR);
-    Regs.PC += 3;
+    STO_OP (ABS, Regs.YR);
 }
 
 
@@ -1581,11 +2293,7 @@ static void OPC_6502_8C (void)
 static void OPC_6502_8D (void)
 /* Opcode $8D: STA abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    MemWriteByte (Addr, Regs.AC);
-    Regs.PC += 3;
+    STO_OP (ABS, Regs.AC);
 }
 
 
@@ -1593,11 +2301,15 @@ static void OPC_6502_8D (void)
 static void OPC_6502_8E (void)
 /* Opcode $8E: STX abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    MemWriteByte (Addr, Regs.XR);
-    Regs.PC += 3;
+    STO_OP (ABS, Regs.XR);
+}
+
+
+
+static void OPC_6502_8F (void)
+/* Opcode $8F: SAX abs */
+{
+    STO_OP (ABS, Regs.AC & Regs.XR);
 }
 
 
@@ -1613,13 +2325,7 @@ static void OPC_6502_90 (void)
 static void OPC_6502_91 (void)
 /* Opcode $91: sta (zp),y */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr = MemReadZPWord (ZPAddr) + Regs.YR;
-    MemWriteByte (Addr, Regs.AC);
-    Regs.PC += 2;
+    STO_OP (ZPINDY, Regs.AC);
 }
 
 
@@ -1627,13 +2333,15 @@ static void OPC_6502_91 (void)
 static void OPC_65SC02_92 (void)
 /* Opcode $92: sta (zp) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr = MemReadZPWord (ZPAddr);
-    MemWriteByte (Addr, Regs.AC);
-    Regs.PC += 2;
+    STO_OP (ZPIND, Regs.AC);
+}
+
+
+
+static void OPC_6502_93 (void)
+/* Opcode $93: SHA (zp),y */
+{
+    STO_CB (ZPINDY, SHA);
 }
 
 
@@ -1641,11 +2349,7 @@ static void OPC_65SC02_92 (void)
 static void OPC_6502_94 (void)
 /* Opcode $94: STY zp,x */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    MemWriteByte (ZPAddr, Regs.YR);
-    Regs.PC += 2;
+    STO_OP (ZPX, Regs.YR);
 }
 
 
@@ -1653,11 +2357,7 @@ static void OPC_6502_94 (void)
 static void OPC_6502_95 (void)
 /* Opcode $95: STA zp,x */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    MemWriteByte (ZPAddr, Regs.AC);
-    Regs.PC += 2;
+    STO_OP (ZPX, Regs.AC);
 }
 
 
@@ -1665,11 +2365,15 @@ static void OPC_6502_95 (void)
 static void OPC_6502_96 (void)
 /* Opcode $96: stx zp,y */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.YR;
-    MemWriteByte (ZPAddr, Regs.XR);
-    Regs.PC += 2;
+    STO_OP (ZPY, Regs.XR);
+}
+
+
+
+static void OPC_6502_97 (void)
+/* Opcode $97: SAX zp,y */
+{
+    STO_OP (ZPY, Regs.AC & Regs.XR);
 }
 
 
@@ -1689,11 +2393,7 @@ static void OPC_6502_98 (void)
 static void OPC_6502_99 (void)
 /* Opcode $99: STA abs,y */
 {
-    unsigned Addr;
-    Cycles = 5;
-    Addr = MemReadWord (Regs.PC+1) + Regs.YR;
-    MemWriteByte (Addr, Regs.AC);
-    Regs.PC += 3;
+    STO_OP (ABSY, Regs.AC);
 }
 
 
@@ -1708,14 +2408,26 @@ static void OPC_6502_9A (void)
 
 
 
+static void OPC_6502_9B (void)
+/* Opcode $9B: TAS abs,y */
+{
+    STO_CB (ABSY, TAS);
+}
+
+
+
+static void OPC_6502_9C (void)
+/* Opcode $9D: SHY abs,x */
+{
+    STO_OP (ABSX, Regs.YR & ((address >> 8) + 1));
+}
+
+
+
 static void OPC_65SC02_9C (void)
 /* Opcode $9C: STZ abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    MemWriteByte (Addr, 0);
-    Regs.PC += 3;
+    STO_OP (ABS, 0);
 }
 
 
@@ -1723,11 +2435,23 @@ static void OPC_65SC02_9C (void)
 static void OPC_6502_9D (void)
 /* Opcode $9D: STA abs,x */
 {
-    unsigned Addr;
-    Cycles = 5;
-    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    MemWriteByte (Addr, Regs.AC);
-    Regs.PC += 3;
+    STO_OP (ABSX, Regs.AC);
+}
+
+
+
+static void OPC_6502_9E (void)
+/* Opcode $9E: SHX abs,x */
+{
+    STO_OP (ABSY, Regs.XR & ((address >> 8) + 1));
+}
+
+
+
+static void OPC_6502_9F (void)
+/* Opcode $9F: SHA abs,y */
+{
+    STO_CB (ABSY, SHA);
 }
 
 
@@ -1735,11 +2459,7 @@ static void OPC_6502_9D (void)
 static void OPC_65SC02_9E (void)
 /* Opcode $9E: STZ abs,x */
 {
-    unsigned Addr;
-    Cycles = 5;
-    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    MemWriteByte (Addr, 0);
-    Regs.PC += 3;
+    STO_OP (ABSX, 0);
 }
 
 
@@ -1747,11 +2467,7 @@ static void OPC_65SC02_9E (void)
 static void OPC_6502_A0 (void)
 /* Opcode $A0: LDY #imm */
 {
-    Cycles = 2;
-    Regs.YR = MemReadByte (Regs.PC+1);
-    TEST_ZF (Regs.YR);
-    TEST_SF (Regs.YR);
-    Regs.PC += 2;
+    ALU_OP_IMM (LDY);
 }
 
 
@@ -1759,15 +2475,7 @@ static void OPC_6502_A0 (void)
 static void OPC_6502_A1 (void)
 /* Opcode $A1: LDA (zp,x) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr = MemReadZPWord (ZPAddr);
-    Regs.AC = MemReadByte (Addr);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 2;
+    ALU_OP (ZPXIND, LDA);
 }
 
 
@@ -1775,11 +2483,15 @@ static void OPC_6502_A1 (void)
 static void OPC_6502_A2 (void)
 /* Opcode $A2: LDX #imm */
 {
-    Cycles = 2;
-    Regs.XR = MemReadByte (Regs.PC+1);
-    TEST_ZF (Regs.XR);
-    TEST_SF (Regs.XR);
-    Regs.PC += 2;
+    ALU_OP_IMM (LDX);
+}
+
+
+
+static void OPC_6502_A3 (void)
+/* Opcode $A3: LAX (zp,x) */
+{
+    ALU_OP (ZPXIND, LAX);
 }
 
 
@@ -1787,13 +2499,7 @@ static void OPC_6502_A2 (void)
 static void OPC_6502_A4 (void)
 /* Opcode $A4: LDY zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Regs.YR = MemReadByte (ZPAddr);
-    TEST_ZF (Regs.YR);
-    TEST_SF (Regs.YR);
-    Regs.PC += 2;
+    ALU_OP (ZP, LDY);
 }
 
 
@@ -1801,13 +2507,7 @@ static void OPC_6502_A4 (void)
 static void OPC_6502_A5 (void)
 /* Opcode $A5: LDA zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Regs.AC = MemReadByte (ZPAddr);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 2;
+    ALU_OP (ZP, LDA);
 }
 
 
@@ -1815,13 +2515,15 @@ static void OPC_6502_A5 (void)
 static void OPC_6502_A6 (void)
 /* Opcode $A6: LDX zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Regs.XR = MemReadByte (ZPAddr);
-    TEST_ZF (Regs.XR);
-    TEST_SF (Regs.XR);
-    Regs.PC += 2;
+    ALU_OP (ZP, LDX);
+}
+
+
+
+static void OPC_6502_A7 (void)
+/* Opcode $A7: LAX zp */
+{
+    ALU_OP (ZP, LAX);
 }
 
 
@@ -1841,11 +2543,7 @@ static void OPC_6502_A8 (void)
 static void OPC_6502_A9 (void)
 /* Opcode $A9: LDA #imm */
 {
-    Cycles = 2;
-    Regs.AC = MemReadByte (Regs.PC+1);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 2;
+    ALU_OP_IMM (LDA);
 }
 
 
@@ -1862,16 +2560,18 @@ static void OPC_6502_AA (void)
 
 
 
+static void OPC_6502_AB (void)
+/* Opcode $AB: LXA imm */
+{
+    ALU_OP_IMM (LXA);
+}
+
+
+
 static void OPC_6502_AC (void)
 /* Opcode $Regs.AC: LDY abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    Regs.YR = MemReadByte (Addr);
-    TEST_ZF (Regs.YR);
-    TEST_SF (Regs.YR);
-    Regs.PC += 3;
+    ALU_OP (ABS, LDY);
 }
 
 
@@ -1879,13 +2579,7 @@ static void OPC_6502_AC (void)
 static void OPC_6502_AD (void)
 /* Opcode $AD: LDA abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    Regs.AC = MemReadByte (Addr);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 3;
+    ALU_OP (ABS, LDA);
 }
 
 
@@ -1893,13 +2587,15 @@ static void OPC_6502_AD (void)
 static void OPC_6502_AE (void)
 /* Opcode $AE: LDX abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    Regs.XR = MemReadByte (Addr);
-    TEST_ZF (Regs.XR);
-    TEST_SF (Regs.XR);
-    Regs.PC += 3;
+    ALU_OP (ABS, LDX);
+}
+
+
+
+static void OPC_6502_AF (void)
+/* Opcode $AF: LAX abs */
+{
+    ALU_OP (ABS, LAX);
 }
 
 
@@ -1915,18 +2611,7 @@ static void OPC_6502_B0 (void)
 static void OPC_6502_B1 (void)
 /* Opcode $B1: LDA (zp),y */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr = MemReadZPWord (ZPAddr);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    Regs.AC = MemReadByte (Addr + Regs.YR);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 2;
+    ALU_OP (ZPINDY, LDA);
 }
 
 
@@ -1934,15 +2619,15 @@ static void OPC_6502_B1 (void)
 static void OPC_65SC02_B2 (void)
 /* Opcode $B2: LDA (zp) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr = MemReadZPWord (ZPAddr);
-    Regs.AC = MemReadByte (Addr);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 2;
+    ALU_OP (ZPIND, LDA);
+}
+
+
+
+static void OPC_6502_B3 (void)
+/* Opcode $B3: LAX (zp),y */
+{
+    ALU_OP (ZPINDY, LAX);
 }
 
 
@@ -1950,13 +2635,7 @@ static void OPC_65SC02_B2 (void)
 static void OPC_6502_B4 (void)
 /* Opcode $B4: LDY zp,x */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Regs.YR = MemReadByte (ZPAddr);
-    TEST_ZF (Regs.YR);
-    TEST_SF (Regs.YR);
-    Regs.PC += 2;
+    ALU_OP (ZPX, LDY);
 }
 
 
@@ -1964,13 +2643,7 @@ static void OPC_6502_B4 (void)
 static void OPC_6502_B5 (void)
 /* Opcode $B5: LDA zp,x */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Regs.AC = MemReadByte (ZPAddr);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 2;
+    ALU_OP (ZPX, LDA);
 }
 
 
@@ -1978,13 +2651,15 @@ static void OPC_6502_B5 (void)
 static void OPC_6502_B6 (void)
 /* Opcode $B6: LDX zp,y */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.YR;
-    Regs.XR = MemReadByte (ZPAddr);
-    TEST_ZF (Regs.XR);
-    TEST_SF (Regs.XR);
-    Regs.PC += 2;
+    ALU_OP (ZPY, LDX);
+}
+
+
+
+static void OPC_6502_B7 (void)
+/* Opcode $B7: LAX zp,y */
+{
+    ALU_OP (ZPY, LAX);
 }
 
 
@@ -2002,16 +2677,7 @@ static void OPC_6502_B8 (void)
 static void OPC_6502_B9 (void)
 /* Opcode $B9: LDA abs,y */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    Regs.AC = MemReadByte (Addr + Regs.YR);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 3;
+    ALU_OP (ABSY, LDA);
 }
 
 
@@ -2028,19 +2694,18 @@ static void OPC_6502_BA (void)
 
 
 
+static void OPC_6502_BB (void)
+/* Opcode $BB: LAS abs,y */
+{
+    ALU_OP (ABSY, LAS);
+}
+
+
+
 static void OPC_6502_BC (void)
 /* Opcode $BC: LDY abs,x */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.XR)) {
-        ++Cycles;
-    }
-    Regs.YR = MemReadByte (Addr + Regs.XR);
-    TEST_ZF (Regs.YR);
-    TEST_SF (Regs.YR);
-    Regs.PC += 3;
+    ALU_OP (ABSX, LDY);
 }
 
 
@@ -2048,16 +2713,7 @@ static void OPC_6502_BC (void)
 static void OPC_6502_BD (void)
 /* Opcode $BD: LDA abs,x */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.XR)) {
-        ++Cycles;
-    }
-    Regs.AC = MemReadByte (Addr + Regs.XR);
-    TEST_ZF (Regs.AC);
-    TEST_SF (Regs.AC);
-    Regs.PC += 3;
+    ALU_OP (ABSX, LDA);
 }
 
 
@@ -2065,16 +2721,15 @@ static void OPC_6502_BD (void)
 static void OPC_6502_BE (void)
 /* Opcode $BE: LDX abs,y */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    Regs.XR = MemReadByte (Addr + Regs.YR);
-    TEST_ZF (Regs.XR);
-    TEST_SF (Regs.XR);
-    Regs.PC += 3;
+    ALU_OP (ABSY, LDX);
+}
+
+
+
+static void OPC_6502_BF (void)
+/* Opcode $BF: LAX abs,y */
+{
+    ALU_OP (ABSY, LAX);
 }
 
 
@@ -2082,9 +2737,7 @@ static void OPC_6502_BE (void)
 static void OPC_6502_C0 (void)
 /* Opcode $C0: CPY #imm */
 {
-    Cycles = 2;
-    CMP (Regs.YR, MemReadByte (Regs.PC+1));
-    Regs.PC += 2;
+    ALU_OP_IMM (CPY);
 }
 
 
@@ -2092,13 +2745,15 @@ static void OPC_6502_C0 (void)
 static void OPC_6502_C1 (void)
 /* Opcode $C1: CMP (zp,x) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr = MemReadZPWord (ZPAddr);
-    CMP (Regs.AC, MemReadByte (Addr));
-    Regs.PC += 2;
+    ALU_OP (ZPXIND, CMP);
+}
+
+
+
+static void OPC_6502_C3 (void)
+/* Opcode $C3: DCP (zp,x) */
+{
+    MEM_OP (ZPXIND, DCP);
 }
 
 
@@ -2106,11 +2761,7 @@ static void OPC_6502_C1 (void)
 static void OPC_6502_C4 (void)
 /* Opcode $C4: CPY zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    CMP (Regs.YR, MemReadByte (ZPAddr));
-    Regs.PC += 2;
+    ALU_OP (ZP, CPY);
 }
 
 
@@ -2118,11 +2769,7 @@ static void OPC_6502_C4 (void)
 static void OPC_6502_C5 (void)
 /* Opcode $C5: CMP zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    CMP (Regs.AC, MemReadByte (ZPAddr));
-    Regs.PC += 2;
+    ALU_OP (ZP, CMP);
 }
 
 
@@ -2130,15 +2777,15 @@ static void OPC_6502_C5 (void)
 static void OPC_6502_C6 (void)
 /* Opcode $C6: DEC zp */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr) - 1;
-    MemWriteByte (ZPAddr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 2;
+    MEM_OP (ZP, DEC);
+}
+
+
+
+static void OPC_6502_C7 (void)
+/* Opcode $C7: DCP zp */
+{
+    MEM_OP (ZP, DCP);
 }
 
 
@@ -2147,9 +2794,7 @@ static void OPC_6502_C8 (void)
 /* Opcode $C8: INY */
 {
     Cycles = 2;
-    Regs.YR = (Regs.YR + 1) & 0xFF;
-    TEST_ZF (Regs.YR);
-    TEST_SF (Regs.YR);
+    INC(Regs.YR);
     Regs.PC += 1;
 }
 
@@ -2158,9 +2803,7 @@ static void OPC_6502_C8 (void)
 static void OPC_6502_C9 (void)
 /* Opcode $C9: CMP #imm */
 {
-    Cycles = 2;
-    CMP (Regs.AC, MemReadByte (Regs.PC+1));
-    Regs.PC += 2;
+    ALU_OP_IMM (CMP);
 }
 
 
@@ -2169,10 +2812,16 @@ static void OPC_6502_CA (void)
 /* Opcode $CA: DEX */
 {
     Cycles = 2;
-    Regs.XR = (Regs.XR - 1) & 0xFF;
-    TEST_ZF (Regs.XR);
-    TEST_SF (Regs.XR);
+    DEC (Regs.XR);
     Regs.PC += 1;
+}
+
+
+
+static void OPC_6502_CB (void)
+/* Opcode $CB: SBX imm */
+{
+    ALU_OP_IMM (SBX);
 }
 
 
@@ -2180,11 +2829,7 @@ static void OPC_6502_CA (void)
 static void OPC_6502_CC (void)
 /* Opcode $CC: CPY abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    CMP (Regs.YR, MemReadByte (Addr));
-    Regs.PC += 3;
+    ALU_OP (ABS, CPY);
 }
 
 
@@ -2192,11 +2837,7 @@ static void OPC_6502_CC (void)
 static void OPC_6502_CD (void)
 /* Opcode $CD: CMP abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    CMP (Regs.AC, MemReadByte (Addr));
-    Regs.PC += 3;
+    ALU_OP (ABS, CMP);
 }
 
 
@@ -2204,15 +2845,15 @@ static void OPC_6502_CD (void)
 static void OPC_6502_CE (void)
 /* Opcode $CE: DEC abs */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Val  = MemReadByte (Addr) - 1;
-    MemWriteByte (Addr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 3;
+    MEM_OP (ABS, DEC);
+}
+
+
+
+static void OPC_6502_CF (void)
+/* Opcode $CF: DCP abs */
+{
+    MEM_OP (ABS, DCP);
 }
 
 
@@ -2228,16 +2869,7 @@ static void OPC_6502_D0 (void)
 static void OPC_6502_D1 (void)
 /* Opcode $D1: CMP (zp),y */
 {
-    unsigned ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr = MemReadWord (ZPAddr);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    CMP (Regs.AC, MemReadByte (Addr + Regs.YR));
-    Regs.PC += 2;
+    ALU_OP (ZPINDY, CMP);
 }
 
 
@@ -2245,13 +2877,15 @@ static void OPC_6502_D1 (void)
 static void OPC_65SC02_D2 (void)
 /* Opcode $D2: CMP (zp) */
 {
-    unsigned ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr = MemReadWord (ZPAddr);
-    CMP (Regs.AC, MemReadByte (Addr));
-    Regs.PC += 2;
+    ALU_OP (ZPIND, CMP);
+}
+
+
+
+static void OPC_6502_D3 (void)
+/* Opcode $D3: DCP (zp),y */
+{
+    MEM_OP (ZPINDY, DCP);
 }
 
 
@@ -2259,11 +2893,7 @@ static void OPC_65SC02_D2 (void)
 static void OPC_6502_D5 (void)
 /* Opcode $D5: CMP zp,x */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    CMP (Regs.AC, MemReadByte (ZPAddr));
-    Regs.PC += 2;
+    ALU_OP (ZPX, CMP);
 }
 
 
@@ -2271,15 +2901,15 @@ static void OPC_6502_D5 (void)
 static void OPC_6502_D6 (void)
 /* Opcode $D6: DEC zp,x */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (ZPAddr) - 1;
-    MemWriteByte (ZPAddr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 2;
+    MEM_OP (ZPX, DEC);
+}
+
+
+
+static void OPC_6502_D7 (void)
+/* Opcode $D7: DCP zp,x */
+{
+    MEM_OP (ZPX, DCP);
 }
 
 
@@ -2297,14 +2927,7 @@ static void OPC_6502_D8 (void)
 static void OPC_6502_D9 (void)
 /* Opcode $D9: CMP abs,y */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    CMP (Regs.AC, MemReadByte (Addr + Regs.YR));
-    Regs.PC += 3;
+    ALU_OP (ABSY, CMP);
 }
 
 
@@ -2319,17 +2942,18 @@ static void OPC_65SC02_DA (void)
 
 
 
+static void OPC_6502_DB (void)
+/* Opcode $DB: DCP abs,y */
+{
+    MEM_OP (ABSY, DCP);
+}
+
+
+
 static void OPC_6502_DD (void)
 /* Opcode $DD: CMP abs,x */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.XR)) {
-        ++Cycles;
-    }
-    CMP (Regs.AC, MemReadByte (Addr + Regs.XR));
-    Regs.PC += 3;
+    ALU_OP (ABSX, CMP);
 }
 
 
@@ -2337,15 +2961,15 @@ static void OPC_6502_DD (void)
 static void OPC_6502_DE (void)
 /* Opcode $DE: DEC abs,x */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 7;
-    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (Addr) - 1;
-    MemWriteByte (Addr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 3;
+    MEM_OP (ABSX, DEC);
+}
+
+
+
+static void OPC_6502_DF (void)
+/* Opcode $DF: DCP abs,x */
+{
+    MEM_OP (ABSX, DCP);
 }
 
 
@@ -2353,9 +2977,7 @@ static void OPC_6502_DE (void)
 static void OPC_6502_E0 (void)
 /* Opcode $E0: CPX #imm */
 {
-    Cycles = 2;
-    CMP (Regs.XR, MemReadByte (Regs.PC+1));
-    Regs.PC += 2;
+    ALU_OP_IMM (CPX);
 }
 
 
@@ -2363,13 +2985,15 @@ static void OPC_6502_E0 (void)
 static void OPC_6502_E1 (void)
 /* Opcode $E1: SBC (zp,x) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Addr = MemReadZPWord (ZPAddr);
-    SBC (MemReadByte (Addr));
-    Regs.PC += 2;
+    ALU_OP (ZPXIND, SBC);
+}
+
+
+
+static void OPC_6502_E3 (void)
+/* Opcode $E3: ISC (zp,x) */
+{
+    MEM_OP (ZPXIND, ISC);
 }
 
 
@@ -2377,11 +3001,7 @@ static void OPC_6502_E1 (void)
 static void OPC_6502_E4 (void)
 /* Opcode $E4: CPX zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    CMP (Regs.XR, MemReadByte (ZPAddr));
-    Regs.PC += 2;
+    ALU_OP (ZP, CPX);
 }
 
 
@@ -2389,11 +3009,7 @@ static void OPC_6502_E4 (void)
 static void OPC_6502_E5 (void)
 /* Opcode $E5: SBC zp */
 {
-    unsigned char ZPAddr;
-    Cycles = 3;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    SBC (MemReadByte (ZPAddr));
-    Regs.PC += 2;
+    ALU_OP (ZP, SBC);
 }
 
 
@@ -2401,15 +3017,15 @@ static void OPC_6502_E5 (void)
 static void OPC_6502_E6 (void)
 /* Opcode $E6: INC zp */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Val = MemReadByte (ZPAddr) + 1;
-    MemWriteByte (ZPAddr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 2;
+    MEM_OP (ZP, INC);
+}
+
+
+
+static void OPC_6502_E7 (void)
+/* Opcode $E7: ISC zp */
+{
+    MEM_OP (ZP, ISC);
 }
 
 
@@ -2418,23 +3034,30 @@ static void OPC_6502_E8 (void)
 /* Opcode $E8: INX */
 {
     Cycles = 2;
-    Regs.XR = (Regs.XR + 1) & 0xFF;
-    TEST_ZF (Regs.XR);
-    TEST_SF (Regs.XR);
+    INC (Regs.XR);
     Regs.PC += 1;
 }
 
 
 
+/* Aliases of opcode $EA */
+#define OPC_6502_EB OPC_6502_E9
+
 static void OPC_6502_E9 (void)
 /* Opcode $E9: SBC #imm */
 {
-    Cycles = 2;
-    SBC (MemReadByte (Regs.PC+1));
-    Regs.PC += 2;
+    ALU_OP_IMM (SBC);
 }
 
 
+
+/* Aliases of opcode $EA */
+#define OPC_6502_1A OPC_6502_EA
+#define OPC_6502_3A OPC_6502_EA
+#define OPC_6502_5A OPC_6502_EA
+#define OPC_6502_7A OPC_6502_EA
+#define OPC_6502_DA OPC_6502_EA
+#define OPC_6502_FA OPC_6502_EA
 
 static void OPC_6502_EA (void)
 /* Opcode $EA: NOP */
@@ -2485,11 +3108,7 @@ static void OPC_65C02_NOP34 (void)
 static void OPC_6502_EC (void)
 /* Opcode $EC: CPX abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr   = MemReadWord (Regs.PC+1);
-    CMP (Regs.XR, MemReadByte (Addr));
-    Regs.PC += 3;
+    ALU_OP (ABS, CPX);
 }
 
 
@@ -2497,27 +3116,22 @@ static void OPC_6502_EC (void)
 static void OPC_6502_ED (void)
 /* Opcode $ED: SBC abs */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    SBC (MemReadByte (Addr));
-    Regs.PC += 3;
+    ALU_OP (ABS, SBC);
 }
-
 
 
 static void OPC_6502_EE (void)
 /* Opcode $EE: INC abs */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Val = MemReadByte (Addr) + 1;
-    MemWriteByte (Addr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 3;
+    MEM_OP (ABS, INC);
+}
+
+
+
+static void OPC_6502_EF (void)
+/* Opcode $EF: ISC abs */
+{
+    MEM_OP (ABS, ISC);
 }
 
 
@@ -2533,16 +3147,7 @@ static void OPC_6502_F0 (void)
 static void OPC_6502_F1 (void)
 /* Opcode $F1: SBC (zp),y */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr = MemReadZPWord (ZPAddr);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    SBC (MemReadByte (Addr + Regs.YR));
-    Regs.PC += 2;
+    ALU_OP (ZPINDY, SBC);
 }
 
 
@@ -2550,13 +3155,15 @@ static void OPC_6502_F1 (void)
 static void OPC_65SC02_F2 (void)
 /* Opcode $F2: SBC (zp) */
 {
-    unsigned char ZPAddr;
-    unsigned Addr;
-    Cycles = 5;
-    ZPAddr = MemReadByte (Regs.PC+1);
-    Addr = MemReadZPWord (ZPAddr);
-    SBC (MemReadByte (Addr));
-    Regs.PC += 2;
+    ALU_OP (ZPIND, SBC);
+}
+
+
+
+static void OPC_6502_F3 (void)
+/* Opcode $F3: ISC (zp),y */
+{
+    MEM_OP (ZPINDY, ISC);
 }
 
 
@@ -2564,11 +3171,7 @@ static void OPC_65SC02_F2 (void)
 static void OPC_6502_F5 (void)
 /* Opcode $F5: SBC zp,x */
 {
-    unsigned char ZPAddr;
-    Cycles = 4;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    SBC (MemReadByte (ZPAddr));
-    Regs.PC += 2;
+    ALU_OP (ZPX, SBC);
 }
 
 
@@ -2576,15 +3179,15 @@ static void OPC_6502_F5 (void)
 static void OPC_6502_F6 (void)
 /* Opcode $F6: INC zp,x */
 {
-    unsigned char ZPAddr;
-    unsigned char Val;
-    Cycles = 6;
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (ZPAddr) + 1;
-    MemWriteByte (ZPAddr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 2;
+    MEM_OP (ZPX, INC);
+}
+
+
+
+static void OPC_6502_F7 (void)
+/* Opcode $F7: ISC zp,x */
+{
+    MEM_OP (ZPX, ISC);
 }
 
 
@@ -2602,14 +3205,7 @@ static void OPC_6502_F8 (void)
 static void OPC_6502_F9 (void)
 /* Opcode $F9: SBC abs,y */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.YR)) {
-        ++Cycles;
-    }
-    SBC (MemReadByte (Addr + Regs.YR));
-    Regs.PC += 3;
+    ALU_OP (ABSY, SBC);
 }
 
 
@@ -2626,17 +3222,18 @@ static void OPC_65SC02_FA (void)
 
 
 
+static void OPC_6502_FB (void)
+/* Opcode $FB: ISC abs,y */
+{
+    MEM_OP (ABSY, ISC);
+}
+
+
+
 static void OPC_6502_FD (void)
 /* Opcode $FD: SBC abs,x */
 {
-    unsigned Addr;
-    Cycles = 4;
-    Addr = MemReadWord (Regs.PC+1);
-    if (PAGE_CROSS (Addr, Regs.XR)) {
-        ++Cycles;
-    }
-    SBC (MemReadByte (Addr + Regs.XR));
-    Regs.PC += 3;
+    ALU_OP (ABSX, SBC);
 }
 
 
@@ -2644,15 +3241,15 @@ static void OPC_6502_FD (void)
 static void OPC_6502_FE (void)
 /* Opcode $FE: INC abs,x */
 {
-    unsigned Addr;
-    unsigned char Val;
-    Cycles = 7;
-    Addr = MemReadWord (Regs.PC+1) + Regs.XR;
-    Val = MemReadByte (Addr) + 1;
-    MemWriteByte (Addr, Val);
-    TEST_ZF (Val);
-    TEST_SF (Val);
-    Regs.PC += 3;
+    MEM_OP (ABSX, INC);
+}
+
+
+
+static void OPC_6502_FF (void)
+/* Opcode $FF: ISC abs,x */
+{
+    MEM_OP (ABSX, ISC);
 }
 
 
@@ -2925,6 +3522,268 @@ static const OPFunc OP6502Table[256] = {
 
 
 
+/* Opcode handler table for the 6502X */
+static const OPFunc OP6502XTable[256] = {
+    OPC_6502_00,
+    OPC_6502_01,
+    OPC_Illegal,
+    OPC_6502_03,
+    OPC_6502_04,
+    OPC_6502_05,
+    OPC_6502_06,
+    OPC_6502_07,
+    OPC_6502_08,
+    OPC_6502_09,
+    OPC_6502_0A,
+    OPC_6502_0B,
+    OPC_6502_0C,
+    OPC_6502_0D,
+    OPC_6502_0E,
+    OPC_6502_0F,
+    OPC_6502_10,
+    OPC_6502_11,
+    OPC_Illegal,
+    OPC_6502_13,
+    OPC_6502_14,
+    OPC_6502_15,
+    OPC_6502_16,
+    OPC_6502_17,
+    OPC_6502_18,
+    OPC_6502_19,
+    OPC_6502_1A,
+    OPC_6502_1B,
+    OPC_6502_1C,
+    OPC_6502_1D,
+    OPC_6502_1E,
+    OPC_6502_1F,
+    OPC_6502_20,
+    OPC_6502_21,
+    OPC_Illegal,
+    OPC_6502_23,
+    OPC_6502_24,
+    OPC_6502_25,
+    OPC_6502_26,
+    OPC_6502_27,
+    OPC_6502_28,
+    OPC_6502_29,
+    OPC_6502_2A,
+    OPC_6502_2B,
+    OPC_6502_2C,
+    OPC_6502_2D,
+    OPC_6502_2E,
+    OPC_6502_2F,
+    OPC_6502_30,
+    OPC_6502_31,
+    OPC_Illegal,
+    OPC_6502_33,
+    OPC_6502_34,
+    OPC_6502_35,
+    OPC_6502_36,
+    OPC_6502_37,
+    OPC_6502_38,
+    OPC_6502_39,
+    OPC_6502_3A,
+    OPC_6502_3B,
+    OPC_6502_3C,
+    OPC_6502_3D,
+    OPC_6502_3E,
+    OPC_6502_3F,
+    OPC_6502_40,
+    OPC_6502_41,
+    OPC_Illegal,
+    OPC_6502_43,
+    OPC_6502_44,
+    OPC_6502_45,
+    OPC_6502_46,
+    OPC_6502_47,
+    OPC_6502_48,
+    OPC_6502_49,
+    OPC_6502_4A,
+    OPC_6502_4B,
+    OPC_6502_4C,
+    OPC_6502_4D,
+    OPC_6502_4E,
+    OPC_6502_4F,
+    OPC_6502_50,
+    OPC_6502_51,
+    OPC_Illegal,
+    OPC_6502_53,
+    OPC_6502_54,
+    OPC_6502_55,
+    OPC_6502_56,
+    OPC_6502_57,
+    OPC_6502_58,
+    OPC_6502_59,
+    OPC_6502_5A,
+    OPC_6502_5B,
+    OPC_6502_5C,
+    OPC_6502_5D,
+    OPC_6502_5E,
+    OPC_6502_5F,
+    OPC_6502_60,
+    OPC_6502_61,
+    OPC_Illegal,
+    OPC_6502_63,
+    OPC_6502_64,
+    OPC_6502_65,
+    OPC_6502_66,
+    OPC_6502_67,
+    OPC_6502_68,
+    OPC_6502_69,
+    OPC_6502_6A,
+    OPC_6502_6B,
+    OPC_6502_6C,
+    OPC_6502_6D,
+    OPC_6502_6E,
+    OPC_6502_6F,
+    OPC_6502_70,
+    OPC_6502_71,
+    OPC_Illegal,
+    OPC_6502_73,
+    OPC_6502_74,
+    OPC_6502_75,
+    OPC_6502_76,
+    OPC_6502_77,
+    OPC_6502_78,
+    OPC_6502_79,
+    OPC_6502_7A,
+    OPC_6502_7B,
+    OPC_6502_7C,
+    OPC_6502_7D,
+    OPC_6502_7E,
+    OPC_6502_7F,
+    OPC_6502_80,
+    OPC_6502_81,
+    OPC_6502_82,
+    OPC_6502_83,
+    OPC_6502_84,
+    OPC_6502_85,
+    OPC_6502_86,
+    OPC_6502_87,
+    OPC_6502_88,
+    OPC_6502_89,
+    OPC_6502_8A,
+    OPC_6502_8B,
+    OPC_6502_8C,
+    OPC_6502_8D,
+    OPC_6502_8E,
+    OPC_6502_8F,
+    OPC_6502_90,
+    OPC_6502_91,
+    OPC_Illegal,
+    OPC_6502_93,
+    OPC_6502_94,
+    OPC_6502_95,
+    OPC_6502_96,
+    OPC_6502_97,
+    OPC_6502_98,
+    OPC_6502_99,
+    OPC_6502_9A,
+    OPC_6502_9B,
+    OPC_6502_9C,
+    OPC_6502_9D,
+    OPC_6502_9E,
+    OPC_6502_9F,
+    OPC_6502_A0,
+    OPC_6502_A1,
+    OPC_6502_A2,
+    OPC_6502_A3,
+    OPC_6502_A4,
+    OPC_6502_A5,
+    OPC_6502_A6,
+    OPC_6502_A7,
+    OPC_6502_A8,
+    OPC_6502_A9,
+    OPC_6502_AA,
+    OPC_6502_AB,
+    OPC_6502_AC,
+    OPC_6502_AD,
+    OPC_6502_AE,
+    OPC_6502_AF,
+    OPC_6502_B0,
+    OPC_6502_B1,
+    OPC_Illegal,
+    OPC_6502_B3,
+    OPC_6502_B4,
+    OPC_6502_B5,
+    OPC_6502_B6,
+    OPC_6502_B7,
+    OPC_6502_B8,
+    OPC_6502_B9,
+    OPC_6502_BA,
+    OPC_6502_BB,
+    OPC_6502_BC,
+    OPC_6502_BD,
+    OPC_6502_BE,
+    OPC_6502_BF,
+    OPC_6502_C0,
+    OPC_6502_C1,
+    OPC_6502_C2,
+    OPC_6502_C3,
+    OPC_6502_C4,
+    OPC_6502_C5,
+    OPC_6502_C6,
+    OPC_6502_C7,
+    OPC_6502_C8,
+    OPC_6502_C9,
+    OPC_6502_CA,
+    OPC_6502_CB,
+    OPC_6502_CC,
+    OPC_6502_CD,
+    OPC_6502_CE,
+    OPC_6502_CF,
+    OPC_6502_D0,
+    OPC_6502_D1,
+    OPC_Illegal,
+    OPC_6502_D3,
+    OPC_6502_D4,
+    OPC_6502_D5,
+    OPC_6502_D6,
+    OPC_6502_D7,
+    OPC_6502_D8,
+    OPC_6502_D9,
+    OPC_6502_DA,
+    OPC_6502_DB,
+    OPC_6502_DC,
+    OPC_6502_DD,
+    OPC_6502_DE,
+    OPC_6502_DF,
+    OPC_6502_E0,
+    OPC_6502_E1,
+    OPC_6502_E2,
+    OPC_6502_E3,
+    OPC_6502_E4,
+    OPC_6502_E5,
+    OPC_6502_E6,
+    OPC_6502_E7,
+    OPC_6502_E8,
+    OPC_6502_E9,
+    OPC_6502_EA,
+    OPC_6502_EB,
+    OPC_6502_EC,
+    OPC_6502_ED,
+    OPC_6502_EE,
+    OPC_6502_EF,
+    OPC_6502_F0,
+    OPC_6502_F1,
+    OPC_Illegal,
+    OPC_6502_F3,
+    OPC_6502_F4,
+    OPC_6502_F5,
+    OPC_6502_F6,
+    OPC_6502_F7,
+    OPC_6502_F8,
+    OPC_6502_F9,
+    OPC_6502_FA,
+    OPC_6502_FB,
+    OPC_6502_FC,
+    OPC_6502_FD,
+    OPC_6502_FE,
+    OPC_6502_FF
+};
+
+
+
 /* Opcode handler table for the 65C02 */
 static const OPFunc OP65C02Table[256] = {
     OPC_6502_00,
@@ -2957,7 +3816,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP11,    // $1B
     OPC_65SC02_1C,
     OPC_6502_1D,
-    OPC_6502_1E,
+    OPC_65C02_1E,
     OPC_Illegal,        // $1F: BBR1 currently unsupported
     OPC_6502_20,
     OPC_6502_21,
@@ -2989,13 +3848,13 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP11,    // $3B
     OPC_65SC02_3C,
     OPC_6502_3D,
-    OPC_6502_3E,
+    OPC_65C02_3E,
     OPC_Illegal,        // $3F: BBR3 currently unsupported
     OPC_6502_40,
     OPC_6502_41,
     OPC_65C02_NOP22,    // $42
     OPC_65C02_NOP11,    // $43
-    OPC_65C02_44,       // $44
+    OPC_6502_44,        // $44
     OPC_6502_45,
     OPC_6502_46,
     OPC_Illegal,        // $47: RMB4 currently unsupported
@@ -3021,7 +3880,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP11,    // $5B
     OPC_65C02_5C,
     OPC_6502_5D,
-    OPC_6502_5E,
+    OPC_65C02_5E,
     OPC_Illegal,        // $5F: BBR5 currently unsupported
     OPC_6502_60,
     OPC_6502_61,
@@ -3053,7 +3912,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP11,    // $7B
     OPC_65SC02_7C,
     OPC_6502_7D,
-    OPC_6502_7E,
+    OPC_65C02_7E,
     OPC_Illegal,        // $7F: BBR7 currently unsupported
     OPC_65SC02_80,
     OPC_6502_81,
@@ -3188,7 +4047,11 @@ static const OPFunc OP65C02Table[256] = {
 
 
 /* Tables with opcode handlers */
-static const OPFunc* Handlers[2] = {OP6502Table, OP65C02Table};
+static const OPFunc* Handlers[3] = {
+    OP6502Table,
+    OP65C02Table,
+    OP6502XTable
+};
 
 
 

@@ -177,10 +177,16 @@ static unsigned char ReadProgramFile (void)
 
     /* Get the CPU type from the file header */
     if ((Val = fgetc(F)) != EOF) {
-        if (Val != CPU_6502 && Val != CPU_65C02) {
+        switch (Val) {
+        case CPU_6502:
+        case CPU_65C02:
+        case CPU_6502X:
+            CPU = Val;
+            break;
+
+        default:
             Error ("'%s': Invalid CPU type", ProgramFile);
         }
-        CPU = Val;
     }
 
     /* Get the address of sp from the file header */

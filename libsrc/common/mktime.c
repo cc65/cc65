@@ -82,8 +82,8 @@ time_t __fastcall__ mktime (register struct tm* TM)
 */
 {
     register div_t D;
-    int Max;
-    unsigned DayCount;
+    static int Max;
+    static unsigned DayCount;
 
     /* Check if TM is valid */
     if (TM == 0) {

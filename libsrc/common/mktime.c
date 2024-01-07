@@ -70,7 +70,12 @@ static const unsigned MonthDays [] = {
 static unsigned char __fastcall__ IsLeapYear (unsigned Year)
 /* Returns 1 if the given year is a leap year */
 {
-    return (((Year % 4) == 0) && ((Year % 100) != 0 || (Year % 400) == 0));
+    /* Originally the famous
+    ** return (((Year % 4) == 0) && ((Year % 100) != 0 || (Year % 400) == 0))
+    ** with a real year, but simplified for size in the range that we handle,
+    ** where only 200 (2100) is a special case.
+    */
+    return (Year != 200 && Year % 4 == 0);
 }
 
 
@@ -88,7 +93,7 @@ time_t __fastcall__ mktime (register struct tm* TM)
     /* Check if TM is valid */
     if (TM == 0) {
         /* Invalid data */
-        goto Error;
+        return (time_t) -1L;
     }
 
     /* Adjust seconds. */
@@ -96,17 +101,11 @@ time_t __fastcall__ mktime (register struct tm* TM)
     TM->tm_sec = D.rem;
 
     /* Adjust minutes */
-    if (TM->tm_min + D.quot < 0) {
-        goto Error;
-    }
     TM->tm_min += D.quot;
     D = div (TM->tm_min, 60);
     TM->tm_min = D.rem;
 
     /* Adjust hours */
-    if (TM->tm_hour + D.quot < 0) {
-        goto Error;
-    }
     TM->tm_hour += D.quot;
     D = div (TM->tm_hour, 24);
     TM->tm_hour = D.rem;
@@ -122,15 +121,12 @@ time_t __fastcall__ mktime (register struct tm* TM)
         /* Make sure, month is in the range 0..11 */
         D = div (TM->tm_mon, 12);
         TM->tm_mon = D.rem;
-        if (TM->tm_year + D.quot < 0) {
-            goto Error;
-        }
         TM->tm_year += D.quot;
 
         /* Now check if mday is in the correct range, if not, correct month
         ** and eventually year and repeat the process.
         */
-        if (TM->tm_mon == FEBRUARY && IsLeapYear (TM->tm_year + 1900)) {
+        if (TM->tm_mon == FEBRUARY && IsLeapYear (TM->tm_year)) {
             Max = 29;
         } else {
             Max = MonthLength[TM->tm_mon];
@@ -154,18 +150,26 @@ time_t __fastcall__ mktime (register struct tm* TM)
     ** year.
     */
     TM->tm_yday = MonthDays[TM->tm_mon] + TM->tm_mday - 1;
-    if (TM->tm_mon > FEBRUARY && IsLeapYear (TM->tm_year + 1900)) {
+    if (TM->tm_mon > FEBRUARY && IsLeapYear (TM->tm_year)) {
         ++TM->tm_yday;
     }
 
     /* Calculate days since 1/1/1970. In the complete epoch (1/1/1970 to
-    ** somewhere in 2038) all years dividable by 4 are leap years, so
-    ** dividing by 4 gives the days that must be added cause of leap years.
+    ** somewhere in 2106) all years dividable by 4 are leap years, with
+    ** an exception on year 2100, so dividing by 4 gives the days that
+    ** must be added cause of leap years.
     ** (and the last leap year before 1970 was 1968)
     */
     DayCount = ((unsigned) (TM->tm_year-70)) * 365U +
                (((unsigned) (TM->tm_year-(68+1))) / 4) +
                TM->tm_yday;
+
+    /* Compensate after February 2100 */
+    if (TM->tm_year == 200 && TM->tm_mon > FEBRUARY) {
+      DayCount--;
+    } else if (TM->tm_year > 200) {
+      DayCount--;
+    }
 
     /* Calculate the weekday */
     TM->tm_wday = (JAN_1_1970 + DayCount) % 7;
@@ -179,8 +183,4 @@ time_t __fastcall__ mktime (register struct tm* TM)
            ((unsigned) TM->tm_min) * 60U +
            ((unsigned) TM->tm_sec) -
            _tz.timezone;
-
-Error:
-    /* Error exit */
-    return (time_t) -1L;
 }

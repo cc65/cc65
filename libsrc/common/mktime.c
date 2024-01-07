@@ -36,7 +36,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include "_is_leap_year.h"
 
 
 /*****************************************************************************/
@@ -67,14 +67,6 @@ static const unsigned MonthDays [] = {
 
 
 
-static unsigned char __fastcall__ IsLeapYear (unsigned Year)
-/* Returns 1 if the given year is a leap year */
-{
-    return (((Year % 4) == 0) && ((Year % 100) != 0 || (Year % 400) == 0));
-}
-
-
-
 time_t __fastcall__ mktime (register struct tm* TM)
 /* Make a time in seconds since 1/1/1970 from the broken down time in TM.
 ** A call to mktime does also correct the time in TM to contain correct
@@ -82,13 +74,13 @@ time_t __fastcall__ mktime (register struct tm* TM)
 */
 {
     register div_t D;
-    int Max;
-    unsigned DayCount;
+    static int Max;
+    static unsigned DayCount;
 
     /* Check if TM is valid */
     if (TM == 0) {
         /* Invalid data */
-        goto Error;
+        return (time_t) -1L;
     }
 
     /* Adjust seconds. */
@@ -96,26 +88,28 @@ time_t __fastcall__ mktime (register struct tm* TM)
     TM->tm_sec = D.rem;
 
     /* Adjust minutes */
-    if (TM->tm_min + D.quot < 0) {
-        goto Error;
-    }
     TM->tm_min += D.quot;
     D = div (TM->tm_min, 60);
     TM->tm_min = D.rem;
 
     /* Adjust hours */
-    if (TM->tm_hour + D.quot < 0) {
-        goto Error;
-    }
     TM->tm_hour += D.quot;
     D = div (TM->tm_hour, 24);
     TM->tm_hour = D.rem;
 
     /* Adjust days */
-    if (TM->tm_mday + D.quot < 0) {
-        goto Error;
-    }
     TM->tm_mday += D.quot;
+
+    /* Adjust year */
+    while (1) {
+      Max = 365UL + IsLeapYear (TM->tm_year);
+      if ((unsigned int)TM->tm_mday > Max) {
+        ++TM->tm_year;
+        TM->tm_mday -= Max;
+      } else {
+        break;
+      }
+    }
 
     /* Adjust month and year. This is an iterative process, since changing
     ** the month will change the allowed days for this month.
@@ -125,20 +119,17 @@ time_t __fastcall__ mktime (register struct tm* TM)
         /* Make sure, month is in the range 0..11 */
         D = div (TM->tm_mon, 12);
         TM->tm_mon = D.rem;
-        if (TM->tm_year + D.quot < 0) {
-            goto Error;
-        }
         TM->tm_year += D.quot;
 
         /* Now check if mday is in the correct range, if not, correct month
         ** and eventually year and repeat the process.
         */
-        if (TM->tm_mon == FEBRUARY && IsLeapYear (TM->tm_year + 1900)) {
+        if (TM->tm_mon == FEBRUARY && IsLeapYear (TM->tm_year)) {
             Max = 29;
         } else {
             Max = MonthLength[TM->tm_mon];
         }
-        if (TM->tm_mday > Max) {
+        if ((unsigned int)TM->tm_mday > Max) {
             /* Must correct month and eventually, year */
             if (TM->tm_mon == DECEMBER) {
                 TM->tm_mon = JANUARY;
@@ -157,18 +148,26 @@ time_t __fastcall__ mktime (register struct tm* TM)
     ** year.
     */
     TM->tm_yday = MonthDays[TM->tm_mon] + TM->tm_mday - 1;
-    if (TM->tm_mon > FEBRUARY && IsLeapYear (TM->tm_year + 1900)) {
+    if (TM->tm_mon > FEBRUARY && IsLeapYear (TM->tm_year)) {
         ++TM->tm_yday;
     }
 
     /* Calculate days since 1/1/1970. In the complete epoch (1/1/1970 to
-    ** somewhere in 2038) all years dividable by 4 are leap years, so
-    ** dividing by 4 gives the days that must be added cause of leap years.
+    ** somewhere in 2106) all years dividable by 4 are leap years(1),
+    ** so dividing by 4 gives the days that must be added because of leap years.
     ** (and the last leap year before 1970 was 1968)
+    ** (1): Exception on 2100, which is not leap, and handled just after.
     */
     DayCount = ((unsigned) (TM->tm_year-70)) * 365U +
                (((unsigned) (TM->tm_year-(68+1))) / 4) +
                TM->tm_yday;
+
+    /* Handle the 2100 exception */
+    if (TM->tm_year == 200 && TM->tm_mon > FEBRUARY) {
+      DayCount--;
+    } else if (TM->tm_year > 200) {
+      DayCount--;
+    }
 
     /* Calculate the weekday */
     TM->tm_wday = (JAN_1_1970 + DayCount) % 7;
@@ -182,11 +181,4 @@ time_t __fastcall__ mktime (register struct tm* TM)
            ((unsigned) TM->tm_min) * 60U +
            ((unsigned) TM->tm_sec) -
            _tz.timezone;
-
-Error:
-    /* Error exit */
-    return (time_t) -1L;
 }
-
-
-

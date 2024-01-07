@@ -43,10 +43,6 @@ typedef unsigned long clock_t;
 
 
 
-#include <target.h>
-
-
-
 /* NULL pointer */
 #ifndef NULL
 #define NULL ((void *) 0)

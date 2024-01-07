@@ -48,11 +48,7 @@ struct tm* __fastcall__ gmtime (const time_t* timep)
     static struct tm timebuf;
     time_t t;
 
-    /* Check the argument */
-    if (timep == 0 || (long) (t = *timep) < 0) {
-        /* Invalid arg */
-        return 0;
-    }
+    t = *timep;
 
     /* Since our ints are just 16 bits, split the given time into seconds,
     ** hours and days. Each of the values will fit in a 16 bit variable.

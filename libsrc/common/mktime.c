@@ -112,9 +112,6 @@ time_t __fastcall__ mktime (register struct tm* TM)
     TM->tm_hour = D.rem;
 
     /* Adjust days */
-    if (TM->tm_mday + D.quot < 0) {
-        goto Error;
-    }
     TM->tm_mday += D.quot;
 
     /* Adjust month and year. This is an iterative process, since changing
@@ -138,7 +135,7 @@ time_t __fastcall__ mktime (register struct tm* TM)
         } else {
             Max = MonthLength[TM->tm_mon];
         }
-        if (TM->tm_mday > Max) {
+        if ((unsigned int)TM->tm_mday > Max) {
             /* Must correct month and eventually, year */
             if (TM->tm_mon == DECEMBER) {
                 TM->tm_mon = JANUARY;
@@ -187,6 +184,3 @@ Error:
     /* Error exit */
     return (time_t) -1L;
 }
-
-
-

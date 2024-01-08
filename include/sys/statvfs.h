@@ -1,15 +1,13 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 gmtime.c                                  */
+/*                                  statvfs.h                                */
 /*                                                                           */
-/*            Convert calendar time into broken down time in UTC             */
+/*                             statvfs(3) definition                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2023      Colin Leroy-Mira                                            */
+/* EMail:        colin@colino.net                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,7 +31,32 @@
 
 
 
-#include <time.h>
+#ifndef _STATVFS_H
+#define _STATVFS_H
+
+#include <sys/types.h>
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+struct statvfs {
+    unsigned long     f_bsize;
+    unsigned long     f_frsize;
+    fsblkcnt_t        f_blocks;
+    fsblkcnt_t        f_bfree;
+    fsblkcnt_t        f_bavail;
+    fsfilcnt_t        f_files;
+    fsfilcnt_t        f_ffree;
+    fsfilcnt_t        f_favail;
+    unsigned long     f_fsid;
+    unsigned long     f_flag;
+    unsigned long     f_namemax;
+};
 
 
 
@@ -43,31 +66,9 @@
 
 
 
-struct tm* __fastcall__ gmtime (const time_t* timep)
-{
-    static struct tm timebuf;
-    time_t t;
+int __fastcall__ statvfs (const char* pathname, struct statvfs* buf);
 
-    /* Check the argument */
-    if (timep == 0 || (long) (t = *timep) < 0) {
-        /* Invalid arg */
-        return 0;
-    }
 
-    /* Since our ints are just 16 bits, split the given time into seconds,
-    ** hours and days. Each of the values will fit in a 16 bit variable.
-    ** The mktime routine will then do the rest.
-    */
-    timebuf.tm_sec  = t % 3600;
-    timebuf.tm_min  = 0;
-    timebuf.tm_hour = (t / 3600) % 24;
-    timebuf.tm_mday = (t / (3600UL * 24UL)) + 1;
-    timebuf.tm_mon  = 0;
-    timebuf.tm_year = 70;       /* Base value is 1/1/1970 */
 
-    /* Call mktime to do the final conversion */
-    mktime (&timebuf);
-
-    /* Return the result */
-    return &timebuf;
-}
+/* End of statvfs.h */
+#endif

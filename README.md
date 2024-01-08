@@ -28,6 +28,7 @@ External contributors:
 * [Stephan Mühlstrasser](https://github.com/smuehlst): osic1p target
 * [Wayne Parham](https://github.com/WayneParham): Sym-1 target
 * [Dave Plummer](https://github.com/davepl): KIM-1 target
+* [rumbledethumps](https://github.com/rumbledethumps): Picocomputer target
 
 *(The above list is incomplete, if you feel left out - please speak up or add yourself in a PR)*
 

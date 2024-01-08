@@ -61,7 +61,6 @@
 #include "standard.h"
 #include "staticassert.h"
 #include "symtab.h"
-#include "wrappedcall.h"
 #include "typeconv.h"
 
 
@@ -501,6 +500,31 @@ static void FixQualifiers (Type* DataType)
             if ((T[0].C & T_QUAL_ADDRSIZE) == 0) {
                 T[0].C |= CodeAddrSizeQualifier ();
             }
+
+        } else {
+
+            /* If we have remaining qualifiers, flag them as invalid */
+            Q = T[0].C;
+
+            if (Q & T_QUAL_NEAR) {
+                Error ("Invalid '__near__' qualifier");
+                Q &= ~T_QUAL_NEAR;
+            }
+            if (Q & T_QUAL_FAR) {
+                Error ("Invalid '__far__' qualifier");
+                Q &= ~T_QUAL_FAR;
+            }
+            if (Q & T_QUAL_FASTCALL) {
+                Error ("Invalid '__fastcall__' qualifier");
+                Q &= ~T_QUAL_FASTCALL;
+            }
+            if (Q & T_QUAL_CDECL) {
+                Error ("Invalid '__cdecl__' qualifier");
+                Q &= ~T_QUAL_CDECL;
+            }
+
+            /* Clear the invalid qualifiers */
+            T[0].C &= Q;
 
         }
         ++T;
@@ -1741,10 +1765,12 @@ static const Type* ParamTypeCvt (Type* T)
 static void ParseOldStyleParamList (FuncDesc* F)
 /* Parse an old-style (K&R) parameter list */
 {
-    unsigned PrevErrorCount = ErrorCount;
+    if (CurTok.Tok == TOK_RPAREN) {
+        return;
+    }
 
     /* Parse params */
-    while (CurTok.Tok != TOK_RPAREN) {
+    while (1) {
 
         /* List of identifiers expected */
         if (CurTok.Tok == TOK_IDENT) {
@@ -1769,28 +1795,32 @@ static void ParseOldStyleParamList (FuncDesc* F)
         }
 
         /* Check for more parameters */
-        if (CurTok.Tok == TOK_COMMA) {
-            NextToken ();
-        } else {
+        if (CurTok.Tok != TOK_COMMA) {
             break;
         }
-    }
+        NextToken ();
 
-    /* Skip right paren. We must explicitly check for one here, since some of
-    ** the breaks above bail out without checking.
-    */
-    ConsumeRParen ();
+    }
+}
+
+
+
+static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
+/* Parse an old-style (K&R) function declarator declaration list */
+{
+    if (CurTok.Tok == TOK_SEMI) {
+        /* No parameter declaration list */
+        return;
+    }
 
     /* An optional list of type specifications follows */
     while (CurTok.Tok != TOK_LCURLY) {
 
         DeclSpec        Spec;
+        int             NeedClean;
 
         /* Read the declaration specifier */
         ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
-
-        /* Paremeters must have identifiers as names */
-        Spec.Flags |= DS_NO_EMPTY_DECL;
 
         /* We accept only auto and register as storage class specifiers, but
         ** we ignore all this, since we use auto anyway.
@@ -1800,10 +1830,14 @@ static void ParseOldStyleParamList (FuncDesc* F)
             Error ("Illegal storage class");
         }
 
-        /* Type must be specified */
+        /* If we haven't got a type specifier yet, something must be wrong */
         if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
-            Error ("Expected declaration specifiers");
-            break;
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
         }
 
         /* Parse a comma separated variable list */
@@ -1812,7 +1846,12 @@ static void ParseOldStyleParamList (FuncDesc* F)
             Declarator Decl;
 
             /* Read the parameter */
-            ParseDecl (&Spec, &Decl, DM_IDENT_OR_EMPTY);
+            NeedClean = ParseDecl (&Spec, &Decl, DM_IDENT_OR_EMPTY);
+
+            /* Bail out if there are errors */
+            if (NeedClean <= 0) {
+                break;
+            }
 
             /* Warn about new local type declaration */
             if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0) {
@@ -1821,9 +1860,9 @@ static void ParseOldStyleParamList (FuncDesc* F)
             }
 
             if (Decl.Ident[0] != '\0') {
-
                 /* We have a name given. Search for the symbol */
                 SymEntry* Param = FindLocalSym (Decl.Ident);
+
                 if (Param) {
                     /* Check if we already changed the type for this
                     ** parameter.
@@ -1838,25 +1877,40 @@ static void ParseOldStyleParamList (FuncDesc* F)
                         Error ("Redefinition for parameter '%s'", Param->Name);
                     }
                 } else {
-                    Error ("Unknown identifier: '%s'", Decl.Ident);
+                    Error ("Unknown parameter '%s'", Decl.Ident);
+                }
+
+                /* Initialization is not allowed */
+                if (CurTok.Tok == TOK_ASSIGN) {
+                    Error ("Parameter '%s' cannot be initialized", Decl.Ident);
+
+                    /* Try some smart error recovery */
+                    SmartErrorSkip (0);
                 }
             }
 
-            if (CurTok.Tok == TOK_COMMA) {
-                NextToken ();
-            } else {
+            /* Check for more declarators */
+            if (CurTok.Tok != TOK_COMMA) {
                 break;
             }
+            NextToken ();
 
         }
 
-        /* Variable list must be semicolon terminated */
-        ConsumeSemi ();
-    }
+EndOfDecl:
+        if (NeedClean > 0) {
+            /* Must be followed by a semicolon */
+            if (ConsumeSemi ()) {
+                NeedClean = 0;
+            } else {
+                NeedClean = -1;
+            }
+        }
 
-    if (PrevErrorCount != ErrorCount && CurTok.Tok != TOK_LCURLY) {
         /* Try some smart error recovery */
-        SmartErrorSkip (0);
+        if (NeedClean < 0) {
+            SmartErrorSkip (1);
+        }
     }
 }
 
@@ -1865,8 +1919,12 @@ static void ParseOldStyleParamList (FuncDesc* F)
 static void ParseAnsiParamList (FuncDesc* F)
 /* Parse a new-style (ANSI) parameter list */
 {
+    if (CurTok.Tok == TOK_RPAREN) {
+        return;
+    }
+
     /* Parse params */
-    while (CurTok.Tok != TOK_RPAREN) {
+    while (1) {
 
         DeclSpec    Spec;
         Declarator  Decl;
@@ -1895,7 +1953,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
         /* Type must be specified */
         if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
-            Error ("Type specifier missing");
+            Error ("Declaration specifier or '...' expected");
         }
 
         /* Warn about new local type declaration */
@@ -1946,36 +2004,24 @@ static void ParseAnsiParamList (FuncDesc* F)
             }
         }
 
-        /* Check for more parameters */
-        if (CurTok.Tok == TOK_COMMA) {
-            NextToken ();
-        } else {
+        /* Check for end of parameter type list */
+        if (CurTok.Tok != TOK_COMMA) {
             break;
         }
+        NextToken ();
     }
-
-    /* Skip right paren. We must explicitly check for one here, since some of
-    ** the breaks above bail out without checking.
-    */
-    ConsumeRParen ();
 }
 
 
 
-static FuncDesc* ParseFuncDecl (void)
-/* Parse the argument list of a function with the enclosing parentheses */
+static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
+/* Parse the argument list of a function with the closing parenthesis */
 {
-    SymEntry* WrappedCall;
-    unsigned int WrappedCallData;
-
     /* Create a new function descriptor */
     FuncDesc* F = NewFuncDesc ();
 
     /* Enter a new lexical level */
     EnterFunctionLevel ();
-
-    /* Skip the opening paren */
-    NextToken ();
 
     /* Check for several special parameter lists */
     if (CurTok.Tok == TOK_RPAREN) {
@@ -1985,14 +2031,17 @@ static FuncDesc* ParseFuncDecl (void)
         /* Parameter list declared as void */
         NextToken ();
         F->Flags |= FD_VOID_PARAM;
-    } else if (CurTok.Tok == TOK_IDENT &&
+    } else if (Mode != DM_NO_IDENT &&
+               CurTok.Tok == TOK_IDENT &&
                (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
         /* If the identifier is a typedef, we have a new-style parameter list;
         ** if it's some other identifier, it's an old-style parameter list.
+        ** Note: Non-empty Old-style (K&R) parameter list is not allowed in
+        ** type names.
         */
         SymEntry* Sym = FindSym (CurTok.Ident);
         if (Sym == 0 || !SymIsTypeDef (Sym)) {
-            /* Old-style (K&R) function. */
+            /* Old-style (K&R) function */
             F->Flags |= FD_OLDSTYLE;
         }
     }
@@ -2006,6 +2055,16 @@ static FuncDesc* ParseFuncDecl (void)
         /* Old-style function */
         ParseOldStyleParamList (F);
     }
+
+    if (!ConsumeRParen ()) {
+        /* Try some smart error recovery */
+        SimpleErrorSkip ();
+        NextToken ();
+    } else if (Mode == DM_IDENT_OR_EMPTY && (F->Flags & FD_OLDSTYLE) != 0) {
+        /* Parameter declaration list is only allowed in function definitions */
+        ParseOldStyleParamDeclList (F);
+    }
+
     PopLexicalLevel ();
 
     /* Remember the last function parameter. We need it later for several
@@ -2013,42 +2072,43 @@ static FuncDesc* ParseFuncDecl (void)
     ** more symbols are added to the table, it is easier if we remember it
     ** now, since it is currently the last entry in the symbol table.
     */
-    F->LastParam = GetSymTab()->SymTail;
+    F->LastParam = GetSymTab ()->SymTail;
+
+    /* Leave the lexical level remembering the symbol tables */
+    RememberFunctionLevel (F);
 
     /* It is allowed to use incomplete types in function prototypes, so we
     ** won't always get to know the parameter sizes here and may do that later.
     */
     F->Flags |= FD_INCOMPLETE_PARAM;
 
-    /* Leave the lexical level remembering the symbol tables */
-    RememberFunctionLevel (F);
-
-    /* Did we have a WrappedCall for this function? */
-    GetWrappedCall((void **) &WrappedCall, &WrappedCallData);
-    if (WrappedCall) {
-        F->WrappedCall = WrappedCall;
-        F->WrappedCallData = WrappedCallData;
+    /* We cannot specify fastcall for variadic functions */
+    if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
+        Error ("Variadic functions cannot be __fastcall__");
+        Qualifiers &= ~T_QUAL_FASTCALL;
     }
 
-    /* Return the function descriptor */
-    return F;
+    /* Add the function type. Be sure to bounds check the type buffer */
+    NeedTypeSpace (D, 1);
+    D->Type[D->Index].C = T_FUNC | Qualifiers;
+    D->Type[D->Index].A.F = F;
+    ++D->Index;
 }
 
 
 
-static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
+static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_t Mode)
 /* Recursively process direct declarators. Build a type array in reverse order. */
 {
     /* Read optional function or pointer qualifiers that modify the identifier
-    ** or token to the right. For convenience, we allow a calling convention
-    ** also for pointers here. If it's a pointer-to-function, the qualifier
-    ** later will be transfered to the function itself. If it's a pointer to
-    ** something else, it will be flagged as an error.
+    ** or token to the right.
     */
-    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
+    TypeCode Qualifiers = *RemQ | OptionalQualifiers (*RemQ, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
 
     /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
+        /* Qualifiers on the pointer itself */
+        TypeCode Q = T_QUAL_NONE;
 
         /* Skip the star */
         NextToken ();
@@ -2059,26 +2119,75 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         }
 
         /* Allow const, restrict, and volatile qualifiers */
-        Qualifiers |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
+        Q |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
 
-        /* Parse the type that the pointer points to */
-        DirectDecl (Spec, D, Mode);
+        /* For convenience, we allow a calling convention also for pointers
+        ** here. If it's a pointer-to-function, the qualifier later will be
+        ** transfered to the function itself. If it's a pointer to something
+        ** else, it will be flagged as an error.
+        */
+        *RemQ = T_QUAL_NONE;
+
+        /* Parse the type that derives from the pointer */
+        DirectDecl (Spec, D, RemQ, Mode);
 
         /* Add the type */
-        AddTypeCodeToDeclarator (D, T_PTR | Qualifiers);
+        AddTypeCodeToDeclarator (D, T_PTR | Q | *RemQ);
+
+        /* Return the calling convention and address size specifiers on the
+        ** pointee type.
+        */
+        *RemQ = Qualifiers;
         return;
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
-        NextToken ();
+        int       Nested = 0;
+        SymEntry* Entry;
+
         /* An empty declaration cannot contain parentheses where an identifier
         ** would show up if it were a non-empty declaration.
         */
         if (Mode == DM_IDENT_OR_EMPTY) {
             Spec->Flags |= DS_NO_EMPTY_DECL;
         }
-        DirectDecl (Spec, D, Mode);
-        ConsumeRParen ();
+
+        /* Skip the opening paren */
+        NextToken ();
+
+        /* We have to disambiguate the meanings of 'type (identifier' when
+        ** the identifier can be a typedef'ed parameter type specifier or
+        ** a declarator enclosed in parentheses in some cases.
+        */
+        if (Mode == DM_IDENT_OR_EMPTY ||                /* If we are in a declaration... */
+            CurTok.Tok == TOK_LPAREN  ||                /* or the next token is one more paren... */
+            CurTok.Tok == TOK_STAR    ||                /* or a '*' ... */
+            (CurTok.Tok == TOK_IDENT &&                 /* or an identifier that... */
+             ((Entry = FindSym (CurTok.Ident)) == 0 ||  /* is not a typedef. */
+              !SymIsTypeDef (Entry)))) {
+            Nested = 1;
+        } else {
+            /* Check for qualifiers */
+            TypeCode Q = OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
+
+            if (Q != T_QUAL_NONE) {
+                Qualifiers |= Q;
+                Nested = 1;
+            }
+        }
+
+        if (Nested) {
+            /* Parse the direct declarator in parentheses */
+            DirectDecl (Spec, D, &Qualifiers, Mode);
+            ConsumeRParen ();
+        } else {
+            /* This is a parameter type list in parentheses */
+            ParseFuncDecl (D, Mode, Qualifiers);
+
+            /* Qualifiers now used */
+            Qualifiers = T_QUAL_NONE;
+        }
+
     } else if (CurTok.Tok == TOK_IDENT) {
         if (Mode == DM_NO_IDENT) {
             Error ("Unexpected identifier in type name");
@@ -2087,48 +2196,26 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         NextToken ();
     } else {
         D->Ident[0] = '\0';
-        if ((Spec->Flags & DS_NO_EMPTY_DECL) != 0   &&
-            CurTok.Tok != TOK_LBRACK                &&
+        if (CurTok.Tok != TOK_LBRACK &&
             ((Spec->Flags & DS_ALLOW_BITFIELD) == 0 || CurTok.Tok != TOK_COLON)) {
-            Error ("Identifier expected");
+            if ((Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE) {
+                Error ("Declaration specifier or identifier expected");
+            } else if ((Spec->Flags & DS_NO_EMPTY_DECL) != 0) {
+                Error ("Identifier expected");
+            }
         }
     }
 
     while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
         if (CurTok.Tok == TOK_LPAREN) {
+            /* Skip the opening paren */
+            NextToken ();
 
             /* Function declarator */
-            FuncDesc* F;
-            SymEntry* PrevEntry;
-
-            /* Parse the function declarator */
-            F = ParseFuncDecl ();
-
-            /* We cannot specify fastcall for variadic functions */
-            if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
-                Error ("Variadic functions cannot be __fastcall__");
-                Qualifiers &= ~T_QUAL_FASTCALL;
-            }
-
-            /* Was there a previous entry? If so, copy WrappedCall info from it */
-            PrevEntry = FindGlobalSym (D->Ident);
-            if (PrevEntry && PrevEntry->Flags & SC_FUNC) {
-                FuncDesc* D = GetFuncDesc (PrevEntry->Type);
-                if (D->WrappedCall && !F->WrappedCall) {
-                    F->WrappedCall = D->WrappedCall;
-                    F->WrappedCallData = D->WrappedCallData;
-                }
-            }
-
-            /* Add the function type. Be sure to bounds check the type buffer */
-            NeedTypeSpace (D, 1);
-            D->Type[D->Index].C = T_FUNC | Qualifiers;
-            D->Type[D->Index].A.F = F;
-            ++D->Index;
+            ParseFuncDecl (D, Mode, Qualifiers);
 
             /* Qualifiers now used */
             Qualifiers = T_QUAL_NONE;
-
         } else {
             /* Array declarator */
             long Size = UNSPECIFIED;
@@ -2179,19 +2266,7 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         }
     }
 
-    /* If we have remaining qualifiers, flag them as invalid */
-    if (Qualifiers & T_QUAL_NEAR) {
-        Error ("Invalid '__near__' qualifier");
-    }
-    if (Qualifiers & T_QUAL_FAR) {
-        Error ("Invalid '__far__' qualifier");
-    }
-    if (Qualifiers & T_QUAL_FASTCALL) {
-        Error ("Invalid '__fastcall__' qualifier");
-    }
-    if (Qualifiers & T_QUAL_CDECL) {
-        Error ("Invalid '__cdecl__' qualifier");
-    }
+    *RemQ = Qualifiers;
 }
 
 
@@ -2252,6 +2327,8 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 ** Return 1 otherwise.
 */
 {
+    TypeCode Q = T_QUAL_NONE;
+
     /* Used to check if we have any errors during parsing this */
     unsigned PrevErrorCount = ErrorCount;
 
@@ -2267,11 +2344,12 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     InitDeclarator (D);
 
     /* Get additional derivation of the declarator and the identifier */
-    DirectDecl (Spec, D, Mode);
+    DirectDecl (Spec, D, &Q, Mode);
 
     /* Add the base type */
     NeedTypeSpace (D, TypeLen (Spec->Type) + 1);        /* Bounds check */
     TypeCopy (D->Type + D->Index, Spec->Type);
+    D->Type[D->Index].C |= Q;
 
     /* Use the storage class from the declspec */
     D->StorageClass = Spec->StorageClass;
@@ -2373,9 +2451,11 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         }
 
         /* Try some smart error recovery */
-        if (CurTok.Tok != TOK_LCURLY || !IsTypeFunc (D->Type)) {
+        if (Mode == DM_NO_IDENT) {
+            return SimpleErrorSkip ();
+        } else if (CurTok.Tok != TOK_LCURLY || !IsTypeFunc (D->Type)) {
             /* Skip to the end of the whole declaration if it is not part of a
-            ** parameter list or a type cast.
+            ** parameter list.
             */
             return SmartErrorSkip (Mode == DM_IDENT_OR_EMPTY);
         }

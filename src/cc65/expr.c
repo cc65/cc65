@@ -1071,11 +1071,6 @@ static void FunctionCall (ExprDesc* Expr)
 
     /* Special handling for function pointers */
     if (IsFuncPtr) {
-
-        if (Func->WrappedCall) {
-            Warning ("Calling a wrapped function via a pointer, wrapped-call will not be used");
-        }
-
         /* If the function is not a fastcall function, load the pointer to
         ** the function into the primary.
         */
@@ -1124,18 +1119,18 @@ static void FunctionCall (ExprDesc* Expr)
     } else {
 
         /* Normal function */
-        if (Func->WrappedCall) {
+        if (Expr->Sym && Expr->Sym->V.F.WrappedCall) {
             char tmp[64];
             StrBuf S = AUTO_STRBUF_INITIALIZER;
 
-            if (Func->WrappedCallData == WRAPPED_CALL_USE_BANK) {
+            if (Expr->Sym->V.F.WrappedCallData == WRAPPED_CALL_USE_BANK) {
                 /* Store the bank attribute in tmp4 */
                 SB_AppendStr (&S, "ldy #<.bank(_");
                 SB_AppendStr (&S, (const char*) Expr->Name);
                 SB_AppendChar (&S, ')');
             } else {
                 /* Store the WrappedCall data in tmp4 */
-                sprintf(tmp, "ldy #%u", Func->WrappedCallData);
+                sprintf(tmp, "ldy #%u", Expr->Sym->V.F.WrappedCallData);
                 SB_AppendStr (&S, tmp);
             }
             g_asmcode (&S);
@@ -1168,7 +1163,7 @@ static void FunctionCall (ExprDesc* Expr)
 
             SB_Done (&S);
 
-            g_call (CG_CallFlags (Expr->Type), Func->WrappedCall->Name, ArgSize);
+            g_call (CG_CallFlags (Expr->Type), Expr->Sym->V.F.WrappedCall->Name, ArgSize);
         } else {
             g_call (CG_CallFlags (Expr->Type), (const char*) Expr->Name, ArgSize);
         }
@@ -1342,6 +1337,7 @@ static void Primary (ExprDesc* E)
                     E->Type  = type_int;
                 }
 
+                E->Sym = Sym;
             }
             break;
 
@@ -1426,7 +1422,7 @@ static void Primary (ExprDesc* E)
             } else {
                 /* Let's see if this is a C99-style declaration */
                 DeclSpec Spec;
-                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
+                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
 
                 if ((Spec.Flags & DS_TYPE_MASK) != DS_NONE) {
                     Error ("Mixed declarations and code are not supported in cc65");

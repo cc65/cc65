@@ -37,6 +37,11 @@
 #define _TIME_H
 
 
+/* Forward declaration for target.h */
+typedef unsigned long time_t;
+typedef unsigned long clock_t;
+
+
 
 /* NULL pointer */
 #ifndef NULL
@@ -48,9 +53,6 @@
 #define _HAVE_size_t
 typedef unsigned size_t;
 #endif
-
-typedef unsigned long time_t;
-typedef unsigned long clock_t;
 
 /* Structure for broken down time */
 struct tm {

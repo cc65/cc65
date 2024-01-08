@@ -637,10 +637,10 @@ INLINE void ED_MarkExprAsRVal (ExprDesc* Expr)
 #  define ED_MarkExprAsRVal(Expr)   do { (Expr)->Flags &= ~E_RTYPE_LVAL; } while (0)
 #endif
 
-ExprDesc* ED_AddrExpr (ExprDesc* Expr);
+void ED_AddrExpr (ExprDesc* Expr);
 /* Take address of Expr */
 
-ExprDesc* ED_IndExpr (ExprDesc* Expr);
+void ED_IndExpr (ExprDesc* Expr);
 /* Dereference Expr */
 
 #if defined(HAVE_INLINE)

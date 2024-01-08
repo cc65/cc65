@@ -701,7 +701,7 @@ static unsigned ParseVoidInit (Type* T)
     Size = 0;
     do {
         ExprDesc Expr = NoCodeConstExpr (hie1);
-        switch (GetUnqualTypeCode (&Expr.Type[0])) {
+        switch (GetUnderlyingTypeCode (&Expr.Type[0])) {
 
             case T_SCHAR:
             case T_UCHAR:
@@ -769,7 +769,7 @@ static unsigned ParseVoidInit (Type* T)
 static unsigned ParseInitInternal (Type* T, int *Braces, int AllowFlexibleMembers)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    switch (GetUnqualTypeCode (T)) {
+    switch (GetUnderlyingTypeCode (T)) {
 
         case T_SCHAR:
         case T_UCHAR:

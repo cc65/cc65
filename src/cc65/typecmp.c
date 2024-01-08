@@ -259,8 +259,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         }
 
         /* Get the ranks of the left and right hands */
-        LeftRank  = (GetUnqualTypeCode (lhs) & T_MASK_RANK);
-        RightRank = (GetUnqualTypeCode (rhs) & T_MASK_RANK);
+        LeftRank  = (GetUnderlyingTypeCode (lhs) & T_MASK_RANK);
+        RightRank = (GetUnderlyingTypeCode (rhs) & T_MASK_RANK);
 
         /* Bit-fields are considered compatible if they have the same
         ** signedness, bit-offset and bit-width.
@@ -344,10 +344,10 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             case T_RANK_PTR:
                 ++Result->Indirections;
                 if (Result->Indirections == 1) {
-                    if ((GetUnqualTypeCode (lhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
+                    if ((GetUnderlyingTypeCode (lhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
                         Result->F |= TCF_VOID_PTR_ON_LEFT;
                     }
-                    if ((GetUnqualTypeCode (rhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
+                    if ((GetUnderlyingTypeCode (rhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
                         Result->F |= TCF_VOID_PTR_ON_RIGHT;
                     }
                 } else {

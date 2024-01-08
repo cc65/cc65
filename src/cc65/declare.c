@@ -501,6 +501,31 @@ static void FixQualifiers (Type* DataType)
                 T[0].C |= CodeAddrSizeQualifier ();
             }
 
+        } else {
+
+            /* If we have remaining qualifiers, flag them as invalid */
+            Q = T[0].C;
+
+            if (Q & T_QUAL_NEAR) {
+                Error ("Invalid '__near__' qualifier");
+                Q &= ~T_QUAL_NEAR;
+            }
+            if (Q & T_QUAL_FAR) {
+                Error ("Invalid '__far__' qualifier");
+                Q &= ~T_QUAL_FAR;
+            }
+            if (Q & T_QUAL_FASTCALL) {
+                Error ("Invalid '__fastcall__' qualifier");
+                Q &= ~T_QUAL_FASTCALL;
+            }
+            if (Q & T_QUAL_CDECL) {
+                Error ("Invalid '__cdecl__' qualifier");
+                Q &= ~T_QUAL_CDECL;
+            }
+
+            /* Clear the invalid qualifiers */
+            T[0].C &= Q;
+
         }
         ++T;
     }
@@ -1990,16 +2015,13 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 
 static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
-/* Parse the argument list of a function with the enclosing parentheses */
+/* Parse the argument list of a function with the closing parenthesis */
 {
     /* Create a new function descriptor */
     FuncDesc* F = NewFuncDesc ();
 
     /* Enter a new lexical level */
     EnterFunctionLevel ();
-
-    /* Skip the opening paren */
-    NextToken ();
 
     /* Check for several special parameter lists */
     if (CurTok.Tok == TOK_RPAREN) {
@@ -2075,19 +2097,18 @@ static void ParseFuncDecl (Declarator* D, declmode_t Mode, TypeCode Qualifiers)
 
 
 
-static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
+static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_t Mode)
 /* Recursively process direct declarators. Build a type array in reverse order. */
 {
     /* Read optional function or pointer qualifiers that modify the identifier
-    ** or token to the right. For convenience, we allow a calling convention
-    ** also for pointers here. If it's a pointer-to-function, the qualifier
-    ** later will be transfered to the function itself. If it's a pointer to
-    ** something else, it will be flagged as an error.
+    ** or token to the right.
     */
-    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
+    TypeCode Qualifiers = *RemQ | OptionalQualifiers (*RemQ, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
 
     /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
+        /* Qualifiers on the pointer itself */
+        TypeCode Q = T_QUAL_NONE;
 
         /* Skip the star */
         NextToken ();
@@ -2098,17 +2119,30 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         }
 
         /* Allow const, restrict, and volatile qualifiers */
-        Qualifiers |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
+        Q |= OptionalQualifiers (Qualifiers, T_QUAL_CVR);
 
-        /* Parse the type that the pointer points to */
-        DirectDecl (Spec, D, Mode);
+        /* For convenience, we allow a calling convention also for pointers
+        ** here. If it's a pointer-to-function, the qualifier later will be
+        ** transfered to the function itself. If it's a pointer to something
+        ** else, it will be flagged as an error.
+        */
+        *RemQ = T_QUAL_NONE;
+
+        /* Parse the type that derives from the pointer */
+        DirectDecl (Spec, D, RemQ, Mode);
 
         /* Add the type */
-        AddTypeCodeToDeclarator (D, T_PTR | Qualifiers);
+        AddTypeCodeToDeclarator (D, T_PTR | Q | *RemQ);
+
+        /* Return the calling convention and address size specifiers on the
+        ** pointee type.
+        */
+        *RemQ = Qualifiers;
         return;
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
+        int       Nested = 0;
         SymEntry* Entry;
 
         /* An empty declaration cannot contain parentheses where an identifier
@@ -2118,19 +2152,33 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
             Spec->Flags |= DS_NO_EMPTY_DECL;
         }
 
+        /* Skip the opening paren */
+        NextToken ();
+
         /* We have to disambiguate the meanings of 'type (identifier' when
         ** the identifier can be a typedef'ed parameter type specifier or
         ** a declarator enclosed in parentheses in some cases.
         */
         if (Mode == DM_IDENT_OR_EMPTY ||                /* If we are in a declaration... */
-            NextTok.Tok == TOK_LPAREN ||                /* or the next token is one more paren... */
-            NextTok.Tok == TOK_STAR ||                  /* or a '*' ... */
-            (NextTok.Tok == TOK_IDENT &&                /* or an identifier that... */
-            ((Entry = FindSym (NextTok.Ident)) == 0 ||  /* is not a typedef. */
-            !SymIsTypeDef (Entry)))) {
+            CurTok.Tok == TOK_LPAREN  ||                /* or the next token is one more paren... */
+            CurTok.Tok == TOK_STAR    ||                /* or a '*' ... */
+            (CurTok.Tok == TOK_IDENT &&                 /* or an identifier that... */
+             ((Entry = FindSym (CurTok.Ident)) == 0 ||  /* is not a typedef. */
+              !SymIsTypeDef (Entry)))) {
+            Nested = 1;
+        } else {
+            /* Check for qualifiers */
+            TypeCode Q = OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_CCONV);
+
+            if (Q != T_QUAL_NONE) {
+                Qualifiers |= Q;
+                Nested = 1;
+            }
+        }
+
+        if (Nested) {
             /* Parse the direct declarator in parentheses */
-            NextToken ();
-            DirectDecl (Spec, D, Mode);
+            DirectDecl (Spec, D, &Qualifiers, Mode);
             ConsumeRParen ();
         } else {
             /* This is a parameter type list in parentheses */
@@ -2160,6 +2208,9 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 
     while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
         if (CurTok.Tok == TOK_LPAREN) {
+            /* Skip the opening paren */
+            NextToken ();
+
             /* Function declarator */
             ParseFuncDecl (D, Mode, Qualifiers);
 
@@ -2215,19 +2266,7 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         }
     }
 
-    /* If we have remaining qualifiers, flag them as invalid */
-    if (Qualifiers & T_QUAL_NEAR) {
-        Error ("Invalid '__near__' qualifier");
-    }
-    if (Qualifiers & T_QUAL_FAR) {
-        Error ("Invalid '__far__' qualifier");
-    }
-    if (Qualifiers & T_QUAL_FASTCALL) {
-        Error ("Invalid '__fastcall__' qualifier");
-    }
-    if (Qualifiers & T_QUAL_CDECL) {
-        Error ("Invalid '__cdecl__' qualifier");
-    }
+    *RemQ = Qualifiers;
 }
 
 
@@ -2288,6 +2327,8 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 ** Return 1 otherwise.
 */
 {
+    TypeCode Q = T_QUAL_NONE;
+
     /* Used to check if we have any errors during parsing this */
     unsigned PrevErrorCount = ErrorCount;
 
@@ -2303,11 +2344,12 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     InitDeclarator (D);
 
     /* Get additional derivation of the declarator and the identifier */
-    DirectDecl (Spec, D, Mode);
+    DirectDecl (Spec, D, &Q, Mode);
 
     /* Add the base type */
     NeedTypeSpace (D, TypeLen (Spec->Type) + 1);        /* Bounds check */
     TypeCopy (D->Type + D->Index, Spec->Type);
+    D->Type[D->Index].C |= Q;
 
     /* Use the storage class from the declspec */
     D->StorageClass = Spec->StorageClass;

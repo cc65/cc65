@@ -7,13 +7,13 @@
 
         .export         _strspn
         .import         popptr1, _strlen
-        .importzp       ptr1, ptr2, tmp1, tmp2
+        .importzp       ptr1, ptr4, tmp1, tmp2
 
 _strspn:
-        jsr _strlen         ; get length in a/x and transfer s2 to ptr2
+        jsr _strlen         ; get length in a/x and transfer s2 to ptr4
                             ; Note: It does not make sense to
                             ; have more than 255 test chars, so
-                            ; we don't support a high byte here! (ptr2+1 is
+                            ; we don't support a high byte here! (ptr4+1 is
                             ; also unchanged in strlen then (important!))
                             ; -> the original implementation also
                             ; ignored this case
@@ -38,7 +38,7 @@ checkNext:
         iny
 check:  cpy tmp1            ; compare with length of test character string
         beq leave
-        cmp (ptr2),y        ; found matching char?
+        cmp (ptr4),y        ; found matching char?
         bne checkNext
 
 foundTestChar:

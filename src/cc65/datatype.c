@@ -539,7 +539,7 @@ const Type* AddressOf (const Type* T)
     Type* P = TypeAlloc (Size + 1);
 
     /* Create the return type... */
-    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE) | T_QUAL_CONST;
+    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE);
     memcpy (P+1, T, Size * sizeof (Type));
 
     /* ...and return it */
@@ -1365,6 +1365,65 @@ const char* GetFullTypeName (const Type* T)
 
 
 
+static void GetParameterList (StrBuf* ParamList, StrBuf* Buf, const FuncDesc* D, int Detailed)
+{
+    /* First argument */
+    const SymEntry* Param = D->SymTab->SymHead;
+    unsigned I;
+
+    if ((D->Flags & FD_OLDSTYLE) == 0) {
+        /* ANSI style */
+        for (I = 0; I < D->ParamCount; ++I) {
+            CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
+            if (I > 0) {
+                SB_AppendStr (ParamList, ", ");
+            }
+            if (Detailed) {
+                if (SymIsRegVar (Param)) {
+                    SB_AppendStr (ParamList, "register ");
+                }
+                if (!SymHasAnonName (Param)) {
+                    SB_AppendStr (Buf, Param->Name);
+                }
+            }
+            SB_AppendStr (ParamList, SB_GetConstBuf (GetFullTypeNameBuf (Buf, Param->Type)));
+            SB_Clear (Buf);
+            /* Next argument */
+            Param = Param->NextSym;
+        }
+        if ((D->Flags & FD_VARIADIC) == 0) {
+            if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
+                SB_AppendStr (ParamList, "void");
+            }
+        } else {
+            if (D->ParamCount > 0) {
+                SB_AppendStr (ParamList, ", ...");
+            } else {
+                SB_AppendStr (ParamList, "...");
+            }
+        }
+    } else {
+        /* K&R style */
+        if (Detailed) {
+            for (I = 0; I < D->ParamCount; ++I) {
+                CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
+                if (I > 0) {
+                    SB_AppendStr (ParamList, ", ");
+                }
+                if (!SymHasAnonName (Param)) {
+                    SB_AppendStr (ParamList, Param->Name);
+                }
+                /* Next argument */
+                Param = Param->NextSym;
+            }
+        }
+        SB_Clear (Buf);
+    }
+    SB_Terminate (ParamList);
+}
+
+
+
 static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBuf* East, const Type* T)
 /* Return the name string of the given type split into a western part and an
 ** eastern part.
@@ -1404,34 +1463,12 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
 
     } else if (IsTypeFunc (T)) {
 
-        FuncDesc* D             = GetFuncDesc (T);
-        struct StrBuf ParamList = AUTO_STRBUF_INITIALIZER;
+        int             QualCount = 0;
+        struct StrBuf   ParamList = AUTO_STRBUF_INITIALIZER;
+        const FuncDesc* D = GetFuncDesc (T);
 
-        /* First argument */
-        SymEntry* Param = D->SymTab->SymHead;
-        unsigned I;
-        for (I = 0; I < D->ParamCount; ++I) {
-            CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
-            if (I > 0) {
-                SB_AppendStr (&ParamList, ", ");
-            }
-            SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
-            SB_Clear (&Buf);
-            /* Next argument */
-            Param = Param->NextSym;
-        }
-        if ((D->Flags & FD_VARIADIC) == 0) {
-            if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
-                SB_AppendStr (&ParamList, "void");
-            }
-        } else {
-            if (D->ParamCount > 0) {
-                SB_AppendStr (&ParamList, ", ...");
-            } else {
-                SB_AppendStr (&ParamList, "...");
-            }
-        }
-        SB_Terminate (&ParamList);
+        /* Get the parameter list string */
+        GetParameterList (&ParamList, &Buf, D, 0);
 
         /* Join the existing West and East together */
         if (!SB_IsEmpty (East)) {
@@ -1440,13 +1477,27 @@ static struct StrBuf* GetFullTypeNameWestEast (struct StrBuf* West, struct StrBu
             SB_Clear (East);
         }
 
+        /* Add qualifiers */
+        if ((GetQualifier (T) & ~T_QUAL_NEAR) != T_QUAL_NONE) {
+            QualCount = GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NEAR);
+            if (QualCount > 0) {
+                SB_AppendChar (&Buf, ' ');
+            }
+        }
+
         if (SB_IsEmpty (West)) {
-            /* Just use the param list */
-            SB_Printf (West, "(%s)", SB_GetConstBuf (&ParamList));
+            /* Use no parentheses */
+            SB_Terminate (&Buf);
+
+            /* Append the param list to the West */
+            SB_Printf (West, "%s(%s)", SB_GetConstBuf (&Buf), SB_GetConstBuf (&ParamList));
         } else {
-            /* Append the param list to the existing West */
-            SB_Printf (&Buf, "(%s)(%s)", SB_GetConstBuf (West), SB_GetConstBuf (&ParamList));
-            SB_Printf (West, "%s", SB_GetConstBuf (&Buf));
+            /* Append the existing West */
+            SB_Append (&Buf, West);
+            SB_Terminate (&Buf);
+
+            /* Append the param list to the West */
+            SB_Printf (West, "(%s)(%s)", SB_GetConstBuf (&Buf), SB_GetConstBuf (&ParamList));
         }
         SB_Done (&ParamList);
 
@@ -1609,37 +1660,8 @@ void PrintFuncSig (FILE* F, const char* Name, const Type* T)
     /* Get the function descriptor used in definition */
     const FuncDesc* D = GetFuncDefinitionDesc (T);
 
-    /* Get the parameter list string. Start from the first parameter */
-    SymEntry* Param = D->SymTab->SymHead;
-    unsigned I;
-    for (I = 0; I < D->ParamCount; ++I) {
-        CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
-        if (I > 0) {
-            SB_AppendStr (&ParamList, ", ");
-        }
-        if (SymIsRegVar (Param)) {
-            SB_AppendStr (&ParamList, "register ");
-        }
-        if (!SymHasAnonName (Param)) {
-            SB_AppendStr (&Buf, Param->Name);
-        }
-        SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
-        SB_Clear (&Buf);
-        /* Next argument */
-        Param = Param->NextSym;
-    }
-    if ((D->Flags & FD_VARIADIC) == 0) {
-        if (D->ParamCount == 0 && (D->Flags & FD_EMPTY) == 0) {
-            SB_AppendStr (&ParamList, "void");
-        }
-    } else {
-        if (D->ParamCount > 0) {
-            SB_AppendStr (&ParamList, ", ...");
-        } else {
-            SB_AppendStr (&ParamList, "...");
-        }
-    }
-    SB_Terminate (&ParamList);
+    /* Get the parameter list string */
+    GetParameterList (&ParamList, &Buf, D, 1);
 
     /* Get the function qualifiers */
     if (GetQualifierTypeCodeNameBuf (&Buf, T->C, T_QUAL_NONE) > 0) {
@@ -1650,16 +1672,44 @@ void PrintFuncSig (FILE* F, const char* Name, const Type* T)
 
     /* Get the signature string without the return type */
     SB_Printf (&West, "%s%s (%s)", SB_GetConstBuf (&Buf), Name, SB_GetConstBuf (&ParamList));
-    SB_Done (&Buf);
-    SB_Done (&ParamList);
 
     /* Complete with the return type */
     GetFullTypeNameWestEast (&West, &East, GetFuncReturnType (T));
     SB_Append (&West, &East);
+
+    /* Check if the function is defined in K&R style */
+    if ((D->Flags & FD_OLDSTYLE) != 0 && D->ParamCount > 0) {
+        /* First argument */
+        const SymEntry* Param = D->SymTab->SymHead;
+        unsigned I;
+
+        SB_Clear (&ParamList);
+        SB_Clear (&Buf);
+        for (I = 0; I < D->ParamCount; ++I) {
+            CHECK (Param != 0 && (Param->Flags & SC_PARAM) != 0);
+            SB_AppendChar (&ParamList, ' ');
+            if (SymIsRegVar (Param)) {
+                SB_AppendStr (&ParamList, "register ");
+            }
+            if (!SymHasAnonName (Param)) {
+                SB_AppendStr (&Buf, Param->Name);
+            }
+            SB_AppendStr (&ParamList, SB_GetConstBuf (GetFullTypeNameBuf (&Buf, Param->Type)));
+            SB_AppendChar (&ParamList, ';');
+            SB_Clear (&Buf);
+
+            /* Next argument */
+            Param = Param->NextSym;
+        }
+        SB_Append (&West, &ParamList);
+    }
+
     SB_Terminate (&West);
 
     /* Output */
     fprintf (F, "%s", SB_GetConstBuf (&West));
+    SB_Done (&ParamList);
+    SB_Done (&Buf);
     SB_Done (&East);
     SB_Done (&West);
 }

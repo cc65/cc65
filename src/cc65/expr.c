@@ -129,7 +129,7 @@ unsigned CG_TypeOf (const Type* T)
 {
     unsigned CG_Type;
 
-    switch (GetUnqualTypeCode (T)) {
+    switch (GetUnderlyingTypeCode (T)) {
 
         case T_SCHAR:
             return CF_CHAR;
@@ -188,7 +188,7 @@ unsigned CG_TypeOf (const Type* T)
 unsigned CG_CallFlags (const Type* T)
 /* Get the code generator flags for calling the function */
 {
-    if (GetUnqualTypeCode (T) == T_FUNC) {
+    if (GetUnderlyingTypeCode (T) == T_FUNC) {
         return (T->A.F->Flags & FD_VARIADIC) ? 0 : CF_FIXARGC;
     } else {
         Error ("Illegal function type %04lX", T->C);
@@ -291,7 +291,7 @@ static unsigned typeadjust (ExprDesc* lhs, const ExprDesc* rhs, int NoPush)
 void LimitExprValue (ExprDesc* Expr, int WarnOverflow)
 /* Limit the constant value of the expression to the range of its type */
 {
-    switch (GetUnqualTypeCode (Expr->Type)) {
+    switch (GetUnderlyingTypeCode (Expr->Type)) {
         case T_INT:
         case T_SHORT:
             if (WarnOverflow && ((Expr->IVal < -0x8000) || (Expr->IVal > 0x7FFF))) {

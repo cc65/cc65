@@ -216,7 +216,7 @@ unsigned BitSizeOf (const Type* T)
 unsigned SizeOf (const Type* T)
 /* Compute size (in bytes) of object represented by type array */
 {
-    switch (GetUnqualTypeCode (T)) {
+    switch (GetUnderlyingTypeCode (T)) {
 
         case T_VOID:
             /* A void variable is a cc65 extension.
@@ -368,7 +368,7 @@ static unsigned GetMinimalTypeSizeByBitWidth (unsigned BitWidth)
 
 
 
-TypeCode GetUnqualTypeCode (const Type* Type)
+TypeCode GetUnderlyingTypeCode (const Type* Type)
 /* Get the type code of the unqualified underlying type of Type.
 ** Return GetUnqualRawTypeCode (Type) if Type is not scalar.
 */
@@ -725,7 +725,7 @@ const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
 const Type* GetSignedType (const Type* T)
 /* Get signed counterpart of the integral type */
 {
-    switch (GetUnqualTypeCode (T) & T_MASK_RANK) {
+    switch (GetUnderlyingTypeCode (T) & T_MASK_RANK) {
         case T_RANK_CHAR:
             return type_schar;
 
@@ -739,7 +739,7 @@ const Type* GetSignedType (const Type* T)
             return type_long;
 
         default:
-            Internal ("Unknown type code: %lX", GetUnqualTypeCode (T));
+            Internal ("Unknown type code: %lX", GetUnderlyingTypeCode (T));
             return T;
     }
 }
@@ -749,7 +749,7 @@ const Type* GetSignedType (const Type* T)
 const Type* GetUnsignedType (const Type* T)
 /* Get unsigned counterpart of the integral type */
 {
-    switch (GetUnqualTypeCode (T) & T_MASK_RANK) {
+    switch (GetUnderlyingTypeCode (T) & T_MASK_RANK) {
         case T_RANK_CHAR:
             return type_uchar;
 
@@ -763,7 +763,7 @@ const Type* GetUnsignedType (const Type* T)
             return type_ulong;
 
         default:
-            Internal ("Unknown type code: %lX", GetUnqualTypeCode (T));
+            Internal ("Unknown type code: %lX", GetUnderlyingTypeCode (T));
             return T;
     }
 }

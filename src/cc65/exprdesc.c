@@ -418,7 +418,7 @@ ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr)
 
 
 
-ExprDesc* ED_AddrExpr (ExprDesc* Expr)
+void ED_AddrExpr (ExprDesc* Expr)
 /* Take address of Expr. The result is always an rvalue */
 {
     switch (Expr->Flags & E_MASK_LOC) {
@@ -447,12 +447,11 @@ ExprDesc* ED_AddrExpr (ExprDesc* Expr)
             }
             break;
     }
-    return Expr;
 }
 
 
 
-ExprDesc* ED_IndExpr (ExprDesc* Expr)
+void ED_IndExpr (ExprDesc* Expr)
 /* Dereference Expr */
 {
     switch (Expr->Flags & E_MASK_LOC) {
@@ -486,7 +485,6 @@ ExprDesc* ED_IndExpr (ExprDesc* Expr)
             }
             break;
     }
-    return Expr;
 }
 
 

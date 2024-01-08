@@ -1305,6 +1305,9 @@ static void OptStaticLocals (const char* Opt attribute ((unused)),
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
+    if (FirstInput) {
+        Error ("Target must be specified before input files");
+    }
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
         Error ("No such target system: '%s'", Arg);

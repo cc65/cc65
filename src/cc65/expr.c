@@ -4305,8 +4305,13 @@ ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*))
     if (!ED_IsConst (&Expr) || !ED_CodeRangeIsEmpty (&Expr)) {
         Error ("Constant expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
-        Expr.Flags &= E_MASK_RTYPE | E_MASK_KEEP_RESULT;
+        Expr.Flags &= E_MASK_RTYPE | E_MASK_KEEP_MAKE;
         Expr.Flags |= E_LOC_NONE;
+
+        /* Remove any non-constant code generated */
+        if (!ED_CodeRangeIsEmpty (&Expr)) {
+            RemoveCodeRange (&Expr.Start, &Expr.End);
+        }
     }
 
     /* Return by value */
@@ -4331,6 +4336,11 @@ ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*))
         Error ("Constant integer expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
         ED_MakeConstAbsInt (&Expr, 1);
+
+        /* Remove any non-constant code generated */
+        if (!ED_CodeRangeIsEmpty (&Expr)) {
+            RemoveCodeRange (&Expr.Start, &Expr.End);
+        }
     }
 
     /* Return by value */

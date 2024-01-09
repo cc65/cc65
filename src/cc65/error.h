@@ -100,6 +100,9 @@ struct StrBuf;
 
 
 
+void PrintFileInclusionInfo (const LineInfo* LI);
+/* Print hierarchy of file inclusion */
+
 void Fatal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
 /* Print a message about a fatal error and die */
 
@@ -109,7 +112,7 @@ void Internal (const char* Format, ...) attribute ((noreturn, format (printf, 1,
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
 
-void LIError (errcat_t EC, const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void LIError (errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 3, 4)));
 /* Print an error message with the line info given explicitly */
 
 void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
@@ -118,7 +121,7 @@ void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
 void Warning (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print a warning message */
 
-void LIWarning (errcat_t EC, const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void LIWarning (errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 3, 4)));
 /* Print a warning message with the line info given explicitly */
 
 void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));

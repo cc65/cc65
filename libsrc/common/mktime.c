@@ -65,7 +65,8 @@ static const unsigned MonthDays [] = {
 /*                                   Code                                    */
 /*****************************************************************************/
 
-
+/* use statics for size optimisation (~34 bytes) */
+#pragma static-locals(push, on)
 
 time_t __fastcall__ mktime (register struct tm* TM)
 /* Make a time in seconds since 1/1/1970 from the broken down time in TM.
@@ -74,8 +75,8 @@ time_t __fastcall__ mktime (register struct tm* TM)
 */
 {
     register div_t D;
-    static int Max;
-    static unsigned DayCount;
+    int Max;
+    unsigned DayCount;
 
     /* Check if TM is valid */
     if (TM == 0) {
@@ -182,3 +183,5 @@ time_t __fastcall__ mktime (register struct tm* TM)
            ((unsigned) TM->tm_sec) -
            _tz.timezone;
 }
+
+#pragma static-locals(pop)

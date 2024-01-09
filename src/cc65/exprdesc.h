@@ -582,7 +582,21 @@ int ED_IsZPInd (const ExprDesc* Expr);
 /* Return true if the expression is located on the zeropage */
 
 int ED_IsNullPtr (const ExprDesc* Expr);
-/* Return true if the given expression is a NULL pointer constant */
+/* Return true if the given expression is a null pointer.
+** Note: A null pointer constant converted to a pointer type is a null pointer.
+*/
+
+int ED_IsNullPtrConstant (const ExprDesc* Expr);
+/* Return true if the given expression is a null pointer constant.
+** Note: An integer constant expression with value 0, or such an
+** expression cast to void* is a null pointer constant. However, a
+** null pointer constant converted to a pointer type is just a null
+** pointer, not necessarily a constant in ISO C.
+*/
+
+int ED_IsEntityAddr (const ExprDesc* Expr);
+/* Return true if the expression denotes the address of an object or function.
+*/
 
 int ED_IsBool (const ExprDesc* Expr);
 /* Return true if the expression can be treated as a boolean, that is, it can

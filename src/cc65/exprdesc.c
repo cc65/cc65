@@ -255,7 +255,7 @@ int ED_IsConstTrue (const ExprDesc* Expr)
 {
     /* Non-zero arithmetics and objects addresses are boolean true */
     return (ED_IsConstAbsInt (Expr) && Expr->IVal != 0) ||
-           (ED_IsAddrExpr (Expr));
+           ED_IsEntityAddr (Expr);
 }
 
 
@@ -331,12 +331,41 @@ int ED_IsZPInd (const ExprDesc* Expr)
 
 
 int ED_IsNullPtr (const ExprDesc* Expr)
-/* Return true if the given expression is a NULL pointer constant */
+/* Return true if the given expression is a null pointer.
+** Note: A null pointer constant converted to a pointer type is a null pointer.
+*/
 {
-    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) ==
-                               (E_LOC_NONE|E_RTYPE_RVAL) &&
-           Expr->IVal == 0                               &&
-           IsClassInt (Expr->Type);
+    return ED_IsConstAbs (Expr) &&
+           Expr->IVal == 0      &&
+           (IsClassInt (Expr->Type) || IsTypePtr (Expr->Type));
+}
+
+
+
+int ED_IsNullPtrConstant (const ExprDesc* Expr)
+/* Return true if the given expression is a null pointer constant.
+** Note: An integer constant expression with value 0, or such an
+** expression cast to void* is a null pointer constant. However, a
+** null pointer constant converted to a pointer type is just a null
+** pointer, not necessarily a constant in ISO C.
+*/
+{
+    return ED_IsConstAbs (Expr) &&
+           Expr->IVal == 0      &&
+           (IsClassInt (Expr->Type) ||
+            (IsTypePtr (Expr->Type) && IsTypeVoid (Expr->Type + 1) &&
+             GetQualifier (Expr->Type + 1) == T_QUAL_NONE));
+}
+
+
+
+int ED_IsEntityAddr (const ExprDesc* Expr)
+/* Return true if the expression denotes the address of an object or function.
+*/
+{
+    return ED_IsAddrExpr (Expr) &&
+           Expr->Sym != 0       &&
+           (IsClassPtr (Expr->Type) || IsTypeFunc (Expr->Type));
 }
 
 

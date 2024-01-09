@@ -1991,7 +1991,7 @@ void hie10 (ExprDesc* Expr)
             if (ED_IsConstAbs (Expr)) {
                 /* Constant numeric expression */
                 Expr->IVal = !Expr->IVal;
-            } else if (ED_IsAddrExpr (Expr)) {
+            } else if (ED_IsEntityAddr (Expr)) {
                 /* Address != NULL, so !Address == 0 */
                 ED_MakeConstBool (Expr, 0);
             } else {
@@ -2445,8 +2445,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         }
 
         /* Check for numeric constant operands */
-        if ((ED_IsAddrExpr (Expr) && ED_IsNullPtr (&Expr2)) ||
-            (ED_IsNullPtr (Expr) && ED_IsAddrExpr (&Expr2))) {
+        if ((ED_IsEntityAddr (Expr) && ED_IsNullPtr (&Expr2)) ||
+            (ED_IsNullPtr (Expr) && ED_IsEntityAddr (&Expr2))) {
 
             /* Object addresses are inequal to null pointer */
             Expr->IVal = (Tok != TOK_EQ);
@@ -2477,8 +2477,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 pop (ltype);
             }
 
-        } else if (ED_IsAddrExpr (Expr)     &&
-                   ED_IsAddrExpr (&Expr2)   &&
+        } else if (ED_IsEntityAddr (Expr)   &&
+                   ED_IsEntityAddr (&Expr2) &&
                    Expr->Sym == Expr2.Sym) {
 
             /* Evaluate the result for static addresses */
@@ -3944,10 +3944,10 @@ static void hieQuest (ExprDesc* Expr)
         NextToken ();
 
         /* Parse second expression. Remember for later if it is a NULL pointer
-        ** expression, then load it into the primary.
+        ** constant expression, then load it into the primary.
         */
         ExprWithCheck (hie0, &Expr2);
-        Expr2IsNULL = ED_IsNullPtr (&Expr2);
+        Expr2IsNULL = ED_IsNullPtrConstant (&Expr2);
         if (!IsTypeVoid (Expr2.Type)    &&
             ED_YetToLoad (&Expr2)       &&
             (!ConstantCond || !ED_IsConst (&Expr2))) {
@@ -3991,10 +3991,10 @@ static void hieQuest (ExprDesc* Expr)
         ConsumeColon ();
 
         /* Parse third expression. Remember for later if it is a NULL pointer
-        ** expression, then load it into the primary.
+        ** constant expression, then load it into the primary.
         */
         ExprWithCheck (hieQuest, &Expr3);
-        Expr3IsNULL = ED_IsNullPtr (&Expr3);
+        Expr3IsNULL = ED_IsNullPtrConstant (&Expr3);
         if (!IsTypeVoid (Expr3.Type)    &&
             ED_YetToLoad (&Expr3)       &&
             (!ConstantCond || !ED_IsConst (&Expr3))) {

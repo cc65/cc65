@@ -165,22 +165,22 @@ static void CheckSymTable (SymTable* Tab)
         /* Ignore typedef entries */
         if (!SymIsTypeDef (Entry)) {
 
-            /* Check if the symbol is one with storage, and it if it was
-            ** defined but not used.
-            */
-            if (((Flags & SC_AUTO) || (Flags & SC_STATIC)) && (Flags & SC_EXTERN) == 0) {
+            /* Check if the symbol has non-external linkage and is defined but not used */
+            if (!SymIsGlobal (Entry) || (Flags & SC_STORAGEMASK) == SC_STATIC) {
                 if (SymIsDef (Entry) && !SymIsRef (Entry) &&
                     !SymHasAttr (Entry, atUnused)) {
                     if (Flags & SC_PARAM) {
                         if (IS_Get (&WarnUnusedParam)) {
                             Warning ("Parameter '%s' is never used", Entry->Name);
                         }
-                    } else if (Flags & SC_FUNC) {
+                    } else if ((Flags & SC_TYPEMASK) == SC_FUNC) {
                         if (IS_Get (&WarnUnusedFunc)) {
                             Warning ("Function '%s' is defined but never used", Entry->Name);
                         }
-                    } else if (!IsAnonName (Entry->Name)) {
-                        if (IS_Get (&WarnUnusedVar)) {
+                    } else if ((Flags & SC_TYPEMASK) == SC_NONE) {
+                        if (IS_Get (&WarnUnusedVar) &&
+                            !IsAnonName (Entry->Name) &&
+                            (Flags & SC_CONST) != SC_CONST) {
                             Warning ("Variable '%s' is defined but never used", Entry->Name);
                         }
                     }
@@ -188,7 +188,7 @@ static void CheckSymTable (SymTable* Tab)
             }
 
             /* If the entry is a label, check if it was defined in the function */
-            if (Flags & SC_LABEL) {
+            if ((Flags & SC_TYPEMASK) == SC_LABEL) {
                 if (!SymIsDef (Entry)) {
                     /* Undefined label */
                     Error ("Undefined label: '%s'", Entry->Name);
@@ -716,7 +716,7 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
             Sym = 0;
         }
 
-    } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
+    } else if ((Sym->Flags & SC_TYPEMASK) == SC_FUNC) {
 
         /* In case of a function, use the new type descriptor, since it
         ** contains pointers to the new symbol tables that are needed if
@@ -863,7 +863,6 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
             } else {
                 TagEntry->V.E.SymTab = Tab;
                 TagEntry->V.E.Type   = Type;
-                TagEntry->Flags     &= ~SC_DECL;
                 TagEntry->Flags     |= SC_DEF;
 
                 /* Remember this is the first definition of this type */
@@ -1047,7 +1046,7 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
     SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
 
     if (Entry) {
-        if ((Entry->Flags & SC_CONST) != SC_CONST) {
+        if ((Entry->Flags & SC_TYPEMASK) != (Flags & SC_TYPEMASK)) {
             Error ("Symbol '%s' is already different kind", Name);
         } else {
             Error ("Multiple definition for constant '%s'", Name);
@@ -1056,7 +1055,7 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
     }
 
     /* Create a new entry */
-    Entry = NewSymEntry (Name, Flags);
+    Entry = NewSymEntry (Name, Flags | SC_CONST);
 
     /* We only have integer constants for now */
     Entry->Type = TypeDup (T);
@@ -1167,7 +1166,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
                     /* Optimizer will need the information about the value of SP adjustment
                     ** later, so let's preserve it.
                     */
-                    E = NewSymEntry (LocalDataLabelName (DOR->LateSP_Label), SC_SPADJUSTMENT);
+                    E = NewSymEntry (LocalDataLabelName (DOR->LateSP_Label), 0);
                     E->V.SPAdjustment = StackPtr - DOR->StackPtr;
                     AddSymEntry (SPAdjustTab, E);
                 }
@@ -1236,38 +1235,32 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
     Entry = FindSymInTable (Tab, Name, HashStr (Name));
 
     if (Entry) {
-        int CheckExtern = 0;
         if ((Flags & SC_STRUCTFIELD) == 0) {
             while (Entry && (Entry->Flags & SC_ALIAS) == SC_ALIAS) {
                 /* Get the aliased entry */
                 Entry = Entry->V.A.Field;
-                /* Check for conflict with local storage class */
-                CheckExtern = 1;
             }
         }
 
         /* We have a symbol with this name already */
         if (HandleSymRedefinition (Entry, T, Flags)) {
             Entry = 0;
-        } else if ((Flags & SC_ESUTYPEMASK) != SC_TYPEDEF) {
+        } else if ((Flags & SC_TYPEMASK) != SC_TYPEDEF) {
             /* Redefinitions are not allowed */
             if (SymIsDef (Entry) && (Flags & SC_DEF) == SC_DEF) {
                 Error ("Multiple definition of '%s'", Entry->Name);
                 Entry = 0;
-            } else if (CheckExtern) {
-                if ((Flags & (SC_AUTO | SC_REGISTER)) != 0) {
-                    Error ("Declaration of '%s' with no linkage follows extern declaration", Name);
-                    Entry = 0;
-                } else if ((Flags & SC_DEF) != 0 && (Flags & SC_EXTERN) == 0) {
-                    /* If a static declaration follows a non-static declaration,
-                    ** then it is an error.
-                    */
-                    Error ("Static declaration of '%s' follows extern declaration", Name);
-                    Entry = 0;
-                }
             } else if ((Flags & SC_STRUCTFIELD) != 0) {
                 Error ("Duplicate member '%s'", Entry->Name);
                 Entry = 0;
+            } else if (Entry->Owner == SymTab0) {
+                if ((Flags & SC_STORAGEMASK) == SC_AUTO ||
+                    (Flags & SC_STORAGEMASK) == SC_REGISTER ||
+                    (Flags & SC_STORAGEMASK) == SC_STATIC) {
+                    Error ("Declaration of '%s' with no linkage follows extern declaration",
+                           Name);
+                    Entry = 0;
+                }
             }
         }
 
@@ -1290,20 +1283,20 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
         Entry->Type = TypeDup (T);
 
         if ((Flags & SC_STRUCTFIELD) == SC_STRUCTFIELD ||
-            (Flags & SC_ESUTYPEMASK) == SC_TYPEDEF) {
+            (Flags & SC_TYPEMASK) == SC_TYPEDEF) {
             if ((Flags & SC_ALIAS) != SC_ALIAS) {
                 Entry->V.Offs = Offs;
             }
-        } else if ((Flags & SC_AUTO) == SC_AUTO) {
+        } else if ((Flags & SC_STORAGEMASK) == SC_AUTO) {
             Entry->V.Offs = Offs;
-        } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
+        } else if ((Flags & SC_STORAGEMASK) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
             Entry->V.R.SaveOffs = StackPtr;
-        } else if ((Flags & SC_EXTERN) == SC_EXTERN ||
-                   (Flags & SC_FUNC) == SC_FUNC) {
+        } else if ((Flags & SC_STORAGEMASK) == SC_EXTERN ||
+                   (Flags & SC_TYPEMASK) == SC_FUNC) {
             Entry->V.L.Label = Offs;
             SymSetAsmName (Entry);
-        } else if ((Flags & SC_STATIC) == SC_STATIC) {
+        } else if ((Flags & SC_STORAGEMASK) == SC_STATIC) {
             /* Generate the assembler name from the data label number */
             Entry->V.L.Label = Offs;
             Entry->AsmName = xstrdup (LocalDataLabelName (Entry->V.L.Label));
@@ -1348,49 +1341,63 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
         Entry = FindGlobalSym (Name);
     }
 
+    /* Do we have a symbol with this name already? */
     if (Entry) {
-        /* We have a symbol with this name already */
+        /* Check if the symbol refers to some different type of things */
         if (HandleSymRedefinition (Entry, T, Flags)) {
             Entry = 0;
-        } else if ((Entry->Flags & (SC_AUTO | SC_REGISTER)) != 0) {
-            /* Check for local storage class conflict */
+        } else if (Entry->Owner != SymTab0) {
+            /* The previous declaration has no linkage. The current declaration
+            ** has either external or internal linkage. Either way it is an
+            ** error since the two declarations would be referring to different
+            ** objects with the same identifier.
+            */
             Error ("Extern declaration of '%s' follows declaration with no linkage",
                    Name);
             Entry = 0;
-        } else if ((Flags & SC_ESUTYPEMASK) != SC_TYPEDEF) {
-            /* If a static declaration follows a non-static declaration, then
-            ** the result is undefined.
-            ** Most compilers choose to either give an error at compile time,
-            ** or remove the extern property for a link time error if used.
+        } else if ((Flags & SC_TYPEMASK) != SC_TYPEDEF) {
+            /* The C standard specifies that the result is undefined if the
+            ** same thing has both internal and external linkage. Most
+            ** compilers choose to either give an error at compile time, or
+            ** remove the external linkage for a link time error if used
+            ** outside the current translation unit. We choose to give an
+            ** error at compile time in this case.
             */
-            if (SymTab == SymTab0           &&
-                (Flags & SC_EXTERN) == 0    &&
-                (Entry->Flags & SC_EXTERN) != 0) {
-                Error ("Static declaration of '%s' follows non-static declaration", Name);
-                Entry = 0;
-            } else if ((Flags & SC_EXTERN) != 0                                     &&
-                       (Entry->Owner == SymTab0 || (Entry->Flags & SC_DEF) != 0)    &&
-                       (Entry->Flags & SC_EXTERN) == 0) {
-                /* It is OK if a global extern declaration follows a global
-                ** non-static declaration, but an error if either of them is
-                ** local, as the two would be referring to different objects.
-                ** It is an error as well if a global non-static declaration
-                ** follows a global static declaration.
+            if ((Entry->Flags & SC_STORAGEMASK) != SC_STATIC) {
+                /* The previous declaration is a non-static declaration of an
+                ** object or function that has external linkage.
                 */
-                if (Entry->Owner == SymTab0) {
-                    if ((Flags & SC_STORAGE) == 0) {
-                        /* The C standard specifies that a later extern declaration will keep
-                        ** the previously declared internal or external linkage unchanged.
-                        ** Though not required by the standard, we are warning on this case.
-                        */
-                        Flags &= ~SC_EXTERN;
-                        Warning ("Extern declaration of '%s' follows static declaration, linkage unchanged", Name);
-                    } else {
-                        Error ("Non-static declaration of '%s' follows static declaration", Name);
-                        Entry = 0;
-                    }
-                } else {
-                    Error ("Extern declaration of '%s' follows static declaration", Name);
+                if ((Flags & SC_STORAGEMASK) == SC_STATIC) {
+                    /* It is a static declaration of an object or function that
+                    ** has internal linkage. Conflicted wih the previous one.
+                    */
+                    Error ("Static declaration of '%s' follows non-static declaration",
+                           Name);
+                    Entry = 0;
+                }
+            } else if ((Flags & SC_STORAGEMASK) != SC_STATIC) {
+                /* The previous declaration is a static declaration of an
+                ** object or function that has internal linkage.
+                */
+                if ((Flags & SC_STORAGEMASK) == SC_EXTERN ||
+                    (Flags & SC_TYPEMASK) == SC_FUNC) {
+                    /* The C standard specifies that an extern declaration
+                    ** shall keep the previously declared internal linkage
+                    ** unchanged. For a function declaration with no storage
+                    ** class specifiers, it is treated as if with 'extern'.
+                    ** We give a warning although it is not required by the
+                    ** standard.
+                    */
+                    Flags &= ~SC_STORAGEMASK;
+                    Warning ("Extern declaration of '%s' follows static declaration",
+                             Name);
+                } else if ((Flags & SC_STORAGEMASK) == SC_NONE) {
+                    /* It is a non-extern-or-static declaration of an object in
+                    ** file scope that has external linkage. Conflicted wih the
+                    ** previous one.
+                    */
+                    Error ("Non-static declaration of '%s' follows static declaration",
+                           Name);
                     Entry = 0;
                 }
             }
@@ -1486,10 +1493,18 @@ SymTable* GetLabelSymTab (void)
 
 
 
-int SymIsLocal (SymEntry* Sym)
-/* Return true if the symbol is defined in the highest lexical level */
+int SymIsLocal (const SymEntry* Sym)
+/* Return true if the symbol is declared in the highest lexical level */
 {
     return (Sym->Owner == SymTab || Sym->Owner == TagTab);
+}
+
+
+
+int SymIsGlobal (const SymEntry* Sym)
+/* Return true if the symbol is declared in the file scope level */
+{
+    return (Sym->Owner == SymTab0 || Sym->Owner == TagTab0);
 }
 
 
@@ -1553,7 +1568,9 @@ void EmitExternals (void)
     Entry = SymTab->SymHead;
     while (Entry) {
         unsigned Flags = Entry->Flags;
-        if (Flags & SC_EXTERN) {
+        if (Entry->Owner == SymTab0 &&
+            (Flags & SC_STORAGEMASK) != SC_STATIC &&
+            ((Flags & SC_TYPEMASK) == SC_FUNC || (Flags & SC_TYPEMASK) == SC_NONE)) {
             /* Only defined or referenced externs */
             if (SymIsRef (Entry) && !SymIsDef (Entry)) {
                 /* An import */
@@ -1587,18 +1604,18 @@ void EmitDebugInfo (void)
         }
         Sym = SymTab->SymHead;
         while (Sym) {
-            if ((Sym->Flags & (SC_CONST | SC_TYPEMASK)) == 0) {
-                if (Sym->Flags & SC_AUTO) {
+            if ((Sym->Flags & SC_TYPEMASK) == 0) {
+                if ((Sym->Flags & SC_STORAGEMASK) == SC_AUTO) {
                     AddTextLine ("%s, \"%s\", \"00\", auto, %d",
                                  Head, Sym->Name, Sym->V.Offs);
-                } else if (Sym->Flags & SC_REGISTER) {
+                } else if ((Sym->Flags & SC_STORAGEMASK) == SC_REGISTER) {
                     AddTextLine ("%s, \"%s\", \"00\", register, \"regbank\", %d",
                                  Head, Sym->Name, Sym->V.R.RegOffs);
 
                 } else if (SymIsRef (Sym) && !SymIsDef (Sym)) {
                     AddTextLine ("%s, \"%s\", \"00\", %s, \"%s\"",
                                  Head, Sym->Name,
-                                 (Sym->Flags & SC_EXTERN)? "extern" : "static",
+                                 (Sym->Flags & SC_STORAGEMASK) != SC_STATIC ? "extern" : "static",
                                  Sym->AsmName);
                 }
             }

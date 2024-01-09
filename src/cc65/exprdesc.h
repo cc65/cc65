@@ -98,7 +98,7 @@ enum {
     E_LOC_NONE          = 0x0000,       /* Pure rvalue with no storage */
     E_LOC_ABS           = 0x0001,       /* Absolute numeric addressed variable */
     E_LOC_GLOBAL        = 0x0002,       /* Global variable */
-    E_LOC_STATIC        = 0x0004,       /* Static variable */
+    E_LOC_STATIC        = 0x0004,       /* Local static variable */
     E_LOC_REGISTER      = 0x0008,       /* Register variable */
     E_LOC_STACK         = 0x0010,       /* Value on the stack */
     E_LOC_PRIMARY       = 0x0020,       /* Temporary in primary register */

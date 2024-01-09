@@ -91,7 +91,7 @@ static unsigned ParseOneStorageClass (void)
     switch (CurTok.Tok) {
 
         case TOK_EXTERN:
-            StorageClass = SC_EXTERN | SC_STATIC;
+            StorageClass = SC_EXTERN;
             NextToken ();
             break;
 
@@ -101,7 +101,7 @@ static unsigned ParseOneStorageClass (void)
             break;
 
         case TOK_REGISTER:
-            StorageClass = SC_REGISTER | SC_STATIC;
+            StorageClass = SC_REGISTER;
             NextToken ();
             break;
 
@@ -136,9 +136,9 @@ static int ParseStorageClass (DeclSpec* Spec)
     }
 
     while (StorageClass != 0) {
-        if (Spec->StorageClass == 0) {
-            Spec->StorageClass = StorageClass;
-        } else if (Spec->StorageClass == StorageClass) {
+        if ((Spec->StorageClass & SC_STORAGEMASK) == 0) {
+            Spec->StorageClass |= StorageClass;
+        } else if ((Spec->StorageClass & SC_STORAGEMASK) == StorageClass) {
             Warning ("Duplicate storage class specifier");
         } else {
             Error ("Conflicting storage class specifier");
@@ -618,12 +618,12 @@ static SymEntry* ForwardESU (const char* Name, unsigned Flags, unsigned* DSFlags
     */
     SymEntry* TagEntry = FindTagSym (Name);
     if (TagEntry == 0) {
-        if ((Flags & SC_ESUTYPEMASK) != SC_ENUM) {
+        if ((Flags & SC_TYPEMASK) != SC_ENUM) {
             TagEntry = AddStructSym (Name, Flags, 0, 0, DSFlags);
         } else {
             TagEntry = AddEnumSym (Name, Flags, 0, 0, DSFlags);
         }
-    } else if ((TagEntry->Flags & SC_TYPEMASK) != (Flags & SC_ESUTYPEMASK)) {
+    } else if ((TagEntry->Flags & SC_TYPEMASK) != (Flags & SC_TYPEMASK)) {
         /* Already defined, but not the same type class */
         Error ("Symbol '%s' is already different kind", Name);
     }
@@ -798,7 +798,7 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
         }
 
         /* Add an entry of the enumerator to the symbol table */
-        AddConstSym (Ident, NewType, SC_ENUMERATOR | SC_CONST, EnumVal);
+        AddConstSym (Ident, NewType, SC_DEF | SC_ENUMERATOR, EnumVal);
 
         /* Use this type for following members */
         MemberType = NewType;
@@ -1825,8 +1825,8 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
         /* We accept only auto and register as storage class specifiers, but
         ** we ignore all this, since we use auto anyway.
         */
-        if ((Spec.StorageClass & SC_AUTO) == 0 &&
-            (Spec.StorageClass & SC_REGISTER) == 0) {
+        if ((Spec.StorageClass & SC_STORAGEMASK) != SC_AUTO &&
+            (Spec.StorageClass & SC_STORAGEMASK) != SC_REGISTER) {
             Error ("Illegal storage class");
         }
 
@@ -1942,12 +1942,12 @@ static void ParseAnsiParamList (FuncDesc* F)
         ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
         /* We accept only auto and register as storage class specifiers */
-        if ((Spec.StorageClass & SC_AUTO) == SC_AUTO) {
-            Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
-        } else if ((Spec.StorageClass & SC_REGISTER) == SC_REGISTER) {
-            Spec.StorageClass = SC_REGISTER | SC_STATIC | SC_PARAM | SC_DEF;
+        if ((Spec.StorageClass & SC_STORAGEMASK) == SC_REGISTER) {
+            Spec.StorageClass = SC_REGISTER | SC_PARAM | SC_DEF;
         } else {
-            Error ("Illegal storage class");
+            if ((Spec.StorageClass & SC_STORAGEMASK) != SC_AUTO) {
+                Error ("Illegal storage class");
+            }
             Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
         }
 
@@ -2355,7 +2355,9 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     D->StorageClass = Spec->StorageClass;
 
     /* If we have a function, add a special symbol type */
-    if (IsTypeFunc (D->Type)) {
+    if (Mode != DM_ACCEPT_PARAM_IDENT   &&
+        IsTypeFunc (D->Type)            &&
+        (D->StorageClass & SC_TYPEMASK) == SC_NONE) {
         D->StorageClass |= SC_FUNC;
     }
 
@@ -2479,9 +2481,9 @@ void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage)
     ParseTypeSpec (Spec, TSFlags | TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC);
 
     /* If no explicit storage class is given, use the default */
-    if (Spec->StorageClass == 0) {
+    if ((Spec->StorageClass & SC_STORAGEMASK) == 0) {
         Spec->Flags |= DS_DEF_STORAGE;
-        Spec->StorageClass = DefStorage;
+        Spec->StorageClass |= DefStorage;
     }
 }
 

@@ -41,7 +41,7 @@ __time_t_to_tm:
         ldx     #.sizeof(tm)-1
 :       sta     TM,x
         dex
-        bne     :-
+        bpl     :-
 
         ; Divide t/86400
         jsr     udiv32

@@ -75,6 +75,11 @@ int main (void)
 {
     int i;
 
+    if (mktime(NULL) != (time_t)-1) {
+      printf("mktime should return -1 with a NULL parameter\n");
+      fails++;
+    }
+
     /* Verify conversion both ways */
     for (i = 0; ; i++) {
       time_t t = data[i].t;
@@ -91,6 +96,7 @@ int main (void)
       }
       if (strcmp(data[i].str, ctime(&t))) {
         printf("0x%lx: unexpected ctime result: expected %s, got %s", t, data[i].str, ctime(&t));
+        fails++;
       }
 
       if (t == 0xFFFFFFFF)

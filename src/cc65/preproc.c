@@ -2963,14 +2963,34 @@ static void DoLine (void)
     MLine = InitLine (MLine);
 }
 
+/* Possible outcomes of preprocessing a pragma */
+typedef enum {
+    /* the #pragma directive was preprocessed into _Pragma() */
+    PREPROC_PRAGMA_EMITTED,
 
+    /* processing the #pragma directive did not result in any output */
+    PREPROC_PRAGMA_NOTHING_EMITTED,
 
-static void DoPragma (void)
+    /* the preprocessor should stop processing the current file */
+    PREPROC_PRAGMA_HALT
+} preproc_pragma_t;
+
+static preproc_pragma_t DoPragmaOnce (void)
+/**
+ * Handle a pragma once directive, and determine if the current file
+ * should still be processed or not.
+ */
+{
+    return PREPROC_PRAGMA_HALT;
+}
+
+static preproc_pragma_t DoPragma (void)
 /* Handle a #pragma line by converting the #pragma preprocessor directive into
 ** the _Pragma() compiler operator.
 */
 {
-    StrBuf* PragmaLine = OLine;
+    StrBuf* const PragmaLine = OLine;
+    preproc_pragma_t status;
 
     PRECONDITION (PragmaLine != 0);
 
@@ -2981,14 +3001,22 @@ static void DoPragma (void)
     SB_Clear (MLine);
     PreprocessDirective (Line, MLine, MSM_NONE);
 
-    /* Convert #pragma to _Pragma () */
-    SB_AppendStr (PragmaLine, "_Pragma (");
-    SB_Reset (MLine);
-    Stringize (MLine, PragmaLine);
-    SB_AppendChar (PragmaLine, ')');
+    if (SB_CompareStr(MLine, "once") == 0) {
+        status = DoPragmaOnce();
+    }
+    else {
+        /* Convert #pragma to _Pragma () */
+        SB_AppendStr (PragmaLine, "_Pragma (");
+        SB_Reset (MLine);
+        Stringize (MLine, PragmaLine);
+        SB_AppendChar (PragmaLine, ')');
+        status = PREPROC_PRAGMA_EMITTED;
+    }
 
     /* End this line */
     SB_SetIndex (PragmaLine, SB_GetLen (PragmaLine));
+
+    return status;
 }
 
 
@@ -3156,8 +3184,13 @@ static int ParseDirectives (unsigned ModeFlags)
                     case PPD_PRAGMA:
                         if (!PPSkip) {
                             if ((ModeFlags & MSM_IN_ARG_LIST) == 0) {
-                                DoPragma ();
-                                return Whitespace;
+                                preproc_pragma_t status = DoPragma();
+                                if (status == PREPROC_PRAGMA_EMITTED) {
+                                    return Whitespace;
+                                }
+                                else if (status == PREPROC_PRAGMA_HALT) {
+                                    PPSkip = 1;
+                                }
                             } else {
                                 PPError ("Embedded #pragma directive within macro arguments is unsupported");
                             }

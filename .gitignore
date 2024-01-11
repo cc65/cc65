@@ -4,6 +4,7 @@
 /lib/
 /libwrk/
 /target/
+/test/ref/test_fgets.out
 /testwrk/
 /wrk/
 /cc65.zip

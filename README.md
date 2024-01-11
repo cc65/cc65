@@ -7,9 +7,10 @@ For details look at the [Website](https://cc65.github.io).
 
 ## People
 
-Project founder:
+Project founders:
 
-* Ullrich von Bassewitz
+* John R. Dunning: original implementation of the C compiler and runtime library, Atari hosted
+* Ullrich von Bassewitz: move the code to modern systems, completely rewritten runtime library
 
 Core team members:
 

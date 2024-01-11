@@ -14,7 +14,7 @@
 */
 
 typedef short return_t;
-#error /* produce an error */
+#error This is an/* produce an error */error
 
 return_t main(int argc, char* argv[])
 {
@@ -22,3 +22,6 @@ return_t main(int argc, char* argv[])
     n = 0;                /* produce an error */
     /* produce a warning */
 }
+
+int arr[main(0, 0)]; /* produce an error */
+int b = 0;

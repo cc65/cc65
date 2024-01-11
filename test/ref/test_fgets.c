@@ -56,7 +56,10 @@ char *argv[];
     {
         printf("%s",buf);
     }
-
+    if (!feof(in))
+    {
+        printf("We should have EOF!\n");
+    }
     fclose(in);
     return 0;
 }

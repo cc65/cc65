@@ -101,6 +101,7 @@ long __fastcall__ ria_call_long_errno (unsigned char op);
 #define RIA_OP_CODEPAGE 0x03
 #define RIA_OP_LRAND 0x04
 #define RIA_OP_STDIN_OPT 0x05
+#define RIA_OP_CLOCK 0x0F
 #define RIA_OP_CLOCK_GETRES 0x10
 #define RIA_OP_CLOCK_GETTIME 0x11
 #define RIA_OP_CLOCK_SETTIME 0x12

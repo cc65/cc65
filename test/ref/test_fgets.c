@@ -47,6 +47,11 @@ char *argv[];
       return 1;
     }
 
+    /* Test ungetc while we're at it */
+    buf[0] = fgetc(in);
+    ungetc(buf[0], in);
+
+
     while (fgets(buf, sizeof(buf), in) != NULL)
     {
         printf("%s",buf);

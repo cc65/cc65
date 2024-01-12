@@ -37,6 +37,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#if defined(_WIN32)
+#include <windef.h>
+#endif
 
 /* common */
 #include "chartype.h"

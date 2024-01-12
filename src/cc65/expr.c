@@ -1422,7 +1422,7 @@ static void Primary (ExprDesc* E)
             } else {
                 /* Let's see if this is a C99-style declaration */
                 DeclSpec Spec;
-                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
+                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
                 if ((Spec.Flags & DS_TYPE_MASK) != DS_NONE) {
                     Error ("Mixed declarations and code are not supported in cc65");
@@ -2049,7 +2049,7 @@ void hie10 (ExprDesc* Expr)
             if (ED_IsConstAbs (Expr)) {
                 /* Constant numeric expression */
                 Expr->IVal = !Expr->IVal;
-            } else if (ED_IsAddrExpr (Expr)) {
+            } else if (ED_IsEntityAddr (Expr)) {
                 /* Address != NULL, so !Address == 0 */
                 ED_MakeConstBool (Expr, 0);
             } else {
@@ -2737,8 +2737,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         }
 
         /* Check for numeric constant operands */
-        if ((ED_IsAddrExpr (Expr) && ED_IsNullPtr (&Expr2)) ||
-            (ED_IsNullPtr (Expr) && ED_IsAddrExpr (&Expr2))) {
+        if ((ED_IsEntityAddr (Expr) && ED_IsNullPtr (&Expr2)) ||
+            (ED_IsNullPtr (Expr) && ED_IsEntityAddr (&Expr2))) {
             LOG(("hie_compare numeric constant operands\n"));
             /* Object addresses are inequal to null pointer */
             Expr->IVal = (Tok != TOK_EQ);
@@ -2770,8 +2770,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 pop (ltype);
             }
 
-        } else if (ED_IsAddrExpr (Expr)     &&
-                   ED_IsAddrExpr (&Expr2)   &&
+        } else if (ED_IsEntityAddr (Expr)   &&
+                   ED_IsEntityAddr (&Expr2) &&
                    Expr->Sym == Expr2.Sym) {
             /* Evaluate the result for static addresses */
             unsigned long Val1 = Expr->IVal;
@@ -4658,10 +4658,10 @@ static void hieQuest (ExprDesc* Expr)
         NextToken ();
 
         /* Parse second expression. Remember for later if it is a NULL pointer
-        ** expression, then load it into the primary.
+        ** constant expression, then load it into the primary.
         */
         ExprWithCheck (hie0, &Expr2);
-        Expr2IsNULL = ED_IsNullPtr (&Expr2);
+        Expr2IsNULL = ED_IsNullPtrConstant (&Expr2);
         if (!IsTypeVoid (Expr2.Type)    &&
             ED_YetToLoad (&Expr2)       &&
             (!ConstantCond || !ED_IsConst (&Expr2))) {
@@ -4705,10 +4705,10 @@ static void hieQuest (ExprDesc* Expr)
         ConsumeColon ();
 
         /* Parse third expression. Remember for later if it is a NULL pointer
-        ** expression, then load it into the primary.
+        ** constant expression, then load it into the primary.
         */
         ExprWithCheck (hieQuest, &Expr3);
-        Expr3IsNULL = ED_IsNullPtr (&Expr3);
+        Expr3IsNULL = ED_IsNullPtrConstant (&Expr3);
         if (!IsTypeVoid (Expr3.Type)    &&
             ED_YetToLoad (&Expr3)       &&
             (!ConstantCond || !ED_IsConst (&Expr3))) {
@@ -5022,8 +5022,13 @@ ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*))
     if (!ED_IsConst (&Expr) || !ED_CodeRangeIsEmpty (&Expr)) {
         Error ("Constant expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
-        Expr.Flags &= E_MASK_RTYPE | E_MASK_KEEP_RESULT;
+        Expr.Flags &= E_MASK_RTYPE | E_MASK_KEEP_MAKE;
         Expr.Flags |= E_LOC_NONE;
+
+        /* Remove any non-constant code generated */
+        if (!ED_CodeRangeIsEmpty (&Expr)) {
+            RemoveCodeRange (&Expr.Start, &Expr.End);
+        }
     }
 
     /* Return by value */
@@ -5048,6 +5053,11 @@ ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*))
         Error ("Constant integer expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
         ED_MakeConstAbsInt (&Expr, 1);
+
+        /* Remove any non-constant code generated */
+        if (!ED_CodeRangeIsEmpty (&Expr)) {
+            RemoveCodeRange (&Expr.Start, &Expr.End);
+        }
     }
 
     /* Return by value */

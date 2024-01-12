@@ -44,6 +44,7 @@
 #include "inline.h"
 #include "print.h"
 #include "xmalloc.h"
+#include "strpool.h"
 
 /* cc65 */
 #include "codegen.h"
@@ -112,6 +113,8 @@ static RescanInputStack* CurRescanStack;
 static StrBuf* PLine;   /* Buffer for macro expansion */
 static StrBuf* MLine;   /* Buffer for macro expansion in #pragma */
 static StrBuf* OLine;   /* Buffer for #pragma output */
+
+static StringPool* PragmaOnceSeenFiles;
 
 /* Newlines to be added to preprocessed text */
 static unsigned PendingNewLines;
@@ -2963,6 +2966,32 @@ static void DoLine (void)
     MLine = InitLine (MLine);
 }
 
+/**
+ * Determines the absolute path of the given relative path.
+ * The absolute path for the file is stored in a malloced buffer.
+ * Returns NULL if some error occured.
+ */
+char *FindAbsolutePath(const char *path);
+
+
+#if defined(_WIN32)
+
+char *FindAbsolutePath(const char *path) {
+    return  _fullpath(NULL, path, PATH_MAX);
+}
+
+#else
+
+extern char* realpath(const char* path, char* resolved_path);
+
+/* this uses the POSIX1.-2008 version of the function,
+   which solves the problem of finding a maximum path length for the file */
+char* FindAbsolutePath(const char* path) {
+    return realpath(path, NULL);
+}
+
+#endif
+
 /* Possible outcomes of preprocessing a pragma */
 typedef enum {
     /* the #pragma directive was preprocessed into _Pragma() */
@@ -2981,7 +3010,32 @@ static preproc_pragma_t DoPragmaOnce (void)
  * should still be processed or not.
  */
 {
-    return PREPROC_PRAGMA_HALT;
+    const char * const file_name = GetCurrentFilename();
+
+    char * const full_path = FindAbsolutePath(file_name);
+
+    if (full_path == NULL) {
+        AbEnd ("Failed to find the full path for the file %s", file_name);
+    }
+
+    /* considering StrPool does not have a way for checking if a string
+       is in the set or not, compare the counts to accomplish that */
+
+    unsigned previous_count = SP_GetCount(PragmaOnceSeenFiles);
+
+    SP_AddStr(PragmaOnceSeenFiles, full_path);
+
+    unsigned next_count = SP_GetCount(PragmaOnceSeenFiles);
+
+    free(full_path);
+
+    if (previous_count == next_count) {
+        /* file has been seen*/
+        return PREPROC_PRAGMA_HALT;
+    }
+    else {
+        return PREPROC_PRAGMA_NOTHING_EMITTED;
+    }
 }
 
 static preproc_pragma_t DoPragma (void)
@@ -3381,6 +3435,9 @@ void InitPreprocess (void)
     /* Create the output buffers */
     MLine = NewStrBuf ();
     PLine = NewStrBuf ();
+
+    /* 64 is a sensible number of slots for the hash table */
+    PragmaOnceSeenFiles = NewStringPool(64);
 }
 
 
@@ -3391,6 +3448,7 @@ void DonePreprocess (void)
     /* Done with the output buffers */
     SB_Done (MLine);
     SB_Done (PLine);
+    FreeStringPool(PragmaOnceSeenFiles);
 }
 
 

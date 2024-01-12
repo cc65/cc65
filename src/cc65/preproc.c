@@ -2978,7 +2978,7 @@ char *FindAbsolutePath (const char *path);
 #if defined(_WIN32)
 
 char *FindAbsolutePath (const char *path) {
-    return  _fullpath (NULL, path, PATH_MAX);
+    return  _fullpath (NULL, path, MAX_PATH);
 }
 
 #else

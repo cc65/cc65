@@ -45,6 +45,7 @@
 #include "print.h"
 #include "xmalloc.h"
 #include "strpool.h"
+#include "abend.h"
 
 /* cc65 */
 #include "codegen.h"
@@ -2971,23 +2972,23 @@ static void DoLine (void)
  * The absolute path for the file is stored in a malloced buffer.
  * Returns NULL if some error occured.
  */
-char *FindAbsolutePath(const char *path);
+char *FindAbsolutePath (const char *path);
 
 
 #if defined(_WIN32)
 
-char *FindAbsolutePath(const char *path) {
-    return  _fullpath(NULL, path, PATH_MAX);
+char *FindAbsolutePath (const char *path) {
+    return  _fullpath (NULL, path, PATH_MAX);
 }
 
 #else
 
-extern char* realpath(const char* path, char* resolved_path);
+extern char* realpath (const char* path, char* resolved_path);
 
 /* this uses the POSIX1.-2008 version of the function,
    which solves the problem of finding a maximum path length for the file */
-char* FindAbsolutePath(const char* path) {
-    return realpath(path, NULL);
+char* FindAbsolutePath (const char* path) {
+    return realpath (path, NULL);
 }
 
 #endif
@@ -3010,9 +3011,11 @@ static preproc_pragma_t DoPragmaOnce (void)
  * should still be processed or not.
  */
 {
-    const char * const file_name = GetCurrentFilename();
+    const char * const file_name = GetCurrentFilename ();
+    char * const full_path = FindAbsolutePath (file_name);
+    unsigned previous_count;
+    unsigned next_count;
 
-    char * const full_path = FindAbsolutePath(file_name);
 
     if (full_path == NULL) {
         AbEnd ("Failed to find the full path for the file %s", file_name);
@@ -3021,13 +3024,13 @@ static preproc_pragma_t DoPragmaOnce (void)
     /* considering StrPool does not have a way for checking if a string
        is in the set or not, compare the counts to accomplish that */
 
-    unsigned previous_count = SP_GetCount(PragmaOnceSeenFiles);
+    previous_count = SP_GetCount (PragmaOnceSeenFiles);
 
     SP_AddStr(PragmaOnceSeenFiles, full_path);
 
-    unsigned next_count = SP_GetCount(PragmaOnceSeenFiles);
+    next_count = SP_GetCount (PragmaOnceSeenFiles);
 
-    free(full_path);
+    free (full_path);
 
     if (previous_count == next_count) {
         /* file has been seen*/
@@ -3056,7 +3059,7 @@ static preproc_pragma_t DoPragma (void)
     PreprocessDirective (Line, MLine, MSM_NONE);
 
     if (SB_CompareStr(MLine, "once") == 0) {
-        status = DoPragmaOnce();
+        status = DoPragmaOnce ();
     }
     else {
         /* Convert #pragma to _Pragma () */

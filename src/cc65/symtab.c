@@ -557,8 +557,10 @@ static SymEntry* FindSymInTable (const SymTable* T, const char* Name, unsigned H
 
 
 
-static SymEntry* FindSymInTree (const SymTable* Tab, const char* Name)
-/* Find the symbol with the given name in the table tree that starts with T */
+static SymEntry* FindVisibleSymInTree (const SymTable* Tab, const char* Name)
+/* Find the visible symbol with the given name in the table tree that starts
+** with Tab.
+*/
 {
     /* Get the hash over the name */
     unsigned Hash = HashStr (Name);
@@ -574,7 +576,7 @@ static SymEntry* FindSymInTree (const SymTable* Tab, const char* Name)
         }
 
         /* Bail out if we found it */
-        if (E != 0) {
+        if (E != 0 && (Tab != SymTab0 || (E->Flags & SC_LOCALSCOPE) == 0)) {
             return E;
         }
 
@@ -589,9 +591,9 @@ static SymEntry* FindSymInTree (const SymTable* Tab, const char* Name)
 
 
 SymEntry* FindSym (const char* Name)
-/* Find the symbol with the given name */
+/* Find with the given name the symbol visible in the current scope */
 {
-    return FindSymInTree (SymTab, Name);
+    return FindVisibleSymInTree (SymTab, Name);
 }
 
 
@@ -613,9 +615,9 @@ SymEntry* FindLocalSym (const char* Name)
 
 
 SymEntry* FindTagSym (const char* Name)
-/* Find the symbol with the given name in the tag table */
+/* Find with the given name the tag symbol visible in the current scope */
 {
-    return FindSymInTree (TagTab, Name);
+    return FindVisibleSymInTree (TagTab, Name);
 }
 
 
@@ -1356,6 +1358,13 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
                    Name);
             Entry = 0;
         } else if ((Flags & SC_TYPEMASK) != SC_TYPEDEF) {
+            /* If we are adding the symbol in the file scope, it is now
+            ** visible there.
+            */
+            if (SymTab == SymTab0) {
+                Entry->Flags &= ~SC_LOCALSCOPE;
+            }
+
             /* The C standard specifies that the result is undefined if the
             ** same thing has both internal and external linkage. Most
             ** compilers choose to either give an error at compile time, or
@@ -1415,6 +1424,13 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
     }
 
     if (Entry == 0) {
+        /* Hide the symbol in the file scope if we are declaring it in a
+        ** local scope.
+        */
+        if (Tab == SymTab0 && SymTab != SymTab0) {
+            Flags |= SC_LOCALSCOPE;
+        }
+
         /* Create a new entry */
         Entry = NewSymEntry (Name, Flags);
 

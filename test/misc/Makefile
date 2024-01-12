@@ -133,6 +133,12 @@ $(WORKDIR)/goto.$1.$2.prg: goto.c $(ISEQUAL) | $(WORKDIR)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/goto.$1.$2.out goto.ref
 
+# this one requires failure with --std=c89, it fails with --std=cc65 due to
+# stricter checks
+$(WORKDIR)/bug2304-implicit-func.$1.$2.prg: bug2304-implicit-func.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug2304-implicit-func.$1.$2.prg)
+	$(NOT) $(CC65) --standard c89 -t sim$2 -$1 -o $$@ $$< $(NULLERR)
+
 # should not compile until 3-byte struct by value tests are re-enabled
 $(WORKDIR)/struct-by-value.$1.$2.prg: struct-by-value.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/struct-by-value.$1.$2.prg)

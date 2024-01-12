@@ -38,7 +38,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #if defined(_WIN32)
-#include <windef.h>
+#include <windows.h>
 #endif
 
 /* common */

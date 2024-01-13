@@ -1439,6 +1439,16 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             Entry->V.F.WrappedCall = WrappedCall;
             Entry->V.F.WrappedCallData = WrappedCallData;
         }
+
+        /* A files cope function declaration with the 'extern' storage
+        ** class or without the 'inline' specifier ensures that the
+        ** function definition (if any) is a non-inline definition.
+        */
+        if (SymTab == SymTab0 &&
+            ((Flags & SC_STORAGEMASK) == SC_EXTERN ||
+             (Flags & SC_INLINE) == 0)) {
+            Entry->Flags |= SC_NOINLINEDEF;
+        }
     }
 
     /* Add an alias of the global symbol to the local symbol table */
@@ -1575,7 +1585,7 @@ void EmitExternals (void)
             if (SymIsRef (Entry) && !SymIsDef (Entry)) {
                 /* An import */
                 g_defimport (Entry->Name, Flags & SC_ZEROPAGE);
-            } else if (SymIsDef (Entry)) {
+            } else if (SymIsDef (Entry) && ((Flags & SC_NOINLINEDEF) || (Flags & SC_INLINE) == 0)) {
                 /* An export */
                 g_defexport (Entry->Name, Flags & SC_ZEROPAGE);
             }

@@ -151,6 +151,10 @@ struct CodeEntry;
 #define SC_THREAD       0x08000000U     /* UNSUPPORTED: Thread-local storage class */
 #define SC_STORAGEMASK  0x0F000000U     /* Storage type mask */
 
+/* Function specifiers */
+#define SC_INLINE       0x10000000U     /* Inline function */
+#define SC_NORETURN     0x20000000U     /* Noreturn function */
+
 
 
 /* Label definition or reference */

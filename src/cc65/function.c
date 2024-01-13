@@ -518,6 +518,12 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
             Error ("'main' cannot be declared as __fastcall__");
         }
 
+        /* main() cannot be an inline function */
+        if ((Func->Flags & SC_INLINE) == SC_INLINE) {
+            Error ("'main' cannot be declared inline");
+            Func->Flags &= ~SC_INLINE;
+        }
+
         /* Check return type */
         if (GetUnqualRawTypeCode (ReturnType) == T_INT) {
             /* Determine if this is a main function in a C99 environment that

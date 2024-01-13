@@ -121,7 +121,7 @@ static void Parse (void)
         }
 
         /* Read the declaration specifier */
-        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_NONE);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT | TS_FUNCTION_SPEC, SC_NONE);
 
         /* Don't accept illegal storage classes */
         if ((Spec.StorageClass & SC_STORAGEMASK) == SC_AUTO ||
@@ -560,6 +560,10 @@ void Compile (const char* FileName)
                 if ((Entry->Flags & SC_STORAGEMASK) == SC_STATIC && SymIsRef (Entry)) {
                     Warning ("Static function '%s' used but never defined",
                              Entry->Name);
+                } else if ((Entry->Flags & SC_INLINE) != 0) {
+                    Warning ("Inline function '%s' %s but never defined",
+                             Entry->Name,
+                             SymIsRef (Entry) ? "used" : "declared");
                 }
             }
         }

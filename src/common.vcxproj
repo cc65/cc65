@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -110,6 +110,7 @@
     <ClInclude Include="common\objdefs.h" />
     <ClInclude Include="common\optdefs.h" />
     <ClInclude Include="common\print.h" />
+    <ClInclude Include="common\pathutil.h" />
     <ClInclude Include="common\scopedefs.h" />
     <ClInclude Include="common\searchpath.h" />
     <ClInclude Include="common\segdefs.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="common\matchpat.c" />
     <ClCompile Include="common\mmodel.c" />
     <ClCompile Include="common\print.c" />
+    <ClCompile Include="common\pathutil.c" />
     <ClCompile Include="common\searchpath.c" />
     <ClCompile Include="common\segnames.c" />
     <ClCompile Include="common\shift.c" />

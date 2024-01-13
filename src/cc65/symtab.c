@@ -170,7 +170,8 @@ static void CheckSymTable (SymTable* Tab)
                 if (SymIsDef (Entry) && !SymIsRef (Entry) &&
                     !SymHasAttr (Entry, atUnused)) {
                     if (Flags & SC_PARAM) {
-                        if (IS_Get (&WarnUnusedParam)) {
+                        if (IS_Get (&WarnUnusedParam) &&
+                            !IsAnonName (Entry->Name)) {
                             Warning ("Parameter '%s' is never used", Entry->Name);
                         }
                     } else if ((Flags & SC_TYPEMASK) == SC_FUNC) {

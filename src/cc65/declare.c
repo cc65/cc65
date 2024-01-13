@@ -2388,16 +2388,26 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
             GetFuncDesc (D->Type)->Flags |= FD_OLDSTYLE_INTRET;
         }
 
-        /* For anything that is not a function or typedef, check for an implicit
-        ** int declaration.
+        /* For anything that is not a function, check for an implicit int
+        ** declaration.
         */
-        if (!IsTypeFunc (D->Type) &&
-            (D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-            /* If the standard was not set explicitly to C89, print a warning
-            ** for variables with implicit int type.
-            */
-            if (IS_Get (&Standard) >= STD_C99) {
-                Warning ("Implicit 'int' is an obsolete feature");
+        if (!IsTypeFunc (D->Type) && IsRankInt (D->Type)) {
+            if ((D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+                /* If the standard was not set explicitly to C89, print a warning
+                ** for variables with implicit int type.
+                */
+                if (IS_Get (&Standard) >= STD_C99) {
+                    Warning ("Implicit 'int' is an obsolete feature");
+                }
+            } else {
+                /* If the standard was not set explicitly to C89, print a warning
+                ** for typedefs with implicit int type.
+                */
+                if (IS_Get (&Standard) >= STD_C99) {
+                    Warning ("Type defaults to 'int' in typedef of '%s'",
+                             D->Ident);
+                    Note ("Implicit 'int' is an obsolete feature");
+                }
             }
         }
     }

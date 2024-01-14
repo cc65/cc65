@@ -2809,6 +2809,26 @@ static int DoIfDef (int skip, int flag)
 }
 
 
+static void TryOpenIncludeFile (const char* Name, InputType IT)
+/* Opens the given inclde file if it has not been marked with #pragma once. */
+{
+    char *FullPath = FindAbsolutePath(Name);
+
+    if (FullPath == NULL) {
+        PPError ("Failed to find the full path for the file %s", Name);
+        return;
+    }
+
+    /* Has #pragma once been seen in this file already? */
+    if (SP_LookupStr (PragmaOnceSeenFiles, FullPath)) {
+        /* Do not include it. */
+        free(FullPath);
+        return;
+    }
+
+    OpenIncludeFile (Name, IT);
+    free(FullPath);
+}
 
 static void DoInclude (void)
 /* Open an include file. */
@@ -2860,7 +2880,7 @@ static void DoInclude (void)
         /* Check for extra tokens following the filename */
         CheckExtraTokens ("include");
         /* Open the include file */
-        OpenIncludeFile (SB_GetConstBuf (&Filename), IT);
+        TryOpenIncludeFile (SB_GetConstBuf (&Filename), IT);
     } else {
         /* No terminator found */
         PPError ("#include expects \"FILENAME\" or <FILENAME>");
@@ -2968,62 +2988,25 @@ static void DoLine (void)
     MLine = InitLine (MLine);
 }
 
-
-/* Possible outcomes of preprocessing a pragma */
-typedef enum {
-    /* the #pragma directive was preprocessed into _Pragma() */
-    PREPROC_PRAGMA_EMITTED,
-
-    /* processing the #pragma directive did not result in any output */
-    PREPROC_PRAGMA_NOTHING_EMITTED,
-
-    /* the preprocessor should stop processing the current file */
-    PREPROC_PRAGMA_HALT
-} preproc_pragma_t;
-
-static preproc_pragma_t DoPragmaOnce (void)
-/**
- * Handle a pragma once directive, and determine if the current file
- * should still be processed or not.
- */
+static void DoPragmaOnce (void)
+/* Marks the current file as seen by #pragma once. */
 {
-    const char * const file_name = GetCurrentFilename ();
-    char * const full_path = FindAbsolutePath (file_name);
-    unsigned previous_count;
-    unsigned next_count;
+    const char * const Filename = GetCurrentFilename ();
+    char * const FullPath = FindAbsolutePath (Filename);
 
-
-    if (full_path == NULL) {
-        AbEnd ("Failed to find the full path for the file %s", file_name);
+    if (FullPath == NULL) {
+        PPError ("Failed to find the full path for the file %s", Filename);
     }
 
-    /* considering StrPool does not have a way for checking if a string
-       is in the set or not, compare the counts to accomplish that */
-
-    previous_count = SP_GetCount (PragmaOnceSeenFiles);
-
-    SP_AddStr(PragmaOnceSeenFiles, full_path);
-
-    next_count = SP_GetCount (PragmaOnceSeenFiles);
-
-    free (full_path);
-
-    if (previous_count == next_count) {
-        /* file has been seen*/
-        return PREPROC_PRAGMA_HALT;
-    }
-    else {
-        return PREPROC_PRAGMA_NOTHING_EMITTED;
-    }
+    SP_AddStr(PragmaOnceSeenFiles, FullPath);
 }
 
-static preproc_pragma_t DoPragma (void)
+static void DoPragma (void)
 /* Handle a #pragma line by converting the #pragma preprocessor directive into
 ** the _Pragma() compiler operator.
 */
 {
     StrBuf* const PragmaLine = OLine;
-    preproc_pragma_t status;
 
     PRECONDITION (PragmaLine != 0);
 
@@ -3035,7 +3018,7 @@ static preproc_pragma_t DoPragma (void)
     PreprocessDirective (Line, MLine, MSM_NONE);
 
     if (SB_CompareStr(MLine, "once") == 0) {
-        status = DoPragmaOnce ();
+        DoPragmaOnce ();
     }
     else {
         /* Convert #pragma to _Pragma () */
@@ -3043,13 +3026,10 @@ static preproc_pragma_t DoPragma (void)
         SB_Reset (MLine);
         Stringize (MLine, PragmaLine);
         SB_AppendChar (PragmaLine, ')');
-        status = PREPROC_PRAGMA_EMITTED;
     }
 
     /* End this line */
     SB_SetIndex (PragmaLine, SB_GetLen (PragmaLine));
-
-    return status;
 }
 
 
@@ -3217,13 +3197,9 @@ static int ParseDirectives (unsigned ModeFlags)
                     case PPD_PRAGMA:
                         if (!PPSkip) {
                             if ((ModeFlags & MSM_IN_ARG_LIST) == 0) {
-                                preproc_pragma_t status = DoPragma();
-                                if (status == PREPROC_PRAGMA_EMITTED) {
-                                    return Whitespace;
-                                }
-                                else if (status == PREPROC_PRAGMA_HALT) {
-                                    PPSkip = 1;
-                                }
+                                DoPragma();
+
+                                return Whitespace;
                             } else {
                                 PPError ("Embedded #pragma directive within macro arguments is unsupported");
                             }

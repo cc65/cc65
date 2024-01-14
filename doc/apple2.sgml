@@ -331,9 +331,25 @@ usage.
 <item>_filetype
 <item>_datetime
 <item>get_ostype
+<item>gmtime_dt
+<item>mktime_dt
 <item>rebootafterexit
 <item>ser_apple2_slot
 <item>tgi_apple2_mix
+</itemize>
+
+
+<sect1>Apple IIgs specific functions in accelerator.h<p>
+
+In addition to those, the <tt/accelerator.h/ header file contains three functions
+to help determine whether the program is running on a IIgs, and change the IIgs
+CPU speed. See the <url url="funcref.html" name="function reference"> for declaration and
+usage.
+
+<itemize>
+<item>detect_iigs
+<item>get_iigs_speed
+<item>set_iigs_speed
 </itemize>
 
 

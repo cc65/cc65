@@ -281,3 +281,22 @@ unsigned SP_GetCount (const StringPool* P)
 {
     return CollCount (&P->Entries);
 }
+
+unsigned SP_Lookup(StringPool *P, const StrBuf *S)
+/*
+** Determine whether the given string is in the pool.
+** Returns 1 if the string is in the pool, 0 otherwise.
+*/
+{
+    return HT_Find (&P->Tab, S) != 0;
+}
+
+unsigned SP_LookupStr(StringPool *P, const char *S)
+/*
+** Determine whether the given string is in the pool.
+** Returns 1 if the string is in the pool, 0 otherwise.
+*/
+{
+    StrBuf Buf;
+    return SP_Lookup (P, SB_InitFromString (&Buf, S));
+}

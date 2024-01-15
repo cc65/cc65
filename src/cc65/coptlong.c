@@ -120,13 +120,9 @@ unsigned OptLongAssign (CodeSeg* S)
               !CS_RangeHasLabel(S, I, 12)) {
 
               L[1]->AM = L[11]->AM;
-              L[1]->Size = L[11]->Size;
-              L[1]->Flags = L[11]->Flags;
               CE_SetArg(L[1], L[11]->Arg);
 
               L[3]->AM = L[9]->AM;
-              L[3]->Size = L[9]->Size;
-              L[3]->Flags = L[9]->Flags;
               CE_SetArg(L[3], L[9]->Arg);
 
               CS_DelEntries (S, I+8, 4);
@@ -215,13 +211,9 @@ unsigned OptLongCopy (CodeSeg* S)
               !CS_RangeHasLabel(S, I, 12)) {
 
               L[1]->AM = L[11]->AM;
-              L[1]->Size = L[11]->Size;
-              L[1]->Flags = L[11]->Flags;
               CE_SetArg(L[1], L[11]->Arg);
 
               L[3]->AM = L[9]->AM;
-              L[3]->Size = L[9]->Size;
-              L[3]->Flags = L[9]->Flags;
               CE_SetArg(L[3], L[9]->Arg);
 
               CS_DelEntries (S, I+8, 4);

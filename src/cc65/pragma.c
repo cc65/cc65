@@ -630,7 +630,7 @@ static void WrappedCallPragma (pragma_scope_t Scope, StrBuf* B)
     Entry = FindSym(Name);
 
     /* Check if the name is valid */
-    if (Entry && (Entry->Flags & SC_FUNC) == SC_FUNC) {
+    if (Entry && (Entry->Flags & SC_TYPEMASK) == SC_FUNC) {
 
         PushWrappedCall(Entry, (unsigned int) Val);
         Entry->Flags |= SC_REF;

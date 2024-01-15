@@ -1223,8 +1223,8 @@ static void Primary (ExprDesc* E)
                 NextToken ();
 
                 /* Check for illegal symbol types */
-                CHECK ((Sym->Flags & SC_LABEL) != SC_LABEL);
-                if (Sym->Flags & SC_ESUTYPEMASK) {
+                CHECK ((Sym->Flags & SC_TYPEMASK) != SC_LABEL);
+                if ((Sym->Flags & SC_TYPEMASK) == SC_TYPEDEF) {
                     /* Cannot use type symbols */
                     Error ("Variable identifier expected");
                     /* Assume an int type to make E valid */
@@ -1244,7 +1244,7 @@ static void Primary (ExprDesc* E)
                     /* Enum or some other numeric constant */
                     E->Flags = E_LOC_NONE | E_RTYPE_RVAL;
                     E->IVal  = Sym->V.ConstVal;
-                } else if ((Sym->Flags & SC_AUTO) == SC_AUTO) {
+                } else if ((Sym->Flags & SC_STORAGEMASK) == SC_AUTO) {
                     /* Local variable. If this is a parameter for a variadic
                     ** function, we have to add some address calculations, and the
                     ** address is not const.
@@ -1258,25 +1258,24 @@ static void Primary (ExprDesc* E)
                         E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
                         E->IVal  = Sym->V.Offs;
                     }
-                } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
+                } else if ((Sym->Flags & SC_TYPEMASK) == SC_FUNC) {
                     /* Function */
                     E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
                     E->Name  = (uintptr_t) Sym->Name;
-                } else if ((Sym->Flags & SC_REGISTER) == SC_REGISTER) {
+                } else if ((Sym->Flags & SC_STORAGEMASK) == SC_REGISTER) {
                     /* Register variable, zero page based */
                     E->Flags = E_LOC_REGISTER | E_RTYPE_LVAL;
                     E->Name  = Sym->V.R.RegOffs;
-                } else if ((Sym->Flags & SC_STATIC) == SC_STATIC) {
-                    /* Static variable */
-                    if (Sym->Flags & (SC_EXTERN | SC_STORAGE | SC_DECL)) {
-                        E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
-                        E->Name  = (uintptr_t) Sym->Name;
-                    } else {
-                        E->Flags = E_LOC_STATIC | E_RTYPE_LVAL;
-                        E->Name  = Sym->V.L.Label;
-                    }
-                } else {
+                } else if (SymIsGlobal (Sym)) {
+                    /* Global variable */
+                    E->Flags = E_LOC_GLOBAL | E_RTYPE_LVAL;
+                    E->Name  = (uintptr_t) Sym->Name;
+                } else if ((Sym->Flags & SC_STORAGEMASK) == SC_STATIC) {
                     /* Local static variable */
+                    E->Flags = E_LOC_STATIC | E_RTYPE_LVAL;
+                    E->Name  = Sym->V.L.Label;
+                } else {
+                    /* Other */
                     E->Flags = E_LOC_STATIC | E_RTYPE_LVAL;
                     E->Name  = Sym->V.Offs;
                 }
@@ -1311,7 +1310,7 @@ static void Primary (ExprDesc* E)
                     } else {
                         Warning ("Call to undeclared function '%s'", Ident);
                     }
-                    Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
+                    Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_REF | SC_FUNC);
                     E->Type  = Sym->Type;
                     E->Flags = E_LOC_GLOBAL | E_RTYPE_RVAL;
                     E->Name  = (uintptr_t) Sym->Name;
@@ -1408,7 +1407,7 @@ static void Primary (ExprDesc* E)
             } else {
                 /* Let's see if this is a C99-style declaration */
                 DeclSpec Spec;
-                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
+                ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_NONE, SC_AUTO);
 
                 if ((Spec.Flags & DS_TYPE_MASK) != DS_NONE) {
                     Error ("Mixed declarations and code are not supported in cc65");
@@ -1991,7 +1990,7 @@ void hie10 (ExprDesc* Expr)
             if (ED_IsConstAbs (Expr)) {
                 /* Constant numeric expression */
                 Expr->IVal = !Expr->IVal;
-            } else if (ED_IsAddrExpr (Expr)) {
+            } else if (ED_IsEntityAddr (Expr)) {
                 /* Address != NULL, so !Address == 0 */
                 ED_MakeConstBool (Expr, 0);
             } else {
@@ -2445,8 +2444,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         }
 
         /* Check for numeric constant operands */
-        if ((ED_IsAddrExpr (Expr) && ED_IsNullPtr (&Expr2)) ||
-            (ED_IsNullPtr (Expr) && ED_IsAddrExpr (&Expr2))) {
+        if ((ED_IsEntityAddr (Expr) && ED_IsNullPtr (&Expr2)) ||
+            (ED_IsNullPtr (Expr) && ED_IsEntityAddr (&Expr2))) {
 
             /* Object addresses are inequal to null pointer */
             Expr->IVal = (Tok != TOK_EQ);
@@ -2477,8 +2476,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 pop (ltype);
             }
 
-        } else if (ED_IsAddrExpr (Expr)     &&
-                   ED_IsAddrExpr (&Expr2)   &&
+        } else if (ED_IsEntityAddr (Expr)   &&
+                   ED_IsEntityAddr (&Expr2) &&
                    Expr->Sym == Expr2.Sym) {
 
             /* Evaluate the result for static addresses */
@@ -3944,10 +3943,10 @@ static void hieQuest (ExprDesc* Expr)
         NextToken ();
 
         /* Parse second expression. Remember for later if it is a NULL pointer
-        ** expression, then load it into the primary.
+        ** constant expression, then load it into the primary.
         */
         ExprWithCheck (hie0, &Expr2);
-        Expr2IsNULL = ED_IsNullPtr (&Expr2);
+        Expr2IsNULL = ED_IsNullPtrConstant (&Expr2);
         if (!IsTypeVoid (Expr2.Type)    &&
             ED_YetToLoad (&Expr2)       &&
             (!ConstantCond || !ED_IsConst (&Expr2))) {
@@ -3991,10 +3990,10 @@ static void hieQuest (ExprDesc* Expr)
         ConsumeColon ();
 
         /* Parse third expression. Remember for later if it is a NULL pointer
-        ** expression, then load it into the primary.
+        ** constant expression, then load it into the primary.
         */
         ExprWithCheck (hieQuest, &Expr3);
-        Expr3IsNULL = ED_IsNullPtr (&Expr3);
+        Expr3IsNULL = ED_IsNullPtrConstant (&Expr3);
         if (!IsTypeVoid (Expr3.Type)    &&
             ED_YetToLoad (&Expr3)       &&
             (!ConstantCond || !ED_IsConst (&Expr3))) {
@@ -4305,8 +4304,13 @@ ExprDesc NoCodeConstExpr (void (*Func) (ExprDesc*))
     if (!ED_IsConst (&Expr) || !ED_CodeRangeIsEmpty (&Expr)) {
         Error ("Constant expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
-        Expr.Flags &= E_MASK_RTYPE | E_MASK_KEEP_RESULT;
+        Expr.Flags &= E_MASK_RTYPE | E_MASK_KEEP_MAKE;
         Expr.Flags |= E_LOC_NONE;
+
+        /* Remove any non-constant code generated */
+        if (!ED_CodeRangeIsEmpty (&Expr)) {
+            RemoveCodeRange (&Expr.Start, &Expr.End);
+        }
     }
 
     /* Return by value */
@@ -4331,6 +4335,11 @@ ExprDesc NoCodeConstAbsIntExpr (void (*Func) (ExprDesc*))
         Error ("Constant integer expression expected");
         /* To avoid any compiler errors, make the expression a valid const */
         ED_MakeConstAbsInt (&Expr, 1);
+
+        /* Remove any non-constant code generated */
+        if (!ED_CodeRangeIsEmpty (&Expr)) {
+            RemoveCodeRange (&Expr.Start, &Expr.End);
+        }
     }
 
     /* Return by value */

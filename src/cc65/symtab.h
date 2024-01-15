@@ -211,8 +211,11 @@ SymTable* GetFieldSymTab (void);
 SymTable* GetLabelSymTab (void);
 /* Return the label symbol table */
 
-int SymIsLocal (SymEntry* Sym);
-/* Return true if the symbol is defined in the highest lexical level */
+int SymIsLocal (const SymEntry* Sym);
+/* Return true if the symbol is declared in the highest lexical level */
+
+int SymIsGlobal (const SymEntry* Sym);
+/* Return true if the symbol is declared in the file scope level */
 
 void MakeZPSym (const char* Name);
 /* Mark the given symbol as zero page symbol */

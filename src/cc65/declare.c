@@ -1020,7 +1020,8 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
         ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE);
 
         /* Check if this is only a type declaration */
-        if (CurTok.Tok == TOK_SEMI && (Spec.Flags & DS_EXTRA_TYPE) == 0) {
+        if (CurTok.Tok == TOK_SEMI &&
+            !(IS_Get (&Standard) >= STD_CC65 && IsAnonStructClass (Spec.Type))) {
             CheckEmptyDecl (&Spec);
             NextToken ();
             continue;
@@ -1061,22 +1062,12 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
                     /* In cc65 mode, we allow anonymous structs/unions within
                     ** a union.
                     */
-                    SymEntry* TagEntry;
-                    if (IS_Get (&Standard) >= STD_CC65          &&
-                        IsClassStruct (Decl.Type)               &&
-                        (TagEntry = GetESUTagSym (Decl.Type))   &&
-                        SymHasAnonName (TagEntry)) {
-                        /* This is an anonymous struct or union */
-                        AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), UnionTagEntry->V.S.ACount);
+                    AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), UnionTagEntry->V.S.ACount);
 
-                        /* Ignore CVR qualifiers */
-                        if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
-                            Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
-                            Decl.Type[0].C &= ~T_QUAL_CVR;
-                        }
-                    } else {
-                        /* Invalid member */
-                        goto NextMember;
+                    /* Ignore CVR qualifiers */
+                    if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
+                        Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
+                        Decl.Type[0].C &= ~T_QUAL_CVR;
                     }
                 } else if (FieldWidth > 0) {
                     /* A bit-field without a name will get an anonymous one */
@@ -1240,7 +1231,8 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
         ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE);
 
         /* Check if this is only a type declaration */
-        if (CurTok.Tok == TOK_SEMI && (Spec.Flags & DS_EXTRA_TYPE) == 0) {
+        if (CurTok.Tok == TOK_SEMI &&
+            !(IS_Get (&Standard) >= STD_CC65 && IsAnonStructClass (Spec.Type))) {
             CheckEmptyDecl (&Spec);
             NextToken ();
             continue;
@@ -1308,22 +1300,12 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                     /* In cc65 mode, we allow anonymous structs/unions within
                     ** a struct.
                     */
-                    SymEntry* TagEntry;
-                    if (IS_Get (&Standard) >= STD_CC65          &&
-                        IsClassStruct (Decl.Type)               &&
-                        (TagEntry = GetESUTagSym (Decl.Type))   &&
-                        SymHasAnonName (TagEntry)) {
-                        /* This is an anonymous struct or union */
-                        AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), StructTagEntry->V.S.ACount);
+                    AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), StructTagEntry->V.S.ACount);
 
-                        /* Ignore CVR qualifiers */
-                        if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
-                            Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
-                            Decl.Type[0].C &= ~T_QUAL_CVR;
-                        }
-                    } else {
-                        /* Invalid member */
-                        goto NextMember;
+                    /* Ignore CVR qualifiers */
+                    if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
+                        Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
+                        Decl.Type[0].C &= ~T_QUAL_CVR;
                     }
                 } else if (FieldWidth > 0) {
                     /* A bit-field without a name will get an anonymous one */
@@ -1854,7 +1836,7 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
             }
 
             /* Warn about new local type declaration */
-            if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0) {
+            if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0 && !IsAnonESUType (Spec.Type)) {
                 Warning ("'%s' will be invisible out of this function",
                          GetFullTypeName (Spec.Type));
             }
@@ -1957,7 +1939,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         }
 
         /* Warn about new local type declaration */
-        if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0) {
+        if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0 && !IsAnonESUType (Spec.Type)) {
             Warning ("'%s' will be invisible out of this function",
                      GetFullTypeName (Spec.Type));
         }
@@ -2508,10 +2490,20 @@ void CheckEmptyDecl (const DeclSpec* Spec)
     if ((Spec->Flags & DS_TYPE_MASK) == DS_NONE) {
         /* No declaration at all */
     } else if ((Spec->Flags & DS_EXTRA_TYPE) == 0) {
-        Warning ("Declaration does not declare anything");
-    } else if (IsClassStruct (Spec->Type)           &&
-               !IsIncompleteESUType (Spec->Type)    &&
-               SymHasAnonName (GetESUTagSym (Spec->Type))) {
+        /* Empty declaration of basic types */
+        Warning ("Useless declaration");
+    } else if (IsAnonStructClass (Spec->Type)) {
+        /* This could be that the user made a wrong attempt to declare an
+        ** anonymous struct/union field outside a struct/union.
+        */
         Warning ("Unnamed %s that defines no instances", GetBasicTypeName (Spec->Type));
+    } else if (GetLexicalLevel () == LEX_LEVEL_STRUCT) {
+        /* This could be that the user made a wrong attempt to declare an
+        ** anonymous struct/union field inside a struct/union. Perhaps just
+        ** paranoid since it is not so uncommon to do forward declarations.
+        */
+        if (!IsTypeEnum (Spec->Type) || ((Spec->Flags & DS_NEW_TYPE_DEF) == 0)) {
+            Warning ("Declaration defines no instances");
+        }
     }
 }

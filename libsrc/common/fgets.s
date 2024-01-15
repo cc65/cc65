@@ -12,6 +12,8 @@
         .include        "stdio.inc"
         .include        "_file.inc"
 
+        .macpack        cpu
+
 terminate_ptr:
         lda     #$00
         tax
@@ -37,8 +39,12 @@ _fgets:
         sta     buf
         stx     buf+1
 
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz     didread
+        .else
         lda     #$00            ; We have read nothing yet
         sta     didread
+        .endif
 
         ; Check size
         lda     size

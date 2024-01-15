@@ -997,7 +997,7 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
 
     /* Parse union fields */
     UnionSize = 0;
-    while (CurTok.Tok != TOK_RCURLY) {
+    while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
 
         /* Get the type of the entry */
         DeclSpec    Spec;
@@ -1217,7 +1217,7 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
     FlexibleMember = 0;
     StructSize     = 0;
     BitOffs        = 0;
-    while (CurTok.Tok != TOK_RCURLY) {
+    while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
 
         /* Get the type of the entry */
         DeclSpec    Spec;
@@ -1814,7 +1814,7 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
     }
 
     /* An optional list of type specifications follows */
-    while (CurTok.Tok != TOK_LCURLY) {
+    while (CurTok.Tok != TOK_LCURLY && CurTok.Tok != TOK_CEOF) {
 
         DeclSpec        Spec;
         int             NeedClean;

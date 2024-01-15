@@ -59,6 +59,11 @@ void* __fastcall__ realloc (void* block, register size_t size)
         return 0;
     }
 
+    /* Don't overflow! */
+    if (size > 0xFFFF - HEAP_ADMIN_SPACE) {
+      return 0;
+    }
+
     /* Make the internal used size from the given size */
     size += HEAP_ADMIN_SPACE;
     if (size < sizeof (struct freeblock)) {
@@ -107,6 +112,3 @@ void* __fastcall__ realloc (void* block, register size_t size)
     }
     return newblock;
 }
-
-
-

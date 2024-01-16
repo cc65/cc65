@@ -41,14 +41,14 @@
 /*****************************************************************************/
 
 
-/**
- * Determines the absolute path of the given relative path.
- * The absolute path for the file is stored in a malloced buffer.
- * Returns NULL if some error occured.
- * The returned path's separator is system specific.
- */
 char *FindAbsolutePath (const char *path);
-
+/*
+** Determines the absolute path of the given relative path.
+** If the path points to a symlink, resolves such symlink.
+** The absolute path for the file is stored in a malloced buffer.
+** Returns NULL if some error occured.
+** The returned path's separator is system specific.
+*/
 
 
 /* End of pathutil.h */

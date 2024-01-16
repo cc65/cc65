@@ -87,6 +87,7 @@ unsigned OptLongAssign (CodeSeg* S)
         L[0] = CS_GetEntry (S, I);
 
         if (CS_GetEntries (S, L+1, I+1, 12)) {
+          CodeEntry* N;
           if (/* Check the opcode sequence */
               L[0]->OPC == OP65_LDA                                &&
               L[1]->OPC == OP65_STA                                &&
@@ -119,11 +120,13 @@ unsigned OptLongAssign (CodeSeg* S)
               !RegXUsed (S, I+12)                                  &&
               !CS_RangeHasLabel(S, I, 12)) {
 
-              L[1]->AM = L[11]->AM;
-              CE_SetArg(L[1], L[11]->Arg);
+              N = NewCodeEntry (OP65_STA, L[11]->AM, L[11]->Arg, 0, L[11]->LI);
+              CS_DelEntry (S, I+1);
+              CS_InsertEntry (S, N, I+1);
 
-              L[3]->AM = L[9]->AM;
-              CE_SetArg(L[3], L[9]->Arg);
+              N = NewCodeEntry (OP65_STA, L[9]->AM, L[9]->Arg, 0, L[9]->LI);
+              CS_DelEntry (S, I+3);
+              CS_InsertEntry (S, N, I+3);
 
               CS_DelEntries (S, I+8, 4);
 
@@ -179,6 +182,7 @@ unsigned OptLongCopy (CodeSeg* S)
         L[0] = CS_GetEntry (S, I);
 
         if (CS_GetEntries (S, L+1, I+1, 12)) {
+          CodeEntry *N;
           if (L[0]->OPC == OP65_LDA                                &&
                 !strncmp(L[0]->Arg, L[5]->Arg, strlen(L[5]->Arg))  &&
                 !strcmp(L[0]->Arg + strlen(L[5]->Arg), "+3")       &&
@@ -210,11 +214,13 @@ unsigned OptLongCopy (CodeSeg* S)
               !RegXUsed (S, I+11)                                  &&
               !CS_RangeHasLabel(S, I, 12)) {
 
-              L[1]->AM = L[11]->AM;
-              CE_SetArg(L[1], L[11]->Arg);
+              N = NewCodeEntry (OP65_STA, L[11]->AM, L[11]->Arg, 0, L[11]->LI);
+              CS_DelEntry (S, I+1);
+              CS_InsertEntry (S, N, I+1);
 
-              L[3]->AM = L[9]->AM;
-              CE_SetArg(L[3], L[9]->Arg);
+              N = NewCodeEntry (OP65_STA, L[9]->AM, L[9]->Arg, 0, L[9]->LI);
+              CS_DelEntry (S, I+3);
+              CS_InsertEntry (S, N, I+3);
 
               CS_DelEntries (S, I+8, 4);
 

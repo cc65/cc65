@@ -46,7 +46,8 @@
 #include "xmalloc.h"
 #include "strpool.h"
 #include "abend.h"
-#include "pathutil.h"
+#include "searchpath.h"
+#include "incpath.h"
 
 /* cc65 */
 #include "codegen.h"
@@ -2809,27 +2810,6 @@ static int DoIfDef (int skip, int flag)
 }
 
 
-static void TryOpenIncludeFile (const char* Name, InputType IT)
-/* Opens the given inclde file if it has not been marked with #pragma once. */
-{
-    char *FullPath = FindAbsolutePath(Name);
-
-    if (FullPath == NULL) {
-        PPError ("Failed to find the full path for the file %s", Name);
-        return;
-    }
-
-    /* Has #pragma once been seen in this file already? */
-    if (SP_LookupStr (PragmaOnceSeenFiles, FullPath)) {
-        /* Do not include it. */
-        free(FullPath);
-        return;
-    }
-
-    OpenIncludeFile (Name, IT);
-    free(FullPath);
-}
-
 static void DoInclude (void)
 /* Open an include file. */
 {
@@ -2879,8 +2859,8 @@ static void DoInclude (void)
         NextChar ();
         /* Check for extra tokens following the filename */
         CheckExtraTokens ("include");
-        /* Open the include file */
-        TryOpenIncludeFile (SB_GetConstBuf (&Filename), IT);
+        /* Open the include file, if it is not marked with #pragma once */
+        OpenIncludeFile (SB_GetConstBuf (&Filename), IT, PragmaOnceSeenFiles);
     } else {
         /* No terminator found */
         PPError ("#include expects \"FILENAME\" or <FILENAME>");
@@ -2992,7 +2972,7 @@ static void DoPragmaOnce (void)
 /* Marks the current file as seen by #pragma once. */
 {
     const char * const Filename = GetCurrentFilename ();
-    char * const FullPath = FindAbsolutePath (Filename);
+    char * const FullPath = SearchFile(UsrIncSearchPath, Filename);
 
     if (FullPath == NULL) {
         PPError ("Failed to find the full path for the file %s", Filename);

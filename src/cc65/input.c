@@ -293,7 +293,7 @@ void OpenMainFile (const char* Name)
 
 
 
-void OpenIncludeFile (const char* Name, InputType IT)
+void OpenIncludeFile (const char* Name, InputType IT, StringPool *FilesToIgnore)
 /* Open an include file and insert it into the tables. */
 {
     char*  N;
@@ -311,6 +311,12 @@ void OpenIncludeFile (const char* Name, InputType IT)
     N = SearchFile ((IT == IT_SYSINC)? SysIncSearchPath : UsrIncSearchPath, Name);
     if (N == 0) {
         PPError ("Include file '%s' not found", Name);
+        return;
+    }
+
+    if (SP_LookupStr(FilesToIgnore, N) != 0) {
+        /* This file should not be included. */
+        xfree (N);
         return;
     }
 

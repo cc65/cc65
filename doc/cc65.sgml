@@ -1685,7 +1685,7 @@ void somefunc2(int, char *);
 
   This pragma is used to prevent multiple inclusion of a header file.
   If this pragma is preprocessed in a file, any posterior
-  <tt>#include<tt> which targets the current file will be ignored.
+  <tt>#include</tt> which targets the current file will be ignored.
 
   Two files are considered to be the same by this directive if they
   share the same absolute path. In the case of symbolic links,

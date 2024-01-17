@@ -1,11 +1,20 @@
 
-#include <stdlib.h>
-
 #if defined(_WIN32)
-#   include <windows.h>
-#   include <fileapi.h>
-#   include "xmalloc.h"
+
+/* Set minimum windows version for GetFinalPathNameByHandleA */
+/* NTDDI_VISTA */
+#define NTDDI_VERSION 0x06000000
+
+/* _WIN32_WINNT_VISTA */
+#define _WIN32_WINNT 0x600
+
+#include "xmalloc.h"
+#include <windows.h>
+#include <fileapi.h>
+
 #endif
+
+#include <stdlib.h>
 
 #if defined(_WIN32)
 

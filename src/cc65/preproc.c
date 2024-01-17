@@ -46,8 +46,6 @@
 #include "xmalloc.h"
 #include "strpool.h"
 #include "abend.h"
-#include "searchpath.h"
-#include "incpath.h"
 #include "pathutil.h"
 
 /* cc65 */
@@ -2973,19 +2971,16 @@ static void DoPragmaOnce (void)
 /* Marks the current file as seen by #pragma once. */
 {
     const char * const Filename = GetCurrentFilename ();
-    char * const IncludePath = SearchFile(UsrIncSearchPath, Filename);
 
-    if (IncludePath == NULL) {
-        AbEnd ("Cannot find the full path for the file %s", Filename);
-    }
-
-    const char * const FullPath = FindRealPath(IncludePath);
+    char * const FullPath = FindRealPath (Filename);
 
     if (FullPath == NULL) {
-        AbEnd ("Failed to find the full path for the file %s", Filename);
+        AbEnd ("Failed to find the real path for the file %s", Filename);
     }
 
-    SP_AddStr(PragmaOnceSeenFiles, FullPath);
+    SP_AddStr (PragmaOnceSeenFiles, FullPath);
+
+    free (FullPath);
 }
 
 static void DoPragma (void)

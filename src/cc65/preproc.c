@@ -48,6 +48,7 @@
 #include "abend.h"
 #include "searchpath.h"
 #include "incpath.h"
+#include "pathutil.h"
 
 /* cc65 */
 #include "codegen.h"
@@ -2972,10 +2973,16 @@ static void DoPragmaOnce (void)
 /* Marks the current file as seen by #pragma once. */
 {
     const char * const Filename = GetCurrentFilename ();
-    char * const FullPath = SearchFile(UsrIncSearchPath, Filename);
+    char * const IncludePath = SearchFile(UsrIncSearchPath, Filename);
+
+    if (IncludePath == NULL) {
+        AbEnd ("Cannot find the full path for the file %s", Filename);
+    }
+
+    const char * const FullPath = FindAbsolutePath(IncludePath);
 
     if (FullPath == NULL) {
-        PPError ("Failed to find the full path for the file %s", Filename);
+        AbEnd ("Failed to find the full path for the file %s", Filename);
     }
 
     SP_AddStr(PragmaOnceSeenFiles, FullPath);

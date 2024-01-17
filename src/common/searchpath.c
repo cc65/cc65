@@ -57,7 +57,6 @@
 #include "searchpath.h"
 #include "strbuf.h"
 #include "xmalloc.h"
-#include "pathutil.h"
 
 
 
@@ -379,11 +378,10 @@ char* SearchFile (const SearchPaths* P, const char* File)
         SB_Terminate (&PathName);
 
 
-        /* Find real path of file, if it exists */
-        Name = FindAbsolutePath(SB_GetBuf(&PathName));
-
-        if (Name != 0) {
+        /* Check if this file exists */
+        if (access (SB_GetBuf (&PathName), 0) == 0) {
             /* The file exists, we're done */
+            Name = xstrdup (SB_GetBuf (&PathName));
             break;
         }
     }

@@ -54,7 +54,7 @@ char *FindRealPath (const char *Path)
 
 extern char* realpath (const char* path, char* resolved_path);
 
-char* FindAbsolutePath (const char* path)
+char* FindRealPath (const char* path)
 /*
 ** Determines the absolute path of the given relative path.
 ** If the path points to a symlink, resolves such symlink.

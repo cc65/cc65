@@ -2979,7 +2979,7 @@ static void DoPragmaOnce (void)
         AbEnd ("Cannot find the full path for the file %s", Filename);
     }
 
-    const char * const FullPath = FindAbsolutePath(IncludePath);
+    const char * const FullPath = FindRealPath(IncludePath);
 
     if (FullPath == NULL) {
         AbEnd ("Failed to find the full path for the file %s", Filename);

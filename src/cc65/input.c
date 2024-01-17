@@ -317,7 +317,7 @@ void OpenIncludeFile (const char* Name, InputType IT, StringPool *FilesToIgnore)
     }
 
     /* Resolve real path of file in case of a symlink */
-    M = FindAbsolutePath(N);
+    M = FindRealPath(N);
     if (M == 0) {
         PPError ("Cannot resolve absolute path of '%s'", N);
         xfree (N);

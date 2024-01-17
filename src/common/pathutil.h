@@ -41,12 +41,12 @@
 /*****************************************************************************/
 
 
-char *FindAbsolutePath (const char *path);
+char *FindRealPath (const char *path);
 /*
-** Determines the absolute path of the given relative path.
+** Determines the real path the given relative path of an existing file.
 ** If the path points to a symlink, resolves such symlink.
-** The absolute path for the file is stored in a malloced buffer.
-** Returns NULL if some error occured.
+** The real path for the file is stored in a malloced buffer.
+** Returns NULL if the file doesn't exist.
 ** The returned path's separator is system specific.
 */
 

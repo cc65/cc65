@@ -3,17 +3,18 @@
 
 #if defined(_WIN32)
 #   include <windows.h>
+#   include <fileapi.h>
 #   include "xmalloc.h"
 #endif
 
 #if defined(_WIN32)
 
-char *FindAbsolutePath (const char *Path)
+char *FindRealPath (const char *Path)
 /*
-** Determines the absolute path of the given relative path.
+** Determines the real path the given relative path of an existing file.
 ** If the path points to a symlink, resolves such symlink.
-** The absolute path for the file is stored in a malloced buffer.
-** Returns NULL if some error occured.
+** The real path for the file is stored in a malloced buffer.
+** Returns NULL if the file doesn't exist.
 ** The returned path's separator is system specific.
 */
 {

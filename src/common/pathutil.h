@@ -1,7 +1,7 @@
 /*****************************************************************************/
 /*                                                                           */
 /*                                pathutil.h                                 */
-/*                           Path manipulation utilities                     */
+/*                         Path manipulation utilities                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

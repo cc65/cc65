@@ -331,6 +331,7 @@ usage.
 <item>_dos_type
 <item>_filetype
 <item>_datetime
+<item>beep
 <item>get_ostype
 <item>gmtime_dt
 <item>mktime_dt

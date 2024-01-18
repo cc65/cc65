@@ -4,12 +4,12 @@
 ** !!LICENCE!!     Public Domain
 */
 
+#pragma once
 
+#include "pragma-once-sample-2.h"
+#include "pragma-once-sample-2.h"
 #include "pragma-once-sample.h"
 #include "pragma-once-sample.h"
-#include "pragma-once-sample-link.h"
-
-/* pragma-once-sample-link.h is a symlink to pragma-once-sample. */
 
 
 #include <stdio.h>

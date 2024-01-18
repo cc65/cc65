@@ -95,6 +95,7 @@ function.
 
 <itemize>
 <item>_dos_type
+<item><ref id="beep" name="beep">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
 <item><ref id="mktime_dt" name="mktime_dt">
@@ -106,6 +107,7 @@ function.
 
 <itemize>
 <item>_dos_type
+<item><ref id="beep" name="beep">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
 <item><ref id="mktime_dt" name="mktime_dt">
@@ -1771,10 +1773,11 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Beep sound.
 <tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
 <tag/Declaration/<tt/void beep(void);/
 <tag/Description/<tt/beep/ makes a brief tone.
 <tag/Notes/<itemize>
-<item>The function is specific to the Sym-1.
+<item>The function is specific to the Sym-1 and Apple2 platforms.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

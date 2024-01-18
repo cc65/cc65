@@ -197,6 +197,9 @@ extern void a2_lo_tgi[];
 
 
 
+void beep (void);
+/* Beep beep. */
+
 unsigned char get_ostype (void);
 /* Get the machine type. Returns one of the APPLE_xxx codes. */
 

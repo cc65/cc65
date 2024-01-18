@@ -685,9 +685,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Leave the lexical level */
     LeaveFunctionLevel ();
 
-    /* Eat the closing brace */
-    ConsumeRCurly ();
-
     /* Restore the old literal pool, remembering the one for the function */
     Func->V.F.LitPool = PopLiteralPool ();
 
@@ -698,6 +695,12 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
     /* Switch back to the old segments */
     PopSegContext ();
+
+    /* Eat the closing brace after we've done everything with the function
+    ** definition. This way we won't have troubles with pragmas right after
+    ** the closing brace.
+    */
+    ConsumeRCurly();
 
     /* Reset the current function pointer */
     FreeFunction (CurrentFunc);

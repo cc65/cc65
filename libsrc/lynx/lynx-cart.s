@@ -17,7 +17,7 @@
         .include "extzp.inc"
         .export  lynxskip0, lynxread0
         .export  lynxblock
-        .import  __BLOCKSIZE__
+        .import  __BANK0BLOCKSIZE__
 
         .code
 

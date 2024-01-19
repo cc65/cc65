@@ -105,8 +105,6 @@ char *FindRealPath (const char *Path)
 
 #else
 
-extern char* realpath (const char* path, char* resolved_path);
-
 char* FindRealPath (const char* path)
 /*
 ** Returns a malloced buffer containing the canonical path of the given path.

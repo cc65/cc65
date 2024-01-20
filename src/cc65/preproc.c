@@ -3179,7 +3179,7 @@ static int ParseDirectives (unsigned ModeFlags)
                     case PPD_PRAGMA:
                         if (!PPSkip) {
                             if ((ModeFlags & MSM_IN_ARG_LIST) == 0) {
-                                DoPragma();
+                                DoPragma ();
 
                                 return Whitespace;
                             } else {

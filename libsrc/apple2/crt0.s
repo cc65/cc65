@@ -40,11 +40,14 @@ _exit:  ldx     #<exit
         lda     #>exit
         jsr     reset           ; Setup RESET vector
 
-        ; Switch in ROM, in case it wasn't already switched in by a RESET.
-        bit     $C082
+        ; Switch in LC bank 2 for R/O in case it was switched out by a RESET.
+        bit     $C080
 
         ; Call the module destructors.
         jsr     donelib
+
+        ; Switch in ROM.
+        bit     $C082
 
         ; Restore the original RESET vector.
 exit:   ldx     #$02

@@ -792,6 +792,12 @@ int IsESUType (const Type* T);
 int IsIncompleteESUType (const Type* T);
 /* Return true if this is an incomplete ESU type */
 
+int IsAnonESUType (const Type* T);
+/* Return true if this is an anonymous ESU type */
+
+int IsAnonStructClass (const Type* T);
+/* Return true if this is an anonymous struct or union type */
+
 int IsPassByRefType (const Type* T);
 /* Return true if this is a large struct/union type that doesn't fit in the
 ** primary. This returns false for the void value extension type since it is

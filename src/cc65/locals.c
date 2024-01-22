@@ -572,7 +572,9 @@ void DeclareLocals (void)
     /* A place to store info about potential initializations of auto variables */
     CollAppend (&CurrentFunc->LocalsBlockStack, 0);
 
-    /* Loop until we don't find any more variables */
+    /* Loop until we don't find any more variables. EOF is handled in the loop
+    ** as well.
+    */
     while (1) {
         DeclSpec Spec;
         int      NeedClean;

@@ -170,7 +170,8 @@ static void CheckSymTable (SymTable* Tab)
                 if (SymIsDef (Entry) && !SymIsRef (Entry) &&
                     !SymHasAttr (Entry, atUnused)) {
                     if (Flags & SC_PARAM) {
-                        if (IS_Get (&WarnUnusedParam)) {
+                        if (IS_Get (&WarnUnusedParam) &&
+                            !IsAnonName (Entry->Name)) {
                             Warning ("Parameter '%s' is never used", Entry->Name);
                         }
                     } else if ((Flags & SC_TYPEMASK) == SC_FUNC) {
@@ -956,7 +957,13 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
                     TagEntry = 0;
                 } else if (Size == 0) {
                     /* Empty struct is not supported now */
-                    Error ("Empty %s type '%s' is not supported", SCType == SC_STRUCT ? "struct" : "union", Name);
+                    if (!IsAnonName (Name)) {
+                        Error ("Empty %s type '%s' is not supported",
+                               SCType == SC_STRUCT ? "struct" : "union", Name);
+                    } else {
+                        Error ("Empty %s type is not supported",
+                               SCType == SC_STRUCT ? "struct" : "union");
+                    }
                     TagEntry = 0;
                 }
             }

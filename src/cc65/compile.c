@@ -163,19 +163,19 @@ static void Parse (void)
                 break;
             }
 
-            /* Check if we must reserve storage for the variable. We do this,
-            **
-            **   - if it is not a typedef or function,
-            **   - if we don't had a storage class given ("int i")
-            **   - if the storage class is explicitly specified as static,
-            **   - or if there is an initialization.
-            **
-            ** This means that "extern int i;" will not get storage allocated
-            ** in this translation unit.
-            */
+            /* The symbol is now visible in the file scope */
             if ((Decl.StorageClass & SC_TYPEMASK) != SC_FUNC &&
                 (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-                /* The variable is visible in the file scope */
+                /* Check if we must reserve storage for the variable. We do this,
+                **
+                **   - if it is not a typedef or function,
+                **   - if we don't had a storage class given ("int i")
+                **   - if the storage class is explicitly specified as static,
+                **   - or if there is an initialization.
+                **
+                ** This means that "extern int i;" will not get storage allocated
+                ** in this translation unit.
+                */
                 if ((Decl.StorageClass & SC_STORAGEMASK) == SC_NONE     ||
                     (Decl.StorageClass & SC_STORAGEMASK) == SC_STATIC   ||
                     ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN &&
@@ -189,7 +189,6 @@ static void Parse (void)
             ** or semicolon, it must be followed by a function body.
             */
             if ((Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
-                /* The function is now visible in the file scope */
                 if (CurTok.Tok == TOK_LCURLY) {
                     /* A definition */
                     Decl.StorageClass |= SC_DEF;

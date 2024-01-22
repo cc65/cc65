@@ -71,18 +71,21 @@ function.
 <item><ref id="detect_c64dtv" name="detect_c64dtv">
 <item><ref id="detect_c65" name="detect_c65">
 <item><ref id="detect_chameleon" name="detect_chameleon">
+<item><ref id="detect_iigs" name="detect_iigs">
 <item><ref id="detect_scpu" name="detect_scpu">
 <item><ref id="detect_turbomaster" name="detect_turbomaster">
 <item><ref id="get_c128_speed" name="get_c128_speed">
 <item><ref id="get_c64dtv_speed" name="get_c64dtv_speed">
 <item><ref id="get_c65_speed" name="get_c65_speed">
 <item><ref id="get_chameleon_speed" name="get_chameleon_speed">
+<item><ref id="get_iigs_speed" name="get_iigs_speed">
 <item><ref id="get_scpu_speed" name="get_scpu_speed">
 <item><ref id="get_turbomaster_speed" name="get_turbomaster_speed">
 <item><ref id="set_c128_speed" name="set_c128_speed">
 <item><ref id="set_c64dtv_speed" name="set_c64dtv_speed">
 <item><ref id="set_c65_speed" name="set_c65_speed">
 <item><ref id="set_chameleon_speed" name="set_chameleon_speed">
+<item><ref id="set_iigs_speed" name="set_iigs_speed">
 <item><ref id="set_scpu_speed" name="set_scpu_speed">
 <item><ref id="set_turbomaster_speed" name="set_turbomaster_speed">
 </itemize>
@@ -104,6 +107,8 @@ function.
 <itemize>
 <item>_dos_type
 <item><ref id="get_ostype" name="get_ostype">
+<item><ref id="gmtime_dt" name="gmtime_dt">
+<item><ref id="mktime_dt" name="mktime_dt">
 <item>rebootafterexit
 <item><ref id="videomode" name="videomode">
 </itemize>
@@ -3453,6 +3458,26 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>detect_iigs<label id="detect_iigs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check whether we are running on an Apple IIgs..
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_iigs (void);/
+<tag/Description/The function returns a 1 if running on an Apple IIgs.
+<tag/Notes/<itemize>
+<item>The function is specific to the Apple2 and Apple2enh platforms.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_iigs_speed" name="get_iigs_speed">,
+<ref id="set_iigs_speed" name="set_iigs_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>detect_scpu<label id="detect_scpu"><p>
 
 <quote>
@@ -4162,6 +4187,27 @@ header files define constants that can be used to check the return code.
 <tag/See also/
 <ref id="detect_chameleon" name="detect_chameleon">,
 <ref id="set_chameleon_speed" name="set_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_iigs_speed<label id="get_iigs_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the Apple IIgs.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_iigs_speed (void);/
+<tag/Description/The function returns the current speed of the Apple IIgs.
+<tag/Notes/<itemize>
+<item>The function is specific to the Apple2 and Apple2enh platforms.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_iigs" name="detect_iigs">,
+<ref id="set_iigs_speed" name="set_iigs_speed">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6980,6 +7026,30 @@ clean-up when exiting the program.
 <tag/See also/
 <ref id="detect_chameleon" name="detect_chameleon">,
 <ref id="get_chameleon_speed" name="get_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_iigs_speed<label id="set_iigs_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the Apple IIgs.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_iigs_speed (unsigned char speed);/
+<tag/Description/The function sets the speed of the Apple IIgs CPU (and returns
+the new speed).
+<tag/Notes/<itemize>
+<item>The function is specific to the Apple2 and Apple2enh platforms.
+<item>See the accelerator.h header for the speed definitions.
+<item>Accepted parameters are SPEED_SLOW and SPEED_FAST (all other values are
+considered SPEED_FAST).
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_iigs" name="detect_iigs">,
+<ref id="get_iigs_speed" name="get_iigs_speed">,
 <tag/Example/None.
 </descrip>
 </quote>

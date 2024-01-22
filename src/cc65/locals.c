@@ -584,7 +584,7 @@ void DeclareLocals (void)
         }
 
         /* Read the declaration specifier */
-        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT | TS_FUNCTION_SPEC, SC_AUTO);
 
         /* Check variable declarations. We need distinguish between a default
         ** int type and the end of variable declarations. So we will do the

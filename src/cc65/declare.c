@@ -124,9 +124,37 @@ static unsigned ParseOneStorageClass (void)
 
 
 
+static unsigned ParseOneFuncSpec (void)
+/* Parse and return a function specifier */
+{
+    unsigned FuncSpec = 0;
+
+    /* Check the function specifier given */
+    switch (CurTok.Tok) {
+
+        case TOK_INLINE:
+            FuncSpec = SC_INLINE;
+            NextToken ();
+            break;
+
+        case TOK_NORETURN:
+            FuncSpec = SC_NORETURN;
+            NextToken ();
+            break;
+
+        default:
+            break;
+    }
+
+    return FuncSpec;
+}
+
+
+
 static int ParseStorageClass (DeclSpec* Spec)
 /* Parse storage class specifiers. Return true if a specifier is read even if
-** it was duplicated or disallowed. */
+** it was duplicated or disallowed.
+*/
 {
     /* Check the storage class given */
     unsigned StorageClass = ParseOneStorageClass ();
@@ -144,6 +172,31 @@ static int ParseStorageClass (DeclSpec* Spec)
             Error ("Conflicting storage class specifier");
         }
         StorageClass = ParseOneStorageClass ();
+    }
+
+    return 1;
+}
+
+
+
+static int ParseFuncSpecClass (DeclSpec* Spec)
+/* Parse function specifiers. Return true if a specifier is read even if it
+** was duplicated or disallowed.
+*/
+{
+    /* Check the function specifiers given */
+    unsigned FuncSpec = ParseOneFuncSpec ();
+
+    if (FuncSpec == 0) {
+        return 0;
+    }
+
+    while (FuncSpec != 0) {
+        if ((Spec->StorageClass & FuncSpec) != 0) {
+            Warning ("Duplicate function specifier");
+        }
+        Spec->StorageClass |= FuncSpec;
+        FuncSpec = ParseOneFuncSpec ();
     }
 
     return 1;
@@ -303,7 +356,8 @@ static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t
 */
 {
     TypeCode Q = T_QUAL_NONE;
-    int Continue;
+    int HasStorageClass;
+    int HasFuncSpec;
 
     do {
         /* There may be type qualifiers *before* any storage class specifiers */
@@ -311,11 +365,17 @@ static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t
         *Qualifiers |= Q;
 
         /* Parse storage class specifiers anyway then check */
-        Continue = ParseStorageClass (Spec);
-        if (Continue && (TSFlags & (TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC)) == 0) {
+        HasStorageClass = ParseStorageClass (Spec);
+        if (HasStorageClass && (TSFlags & TS_STORAGE_CLASS_SPEC) == 0) {
             Error ("Unexpected storage class specified");
         }
-    } while (Continue || Q != T_QUAL_NONE);
+
+        /* Parse function specifiers anyway then check */
+        HasFuncSpec = ParseFuncSpecClass (Spec);
+        if (HasFuncSpec && (TSFlags & TS_FUNCTION_SPEC) == 0) {
+            Error ("Unexpected function specifiers");
+        }
+    } while (Q != T_QUAL_NONE || HasStorageClass || HasFuncSpec);
 }
 
 
@@ -2375,6 +2435,14 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     /* Parse attributes for this declarator */
     ParseAttribute (D);
 
+    /* 'inline' is only allowed on functions */
+    if (Mode != DM_ACCEPT_PARAM_IDENT               &&
+        (D->StorageClass & SC_TYPEMASK) != SC_FUNC  &&
+        (D->StorageClass & SC_INLINE) == SC_INLINE) {
+        Error ("'inline' on non-function declaration");
+        D->StorageClass &= ~SC_INLINE;
+    }
+
     /* Check a few pre-C99 things */
     if (D->Ident[0] != '\0' && (Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE) {
         /* Check and warn about an implicit int return in the function */
@@ -2478,7 +2546,7 @@ void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage)
     Spec->Flags &= ~DS_DEF_STORAGE;
 
     /* Parse the type specifiers */
-    ParseTypeSpec (Spec, TSFlags | TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC);
+    ParseTypeSpec (Spec, TSFlags | TS_STORAGE_CLASS_SPEC);
 
     /* If no explicit storage class is given, use the default */
     if ((Spec->StorageClass & SC_STORAGEMASK) == 0) {
@@ -2495,7 +2563,9 @@ void CheckEmptyDecl (const DeclSpec* Spec)
 ** warning if not.
 */
 {
-    if ((Spec->Flags & DS_TYPE_MASK) == DS_NONE) {
+    if ((Spec->StorageClass & SC_INLINE) == SC_INLINE) {
+        Error ("'inline' on empty declaration");
+    } else if ((Spec->Flags & DS_TYPE_MASK) == DS_NONE) {
         /* No declaration at all */
     } else if ((Spec->Flags & DS_EXTRA_TYPE) == 0) {
         Warning ("Declaration does not declare anything");

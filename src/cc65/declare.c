@@ -2417,48 +2417,54 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     /* Parse attributes for this declarator */
     ParseAttribute (D);
 
-    /* 'inline' is only allowed on functions */
-    if (Mode != DM_ACCEPT_PARAM_IDENT               &&
-        (D->StorageClass & SC_TYPEMASK) != SC_FUNC  &&
-        (D->StorageClass & SC_INLINE) == SC_INLINE) {
-        Error ("'inline' on non-function declaration");
-        D->StorageClass &= ~SC_INLINE;
-    }
-
-    /* Check a few pre-C99 things */
-    if (D->Ident[0] != '\0' && (Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE) {
-        /* Check and warn about an implicit int return in the function */
-        if (IsTypeFunc (D->Type) && IsRankInt (GetFuncReturnType (D->Type))) {
-            /* Function has an implicit int return. Output a warning if we don't
-            ** have the C89 standard enabled explicitly.
+    /* Check a few things for the instance (rather than the type) */
+    if (D->Ident[0] != '\0') {
+        /* Check a few pre-C99 things */
+        if ((Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE && IsRankInt (Spec->Type)) {
+            /* If the standard was not set explicitly to C89, print a warning
+            ** for typedefs with implicit int type specifier.
             */
             if (IS_Get (&Standard) >= STD_C99) {
-                Warning ("Implicit 'int' return type is an obsolete feature");
+                if ((D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+                    Warning ("Implicit 'int' type specifier is an obsolete feature");
+                } else {
+                    Warning ("Type specifier defaults to 'int' in typedef of '%s'",
+                             D->Ident);
+                    Note ("Implicit 'int' type specifier is an obsolete feature");
+                }
             }
-            GetFuncDesc (D->Type)->Flags |= FD_OLDSTYLE_INTRET;
         }
 
-        /* For anything that is not a function, check for an implicit int
-        ** declaration.
-        */
-        if (!IsTypeFunc (D->Type) && IsRankInt (D->Type)) {
-            if ((D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-                /* If the standard was not set explicitly to C89, print a warning
-                ** for variables with implicit int type.
-                */
-                if (IS_Get (&Standard) >= STD_C99) {
-                    Warning ("Implicit 'int' is an obsolete feature");
+        /* Check other things depending on the "kind" of the instance */
+        if ((D->StorageClass & SC_TYPEMASK) == SC_FUNC) {
+            /* Special handling for main() */
+            if (strcmp (D->Ident, "main") == 0) {
+                /* main() cannot be a fastcall function */
+                if (IsQualFastcall (D->Type)) {
+                    Error ("'main' cannot be declared __fastcall__");
                 }
-            } else {
-                /* If the standard was not set explicitly to C89, print a warning
-                ** for typedefs with implicit int type.
-                */
-                if (IS_Get (&Standard) >= STD_C99) {
-                    Warning ("Type defaults to 'int' in typedef of '%s'",
-                             D->Ident);
-                    Note ("Implicit 'int' is an obsolete feature");
+
+                /* main() cannot be an inline function */
+                if ((D->StorageClass & SC_INLINE) == SC_INLINE) {
+                    Error ("'main' cannot be declared inline");
+                    D->StorageClass &= ~SC_INLINE;
+                }
+
+                /* Check return type */
+                if (GetUnqualRawTypeCode (GetFuncReturnType (D->Type)) != T_INT) {
+                    /* If cc65 extensions aren't enabled, don't allow a main function
+                    ** that doesn't return an int.
+                    */
+                    if (IS_Get (&Standard) != STD_CC65) {
+                        Error ("'main' must always return an int");
+                    }
                 }
             }
+        } else if (Mode != DM_ACCEPT_PARAM_IDENT &&
+                   (D->StorageClass & SC_INLINE) == SC_INLINE) {
+            /* 'inline' is only allowed on functions */
+            Error ("'inline' on non-function declaration");
+            D->StorageClass &= ~SC_INLINE;
         }
     }
 

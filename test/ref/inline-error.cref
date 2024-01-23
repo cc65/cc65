@@ -13,8 +13,9 @@ inline-error.c:22: Error: 'inline' on non-function declaration
 inline-error.c:23: Error: 'inline' on non-function declaration
 inline-error.c:24: Error: 'inline' on non-function declaration
 inline-error.c:34: Warning: Variable 'fp2' is defined but never used
-inline-error.c:37: Warning: Inline function 'f1a' used but never defined
-inline-error.c:37: Warning: Inline function 'f1b' used but never defined
-inline-error.c:37: Warning: Static function 'f1c' used but never defined
-inline-error.c:37: Warning: Inline function 'f2a' used but never defined
-inline-error.c:37: Warning: Inline function 'f2b' used but never defined
+inline-error.c:36: Error: 'main' cannot be declared inline
+inline-error.c:39: Warning: Inline function 'f1a' used but never defined
+inline-error.c:39: Warning: Inline function 'f1b' used but never defined
+inline-error.c:39: Warning: Static function 'f1c' used but never defined
+inline-error.c:39: Warning: Inline function 'f2a' used but never defined
+inline-error.c:39: Warning: Inline function 'f2b' used but never defined

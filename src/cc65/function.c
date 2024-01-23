@@ -450,7 +450,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 /* Parse argument declarations and function body. */
 {
     int         ParamComplete;  /* If all paramemters have complete types */
-    int         C99MainFunc = 0;/* Flag for C99 main function returning int */
     SymEntry*   Param;
     const Type* RType;          /* Real type used for struct parameters */
     const Type* ReturnType;     /* Return type */
@@ -512,34 +511,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
         /* Mark this as the main function */
         CurrentFunc->Flags |= FF_IS_MAIN;
-
-        /* Main cannot be a fastcall function */
-        if (IsQualFastcall (Func->Type)) {
-            Error ("'main' cannot be declared as __fastcall__");
-        }
-
-        /* main() cannot be an inline function */
-        if ((Func->Flags & SC_INLINE) == SC_INLINE) {
-            Error ("'main' cannot be declared inline");
-            Func->Flags &= ~SC_INLINE;
-        }
-
-        /* Check return type */
-        if (GetUnqualRawTypeCode (ReturnType) == T_INT) {
-            /* Determine if this is a main function in a C99 environment that
-            ** returns an int.
-            */
-            if (IS_Get (&Standard) >= STD_C99) {
-                C99MainFunc = 1;
-            }
-        } else {
-            /* If cc65 extensions aren't enabled, don't allow a main function
-            ** that doesn't return an int.
-            */
-            if (IS_Get (&Standard) != STD_CC65) {
-                Error ("'main' must always return an int");
-            }
-        }
 
         /* Add a forced import of a symbol that is contained in the startup
         ** code. This will force the startup code to be linked in.
@@ -665,7 +636,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* If this is the main function in a C99 environment returning an int,
         ** let it always return zero. Otherwise output a warning.
         */
-        if (C99MainFunc) {
+        if (IS_Get (&Standard) >= STD_C99 && GetUnqualRawTypeCode (ReturnType) == T_INT) {
             g_getimmed (CF_INT | CF_CONST, 0, 0);
         } else if (IS_Get (&WarnReturnType)) {
             Warning ("Control reaches end of non-void function [-Wreturn-type]");

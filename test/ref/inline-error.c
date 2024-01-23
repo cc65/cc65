@@ -33,4 +33,6 @@ inline int main(void)               /* Error */
     f2b();                          /* Still imported */
 }
 
+inline int main(void);              /* Error */
+
 /* Warning: non-external inline functions declared but undefined in TU */

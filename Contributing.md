@@ -1,4 +1,6 @@
-This document contains all kinds of information that you should know if you want to contribute to the cc65 project. Before you start, please read all of it. If something is not clear to you, please ask - this document is an ongoing effort and may well be incomplete.
+This document contains all kinds of information that you should know if you want to contribute to the cc65 project. Before you start, please read all of it. If something is not clear to you, please ask - this document is an ongoing effort and may well be incomplete. 
+
+Also, before you put a lot of work into implementing something you want to contribute, please get in touch with one of the developers and ask if what you are going to do is actually wanted and has a chance of being merged. Perhaps someone else is already working on it, or perhaps what you have in mind is not how we'd expect it to be - talking to us before you start might save you a lot of work in those cases.
 
 (''Note:'' The word "must" indicates a requirement.  The word "should" indicates a recomendation.)
 

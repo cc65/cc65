@@ -3,7 +3,7 @@
 ; 2002-10-22, Greg King
 ;
 ; This signed-division function returns both the quotient and the remainder,
-; in this structure:
+; in this structure: (quotient in sreg, remainder in AX)
 ;
 ; typedef struct {
 ;     int rem, quot;

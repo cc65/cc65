@@ -40,7 +40,7 @@
 
         .export         _cbm_read
         .importzp       ptr1, ptr2, ptr3, tmp1
-        .import         popax, popa
+        .import         popax, popa, returnFFFF
         .import         ___oserror
 
 
@@ -107,7 +107,4 @@ _cbm_read:
 ; CHKIN failed
 
 @E1:    sta     ___oserror
-        lda     #$FF
-        tax
-        rts                     ; return -1
-
+        jmp     returnFFFF

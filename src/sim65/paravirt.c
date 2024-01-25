@@ -163,7 +163,7 @@ static void PVArgs (CPURegs* Regs)
 
 static void PVOpen (CPURegs* Regs)
 {
-    char Path[PVOPEN_PATH_SIZE];
+    char Path[PV_PATH_SIZE];
     int OFlag = O_INITIAL;
     int OMode = 0;
     unsigned RetVal, I = 0;
@@ -184,7 +184,7 @@ static void PVOpen (CPURegs* Regs)
             break;
         }
         ++I;
-        if (I >= PVOPEN_PATH_SIZE) {
+        if (I >= PV_PATH_SIZE) {
             Error("PVOpen path too long at address $%04X",Name);
         }
     }
@@ -253,6 +253,35 @@ static void PVClose (CPURegs* Regs)
 
 
 
+static void PVSysRemove (CPURegs* Regs)
+{
+    char Path[PV_PATH_SIZE];
+    unsigned RetVal, I = 0;
+
+    unsigned Name  = GetAX (Regs);
+
+    Print (stderr, 2, "PVSysRemove ($%04X)\n", Name);
+
+    do {
+        if (!(Path[I] = MemReadByte ((Name + I) & 0xFFFF))) {
+            break;
+        }
+        ++I;
+        if (I >= PV_PATH_SIZE) {
+            Error("PVSysRemove path too long at address $%04X", Name);
+        }
+    }
+    while (1);
+
+    Print (stderr, 2, "PVSysRemove (\"%s\")\n", Path);
+
+    RetVal = remove (Path);
+
+    SetAX (Regs, RetVal);
+}
+
+
+
 static void PVRead (CPURegs* Regs)
 {
     unsigned char* Data;
@@ -305,7 +334,17 @@ static void PVWrite (CPURegs* Regs)
 
 
 
+static void PVOSMapErrno (CPURegs* Regs)
+{
+    unsigned err = GetAX(Regs);
+    SetAX (Regs, err != 0 ? -1 : 0);
+}
+
+
+
 static const PVFunc Hooks[] = {
+    PVSysRemove,
+    PVOSMapErrno,
     PVOpen,
     PVClose,
     PVRead,

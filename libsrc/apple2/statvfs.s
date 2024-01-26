@@ -6,7 +6,7 @@
 
         .export         _statvfs
         .import         _dio_query_sectsize
-        .import         mli_file_info, pushax, popax, popptr1
+        .import         mli_file_info, pushax, popax, popptr1, pushptr1
         .include        "zeropage.inc"
         .include        "apple2.inc"
         .include        "errno.inc"
@@ -45,9 +45,7 @@ _statvfs:
         sty     vol_sep         ; Register '/' index
         lda     #$00
         sta     (ptr1),y        ; Cut pathname at first slash
-:       lda     ptr1
-        ldx     ptr1+1
-        jsr     pushax
+:       jsr     pushptr1
 
         jsr     mli_file_info
 

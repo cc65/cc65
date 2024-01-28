@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 FILE *in, *out;
 char buf[32];
@@ -34,6 +35,7 @@ int main(int argc,char **argv)
       printf("Error: file pointer should be in error state\n");
     }
     fclose(out);
+    unlink(outfile_path);
 
     in = fopen(INFILE, "rb");
     if (in == NULL) {

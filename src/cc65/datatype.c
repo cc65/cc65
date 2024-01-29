@@ -989,6 +989,24 @@ int IsIncompleteESUType (const Type* T)
 
 
 
+int IsAnonESUType (const Type* T)
+/* Return true if this is an anonymous ESU type */
+{
+    SymEntry* TagSym = GetESUTagSym (T);
+
+    return TagSym != 0 && SymHasAnonName (TagSym);
+}
+
+
+
+int IsAnonStructClass (const Type* T)
+/* Return true if this is an anonymous struct or union type */
+{
+    return IsClassStruct (T) && IsAnonESUType (T);
+}
+
+
+
 int IsPassByRefType (const Type* T)
 /* Return true if this is a large struct/union type that doesn't fit in the
 ** primary. This returns false for the void value extension type since it is

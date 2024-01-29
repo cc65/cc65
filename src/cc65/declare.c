@@ -124,9 +124,37 @@ static unsigned ParseOneStorageClass (void)
 
 
 
+static unsigned ParseOneFuncSpec (void)
+/* Parse and return a function specifier */
+{
+    unsigned FuncSpec = 0;
+
+    /* Check the function specifier given */
+    switch (CurTok.Tok) {
+
+        case TOK_INLINE:
+            FuncSpec = SC_INLINE;
+            NextToken ();
+            break;
+
+        case TOK_NORETURN:
+            FuncSpec = SC_NORETURN;
+            NextToken ();
+            break;
+
+        default:
+            break;
+    }
+
+    return FuncSpec;
+}
+
+
+
 static int ParseStorageClass (DeclSpec* Spec)
 /* Parse storage class specifiers. Return true if a specifier is read even if
-** it was duplicated or disallowed. */
+** it was duplicated or disallowed.
+*/
 {
     /* Check the storage class given */
     unsigned StorageClass = ParseOneStorageClass ();
@@ -144,6 +172,31 @@ static int ParseStorageClass (DeclSpec* Spec)
             Error ("Conflicting storage class specifier");
         }
         StorageClass = ParseOneStorageClass ();
+    }
+
+    return 1;
+}
+
+
+
+static int ParseFuncSpecClass (DeclSpec* Spec)
+/* Parse function specifiers. Return true if a specifier is read even if it
+** was duplicated or disallowed.
+*/
+{
+    /* Check the function specifiers given */
+    unsigned FuncSpec = ParseOneFuncSpec ();
+
+    if (FuncSpec == 0) {
+        return 0;
+    }
+
+    while (FuncSpec != 0) {
+        if ((Spec->StorageClass & FuncSpec) != 0) {
+            Warning ("Duplicate function specifier");
+        }
+        Spec->StorageClass |= FuncSpec;
+        FuncSpec = ParseOneFuncSpec ();
     }
 
     return 1;
@@ -303,7 +356,8 @@ static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t
 */
 {
     TypeCode Q = T_QUAL_NONE;
-    int Continue;
+    int HasStorageClass;
+    int HasFuncSpec;
 
     do {
         /* There may be type qualifiers *before* any storage class specifiers */
@@ -311,11 +365,17 @@ static void OptionalSpecifiers (DeclSpec* Spec, TypeCode* Qualifiers, typespec_t
         *Qualifiers |= Q;
 
         /* Parse storage class specifiers anyway then check */
-        Continue = ParseStorageClass (Spec);
-        if (Continue && (TSFlags & (TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC)) == 0) {
+        HasStorageClass = ParseStorageClass (Spec);
+        if (HasStorageClass && (TSFlags & TS_STORAGE_CLASS_SPEC) == 0) {
             Error ("Unexpected storage class specified");
         }
-    } while (Continue || Q != T_QUAL_NONE);
+
+        /* Parse function specifiers anyway then check */
+        HasFuncSpec = ParseFuncSpecClass (Spec);
+        if (HasFuncSpec && (TSFlags & TS_FUNCTION_SPEC) == 0) {
+            Error ("Unexpected function specifiers");
+        }
+    } while (Q != T_QUAL_NONE || HasStorageClass || HasFuncSpec);
 }
 
 
@@ -997,7 +1057,7 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
 
     /* Parse union fields */
     UnionSize = 0;
-    while (CurTok.Tok != TOK_RCURLY) {
+    while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
 
         /* Get the type of the entry */
         DeclSpec    Spec;
@@ -1020,7 +1080,8 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
         ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE);
 
         /* Check if this is only a type declaration */
-        if (CurTok.Tok == TOK_SEMI && (Spec.Flags & DS_EXTRA_TYPE) == 0) {
+        if (CurTok.Tok == TOK_SEMI &&
+            !(IS_Get (&Standard) >= STD_CC65 && IsAnonStructClass (Spec.Type))) {
             CheckEmptyDecl (&Spec);
             NextToken ();
             continue;
@@ -1061,22 +1122,12 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
                     /* In cc65 mode, we allow anonymous structs/unions within
                     ** a union.
                     */
-                    SymEntry* TagEntry;
-                    if (IS_Get (&Standard) >= STD_CC65          &&
-                        IsClassStruct (Decl.Type)               &&
-                        (TagEntry = GetESUTagSym (Decl.Type))   &&
-                        SymHasAnonName (TagEntry)) {
-                        /* This is an anonymous struct or union */
-                        AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), UnionTagEntry->V.S.ACount);
+                    AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), UnionTagEntry->V.S.ACount);
 
-                        /* Ignore CVR qualifiers */
-                        if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
-                            Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
-                            Decl.Type[0].C &= ~T_QUAL_CVR;
-                        }
-                    } else {
-                        /* Invalid member */
-                        goto NextMember;
+                    /* Ignore CVR qualifiers */
+                    if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
+                        Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
+                        Decl.Type[0].C &= ~T_QUAL_CVR;
                     }
                 } else if (FieldWidth > 0) {
                     /* A bit-field without a name will get an anonymous one */
@@ -1217,7 +1268,7 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
     FlexibleMember = 0;
     StructSize     = 0;
     BitOffs        = 0;
-    while (CurTok.Tok != TOK_RCURLY) {
+    while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
 
         /* Get the type of the entry */
         DeclSpec    Spec;
@@ -1240,7 +1291,8 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
         ParseTypeSpec (&Spec, TS_DEFAULT_TYPE_NONE);
 
         /* Check if this is only a type declaration */
-        if (CurTok.Tok == TOK_SEMI && (Spec.Flags & DS_EXTRA_TYPE) == 0) {
+        if (CurTok.Tok == TOK_SEMI &&
+            !(IS_Get (&Standard) >= STD_CC65 && IsAnonStructClass (Spec.Type))) {
             CheckEmptyDecl (&Spec);
             NextToken ();
             continue;
@@ -1308,22 +1360,12 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                     /* In cc65 mode, we allow anonymous structs/unions within
                     ** a struct.
                     */
-                    SymEntry* TagEntry;
-                    if (IS_Get (&Standard) >= STD_CC65          &&
-                        IsClassStruct (Decl.Type)               &&
-                        (TagEntry = GetESUTagSym (Decl.Type))   &&
-                        SymHasAnonName (TagEntry)) {
-                        /* This is an anonymous struct or union */
-                        AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), StructTagEntry->V.S.ACount);
+                    AnonFieldName (Decl.Ident, GetBasicTypeName (Decl.Type), StructTagEntry->V.S.ACount);
 
-                        /* Ignore CVR qualifiers */
-                        if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
-                            Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
-                            Decl.Type[0].C &= ~T_QUAL_CVR;
-                        }
-                    } else {
-                        /* Invalid member */
-                        goto NextMember;
+                    /* Ignore CVR qualifiers */
+                    if (IsQualConst (Decl.Type) || IsQualVolatile (Decl.Type) || IsQualRestrict (Decl.Type)) {
+                        Warning ("Anonymous %s qualifiers are ignored", GetBasicTypeName (Decl.Type));
+                        Decl.Type[0].C &= ~T_QUAL_CVR;
                     }
                 } else if (FieldWidth > 0) {
                     /* A bit-field without a name will get an anonymous one */
@@ -1814,7 +1856,7 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
     }
 
     /* An optional list of type specifications follows */
-    while (CurTok.Tok != TOK_LCURLY) {
+    while (CurTok.Tok != TOK_LCURLY && CurTok.Tok != TOK_CEOF) {
 
         DeclSpec        Spec;
         int             NeedClean;
@@ -1854,7 +1896,7 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
             }
 
             /* Warn about new local type declaration */
-            if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0) {
+            if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0 && !IsAnonESUType (Spec.Type)) {
                 Warning ("'%s' will be invisible out of this function",
                          GetFullTypeName (Spec.Type));
             }
@@ -1957,7 +1999,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         }
 
         /* Warn about new local type declaration */
-        if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0) {
+        if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0 && !IsAnonESUType (Spec.Type)) {
             Warning ("'%s' will be invisible out of this function",
                      GetFullTypeName (Spec.Type));
         }
@@ -2375,30 +2417,54 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
     /* Parse attributes for this declarator */
     ParseAttribute (D);
 
-    /* Check a few pre-C99 things */
-    if (D->Ident[0] != '\0' && (Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE) {
-        /* Check and warn about an implicit int return in the function */
-        if (IsTypeFunc (D->Type) && IsRankInt (GetFuncReturnType (D->Type))) {
-            /* Function has an implicit int return. Output a warning if we don't
-            ** have the C89 standard enabled explicitly.
+    /* Check a few things for the instance (rather than the type) */
+    if (D->Ident[0] != '\0') {
+        /* Check a few pre-C99 things */
+        if ((Spec->Flags & DS_TYPE_MASK) == DS_DEF_TYPE && IsRankInt (Spec->Type)) {
+            /* If the standard was not set explicitly to C89, print a warning
+            ** for typedefs with implicit int type specifier.
             */
             if (IS_Get (&Standard) >= STD_C99) {
-                Warning ("Implicit 'int' return type is an obsolete feature");
+                if ((D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+                    Warning ("Implicit 'int' type specifier is an obsolete feature");
+                } else {
+                    Warning ("Type specifier defaults to 'int' in typedef of '%s'",
+                             D->Ident);
+                    Note ("Implicit 'int' type specifier is an obsolete feature");
+                }
             }
-            GetFuncDesc (D->Type)->Flags |= FD_OLDSTYLE_INTRET;
         }
 
-        /* For anything that is not a function or typedef, check for an implicit
-        ** int declaration.
-        */
-        if (!IsTypeFunc (D->Type) &&
-            (D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-            /* If the standard was not set explicitly to C89, print a warning
-            ** for variables with implicit int type.
-            */
-            if (IS_Get (&Standard) >= STD_C99) {
-                Warning ("Implicit 'int' is an obsolete feature");
+        /* Check other things depending on the "kind" of the instance */
+        if ((D->StorageClass & SC_TYPEMASK) == SC_FUNC) {
+            /* Special handling for main() */
+            if (strcmp (D->Ident, "main") == 0) {
+                /* main() cannot be a fastcall function */
+                if (IsQualFastcall (D->Type)) {
+                    Error ("'main' cannot be declared __fastcall__");
+                }
+
+                /* main() cannot be an inline function */
+                if ((D->StorageClass & SC_INLINE) == SC_INLINE) {
+                    Error ("'main' cannot be declared inline");
+                    D->StorageClass &= ~SC_INLINE;
+                }
+
+                /* Check return type */
+                if (GetUnqualRawTypeCode (GetFuncReturnType (D->Type)) != T_INT) {
+                    /* If cc65 extensions aren't enabled, don't allow a main function
+                    ** that doesn't return an int.
+                    */
+                    if (IS_Get (&Standard) != STD_CC65) {
+                        Error ("'main' must always return an int");
+                    }
+                }
             }
+        } else if (Mode != DM_ACCEPT_PARAM_IDENT &&
+                   (D->StorageClass & SC_INLINE) == SC_INLINE) {
+            /* 'inline' is only allowed on functions */
+            Error ("'inline' on non-function declaration");
+            D->StorageClass &= ~SC_INLINE;
         }
     }
 
@@ -2478,7 +2544,7 @@ void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage)
     Spec->Flags &= ~DS_DEF_STORAGE;
 
     /* Parse the type specifiers */
-    ParseTypeSpec (Spec, TSFlags | TS_STORAGE_CLASS_SPEC | TS_FUNCTION_SPEC);
+    ParseTypeSpec (Spec, TSFlags | TS_STORAGE_CLASS_SPEC);
 
     /* If no explicit storage class is given, use the default */
     if ((Spec->StorageClass & SC_STORAGEMASK) == 0) {
@@ -2495,13 +2561,25 @@ void CheckEmptyDecl (const DeclSpec* Spec)
 ** warning if not.
 */
 {
-    if ((Spec->Flags & DS_TYPE_MASK) == DS_NONE) {
+    if ((Spec->StorageClass & SC_INLINE) == SC_INLINE) {
+        Error ("'inline' on empty declaration");
+    } else if ((Spec->Flags & DS_TYPE_MASK) == DS_NONE) {
         /* No declaration at all */
     } else if ((Spec->Flags & DS_EXTRA_TYPE) == 0) {
-        Warning ("Declaration does not declare anything");
-    } else if (IsClassStruct (Spec->Type)           &&
-               !IsIncompleteESUType (Spec->Type)    &&
-               SymHasAnonName (GetESUTagSym (Spec->Type))) {
+        /* Empty declaration of basic types */
+        Warning ("Useless declaration");
+    } else if (IsAnonStructClass (Spec->Type)) {
+        /* This could be that the user made a wrong attempt to declare an
+        ** anonymous struct/union field outside a struct/union.
+        */
         Warning ("Unnamed %s that defines no instances", GetBasicTypeName (Spec->Type));
+    } else if (GetLexicalLevel () == LEX_LEVEL_STRUCT) {
+        /* This could be that the user made a wrong attempt to declare an
+        ** anonymous struct/union field inside a struct/union. Perhaps just
+        ** paranoid since it is not so uncommon to do forward declarations.
+        */
+        if (!IsTypeEnum (Spec->Type) || ((Spec->Flags & DS_NEW_TYPE_DEF) == 0)) {
+            Warning ("Declaration defines no instances");
+        }
     }
 }

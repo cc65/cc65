@@ -121,7 +121,7 @@ static void Parse (void)
         }
 
         /* Read the declaration specifier */
-        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_NONE);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT | TS_FUNCTION_SPEC, SC_NONE);
 
         /* Don't accept illegal storage classes */
         if ((Spec.StorageClass & SC_STORAGEMASK) == SC_AUTO ||
@@ -163,19 +163,19 @@ static void Parse (void)
                 break;
             }
 
-            /* Check if we must reserve storage for the variable. We do this,
-            **
-            **   - if it is not a typedef or function,
-            **   - if we don't had a storage class given ("int i")
-            **   - if the storage class is explicitly specified as static,
-            **   - or if there is an initialization.
-            **
-            ** This means that "extern int i;" will not get storage allocated
-            ** in this translation unit.
-            */
+            /* The symbol is now visible in the file scope */
             if ((Decl.StorageClass & SC_TYPEMASK) != SC_FUNC &&
                 (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-                /* The variable is visible in the file scope */
+                /* Check if we must reserve storage for the variable. We do this,
+                **
+                **   - if it is not a typedef or function,
+                **   - if we don't had a storage class given ("int i")
+                **   - if the storage class is explicitly specified as static,
+                **   - or if there is an initialization.
+                **
+                ** This means that "extern int i;" will not get storage allocated
+                ** in this translation unit.
+                */
                 if ((Decl.StorageClass & SC_STORAGEMASK) == SC_NONE     ||
                     (Decl.StorageClass & SC_STORAGEMASK) == SC_STATIC   ||
                     ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN &&
@@ -189,7 +189,6 @@ static void Parse (void)
             ** or semicolon, it must be followed by a function body.
             */
             if ((Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
-                /* The function is now visible in the file scope */
                 if (CurTok.Tok == TOK_LCURLY) {
                     /* A definition */
                     Decl.StorageClass |= SC_DEF;
@@ -560,6 +559,10 @@ void Compile (const char* FileName)
                 if ((Entry->Flags & SC_STORAGEMASK) == SC_STATIC && SymIsRef (Entry)) {
                     Warning ("Static function '%s' used but never defined",
                              Entry->Name);
+                } else if ((Entry->Flags & SC_INLINE) != 0) {
+                    Warning ("Inline function '%s' %s but never defined",
+                             Entry->Name,
+                             SymIsRef (Entry) ? "used" : "declared");
                 }
             }
         }

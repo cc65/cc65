@@ -52,6 +52,10 @@
 
 
 
+/* Forwards */
+struct IFile;
+struct LineInfo;
+
 /* An enum that describes different types of input files. The members are
 ** choosen so that it is possible to combine them to bitsets
 */
@@ -60,9 +64,6 @@ typedef enum {
     IT_SYSINC = 0x02,           /* System include file (using <>) */
     IT_USRINC = 0x04,           /* User include file (using "") */
 } InputType;
-
-/* Forward for an IFile structure */
-struct IFile;
 
 /* The current input line */
 extern StrBuf* Line;
@@ -125,10 +126,19 @@ int PreprocessNextLine (void);
 ** main file.
 */
 
-const char* GetInputFile (const struct IFile* IF);
-/* Return a filename from an IFile struct */
+void GetFileInclusionInfo (struct LineInfo* LI);
+/* Get info about source file inclusion for LineInfo struct */
 
-const char* GetCurrentFilename (void);
+void FreeFileInclusionInfo (struct LineInfo* LI);
+/* Free info about source file inclusion for LineInfo struct */
+
+int HasFileInclusionChanged (const struct LineInfo* LI);
+/* Return true if file inclusion has changed from last time */
+
+const char* GetInputFileName (const struct IFile* IF);
+/* Return the name of the file from an IFile struct */
+
+const char* GetCurrentFileName (void);
 /* Return the name of the current input file */
 
 unsigned GetCurrentLineNum (void);
@@ -137,7 +147,7 @@ unsigned GetCurrentLineNum (void);
 void SetCurrentLineNum (unsigned LineNum);
 /* Set the line number in the current input file */
 
-void SetCurrentFilename (const char* Name);
+void SetCurrentFileName (const char* Name);
 /* Set the presumed name of the current input file */
 
 unsigned GetCurrentCounter (void);

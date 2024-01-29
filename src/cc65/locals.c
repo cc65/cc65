@@ -551,7 +551,9 @@ void DeclareLocals (void)
     /* A place to store info about potential initializations of auto variables */
     CollAppend (&CurrentFunc->LocalsBlockStack, 0);
 
-    /* Loop until we don't find any more variables */
+    /* Loop until we don't find any more variables. EOF is handled in the loop
+    ** as well.
+    */
     while (1) {
         DeclSpec Spec;
         int      NeedClean;
@@ -563,7 +565,7 @@ void DeclareLocals (void)
         }
 
         /* Read the declaration specifier */
-        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_AUTO);
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT | TS_FUNCTION_SPEC, SC_AUTO);
 
         /* Check variable declarations. We need distinguish between a default
         ** int type and the end of variable declarations. So we will do the

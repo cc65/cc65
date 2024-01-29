@@ -5,7 +5,7 @@
 ;
 
         .constructor    initostype, 9
-        .export         _get_ostype
+        .export         _get_ostype, ostype
 
 ; Identify machine according to:
 ; Apple II Miscellaneous TechNote #7, Apple II Family Identification

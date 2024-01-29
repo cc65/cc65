@@ -142,7 +142,7 @@ void LeaveStructLevel (void);
 
 
 SymEntry* FindSym (const char* Name);
-/* Find the symbol with the given name */
+/* Find with the given name the symbol visible in the current scope */
 
 SymEntry* FindGlobalSym (const char* Name);
 /* Find the symbol with the given name in the global symbol table only */
@@ -151,7 +151,7 @@ SymEntry* FindLocalSym (const char* Name);
 /* Find the symbol with the given name in the current symbol table only */
 
 SymEntry* FindTagSym (const char* Name);
-/* Find the symbol with the given name in the tag table */
+/* Find with the given name the tag symbol visible in the current scope */
 
 SymEntry FindStructField (const Type* TypeArray, const char* Name);
 /* Find a struct/union field in the fields list.

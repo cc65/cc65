@@ -76,6 +76,7 @@ typedef enum token_t {
 
     /* Function specifiers */
     TOK_INLINE,
+    TOK_NORETURN,
     TOK_FASTCALL,
     TOK_CDECL,
 

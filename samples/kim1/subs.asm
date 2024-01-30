@@ -759,149 +759,179 @@ ScreenLineAddresses:
 ; Preserves all registers, but its not very threadsafe or reentrant
 ;-----------------------------------------------------------------------------------
 
-_DrawChar:     sty tempy
-               stx tempx
-               sta tempa
-               
-               tya                                 ; Get the address in screen memory where this
-               asl                                 ;  character X/Y cursor pos should be drawn
-               tay
-               txa
-               clc
-               adc ScreenLineAddresses, y
-               sta dest_lo
-               lda ScreenLineAddresses+1, y
-               adc #0
-               sta dest_hi
-               
-               lda #0                              ; Get the address in font memory where this
-               sta src_hi                          ;  Petscii chracter lives (after conversion from
-               lda tempa                           ;  ascii)
+_DrawChar:      sty tempy
+                stx tempx
+                sta tempa
+                
+                tya                                 ; Get the address in screen memory where this
+                asl                                 ;  character X/Y cursor pos should be drawn
+                tay
+                txa
+                clc
+                adc ScreenLineAddresses, y
+                sta dest_lo
+                lda ScreenLineAddresses+1, y
+                adc #0
+                sta dest_hi
+                
+                lda #0                              ; Get the address in font memory where this
+                sta src_hi                          ;  Petscii chracter lives (after conversion from
+                lda tempa                           ;  ascii)
+ 
+                sty temp2
+                jsr _AscToPet
+                ldy temp2
+ 
+                asl 
+                rol src_hi
+                asl 
+                rol src_hi
+                asl 
+                rol src_hi
+                clc
+                adc #<_font8x8_basic                ; Add the base address of the font table to the offset
+                sta src_lo
+                lda src_hi
+                adc #>_font8x8_basic
+                sta src_hi
+ 
+                ldy #0                              ; opy the character def to the screen, one byte at a time
+                ldx #0
+:               lda (src), y                        ; Copy this byte from the character def to the screen target
+                sta (dest, x)
+                lda dest_lo                         ; Advance to the next "scanline", or pixel row, down
+                clc
+                adc #<BYTESPERROW               
+                sta dest_lo
+                lda dest_hi
+                adc #>BYTESPERROW
+                sta dest_hi
+ 
+                iny
+                cpy #8
+                bne :-
+ 
+                ldy tempy
+                ldx tempx
+                lda tempa
+                rts
 
-               sty temp2
-               jsr _AscToPet
-               ldy temp2
+;-----------------------------------------------------------------------------------
+; CursorOn     - Turns on the text cursor and draws it at the current cursor pos
+;-----------------------------------------------------------------------------------
 
-               asl 
-               rol src_hi
-               asl 
-               rol src_hi
-               asl 
-               rol src_hi
-               clc
-               adc #<_font8x8_basic                ; Add the base address of the font table to the offset
-               sta src_lo
-               lda src_hi
-               adc #>_font8x8_basic
-               sta src_hi
+CursorOn:       ldx _cursorX
+                ldy _cursorY
+                lda #'_'
+                jsr _DrawChar
+                rts
 
-               ldy #0                              ; opy the character def to the screen, one byte at a time
-               ldx #0
-:              lda (src), y                       ; Copy this byte from the character def to the screen target
-               sta (dest, x)
-               lda dest_lo                         ; Advance to the next "scanline", or pixel row, down
-               clc
-               adc #<BYTESPERROW               
-               sta dest_lo
-               lda dest_hi
-               adc #>BYTESPERROW
-               sta dest_hi
-
-               iny
-               cpy #8
-               bne :-
-
-               ldy tempy
-               ldx tempx
-               lda tempa
-               rts
-
+CursorOff:      ldx _cursorX
+                ldy _cursorY
+                lda #' '
+                jsr _DrawChar
+                rts
+                
 ;-----------------------------------------------------------------------------------
 ; DrawText     - Draws an ASCII char in A at the current cursor pos, saves all regs
 ;-----------------------------------------------------------------------------------
 
-_CharOut:      sta temp
-               lda #0
-               sta temp+1
-               txa
-               pha
-               tya 
-               pha
+_CharOut:       sta temp
+                lda #0
+                sta temp+1
+                txa
+                pha
+                tya 
+                pha
+        
+                ldx #<temp
+                ldy #>temp
+                jsr _DrawText                        
+        
+                pla
+                tay
+                pla
+                tax
+                rts
 
-               ldx #<temp
-               ldy #>temp
-               jsr _DrawText                        
+;-----------------------------------------------------------------------------------
+; Backspace    - Erase the current character and move back one position. Does not
+;                move back up to previous line
+;-----------------------------------------------------------------------------------
 
-               pla
-               tay
-               pla
-               tax
-               rts
-
+Backspace:      lda _cursorX
+                beq colzero:
+                jsr CursorOff
+                dec _cursorX
+                jsr CursorOn
+colzero:        rts
+                         
 ;-----------------------------------------------------------------------------------
 ; DrawText     - Draws an ASCII string at the current cursor position
 ;-----------------------------------------------------------------------------------
 ; XY           - Pointer to the string to draw, stops on NUL or 255 chars later
 ;-----------------------------------------------------------------------------------
 
-_DrawText:     stx adp1_lo
-               sty adp1_hi
-               ldy #0
-
-checkHWrap:    lda _cursorX
-               cmp #CHARSPERROW
-               bcc checkVWrap
-               lda #0
-               sta _cursorX
-               inc _cursorY    
-              
-checkVWrap:    lda _cursorY
-               cmp #ROWSPERCOLUMN
-               bcc loadChar
-               jsr _ScrollScreen
-               lda #ROWSPERCOLUMN-1
-               sta _cursorY
-
-loadChar:      lda (adp1), y
-               beq doneText
-
-               cmp #$0a
-               bne :+
-
-               lda #0                              ; Back to the left edge
-               sta _cursorX
-               inc _cursorY                        ; Advance to the next line
-               iny
-               bne checkHWrap
-
-:              sty temp
-               ldx _cursorX
-               ldy _cursorY
-               jsr _DrawChar
-               ldy temp
-               inc _cursorX
-               iny
-               bne checkHWrap
-
-doneText:      rts      
-
-demoText1:     .byte "  *** COMMODORE KIM-1 SHELL V0.1 ***", $0A, $0A
-               .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A, $00
-readyText:     .byte $0A,"READY.", $0A, 00
-
-_Demo:         jsr _ClearScreen
-               lda #0
-               sta _cursorX
-               sta _cursorY
-               ldx #<demoText1
-               ldy #>demoText1
-               jsr _DrawText
-               rts
-
-_Ready:        ldx #<readyText
-               ldy #>readyText
-               jsr _DrawText
-               rts
+_DrawText:      stx adp1_lo
+                sty adp1_hi
+                jsr CursorOff
+                
+                ldy #0
+checkHWrap:     lda _cursorX
+                cmp #CHARSPERROW
+                bcc checkVWrap
+                lda #0
+                sta _cursorX
+                inc _cursorY    
+               
+checkVWrap:     lda _cursorY
+                cmp #ROWSPERCOLUMN
+                bcc loadChar
+                jsr _ScrollScreen
+                lda #ROWSPERCOLUMN-1
+                sta _cursorY
+ 
+loadChar:       lda (adp1), y
+                beq doneText
+ 
+                cmp #$0a
+                bne :+
+ 
+                lda #0                              ; Back to the left edge
+                sta _cursorX
+                inc _cursorY                        ; Advance to the next line
+                iny
+                bne checkHWrap
+ 
+:               sty temp
+                ldx _cursorX
+                ldy _cursorY
+                jsr _DrawChar
+                ldy temp
+                inc _cursorX
+                iny
+                bne checkHWrap
+ 
+doneText:       jsr CursorOn
+                rts      
+ 
+demoText1:      .byte "  *** COMMODORE KIM-1 SHELL V0.1 ***", $0A, $0A
+                .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A, $00
+readyText:      .byte $0A,"READY.", $0A, 00
+ 
+_Demo:          jsr _ClearScreen
+                lda #0
+                sta _cursorX
+                sta _cursorY
+                ldx #<demoText1
+                ldy #>demoText1
+                jsr _DrawText
+                rts
+ 
+_Ready:         ldx #<readyText
+                ldy #>readyText
+                jsr _DrawText
+                rts
 
 
 ;-----------------------------------------------------------------------------------
@@ -943,168 +973,168 @@ _Ready:        ldx #<readyText
 ; }
 ;-----------------------------------------------------------------------------------
 
-_DrawLine:  sta pixel
+_DrawLine:      sta pixel
+                    
+                ldx #$01                ; positive x-step for now
+                stx sx
+        
+                ; Calculate dx = (x2cord - X1cord) and see if its positive or not
+        
+                lda _x2cord             ; Calculate dx = (x2cord - X1cord)
+                sec
+                sbc _x1cord
+                sta dx
+                lda _x2cord+1
+                sbc _x1cord+1
+                sta dx+1
+                bpl calcdy              ; dx is positive (dx >= 0), so we're good
+                
+                ; dx was negative (dx < 0), so we set sx to -1 and get the absolute
+                ;  value by subtracting the other direction
+        
+                ldx #$FF                ; negative x-step
+                stx sx
+                lda _x1cord             ; Calculate dx = (x2cord - X1cord)
+                sec
+                sbc _x2cord
+                sta dx
+                lda _x1cord+1
+                sbc _x2cord+1
+                sta dx+1
+        
+                ; Calculate dy = (y2cord - y1cord) and see if its positive or not
+        
+calcdy:         ldx #$01                ; positive y-step for now
+                stx sy
+                lda _y2cord
+                sec
+                sbc _y1cord
+                sta dy
+                bcs positivedy          ; If y2cord > y1cord, then dy is positive and we're good
+        
+                ; dy was negative (dy < 0), so we set sy to -1 and get the absolute value
+        
+                ldx #$FF                ; negative y-step
+                stx sy
+                lda _y1cord
+                sec
+                sbc _y2cord
+                sta dy
+        
+                ; Now we have dx and dy, so we can calculate err, but first we need
+                ;  to see if dx > dy or not
+        
+positivedy:     lda dx+1                ; Check if dx > dy (both are always positive now)
+                bne dxgt                ; If MSB of dx is greater than zero, then dx > dy since dy is 8-bits
+                lda dy
+                cmp dx
+                bcs dygte
+        
+dxgt:           lda dx                  ; We found dx>dy so set err = dx / 2
+                sta err
+                lda dx+1
+                lsr
+                sta err+1               ; err = dx/2
+                ror err
+                jmp loop
+        
+dygte:          lda #0                  ; we found dx <= dy so set err = -dy / 2
+                sec
+                sbc dy                  ; else err = -dy / 2
+                ror
+                ora #$80
+                sta err
+                lda #$FF
+                sta err+1
+        
+                ; Now we have dx, dy, and err, so we can start drawing pixels
+        
+loop:           lda pixel
+                beq clearpixel
+                jsr _SetPixel           ; Plot the current _x1cord, _y1cord
+                jmp next
+clearpixel:     jsr _ClearPixel         ; Clear the current _x1cord, _y1cord
+        
+next:           lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _y2cord) then we rts
+                cmp _x2cord
+                bne noteq
+                lda _y1cord
+                cmp _y2cord
+                bne noteq
+                lda _x1cord+1
+                cmp _x2cord+1
+                bne noteq
+                
+                rts
+        
+noteq:          lda err                 ; e2 = err
+                sta e2
+                lda err+1
+                sta e2+1
+        
+                ; Check the two update conditions for x and y, and update if needed
+        
+                lda e2                  ; if (e2 > -dx) is the same as if (e2 + dx > 0), so we test that because its easier
+                clc                     ;    If its true then we dec err and inc _x1cord
+                adc dx
+                sta temp
+                lda e2+1
+                adc dx+1
+                bmi doneupdatex         ; If result is negative, then e2 + dx < 0, so we don't dec err or inc _x1cord
+                bne stepx                ; If MSB is non-zero, then e2 + dx > 0, so we DO dec err and inc _x1cord
+                lda temp                ; If result is zero in MSB, then we check the LSB here
+                beq doneupdatex         ;    If LSB is zero, then we don't dec err or inc _x1cord
+                                        ; We already know e2 + dx > 0, so LSB can't be negative
+stepx:          lda sx
+                bmi decx
+incxval:        inc _x1cord             ; _x1cord += 1 because sx == 1
+                bne updatexerr
+                inc _x1cord+1
+                jmp updatexerr
+        
+decx:           lda _x1cord             ; _x1cord += 1 because sx == 1
+                sec
+                sbc #1
+                sta _x1cord
+                lda _x1cord+1
+                sbc #0
+                sta _x1cord+1
+        
+updatexerr:     lda err                 ; err -= dy  
+                sec
+                sbc dy
+                sta err
+                lda err+1
+                sbc #0
+                sta err+1
+        
+doneupdatex:    lda e2+1                ; if (e2 < dy) then we inc err and inc _y1cord 
+                bmi updateerry          ; If MSB is negative, then e2 < dy, so we inc err and inc _y1cord
+                bne noupdatey           ; If the MSB of e2 is set and positive, then we know e2 > dy, so we don't inc err or inc _y1cord
+                lda e2                  
+                sec
+                sbc dy              
+                beq noupdatey           ; e2 - dy == 0 so we don't inc err or inc _y1cord
+                bcs noupdatey           ; if e2 was large enough that carry never cleared, then e2 > dy do no update
+        
+updateerry:     lda err                 ; err += dx     
+                clc
+                adc dx
+                sta err
+                lda err+1
+                adc dx+1
+                sta err+1
+        
+stepy:          lda _y1cord
+                clc
+                adc sy
+                sta _y1cord
+        
+noupdatey:      jmp loop
 
-            ldx #$01                ; positive x-step for now
-            stx sx
-
-            ; Calculate dx = (x2cord - X1cord) and see if its positive or not
-
-            lda _x2cord             ; Calculate dx = (x2cord - X1cord)
-            sec
-            sbc _x1cord
-            sta dx
-            lda _x2cord+1
-            sbc _x1cord+1
-            sta dx+1
-            bpl calcdy              ; dx is positive (dx >= 0), so we're good
-            
-            ; dx was negative (dx < 0), so we set sx to -1 and get the absolute
-            ;  value by subtracting the other direction
-
-            ldx #$FF                ; negative x-step
-            stx sx
-            lda _x1cord             ; Calculate dx = (x2cord - X1cord)
-            sec
-            sbc _x2cord
-            sta dx
-            lda _x1cord+1
-            sbc _x2cord+1
-            sta dx+1
-
-            ; Calculate dy = (y2cord - y1cord) and see if its positive or not
-
-calcdy:     ldx #$01                ; positive y-step for now
-            stx sy
-            lda _y2cord
-            sec
-            sbc _y1cord
-            sta dy
-            bcs positivedy          ; If y2cord > y1cord, then dy is positive and we're good
-
-            ; dy was negative (dy < 0), so we set sy to -1 and get the absolute value
-
-            ldx #$FF                ; negative y-step
-            stx sy
-            lda _y1cord
-            sec
-            sbc _y2cord
-            sta dy
-
-            ; Now we have dx and dy, so we can calculate err, but first we need
-            ;  to see if dx > dy or not
-
-positivedy: lda dx+1                ; Check if dx > dy (both are always positive now)
-            bne dxgt                ; If MSB of dx is greater than zero, then dx > dy since dy is 8-bits
-            lda dy
-            cmp dx
-            bcs dygte
-
-dxgt:       lda dx                  ; We found dx>dy so set err = dx / 2
-            sta err
-            lda dx+1
-            lsr
-            sta err+1               ; err = dx/2
-            ror err
-            jmp loop
-
-dygte:      lda #0                  ; we found dx <= dy so set err = -dy / 2
-            sec
-            sbc dy                  ; else err = -dy / 2
-            ror
-            ora #$80
-            sta err
-            lda #$FF
-            sta err+1
-      
-            ; Now we have dx, dy, and err, so we can start drawing pixels
-
-loop:       lda pixel
-            beq clearpixel
-            jsr _SetPixel           ; Plot the current _x1cord, _y1cord
-            jmp next
-clearpixel: jsr _ClearPixel         ; Clear the current _x1cord, _y1cord
-
-next:       lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _y2cord) then we rts
-            cmp _x2cord
-            bne noteq
-            lda _y1cord
-            cmp _y2cord
-            bne noteq
-            lda _x1cord+1
-            cmp _x2cord+1
-            bne noteq
-           
-            rts
-
-noteq:      lda err                 ; e2 = err
-            sta e2
-            lda err+1
-            sta e2+1
-
-            ; Check the two update conditions for x and y, and update if needed
-
-            lda e2                  ; if (e2 > -dx) is the same as if (e2 + dx > 0), so we test that because its easier
-            clc                     ;    If its true then we dec err and inc _x1cord
-            adc dx
-            sta temp
-            lda e2+1
-            adc dx+1
-            bmi doneupdatex         ; If result is negative, then e2 + dx < 0, so we don't dec err or inc _x1cord
-            bne stepx                ; If MSB is non-zero, then e2 + dx > 0, so we DO dec err and inc _x1cord
-            lda temp                ; If result is zero in MSB, then we check the LSB here
-            beq doneupdatex         ;    If LSB is zero, then we don't dec err or inc _x1cord
-                                    ; We already know e2 + dx > 0, so LSB can't be negative
-stepx:      lda sx
-            bmi decx
-incxval:    inc _x1cord             ; _x1cord += 1 because sx == 1
-            bne updatexerr
-            inc _x1cord+1
-            jmp updatexerr
-
-decx:       lda _x1cord             ; _x1cord += 1 because sx == 1
-            sec
-            sbc #1
-            sta _x1cord
-            lda _x1cord+1
-            sbc #0
-            sta _x1cord+1
- 
-updatexerr: lda err                 ; err -= dy  
-            sec
-            sbc dy
-            sta err
-            lda err+1
-            sbc #0
-            sta err+1
-
-doneupdatex:lda e2+1                ; if (e2 < dy) then we inc err and inc _y1cord 
-            bmi updateerry          ; If MSB is negative, then e2 < dy, so we inc err and inc _y1cord
-            bne noupdatey           ; If the MSB of e2 is set and positive, then we know e2 > dy, so we don't inc err or inc _y1cord
-            lda e2                  
-            sec
-            sbc dy              
-            beq noupdatey           ; e2 - dy == 0 so we don't inc err or inc _y1cord
-            bcs noupdatey           ; if e2 was large enough that carry never cleared, then e2 > dy do no update
-
-updateerry: lda err                 ; err += dx     
-            clc
-            adc dx
-            sta err
-            lda err+1
-            adc dx+1
-            sta err+1
-
-stepy:      lda _y1cord
-            clc
-            adc sy
-            sta _y1cord
-
-noupdatey:  jmp loop
-
-_getch: jsr     $1E5A            ; Get character using Monitor ROM call
-        and     #$7F             ; Clear top bit
-        cmp     #$0D             ; Check for '\r'
-        bne     gotch            ; ...if CR character
-        lda     #$0A             ; Replace with '\n'
-gotch:  rts
+_getch:         jsr     $1E5A            ; Get character using Monitor ROM call
+                and     #$7F             ; Clear top bit
+                cmp     #$0D             ; Check for '\r'
+                bne     gotch            ; ...if CR character
+                lda     #$0A             ; Replace with '\n'
+gotch:          rts

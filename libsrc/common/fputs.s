@@ -32,9 +32,9 @@ _fputs:
         jsr     swapstk         ; Push fd, get s
 
         jsr     pushax          ; Push s
-        
+
         jsr     _strlen         ; Get length
-        
+
         ; Write
         jmp     _write
 

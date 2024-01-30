@@ -76,6 +76,7 @@ typedef enum token_t {
 
     /* Function specifiers */
     TOK_INLINE,
+    TOK_NORETURN,
     TOK_FASTCALL,
     TOK_CDECL,
 
@@ -219,9 +220,11 @@ struct Token {
     const Type*     Type;       /* Type if integer or float constant */
 };
 
-extern Token CurTok;            /* The current token */
-extern Token NextTok;           /* The next token */
-extern int   PPParserRunning;   /* Is tokenizer used by the preprocessor */
+extern Token    CurTok;             /* The current token */
+extern Token    NextTok;            /* The next token */
+extern int      PPParserRunning;    /* Is tokenizer used by the preprocessor */
+extern int      NoCharMap;          /* Disable literal translation */
+extern unsigned InPragmaParser;     /* Depth of pragma parser calling */
 
 
 
@@ -299,11 +302,47 @@ void CopyPPNumber (StrBuf* Target);
 /* Copy a pp-number from the input to Target */
 
 void NextToken (void);
-/* Get next token from input stream */
+/* Get next non-pragma token from input stream consuming any pragmas
+** encountered. Adjacent string literal tokens will be concatenated.
+*/
 
 void SkipTokens (const token_t* TokenList, unsigned TokenCount);
 /* Skip tokens until we reach TOK_CEOF or a token in the given token list.
 ** This routine is used for error recovery.
+*/
+
+int SmartErrorSkip (int TillEnd);
+/* Try some smart error recovery.
+**
+** - If TillEnd == 0:
+**   Skip tokens until a comma or closing curly brace that is not enclosed in
+**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+**   unpaired right parenthesis/bracket/curly brace is reached. The closing
+**   curly brace is consumed in the former case.
+**
+** - If TillEnd != 0:
+**   Skip tokens until a right curly brace or semicolon is reached and consumed
+**   while there are no open parentheses/brackets/curly braces, or until an EOF
+**   is reached anytime. Any open parenthesis/bracket/curly brace is considered
+**   to be closed by consuming a right parenthesis/bracket/curly brace even if
+**   they didn't match.
+**
+** - Return -1:
+**   If this exits at a semicolon or unpaired right parenthesis/bracket/curly
+**   brace while there are still open parentheses/brackets/curly braces.
+**
+** - Return 0:
+**   If this exits as soon as it reaches an EOF;
+**   Or if this exits right after consuming a semicolon or right curly brace
+**   while there are no open parentheses/brackets/curly braces.
+**
+** - Return 1:
+**   If this exits at a non-EOF without consuming it.
+*/
+
+int SimpleErrorSkip (void);
+/* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
+** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
 */
 
 int Consume (token_t Token, const char* ErrorMsg);

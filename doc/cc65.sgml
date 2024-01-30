@@ -837,21 +837,21 @@ This cc65 version has some extensions to the ISO C standard.
 
 <itemize>
 
-<item>  The compiler allows to insert assembler statements into the output
-        file. The syntax is
+<item>  The compiler allows to insert inline assembler code in the form of the
+        <tt/asm/ expression into the output file. The syntax is
 
         <tscreen><verb>
-        asm [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        asm [optional volatile] (&lt;string literal&gt;[, optional parameters])
         </verb></tscreen>
         or
         <tscreen><verb>
-        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters])
         </verb></tscreen>
 
         The first form is in the user namespace; and, is disabled if the <tt/-A/
         switch is given.
 
-        There is a whole section covering inline assembler statements,
+        There is a whole section covering the inline assembler,
         <ref id="inline-asm" name="see there">.
         <p>
 
@@ -1007,6 +1007,13 @@ This cc65 version has some extensions to the ISO C standard.
 
         <tt/_Static_assert/ is also available as the macro <tt/static_assert/ in
         <tt/assert.h/.
+
+        Note: The string literal as the message in the <tt/_Static_assert/
+        declaration is not subject to string literal translation (see
+        <tt/<ref id="pragma-charmap" name="#pragma&nbsp;charmap()">/) and will
+        always be in the host encoding. On the other hand, any character or
+        string literals present in the condition expression of the
+        <tt/_Static_assert/ declaration will be translated as usual.
 
 <item>  cc65 supports bit-fields of any integral type that is int-sized or
         smaller, and enumerated types with those types as their underlying
@@ -1317,7 +1324,9 @@ parameter with the <tt/#pragma/.
 
 <sect1><tt>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</tt><label id="pragma-charmap"><p>
 
-  Each literal string and each literal character in the source is translated
+  Each literal string and each literal character in the preprocessed source,
+  except when used in an <tt/asm/ expression as the inline assembler code or
+  in a <tt/_Static_assert/ declaration as the failure message, is translated
   by use of a translation table. That translation table is preset when the
   compiler is started, depending on the target system; for example, to map
   ISO-8859-1 characters into PETSCII if the target is a Commodore machine.
@@ -1604,13 +1613,13 @@ parameter with the <tt/#pragma/.
 
   This pragma sets a wrapper for functions, often used for trampolines.
 
-  The name is a function returning <tt/void/, and taking no parameters.
+  The <tt/name/ is a wrapper function returning <tt/void/, and taking no parameters.
   It must preserve the CPU's <tt/A/ and <tt/X/ registers if it wraps any
   <tt/__fastcall__/ functions that have parameters.  It must preserve
   the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
   in their prototypes).
 
-  The identifier is an 8-bit number that's set into <tt/tmp4/. If the identifier
+  The <tt/identifier/ is an 8-bit number that's set into <tt/tmp4/. If the <tt/identifier/
   is "bank", then ca65's <tt><url url="ca65.html#.BANK" name=".bank"></tt> function will be used
   to determine the number from the bank attribute defined in the linker config,
   see <url url="ld65.html#MEMORY" name="Other MEMORY area attributes">. Note that
@@ -1619,6 +1628,11 @@ parameter with the <tt/#pragma/.
 
   The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
   call that function by using "<tt/jsr callptr4/".
+
+  All functions ever declared or defined when this pragma is in effect will be wrapped
+  when they are called explicitly by their names later in the same translation unit.
+  Invocation of these functions in any other ways, for example, that via a function
+  pointer or in inline assembly code, will not be wrapped.
 
   This feature is useful, for example, with banked memory, to switch banks
   automatically to where a wrapped function resides, and then to restore the
@@ -1714,23 +1728,23 @@ bloated code and a slowdown.
 
 <sect>Inline assembler<label id="inline-asm"><p>
 
-The compiler allows to insert assembler statements into the output file. The
-syntax is
+The compiler allows to insert inline assembler code in the form of the <tt/asm/
+expression into the output file. The syntax is
 
 <tscreen><verb>
-        asm [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        asm [optional volatile] (&lt;string literal&gt;[, optional parameters])
 </verb></tscreen>
 or
 <tscreen><verb>
-        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters]) ;
+        __asm__ [optional volatile] (&lt;string literal&gt;[, optional parameters])
 </verb></tscreen>
 <p>
 
 The first form is in the user namespace; and, is disabled by <tt><ref
 id="option--standard" name="--standard"></tt> if the argument is not <tt/cc65/.
 
-The <tt/asm/ statement can be used only inside a function.  Please note that
-the result of an inline assembler expression is always of type <tt/void/.
+The <tt/asm/ expression can be used only inside a function.  The result of an
+<tt/asm/ expression is always of type <tt/void/.
 
 The contents of the string literal are preparsed by the compiler; and, inserted
 into the generated assembly output, so that it can be processed further by
@@ -1741,21 +1755,28 @@ even if the ca65 assembler (which is used to translate the generated assembler
 code) would accept them. The built-in inline assembler is not a replacement for
 the full-blown macro assembler which comes with the compiler.
 
-Note: Inline assembler statements are subject to all optimizations done by the
-compiler. There currently is no way to protect an inline assembler statement
+Note: Inline assembler expressions are subject to all optimizations done by the
+compiler. There currently is no way to protect an inline assembler expression
 -- alone -- from being moved or removed completely by the optimizer. If in
 doubt, check the generated assembler output; or, disable optimizations (for
 that function).
 
 As a shortcut, you can put the <tt/volatile/ qualifier in your <tt/asm/
-statements.  It will disable optimization for the functions in which those
-<tt/asm volatile/ statements sit.  The effect is the same as though you put
+expressions.  It will disable optimization for the functions in which those
+<tt/asm volatile/ expressions sit.  The effect is the same as though you put
 <tt/#pragma optimize(push, off)/ above those functions, and <tt/#pragma
 optimize(pop)/ below those functions.
 
 The string literal may contain format specifiers from the following list. For
 each format specifier, an argument is expected which is inserted instead of
 the format specifier, before passing the assembly code line to the backend.
+
+Note: The string literal as the inline assembler code itself in the <tt/asm/
+expression is not subject to string literal translation (see
+<tt/<ref id="pragma-charmap" name="#pragma&nbsp;charmap()">/) and will always
+be in the host encoding. On the other hand, all character and string literals
+as the arguments for replacing the format specifiers will be translated as
+usual.
 
 <itemize>
   <item><tt/%b/ - Numerical 8-bit value
@@ -1844,7 +1865,7 @@ Arrays also can be accessed:
 <p>
 
 Note: Do not embed the assembler labels that are used as names of global
-variables or functions into your <tt/asm/ statements. Code such as this:
+variables or functions into your <tt/asm/ expressions. Code such as this:
 
 <tscreen><verb>
         int foo;

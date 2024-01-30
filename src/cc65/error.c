@@ -59,8 +59,12 @@
 
 
 /* Count of errors/warnings */
-unsigned ErrorCount     = 0;
-unsigned WarningCount   = 0;
+unsigned PPErrorCount     = 0;  /* Pre-parser errors */
+unsigned PPWarningCount   = 0;  /* Pre-parser warnings */
+unsigned ErrorCount       = 0;  /* Errors occurred in parser and later translation phases */
+unsigned WarningCount     = 0;  /* Warnings occurred in parser and later translation phases */
+unsigned RecentLineNo     = 0;
+unsigned RecentErrorCount = 0;
 
 /* Warning and error options */
 IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
@@ -116,13 +120,46 @@ Collection DiagnosticStrBufs;
 
 
 
+void PrintFileInclusionInfo (const LineInfo* LI)
+/* Print hierarchy of file inclusion */
+{
+    if (LI->IncFiles != 0) {
+        unsigned FileCount = CollCount (LI->IncFiles);
+        if (FileCount > 0) {
+            const char* Str = "In file included from %s:%u%c\n";
+
+            while (FileCount-- > 0) {
+                LineInfoFile* LIF = CollAtUnchecked (LI->IncFiles, FileCount);
+                char C = FileCount > 0 ? ',' : ':';
+
+                fprintf (stderr, Str, LIF->Name, LIF->LineNum, C);
+                Str = "                 from %s:%u%c\n";
+            }
+        }
+    }
+}
+
+
+
+static LineInfo* GetDiagnosticLI (void)
+/* Get the line info where the diagnostic info refers to */
+{
+    if (CurTok.LI) {
+        return CurTok.LI;
+    } else {
+        return GetCurLineInfo ();
+    }
+}
+
+
+
 static const char* GetDiagnosticFileName (void)
 /* Get the source file name where the diagnostic info refers to */
 {
     if (CurTok.LI) {
-        return GetInputName (CurTok.LI);
+        return GetPresumedFileName (CurTok.LI);
     } else {
-        return GetCurrentFilename ();
+        return GetCurrentFileName ();
     }
 }
 
@@ -132,7 +169,7 @@ static unsigned GetDiagnosticLineNum (void)
 /* Get the source line number where the diagnostic info refers to */
 {
     if (CurTok.LI) {
-        return GetInputLine (CurTok.LI);
+        return GetPresumedLineNum (CurTok.LI);
     } else {
         return GetCurrentLineNum ();
     }
@@ -195,20 +232,51 @@ void Internal (const char* Format, ...)
 
 
 
-static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
+static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 /* Print an error message - internal function */
 {
-    fprintf (stderr, "%s:%u: Error: ", Filename, LineNo);
+    unsigned LineNo = GetPresumedLineNum (LI);
+
+    /* Print file inclusion if appropriate */
+    if (HasFileInclusionChanged (LI)) {
+        PrintFileInclusionInfo (LI);
+    }
+    RememberCheckedLI (LI);
+
+    fprintf (stderr, "%s:%u: Error: ", GetPresumedFileName (LI), LineNo);
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 
     if (Line) {
         Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
-    ++ErrorCount;
-    if (ErrorCount > 20) {
+
+    if (EC != EC_PP) {
+        ++ErrorCount;
+    } else {
+        ++PPErrorCount;
+    }
+    if (RecentLineNo != LineNo) {
+        RecentLineNo = LineNo;
+        RecentErrorCount = 0;
+    } else {
+        ++RecentErrorCount;
+    }
+
+    if (RecentErrorCount > 20 || GetTotalErrors () > 200) {
         Fatal ("Too many errors");
     }
+}
+
+
+
+void LIError (errcat_t EC, LineInfo* LI, const char* Format, ...)
+/* Print an error message with the line info given explicitly */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntError (EC, LI, Format, ap);
+    va_end (ap);
 }
 
 
@@ -218,18 +286,7 @@ void Error (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntError (GetDiagnosticFileName (), GetDiagnosticLineNum (), Format, ap);
-    va_end (ap);
-}
-
-
-
-void LIError (const LineInfo* LI, const char* Format, ...)
-/* Print an error message with the line info given explicitly */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntError (GetInputName (LI), GetInputLine (LI), Format, ap);
+    IntError (EC_PARSER, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
@@ -240,7 +297,7 @@ void PPError (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntError (GetCurrentFilename(), GetCurrentLineNum(), Format, ap);
+    IntError (EC_PP, GetCurLineInfo (), Format, ap);
     va_end (ap);
 }
 
@@ -252,26 +309,50 @@ void PPError (const char* Format, ...)
 
 
 
-static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
+static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 /* Print a warning message - internal function */
 {
     if (IS_Get (&WarningsAreErrors)) {
 
         /* Treat the warning as an error */
-        IntError (Filename, LineNo, Msg, ap);
+        IntError (EC, LI, Msg, ap);
 
     } else if (IS_Get (&WarnEnable)) {
 
-        fprintf (stderr, "%s:%u: Warning: ", Filename, LineNo);
+        unsigned LineNo = GetPresumedLineNum (LI);
+
+        /* Print file inclusion if appropriate */
+        if (HasFileInclusionChanged (LI)) {
+            PrintFileInclusionInfo (LI);
+        }
+        RememberCheckedLI (LI);
+
+        fprintf (stderr, "%s:%u: Warning: ", GetPresumedFileName (LI), LineNo);
         vfprintf (stderr, Msg, ap);
         fprintf (stderr, "\n");
 
         if (Line) {
             Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
         }
-        ++WarningCount;
+
+        if (EC != EC_PP) {
+            ++WarningCount;
+        } else {
+            ++PPWarningCount;
+        }
 
     }
+}
+
+
+
+void LIWarning (errcat_t EC, LineInfo* LI, const char* Format, ...)
+/* Print a warning message with the line info given explicitly */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntWarning (EC, LI, Format, ap);
+    va_end (ap);
 }
 
 
@@ -281,18 +362,7 @@ void Warning (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntWarning (GetDiagnosticFileName (), GetDiagnosticLineNum (), Format, ap);
-    va_end (ap);
-}
-
-
-
-void LIWarning (const LineInfo* LI, const char* Format, ...)
-/* Print a warning message with the line info given explicitly */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntWarning (GetInputName (LI), GetInputLine (LI), Format, ap);
+    IntWarning (EC_PARSER, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
@@ -303,7 +373,7 @@ void PPWarning (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntWarning (GetCurrentFilename(), GetCurrentLineNum(), Format, ap);
+    IntWarning (EC_PP, GetCurLineInfo (), Format, ap);
     va_end (ap);
 }
 
@@ -344,23 +414,12 @@ void ListWarnings (FILE* F)
 
 
 
-static void IntNote (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
+static void IntNote (const LineInfo* LI, const char* Msg, va_list ap)
 /* Print a note message - internal function */
 {
-    fprintf (stderr, "%s:%u: Note: ", Filename, LineNo);
+    fprintf (stderr, "%s:%u: Note: ", GetPresumedFileName (LI), GetPresumedLineNum (LI));
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
-}
-
-
-
-void Note (const char* Format, ...)
-/* Print a note message */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntNote (GetDiagnosticFileName (), GetDiagnosticLineNum (), Format, ap);
-    va_end (ap);
 }
 
 
@@ -370,7 +429,18 @@ void LINote (const LineInfo* LI, const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntNote (GetInputName (LI), GetInputLine (LI), Format, ap);
+    IntNote (LI, Format, ap);
+    va_end (ap);
+}
+
+
+
+void Note (const char* Format, ...)
+/* Print a note message */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntNote (GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
@@ -381,23 +451,41 @@ void PPNote (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntNote (GetCurrentFilename(), GetCurrentLineNum(), Format, ap);
+    IntNote (GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*                               Error summary                               */
 /*****************************************************************************/
+
+
+
+unsigned GetTotalErrors (void)
+/* Get total count of errors of all categories */
+{
+    return PPErrorCount + ErrorCount;
+}
+
+
+
+unsigned GetTotalWarnings (void)
+/* Get total count of warnings of all categories */
+{
+    return PPWarningCount + WarningCount;
+}
 
 
 
 void ErrorReport (void)
 /* Report errors (called at end of compile) */
 {
-    unsigned int V = (ErrorCount != 0 ? 0 : 1);
-    Print (stdout, V, "%u errors and %u warnings generated.\n", ErrorCount, WarningCount);
+    unsigned TotalErrors = GetTotalErrors ();
+    unsigned TotalWarnings = GetTotalWarnings ();
+    unsigned int V = (TotalErrors != 0 ? 0 : 1);
+    Print (stdout, V, "%u errors and %u warnings generated.\n", TotalErrors, TotalWarnings);
 }
 
 

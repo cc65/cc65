@@ -5,8 +5,8 @@
 ;
 
         .export         _exec
-        .import         pushname, popname
-        .import         popax, done, _exit
+        .import         mli_file_info_direct
+        .import         pushname, popname, popax, done, _exit
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -17,13 +17,12 @@
 typerr: lda     #$4A            ; "Incompatible file format"
 
         ; Cleanup name
-oserr:  jsr     popname         ; Preserves A
 
-        ; Set ___oserror
-        jmp     ___mappederrno
+mlierr: jsr     popname
+oserr:  jmp     ___mappederrno
 
 _exec:
-        ; Save cmdline
+        ; Store cmdline
         sta     ptr4
         stx     ptr4+1
 
@@ -31,6 +30,9 @@ _exec:
         jsr     popax
         jsr     pushname
         bne     oserr
+
+        jsr     mli_file_info_direct
+        bcs     mlierr
 
         ; ProDOS TechRefMan, chapter 5.1.5.1:
         ; "The complete or partial pathname of the system program
@@ -45,18 +47,6 @@ _exec:
         sta     $0280,y
         dey
         bpl     :-
-
-        ; Set pushed name
-        lda     sp
-        ldx     sp+1
-        sta     mliparam + MLI::INFO::PATHNAME
-        stx     mliparam + MLI::INFO::PATHNAME+1
-
-        ; Get file_type and aux_type
-        lda     #GET_INFO_CALL
-        ldx     #GET_INFO_COUNT
-        jsr     callmli
-        bcs     oserr
 
         ; If we get here the program file at least exists so we copy
         ; the loader stub right now and patch it later to set params
@@ -121,35 +111,9 @@ setbuf: lda     #$00            ; Low byte
         dex
         dex
 
-        ; Set I/O buffer
-        sta     mliparam + MLI::OPEN::IO_BUFFER
-        stx     mliparam + MLI::OPEN::IO_BUFFER+1
-
-        ; PATHNAME already set
-        .assert MLI::OPEN::PATHNAME = MLI::INFO::PATHNAME, error
-
-        ; Lower file level to avoid program file
-        ; being closed by C library shutdown code
-        ldx     LEVEL
-        stx     level
-        beq     :+
-        dec     LEVEL
-
-        ; Open file
-:       lda     #OPEN_CALL
-        ldx     #OPEN_COUNT
-        jsr     callmli
-
-        ; Restore file level
-        ldx     level
-        stx     LEVEL
-        bcc     :+
-        jmp     oserr
-
-        ; Get and save fd
-:       lda     mliparam + MLI::OPEN::REF_NUM
-        sta     read_ref
-        sta     close_ref
+        ; Set OPEN MLI call I/O buffer parameter
+        sta     io_buffer
+        stx     io_buffer+1
 
         .ifdef  __APPLE2ENH__
         ; Calling the 80 column firmware needs the ROM switched
@@ -194,14 +158,25 @@ setbuf: lda     #$00            ; Low byte
         ; Initiate C library shutdown
         jmp     _exit
 
-        .bss
-
-level : .res    1
-
         .rodata
 
+source:
+        ; Open program file
+        ; PATHNAME parameter is already set (we reuse
+        ; the copy at $0280); IO_BUFFER has been setup
+        ; before shutting down the C library
+        jsr     $BF00
+        .byte   OPEN_CALL
+        .word   open_param
+        bcs     error
+
+        ; Copy REF_NUM to MLI READ and CLOSE parameters
+        lda     open_ref
+        sta     read_ref
+        sta     close_ref
+
         ; Read whole program file
-source: jsr     $BF00
+        jsr     $BF00
         .byte   READ_CALL
         .word   read_param
         bcs     error
@@ -213,8 +188,6 @@ source: jsr     $BF00
         bcs     error
 
         ; Check for cmdline handling
-        lda     $0100           ; Valid cmdline?
-        beq     jump            ; No, jump to program right away
         ldx     file_type       ; SYS file?
         bne     system          ; Yes, check for startup filename
 
@@ -256,6 +229,14 @@ jump:   jmp     (data_buffer)
 file_type       = * - source + target
         .byte   $00
 
+open_param      = * - source + target
+        .byte   $03             ; PARAM_COUNT
+        .addr   $0280           ; PATHNAME
+io_buffer       = * - source + target
+        .addr   $0000           ; IO_BUFFER
+open_ref        = * - source + target
+        .byte   $00             ; REF_NUM
+
 read_param      = * - source + target
         .byte   $04             ; PARAM_COUNT
 read_ref        = * - source + target
@@ -286,5 +267,9 @@ quit_param      = * - source + target
 size            = * - source
 
 target          = DOSWARM - size
+
+        ; Make sure that the loader isn't too big, and
+        ; fits in $300-$3D0
+        .assert target >= $300, error
 
 dosvec: jmp     quit

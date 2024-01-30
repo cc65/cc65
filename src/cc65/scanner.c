@@ -56,6 +56,7 @@
 #include "ident.h"
 #include "input.h"
 #include "litpool.h"
+#include "pragma.h"
 #include "preproc.h"
 #include "scanner.h"
 #include "standard.h"
@@ -69,9 +70,12 @@
 
 
 
-Token CurTok;           /* The current token */
-Token NextTok;          /* The next token */
-int   PPParserRunning;  /* Is tokenizer used by the preprocessor */
+static Token SavedTok;          /* Saved token */
+Token       CurTok;             /* The current token */
+Token       NextTok;            /* The next token */
+int         PPParserRunning;    /* Is tokenizer used by the preprocessor */
+int         NoCharMap;          /* Disable literal translation */
+unsigned    InPragmaParser;     /* Depth of pragma parser calling */
 
 
 
@@ -323,7 +327,7 @@ static void SetTok (int tok)
 
 
 static int ParseChar (void)
-/* Parse a character. Converts escape chars into character codes. */
+/* Parse a character token. Converts escape chars into character codes. */
 {
     int C;
     int HadError;
@@ -425,7 +429,7 @@ static int ParseChar (void)
 
 
 static void CharConst (void)
-/* Parse a character constant. */
+/* Parse a character constant token */
 {
     int C;
 
@@ -453,7 +457,7 @@ static void CharConst (void)
     }
 
     /* Translate into target charset */
-    NextTok.IVal = SignExtendChar (TgtTranslateChar (C));
+    NextTok.IVal = SignExtendChar (C);
 
     /* Character constants have type int */
     NextTok.Type = type_int;
@@ -462,7 +466,7 @@ static void CharConst (void)
 
 
 static void StringConst (void)
-/* Parse a quoted string */
+/* Parse a quoted string token */
 {
     /* String buffer */
     StrBuf S = AUTO_STRBUF_INITIALIZER;
@@ -470,42 +474,33 @@ static void StringConst (void)
     /* Assume next token is a string constant */
     NextTok.Tok  = TOK_SCONST;
 
-    /* Concatenate strings. If at least one of the concenated strings is a wide
-    ** character literal, the whole string is a wide char literal, otherwise
-    ** it's a normal string literal.
-    */
-    while (1) {
+    /* Check if this is a normal or a wide char string */
+    if (CurC == 'L' && NextC == '\"') {
+        /* Wide character literal */
+        NextTok.Tok = TOK_WCSCONST;
+        NextChar ();
+        NextChar ();
+    } else if (CurC == '\"') {
+        /* Skip the quote char */
+        NextChar ();
+    } else {
+        /* No string */
+        goto ExitPoint;
+    }
 
-        /* Check if this is a normal or a wide char string */
-        if (CurC == 'L' && NextC == '\"') {
-            /* Wide character literal */
-            NextTok.Tok = TOK_WCSCONST;
-            NextChar ();
-            NextChar ();
-        } else if (CurC == '\"') {
-            /* Skip the quote char */
-            NextChar ();
-        } else {
-            /* No string */
+    /* Read until end of string */
+    while (CurC != '\"') {
+        if (CurC == '\0') {
+            Error ("Unexpected newline");
             break;
         }
-
-        /* Read until end of string */
-        while (CurC != '\"') {
-            if (CurC == '\0') {
-                Error ("Unexpected newline");
-                break;
-            }
-            SB_AppendChar (&S, ParseChar ());
-        }
-
-        /* Skip closing quote char if there was one */
-        NextChar ();
-
-        /* Skip white space, read new input */
-        SkipWhite ();
-
+        SB_AppendChar (&S, ParseChar ());
     }
+
+    /* Skip closing quote char if there was one */
+    NextChar ();
+
+ExitPoint:
 
     /* Terminate the string */
     SB_AppendChar (&S, '\0');
@@ -520,7 +515,7 @@ static void StringConst (void)
 
 
 static void NumericConst (void)
-/* Parse a numeric constant */
+/* Parse a numeric constant token */
 {
     unsigned Base;              /* Temporary number base according to prefix */
     unsigned Index;
@@ -800,39 +795,49 @@ static void NumericConst (void)
 
 
 
-void NextToken (void)
+static void GetNextInputToken (void)
 /* Get next token from input stream */
 {
     ident token;
 
-    /* We have to skip white space here before shifting tokens, since the
-    ** tokens and the current line info is invalid at startup and will get
-    ** initialized by reading the first time from the file. Remember if
-    ** we were at end of input and handle that later.
-    */
-    int GotEOF = (SkipWhite() == 0);
+    if (!NoCharMap && !InPragmaParser) {
+        /* Translate string and character literals into target charset */
+        if (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST) {
+            TranslateLiteral (NextTok.SVal);
+        } else if (NextTok.Tok == TOK_CCONST || NextTok.Tok == TOK_WCCONST) {
+            NextTok.IVal = SignExtendChar (TgtTranslateChar (NextTok.IVal));
+        }
+    }
 
     /* Current token is the lookahead token */
     if (CurTok.LI) {
         ReleaseLineInfo (CurTok.LI);
     }
+
+    /* Get the current token */
     CurTok = NextTok;
 
-    /* When reading the first time from the file, the line info in NextTok,
-    ** which was copied to CurTok is invalid. Since the information from
-    ** the token is used for error messages, we must make it valid.
-    */
-    if (CurTok.LI == 0) {
-        CurTok.LI = UseLineInfo (GetCurLineInfo ());
-    }
+    if (SavedTok.Tok == TOK_INVALID) {
+        /* We have to skip white space here before shifting tokens, since the
+        ** tokens and the current line info is invalid at startup and will get
+        ** initialized by reading the first time from the file. Remember if we
+        ** were at end of input and handle that later.
+        */
+        int GotEOF = (SkipWhite () == 0);
 
-    /* Remember the starting position of the next token */
-    NextTok.LI = UseLineInfo (GetCurLineInfo ());
+        /* Remember the starting position of the next token */
+        NextTok.LI = UseLineInfo (GetCurLineInfo ());
 
-    /* Now handle end of input. */
-    if (GotEOF) {
-        /* End of file reached */
-        NextTok.Tok = TOK_CEOF;
+        /* Now handle end of input */
+        if (GotEOF) {
+            /* End of file reached */
+            NextTok.Tok = TOK_CEOF;
+            return;
+        }
+    } else {
+        /* Just use the saved token */
+        NextTok = SavedTok;
+        SavedTok.Tok = TOK_INVALID;
         return;
     }
 
@@ -859,7 +864,8 @@ void NextToken (void)
 
         if (!PPParserRunning) {
             /* Check for a keyword */
-            if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
+            NextTok.Tok = FindKey (token);
+            if (NextTok.Tok != TOK_IDENT) {
                 /* Reserved word found */
                 return;
             }
@@ -1117,7 +1123,90 @@ void NextToken (void)
             UnknownChar (CurC);
 
     }
+}
 
+
+
+void NextToken (void)
+/* Get next non-pragma token from input stream consuming any pragmas
+** encountered. Adjacent string literal tokens will be concatenated.
+*/
+{
+    /* Used for string literal concatenation */
+    Token PrevTok;
+
+    /* When reading the first time from the file, the line info in NextTok,
+    ** which will be copied to CurTok is invalid. Since the information from
+    ** the token is used for error messages, we must make it valid.
+    */
+    if (NextTok.LI == 0) {
+        NextTok.LI = UseLineInfo (GetCurLineInfo ());
+    }
+
+    PrevTok.Tok = TOK_INVALID;
+    while (1) {
+        /* Read the next token from the file */
+        GetNextInputToken ();
+
+        /* Consume all pragmas at hand, including those nested in a _Pragma() */
+        if (CurTok.Tok == TOK_PRAGMA) {
+            /* Repeated and/or nested _Pragma()'s will be handled recursively */
+            ConsumePragma ();
+        }
+
+        /* Check for string concatenation */
+        if (CurTok.Tok == TOK_SCONST || CurTok.Tok == TOK_WCSCONST) {
+            if (PrevTok.Tok == TOK_SCONST || PrevTok.Tok == TOK_WCSCONST) {
+                /* Warn on non-ISO behavior */
+                if (InPragmaParser) {
+                    Warning ("Concatenated string literals in _Pragma operation");
+                }
+
+                /* Concatenate strings */
+                ConcatLiteral (PrevTok.SVal, CurTok.SVal);
+
+                /* If at least one of the concatenated strings is a wide
+                ** character literal, the whole string is a wide char
+                ** literal, otherwise it is a normal string literal.
+                */
+                if (CurTok.Tok == TOK_WCSCONST) {
+                    PrevTok.Tok = TOK_WCSCONST;
+                    PrevTok.Type = CurTok.Type;
+                }
+            }
+
+            if (NextTok.Tok == TOK_SCONST ||
+                NextTok.Tok == TOK_WCSCONST ||
+                NextTok.Tok == TOK_PRAGMA) {
+                /* Remember current string literal token */
+                if (PrevTok.Tok == TOK_INVALID) {
+                    PrevTok = CurTok;
+                    PrevTok.LI = UseLineInfo (PrevTok.LI);
+                }
+
+                /* Keep looping */
+                continue;
+            }
+        }
+
+        break;
+    }
+
+    /* Use the concatenated string literal token if there is one */
+    if (PrevTok.Tok == TOK_SCONST || PrevTok.Tok == TOK_WCSCONST) {
+        if (CurTok.Tok != TOK_SCONST && CurTok.Tok != TOK_WCSCONST) {
+            /* Push back the incoming tokens */
+            SavedTok = NextTok;
+            NextTok  = CurTok;
+        } else {
+            /* The last string literal token can be just replaced */
+            if (CurTok.LI) {
+                ReleaseLineInfo (CurTok.LI);
+            }
+        }
+        /* Replace the current token with the concatenated string literal */
+        CurTok = PrevTok;
+    }
 }
 
 
@@ -1142,6 +1231,212 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
         NextToken ();
 
     }
+}
+
+
+
+static void OpenBrace (Collection* C, token_t Tok)
+/* Consume an opening parenthesis/bracket/curly brace and remember that */
+{
+    switch (Tok) {
+        case TOK_LPAREN: Tok = TOK_RPAREN; break;
+        case TOK_LBRACK: Tok = TOK_RBRACK; break;
+        case TOK_LCURLY: Tok = TOK_RCURLY; break;
+        default:         Internal ("Unexpected opening token: %02X", (unsigned)Tok);
+    }
+    CollAppend (C, (void*)Tok);
+    NextToken ();
+}
+
+
+
+static void PopBrace (Collection* C)
+/* Close the latest open parenthesis/bracket/curly brace */
+{
+    if (CollCount (C) > 0) {
+        CollPop (C);
+    }
+}
+
+
+
+static int CloseBrace (Collection* C, token_t Tok)
+/* Consume a closing parenthesis/bracket/curly brace if it is matched with an
+** opening one to close and return 0, or bail out and return -1 if it is not
+** matched.
+*/
+{
+    if (CollCount (C) > 0) {
+        token_t LastTok = (token_t)CollLast (C);
+        if (LastTok == Tok) {
+            CollPop (C);
+            NextToken ();
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+
+
+int SmartErrorSkip (int TillEnd)
+/* Try some smart error recovery.
+**
+** - If TillEnd == 0:
+**   Skip tokens until a comma or closing curly brace that is not enclosed in
+**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+**   unpaired right parenthesis/bracket/curly brace is reached. The closing
+**   curly brace is consumed in the former case.
+**
+** - If TillEnd != 0:
+**   Skip tokens until a right curly brace or semicolon is reached and consumed
+**   while there are no open parentheses/brackets/curly braces, or until an EOF
+**   is reached anytime. Any open parenthesis/bracket/curly brace is considered
+**   to be closed by consuming a right parenthesis/bracket/curly brace even if
+**   they didn't match.
+**
+** - Return -1:
+**   If this exits at a semicolon or unpaired right parenthesis/bracket/curly
+**   brace while there are still open parentheses/brackets/curly braces.
+**
+** - Return 0:
+**   If this exits as soon as it reaches an EOF;
+**   Or if this exits right after consuming a semicolon or right curly brace
+**   while there are no open parentheses/brackets/curly braces.
+**
+** - Return 1:
+**   If this exits at a non-EOF without consuming it.
+*/
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI,
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!TillEnd) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    PopBrace (&C);
+                    NextToken ();
+                }
+                break;
+
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!TillEnd) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    PopBrace (&C);
+                    NextToken ();
+                }
+                if (CollCount (&C) == 0) {
+                    /* We consider this as a terminator as well */
+                    Res = 0;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_COMMA:
+                if (CollCount (&C) == 0 && !TillEnd) {
+                    Res = 1;
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_SEMI:
+                if (CollCount (&C) == 0) {
+                    if (TillEnd) {
+                        NextToken ();
+                        Res = 0;
+                    } else {
+                        Res = 1;
+                    }
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_CEOF:
+                /* We cannot consume this */
+                Res = 0;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
+}
+
+
+
+int SimpleErrorSkip (void)
+/* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
+** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
+*/
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = {
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    /* Found a terminator */
+                    Res = -1;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_CEOF:
+                /* We cannot go any farther */
+                Res = 0;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
 }
 
 

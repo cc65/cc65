@@ -33,7 +33,7 @@ loop1:
 cont1:
         jsr     read_byte
         sta     (load_ptr2),y
-        sta     PALETTE         ; feedback ;-)
+        sta     PALETTE + 1         ; feedback ;-)
         iny
         bne     loop1
         inc     load_ptr2+1
@@ -69,6 +69,8 @@ again:
 ; last action : clear interrupt
 ;
 exit:
+        lda     #$10
+        sta     INTRST
         clc
         rts
 

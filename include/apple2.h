@@ -41,6 +41,7 @@
 #  error This module may only be used when compiling for the Apple ][!
 #endif
 
+#include <time.h>
 #include <apple2_filetype.h>
 
 
@@ -142,6 +143,27 @@ extern unsigned char _dos_type;
 ** ProDOS 8 2.4.x - 0x24
 */
 
+/* struct stat.st_mode values */
+#define S_IFDIR  0x01
+#define S_IFREG  0x02
+#define S_IFBLK  0xFF
+#define S_IFCHR  0xFF
+#define S_IFIFO  0xFF
+#define S_IFLNK  0xFF
+#define S_IFSOCK 0xFF
+
+struct datetime {
+    struct {
+        unsigned day  :5;
+        unsigned mon  :4;
+        unsigned year :7;
+    }                 date;
+    struct {
+        unsigned char min;
+        unsigned char hour;
+    }                 time;
+};
+
 
 
 /*****************************************************************************/
@@ -151,20 +173,10 @@ extern unsigned char _dos_type;
 
 
 /* The file stream implementation and the POSIX I/O functions will use the
-** following struct to set the date and time stamp on files. This specificially
+** following struct to set the date and time stamp on files. This specifically
 ** applies to the open and fopen functions.
 */
-extern struct {
-    struct {
-        unsigned day  :5;
-        unsigned mon  :4;
-        unsigned year :7;
-    }             createdate;    /* Current date: 0 */
-    struct {
-        unsigned char min;
-        unsigned char hour;
-    }             createtime;    /* Current time: 0 */
-} _datetime;
+extern struct datetime _datetime;
 
 /* The addresses of the static drivers */
 #if !defined(__APPLE2ENH__)
@@ -172,6 +184,7 @@ extern void a2_auxmem_emd[];
 extern void a2_stdjoy_joy[];     /* Referred to by joy_static_stddrv[]   */
 extern void a2_stdmou_mou[];     /* Referred to by mouse_static_stddrv[] */
 extern void a2_ssc_ser[];        /* Referred to by ser_static_stddrv[]   */
+extern void a2_gs_ser[];         /* IIgs serial driver                   */
 extern void a2_hi_tgi[];         /* Referred to by tgi_static_stddrv[]   */
 extern void a2_lo_tgi[];
 #endif
@@ -183,6 +196,9 @@ extern void a2_lo_tgi[];
 /*****************************************************************************/
 
 
+
+void beep (void);
+/* Beep beep. */
 
 unsigned char get_ostype (void);
 /* Get the machine type. Returns one of the APPLE_xxx codes. */
@@ -209,6 +225,12 @@ void rebootafterexit (void);
 #define _bordercolor(color)     COLOR_BLACK
 #define _cpeekcolor()           COLOR_WHITE
 #define _cpeekrevers()          0
+
+struct tm* __fastcall__ gmtime_dt (const struct datetime* dt);
+/* Converts a ProDOS date/time structure to a struct tm */
+
+time_t __fastcall__ mktime_dt (const struct datetime* dt);
+/* Converts a ProDOS date/time structure to a time_t UNIX timestamp */
 
 
 

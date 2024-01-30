@@ -450,7 +450,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 /* Parse argument declarations and function body. */
 {
     int         ParamComplete;  /* If all paramemters have complete types */
-    int         C99MainFunc = 0;/* Flag for C99 main function returning int */
     SymEntry*   Param;
     const Type* RType;          /* Real type used for struct parameters */
     const Type* ReturnType;     /* Return type */
@@ -466,11 +465,15 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
     /* Check return type */
     ReturnType = F_GetReturnType (CurrentFunc);
-    if (IsIncompleteESUType (ReturnType)) {
+    if (!IsTypeArray (ReturnType) && !IsTypeFunc (ReturnType)) {
         /* There are already diagnostics on returning arrays or functions */
-        if (!IsTypeArray (ReturnType) && !IsTypeFunc (ReturnType)) {
+        if (IsIncompleteESUType (ReturnType)) {
             Error ("Function has incomplete return type '%s'",
                     GetFullTypeName (ReturnType));
+        } else if (IsPassByRefType (ReturnType)) {
+            /* Handle struct/union specially */
+            Error ("Function return type '%s' of size %u is unsupported",
+                   GetFullTypeName (ReturnType), SizeOf (ReturnType));
         }
     }
 
@@ -509,18 +512,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* Mark this as the main function */
         CurrentFunc->Flags |= FF_IS_MAIN;
 
-        /* Main cannot be a fastcall function */
-        if (IsQualFastcall (Func->Type)) {
-            Error ("'main' cannot be declared as __fastcall__");
-        }
-
-        /* If cc65 extensions aren't enabled, don't allow a main function that
-        ** doesn't return an int.
-        */
-        if (IS_Get (&Standard) != STD_CC65 && ReturnType[0].C != T_INT) {
-            Error ("'main' must always return an int");
-        }
-
         /* Add a forced import of a symbol that is contained in the startup
         ** code. This will force the startup code to be linked in.
         */
@@ -536,18 +527,10 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
             /* The start-up code doesn't fast-call main(). */
             Func->Type->C |= T_QUAL_CDECL;
         }
-
-        /* Determine if this is a main function in a C99 environment that
-        ** returns an int.
-        */
-        if (GetUnqualRawTypeCode (ReturnType) == T_INT &&
-            IS_Get (&Standard) == STD_C99) {
-            C99MainFunc = 1;
-        }
     }
 
     /* Allocate code and data segments for this function */
-    Func->V.F.Seg = PushSegments (Func);
+    Func->V.F.Seg = PushSegContext (Func);
 
     /* Use the info in the segments for generating new local labels */
     UseLabelPoolFromSegments (Func->V.F.Seg);
@@ -565,15 +548,15 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* Generate the push */
         /* Handle struct/union specially */
         if (IsClassStruct (D->LastParam->Type)) {
-            Flags = TypeOf (GetStructReplacementType (D->LastParam->Type)) | CF_FORCECHAR;
+            Flags = CG_TypeOf (GetStructReplacementType (D->LastParam->Type)) | CF_FORCECHAR;
         } else {
-            Flags = TypeOf (D->LastParam->Type) | CF_FORCECHAR;
+            Flags = CG_TypeOf (D->LastParam->Type) | CF_FORCECHAR;
         }
         g_push (Flags, 0);
     }
 
     /* Generate function entry code if needed */
-    g_enter (FuncTypeOf (Func->Type), F_GetParamSize (CurrentFunc));
+    g_enter (CG_CallFlags (Func->Type), F_GetParamSize (CurrentFunc));
 
     /* If stack checking code is requested, emit a call to the helper routine */
     if (IS_Get (&CheckStack)) {
@@ -648,21 +631,16 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         AnyStatement (0);
     }
 
-    /* If this is not a void function, and not the main function in a C99
-    ** environment returning int, output a warning if we didn't see a return
-    ** statement.
-    */
-    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc) && !C99MainFunc && IS_Get (&WarnReturnType)) {
-        Warning ("Control reaches end of non-void function [-Wreturn-type]");
-    }
-
-    /* If this is the main function in a C99 environment returning an int, let
-    ** it always return zero. Note: Actual return statements jump to the return
-    ** label defined below.
-    ** The code is removed by the optimizer if unused.
-    */
-    if (C99MainFunc) {
-        g_getimmed (CF_INT | CF_CONST, 0, 0);
+    /* Check if this function is missing a return value */
+    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc)) {
+        /* If this is the main function in a C99 environment returning an int,
+        ** let it always return zero. Otherwise output a warning.
+        */
+        if (IS_Get (&Standard) >= STD_C99 && GetUnqualRawTypeCode (ReturnType) == T_INT) {
+            g_getimmed (CF_INT | CF_CONST, 0, 0);
+        } else if (IS_Get (&WarnReturnType)) {
+            Warning ("Control reaches end of non-void function [-Wreturn-type]");
+        }
     }
 
     /* Output the function exit code label */
@@ -684,9 +662,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Leave the lexical level */
     LeaveFunctionLevel ();
 
-    /* Eat the closing brace */
-    ConsumeRCurly ();
-
     /* Restore the old literal pool, remembering the one for the function */
     Func->V.F.LitPool = PopLiteralPool ();
 
@@ -696,7 +671,13 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     }
 
     /* Switch back to the old segments */
-    PopSegments ();
+    PopSegContext ();
+
+    /* Eat the closing brace after we've done everything with the function
+    ** definition. This way we won't have troubles with pragmas right after
+    ** the closing brace.
+    */
+    ConsumeRCurly();
 
     /* Reset the current function pointer */
     FreeFunction (CurrentFunc);

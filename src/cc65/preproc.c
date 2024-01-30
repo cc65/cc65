@@ -842,7 +842,7 @@ static void AddPreLine (StrBuf* Str)
             SB_AppendChar (Str, '\n');
         }
         SB_Printf (&Comment, "#line %u \"%s\"\n",
-                   GetCurrentLineNum () - ContinuedLines, GetCurrentFilename ());
+                   GetCurrentLineNum () - ContinuedLines, GetCurrentFileName ());
         SB_Append (Str, &Comment);
     } else {
         /* Output new lines */
@@ -2943,7 +2943,7 @@ static void DoLine (void)
             StrBuf Filename = AUTO_STRBUF_INITIALIZER;
             if (SB_GetString (Line, &Filename)) {
                 SB_Terminate (&Filename);
-                SetCurrentFilename (SB_GetConstBuf (&Filename));
+                SetCurrentFileName (SB_GetConstBuf (&Filename));
             } else {
                 PPError ("Invalid filename for #line directive");
                 LineNum = 0;
@@ -3220,7 +3220,7 @@ void HandleSpecialMacro (Macro* M, const char* Name)
     } else if (strcmp (Name, "__FILE__") == 0) {
         /* Replace __FILE__ with the current filename */
         StrBuf B = AUTO_STRBUF_INITIALIZER;
-        SB_InitFromString (&B, GetCurrentFilename ());
+        SB_InitFromString (&B, GetCurrentFileName ());
         SB_Clear (&M->Replacement);
         Stringize (&B, &M->Replacement);
         SB_Done (&B);
@@ -3332,7 +3332,7 @@ void Preprocess (void)
     PLine = InitLine (PLine);
 
     if (Verbosity > 1 && SB_NotEmpty (Line)) {
-        printf ("%s:%u: %.*s\n", GetCurrentFilename (), GetCurrentLineNum (),
+        printf ("%s:%u: %.*s\n", GetCurrentFileName (), GetCurrentLineNum (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 

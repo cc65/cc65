@@ -67,8 +67,16 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build app (debug)
-        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug
+      - name: Build app (x86 debug)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug -property:Platform=Win32
 
-      - name: Build app (release)
-        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+      - name: Build app (x86 release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release -property:Platform=Win32
+
+      - name: Build app (x64 release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug -property:Platform=x64
+
+      - name: Build app (x64 release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
+
+

@@ -56,6 +56,7 @@
 #include "loop.h"
 #include "pragma.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "stackptr.h"
 #include "stmt.h"
 #include "swstmt.h"
@@ -310,7 +311,6 @@ static void ReturnStatement (void)
 /* Handle the 'return' statement */
 {
     ExprDesc    Expr;
-    const Type* ReturnType;
 
     ED_Init (&Expr);
     NextToken ();
@@ -326,31 +326,19 @@ static void ReturnStatement (void)
         if (F_HasVoidReturn (CurrentFunc)) {
             Error ("Returning a value in function with return type 'void'");
         } else {
-
             /* Check the return type first */
-            ReturnType = F_GetReturnType (CurrentFunc);
-            if (IsIncompleteESUType (ReturnType)) {
-                /* Avoid excess errors */
-                if (ErrorCount == 0) {
-                    Error ("Returning a value in function with incomplete return type");
-                }
+            const Type* ReturnType = F_GetReturnType (CurrentFunc);
+
+            /* Convert the return value to the type of the function result */
+            TypeConversion (&Expr, ReturnType);
+
+            /* Load the value into the primary */
+            if (IsClassStruct (Expr.Type)) {
+                /* Handle struct/union specially */
+                LoadExpr (CG_TypeOf (GetStructReplacementType (ReturnType)), &Expr);
             } else {
-                /* Convert the return value to the type of the function result */
-                TypeConversion (&Expr, ReturnType);
-
                 /* Load the value into the primary */
-                if (IsClassStruct (Expr.Type)) {
-                    /* Handle struct/union specially */
-                    ReturnType = GetStructReplacementType (Expr.Type);
-                    if (ReturnType == Expr.Type) {
-                        Error ("Returning '%s' of this size by value is not supported", GetFullTypeName (Expr.Type));
-                    }
-                    LoadExpr (TypeOf (ReturnType), &Expr);
-
-                } else {
-                    /* Load the value into the primary */
-                    LoadExpr (CF_NONE, &Expr);
-                }
+                LoadExpr (CF_NONE, &Expr);
             }
 
             /* Append deferred inc/dec at sequence point */
@@ -674,6 +662,8 @@ int AnyStatement (int* PendingToken)
 ** NULL, the function will skip the token.
 */
 {
+    int GotBreak = 0;
+
     /* Assume no pending token */
     if (PendingToken) {
         *PendingToken = 0;
@@ -689,7 +679,8 @@ int AnyStatement (int* PendingToken)
     switch (CurTok.Tok) {
 
         case TOK_IF:
-            return IfStatement ();
+            GotBreak = IfStatement ();
+            break;
 
         case TOK_SWITCH:
             SwitchStatement ();
@@ -710,25 +701,25 @@ int AnyStatement (int* PendingToken)
         case TOK_GOTO:
             GotoStatement ();
             CheckSemi (PendingToken);
-            return 1;
+            GotBreak = 1;
+            break;
 
         case TOK_RETURN:
             ReturnStatement ();
             CheckSemi (PendingToken);
-            return 1;
+            GotBreak = 1;
+            break;
 
         case TOK_BREAK:
             BreakStatement ();
             CheckSemi (PendingToken);
-            return 1;
+            GotBreak = 1;
+            break;
 
         case TOK_CONTINUE:
             ContinueStatement ();
             CheckSemi (PendingToken);
-            return 1;
-
-        case TOK_PRAGMA:
-            DoPragma ();
+            GotBreak = 1;
             break;
 
         case TOK_SEMI:
@@ -737,12 +728,17 @@ int AnyStatement (int* PendingToken)
             break;
 
         case TOK_LCURLY:
-            return CompoundStatement (PendingToken);
+            GotBreak = CompoundStatement (PendingToken);
+            break;
 
         default:
             /* Simple statement */
             Statement (PendingToken);
             break;
     }
-    return 0;
+
+    /* Reset SQP flags */
+    SetSQPFlags (SQP_KEEP_NONE);
+
+    return GotBreak;
 }

@@ -2867,6 +2867,26 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
     overridden. When using this feature, you may also get into trouble if
     later versions of the assembler define new keywords starting with a dot.
 
+  <tag><tt>line_continuations</tt><label id="line_continuations"></tag>
+
+    Switch on or off line continuations using the backslash character
+    before a newline. The option is off by default.
+    Note: Line continuations do not work in a comment. A backslash at the
+    end of a comment is treated as part of the comment and does not trigger
+    line continuation.
+
+  Example:
+
+    <tscreen><verb>
+          .feature line_continuations +   ; Allow line continuations
+
+          lda     \
+                  #$20                    ; This is legal now
+    </verb></tscreen>
+
+    For backward compatibility reasons, the <tt>.LINECONT +</tt> control command
+    is also supported and enables the same feature.
+
   <tag><tt>long_jsr_jmp_rts</tt><label id="long_jsr_jmp_rts"></tag>
 
     Affects 65816 mode only.
@@ -3369,26 +3389,6 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   See the <tt><ref id=".CONDES" name=".CONDES"></tt> command and the separate
   section <ref id="condes" name="Module constructors/destructors"> explaining
   the feature in more detail.
-
-
-<sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
-
-  Switch on or off line continuations using the backslash character
-  before a newline. The option is off by default.
-  Note: Line continuations do not work in a comment. A backslash at the
-  end of a comment is treated as part of the comment and does not trigger
-  line continuation.
-  The command can be followed by a '+' or '-' character to switch the
-  option on or off respectively.
-
-  Example:
-
-  <tscreen><verb>
-        .linecont       +               ; Allow line continuations
-
-        lda     \
-                #$20                    ; This is legal now
-  </verb></tscreen>
 
 
 <sect1><tt>.LIST</tt><label id=".LIST"><p>
@@ -4086,7 +4086,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.TAG</tt><label id=".TAG"><p>
 
-  Allocate space for a struct or union.
+  Allocate space for a struct or union. This is equivalent to
+  <tt><ref id=".RES" name=".RES"></tt> with the
+  <tt><ref id=".SIZEOF" name=".SIZEOF"></tt> of a struct.
 
   Example:
 
@@ -4100,6 +4102,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
                 .tag    Point           ; Allocate 4 bytes
   </verb></tscreen>
 
+  See: <ref id="structs" name="&quot;Structs and unions&quot;">
 
 <sect1><tt>.UNDEF, .UNDEFINE</tt><label id=".UNDEFINE"><p>
 
@@ -4489,9 +4492,9 @@ different:
 
 <item>  Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> may not
         span more than a line. You may use line continuation (see <tt><ref
-        id=".LINECONT" name=".LINECONT"></tt>) to spread the definition over
-        more than one line for increased readability, but the macro itself
-        may not contain an end-of-line token.
+        id="line_continuations" name="line_continuations"></tt>) to spread the
+        definition over more than one line for increased readability, but the
+        macro itself may not contain an end-of-line token.
 
 <item>  Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> share
         the name space with classic macros, but they are detected and replaced
@@ -4865,10 +4868,15 @@ compiler, depending on the target system selected:
 
 Structs and unions are special forms of <ref id="scopes" name="scopes">.  They
 are, to some degree, comparable to their C counterparts. Both have a list of
-members. Each member allocates storage, and optionally may have a name whose
-value, in the case of a struct, usually is the storage offset from the
-beginning, and in the case of a union, doesn't change, and usually is zero.
+members. Each member allocates storage, and optionally may have a name.
 
+Each named member has a constant value equal to the storage offset from the
+beginning of the structure. In the case of a union, all members are placed at
+the same offset, typically 0.
+
+Each named member also has a storage size which can be accessed with the
+<tt><ref id=".SIZEOF" name=".SIZEOF"></tt> operator. The struct or union itself
+also has a <tt/.SIZEOF/ indicating its total storage size.
 
 <sect1>Declaration<p>
 
@@ -4895,8 +4903,9 @@ A struct or union may not necessarily have a name. If it is anonymous, no
 local scope is opened; the identifiers used to name the members are placed
 into the current scope instead.
 
-A struct may contain unnamed members and definitions of local structs/unions.
-The storage allocators may contain a multiplier, as in the example below:
+Storage allocators may contain a multiplier. A struct may also contain members
+and definitions of local structs/unions. Example:
+
 <tscreen><verb>
       .struct Circle
               .struct Point
@@ -4905,7 +4914,8 @@ The storage allocators may contain a multiplier, as in the example below:
               Radius  .word
       .endstruct
 </verb></tscreen>
-The size of the Circle struct is 6 (three words).
+
+In this example the size of the Circle struct is 6 (three words).
 
 
 <sect1>The storage allocator keywords<p>
@@ -4915,7 +4925,7 @@ The size of the Circle struct is 6 (three words).
   <tag/.BYTE, .RES/
     Allocates multiples of 1 byte.  <tt/.RES/ requires an operand.
 
-  <tag/.DBYTE, .WORD, .ADDR/
+  <tag/.DBYT, .WORD, .ADDR/
     Allocates multiples of 2 bytes.
 
   <tag/.FARADDR/
@@ -4923,6 +4933,15 @@ The size of the Circle struct is 6 (three words).
 
   <tag/.DWORD/
     Allocates multiples of 4 bytes.
+
+  <tag/.TAG/
+    Allocates a previously defined struct.
+
+  <tag/.STRUCT, .UNION/
+    Begins a nested .struct or .union definition, and allocates it.
+    Note that its member offset values will begin at 0, unless this nested
+    structure is anonymous, in which case they will instead become members of
+    the enclosing scope.
 
   </descrip>
 
@@ -4968,13 +4987,54 @@ name=".TAG"> directive.
 C:      .tag    Circle
 </verb></tscreen>
 
-Currently, members are just offsets from the start of the struct or union. To
+Members are just offsets from the start of the struct or union. To
 access a field of a struct, the member offset must be added to the address of
 the struct variable itself:
 <tscreen><verb>
-        lda     C+Circle::Radius        ; Load circle radius into A
+        lda    C + Circle::Radius                    ; Load circle radius
+        lda    C + Circle::Origin + Point::ycoord    ; Load circle origin.ycoord
 </verb></tscreen>
-That may change in a future version of the assembler.
+
+Nested structures or unions are treated differently depending on whether they
+are anonymous. If named, a new structure definition is created within the
+enclosing scope, with its offsets beginning at 0. If anonymous, the members of
+the new structure are added to the enclosing scope instead, with offsets
+continuing through that scope. Example:
+
+<tscreen><verb>
+      .struct Object
+              id .byte                ; Object::id = 0
+              target .struct Point    ; Object::target = 1
+                      xcoord  .word   ; Object::Point::xcoord = 0
+                      ycoord  .word   ; Object::Point::ycoord = 2
+              .endstruct
+               cost .struct           ; Object::cost = 5
+                      price  .word    ; Object::price = 5
+                      tax  .word      ; Object::tax = 7
+              .endstruct
+              .struct
+                      radius  .word   ; Object::radius = 9
+              .endstruct
+      .endstruct
+
+O:    .tag   Object
+      lda    O + Object::target + Object::Point::ycoord  ; Named struct
+      lda    O + Object::tax                             ; Anonymous
+      lda    O + Object::radius                          ; Anonymous
+
+      ; Be careful not to use a named nested structure without also adding the
+      ; offset to the nested structure itself.
+      lda    O + Object::Point::ycoord                   ; Incorrect!
+      lda    O + Object::target + Object::Point::ycoord  ; Correct
+</verb></tscreen>
+
+In this example, the first nested structure is named "Point", and its member
+offsets begin at 0. On the other hand, the two anonymous structures simply
+continue to add members to the enclosing "Object" structure.
+
+Note that an anonymous structure does not need a member name, since all of its
+members become part of the enclosing structure. The "cost" member in the
+example is redundantly the same offset as its first member "price".
 
 
 <sect1>Limitations<p>

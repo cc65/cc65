@@ -59,24 +59,6 @@ $(ISEQUAL): ../isequal.c | $(WORKDIR)
 define PRG_template
 
 # should compile, but gives an error
-$(WORKDIR)/int-static-1888.$1.$2.prg: int-static-1888.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/int-static-1888.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-
-# should compile, but gives an error
-$(WORKDIR)/bug760.$1.$2.prg: bug760.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug760.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-
-# should compile, but gives an error
-$(WORKDIR)/bug1437.$1.$2.prg: bug1437.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug1437.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-
-# should compile, but gives an error
 $(WORKDIR)/bug1209-ind-goto-rev.$1.$2.prg: bug1209-ind-goto-rev.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1209-ind-goto-rev.$1.$2.prg)
@@ -104,18 +86,6 @@ $(WORKDIR)/bug1209-ind-goto-rev-3.$1.$2.prg: bug1209-ind-goto-rev-3.c | $(WORKDI
 $(WORKDIR)/pptest2.$1.$2.prg: pptest2.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/pptest2.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-
-# should compile, but gives an error
-$(WORKDIR)/bug1263.$1.$2.prg: bug1263.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug1263.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
-
-# should compile, but gives an error
-$(WORKDIR)/bug1357.$1.$2.prg: bug1357.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug1357.$1.$2.prg)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # should compile, but compiler exits with internal error
@@ -162,6 +132,12 @@ $(WORKDIR)/goto.$1.$2.prg: goto.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/goto.$1.$2.prg)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< 2>$(WORKDIR)/goto.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/goto.$1.$2.out goto.ref
+
+# this one requires failure with --std=c89, it fails with --std=cc65 due to
+# stricter checks
+$(WORKDIR)/bug2304-implicit-func.$1.$2.prg: bug2304-implicit-func.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug2304-implicit-func.$1.$2.prg)
+	$(NOT) $(CC65) --standard c89 -t sim$2 -$1 -o $$@ $$< $(NULLERR)
 
 # should not compile until 3-byte struct by value tests are re-enabled
 $(WORKDIR)/struct-by-value.$1.$2.prg: struct-by-value.c | $(WORKDIR)

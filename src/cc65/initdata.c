@@ -58,6 +58,7 @@
 #include "litpool.h"
 #include "pragma.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "shift.h"
 #include "standard.h"
 #include "symtab.h"
@@ -168,12 +169,12 @@ static void DefineData (ExprDesc* Expr)
 
         case E_LOC_NONE:
             /* Immediate numeric value with no storage */
-            g_defdata (CF_IMM | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            g_defdata (CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_ABS:
             /* Absolute numeric address */
-            g_defdata (CF_ABSOLUTE | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            g_defdata (CF_ABSOLUTE | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:
@@ -244,9 +245,6 @@ static void DefineBitFieldData (StructInitData* SI)
 
 static void DefineStrData (Literal* Lit, unsigned Count)
 {
-    /* Translate into target charset */
-    TranslateLiteral (Lit);
-
     /* Output the data */
     g_defbytes (GetLiteralStr (Lit), Count);
 }
@@ -343,8 +341,8 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* Char array initialized by string constant */
         int NeedParen;
 
-        /* If we initializer is enclosed in brackets, remember this fact and
-        ** skip the opening bracket.
+        /* If the initializer is enclosed in curly braces, remember this fact
+        ** and skip the opening one.
         */
         NeedParen = (CurTok.Tok == TOK_LCURLY);
         if (NeedParen) {
@@ -377,7 +375,9 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
     } else {
 
-        /* Arrays can be initialized without a pair of curly braces */
+        /* An array can be initialized without a pair of enclosing curly braces
+        ** if it is itself a member of a struct/union or an element of an array.
+        */
         if (*Braces == 0 || CurTok.Tok == TOK_LCURLY) {
             /* Consume the opening curly brace */
             HasCurly = ConsumeLCurly ();
@@ -387,14 +387,22 @@ static unsigned ParseArrayInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* Initialize the array members */
         Count = 0;
         while (CurTok.Tok != TOK_RCURLY) {
-            /* Flexible array members may not be initialized within
-            ** an array (because the size of each element may differ
-            ** otherwise).
+            /* Flexible array members cannot be initialized within an array.
+            ** (Otherwise the size of each element may differ.)
             */
             ParseInitInternal (ElementType, Braces, 0);
             ++Count;
-            if (CurTok.Tok != TOK_COMMA)
+            if (CurTok.Tok != TOK_COMMA) {
                 break;
+            }
+
+            if (!HasCurly && ElementCount > 0 && Count >= ElementCount) {
+                /* If the array is initialized without enclosing curly braces,
+                ** it only accepts how many elements initializers up to its
+                ** count of elements, leaving any following initializers out.
+                */
+                break;
+            }
             NextToken ();
         }
 
@@ -489,9 +497,9 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
 
             if (HasCurly) {
                 Error ("Excess elements in %s initializer", GetBasicTypeName (T));
-                SkipInitializer (HasCurly);
+                SkipInitializer (0);
             }
-            return SI.Offs;
+            break;
         }
 
         /* Check for special members that don't consume the initializer */
@@ -503,18 +511,20 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* This may be an anonymous bit-field, in which case it doesn't
         ** have an initializer.
         */
-        if (SymIsBitField (TagSym) && (IsAnonName (TagSym->Name))) {
-            /* Account for the data and output it if we have at least a full
-            ** byte. We may have more if there was storage unit overlap, for
-            ** example two consecutive 7 bit fields. Those would be packed
-            ** into 2 bytes.
-            */
-            SI.ValBits += TagSym->Type->A.B.Width;
-            CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
-            /* TODO: Generalize this so any type can be used. */
-            CHECK (SI.ValBits <= LONG_BITS);
-            while (SI.ValBits >= CHAR_BITS) {
-                DefineBitFieldData (&SI);
+        if (SymIsBitField (TagSym) && IsAnonName (TagSym->Name)) {
+            if (!IsTypeUnion (T)) {
+                /* Account for the data and output it if we have at least a full
+                ** byte. We may have more if there was storage unit overlap, for
+                ** example two consecutive 7 bit fields. Those would be packed
+                ** into 2 bytes.
+                */
+                SI.ValBits += TagSym->Type->A.B.Width;
+                CHECK (SI.ValBits <= CHAR_BIT * sizeof(SI.BitVal));
+                /* TODO: Generalize this so any type can be used. */
+                CHECK (SI.ValBits <= LONG_BITS);
+                while (SI.ValBits >= CHAR_BITS) {
+                    DefineBitFieldData (&SI);
+                }
             }
             /* Avoid consuming the comma if any */
             goto NextMember;
@@ -620,15 +630,15 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
         /* Skip the comma next round */
         SkipComma = 1;
 
-NextMember:
-        /* Next member. For unions, only the first one can be initialized */
+        /* For unions, only the first named member can be initialized */
         if (IsTypeUnion (T)) {
-            /* Union */
             TagSym = 0;
-        } else {
-            /* Struct */
-            TagSym = TagSym->NextSym;
+            continue;
         }
+
+NextMember:
+        /* Next member */
+        TagSym = TagSym->NextSym;
     }
 
     if (HasCurly) {
@@ -669,7 +679,7 @@ static unsigned ParseVoidInit (Type* T)
     Size = 0;
     do {
         ExprDesc Expr = NoCodeConstExpr (hie1);
-        switch (GetUnqualTypeCode (&Expr.Type[0])) {
+        switch (GetUnderlyingTypeCode (&Expr.Type[0])) {
 
             case T_SCHAR:
             case T_UCHAR:
@@ -737,7 +747,7 @@ static unsigned ParseVoidInit (Type* T)
 static unsigned ParseInitInternal (Type* T, int *Braces, int AllowFlexibleMembers)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    switch (GetUnqualTypeCode (T)) {
+    switch (GetUnderlyingTypeCode (T)) {
 
         case T_SCHAR:
         case T_UCHAR:

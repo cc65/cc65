@@ -86,6 +86,10 @@ extern FILE* stderr;
 #  define FILENAME_MAX      (80+1)
 #elif defined(__TELESTRAT__)
 #  define FILENAME_MAX      (50+1)
+#elif defined(__SIM6502__)
+#  define FILENAME_MAX      (1024+1)
+#elif defined(__SIM65C02__)
+#  define FILENAME_MAX      (1024+1)
 #else
 #  define FILENAME_MAX      (16+1)
 #endif

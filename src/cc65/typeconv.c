@@ -111,7 +111,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (CG_TypeOf (NewType), CG_TypeOf (OldType));
 
             /* Value is now in primary and an rvalue */
             ED_FinalizeRValLoad (Expr);
@@ -178,7 +178,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code. */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (CG_TypeOf (NewType), CG_TypeOf (OldType));
 
             /* Value is now an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);
@@ -321,14 +321,8 @@ void TypeCast (ExprDesc* Expr)
 {
     Type    NewType[MAXTYPELEN];
 
-    /* Skip the left paren */
-    NextToken ();
-
-    /* Read the type */
+    /* Read the type enclosed in parentheses */
     ParseType (NewType);
-
-    /* Closing paren */
-    ConsumeRParen ();
 
     /* Read the expression we have to cast */
     hie10 (Expr);
@@ -433,10 +427,6 @@ void TypeComposition (Type* lhs, const Type* rhs)
 ** type or this fails with a critical check.
 */
 {
-    FuncDesc*   F1;
-    FuncDesc*   F2;
-    long LeftCount, RightCount;
-
     /* Compose two types */
     while (lhs->C != T_END) {
 
@@ -446,13 +436,13 @@ void TypeComposition (Type* lhs, const Type* rhs)
         }
 
         /* Check for sanity */
-        CHECK (GetUnqualTypeCode (lhs) == GetUnqualTypeCode (rhs));
+        CHECK (GetUnderlyingTypeCode (lhs) == GetUnderlyingTypeCode (rhs));
 
         /* Check for special type elements */
         if (IsTypeFunc (lhs)) {
             /* Compose the function descriptors */
-            F1 = GetFuncDesc (lhs);
-            F2 = GetFuncDesc (rhs);
+            FuncDesc* F1 = GetFuncDesc (lhs);
+            FuncDesc* F2 = GetFuncDesc (rhs);
 
             /* If F1 has an empty parameter list (which does also mean, it is
             ** not a function definition, because the flag is reset in this
@@ -476,8 +466,8 @@ void TypeComposition (Type* lhs, const Type* rhs)
             }
         } else if (IsTypeArray (lhs)) {
             /* Check member count */
-            LeftCount  = GetElementCount (lhs);
-            RightCount = GetElementCount (rhs);
+            long LeftCount  = GetElementCount (lhs);
+            long RightCount = GetElementCount (rhs);
 
             /* Set composite type if it is requested */
             if (LeftCount != UNSPECIFIED) {
@@ -485,41 +475,10 @@ void TypeComposition (Type* lhs, const Type* rhs)
             } else if (RightCount != UNSPECIFIED) {
                 SetElementCount (lhs, RightCount);
             }
-        } else {
-            /* Combine the qualifiers */
-            if (IsClassPtr (lhs)) {
-                ++lhs;
-                ++rhs;
-                lhs->C |= GetQualifier (rhs);
-            }
         }
 
         /* Next type string element */
         ++lhs;
         ++rhs;
     }
-
-    return;
-}
-
-
-
-FuncDesc* RefineFuncDesc (Type* OldType, const Type* NewType)
-/* Refine the existing function descriptor with a new one */
-{
-    FuncDesc* Old = GetFuncDesc (OldType);
-    FuncDesc* New = GetFuncDesc (NewType);
-
-    CHECK (Old != 0 && New != 0);
-
-    if ((New->Flags & FD_EMPTY) == 0) {
-        if ((Old->Flags & FD_EMPTY) == 0) {
-            TypeComposition (OldType, NewType);
-        } else {
-            TypeCopy (OldType, NewType);
-            Old->Flags &= ~FD_EMPTY;
-        }
-    }
-
-    return Old;
 }

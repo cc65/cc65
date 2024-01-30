@@ -55,9 +55,20 @@
 
 
 
+/* Error categories */
+typedef enum errcat_t errcat_t;
+enum errcat_t {
+    EC_PP,      /* Pre-parser phases */
+    EC_PARSER,  /* Parser and later phases */
+};
+
+
+
 /* Count of errors/warnings */
-extern unsigned ErrorCount;
-extern unsigned WarningCount;
+extern unsigned PPErrorCount;           /* Pre-parser errors */
+extern unsigned PPWarningCount;         /* Pre-parser warnings */
+extern unsigned ErrorCount;             /* Errors occurred in parser and later translation phases */
+extern unsigned WarningCount;           /* Warnings occurred in parser and later translation phases */
 
 /* Warning and error options */
 extern IntStack WarnEnable;             /* Enable warnings */
@@ -89,6 +100,9 @@ struct StrBuf;
 
 
 
+void PrintFileInclusionInfo (const LineInfo* LI);
+/* Print hierarchy of file inclusion */
+
 void Fatal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
 /* Print a message about a fatal error and die */
 
@@ -98,7 +112,7 @@ void Internal (const char* Format, ...) attribute ((noreturn, format (printf, 1,
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
 
-void LIError (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
+void LIError (errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 3, 4)));
 /* Print an error message with the line info given explicitly */
 
 void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
@@ -107,7 +121,7 @@ void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
 void Warning (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print a warning message */
 
-void LIWarning (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
+void LIWarning (errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 3, 4)));
 /* Print a warning message with the line info given explicitly */
 
 void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
@@ -129,6 +143,12 @@ void LINote (const LineInfo* LI, const char* Format, ...) attribute ((format (pr
 
 void PPNote (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print a note message. For use within the preprocessor */
+
+unsigned GetTotalErrors (void);
+/* Get total count of errors of all categories */
+
+unsigned GetTotalWarnings (void);
+/* Get total count of warnings of all categories */
 
 void ErrorReport (void);
 /* Report errors (called at end of compile) */

@@ -131,6 +131,7 @@ _malloc:
         sta     ptr1
         bcc     @L1
         inc     ptr1+1
+        beq     OutOfHeapSpace          ; if high byte's 0, we overflowed!
 @L1:    ldx     ptr1+1
         bne     @L2
         cmp     #HEAP_MIN_BLOCKSIZE+1
@@ -336,4 +337,3 @@ RetUserPtr:
         bcc     @L9
         inx
 @L9:    rts
-

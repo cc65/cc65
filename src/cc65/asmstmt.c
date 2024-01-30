@@ -80,9 +80,9 @@ static void AsmErrorSkip (void)
 
 
 
-static SymEntry* AsmGetSym (unsigned Arg, unsigned Type)
-/* Find the symbol with the name currently in NextTok. The symbol must be of
-** the given type. On errors, NULL is returned.
+static SymEntry* AsmGetSym (unsigned Arg, int OnStack)
+/* Find the symbol with the name currently in NextTok. The symbol must be on
+** the stack if OnStack is true. On errors, NULL is returned.
 */
 {
     SymEntry* Sym;
@@ -102,7 +102,7 @@ static SymEntry* AsmGetSym (unsigned Arg, unsigned Type)
 
     /* Did we find a symbol with this name? */
     if (Sym == 0) {
-        Error ("Undefined symbol '%s' for argument %u", CurTok.Ident, Arg);
+        Error ("Undeclared symbol '%s' for argument %u", CurTok.Ident, Arg);
         AsmErrorSkip ();
         return 0;
     }
@@ -110,8 +110,8 @@ static SymEntry* AsmGetSym (unsigned Arg, unsigned Type)
     /* We found the symbol - skip the name token */
     NextToken ();
 
-    /* Check if we have a global symbol */
-    if ((Sym->Flags & Type) != Type) {
+    /* Check if the symbol is on the stack */
+    if ((Sym->Flags & SC_STORAGEMASK) != SC_AUTO ? OnStack : !OnStack) {
         Error ("Type of argument %u differs from format specifier", Arg);
         AsmErrorSkip ();
         return 0;
@@ -218,23 +218,24 @@ static void ParseGVarArg (StrBuf* T, unsigned Arg)
 */
 {
     /* Parse the symbol name parameter and check the type */
-    SymEntry* Sym = AsmGetSym (Arg, SC_STATIC);
+    SymEntry* Sym = AsmGetSym (Arg, 0);
     if (Sym == 0) {
         /* Some sort of error */
         return;
     }
 
-    /* Check for external linkage */
-    if (Sym->Flags & (SC_EXTERN | SC_STORAGE | SC_FUNC)) {
-        /* External linkage or a function */
+    /* Get the correct asm name */
+    if ((Sym->Flags & SC_TYPEMASK) == SC_FUNC || SymIsGlobal (Sym)) {
+        /* External or internal linkage or a function */
         SB_AppendChar (T, '_');
         SB_AppendStr (T, Sym->Name);
-    } else if (Sym->Flags & SC_REGISTER) {
+    } else if ((Sym->Flags & SC_STORAGEMASK) == SC_REGISTER) {
+        /* Register variable */
         char Buf[32];
         xsprintf (Buf, sizeof (Buf), "regbank+%d", Sym->V.R.RegOffs);
         SB_AppendStr (T, Buf);
     } else {
-        /* Static variable */
+        /* Local static variable */
         SB_AppendStr (T, LocalDataLabelName (Sym->V.L.Label));
     }
 }
@@ -248,7 +249,7 @@ static void ParseLVarArg (StrBuf* T, unsigned Arg)
     char Buf [16];
 
     /* Parse the symbol name parameter and check the type */
-    SymEntry* Sym = AsmGetSym (Arg, SC_AUTO);
+    SymEntry* Sym = AsmGetSym (Arg, 1);
     if (Sym == 0) {
         /* Some sort of error */
         return;
@@ -417,6 +418,9 @@ void AsmStatement (void)
 ** a string literal in parenthesis.
 */
 {
+    /* Prevent from translating the inline code string literal in asm */
+    NoCharMap = 1;
+
     /* Skip the ASM */
     NextToken ();
 
@@ -431,8 +435,14 @@ void AsmStatement (void)
 
     /* Need left parenthesis */
     if (!ConsumeLParen ()) {
+        NoCharMap = 0;
         return;
     }
+
+    /* We have got the inline code string untranslated, now reenable string
+    ** literal translation for string arguments (if any).
+    */
+    NoCharMap = 0;
 
     /* String literal */
     if (CurTok.Tok != TOK_SCONST) {

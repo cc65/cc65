@@ -69,11 +69,11 @@ adp2:
 adp2_lo:        .res 1
 adp2_hi:        .res 1
 
-scroll_src:     
+scroll_src:
 scroll_src_lo:  .res 1
-scroll_src_hi:  .res 1  
+scroll_src_hi:  .res 1
 
-scroll_dest:   
+scroll_dest:
 scroll_dest_lo: .res 1
 scroll_dest_hi: .res 1
 
@@ -103,9 +103,9 @@ pixel:      .res 1
 
 xval:           .res 2              ; These could move to zeropage for perf, but presume we
 yval:           .res 2              ;   we want to minimize the amount we grow zero page use
-err:            .res 2  
+err:            .res 2
 temp:           .res 2
-tempa:          .res 1    
+tempa:          .res 1
 tempx:          .res 1
 tempy:          .res 1
 temp2:          .res 2
@@ -131,11 +131,11 @@ tempstr:        .res 2
 ; Based on MTU PIXADR code
 ;-----------------------------------------------------------------------------------
 ; In:       _x1cord         (16-bit)
-;           _y1cord         (16-bit)   
-; Out:      adp1            (16-bit) Address of pixel to set 
+;           _y1cord         (16-bit)
+; Out:      adp1            (16-bit) Address of pixel to set
 ;-----------------------------------------------------------------------------------
 
-_GetPixelAddress:          
+_GetPixelAddress:
                 lda     _x1cord         ; compute bit address first
                 sta     adp1            ; also transfer x1cord to adp1
                 and     #$07            ; + which is simply the low 3 bits of x
@@ -181,7 +181,7 @@ _GetPixelAddress:
                 adc     adp1+1
                 adc     #>SCREEN    ; add in vmorg*256
                 sta     adp1+1          ; final result
-                rts                             ; return        
+                rts                             ; return
 
 ;-----------------------------------------------------------------------------------
 ; Mask tables for individual pixel subroutines
@@ -220,7 +220,7 @@ _Delay:         pha
 ; SetPixel - Set a pixel in the video memory
 ;-----------------------------------------------------------------------------------
 ; x             - _x1cord (16-bit)
-; y             - _y1cord (16-bit)   
+; y             - _y1cord (16-bit)
 ;-----------------------------------------------------------------------------------
 ; Mask tables for individual pixel subroutines
 ;-----------------------------------------------------------------------------------
@@ -228,25 +228,25 @@ _Delay:         pha
 _SetPixel:      jsr     _GetPixelAddress
                 ldy     btpt            ; get bit number in y
                 lda     msktb1,y        ; get a byte with that bit =1, others =0
-                ldy     #0              
+                ldy     #0
                 ora     (adp1),y        ; combine the bit with the addressed vm
                 sta     (adp1),y        ; byte
-                rts                     
+                rts
 
 ;-----------------------------------------------------------------------------------
 ; ClearPixel - Clears a pixel in the video memory
 ;-----------------------------------------------------------------------------------
 ; x             - _x1cord (16-bit)
-; y             - _y1cord (16-bit)   
+; y             - _y1cord (16-bit)
 ;-----------------------------------------------------------------------------------
 
 _ClearPixel:    jsr     _GetPixelAddress
                 ldy     btpt            ; get bit number in y
                 lda     msktb2,y        ; get a byte with that bit =0, others =1
-                ldy     #0              
+                ldy     #0
                 and     (adp1),y        ; remove the bit from the addressed vm
                 sta     (adp1),y        ; byte
-                rts                     
+                rts
 
 ;-----------------------------------------------------------------------------------
 ; ClearScreen - Clears the entire video memory (and thus the screen)
@@ -262,21 +262,21 @@ _ClearScreen:
 
                 ldy #0
 :               sta (dest), y       ; Loop unwound by a factor of 8, which means our iny before the branchh
-                iny                 ;  will still work as it's on a page crossing boundary. 
+                iny                 ;  will still work as it's on a page crossing boundary.
                 sta (dest), y       ;  This will avoid most of the overhead of the branch.
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                
+                iny
                 sta (dest), y
-                iny                                               
+                iny     
                 bne :-
 
                 inc dest_hi
@@ -319,8 +319,8 @@ _ScrollScreen:
 
                 lda (scroll_src),y                          ; I've unwound the loop to do 8 bytes at a time.  Since we're doing full pages
                 sta (scroll_dest),y                         ;   as long as we unwind the loop to do 8 bytes at a time, we know we'll still
-                iny                                         ;   do the final increment on a page boundary.  
-                lda (scroll_src),y                          
+                iny                                         ;   do the final increment on a page boundary.
+                lda (scroll_src),y
                 sta (scroll_dest),y
                 iny
                 lda (scroll_src),y
@@ -358,7 +358,7 @@ fullPageLoop:
                 sta (scroll_dest_lo),y
                 iny
                 bne fullPageLoop
-                inc scroll_dest_hi                
+                inc scroll_dest_hi
 partialPageLoop:
                 sta (scroll_dest_lo),y
                 iny
@@ -376,7 +376,7 @@ partialPageLoop:
 ; DrawCircle    - Draws a circle in video memory of a given radius at a given coord
 ;-----------------------------------------------------------------------------------
 ; x             - _x1cord (16-bit)
-; y             - _y1cord (16-bit)   
+; y             - _y1cord (16-bit)
 ; radius        - _y2cord (16-bit)
 ;-----------------------------------------------------------------------------------
 ; Implements the midpoint circle algorithm without floating point or trig functions
@@ -384,8 +384,8 @@ partialPageLoop:
 ;     int x = radius;
 ;     int y = 0;
 ;     int err = 0;
-; 
-;     while (x >= y) 
+;
+;     while (x >= y)
 ;     {
 ;         SETPIXEL(x0 + x, y0 + y, val);
 ;         SETPIXEL(x0 + y, y0 + x, val);
@@ -395,7 +395,7 @@ partialPageLoop:
 ;         SETPIXEL(x0 - y, y0 - x, val);
 ;         SETPIXEL(x0 + y, y0 - x, val);
 ;         SETPIXEL(x0 + x, y0 - y, val);
-; 
+;
 ;         y++;
 ;         err += 1 + 2 * y;
 ;         if (2 * (err - x) + 1 > 0) {
@@ -418,20 +418,20 @@ _DrawCircle:    lda _x1cord                     ; x0 = _x1cord
                 sta xval
                 lda _y2cord+1
                 sta xval+1
-                    
+
                 lda #$0                         ; yval = 0;
                 sta yval
                 sta yval+1
                 sta err                         ; err = 0;
-                sta err+1                       
-circleloop:                        
+                sta err+1
+circleloop:
                 lda xval+1                      ; if (xval < yval) we're done;
                 sec
                 cmp yval+1
                 bcc doneCircle                  ; if high byteof yval is greater, we can draw
                 bne doCircle                    ; it not greater and not equal, is less, so done
                 lda xval                        ; in other cases we need to compare the LSB next
-                cmp yval                            
+                cmp yval
                 bcs doCircle                    ; if it's less, but MSB was equal, we go draw
 
 doneCircle:     rts
@@ -451,7 +451,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 sbc xval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + y, y0 - x, val);
-      
+
                 lda x0
                 sec
                 sbc yval
@@ -467,7 +467,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 sbc xval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 - y, y0 - x, val);
-             
+
                 lda x0
                 sec
                 sbc xval
@@ -483,7 +483,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 sbc yval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 - x, y0 - y, val);
-                
+
                 lda x0
                 sec
                 sbc xval
@@ -499,7 +499,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 adc yval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 - x, y0 + y, val);
-                
+
                 lda x0
                 clc
                 adc yval
@@ -515,7 +515,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 adc xval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + y, y0 + x, val);
-                
+
                 lda x0
                 clc
                 adc xval
@@ -531,7 +531,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 adc yval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + x, y0 + y, val);
-                
+
                 lda x0
                 clc
                 adc xval
@@ -547,7 +547,7 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 sbc yval+1
                 sta _y1cord+1
                 jsr _SetPixel                    ; SETPIXEL(x0 + x, y0 - y, val);
-                
+
                 lda x0
                 sec
                 sbc yval
@@ -572,12 +572,12 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 asl
                 sta temp
                 lda yval+1
-                rol 
+                rol
                 sta temp+1
                 inc temp
                 bne :+
                 inc temp+1
-:               
+:
                 lda err                         ; err += temp
                 clc
                 adc temp
@@ -586,20 +586,20 @@ doCircle:       lda x0                          ; Draw the first of 8 symmetric 
                 adc temp+1
                 sta err+1
                                                 ; if (2 * (err - xval) + 1 > 0) then dec xval
-                lda err                         ; temp = err-xval                              
+                lda err                         ; temp = err-xval
                 sec
                 sbc xval
                 sta temp
                 lda err+1
                 sbc xval+1
                 sta temp+1
-                
+
                 asl temp                        ; temp = 2*(err-xval)+1
                 rol temp+1
-                inc temp                     
+                inc temp
                 bne :+
                 inc temp+1
-:               
+:
                 lda temp+1                      ; if (temp > 0) we'll dec xval
                 bmi doneLoop                    ; less than zero, so no dec
                 bne decxval                     ; if not zero, go ahead and dec
@@ -626,7 +626,7 @@ updateerr:      lda xval                        ; temp = xval * 2
                 lda #0
                 sbc temp+1
                 sta temp2+1
-                                
+
                 lda err                         ; err += 1-(xval*2)
                 clc
                 adc temp2
@@ -634,7 +634,7 @@ updateerr:      lda xval                        ; temp = xval * 2
                 lda err+1
                 adc temp2+1
                 sta err+1
-                
+
 doneLoop:       jmp circleloop
 
 ;-----------------------------------------------------------------------------------
@@ -659,8 +659,8 @@ ascToPetTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$20,$0d,$11,$93,$0a,$0
                 .byte $f0,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9,$fa,$fb,$fc,$fd,$fe,$ff
 
 ; PETSCI to Ascii lookup table - not current used, so commented out, but can be used to map fonts
-;               
-; 
+;
+;
  petToAscTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$09,$0d,$11,$93,$0a,$0e,$0f
                  .byte $10,$0b,$12,$13,$08,$15,$16,$17,$18,$19,$1a,$1b,$1c,$1d,$1e,$1f
                  .byte $20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$2a,$2b,$2c,$2d,$2e,$2f
@@ -686,9 +686,9 @@ ascToPetTable:  .byte $00,$01,$02,$03,$04,$05,$06,$07,$14,$20,$0d,$11,$93,$0a,$0
 
 _AscToPet:      tay
                 lda ascToPetTable, y
-                rts             
+                rts
 
-_PetToAsc:      tay     
+_PetToAsc:      tay
                 lda petToAscTable, Y
                 rts
 
@@ -762,7 +762,7 @@ ScreenLineAddresses:
 _DrawChar:      sty tempy
                 stx tempx
                 sta tempa
-                
+
                 tya                                 ; Get the address in screen memory where this
                 asl                                 ;  character X/Y cursor pos should be drawn
                 tay
@@ -773,20 +773,20 @@ _DrawChar:      sty tempy
                 lda ScreenLineAddresses+1, y
                 adc #0
                 sta dest_hi
-                
+
                 lda #0                              ; Get the address in font memory where this
                 sta src_hi                          ;  Petscii chracter lives (after conversion from
                 lda tempa                           ;  ascii)
- 
+
                 sty temp2
                 jsr _AscToPet
                 ldy temp2
- 
-                asl 
+
+                asl
                 rol src_hi
-                asl 
+                asl
                 rol src_hi
-                asl 
+                asl
                 rol src_hi
                 clc
                 adc #<_font8x8_basic                ; Add the base address of the font table to the offset
@@ -794,23 +794,23 @@ _DrawChar:      sty tempy
                 lda src_hi
                 adc #>_font8x8_basic
                 sta src_hi
- 
+
                 ldy #0                              ; opy the character def to the screen, one byte at a time
                 ldx #0
 :               lda (src), y                        ; Copy this byte from the character def to the screen target
                 sta (dest, x)
                 lda dest_lo                         ; Advance to the next "scanline", or pixel row, down
                 clc
-                adc #<BYTESPERROW               
+                adc #<BYTESPERROW
                 sta dest_lo
                 lda dest_hi
                 adc #>BYTESPERROW
                 sta dest_hi
- 
+
                 iny
                 cpy #8
                 bne :-
- 
+
                 ldy tempy
                 ldx tempx
                 lda tempa
@@ -831,7 +831,7 @@ CursorOff:      ldx _cursorX
                 lda #' '
                 jsr _DrawChar
                 rts
-                
+
 ;-----------------------------------------------------------------------------------
 ; DrawText     - Draws an ASCII char in A at the current cursor pos, saves all regs
 ;-----------------------------------------------------------------------------------
@@ -841,13 +841,13 @@ _CharOut:       sta temp
                 sta temp+1
                 txa
                 pha
-                tya 
+                tya
                 pha
-        
+
                 ldx #<temp
                 ldy #>temp
-                jsr _DrawText                        
-        
+                jsr _DrawText
+
                 pla
                 tay
                 pla
@@ -865,7 +865,7 @@ Backspace:      lda _cursorX
                 dec _cursorX
                 jsr CursorOn
 colzero:        rts
-                         
+
 ;-----------------------------------------------------------------------------------
 ; DrawText     - Draws an ASCII string at the current cursor position
 ;-----------------------------------------------------------------------------------
@@ -875,34 +875,34 @@ colzero:        rts
 _DrawText:      stx adp1_lo
                 sty adp1_hi
                 jsr CursorOff
-                
+
                 ldy #0
 checkHWrap:     lda _cursorX
                 cmp #CHARSPERROW
                 bcc checkVWrap
                 lda #0
                 sta _cursorX
-                inc _cursorY    
-               
+                inc _cursorY
+
 checkVWrap:     lda _cursorY
                 cmp #ROWSPERCOLUMN
                 bcc loadChar
                 jsr _ScrollScreen
                 lda #ROWSPERCOLUMN-1
                 sta _cursorY
- 
+
 loadChar:       lda (adp1), y
                 beq doneText
- 
+
                 cmp #$0a
                 bne :+
- 
+
                 lda #0                              ; Back to the left edge
                 sta _cursorX
                 inc _cursorY                        ; Advance to the next line
                 iny
                 bne checkHWrap
- 
+
 :               sty temp
                 ldx _cursorX
                 ldy _cursorY
@@ -911,14 +911,14 @@ loadChar:       lda (adp1), y
                 inc _cursorX
                 iny
                 bne checkHWrap
- 
+
 doneText:       jsr CursorOn
-                rts      
- 
+                rts
+
 demoText1:      .byte "  *** COMMODORE KIM-1 SHELL V0.1 ***", $0A, $0A
                 .byte "   60K RAM SYSTEM.  49152 BYTES FREE.", $0A, $0A, $00
 readyText:      .byte $0A,"READY.", $0A, 00
- 
+
 _Demo:          jsr _ClearScreen
                 lda #0
                 sta _cursorX
@@ -927,7 +927,7 @@ _Demo:          jsr _ClearScreen
                 ldy #>demoText1
                 jsr _DrawText
                 rts
- 
+
 _Ready:         ldx #<readyText
                 ldy #>readyText
                 jsr _DrawText
@@ -938,7 +938,7 @@ _Ready:         ldx #<readyText
 ; DrawLine    - Draws a line between two points
 ;-----------------------------------------------------------------------------------
 ; _x1cord (16-bit)
-; _y1cord ( 8-bit)   
+; _y1cord ( 8-bit)
 ; _x2cord (16-bit)
 ; _y2cord ( 8-bit)
 ;-----------------------------------------------------------------------------------
@@ -949,16 +949,16 @@ _Ready:         ldx #<readyText
 ;     int dx = abs(_x2cord - _x1cord), sx = _x1cord < _x2cord ? 1 : -1;
 ;     int dy = abs(_y2cord - _y1cord), sy = _y1cord < _y2cord ? 1 : -1;
 ;     int err = (dx > dy ? dx : -dy) / 2, e2;
-; 
+;
 ;     while (1)
 ;     {
 ;         SETPIXEL(_x1cord, _y1cord, val);
-; 
+;
 ;         if (_x1cord == _x2cord && _y1cord == _y2cord)
 ;             break;
-; 
+;
 ;         e2 = err;
-; 
+;
 ;         if (e2 > -dx)
 ;         {
 ;             err -= dy;
@@ -974,12 +974,12 @@ _Ready:         ldx #<readyText
 ;-----------------------------------------------------------------------------------
 
 _DrawLine:      sta pixel
-                    
+
                 ldx #$01                ; positive x-step for now
                 stx sx
-        
+
                 ; Calculate dx = (x2cord - X1cord) and see if its positive or not
-        
+
                 lda _x2cord             ; Calculate dx = (x2cord - X1cord)
                 sec
                 sbc _x1cord
@@ -988,10 +988,10 @@ _DrawLine:      sta pixel
                 sbc _x1cord+1
                 sta dx+1
                 bpl calcdy              ; dx is positive (dx >= 0), so we're good
-                
+
                 ; dx was negative (dx < 0), so we set sx to -1 and get the absolute
                 ;  value by subtracting the other direction
-        
+
                 ldx #$FF                ; negative x-step
                 stx sx
                 lda _x1cord             ; Calculate dx = (x2cord - X1cord)
@@ -1001,9 +1001,9 @@ _DrawLine:      sta pixel
                 lda _x1cord+1
                 sbc _x2cord+1
                 sta dx+1
-        
+
                 ; Calculate dy = (y2cord - y1cord) and see if its positive or not
-        
+
 calcdy:         ldx #$01                ; positive y-step for now
                 stx sy
                 lda _y2cord
@@ -1011,25 +1011,25 @@ calcdy:         ldx #$01                ; positive y-step for now
                 sbc _y1cord
                 sta dy
                 bcs positivedy          ; If y2cord > y1cord, then dy is positive and we're good
-        
+
                 ; dy was negative (dy < 0), so we set sy to -1 and get the absolute value
-        
+
                 ldx #$FF                ; negative y-step
                 stx sy
                 lda _y1cord
                 sec
                 sbc _y2cord
                 sta dy
-        
+
                 ; Now we have dx and dy, so we can calculate err, but first we need
                 ;  to see if dx > dy or not
-        
+
 positivedy:     lda dx+1                ; Check if dx > dy (both are always positive now)
                 bne dxgt                ; If MSB of dx is greater than zero, then dx > dy since dy is 8-bits
                 lda dy
                 cmp dx
                 bcs dygte
-        
+
 dxgt:           lda dx                  ; We found dx>dy so set err = dx / 2
                 sta err
                 lda dx+1
@@ -1037,7 +1037,7 @@ dxgt:           lda dx                  ; We found dx>dy so set err = dx / 2
                 sta err+1               ; err = dx/2
                 ror err
                 jmp loop
-        
+
 dygte:          lda #0                  ; we found dx <= dy so set err = -dy / 2
                 sec
                 sbc dy                  ; else err = -dy / 2
@@ -1046,15 +1046,15 @@ dygte:          lda #0                  ; we found dx <= dy so set err = -dy / 2
                 sta err
                 lda #$FF
                 sta err+1
-        
+
                 ; Now we have dx, dy, and err, so we can start drawing pixels
-        
+
 loop:           lda pixel
                 beq clearpixel
                 jsr _SetPixel           ; Plot the current _x1cord, _y1cord
                 jmp next
 clearpixel:     jsr _ClearPixel         ; Clear the current _x1cord, _y1cord
-        
+
 next:           lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _y2cord) then we rts
                 cmp _x2cord
                 bne noteq
@@ -1064,16 +1064,16 @@ next:           lda _x1cord             ; if (_x1cord == _x2cord && _y1cord == _
                 lda _x1cord+1
                 cmp _x2cord+1
                 bne noteq
-                
+
                 rts
-        
+
 noteq:          lda err                 ; e2 = err
                 sta e2
                 lda err+1
                 sta e2+1
-        
+
                 ; Check the two update conditions for x and y, and update if needed
-        
+
                 lda e2                  ; if (e2 > -dx) is the same as if (e2 + dx > 0), so we test that because its easier
                 clc                     ;    If its true then we dec err and inc _x1cord
                 adc dx
@@ -1091,7 +1091,7 @@ incxval:        inc _x1cord             ; _x1cord += 1 because sx == 1
                 bne updatexerr
                 inc _x1cord+1
                 jmp updatexerr
-        
+
 decx:           lda _x1cord             ; _x1cord += 1 because sx == 1
                 sec
                 sbc #1
@@ -1099,37 +1099,37 @@ decx:           lda _x1cord             ; _x1cord += 1 because sx == 1
                 lda _x1cord+1
                 sbc #0
                 sta _x1cord+1
-        
-updatexerr:     lda err                 ; err -= dy  
+
+updatexerr:     lda err                 ; err -= dy
                 sec
                 sbc dy
                 sta err
                 lda err+1
                 sbc #0
                 sta err+1
-        
-doneupdatex:    lda e2+1                ; if (e2 < dy) then we inc err and inc _y1cord 
+
+doneupdatex:    lda e2+1                ; if (e2 < dy) then we inc err and inc _y1cord
                 bmi updateerry          ; If MSB is negative, then e2 < dy, so we inc err and inc _y1cord
                 bne noupdatey           ; If the MSB of e2 is set and positive, then we know e2 > dy, so we don't inc err or inc _y1cord
-                lda e2                  
+                lda e2
                 sec
-                sbc dy              
+                sbc dy
                 beq noupdatey           ; e2 - dy == 0 so we don't inc err or inc _y1cord
                 bcs noupdatey           ; if e2 was large enough that carry never cleared, then e2 > dy do no update
-        
-updateerry:     lda err                 ; err += dx     
+
+updateerry:     lda err                 ; err += dx
                 clc
                 adc dx
                 sta err
                 lda err+1
                 adc dx+1
                 sta err+1
-        
+
 stepy:          lda _y1cord
                 clc
                 adc sy
                 sta _y1cord
-        
+
 noupdatey:      jmp loop
 
 _getch:         jsr     $1E5A            ; Get character using Monitor ROM call

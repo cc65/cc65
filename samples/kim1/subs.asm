@@ -276,7 +276,7 @@ _ClearScreen:
                 sta (dest), y
                 iny
                 sta (dest), y
-                iny     
+                iny
                 bne :-
 
                 inc dest_hi

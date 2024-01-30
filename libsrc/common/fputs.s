@@ -6,7 +6,7 @@
 
         .export         _fputs
         .importzp       ptr1, ptr2
-        .import         _write, _strlen
+        .import         _write, _strlen, checkferror
         .import         swapstk, pushax, returnFFFF
 
         .include        "stdio.inc"
@@ -16,13 +16,7 @@ _fputs:
         sta     ptr1
         stx     ptr1+1
 
-        ldy     #_FILE::f_flags
-        lda     (ptr1),y
-        tax
-        and     #_FOPEN         ; Check for file open
-        beq     ret_eof
-        txa
-        and     #(_FERROR|_FEOF); Check for error/eof
+        jsr     checkferror
         bne     ret_eof
 
         ; Push _write parameters

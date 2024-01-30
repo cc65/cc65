@@ -6,7 +6,7 @@
 
         .export         _fputc
         .importzp       ptr1
-        .import         _write
+        .import         _write, checkferror
         .import         pushax, pusha0, popax, incsp2
         .import         pushptr1, popptr1, returnFFFF
 
@@ -21,13 +21,7 @@ _fputc:
         sta     c               ; to return it anyway
         stx     c+1
 
-        ldy     #_FILE::f_flags
-        lda     (ptr1),y
-        tax
-        and     #_FOPEN         ; Check for file open
-        beq     ret_eof
-        txa
-        and     #(_FERROR|_FEOF); Check for error/eof
+        jsr     checkferror
         bne     ret_eof
 
         jsr     pushptr1        ; Backup fp pointer

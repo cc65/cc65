@@ -90,9 +90,7 @@ read_loop:
 
 :       cmp     #$0A            ; Stop at \n
         beq     done
-
-        clc
-        bcc     read_loop
+        bne     read_loop
 
 got_eof:
         lda     didread

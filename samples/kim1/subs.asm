@@ -860,7 +860,7 @@ _CharOut:       sta temp
 ;-----------------------------------------------------------------------------------
 
 Backspace:      lda _cursorX
-                beq colzero:
+                beq colzero
                 jsr CursorOff
                 dec _cursorX
                 jsr CursorOn

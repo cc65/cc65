@@ -108,6 +108,9 @@ clean:
 	@$(DEL) kimGFX.bin   2>$(NULLDEV)
 	@$(DEL) kimGFX.ptp   2>$(NULLDEV)
 	@$(DEL) kimGFX.hex   2>$(NULLDEV)
-	@$(DEL) ramfont.c    2>$(NULLDEV)
+	@$(DEL) kimgfx.lbl   2>$(NULLDEV)
+	@$(DEL) kimGFX.lst   2>$(NULLDEV)
+	@$(DEL) subs.o       2>$(NULLDEV)
+
 
 

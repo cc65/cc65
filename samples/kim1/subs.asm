@@ -136,52 +136,52 @@ tempstr:        .res 2
 ;-----------------------------------------------------------------------------------
 
 _GetPixelAddress:          
-                lda 	_x1cord 	; compute bit address first
-                sta 	adp1 		; also transfer x1cord to adp1
-                and 	#$07		; + which is simply the low 3 bits of x
-                sta 	btpt
-                lda 	_x1cord+1 	; finish transferring x1cord to adp1
-                sta 	adp1+1
-                lsr 	adp1+1 		; double shift adp1 right 3 to get
-                ror 	adp1 		; int(xcord/8 )
-                lsr 	adp1+1
-                ror 	adp1
-                lsr 	adp1+1
-                ror 	adp1
-                sec 				; and temporary storage
-                lda 	_y1cord
-                sta 	adp2
-                sta 	temp
-                lda 	#0
-                sbc 	_y1cord+1
-                sta 	adp2+1
-                sta 	temp+1
-                asl 	adp2 		; compute 40*(y1cord)
-                rol 	adp2+1 		;  2*(y1cord)
-                asl 	adp2
-                rol 	adp2+1 		;  4*(y1cord)
-                lda 	adp2 		;  add in temporary save of (y1cord)
-                clc 				;  to make 5*(y1cord)
-                adc 	temp
-                sta 	adp2
-                lda 	adp2+1
-                adc 	temp+1
-                sta 	adp2+1 		; 5*(y1cord)
-                asl 	adp2 		; 10*(1cord)
-                rol 	adp2+1
-                asl 	adp2 		; 20#(y1cord)
-                rol 	adp2+1
-                asl 	adp2 		; 40*(y1cord)
-                rol 	adp2+1
-                lda 	adp2 		; add in int(x1cord/8) computed earlier
+                lda     _x1cord         ; compute bit address first
+                sta     adp1            ; also transfer x1cord to adp1
+                and     #$07            ; + which is simply the low 3 bits of x
+                sta     btpt
+                lda     _x1cord+1       ; finish transferring x1cord to adp1
+                sta     adp1+1
+                lsr     adp1+1          ; double shift adp1 right 3 to get
+                ror     adp1            ; int(xcord/8 )
+                lsr     adp1+1
+                ror     adp1
+                lsr     adp1+1
+                ror     adp1
+                sec                             ; and temporary storage
+                lda     _y1cord
+                sta     adp2
+                sta     temp
+                lda     #0
+                sbc     _y1cord+1
+                sta     adp2+1
+                sta     temp+1
+                asl     adp2            ; compute 40*(y1cord)
+                rol     adp2+1          ;  2*(y1cord)
+                asl     adp2
+                rol     adp2+1          ;  4*(y1cord)
+                lda     adp2            ;  add in temporary save of (y1cord)
+                clc                             ;  to make 5*(y1cord)
+                adc     temp
+                sta     adp2
+                lda     adp2+1
+                adc     temp+1
+                sta     adp2+1          ; 5*(y1cord)
+                asl     adp2            ; 10*(1cord)
+                rol     adp2+1
+                asl     adp2            ; 20#(y1cord)
+                rol     adp2+1
+                asl     adp2            ; 40*(y1cord)
+                rol     adp2+1
+                lda     adp2            ; add in int(x1cord/8) computed earlier
                 clc
-                adc 	adp1
-                sta 	adp1
-                lda 	adp2+1
-                adc 	adp1+1
-                adc 	#>SCREEN    ; add in vmorg*256
-                sta 	adp1+1 		; final result
-                rts 				; return        
+                adc     adp1
+                sta     adp1
+                lda     adp2+1
+                adc     adp1+1
+                adc     #>SCREEN    ; add in vmorg*256
+                sta     adp1+1          ; final result
+                rts                             ; return        
 
 ;-----------------------------------------------------------------------------------
 ; Mask tables for individual pixel subroutines
@@ -190,8 +190,8 @@ _GetPixelAddress:
 ; MSKTB2 is a table of 0 bits corresponding to bit numbers
 ;-----------------------------------------------------------------------------------
 
-msktb1:	 	    .byte 	$80,$40,$20,$10,$08,$04,$02,$01
-msktb2:	  	    .byte 	$7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE
+msktb1:             .byte       $80,$40,$20,$10,$08,$04,$02,$01
+msktb2:             .byte       $7F,$BF,$DF,$EF,$F7,$FB,$FD,$FE
 
 _Delay:         pha
                 sta temp
@@ -225,13 +225,13 @@ _Delay:         pha
 ; Mask tables for individual pixel subroutines
 ;-----------------------------------------------------------------------------------
 
-_SetPixel:	    jsr 	_GetPixelAddress
-                ldy 	btpt 		; get bit number in y
-                lda 	msktb1,y 	; get a byte with that bit =1, others =0
-                ldy 	#0 		
-                ora 	(adp1),y 	; combine the bit with the addressed vm
-                sta 	(adp1),y 	; byte
-                rts 			
+_SetPixel:      jsr     _GetPixelAddress
+                ldy     btpt            ; get bit number in y
+                lda     msktb1,y        ; get a byte with that bit =1, others =0
+                ldy     #0              
+                ora     (adp1),y        ; combine the bit with the addressed vm
+                sta     (adp1),y        ; byte
+                rts                     
 
 ;-----------------------------------------------------------------------------------
 ; ClearPixel - Clears a pixel in the video memory
@@ -240,13 +240,13 @@ _SetPixel:	    jsr 	_GetPixelAddress
 ; y             - _y1cord (16-bit)   
 ;-----------------------------------------------------------------------------------
 
-_ClearPixel:	jsr 	_GetPixelAddress
-                ldy 	btpt 		; get bit number in y
-                lda 	msktb2,y 	; get a byte with that bit =0, others =1
-                ldy 	#0 		
-                and 	(adp1),y 	; remove the bit from the addressed vm
-                sta 	(adp1),y 	; byte
-                rts 			
+_ClearPixel:    jsr     _GetPixelAddress
+                ldy     btpt            ; get bit number in y
+                lda     msktb2,y        ; get a byte with that bit =0, others =1
+                ldy     #0              
+                and     (adp1),y        ; remove the bit from the addressed vm
+                sta     (adp1),y        ; byte
+                rts                     
 
 ;-----------------------------------------------------------------------------------
 ; ClearScreen - Clears the entire video memory (and thus the screen)

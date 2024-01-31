@@ -26,7 +26,7 @@ int main (void)
         printf("wrong result on int %d >> 7: %04X, expected %04X\n", ai, ti, refi);
         return 1;
       }
-    } while (ai != 0);
+    } while (++ai != 0);
 
     do {
       refc = ac >> 4;
@@ -38,7 +38,7 @@ int main (void)
         printf("wrong result on char %d >> 7: %04X, expected %04X\n", ac, tc, refc);
         return 1;
       }
-    } while (ac != 0);
+    } while (++ac != 0);
 
     return 0;
 }

@@ -40,12 +40,5 @@ int main(void) {
     }
     printf("%d errors\n", fails);
 
-#ifdef __OPT__
     return fails;
-#else
-    /* Force exit failure on non-optimised version, which works,
-     * otherwise it breaks the build
-     */
-    return 1;
-#endif
 }

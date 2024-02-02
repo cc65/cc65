@@ -1488,7 +1488,7 @@ static const OptFuncDesc FuncTable[] = {
 };
 
 static const OptFuncDesc FuncRegATable[] = {
-    { "tosandax",   Opt_a_tosand,  REG_NONE, OP_NONE                                   },
+    { "tosandax",   Opt_a_tosand,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "toseqax",    Opt_a_toseq,   REG_NONE, OP_NONE                                   },
     { "tosgeax",    Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
     { "tosgtax",    Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
@@ -1496,13 +1496,13 @@ static const OptFuncDesc FuncRegATable[] = {
     { "tosleax",    Opt_a_tosule,  REG_NONE, OP_NONE                                   },
     { "tosltax",    Opt_a_tosult,  REG_NONE, OP_NONE                                   },
     { "tosneax",    Opt_a_tosne,   REG_NONE, OP_NONE                                   },
-    { "tosorax",    Opt_a_tosor,   REG_NONE, OP_NONE                                   },
+    { "tosorax",    Opt_a_tosor,   REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tossubax",   Opt_a_tossub,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tosugeax",   Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
     { "tosugtax",   Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
     { "tosuleax",   Opt_a_tosule,  REG_NONE, OP_NONE                                   },
     { "tosultax",   Opt_a_tosult,  REG_NONE, OP_NONE                                   },
-    { "tosxorax",   Opt_a_tosxor,  REG_NONE, OP_NONE                                   },
+    { "tosxorax",   Opt_a_tosxor,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
 };
 
 #define FUNC_COUNT(Table) (sizeof(Table) / sizeof(Table[0]))

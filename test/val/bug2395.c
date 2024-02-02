@@ -21,6 +21,7 @@ int main(void) {
       fails++;
     }
 
+    b = c | d;
     a = c | (d != 0);
     b = c | 1;
 

@@ -54,7 +54,7 @@ jobs:
           make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
 
   build_windows:
-    name: Build (Windows)
+    name: Build and Test (Windows)
     runs-on: windows-latest
 
     steps:
@@ -79,4 +79,14 @@ jobs:
       - name: Build app (x64 release)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
 
+      - name: Build utils (MinGW)
+        shell: cmd
+        run: make -j2 util SHELL=cmd
 
+      - name: Build the platform libraries (make lib)
+        shell: cmd
+        run: make -j2 lib QUIET=1 SHELL=cmd
+
+      - name: Run the regression tests (make test)
+        shell: cmd
+        run: make test QUIET=1 SHELL=cmd

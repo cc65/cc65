@@ -30,9 +30,7 @@ char *argv[];
 #endif
 {
     /* Fake stdin with the reference file */
-    fclose(stdin);
-    stdin = fopen(INFILE, "r");
-    if (stdin == NULL) {
+    if (freopen(INFILE, "rb", stdin) == NULL) {
         return EXIT_FAILURE;
     }
 

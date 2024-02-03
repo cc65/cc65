@@ -43,11 +43,11 @@ jobs:
 
       - name: Checkout source
         if: steps.check-sha.outputs.cache-hit != 'true'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Add msbuild to PATH
         if: steps.check-sha.outputs.cache-hit != 'true'
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build app (MSVC debug)
         if: steps.check-sha.outputs.cache-hit != 'true'

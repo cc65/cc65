@@ -19,7 +19,7 @@ jobs:
       - shell: bash
         run: git config --global core.autocrlf input
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Do some simple style checks
         shell: bash
@@ -62,10 +62,10 @@ jobs:
         run: git config --global core.autocrlf input
 
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build app (x86 debug)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug -property:Platform=Win32

@@ -31,9 +31,12 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
-EXELIST_kim1 = \
-        kimHello.bin \
-        kimSieve.bin
+EXELIST_kim1 = 	\
+		kimHello.bin \
+		kimSieve.bin \
+		kimLife.bin \
+		kimTest.bin \
+		kimGFX.bin
 
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
@@ -50,13 +53,65 @@ else
 	@echo > $(NULLDEV)
 endif
 
+subs.o: subs.asm
+	$(AS) subs.asm -o subs.o
+
+ramfont.o: ramfont.asm
+	$(AS) ramfont.asm -o ramfont.o
+
+kimLife.bin: kimLife.c
+	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimLife.bin kimLife.c
+
+kimTest.bin: kimTest.c
+	$(CL) -t kim1 -C kim1-60k.cfg -Oi -o kimTest.bin kimTest.c
+
+kimGFX.bin: kimGFX.c subs.o ramfont.o
+	$(CL) -t kim1 --listing kimGFX.lst -C kim1-mtuE000.cfg -o kimGFX.bin kimGFX.c subs.o ramfont.o -Ln kimgfx.lbl
+
 kimSieve.bin: kimSieve.c
 	$(CL) -t kim1 -C kim1-60k.cfg -O -o kimSieve.bin kimSieve.c
 
 kimHello.bin: kimHello.c
 	$(CL) -t kim1 -O -o kimHello.bin kimHello.c
 
+# To build an intel-format file for the CORSHAM SD card reader
+
+kimLife.hex: kimLife.bin
+	srec_cat kimLife.bin  -binary -offset 0x2000 -o kimLife.hex  -Intel -address-length=2
+
+kimTest.hex: kimTest.bin
+	srec_cat kimTest.bin  -binary -offset 0x2000 -o kimTest.hex  -Intel -address-length=2
+
+kimGFX.hex: kimGFX.bin ramfont.o
+	srec_cat kimGFX.bin  -binary -offset 0x2000 -o kimGFX.hex  -Intel -address-length=2
+
+# To build a paper tape file for uploading to the KIM-1 via terminal
+
+kimLife.ptp: kimLife.bin
+	srec_cat kimLife.bin -binary -offset 0x2000 -o kimLife.ptp -MOS_Technologies
+
+kimGFX.ptp: kimGFX.bin
+	srec_cat kimGFX.bin -binary -offset 0x2000 -o kimGFX.ptp -MOS_Technologies
+
+kimTest.ptp: kimTest.bin
+	srec_cat kimTest.bin -binary -offset 0x2000 -o kimTest.ptp -MOS_Technologies
+
 clean:
 	@$(DEL) kimSieve.bin 2>$(NULLDEV)
 	@$(DEL) kimHello.bin 2>$(NULLDEV)
+	@$(DEL) kimLife.bin  2>$(NULLDEV)
+	@$(DEL) kimLife.ptp  2>$(NULLDEV)
+	@$(DEL) kimLife.hex  2>$(NULLDEV)
+	@$(DEL) kimTest.bin  2>$(NULLDEV)
+	@$(DEL) kimTest.ptp  2>$(NULLDEV)
+	@$(DEL) kimTest.hex  2>$(NULLDEV)
+	@$(DEL) kimGFX.bin   2>$(NULLDEV)
+	@$(DEL) kimGFX.ptp   2>$(NULLDEV)
+	@$(DEL) kimGFX.hex   2>$(NULLDEV)
+	@$(DEL) kimgfx.lbl   2>$(NULLDEV)
+	@$(DEL) kimGFX.lst   2>$(NULLDEV)
+	@$(DEL) subs.o       2>$(NULLDEV)
+	@$(DEL) ramfont.o    2>$(NULLDEV)
+
+
 

@@ -63,7 +63,7 @@ Special locations:
 </descrip><p>
 
 While running <tt/main()/ the Language Card bank 2 is enabled for read access.
-However while running module constructors/destructors the Language Card is disabled.
+However while running module constructors the Language Card is disabled.
 
 Enabling the Language Card allows to use it as additional memory for cc65
 generated code. However code is never automatically placed there. Rather code

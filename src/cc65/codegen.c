@@ -3608,6 +3608,14 @@ void g_asr (unsigned flags, unsigned long val)
                     }
                     val -= 8;
                 }
+                if (val == 7) {
+                    if (flags & CF_UNSIGNED) {
+                        AddCodeLine ("jsr shrax7");
+                    } else {
+                        AddCodeLine ("jsr asrax7");
+                    }
+                    val = 0;
+                }
                 if (val >= 4) {
                     if (flags & CF_UNSIGNED) {
                         AddCodeLine ("jsr shrax4");
@@ -3750,6 +3758,14 @@ void g_asl (unsigned flags, unsigned long val)
                     AddCodeLine ("tax");
                     AddCodeLine ("lda #$00");
                     val -= 8;
+                }
+                if (val == 7) {
+                    if (flags & CF_UNSIGNED) {
+                        AddCodeLine ("jsr shlax7");
+                    } else {
+                        AddCodeLine ("jsr aslax7");
+                    }
+                    val = 0;
                 }
                 if (val >= 4) {
                     if (flags & CF_UNSIGNED) {

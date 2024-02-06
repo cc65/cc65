@@ -136,8 +136,8 @@ plasma: plasma.c
 nachtm: nachtm.c
 	$(CL) -t $(SYS) -O -o nachtm -m nachtm.map nachtm.c
 hello: hello.s
-    #$(AS) '--cpu 6502' hello.s -o hello.obj -l hello.lst
 	$(CL) -t $(SYS) -C c64-asm.cfg -u __EXEHDR__ hello.s -o hello.prg
+
 # --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.

@@ -737,9 +737,9 @@ fn_cont:jsr     get_fn_len
         lda     #0
         sta     ICBLH,x
         jsr     chk_CIO_buf
-        pla     
+        pla
         sta     ICBLH,x
-        pla     
+        pla
         sta     ICBLL,x
         pla
         tay
@@ -756,7 +756,7 @@ chk_CIO_buf:
         lda     ICBAH,x
         cmp     #$c0
         bcc     @cont
-@ret:   
+@ret:
 .ifdef DEBUG
         jsr     CIO_buf_noti
 .endif

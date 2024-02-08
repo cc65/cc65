@@ -54,7 +54,7 @@ typedef enum {
 /* Structure that holds all data needed for function activation */
 struct Function {
     struct SymEntry*    FuncEntry;        /* Symbol table entry */
-    Type*               ReturnType;       /* Function return type */
+    const Type*         ReturnType;       /* Function return type */
     FuncDesc*           Desc;             /* Function descriptor */
     int                 Reserved;         /* Reserved local space */
     unsigned            RetLab;           /* Return code label */
@@ -96,7 +96,7 @@ unsigned F_GetParamCount (const Function* F);
 unsigned F_GetParamSize (const Function* F);
 /* Return the parameter size for the current function */
 
-Type* F_GetReturnType (Function* F);
+const Type* F_GetReturnType (Function* F);
 /* Get the return type for the function */
 
 int F_HasVoidReturn (const Function* F);

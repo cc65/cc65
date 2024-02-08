@@ -74,7 +74,7 @@ conio_color:    .res    1
 dlist:          .repeat 3
                 .byte   DL_BLK8
                 .endrepeat
-                
+
                 .byte   DL_CHR20x8x2 | DL_LMS
                 .word   SCREEN_BUF
 

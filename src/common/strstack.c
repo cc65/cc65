@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -32,12 +32,12 @@
 /*****************************************************************************/
 
 
-                    
+
 /* common */
 #include "check.h"
 #include "strstack.h"
 #include "xmalloc.h"
-            
+
 
 
 /*****************************************************************************/

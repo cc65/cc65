@@ -29,7 +29,8 @@ __syschdir:
         bcs     cleanup
 
         ; Update current working directory
-        jsr     initcwd         ; Returns with A = 0
+        jsr     initcwd
+        lda     #$00
 
         ; Cleanup name
 cleanup:jsr     popname         ; Preserves A

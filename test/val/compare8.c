@@ -23,6 +23,8 @@ bit bit0 = 0;
 #endif
 int int0 = 0;
 int int1 = 0;
+unsigned int uint0 = 0;
+unsigned int uint1 = 0;
 unsigned char uchar0 = 0;
 unsigned char uchar1 = 0;
 signed char char0 = 0;
@@ -59,10 +61,10 @@ void c_char_gt_lit1(unsigned char expected_result)
 
   if(char0 > 0x7e)
     result |= 0x10;
-  
+
   if(char0 > 0x7f)
     result |= 0x20;
-  
+
   if(result != expected_result)
     failures++;
 }
@@ -132,10 +134,10 @@ void c_int_gt_lit1(unsigned char expected_result)
 
   if(int0 > 0x0101)
     result |= 0x10;
-  
+
   if(int0 > 0x01ff)
     result |= 0x20;
-  
+
   if(int0 > 0x0200)
     result |= 0x40;
 
@@ -220,10 +222,10 @@ void c_int_gt_lit2(unsigned char expected_result)
 
   if(int0 > -0x0101)
     result |= 0x10;
-  
+
   if(int0 > -0x0100)
     result |= 0x20;
-  
+
   if(int0 > -0xff)
     result |= 0x40;
 
@@ -296,12 +298,95 @@ void int_compare2(void)
     c_int_gt_lit2(0xff);
 }
 
+void c_uint_gt_lit1(unsigned char expected_result)
+{
+  result = 0;
+
+  if(uint0 > 0)
+    result |= 1;
+
+  if(uint0 > 1)
+    result |= 2;
+
+  if(uint0 > 0xff)
+    result |= 4;
+
+  if(uint0 > 0x100)
+    result |= 8;
+
+  if(uint0 > 0x0101)
+    result |= 0x10;
+
+  if(uint0 > 0x01ff)
+    result |= 0x20;
+
+  if(uint0 > 0x0200)
+    result |= 0x40;
+
+  if(uint0 > 0x0201)
+    result |= 0x80;
+
+  if(result != expected_result)
+    failures=1;
+}
+
+void uint_compare1(void)
+{
+  uint0 = 0;
+  c_uint_gt_lit1(0x00);
+
+  uint0 = 1;
+  c_uint_gt_lit1(0x01);
+
+  uint0 = 2;
+  c_uint_gt_lit1(0x03);
+
+  uint0 = 0xfe;
+  c_uint_gt_lit1(0x03);
+
+  uint0 = 0xff;
+  c_uint_gt_lit1(0x03);
+
+  uint0 = 0x100;
+  c_uint_gt_lit1(0x07);
+
+  uint0 = 0x101;
+  c_uint_gt_lit1(0x0f);
+
+  uint0 = 0x102;
+  c_uint_gt_lit1(0x1f);
+
+  uint0 = 0x1fe;
+  c_uint_gt_lit1(0x1f);
+
+  uint0 = 0x1ff;
+  c_uint_gt_lit1(0x1f);
+
+  uint0 = 0x200;
+  c_uint_gt_lit1(0x3f);
+
+  uint0 = 0x201;
+  c_uint_gt_lit1(0x7f);
+
+  uint0 = 0x7f00;
+  c_uint_gt_lit1(0xff);
+
+  /* now check contiguous ranges */
+
+  for(uint0 = 2; uint0 != 0xff; uint0++)
+    c_uint_gt_lit1(0x03);
+
+  for(uint0 = 0x202; uint0 != 0xffff; uint0++)
+    c_uint_gt_lit1(0xff);
+}
+
 int
 main (void)
 {
   char_compare();
   int_compare1();
   int_compare2();
+  uint_compare1();
 
   success = failures;
   done ();

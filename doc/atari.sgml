@@ -117,7 +117,7 @@ Special locations:
 The startup code rearranges the memory as follows:
 
 <enum>
-<item>Sceen memory and display list are moved below the program start address.
+<item>Screen memory and display list are moved below the program start address.
 <item>The ROM is disabled, making the memory in the areas &lsqb;&dollar;C000-&dollar;CFFF&rsqb;
 and &lsqb;&dollar;D800-&dollar;FFF9&rsqb; available.
 <item>Character generator data is copied from ROM to the CHARGEN location specified in the
@@ -131,7 +131,7 @@ With the default load address of &dollar;2400 this gives a usable memory range o
 &lsqb;&dollar;2400-&dollar;CFFF&rsqb;.
 
 Please note that the first load chunk (which checks the system
-compatibilty and available memory) will always be loaded at
+compatibility and available memory) will always be loaded at
 &dollar;2E00, regardless of the specified start address. This address
 can only be changed by a custom linker config file.
 
@@ -305,7 +305,7 @@ The names are the usual ones you can find in system reference manuals. Example:
 ...
 </verb></tscreen>
 
-Please note that memory location 762/$2FA is called "<tt/char_/" while the orignal name "<tt/char/" conflicts with the C keyword.
+Please note that memory location 762/$2FA is called "<tt/char_/" while the original name "<tt/char/" conflicts with the C keyword.
 
 If you like to use the OS names and locations for the original Atari 800 operating system, please "<tt/#define OSA/" before including the
 <tt/atari.h/ header file.
@@ -332,6 +332,7 @@ See the <url url="funcref.html" name="function reference"> for declaration and u
 <item>_scroll
 <item>_setcolor
 <item>_setcolor_low
+<item>_sound
 <item>waitvsync
 </itemize>
 
@@ -401,7 +402,7 @@ OS.sdlst = &amp;DisplayList;
 ...
 </verb></tscreen>
 
-Please inspect the <tt/_antic.h/ header file to detemine the supported
+Please inspect the <tt/_antic.h/ header file to determine the supported
 instruction names. Modifiers on instructions can be nested without need
 for an order:
 
@@ -410,7 +411,7 @@ for an order:
 Please mind that ANTIC has memory alignment requirements for "player
 missile graphics"-data, font data, display lists and screen memory. Creation
 of a special linker configuration with appropriate aligned segments and
-switching to that segment in the c-code is usually neccessary. A more memory
+switching to that segment in the c-code is usually necessary. A more memory
 hungry solution consists in using the "<tt/posix_memalign()/" function in
 conjunction with copying your data to the allocated memory.
 
@@ -442,19 +443,7 @@ package delivers the same feature.</em>
 You can switch back to the ATASCII mapping by including
 "<tt/atari_atascii_charmap.h/".
 
-A final note: Since cc65 has currently some difficulties with string merging
-under different mappings, defining remapped strings works only flawlessly
-with static array initialization:
-
-<tscreen><verb>
-#include &lt;atari_screen_charmap.h&gt;
-char pcScreenMappingString[] = "Hello Atari!";
-
-#include &lt;atari_atascii_charmap.h&gt;
-char pcAtasciiMappingString[] = "Hello Atari!";
-</verb></tscreen>
-
-delivers correct results, while
+Example:
 
 <tscreen><verb>
 #include &lt;atari_screen_charmap.h&gt;
@@ -463,8 +452,6 @@ char* pcScreenMappingString = "Hello Atari!";
 #include &lt;atari_atascii_charmap.h&gt;
 char* pcAtasciiMappingString = "Hello Atari!";
 </verb></tscreen>
-
-does not.
 
 <sect1>Keyboard codes<p>
 
@@ -675,9 +662,9 @@ The default callbacks definition (<tt/mouse_def_callbacks/) is an alias for the 
 
 <sect1>RS232 device drivers<p>
 
-Currently there is one RS232 driver.  It uses the R: device (therefore
-an R: driver needs to be installed) and was tested with the 850
-interface module.
+Currently there is one RS232 driver. It supports up to 9600 baud, requires hardware flow control
+(RTS/CTS) and uses the R: device (therefore an R: driver needs to be installed). It was tested
+with the 850 interface module.
 
 <table>
 <tabular ca="rr">
@@ -725,6 +712,11 @@ for sectors 1 to 3, regardless of the type of diskette.
 
 The console I/O is speed optimized therefore support for XEP80 hardware
 or f80.com software is missing. Of course you may use stdio.h functions.
+
+<tt/cprintf/ targets a 40 character line. On a 20-column display this has
+the unexpected effect of a blank line after your text. On such displays you can either
+use for example <tt/gotoxy(20,0)/ to target the "next" line, or you can switch to <tt/write()/
+function which does not have this side effect.
 
 
 <sect>Technical details<label id="techdetail"><p>
@@ -1141,8 +1133,8 @@ ld65: Error: Missing memory area assignment for segment 'MAINHDR'
 </verb></tscreen>
 
 The old "HEADER" memory description contained six bytes: &dollar;FFFF
-and the first and last memory addess of the program. For the "system
-check" load chunk this had to be split into two memory assigments. The
+and the first and last memory address of the program. For the "system
+check" load chunk this had to be split into two memory assignments The
 "HEADER" now only contains the &dollar;FFFF. The main program's first
 and last memory address were moved to a new segment, called "MAINHDR",
 which in the new linker config file goes into its own memory area (also
@@ -1170,7 +1162,7 @@ When using cl65, you can leave it out with this command line:
 cl65 -Wl -D__SYSTEM_CHECK__=1 <arguments>
 </verb></tscreen>
 
-The value you assign to <tt/__SYSTEM_CHECK_/ doesn't matter. If the
+The value you assign to <tt/__SYSTEM_CHECK__/ doesn't matter. If the
 <tt/__SYSTEM_CHECK__/ symbol is defined, the load chunk won't be included.
 
 

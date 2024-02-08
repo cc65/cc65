@@ -114,7 +114,8 @@ int __fastcall__ uncompress (unsigned char* dest, unsigned* destLen,
 */
 
 
-unsigned long __fastcall__ adler32 (unsigned long adler, const char* buf,
+unsigned long __fastcall__ adler32 (unsigned long adler,
+                                    const unsigned char* buf,
                                     unsigned len);
 
 /*
@@ -140,7 +141,8 @@ unsigned long __fastcall__ adler32 (unsigned long adler, const char* buf,
 */
 
 
-unsigned long __fastcall__ crc32 (unsigned long crc, const char* buf,
+unsigned long __fastcall__ crc32 (unsigned long crc,
+                                  const unsigned char* buf,
                                   unsigned len);
 /*
    Original zlib description:

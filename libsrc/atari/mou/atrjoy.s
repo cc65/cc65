@@ -137,9 +137,10 @@ INSTALL:
         ldx     YPos+1
         jsr     CMOVEY
 
-; Done, return zero (= MOUSE_ERR_OK)
+; Done
 
-        ldx     #$00
+        ldx     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         txa
         rts
 

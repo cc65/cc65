@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -53,7 +53,8 @@ enum {
     flLabel         = flUseLabel|flGenLabel,    /* Generate and use a label */
     flIllegal       = 0x10,                     /* Illegal instruction */
     flAbsOverride   = 0x20,                     /* Need a: override */
-    flFarOverride   = 0x40                      /* Need f: override */
+    flFarOverride   = 0x40,                     /* Need f: override */
+    flSizeChanges   = 0x80                      /* 65816: size may change */
 };
 
 /* Forward/typedef for struct OpcDesc */

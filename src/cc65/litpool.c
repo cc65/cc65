@@ -126,9 +126,6 @@ static void FreeLiteral (Literal* L)
 static void OutputLiteral (Literal* L)
 /* Output one literal to the currently active data segment */
 {
-    /* Translate the literal into the target charset */
-    TranslateLiteral (L);
-
     /* Define the label for the literal */
     g_defliterallabel (L->Label);
 
@@ -163,9 +160,20 @@ void ReleaseLiteral (Literal* L)
 
 
 void TranslateLiteral (Literal* L)
-/* Translate a literal into the target charset. */
+/* Translate a literal into the target charset */
 {
     TgtTranslateBuf (SB_GetBuf (&L->Data), SB_GetLen (&L->Data));
+}
+
+
+
+void ConcatLiteral (Literal* L, const Literal* Appended)
+/* Concatenate string literals */
+{
+    if (SB_GetLen (&L->Data) > 0 && SB_LookAtLast (&L->Data) == '\0') {
+        SB_Drop (&L->Data, 1);
+    }
+    SB_Append (&L->Data, &Appended->Data);
 }
 
 
@@ -386,9 +394,6 @@ static void OutputReadOnlyLiterals (Collection* Literals)
         if (L->RefCount == 0 || L->Output) {
             continue;
         }
-
-        /* Translate the literal into the target charset */
-        TranslateLiteral (L);
 
         /* Check if this literal is part of another one. Since the literals
         ** are sorted by size (larger ones first), it can only be part of a

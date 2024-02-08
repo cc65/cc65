@@ -71,8 +71,9 @@ INSTALL:
         stx     gettype+2
 gettype:jsr     $0000
         sta     ostype
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
         ; Fall through
 
 ; UNINSTALL routine. Is called before the driver is removed from memory.

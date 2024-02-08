@@ -46,7 +46,6 @@ clean:
 	$(RM) -r ../html ../info
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 ifeq ($(wildcard ../html),../html)
 	$(INSTALL) -d $(DESTDIR)$(htmldir)
 	$(INSTALL) -m0644 ../html/*.* $(DESTDIR)$(htmldir)

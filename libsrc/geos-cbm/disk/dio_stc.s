@@ -9,7 +9,7 @@
 
             .export _dio_log_to_phys
             .importzp ptr1,ptr2,ptr3,tmp1,tmp2
-            .import popax,__oserror
+            .import popax,___oserror
             .import sectab_1541_l, sectab_1541_h
 
             .include "dio.inc"
@@ -20,15 +20,15 @@ _dio_log_to_phys:
 ; check device type
         sta ptr1
         stx ptr1+1              ; pointer to result (struct dio_phys_pos)
-            
+
         jsr popax
         sta ptr2
         stx ptr2+1              ; pointer to input structure (pointer to int)
-            
+
         jsr popax
         sta ptr3
         stx ptr3+1              ; pointer to handle
-            
+
         ldy #sst_flag
         lda (ptr3),y
         and #128
@@ -42,18 +42,18 @@ _dio_log_to_phys:
         sta (ptr1),y            ; track <256
         ldy #diopp_sector+1
         sta (ptr1),y            ; sector <256
-            
+
         ldy #0
         lda (ptr2),y
         sta tmp1
-        iny 
+        iny
         lda (ptr2),y
         sta tmp2
 
 ; get drive info
         ldy #sst_driveno
         lda (ptr3),y
-        tay 
+        tay
         lda driveType,y
         and #%00001111          ; remove ramDisk flags
         cmp #DRV_1541
@@ -62,7 +62,7 @@ _dio_log_to_phys:
         beq dio_stc1571
         cmp #DRV_1581
         beq dio_stc1581
-            
+
         lda #INCOMPATIBLE       ; unsupported device
         ldx #0
         beq _ret
@@ -74,11 +74,11 @@ dio_stcend:
         ldy #diopp_sector
         lda tmp2
         sta (ptr1),y
-            
+
         ldx #0
-        txa 
-_ret:       
-        sta __oserror
+        txa
+_ret:
+        sta ___oserror
         rts                     ; return success
 
 ; errors
@@ -107,14 +107,14 @@ _nxt:   bcc _found
         cpx #35
         bne _loop41
         beq _inv_data
-            
-_found:     
+
+_found:
         lda tmp1
-        sec 
+        sec
         sbc sectab_1541_l,x
         sta tmp2
-_fndend:    
-        inx 
+_fndend:
+        inx
         stx tmp1
         jmp dio_stcend
 
@@ -128,9 +128,9 @@ dio_stc1571:
         lda tmp1
         cmp #<683
 _if71:  bcc dio_stc1541
-            
+
         lda tmp1
-        sec 
+        sec
         sbc #<683
         sta tmp1
         lda tmp2
@@ -139,10 +139,10 @@ _if71:  bcc dio_stc1541
         jsr dio_stc1541         ; will fall through here
         tay
         bne _ret                ; result beyond track 70
-            
+
         ldy #diopp_track
         lda (ptr1),y
-        clc 
+        clc
         adc #35
         sta (ptr1),y
         lda #0
@@ -153,26 +153,26 @@ _if71:  bcc dio_stc1541
 ; - the remainder is sector
 dio_stc1581:
         ldx #0                  ; index=(track-1)
-_loop81:    
+_loop81:
         lda tmp2
         bne _sub81
         lda tmp1
         cmp #40
         bcc _got81
 _sub81: lda tmp1
-        sec 
+        sec
         sbc #40
         sta tmp1
         lda tmp2
         sbc #0
         sta tmp2
-        inx 
+        inx
         cpx #80
         bne _loop81
         beq _inv_data
-            
+
 _got81: lda tmp1
         sta tmp2
-        inx 
+        inx
         stx tmp1
         jmp dio_stcend

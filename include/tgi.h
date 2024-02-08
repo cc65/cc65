@@ -82,7 +82,7 @@ void tgi_unload (void);
 ** necessary.
 */
 
-void __fastcall__ tgi_install (void* driver);
+void __fastcall__ tgi_install (const void* driver);
 /* Install an already loaded driver. */
 
 void tgi_uninstall (void);

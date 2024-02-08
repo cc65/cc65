@@ -183,7 +183,7 @@ typedef struct DbgInfo DbgInfo;
 struct DbgInfo {
 
     /* First we have all items in collections sorted by id. The ids are
-    ** continous, so an access by id is almost as cheap as an array access.
+    ** continuous, so an access by id is almost as cheap as an array access.
     ** The collections are also used when the objects are deleted, so they're
     ** actually the ones that "own" the items.
     */
@@ -680,7 +680,7 @@ static char* SB_StrDup (const StrBuf* B)
 static Collection* CollInit (Collection* C)
 /* Initialize a collection and return it. */
 {
-    /* Intialize the fields. */
+    /* Initialize the fields. */
     C->Count = 0;
     C->Size  = 0;
     C->Items = 0;
@@ -1349,7 +1349,7 @@ static int CompareFileInfoByName (const void* L, const void* R)
 
 
 static LibInfo* NewLibInfo (const StrBuf* Name)
-/* Create a new LibInfo struct, intialize and return it */
+/* Create a new LibInfo struct, initialize and return it */
 {
     /* Allocate memory */
     LibInfo* L = xmalloc (sizeof (LibInfo) + SB_GetLen (Name));
@@ -1463,7 +1463,7 @@ static int CompareLineInfoByLine (const void* L, const void* R)
 
 
 static ModInfo* NewModInfo (const StrBuf* Name)
-/* Create a new ModInfo struct, intialize and return it */
+/* Create a new ModInfo struct, initialize and return it */
 {
     /* Allocate memory */
     ModInfo* M = xmalloc (sizeof (ModInfo) + SB_GetLen (Name));
@@ -1536,7 +1536,7 @@ static int CompareModInfoByName (const void* L, const void* R)
 
 
 static ScopeInfo* NewScopeInfo (const StrBuf* Name)
-/* Create a new ScopeInfo struct, intialize and return it */
+/* Create a new ScopeInfo struct, initialize and return it */
 {
     /* Allocate memory */
     ScopeInfo* S = xmalloc (sizeof (ScopeInfo) + SB_GetLen (Name));
@@ -1697,7 +1697,7 @@ static int CompareSegInfoByName (const void* L, const void* R)
 
 
 static SpanInfo* NewSpanInfo (void)
-/* Create a new SpanInfo struct, intialize and return it */
+/* Create a new SpanInfo struct, initialize and return it */
 {
     /* Allocate memory */
     SpanInfo* S = xmalloc (sizeof (SpanInfo));
@@ -1779,7 +1779,7 @@ static int CompareSpanInfoByAddr (const void* L, const void* R)
 
 
 static SymInfo* NewSymInfo (const StrBuf* Name)
-/* Create a new SymInfo struct, intialize and return it */
+/* Create a new SymInfo struct, initialize and return it */
 {
     /* Allocate memory */
     SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
@@ -2147,7 +2147,7 @@ static TypeInfo* ParseTypeString (InputData* D, StrBuf* Type)
                     I += GT_GET_SIZE (A[I]) + 1;
                 } else {
                     /* Unknown type in type string */
-                    ParseError (D, CC65_ERROR, "Unkown type in type value");
+                    ParseError (D, CC65_ERROR, "Unknown type in type value");
                     return 0;
                 }
                 break;
@@ -2733,7 +2733,7 @@ static int StrConstFollows (InputData* D)
 
 
 static int Consume (InputData* D, Token Tok, const char* Name)
-/* Check for a token and consume it. Return true if the token was comsumed,
+/* Check for a token and consume it. Return true if the token was consumed,
 ** return false otherwise.
 */
 {
@@ -4736,14 +4736,18 @@ static SpanInfoListEntry* FindSpanInfoByAddr (const SpanInfoList* L, cc65_addr A
 
 
 
-static LineInfo* FindLineInfoByLine (const Collection* LineInfos, cc65_line Line)
-/* Find the LineInfo for a given line number. The function returns the line
-** info or NULL if none was found.
+static int FindLineInfoByLine (const Collection* LineInfos, cc65_line Line,
+                               unsigned *Index)
+/* Find the LineInfo for a given line number. The function returns true if the
+** name was found. In this case, Index contains the index of the first item
+** that matches. If the item wasn't found, the function returns false and
+** Index contains the insert position for Name.
 */
 {
     /* Do a binary search */
     int Lo = 0;
     int Hi = (int) CollCount (LineInfos) - 1;
+    int Found = 0;
     while (Lo <= Hi) {
 
         /* Mid of range */
@@ -4755,16 +4759,20 @@ static LineInfo* FindLineInfoByLine (const Collection* LineInfos, cc65_line Line
         /* Found? */
         if (Line > CurItem->Line) {
             Lo = Cur + 1;
-        } else if (Line < CurItem->Line) {
-            Hi = Cur - 1;
         } else {
-            /* Found */
-            return CurItem;
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+            ** the first item that has a match.
+            */
+            if(Line == CurItem->Line) {
+                Found = 1;
+            }
         }
     }
 
-    /* Not found */
-    return 0;
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
 }
 
 
@@ -6127,13 +6135,17 @@ const cc65_lineinfo* cc65_line_byid (cc65_dbginfo Handle, unsigned Id)
 const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
                                          cc65_line Line)
 /* Return line information for a source file/line number combination. The
-** function returns NULL if no line information was found.
+** function returns NULL if no line information was found, otherwise a list
+** of line infos.
 */
 {
     const DbgInfo*  Info;
     const FileInfo* F;
     cc65_lineinfo*  D;
     LineInfo*       L = 0;
+    unsigned        I;
+    unsigned        Index;
+    unsigned        Count;
 
     /* Check the parameter */
     assert (Handle != 0);
@@ -6150,18 +6162,31 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
     F = CollAt (&Info->FileInfoById, FileId);
 
     /* Search in the file for the given line */
-    L = FindLineInfoByLine (&F->LineInfoByLine, Line);
-
-    /* Bail out if we didn't find the line */
-    if (L == 0) {
+    if(!FindLineInfoByLine (&F->LineInfoByLine, Line, &Index)) {
+        /* Not found */
         return 0;
     }
 
+    /* Index contains the first position. Count how many lines with this number
+    ** we have. Skip the first one, since we have at least one.
+    */
+    Count = 1;
+
+    while ((unsigned) Index + Count < CollCount( &F->LineInfoByLine)) {
+        L = CollAt (&F->LineInfoByLine, (unsigned) Index + Count);
+        if (L->Line != Line) {
+            break;
+        }
+        ++Count;
+    }
+
     /* Prepare the struct we will return to the caller */
-    D = new_cc65_lineinfo (1);
+    D = new_cc65_lineinfo (Count);
 
     /* Copy the data */
-    CopyLineInfo (D->data, L);
+    for (I = 0; I < Count; ++I) {
+        CopyLineInfo (D->data + I, CollAt (&F->LineInfoByLine, Index++));
+    }
 
     /* Return the allocated struct */
     return D;
@@ -6936,7 +6961,7 @@ const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
 const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return the direct child scopes of a scope with a given id. The function
 ** returns NULL if no scope with this id was found, otherwise a list of the
-** direct childs.
+** direct children.
 */
 {
     const DbgInfo*      Info;

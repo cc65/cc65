@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -43,6 +43,10 @@
 /*****************************************************************************/
 
 
+/* EffAddr Flags */
+#define EFFADDR_OVERRIDE_ZP     0x00000001UL
+
+
 
 /* GetEA result struct */
 typedef struct EffAddr EffAddr;
@@ -51,6 +55,7 @@ struct EffAddr {
     unsigned long       AddrModeSet;    /* Possible addressing modes */
     struct ExprNode*    Expr;           /* Expression if any (NULL otherwise) */
     unsigned            Reg;            /* Register number in sweet16 mode */
+    unsigned long       Flags;          /* Other properties */
 
     /* The following fields are used inside instr.c */
     unsigned            AddrMode;       /* Actual addressing mode used */

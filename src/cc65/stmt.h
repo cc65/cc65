@@ -44,7 +44,7 @@
 
 
 
-int Statement (int* PendingToken);
+int AnyStatement (int* PendingToken);
 /* Statement parser. Returns 1 if the statement does a return/break, returns
 ** 0 otherwise. If the PendingToken pointer is not NULL, the function will
 ** not skip the terminating token of the statement (closing brace or

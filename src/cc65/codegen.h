@@ -37,10 +37,10 @@
 #define CODEGEN_H
 
 
+#include <inttypes.h>
 
 /* common */
 #include "coll.h"
-#include "inttypes.h"
 
 /* cc65 */
 #include "segments.h"
@@ -208,21 +208,25 @@ void g_toslong (unsigned flags);
 void g_tosint (unsigned flags);
 /* Make sure, the value on TOS is an int. Convert if necessary */
 
-void g_regint (unsigned Flags);
-/* Make sure, the value in the primary register an int. Convert if necessary */
+void g_regint (unsigned from);
+/* Convert the value in the primary register to an int (whose representation
+** is irrelevent of signedness).
+*/
 
-void g_reglong (unsigned Flags);
-/* Make sure, the value in the primary register a long. Convert if necessary */
+void g_reglong (unsigned from);
+/* Convert the value in the primary register to a long (whose representation
+** is irrelevent of signedness).
+*/
 
 unsigned g_typeadjust (unsigned lhs, unsigned rhs);
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
 ** value, that corresponds to the value on TOS, rhs corresponds to the value
-**  in (e)ax. The return value is the the flags value for the resulting type.
+**  in (e)ax. The return value is the flags value for the resulting type.
 */
 
-unsigned g_typecast (unsigned lhs, unsigned rhs);
-/* Cast the value in the primary register to the operand size that is flagged
-** by the lhs value. Return the result value.
+unsigned g_typecast (unsigned to, unsigned from);
+/* Cast the value in the primary register to the specified operand size and
+** signedness. Return the result flags.
 */
 
 void g_scale (unsigned flags, long val);
@@ -271,7 +275,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 
 
 
-void g_getimmed (unsigned Flags, unsigned long Val, long Offs);
+void g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
 /* Load a constant into the primary register */
 
 void g_getstatic (unsigned Flags, uintptr_t Label, long Offs);
@@ -461,7 +465,7 @@ void g_ge (unsigned flags, unsigned long val);
 void g_res (unsigned n);
 /* Reserve static storage, n bytes */
 
-void g_defdata (unsigned flags, unsigned long val, long offs);
+void g_defdata (unsigned flags, uintptr_t val, long offs);
 /* Define data with the size given in flags */
 
 void g_defbytes (const void* bytes, unsigned count);
@@ -486,11 +490,11 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size);
 /*****************************************************************************/
 
 void g_testbitfield (unsigned Flags, unsigned BitOffs, unsigned BitWidth);
-/* Test bit-field in ax. */
+/* Test bit-field in primary. */
 
 void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
                         unsigned BitOffs, unsigned BitWidth);
-/* Extract bits from bit-field in ax. */
+/* Extract bits from bit-field in primary. */
 
 /*****************************************************************************/
 /*                             Switch statement                              */

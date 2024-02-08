@@ -14,12 +14,10 @@ int main (void) {
   int x, n;
 
   sprintf (str1, "%p\n", &x);
-  puts(str1);
   x = 1234;
   n = f1 (x);
   sprintf (str2, "%p\n", &x);
-  puts(str2);
-  
+
   if (strcmp(str1, str2)) {
       puts("not equal");
       failures++;
@@ -30,12 +28,10 @@ int main (void) {
   }
 
   sprintf (str1, "%p\n", &x);
-  puts(str1);
   x = 2345;
   n = f2 (x);
   sprintf (str2, "%p\n", &x);
-  puts(str2);
-  
+
   if (strcmp(str1, str2)) {
       puts("not equal");
       failures++;

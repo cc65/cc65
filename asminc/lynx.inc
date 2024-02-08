@@ -81,8 +81,42 @@ MATHJ       = $FC6F
 
 ; Suzy Misc
 
-SPRCTL0     = $FC80
+SPRCTL0          = $FC80
+; Sprite bits-per-pixel definitions
+BPP_MASK         = %11000000 ; Mask for settings bits per pixel
+BPP_1            = %00000000
+BPP_2            = %01000000
+BPP_3            = %10000000
+BPP_4            = %11000000
+; More sprite control 0 bit definitions
+HFLIP            = %00100000
+VFLIP            = %00010000
+; Sprite types - redefined to reflect the reality caused by the shadow error
+TYPE_SHADOW      = %00000111
+TYPE_XOR         = %00000110
+TYPE_NONCOLL     = %00000101 ; Non-colliding
+TYPE_NORMAL      = %00000100
+TYPE_BOUNDARY    = %00000011
+TYPE_BSHADOW     = %00000010 ; Background shadow
+TYPE_BACKNONCOLL = %00000001 ; Background non-colliding
+TYPE_BACKGROUND  = %00000000
+
 SPRCTL1     = $FC81
+LITERAL     = %10000000
+PACKED      = %00000000
+ALGO3       = %01000000 ; Broken, do not set this bit!
+; Sprite reload mask definitions
+RELOAD_MASK = %00110000
+RENONE      = %00000000 ; Reload nothing
+REHV        = %00010000 ; Reload hsize, vsize
+REHVS       = %00100000 ; Reload hsize, vsize, stretch
+REHVST      = %00110000 ; Reload hsize, vsize, stretch, tilt
+; More sprite control 1 bit definitions
+REUSEPAL    = %00001000
+SKIP        = %00000100
+DRAWUP      = %00000010
+DRAWLEFT    = %00000001
+
 SPRCOLL     = $FC82
 SPRINIT     = $FC83
 SUZYHREV    = $FC88
@@ -135,35 +169,35 @@ STIMCTLB    = $FD1F
 TIM0BKUP    = $FD00
 TIM0CTLA    = $FD01
 TIM0CNT     = $FD02
-TIM0CTLB    = $FD03 
+TIM0CTLB    = $FD03
 TIM1BKUP    = $FD04
 TIM1CTLA    = $FD05
 TIM1CNT     = $FD06
-TIM1CTLB    = $FD07 
+TIM1CTLB    = $FD07
 TIM2BKUP    = $FD08
 TIM2CTLA    = $FD09
 TIM2CNT     = $FD0A
-TIM2CTLB    = $FD0B 
+TIM2CTLB    = $FD0B
 TIM3BKUP    = $FD0C
 TIM3CTLA    = $FD0D
 TIM3CNT     = $FD0E
-TIM3CTLB    = $FD0F 
+TIM3CTLB    = $FD0F
 TIM4BKUP    = $FD10
 TIM4CTLA    = $FD11
 TIM4CNT     = $FD12
-TIM4CTLB    = $FD13 
+TIM4CTLB    = $FD13
 TIM5BKUP    = $FD14
 TIM5CTLA    = $FD15
 TIM5CNT     = $FD16
-TIM5CTLB    = $FD17 
+TIM5CTLB    = $FD17
 TIM6BKUP    = $FD18
 TIM6CTLA    = $FD19
 TIM6CNT     = $FD1A
-TIM6CTLB    = $FD1B 
+TIM6CTLB    = $FD1B
 TIM7BKUP    = $FD1C
 TIM7CTLA    = $FD1D
 TIM7CNT     = $FD1E
-TIM7CTLB    = $FD1F 
+TIM7CTLB    = $FD1F
 
 ; Mikey Audio
 

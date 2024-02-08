@@ -137,7 +137,7 @@ struct __antic {
 ** Called during every vertical blank; see SYSVBV, VVBLKI, CRITIC, and VVBLKD,
 ** as well as the SETVBV routine.
 */
-#define NMIEN_VBI   0x40 
+#define NMIEN_VBI   0x40
 
 /* [Reset] key pressed */
 #define NMIEN_RESET 0x20

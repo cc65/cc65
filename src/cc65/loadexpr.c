@@ -36,6 +36,7 @@
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
+#include "expr.h"
 #include "exprdesc.h"
 #include "global.h"
 #include "loadexpr.h"
@@ -110,6 +111,8 @@ static void LoadAddress (unsigned Flags, ExprDesc* Expr)
 
 void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
 /* Load an expression into the primary register if it is not already there.
+** If Flags contains any CF_TYPEMASK bits, it then overrides the codegen type
+** info that would be otherwise taken from the expression type.
 ** Note: This function can't modify the content in Expr since there are many
 ** instances of the "GetCodePos + LoadExpr (maybe indirectly) + RemoveCode"
 ** code pattern here and there which assumes that Expr should be unchanged,
@@ -124,38 +127,32 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         */
         int AdjustBitField = 0;
         unsigned BitFieldFullWidthFlags = 0;
-        if (ED_IsBitField (Expr)) {
-            unsigned EndBit = Expr->BitOffs + Expr->BitWidth;
-            AdjustBitField = Expr->BitOffs != 0 || (EndBit != CHAR_BITS && EndBit != INT_BITS);
+        if ((Flags & CF_TYPEMASK) == 0) {
+            if (IsTypeFragBitField (Expr->Type)) {
+                /* We need to adjust the bits in this case.  */
+                AdjustBitField = 1;
 
-            /* TODO: This probably needs to be guarded by AdjustBitField when long bit-fields are
-            ** supported.
-            */
-            Flags |= (EndBit <= CHAR_BITS) ? CF_CHAR : CF_INT;
-            if (IsSignUnsigned (Expr->Type)) {
-                Flags |= CF_UNSIGNED;
-            }
+                /* Flags we need operate on the whole bit-field, without CF_FORCECHAR.  */
+                BitFieldFullWidthFlags = Flags | CG_TypeOf (Expr->Type);
 
-            /* Flags we need operate on the whole bit-field, without CF_FORCECHAR.  */
-            BitFieldFullWidthFlags = Flags;
+                /* Flags we need operate on the whole chunk containing the bit-field.  */
+                Flags |= CG_TypeOf (GetBitFieldChunkType (Expr->Type));
 
-            /* If we're adjusting, then only load a char (not an int) and do only char ops;
-            ** We will clear the high byte in the adjustment.  CF_FORCECHAR does nothing if the
-            ** type is not CF_CHAR.
-            */
-            if (AdjustBitField) {
-                /* If adjusting, then we're sign extending manually, so do everything unsigned
+                /* If we're adjusting, then only load a char (not an int) and do only char ops;
+                ** We will clear the high byte in the adjustment.  CF_FORCECHAR does nothing if
+                ** the type is not CF_CHAR;
+                ** If adjusting, then we're sign extending manually, so do everything unsigned
                 ** to make shifts faster.
                 */
                 Flags |= CF_UNSIGNED | CF_FORCECHAR;
                 BitFieldFullWidthFlags |= CF_UNSIGNED;
+            } else {
+                /* If Expr is an incomplete ESY type, bail out */
+                if (IsIncompleteESUType (Expr->Type)) {
+                    return;
+                }
+                Flags |= CG_TypeOf (Expr->Type);
             }
-        } else if ((Flags & CF_TYPEMASK) == 0) {
-            /* If Expr is an incomplete ESY type, bail out */
-            if (IsIncompleteESUType (Expr->Type)) {
-                return;
-            }
-            Flags |= TypeOf (Expr->Type);
         }
 
         if (ED_YetToTest (Expr)) {
@@ -178,7 +175,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
 
             case E_LOC_NONE:
                 /* Immediate number constant */
-                g_getimmed (Flags | CF_IMM | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+                g_getimmed (Flags | CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
                 break;
 
             case E_LOC_ABS:
@@ -254,13 +251,13 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             /* We always need to do something with the low byte, so there is no opportunity
             ** for optimization by skipping it.
             */
-            CHECK (Expr->BitOffs < CHAR_BITS);
+            CHECK (Expr->Type->A.B.Offs < CHAR_BITS);
 
             if (ED_YetToTest (Expr)) {
-                g_testbitfield (Flags, Expr->BitOffs, Expr->BitWidth);
+                g_testbitfield (Flags, Expr->Type->A.B.Offs, Expr->Type->A.B.Width);
             } else {
                 g_extractbitfield (Flags, BitFieldFullWidthFlags, IsSignSigned (Expr->Type),
-                                   Expr->BitOffs, Expr->BitWidth);
+                                   Expr->Type->A.B.Offs, Expr->Type->A.B.Width);
             }
         }
 
@@ -281,4 +278,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         }
     }
 
+    if (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type)) {
+        /* Expression has had side effects */
+        Expr->Flags |= E_SIDE_EFFECTS;
+    }
 }

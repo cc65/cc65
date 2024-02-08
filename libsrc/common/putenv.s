@@ -10,7 +10,7 @@
         .import _malloc, _free
         .import searchenv, copyenvptr
         .import __environ, __envcount, __envsize
-        .import return0
+        .import return0, ___directerrno
         .import ptr1:zp, ptr2:zp, ptr3:zp, tmp1:zp
 
         .include "errno.inc"
@@ -169,10 +169,7 @@ addentry:
 ; Error entries
 
 nomem:  lda     #ENOMEM
-error:  jsr     __seterrno
-        lda     #$FF                    ; Return -1
-        tax
-        rts
+error:  jmp     ___directerrno
 
 .endproc
 
@@ -184,5 +181,3 @@ error:  jsr     __seterrno
 
 name:           .addr   0               ; Pointer to name
 newsize:        .byte   0               ; New environment size
-
-                

@@ -10,7 +10,7 @@
         .importzp       sp, sreg, tmp1
 
         .macpack        cpu
-                                   
+
 tosand0ax:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
         stz     sreg
@@ -19,7 +19,7 @@ tosand0ax:
         ldy     #$00
         sty     sreg
         sty     sreg+1
-.endif  
+.endif
 
 tosandeax:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
@@ -29,7 +29,7 @@ tosandeax:
         ldy     #0
         and     (sp),y          ; byte 0
         iny
-.endif        
+.endif
         sta     tmp1
         txa
         and     (sp),y          ; byte 1

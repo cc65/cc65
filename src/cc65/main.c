@@ -114,6 +114,7 @@ static void Usage (void)
             "  --create-full-dep name\tCreate a full make dependency file\n"
             "  --data-name seg\t\tSet the name of the DATA segment\n"
             "  --debug\t\t\tDebug mode\n"
+            "  --debug-tables name\t\tWrite symbol table debug info to a file\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --debug-opt name\t\tDebug optimization steps\n"
             "  --debug-opt-output\t\tDebug output of each optimization step\n"
@@ -170,6 +171,10 @@ static void SetSys (const char* Sys)
 
         case TGT_ATARI5200:
             DefineNumericMacro ("__ATARI5200__", 1);
+            break;
+
+        case TGT_ATARI7800:
+            DefineNumericMacro ("__ATARI7800__", 1);
             break;
 
         case TGT_ATARI:
@@ -290,8 +295,20 @@ static void SetSys (const char* Sys)
             cbmsys ("__CX16__");
             break;
 
+        case TGT_SYM1:
+            DefineNumericMacro ("__SYM1__", 1);
+            break;
+
+        case TGT_KIM1:
+            DefineNumericMacro ("__KIM1__", 1);
+            break;
+
+        case TGT_RP6502:
+            DefineNumericMacro ("__RP6502__", 1);
+            break;
+
         default:
-            AbEnd ("Unknown target system type %d", Target);
+            AbEnd ("Unknown target system '%s'", Sys);
     }
 
     /* Initialize the translation tables for the target system */
@@ -490,7 +507,11 @@ static void OptDebug (const char* Opt attribute ((unused)),
     ++Debug;
 }
 
-
+static void OptDebugTables (const char* Opt, const char* Arg)
+/* Dump tables to file */
+{
+    FileNameOption (Opt, Arg, &DebugTableName);
+}
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
@@ -861,6 +882,7 @@ int main (int argc, char* argv[])
         { "--create-full-dep",      1,      OptCreateFullDep        },
         { "--data-name",            1,      OptDataName             },
         { "--debug",                0,      OptDebug                },
+        { "--debug-tables",         1,      OptDebugTables          },
         { "--debug-info",           0,      OptDebugInfo            },
         { "--debug-opt",            1,      OptDebugOpt             },
         { "--debug-opt-output",     0,      OptDebugOptOutput       },
@@ -949,10 +971,6 @@ int main (int argc, char* argv[])
 
                 case 't':
                     OptTarget (Arg, GetArg (&I, 2));
-                    break;
-
-                case 'u':
-                    OptCreateDep (Arg, 0);
                     break;
 
                 case 'v':
@@ -1071,7 +1089,7 @@ int main (int argc, char* argv[])
     Compile (InputFile);
 
     /* Create the output file if we didn't had any errors */
-    if (PreprocessOnly == 0 && (ErrorCount == 0 || Debug)) {
+    if (PreprocessOnly == 0 && (GetTotalErrors () == 0 || Debug)) {
 
         /* Emit literals, do cleanup and optimizations */
         FinishCompile ();
@@ -1097,5 +1115,5 @@ int main (int argc, char* argv[])
     DoneSegAddrSizes ();
 
     /* Return an apropriate exit code */
-    return (ErrorCount > 0)? EXIT_FAILURE : EXIT_SUCCESS;
+    return (GetTotalErrors () > 0)? EXIT_FAILURE : EXIT_SUCCESS;
 }

@@ -81,7 +81,7 @@ void PushInput (int (*Func) (void*), void* Data, const char* Desc)
     /* Check for a stack overflow */
     if (ICount > ISTACK_MAX) {
         Fatal ("Maximum input stack nesting exceeded");
-    }                                                
+    }
 
     /* Create a new stack element */
     E = xmalloc (sizeof (*E));

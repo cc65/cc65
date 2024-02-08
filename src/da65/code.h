@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -71,6 +71,9 @@ unsigned GetCodeWord (unsigned Addr);
 
 unsigned long GetCodeDWord (unsigned Addr);
 /* Get a dword from the given address */
+
+unsigned GetCodeLongAddr (unsigned Addr);
+/* Get a 24-bit address from the given address */
 
 unsigned GetRemainingBytes (void);
 /* Return the number of remaining code bytes */

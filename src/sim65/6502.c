@@ -64,17 +64,11 @@ static CPURegs Regs;
 /* Cycles for the current insn */
 static unsigned Cycles;
 
-/* Total number of CPU cycles exec'd */
-static unsigned long TotalCycles;
-
 /* NMI request active */
 static unsigned HaveNMIRequest;
 
 /* IRQ request active */
 static unsigned HaveIRQRequest;
-
-/* flag to print cycles at program termination */
-int PrintCycles;
 
 
 /*****************************************************************************/
@@ -1270,8 +1264,8 @@ static void OPC_6502_6C (void)
         Cycles = 6;
         Regs.PC = MemReadWord(Lo);
     }
-    
-    ParaVirtHooks (&Regs);    
+
+    ParaVirtHooks (&Regs);
 }
 
 
@@ -1283,7 +1277,7 @@ static void OPC_65C02_6C (void)
     Cycles = 5;
     Regs.PC = MemReadWord (MemReadWord (Regs.PC+1));
 
-    ParaVirtHooks (&Regs);    
+    ParaVirtHooks (&Regs);
 }
 
 
@@ -1439,7 +1433,7 @@ static void OPC_65SC02_7C (void)
     Adr = MemReadWord (PC+1);
     Regs.PC = MemReadWord(Adr+Regs.XR);
 
-    ParaVirtHooks (&Regs);    
+    ParaVirtHooks (&Regs);
 }
 
 
@@ -3277,18 +3271,6 @@ unsigned ExecuteInsn (void)
         Handlers[CPU][OPC] ();
     }
 
-    /* Count cycles */
-    TotalCycles += Cycles;
-
     /* Return the number of clock cycles needed by this insn */
     return Cycles;
-}
-
-
-
-unsigned long GetCycles (void)
-/* Return the total number of cycles executed */
-{
-    /* Return the total number of cycles */
-    return TotalCycles;
 }

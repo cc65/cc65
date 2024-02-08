@@ -191,6 +191,8 @@ unsigned char cbm_k_acptr (void);
 unsigned char cbm_k_basin (void);
 void __fastcall__ cbm_k_bsout (unsigned char C);
 unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);
+unsigned char cbm_k_chrin (void);
+void __fastcall__ cbm_k_chrout (unsigned char C);
 void __fastcall__ cbm_k_ciout (unsigned char C);
 unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);
 void cbm_k_clall (void);
@@ -223,7 +225,7 @@ void cbm_k_untlk (void);
 
 
 
-/* The cbm_* I/O functions below set _oserror (see errno.h),
+/* The cbm_* I/O functions below set __oserror (see errno.h),
 ** in case of an error.
 **
 ** error-code   BASIC error
@@ -249,7 +251,7 @@ unsigned int __fastcall__ cbm_load (const char* name, unsigned char device, void
 ** address of the file if "data" is the null pointer (like load"name",8,1
 ** in BASIC).
 ** Returns number of bytes that were loaded if loading was successful;
-** otherwise 0, "_oserror" contains an error-code, then (see table above).
+** otherwise 0, "__oserror" contains an error-code, then (see table above).
 */
 
 unsigned char __fastcall__ cbm_save (const char* name, unsigned char device,
@@ -272,7 +274,7 @@ void __fastcall__ cbm_close (unsigned char lfn);
 int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size);
 /* Reads up to "size" bytes from a file into "buffer".
 ** Returns the number of actually-read bytes, 0 if there are no bytes left.
-** -1 in case of an error; then, _oserror contains an error-code (see table
+** -1 in case of an error; then, __oserror contains an error-code (see table
 ** above).  (Remember:  0 means end-of-file; -1 means error.)
 */
 
@@ -280,7 +282,7 @@ int __fastcall__ cbm_write (unsigned char lfn, const void* buffer,
                             unsigned int size);
 /* Writes up to "size" bytes from "buffer" to a file.
 ** Returns the number of actually-written bytes, or -1 in case of an error;
-** _oserror contains an error-code, then (see above table).
+** __oserror contains an error-code, then (see above table).
 */
 
 unsigned char cbm_opendir (unsigned char lfn, unsigned char device, ...);
@@ -295,7 +297,15 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn,
 /* Reads one directory line into cbm_dirent structure.
 ** Returns 0 if reading directory-line was successful.
 ** Returns non-zero if reading directory failed, or no more file-names to read.
-** Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free."
+** Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free",
+** "blocks used", or "mb free".  Return codes:
+** 0 = read file-name
+** 1 = couldn't read directory
+** 2 = read "blocks free", "blocks used", or "mb free"
+** 3 = couldn't find start of file-name
+** 4 = couldn't find end of file-name
+** 5 = couldn't read file-type
+** 6 = premature end of file
 */
 
 void __fastcall__ cbm_closedir (unsigned char lfn);

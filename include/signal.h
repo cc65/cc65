@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2005, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -45,12 +45,12 @@ typedef unsigned char sig_atomic_t;
 typedef void __fastcall__ (*__sigfunc) (int);
 
 /* Functions that implement SIG_IGN and SIG_DFL */
-void __fastcall__ _sig_ign (int);
-void __fastcall__ _sig_dfl (int);
+void __fastcall__ __sig_ign (int);
+void __fastcall__ __sig_dfl (int);
 
 /* Standard signal handling functions */
-#define SIG_DFL         _sig_dfl
-#define SIG_IGN         _sig_ign
+#define SIG_DFL         __sig_dfl
+#define SIG_IGN         __sig_ign
 #define SIG_ERR         ((__sigfunc) 0x0000)
 
 /* Signal numbers */

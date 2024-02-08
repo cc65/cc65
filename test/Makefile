@@ -22,6 +22,7 @@ continue:
 	@$(MAKE) -C val all
 	@$(MAKE) -C ref all
 	@$(MAKE) -C err all
+	@$(MAKE) -C standard all
 	@$(MAKE) -C misc all
 	@$(MAKE) -C todo all
 
@@ -31,6 +32,7 @@ mostlyclean:
 	@$(MAKE) -C val clean
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean
+	@$(MAKE) -C standard clean
 	@$(MAKE) -C misc clean
 	@$(MAKE) -C todo clean
 

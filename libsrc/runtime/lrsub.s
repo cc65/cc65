@@ -29,7 +29,7 @@ tosrsubeax:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
         sbc     (sp)
         ldy     #1
-.else                         
+.else
         ldy     #0
         sbc     (sp),y          ; byte 0
         iny

@@ -37,7 +37,6 @@
 #define _LIMITS_H
 
 
-
 #define CHAR_BIT        8
 
 #define SCHAR_MIN       ((signed char) 0x80)
@@ -63,7 +62,23 @@
 
 #define ULONG_MAX       4294967295UL
 
-
+#if __CC65_STD__ >= __CC65_STD_CC65__
+/* These defines that are platform dependent */
+/* FILENAME_MAX in stdlib.h is defined as the same value as PATH_MAX */
+#if defined(__APPLE2__)
+#  define PATH_MAX      (64+1)
+#elif defined(__ATARI__)
+#  define PATH_MAX      (63+1)
+#elif defined(__CBM__)
+#  define PATH_MAX      (255)  /* should be 256+1, see libsrc/common/_cmd.s why it's not */
+#elif defined(__LUNIX__)
+#  define PATH_MAX      (80+1)
+#elif defined(__TELESTRAT__)
+#  define PATH_MAX      (50+1)
+#else
+#  define PATH_MAX      (16+1)
+#endif
+#endif /* __CC65_STD__ >= __CC65_STD_CC65__ */
 
 /* End of limits.h */
 #endif

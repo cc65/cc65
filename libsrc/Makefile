@@ -21,20 +21,28 @@ TARGETS = apple2       \
           atarixl      \
           atari2600    \
           atari5200    \
+          atari7800    \
           atmos        \
           creativision \
           $(CBMS)      \
           $(GEOS)      \
           gamate       \
+          kim1         \
           lynx         \
           nes          \
           none         \
           osic1p       \
           pce          \
+          rp6502       \
           sim6502      \
           sim65c02     \
           supervision  \
+          sym1         \
           telestrat
+
+TARGETTEST = none     \
+             sim6502  \
+             sim65c02
 
 DRVTYPES = emd \
            joy \
@@ -50,7 +58,7 @@ OUTPUTDIRS := lib                                                               
               $(subst ../,,$(wildcard ../target/*/drv/*))                                     \
               $(subst ../,,$(wildcard ../target/*/util))
 
-.PHONY: all mostlyclean clean install zip lib $(TARGETS)
+.PHONY: all mostlyclean clean install zip lib libtest $(TARGETS)
 
 .SUFFIXES:
 
@@ -78,6 +86,8 @@ datadir = $(PREFIX)/share/cc65
 
 all lib: $(TARGETS)
 
+libtest: $(TARGETTEST)
+
 mostlyclean:
 	$(call RMDIR,../libwrk)
 
@@ -94,7 +104,6 @@ INSTALL = install
 
 define INSTALL_recipe
 
-$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 $(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
 $(INSTALL) -m0644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 
@@ -114,13 +123,17 @@ endef # ZIP_recipe
 zip:
 	$(foreach dir,$(OUTPUTDIRS),$(ZIP_recipe))
 
-$(TARGETS):
+$(TARGETS): | ../lib
 	@$(MAKE) --no-print-directory $@
+
+# ../lib must be created globally before doing lib targets in parallel
+../lib:
+	@$(call MKDIR,$@)
 
 else # TARGET
 
-CA65FLAGS =
-CC65FLAGS = -Or -W error
+CA65FLAGS = -g
+CC65FLAGS = -g -Or -W error
 
 EXTZP = cbm510 \
         cbm610 \
@@ -133,8 +146,7 @@ MKINC = $(GEOS) \
 
 TARGETUTIL = apple2    \
              apple2enh \
-             atari     \
-             geos-apple
+             atari
 
 GEOSDIRS = common      \
            conio       \
@@ -286,10 +298,12 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
 	@echo $(TARGET) - $(<F)
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
+$(EXTRA_OBJS): | ../lib
+
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../target/$(TARGET)/util:
+../libwrk/$(TARGET) ../target/$(TARGET)/util:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

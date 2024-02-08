@@ -49,6 +49,7 @@ unsigned char DebugInfo         = 0;    /* Add debug info to the obj */
 unsigned char PreprocessOnly    = 0;    /* Just preprocess the input */
 unsigned char DebugOptOutput    = 0;    /* Output debug stuff */
 unsigned      RegisterSpace     = 6;    /* Space available for register vars */
+unsigned      AllowNewComments  = 0;    /* Allow new style comments in C89 mode */
 
 /* Stackable options */
 IntStack WritableStrings    = INTSTACK(0);  /* Literal strings are r/w */
@@ -66,6 +67,7 @@ IntStack CodeSizeFactor     = INTSTACK(100);/* Size factor for generated code */
 IntStack DataAlignment      = INTSTACK(1);  /* Alignment for data */
 
 /* File names */
-StrBuf DepName     = STATIC_STRBUF_INITIALIZER; /* Name of dependencies file */
-StrBuf FullDepName = STATIC_STRBUF_INITIALIZER; /* Name of full dependencies file */
-StrBuf DepTarget   = STATIC_STRBUF_INITIALIZER; /* Name of dependency target */
+StrBuf DepName        = STATIC_STRBUF_INITIALIZER; /* Name of dependencies file */
+StrBuf FullDepName    = STATIC_STRBUF_INITIALIZER; /* Name of full dependencies file */
+StrBuf DepTarget      = STATIC_STRBUF_INITIALIZER; /* Name of dependency target */
+StrBuf DebugTableName = STATIC_STRBUF_INITIALIZER; /* Name of debug table dump file */

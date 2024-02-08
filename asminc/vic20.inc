@@ -1,7 +1,6 @@
 ;
-; Vic20 generic definitions. Stolen mostly from c64.inc - Steve Schmidtke
+; VIC-20 generic definitions. Stolen mostly from c64.inc -- Steve Schmidtke
 ;
-
 
 ; ---------------------------------------------------------------------------
 ; Zero page, Commodore stuff
@@ -35,6 +34,8 @@ CURS_COLOR      := $287         ; Color under the cursor
 KBDREPEAT       := $28a
 KBDREPEATRATE   := $28b
 KBDREPEATDELAY  := $28c
+
+RSSTAT          := $297         ; RS-232 device driver status
 
 ; ---------------------------------------------------------------------------
 ; Screen size
@@ -89,7 +90,7 @@ VIA1_T1LH       := VIA1+$7      ; Timer 1 latch, high byte
 VIA1_T2CL       := VIA1+$8      ; Timer 2, low byte
 VIA1_T2CH       := VIA1+$9      ; Timer 2, high byte
 VIA1_SR         := VIA1+$A      ; Shift register
-VIA1_CR         := VIA1+$B      ; Auxiliary control register
+VIA1_ACR        := VIA1+$B      ; Auxiliary control register
 VIA1_PCR        := VIA1+$C      ; Peripheral control register
 VIA1_IFR        := VIA1+$D      ; Interrupt flag register
 VIA1_IER        := VIA1+$E      ; Interrupt enable register
@@ -111,7 +112,7 @@ VIA2_T1LH       := VIA2+$7      ; Timer 1 latch, high byte
 VIA2_T2CL       := VIA2+$8      ; Timer 2, low byte
 VIA2_T2CH       := VIA2+$9      ; Timer 2, high byte
 VIA2_SR         := VIA2+$A      ; Shift register
-VIA2_CR         := VIA2+$B      ; Auxiliary control register
+VIA2_ACR        := VIA2+$B      ; Auxiliary control register
 VIA2_PCR        := VIA2+$C      ; Peripheral control register
 VIA2_IFR        := VIA2+$D      ; Interrupt flag register
 VIA2_IER        := VIA2+$E      ; Interrupt enable register

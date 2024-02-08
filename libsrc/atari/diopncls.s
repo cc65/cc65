@@ -14,7 +14,7 @@
 
         .export         _dio_open, _dio_close
         .export         sectsizetab
-        .import         __oserror, __sio_call, _dio_read
+        .import         ___oserror, __sio_call, _dio_read
         .import         pushax, addysp, subysp
         .importzp       ptr2, sp
         .include        "atari.inc"
@@ -31,7 +31,7 @@ sectsizetab:
 
 _inv_drive:
         lda     #NONDEV         ; non-existent device
-        sta     __oserror
+        sta     ___oserror
         lda     #0
         tax
         rts                     ; return NULL
@@ -49,7 +49,7 @@ _dio_open:
         sta     sectsizetab+sst_flag,x          ; set flag that drive is "open"
         lda     #0
         sta     sectsizetab+sst_sectsize+1,x
-        sta     __oserror                       ; success
+        sta     ___oserror                      ; success
         tya
         sta     sectsizetab+sst_driveno,x
         stx     ptr2
@@ -137,7 +137,7 @@ _dio_open:
         iny
         lda     #1
 
-finish: sta     (ptr2),y        ; set default sector size       
+finish: sta     (ptr2),y        ; set default sector size
 fini2:  lda     ptr2
         ldx     ptr2+1
         rts
@@ -156,7 +156,7 @@ s128:   lda     #128
         lda     #0
         ldy     #sst_flag
         sta     (ptr2),y
-        sta     __oserror       ; success
+        sta     ___oserror      ; success
         tax
         rts                     ; return no error
 

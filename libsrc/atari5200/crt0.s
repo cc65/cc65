@@ -44,4 +44,4 @@ _exit:  jsr     donelib         ; Run module destructors
 
 ; A 5200 program isn't supposed to exit.
 
-halt:   jmp halt
+halt:   jmp     halt

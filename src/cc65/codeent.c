@@ -172,6 +172,10 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
                 if (Info && Info->ByteUse != REG_NONE) {
                     /* These addressing modes will never change the zp loc */
                     E->Use |= Info->WordUse;
+
+                    if ((E->Use & REG_SP) != 0) {
+                        E->Use |= SLV_IND;
+                    }
                 }
                 break;
 
@@ -1777,6 +1781,13 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                 if (RegValIsKnown (In->RegX)) {
                     Out->RegX = (In->RegX ^ 0xFF);
                 }
+            } else if (strncmp (E->Arg, "asrax", 5) == 0 ||
+                       strncmp (E->Arg, "shrax", 5) == 0) {
+                if (RegValIsKnown (In->RegX)) {
+                    if (In->RegX == 0x00 || In->RegX == 0xFF) {
+                        Out->RegX = In->RegX;
+                    }
+                }
             } else if (strcmp (E->Arg, "tosandax") == 0) {
                 if (RegValIsKnown (In->RegA) && In->RegA == 0) {
                     Out->RegA = 0;
@@ -1786,7 +1797,6 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                 }
             } else if (strcmp (E->Arg, "tosaslax") == 0) {
                 if (RegValIsKnown (In->RegA) && (In->RegA & 0x0F) >= 8) {
-                    printf ("Hey!\n");
                     Out->RegA = 0;
                 }
             } else if (strcmp (E->Arg, "tosorax") == 0) {

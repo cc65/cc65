@@ -126,7 +126,7 @@ and &dollar;FF3F.
 In memory constrained situations the memory from &dollar;400 to &dollar;7FF
 can be made available to a program by calling <tt/_heapadd ((void *) 0x0400, 0x0400);/
 at the beginning of <tt/main()/. Doing so is beneficial even if the program
-doesn't use the the heap explicitly because loading a driver uses the heap implicitly.
+doesn't use the heap explicitly because loading a driver uses the heap implicitly.
 
 Using <tt/c64-soft80.o/ is as simple as placing it on the linker command
 line like this:
@@ -410,9 +410,9 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/c64-1
 <descrip>
 
   <tag><tt/c64-swlink.ser (c64_swlink_ser)/</tag>
-  Driver for the SwiftLink cartridge. Supports up to 38400 BPS, hardware flow
-  control (RTS/CTS), and interrupt-driven receives. Note that, because of the
-  peculiarities of the 6551 chip, together with the use of the NMI, transmits
+  Driver for the SwiftLink cartridge. Supports up to 38400 baud, requires hardware
+  flow control (RTS/CTS) and does interrupt driven receives. Note that, because of
+  the peculiarities of the 6551 chip, together with the use of the NMI, transmits
   are not interrupt driven; and, the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
 

@@ -581,6 +581,60 @@ unsigned OptStoreLoad (CodeSeg* S)
 
 
 
+unsigned OptLoadStoreLoad (CodeSeg* S)
+/* Search for the sequence
+**
+**      ld.     xx
+**      st.     yy
+**      ld.     xx
+**
+** and remove the useless load.
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* L[3];
+
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if ((L[0]->OPC == OP65_LDA ||
+             L[0]->OPC == OP65_LDX ||
+             L[0]->OPC == OP65_LDY)                         &&
+            (L[0]->AM == AM65_ABS || L[0]->AM == AM65_ZP)   &&
+            !CS_RangeHasLabel (S, I+1, 3)                   &&
+            CS_GetEntries (S, L+1, I+1, 2)                  &&
+            (L[1]->OPC == OP65_STA ||
+             L[1]->OPC == OP65_STX ||
+             L[1]->OPC == OP65_STY)                         &&
+            L[2]->OPC == L[0]->OPC                          &&
+            L[2]->AM == L[0]->AM                            &&
+            strcmp (L[0]->Arg, L[2]->Arg) == 0) {
+
+            /* Remove the second load */
+            CS_DelEntries (S, I+2, 1);
+
+            /* Remember, we had changes */
+            ++Changes;
+
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 unsigned OptTransfers1 (CodeSeg* S)
 /* Remove transfers from one register to another and back */
 {
@@ -990,7 +1044,7 @@ unsigned OptTransfers4 (CodeSeg* S)
                 ** isn't used later, and we have an address mode match, we can
                 ** replace the transfer by a load and remove the initial load.
                 */
-                if ((GetRegInfo (S, I, LoadEntry->Chg & REG_ALL) & 
+                if ((GetRegInfo (S, I, LoadEntry->Chg & REG_ALL) &
                     LoadEntry->Chg & REG_ALL) == 0                              &&
                     (LoadEntry->AM == AM65_ABS ||
                      LoadEntry->AM == AM65_ZP  ||
@@ -1252,7 +1306,7 @@ unsigned OptPushPop2 (CodeSeg* S)
                         /* Go into searching mode again */
                         State = Searching;
                     }
-                } else if ((E->Info & OF_BRA)   == 0 && 
+                } else if ((E->Info & OF_BRA)   == 0 &&
                            (E->Info & OF_STORE) == 0 &&
                            E->OPC != OP65_NOP        &&
                            E->OPC != OP65_TSX) {
@@ -1500,14 +1554,11 @@ unsigned OptShiftBack (CodeSeg* S)
             (N->OPC == OP65_LSR ||
              N->OPC == OP65_ROR)                &&
             !CE_HasLabel (N)) {
-            
             CheckStates = PSTATE_ZN;
-            
             if (N->OPC == OP65_LSR &&
                 !PStatesAreClear (E->RI->Out.PFlags, PSTATE_C)) {
                 CheckStates |= REG_A;
             }
-            
             if ((GetRegInfo (S, I+2, CheckStates) & CheckStates) == 0) {
 
                 /* Remove the shifts */

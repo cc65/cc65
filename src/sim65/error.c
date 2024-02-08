@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -38,6 +38,20 @@
 #include <stdarg.h>
 
 #include "error.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* flag to print cycles at program termination */
+int PrintCycles = 0;
+
+/* cycles are counted by main.c */
+extern unsigned long long TotalCycles;
 
 
 
@@ -98,4 +112,15 @@ void Internal (const char* Format, ...)
     putc ('\n', stderr);
     va_end (ap);
     exit (SIM65_ERROR);
+}
+
+
+
+void SimExit (int Code)
+/* Exit the simulation with an exit code */
+{
+    if (PrintCycles) {
+        fprintf (stdout, "%llu cycles\n", TotalCycles);
+    }
+    exit (Code);
 }

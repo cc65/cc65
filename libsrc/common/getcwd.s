@@ -17,22 +17,22 @@
 
 .proc   _getcwd
 
-; Remember -size-1 because this simplifies the following loop
+; Remember size with each byte incremented because this simplifies the following loop
 
-        eor     #$FF
-        sta     ptr2
-        txa
-        eor     #$FF
-        sta     ptr2+1
+        inx
+        stx     ptr2+1
+        tax
+        inx
+        stx     ptr2            ; Save size with each byte incremented separately
 
         jsr     popptr1         ; Get buf to ptr1
 
 ; Copy __cwd to the given buffer checking the length
 
         ; ldy     #$00          is guaranteed by popptr1
-loop:   inc     ptr2
+loop:   dec     ptr2
         bne     @L1
-        inc     ptr2+1
+        dec     ptr2+1
         beq     overflow
 
 ; Copy one character, end the loop if the zero terminator is reached. We
@@ -51,9 +51,9 @@ loop:   inc     ptr2
 
 overflow:
         lda     #<ERANGE
-        jsr     __seterrno      ; Returns 0 in A
+        jsr     ___seterrno      ; Returns 0 in A
         tax                     ; Return zero
-        rts                        
+        rts
 
 ; Success, return buf
 

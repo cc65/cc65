@@ -88,18 +88,18 @@ void InitSearchPaths (void)
     AddSubSearchPathFromEnv (CfgDefaultPath, "CC65_HOME", "cfg");
 
     /* Add some compiled-in search paths if defined at compile time. */
-#if defined(LD65_LIB) && !defined(_WIN32)
-    AddSearchPath (LibDefaultPath, STRINGIZE (LD65_LIB));
+#if defined(LD65_LIB) && !defined(_WIN32) && !defined(_AMIGA)
+    AddSearchPath (LibDefaultPath, LD65_LIB);
 #endif
-#if defined(LD65_OBJ) && !defined(_WIN32)
-    AddSearchPath (ObjDefaultPath, STRINGIZE (LD65_OBJ));
+#if defined(LD65_OBJ) && !defined(_WIN32) && !defined(_AMIGA)
+    AddSearchPath (ObjDefaultPath, LD65_OBJ);
 #endif
-#if defined(LD65_CFG) && !defined(_WIN32)
-    AddSearchPath (CfgDefaultPath, STRINGIZE (LD65_CFG));
+#if defined(LD65_CFG) && !defined(_WIN32) && !defined(_AMIGA)
+    AddSearchPath (CfgDefaultPath, LD65_CFG);
 #endif
 
     /* Add paths relative to the parent directory of the Windows binary. */
-    AddSubSearchPathFromWinBin (LibDefaultPath, "lib");
-    AddSubSearchPathFromWinBin (ObjDefaultPath, "lib");
-    AddSubSearchPathFromWinBin (CfgDefaultPath, "cfg");
+    AddSubSearchPathFromBin (LibDefaultPath, "lib");
+    AddSubSearchPathFromBin (ObjDefaultPath, "lib");
+    AddSubSearchPathFromBin (CfgDefaultPath, "cfg");
 }

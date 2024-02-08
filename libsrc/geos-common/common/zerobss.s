@@ -7,7 +7,7 @@
 
             .export zerobss
             .import __BSS_RUN__, __BSS_SIZE__
-            
+
             .include "jumptab.inc"
             .include "geossym.inc"
 

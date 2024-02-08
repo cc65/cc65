@@ -71,9 +71,9 @@ int main(void)
 
     ret = do_test("", "", 5);
     printresult(ret);
-    
+
     printf("fails: %d\n", fails);
-    
+
 #if defined(__CC65__) && !defined(__SIM6502__) && !defined(__SIM65C02__)
     cgetc();
 #endif

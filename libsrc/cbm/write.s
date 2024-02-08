@@ -55,7 +55,7 @@
 
         jsr     CKOUT
         bcc     @L2
-@error: jmp     __mappederrno   ; Store into __oserror, map to errno, return -1
+@error: jmp     ___mappederrno  ; Store into ___oserror, map to errno, return -1
 
 ; Output the next character from the buffer
 
@@ -83,19 +83,19 @@
 
 ; Decrement count
 
-@L2:    inc     ptr2
+@L2:    dec     ptr2
         bne     @L0
-        inc     ptr2+1
+        dec     ptr2+1
         bne     @L0
 
 ; Wrote all chars or disk full. Close the output channel
 
 @L3:    jsr     CLRCH
 
-; Clear _oserror and return the number of chars written
+; Clear __oserror and return the number of chars written
 
         lda     #0
-        sta     __oserror
+        sta     ___oserror
         lda     ptr3
         ldx     ptr3+1
         rts
@@ -106,12 +106,12 @@ devnotpresent2:
         pla
 devnotpresent:
         lda     #ENODEV
-        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
+        .byte   $2C             ; Skip next opcode via BIT <abs>
 
 ; Error entry: The given file descriptor is not valid or not open
 
 invalidfd:
         lda     #EBADF
-        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
+        jmp     ___directerrno  ; Sets _errno, clears __oserror, returns -1
 
 .endproc

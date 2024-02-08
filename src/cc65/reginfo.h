@@ -102,7 +102,7 @@
 #define ZNREG_A         REG_A
 #define ZNREG_X         REG_X
 #define ZNREG_Y         REG_Y
-#define ZNREG_TMP1      REG_TMP1    
+#define ZNREG_TMP1      REG_TMP1
 #define ZNREG_PTR1_LO   REG_PTR1_LO
 #define ZNREG_PTR1_HI   REG_PTR1_HI
 #define ZNREG_PTR2_LO   REG_PTR2_LO

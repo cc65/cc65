@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -36,27 +36,55 @@
 #ifndef PREPROC_H
 #define PREPROC_H
 
+#include "macrotab.h"
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Maximum #if depth per file */
+#define MAX_PP_IFS      256
+
+/* Data struct used for per-file-directive handling */
+typedef struct PPIfStack PPIfStack;
+struct PPIfStack {
+    unsigned char   Stack[MAX_PP_IFS];
+    int             Index;
+};
+
 
 
 /*****************************************************************************/
-/*                                   data                                    */
-/*****************************************************************************/
-
-
-
-/* Set when the preprocessor calls NoCodeConstExpr() recursively */
-extern unsigned char Preprocessing;
-
-
-
-/*****************************************************************************/
-/*                                   code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
 
 void Preprocess (void);
 /* Preprocess a line */
+
+void SetPPIfStack (PPIfStack* Stack);
+/* Specify which PP #if stack to use */
+
+void ContinueLine (void);
+/* Continue the current line ended with a '\\' */
+
+void PreprocessBegin (void);
+/* Initialize preprocessor with current file */
+
+void PreprocessEnd (void);
+/* Preprocessor done with current file */
+
+void InitPreprocess (void);
+/* Init preprocessor */
+
+void DonePreprocess (void);
+/* Done with preprocessor */
+
+void HandleSpecialMacro (Macro* M, const char* Name);
+/* Handle special "magic" macros that may change */
 
 
 

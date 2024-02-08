@@ -42,8 +42,8 @@
 #include "declare.h"
 #include "error.h"
 #include "expr.h"
+#include "funcdesc.h"
 #include "loadexpr.h"
-#include "scanner.h"
 #include "typecmp.h"
 #include "typeconv.h"
 
@@ -55,30 +55,12 @@
 
 
 
-void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg)
-/* Print error or warning message about type conversion with proper type names */
-{
-    StrBuf NewTypeName = STATIC_STRBUF_INITIALIZER;
-    StrBuf OldTypeName = STATIC_STRBUF_INITIALIZER;
-    GetFullTypeNameBuf (&NewTypeName, NewType);
-    GetFullTypeNameBuf (&OldTypeName, OldType);
-    if (IsError) {
-        Error (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
-    } else {
-        Warning (Msg, SB_GetConstBuf (&NewTypeName), SB_GetConstBuf (&OldTypeName));
-    }
-    SB_Done (&OldTypeName);
-    SB_Done (&NewTypeName);
-}
-
-
-
-static void DoConversion (ExprDesc* Expr, const Type* NewType)
+static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 /* Emit code to convert the given expression to a new type. */
 {
-    Type*    OldType;
-    unsigned OldBits;
-    unsigned NewBits;
+    const Type* OldType;
+    unsigned    OldBits;
+    unsigned    NewBits;
 
 
     /* Remember the old type */
@@ -101,10 +83,15 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
     /* Get the sizes of the types. Since we've excluded void types, checking
     ** for known sizes makes sense here.
     */
-    if (ED_IsBitField (Expr)) {
-        OldBits = Expr->BitWidth;
+    if (IsTypeBitField (OldType)) {
+        OldBits = OldType->A.B.Width;
     } else {
         OldBits = CheckedSizeOf (OldType) * CHAR_BITS;
+    }
+
+    /* If the new type is a bit-field, we use its underlying type instead */
+    if (IsTypeBitField (NewType)) {
+        NewType = GetUnderlyingType (NewType);
     }
     NewBits = CheckedSizeOf (NewType) * CHAR_BITS;
 
@@ -124,7 +111,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (CG_TypeOf (NewType), CG_TypeOf (OldType));
 
             /* Value is now in primary and an rvalue */
             ED_FinalizeRValLoad (Expr);
@@ -136,11 +123,23 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         ** to handle sign extension correctly.
         */
 
+        /* If this is a floating point constant, convert to integer,
+        ** and warn if precision is discarded.
+        */
+        if (IsClassFloat (OldType) && IsClassInt (NewType)) {
+            long IVal = (long)Expr->V.FVal.V;
+            if ((Expr->V.FVal.V != FP_D_FromInt(IVal).V) && !Explicit) {
+                Warning ("Floating point constant (%f) converted to integer loses precision (%ld)",Expr->V.FVal.V,IVal);
+            }
+            Expr->IVal = IVal;
+        }
+
         /* Check if the new datatype will have a smaller range. If it
         ** has a larger range, things are OK, since the value is
         ** internally already represented by a long.
         */
         if (NewBits <= OldBits) {
+            long OldVal = Expr->IVal;
 
             /* Cut the value to the new size */
             Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));
@@ -152,14 +151,18 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
                     Expr->IVal |= shl_l (~0UL, NewBits);
                 }
             }
+
+            if ((OldVal != Expr->IVal) && IS_Get (&WarnConstOverflow) && !Explicit) {
+                Warning ("Implicit conversion of constant overflows %d-bit destination", NewBits);
+            }
         }
 
         /* Do the integer constant <-> absolute address conversion if necessary */
         if (IsClassPtr (NewType)) {
-            Expr->Flags &= ~E_LOC_NONE;
+            Expr->Flags &= ~E_MASK_LOC;
             Expr->Flags |= E_LOC_ABS | E_ADDRESS_OF;
         } else if (IsClassInt (NewType)) {
-            Expr->Flags &= ~(E_LOC_ABS | E_ADDRESS_OF);
+            Expr->Flags &= ~(E_MASK_LOC | E_ADDRESS_OF);
             Expr->Flags |= E_LOC_NONE;
         }
 
@@ -175,7 +178,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code. */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (CG_TypeOf (NewType), CG_TypeOf (OldType));
 
             /* Value is now an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);
@@ -185,9 +188,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
 ExitPoint:
     /* The expression has always the new type */
     ReplaceType (Expr, NewType);
-
-    /* Bit-fields are converted to integers */
-    ED_DisBitField (Expr);
 }
 
 
@@ -208,9 +208,9 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
     PrintRawType (stdout, NewType);
 #endif
     /* First, do some type checking */
-    int HasWarning  = 0;
-    int HasError    = 0;
-    const char* Msg = 0;
+    typecmp_t Result    = TYPECMP_INITIALIZER;
+    int HasError        = 0;
+    const char* Msg     = 0;
     const Type* OldType = Expr->Type;
 
 
@@ -219,20 +219,13 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         HasError = 1;
     }
 
-    /* If both types are strictly compatible, no conversion is needed */
-    if (TypeCmp (NewType, OldType) >= TC_STRICT_COMPATIBLE) {
-        /* We're already done */
-        return;
-    }
-
-    /* If Expr is an array or a function, convert it to a pointer */
-    Expr->Type = PtrConversion (Expr->Type);
-
-    /* If we have changed the type, check again for strictly compatibility */
-    if (Expr->Type != OldType &&
-        TypeCmp (NewType, Expr->Type) >= TC_STRICT_COMPATIBLE) {
-        /* We're already done */
-        return;
+    /* If both types are the same, no conversion is needed */
+    Result = TypeCmp (NewType, OldType);
+    if (Result.C < TC_IDENTICAL && (IsTypeArray (OldType) || IsTypeFunc (OldType))) {
+        /* If Expr is an array or a function, convert it to a pointer */
+        Expr->Type = PtrConversion (Expr->Type);
+        /* Recompare */
+        Result = TypeCmp (NewType, Expr->Type);
     }
 
     /* Check for conversion problems */
@@ -253,37 +246,36 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         /* Handle conversions to pointer type */
         if (IsClassPtr (Expr->Type)) {
 
-            /* Pointer to pointer assignment is valid, if:
+            /* Implicit pointer-to-pointer conversion is valid, if:
             **   - both point to the same types, or
             **   - the rhs pointer is a void pointer, or
             **   - the lhs pointer is a void pointer.
+            ** Note: We additionally allow converting function pointers to and from
+            **       void pointers, just with warnings.
             */
-            if (!IsTypeVoid (IndirectConst (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
-                /* Compare the types */
-                switch (TypeCmp (NewType, Expr->Type)) {
-
-                case TC_INCOMPATIBLE:
-                    HasWarning = 1;
-                    Msg = "Incompatible pointer assignment to '%s' from '%s'";
-                    /* Use the pointer type in the diagnostic */
-                    OldType = Expr->Type;
-                    break;
-
-                case TC_QUAL_DIFF:
-                    HasWarning = 1;
-                    Msg = "Pointer assignment to '%s' from '%s' discards qualifiers";
-                    /* Use the pointer type in the diagnostic */
-                    OldType = Expr->Type;
-                    break;
-
-                default:
-                    /* Ok */
-                    break;
+            if (Result.C == TC_PTR_SIGN_DIFF) {
+                /* Specific warning for pointer signedness difference */
+                if (IS_Get (&WarnPointerSign)) {
+                    TypeCompatibilityDiagnostic (NewType, Expr->Type,
+                        0, "Pointer conversion to '%s' from '%s' changes pointer signedness");
+                }
+            } else if ((Result.C <= TC_PTR_INCOMPATIBLE ||
+                 (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)) {
+                /* Incompatible pointee types or qualifiers */
+                if (IS_Get (&WarnPointerTypes)) {
+                    TypeCompatibilityDiagnostic (NewType, Expr->Type,
+                        0, "Incompatible pointer conversion to '%s' from '%s'");
                 }
             }
 
+            if ((Result.F & TCF_PTR_QUAL_DIFF) != 0) {
+                /* Discarding qualifiers is a bad thing and we always warn */
+                TypeCompatibilityDiagnostic (NewType, Expr->Type,
+                    0, "Pointer conversion to '%s' from '%s' discards qualifiers");
+            }
+
         } else if (IsClassInt (Expr->Type)) {
-            /* Int to pointer assignment is valid only for constant zero */
+            /* Int to pointer conversion is valid only for constant zero */
             if (!ED_IsConstAbsInt (Expr) || Expr->IVal != 0) {
                 Warning ("Converting integer to pointer without a cast");
             }
@@ -291,11 +283,12 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             HasError = 1;
         }
 
-    } else {
+    } else if (Result.C < TC_IDENTICAL) {
          /* Invalid automatic conversion */
          HasError = 1;
     }
 
+    /* Set default diagnostic message */
     if (Msg == 0) {
         Msg = "Converting to '%s' from '%s'";
     }
@@ -303,14 +296,10 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
     if (HasError) {
         TypeCompatibilityDiagnostic (NewType, OldType, 1, Msg);
     } else {
-        if (HasWarning) {
-            TypeCompatibilityDiagnostic (NewType, OldType, 0, Msg);
-        }
-
         /* Both types must be complete */
         if (!IsIncompleteESUType (NewType) && !IsIncompleteESUType (Expr->Type)) {
             /* Do the actual conversion */
-            DoConversion (Expr, NewType);
+            DoConversion (Expr, NewType, 0);
         } else {
             /* We should have already generated error elsewhere so that we
             ** could just silently fail here to avoid excess errors, but to
@@ -332,14 +321,8 @@ void TypeCast (ExprDesc* Expr)
 {
     Type    NewType[MAXTYPELEN];
 
-    /* Skip the left paren */
-    NextToken ();
-
-    /* Read the type */
+    /* Read the type enclosed in parentheses */
     ParseType (NewType);
-
-    /* Closing paren */
-    ConsumeRParen ();
 
     /* Read the expression we have to cast */
     hie10 (Expr);
@@ -350,14 +333,14 @@ void TypeCast (ExprDesc* Expr)
             /* Convert functions and arrays to "pointer to" object */
             Expr->Type = PtrConversion (Expr->Type);
 
-            if (TypeCmp (NewType, Expr->Type) >= TC_QUAL_DIFF) {
-                /* If the new type only differs in qualifiers, just use it to
-                ** replace the old one.
+            if (TypeCmp (NewType, Expr->Type).C >= TC_PTR_INCOMPATIBLE) {
+                /* If the new type has the same underlying presentation, just
+                ** use it to replace the old one.
                 */
                 ReplaceType (Expr, NewType);
             } else if (IsCastType (Expr->Type)) {
-                /* Convert the value. The rsult has always the new type */
-                DoConversion (Expr, NewType);
+                /* Convert the value. The result has always the new type */
+                DoConversion (Expr, NewType, 1);
             } else {
                 TypeCompatibilityDiagnostic (NewType, Expr->Type, 1,
                     "Cast to incompatible type '%s' from '%s'");
@@ -378,4 +361,124 @@ void TypeCast (ExprDesc* Expr)
 
     /* The result is always an rvalue */
     ED_MarkExprAsRVal (Expr);
+}
+
+
+
+static void ComposeFuncParamList (const FuncDesc* F1, const FuncDesc* F2)
+/* Compose two function symbol tables regarding function parameters into F1 */
+{
+    /* Get the symbol tables */
+    const SymTable* Tab1 = F1->SymTab;
+    const SymTable* Tab2 = F2->SymTab;
+
+    /* Compose the parameter lists */
+    SymEntry* Sym1 = Tab1->SymHead;
+    SymEntry* Sym2 = Tab2->SymHead;
+
+    /* Sanity check */
+    CHECK ((F1->Flags & FD_EMPTY) == 0 && (F2->Flags & FD_EMPTY) == 0);
+
+    /* Compose the fields */
+    while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
+
+        /* Get the symbol types */
+        const Type* Type1 = Sym1->Type;
+        const Type* Type2 = Sym2->Type;
+
+        /* If either of both functions is old style, apply the default
+        ** promotions to the parameter type.
+        */
+        if (F1->Flags & FD_OLDSTYLE) {
+            if (IsClassInt (Type1)) {
+                Type1 = IntPromotion (Type1);
+            }
+        }
+        if (F2->Flags & FD_OLDSTYLE) {
+            if (IsClassInt (Type2)) {
+                Type2 = IntPromotion (Type2);
+            }
+        }
+
+        /* When we compose two function parameter lists with any FD_OLDSTYLE
+        ** flags set, we are either refining the declaration of the function
+        ** with its definition seen, or determining the result type of a
+        ** ternary operation. In either case, we can just replace the types
+        ** with the promoted ones since the original types of the parameters
+        ** only matters inside the function definition.
+        */
+        if (Type1 != Sym1->Type) {
+            Sym1->Type = TypeDup (Type1);
+        }
+
+        /* Compose this field */
+        TypeComposition (Sym1->Type, Type2);
+
+        /* Get the pointers to the next fields */
+        Sym1 = Sym1->NextSym;
+        Sym2 = Sym2->NextSym;
+    }
+}
+
+
+
+void TypeComposition (Type* lhs, const Type* rhs)
+/* Recursively compose two types into lhs. The two types must have compatible
+** type or this fails with a critical check.
+*/
+{
+    /* Compose two types */
+    while (lhs->C != T_END) {
+
+        /* Check if the end of the type string is reached */
+        if (rhs->C == T_END) {
+            break;
+        }
+
+        /* Check for sanity */
+        CHECK (GetUnderlyingTypeCode (lhs) == GetUnderlyingTypeCode (rhs));
+
+        /* Check for special type elements */
+        if (IsTypeFunc (lhs)) {
+            /* Compose the function descriptors */
+            FuncDesc* F1 = GetFuncDesc (lhs);
+            FuncDesc* F2 = GetFuncDesc (rhs);
+
+            /* If F1 has an empty parameter list (which does also mean, it is
+            ** not a function definition, because the flag is reset in this
+            ** case), its declaration is replaced by the other declaration. If
+            ** neither of the parameter lists is empty, we have to compose them
+            ** as well as other attributes.
+            */
+            if ((F1->Flags & FD_EMPTY) == FD_EMPTY) {
+                if ((F2->Flags & FD_EMPTY) == 0) {
+                    /* Copy the parameters and flags */
+                    TypeCopy (lhs, rhs);
+                    F1->Flags = F2->Flags;
+                }
+            } else if ((F2->Flags & FD_EMPTY) == 0) {
+                /* Compose the parameter lists */
+                ComposeFuncParamList (F1, F2);
+                /* Prefer non-old-style */
+                if ((F2->Flags & FD_OLDSTYLE) == 0) {
+                    F1->Flags &= ~FD_OLDSTYLE;
+                }
+            }
+        } else if (IsTypeArray (lhs)) {
+            /* Check member count */
+            long LeftCount  = GetElementCount (lhs);
+            long RightCount = GetElementCount (rhs);
+
+            /* Set composite type if it is requested */
+            if (LeftCount != UNSPECIFIED) {
+                SetElementCount (lhs, LeftCount);
+            } else if (RightCount != UNSPECIFIED) {
+                SetElementCount (lhs, RightCount);
+            }
+        }
+
+        /* Next type string element */
+        ++lhs;
+        ++rhs;
+    }
 }

@@ -94,7 +94,7 @@ void InfoWarning (const char* Format, ...)
     xvsprintf (Buf, sizeof (Buf), Format, ap);
     va_end (ap);
 
-    fprintf (stderr, "%s(%u): Warning: %s\n",
+    fprintf (stderr, "%s:%u: Warning: %s\n",
             InputSrcName, InfoErrorLine, Buf);
 }
 
@@ -110,7 +110,7 @@ void InfoError (const char* Format, ...)
     xvsprintf (Buf, sizeof (Buf), Format, ap);
     va_end (ap);
 
-    fprintf (stderr, "%s(%u): Error: %s\n",
+    fprintf (stderr, "%s:%u: Error: %s\n",
             InputSrcName, InfoErrorLine, Buf);
     exit (EXIT_FAILURE);
 }
@@ -369,6 +369,14 @@ Again:
     if (IsDigit (C)) {
         InfoIVal = GetDecimalToken ();
         InfoTok = INFOTOK_INTCON;
+        return;
+    }
+
+    /* Decimal number offset? */
+    if (C == '+') {
+        NextChar ();
+        InfoIVal = GetDecimalToken ();
+        InfoTok = INFOTOK_OFFSET_INTCON;
         return;
     }
 

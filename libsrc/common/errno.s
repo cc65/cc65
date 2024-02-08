@@ -2,7 +2,7 @@
 ; 2003-08-12, Ullrich von Bassewitz
 ; 2015-09-24, Greg King
 ;
-; extern int _errno;
+; extern int __errno;
 ; /* Library errors go here. */
 ;
 
@@ -10,5 +10,5 @@
 
 .bss
 
-__errno:
+___errno:
         .word   0

@@ -17,13 +17,6 @@ __viddma:   .res    1
 __sprsys:   .res    1
 
 ; ------------------------------------------------------------------------
-; sound effect pointers for multitimbral Lynx music hardware
-_abc_score_ptr0: .res 2
-_abc_score_ptr1: .res 2
-_abc_score_ptr2: .res 2
-_abc_score_ptr3: .res 2
-
-; ------------------------------------------------------------------------
 ; Filesystem variables needed for reading stuff from the Lynx cart
 _FileEntry:                     ; The file directory entry is 8 bytes
 _FileStartBlock:    .res   1
@@ -35,4 +28,3 @@ _FileFileLen:       .res   2
 _FileCurrBlock:     .res   1
 _FileBlockByte:     .res   2
 _FileDestPtr:       .res   2
-

@@ -56,8 +56,9 @@ JOY_COUNT       = 2             ; Number of joysticks we support
 ;
 
 INSTALL:
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 
 ;       rts                     ; Run into UNINSTALL instead
 
@@ -93,9 +94,7 @@ joy1:   lda     #$7F
         sta     CIA1_PRA
         lda     CIA1_PRB
         cli
-        and     #$1F
-        eor     #$1F
-        rts
+        jmp     end
 
 ; Read joystick 2
 
@@ -107,8 +106,6 @@ joy2:   ldx     #0
         lda     CIA1_PRA
         sty     CIA1_DDRA
         cli
-        and     #$1F
+end:    and     #$1F
         eor     #$1F
         rts
-
-

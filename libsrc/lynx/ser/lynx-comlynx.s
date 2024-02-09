@@ -151,7 +151,7 @@ SER_OPEN:
         cmp     #SER_BAUD_600
         beq     setbaudrate
 
-        ; Source period is 4 us
+        ; Source period is 8 us
         ldy     #%00011011 ; ENABLE_RELOAD|ENABLE_COUNT|AUD_8
 
         ldx     #51
@@ -341,8 +341,9 @@ SER_IRQ:
         ldx     SERDAT      ; Read received data
         lda     contrl
         and     #PAREN      ; Parity enabled implies SER_PAR_EVEN or SER_PAR_ODD
+        tay
         ora 	#OVERRUN|FRAMERR|RXBRK
-        bit     SERCTL      ; Compare with SERCTL
+        bit     SERCTL      ; Check error flags in SERCTL
 
         beq     @rx_irq     ; No errors so far
 
@@ -358,6 +359,15 @@ SER_IRQ:
         bra     @exit0
 
 @rx_irq:
+        tya
+        bne     @2          ; Parity was enabled so no marker bit check needed
+
+        lda     contrl
+        eor     SERCTL      ; Should match current parity bit
+        and     #PARBIT     ; Check for mark or space value
+        bne     @exit0
+
+@2:
         txa
         ldx     RxPtrIn
         sta     RxBuffer,x

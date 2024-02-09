@@ -113,11 +113,11 @@ SER_OPEN:
         stz     TxPtrIn
         stz     TxPtrOut
 
-        ; source period is 1 us
-        lda     #%00011000
-        sta     TIM4CTLA
         ldy     #SER_PARAMS::BAUDRATE
         lda     (ptr1),y
+
+        ; Source period is 1 us
+        ldy     #%00011000  ; ENABLE_RELOAD|ENABLE_COUNT|AUD_1
 
         ldx     #1
         cmp     #SER_BAUD_62500
@@ -139,6 +139,10 @@ SER_OPEN:
         cmp     #SER_BAUD_2400
         beq     setbaudrate
 
+        ldx     #68
+        cmp     #SER_BAUD_1800
+        beq     setbaudrate
+
         ldx     #103
         cmp     #SER_BAUD_1200
         beq     setbaudrate
@@ -147,65 +151,48 @@ SER_OPEN:
         cmp     #SER_BAUD_600
         beq     setbaudrate
 
-        ; clock = 6 * 15625
-        ldx     #%00011010
-        stx     TIM4CTLA
+        ; Source period is 4 us
+        ldy     #%00011011 ; ENABLE_RELOAD|ENABLE_COUNT|AUD_8
 
-        ldx     #12
-        cmp     #SER_BAUD_7200
-        beq     setbaudrate
-
-        ldx     #25
-        cmp     #SER_BAUD_3600
-        beq     setbaudrate
-
-        ldx     #207
-        stx     TIM4BKUP
-
-        ; clock = 4 * 15625
-        ldx     #%00011100
+        ldx     #51
         cmp     #SER_BAUD_300
-        beq     setprescaler
+        beq     setbaudrate
 
-        ; clock = 6 * 15625
-        ldx     #%00011110
+        ldx     #103
         cmp     #SER_BAUD_150
-        beq     setprescaler
+        beq     setbaudrate
 
-        ; clock = 1 * 15625
-        ldx     #%00011111
-        stx     TIM4CTLA
-        cmp     #SER_BAUD_75
-        beq     baudsuccess
+        ldx     #115
+        cmp     #SER_BAUD_134_5
+        beq     setbaudrate
 
         ldx     #141
         cmp     #SER_BAUD_110
         beq     setbaudrate
 
-        ; clock = 2 * 15625
-        ldx     #%00011010
-        stx     TIM4CTLA
-        ldx     #68
-        cmp     #SER_BAUD_1800
+        ; Source period is 32 us
+        ldy     #%00011101 ; ENABLE_RELOAD|ENABLE_COUNT|AUD_32
+
+        ldx     #51
+        cmp     #SER_BAUD_75
         beq     setbaudrate
 
-        ; clock = 6 * 15625
-        ldx     #%00011110
-        stx     TIM4CTLA
-        ldx     #231
-        cmp     #SER_BAUD_134_5
+        ldx     #68
+        cmp     #SER_BAUD_56_875
+        beq     setbaudrate
+
+        ldx     #77
+        cmp     #SER_BAUD_50
         beq     setbaudrate
 
         lda     #SER_ERR_BAUD_UNAVAIL
         ldx     #0 ; return value is char
         rts
 
-setprescaler:
-        stx     TIM4CTLA
-        bra     baudsuccess
 setbaudrate:
+        sty     TIM4CTLA
         stx     TIM4BKUP
-baudsuccess:
+
         ldx     #TXOPEN|PAREVEN
         stx     contrl
         ldy     #SER_PARAMS::DATABITS   ; Databits
@@ -368,15 +355,9 @@ SER_IRQ:
         stz     RxPtrIn
         stz     RxPtrOut
 @noBreak:
-        lda     contrl
-        ora     #RXINTEN|RESETERR
-        sta     SERCTL
-        bra     @IRQexit
+        bra     @exit0
 
 @rx_irq:
-        lda     contrl
-        ora     #RXINTEN|RESETERR
-        sta     SERCTL
         txa
         ldx     RxPtrIn
         sta     RxBuffer,x
@@ -392,10 +373,7 @@ SER_IRQ:
         sta     RxPtrIn
         lda     #$80
         tsb     SerialStat
-        lda     contrl
-        ora     #RXINTEN|RESETERR
-        sta     SERCTL
-        bra     @IRQexit
+        bra     @exit0
 
 @tx_irq:
         ldx     TxPtrOut    ; Have all bytes been sent?
@@ -418,6 +396,8 @@ SER_IRQ:
         beq     @exit1
         bvs     @exit1
         stz     TxDone
+
+@exit0:
         lda     contrl
         ora     #RXINTEN|RESETERR   ; Re-enable receive interrupt
         sta     SERCTL

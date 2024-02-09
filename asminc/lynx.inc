@@ -267,22 +267,26 @@ MIKEYHREV   = $FD88
 MIKEYSREV   = $FD89
 IODIR       = $FD8A
 IODAT       = $FD8B
-TxIntEnable = %10000000
-RxIntEnable = %01000000
-TxParEnable = %00010000
-ResetErr    = %00001000
-TxOpenColl  = %00000100
-TxBreak     = %00000010
-ParEven     = %00000001
-TxReady     = %10000000
-RxReady     = %01000000
-TxEmpty     = %00100000
-RxParityErr = %00010000
-RxOverrun   = %00001000
-RxFrameErr  = %00000100
-RxBreak     = %00000010
-ParityBit   = %00000001
+
 SERCTL      = $FD8C
+; SERCTL bit definitions for write operations
+TXINTEN  = $80
+RXINTEN  = $40
+PAREN    = $10
+RESETERR = $08
+TXOPEN   = $04
+TXBRK    = $02
+PAREVEN  = $01
+; SERCTL bit definitions for read operations
+TXRDY   = $80
+RXRDY   = $40
+TXEMPTY = $20
+PARERR  = $10
+OVERRUN = $08
+FRAMERR = $04
+RXBRK   = $02
+PARBIT  = $01
+
 SERDAT      = $FD8D
 SDONEACK    = $FD90
 CPUSLEEP    = $FD91

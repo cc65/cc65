@@ -158,33 +158,6 @@ SER_OPEN:
         cmp     #SER_BAUD_300
         beq     setbaudrate
 
-        ldx     #103
-        cmp     #SER_BAUD_150
-        beq     setbaudrate
-
-        ldx     #115
-        cmp     #SER_BAUD_134_5
-        beq     setbaudrate
-
-        ldx     #141
-        cmp     #SER_BAUD_110
-        beq     setbaudrate
-
-        ; Source period is 32 us
-        ldy     #%00011101 ; ENABLE_RELOAD|ENABLE_COUNT|AUD_32
-
-        ldx     #51
-        cmp     #SER_BAUD_75
-        beq     setbaudrate
-
-        ldx     #68
-        cmp     #SER_BAUD_56_875
-        beq     setbaudrate
-
-        ldx     #77
-        cmp     #SER_BAUD_50
-        beq     setbaudrate
-
         lda     #SER_ERR_BAUD_UNAVAIL
         ldx     #0 ; return value is char
         rts
@@ -342,8 +315,8 @@ SER_IRQ:
         lda     contrl
         and     #PAREN      ; Parity enabled implies SER_PAR_EVEN or SER_PAR_ODD
         tay
-        ora 	#OVERRUN|FRAMERR|RXBRK
-        bit     SERCTL      ; Check error flags in SERCTL
+        ora     #OVERRUN|FRAMERR|RXBRK
+        bit     SERCTL      ; Check presence of relevant error flags in SERCTL
 
         beq     @rx_irq     ; No errors so far
 

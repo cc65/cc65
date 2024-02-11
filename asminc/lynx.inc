@@ -259,16 +259,26 @@ SND_INTERRUPT = TIMER7_INTERRUPT
 
 INTRST      = $FD80
 INTSET      = $FD81
+
 MAGRDY0     = $FD84
 MAGRDY1     = $FD85
 AUDIN       = $FD86
 SYSCTL1     = $FD87
 MIKEYHREV   = $FD88
 MIKEYSREV   = $FD89
-IODIR       = $FD8A
-IODAT       = $FD8B
 
-SERCTL      = $FD8C
+IODIR          = $FD8A
+IODAT          = $FD8B
+; IODIR and IODAT bit definitions
+AUDIN_BIT      = $10  ; Note that there is also the address AUDIN
+READ_ENABLE    = $10  ; Same bit for AUDIN_BIT
+RESTLESS       = $08
+NOEXP          = $04  ; If set, redeye is not connected
+CART_ADDR_DATA = $02
+CART_POWER_OFF = $02  ; Same bit for CART_ADDR_DATA
+EXTERNAL_POWER = $01
+
+SERCTL   = $FD8C
 ; SERCTL bit definitions for write operations
 TXINTEN  = $80
 RXINTEN  = $40

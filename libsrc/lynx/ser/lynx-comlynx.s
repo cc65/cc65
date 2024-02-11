@@ -200,7 +200,18 @@ checkhs:
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
         lda     (ptr1),y
         cmp     #SER_HS_NONE
+        beq     redeye_ok
+        cmp     #SER_HS_SW              ; Software handshake will check for connected redeye
         bne     invparameter
+
+        lda     IODAT
+        and     #NOEXP                  ; Check if redeye bit flag is unset
+        beq     redeye_ok
+        lda     #SER_ERR_NO_DEVICE      ; ComLynx cable is not inserted
+        ldx     #0
+        rts
+
+redeye_ok:
         lda     SERDAT
         lda     contrl
         ora     #RXINTEN|RESETERR       ; Turn on interrupts for receive
@@ -209,6 +220,7 @@ checkhs:
         .assert SER_ERR_OK = 0, error
         tax
         rts
+
 invparameter:
         lda     #SER_ERR_INIT_FAILED
         ldx     #0 ; return value is char

@@ -76,7 +76,8 @@ SER_CLOSE:
         ; Disable interrupts and stop timer 4 (serial)
         lda     #TXOPEN|RESETERR
         sta     SERCTL
-        stz     TIM4CTLA  ; Disable count and no reload
+        stz     TIM4CTLA    ; Disable count and no reload
+        stz     SerialStat  ; Reset status
 
         ; Done, return an error code
         lda     #SER_ERR_OK
@@ -241,8 +242,8 @@ GetByte:
         ldy     RxPtrOut
         lda     RxBuffer,y
         inc     RxPtrOut
+        sta     (ptr1)
         ldx     #$00
-        sta     (ptr1,x)
         txa                     ; Return code = 0
         rts
 
@@ -288,8 +289,8 @@ PutByte:
 
 SER_STATUS:
         lda     SerialStat
+        sta     (ptr1)
         ldx     #$00
-        sta     (ptr1,x)
         txa                     ; Return code = 0
         rts
 
@@ -327,7 +328,7 @@ SER_IRQ:
         and     #PAREN      ; Parity enabled implies SER_PAR_EVEN or SER_PAR_ODD
         tay
         ora     #OVERRUN|FRAMERR|RXBRK
-        bit     SERCTL      ; Check presence of relevant error flags in SERCTL
+        and     SERCTL      ; Check presence of relevant error flags in SERCTL
 
         beq     @rx_irq     ; No errors so far
 

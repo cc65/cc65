@@ -76,8 +76,7 @@ SER_CLOSE:
         ; Disable interrupts and stop timer 4 (serial)
         lda     #TXOPEN|RESETERR
         sta     SERCTL
-        lda     #$00  ; Disable count and no reload
-        sta     TIM4CTLA
+        stz     TIM4CTLA  ; Disable count and no reload
 
         ; Done, return an error code
         lda     #SER_ERR_OK

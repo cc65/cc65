@@ -74,7 +74,7 @@ SER_UNINSTALL:
 
 SER_CLOSE:
         ; Disable interrupts and stop timer 4 (serial)
-        lda     #$0C  ; TXOPEN|RESETERR
+        lda     #TXOPEN|RESETERR
         sta     SERCTL
         lda     #$00  ; Disable count and no reload
         sta     TIM4CTLA

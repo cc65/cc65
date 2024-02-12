@@ -40,14 +40,14 @@ cont1:
         bra     loop1
 
 read_byte:
-        bit     SERCTL
+        bit     SERCTL         ; Check for RXRDY ($40)
         bvc     read_byte
         lda     SERDAT
         rts
 
 _UpLoaderIRQ:
         lda     INTSET
-        and     #$10
+        and     #SERIAL_INTERRUPT
         bne     @L0
         clc
         rts
@@ -69,7 +69,7 @@ again:
 ; last action : clear interrupt
 ;
 exit:
-        lda     #$10
+        lda     #SERIAL_INTERRUPT
         sta     INTRST
         clc
         rts

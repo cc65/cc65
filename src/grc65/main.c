@@ -236,6 +236,7 @@ static int findToken (const char * const *tokenTbl, const char *token)
             if (strcmp (tokenTbl[i], token) == 0) {
                 return i;
             }
+        }
     }
 
     return -1;

@@ -5,31 +5,33 @@
 ;
 
         .export         _fgetc
-        .import         _read, pusha0, pushax, popptr1, incsp2, returnFFFF
+        .import         _read, checkferror
+        .import         pusha0, pushax, popptr1, incsp2, returnFFFF
         .importzp       ptr1
 
         .include        "stdio.inc"
         .include        "_file.inc"
+
+        .macpack        cpu
 
 _fgetc:
         sta     ptr1
         stx     ptr1+1
         jsr     pushax          ; Backup our ptr
 
-        ldy     #_FILE::f_flags
-        lda     (ptr1),y
-        tax
-        and     #_FOPEN         ; Check for file open
-        beq     ret_eof
-        txa
-        and     #(_FERROR|_FEOF); Check for error/eof
+        jsr     checkferror
         bne     ret_eof
 
-        txa
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        bit     #_FPUSHBACK     ; Check for pushed back char
+        beq     do_read
+        .else
+        tax
         and     #_FPUSHBACK     ; Check for pushed back char
         beq     do_read
-
         txa
+        .endif
+
         and     #<(~_FPUSHBACK) ; Reset flag
         sta     (ptr1),y
 

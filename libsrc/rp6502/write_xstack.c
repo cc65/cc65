@@ -4,7 +4,7 @@
 int __fastcall__ write_xstack (const void* buf, unsigned count, int fildes)
 {
     unsigned i;
-    if (count > 256) {
+    if (count > 512) {
         return _mappederrno (EINVAL);
     }
     for (i = count; i;) {

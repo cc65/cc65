@@ -7,7 +7,7 @@ unsigned char __fastcall__ _sysrename (const char* oldpath, const char* newpath)
     size_t oldpathlen, newpathlen;
     oldpathlen = strlen (oldpath);
     newpathlen = strlen (newpath);
-    if (oldpathlen + newpathlen > 254) {
+    if (oldpathlen + newpathlen > 510) {
         return _mappederrno (EINVAL);
     }
     while (oldpathlen) {

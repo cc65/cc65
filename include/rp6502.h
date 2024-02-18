@@ -117,6 +117,8 @@ long __fastcall__ ria_call_long_errno (unsigned char op);
 
 /* C API for the operating system. */
 
+int __cdecl__ xregn (char device, char channel, unsigned char address, unsigned count,
+    ...);
 int __cdecl__ xreg (char device, char channel, unsigned char address, ...);
 int phi2 (void);
 int codepage (void);

@@ -66,6 +66,8 @@ HSType:         .res    1               ; Flow-control type
 RecvBuf:        .res    256             ; Receive buffers: 256 bytes
 SendBuf:        .res    256             ; Send buffers: 256 bytes
 
+ClockSource:    .res    1               ; Whether to use BRG or XTAL for clock
+
         .data
 
 Opened:         .byte   $00             ; 1 when opened
@@ -106,6 +108,15 @@ TxBitTable:     .byte   %00000000       ; SER_BITS_5, in WR_TX_CTRL (WR5)
 
         .rodata
 
+ClockMultiplier:.byte   %01000000       ; Clock x16 (300-57600bps, ref page 5-8)
+                .byte   %10000000       ; Clock x32 (115200bps, ref page 5-8)
+
+ClockSourceA:   .byte   %11010000       ; Use baud rate generator (page 5-17)
+                .byte   %10000000       ; Use XTAL (115200bps)
+
+ClockSourceB:   .byte   %01010000       ; Use baud rate generator
+                .byte   %00000000       ; Use XTAL (115200bps)
+
 BaudTable:                              ; bit7 = 1 means setting is invalid
                                         ; Otherwise refers to the index in
                                         ; Baud(Low/High)Table
@@ -127,7 +138,7 @@ BaudTable:                              ; bit7 = 1 means setting is invalid
                 .byte   $05             ; SER_BAUD_19200
                 .byte   $06             ; SER_BAUD_38400
                 .byte   $07             ; SER_BAUD_57600
-                .byte   $FF             ; SER_BAUD_115200
+                .byte   $00             ; SER_BAUD_115200
                 .byte   $FF             ; SER_BAUD_230400
 
 StopTable:      .byte   %00000100       ; SER_STOP_1, in WR_TX_RX_CTRL (WR4)
@@ -180,7 +191,6 @@ RX_CTRL_OFF            = %11111110      ; ANDed,Rx disabled
 
 WR_TX_RX_CTRL          = 4
 RR_TX_RX_STATUS        = 4
-TX_RX_CLOCK_MUL        = %01000000      ; Clock x16 (Ref page 5-8)
 
 WR_TX_CTRL             = 5              ; (Ref page 5-9)
 RR_TX_STATUS           = 5              ; Corresponding status register
@@ -197,15 +207,13 @@ MASTER_IRQ_MIE_RST     = %00001010      ; STA'd
 MASTER_IRQ_SET         = %00011001      ; STA'd
 
 WR_CLOCK_CTRL          = 11             ; (Ref page 5-17)
-CLOCK_CTRL_CH_A        = %11010000
-CLOCK_CTRL_CH_B        = %01010000
 
 WR_BAUDL_CTRL          = 12             ; (Ref page 5-18)
 WR_BAUDH_CTRL          = 13             ; (Ref page 5-19)
 
 WR_MISC_CTRL           = 14             ; (Ref page 5-19)
-MISC_CTRL_RATE_GEN_ON  = %00000001      ; ORed
-MISC_CTRL_RATE_GEN_OFF = %11111110      ; ANDed
+MISC_CTRL_RATE_GEN_ON  = %00000001      ; STA'd
+MISC_CTRL_RATE_GEN_OFF = %00000000      ; STA'd
 
 WR_IRQ_CTRL            = 15             ; (Ref page 5-20)
 IRQ_CLEANUP_EIRQ       = %00001000
@@ -329,6 +337,16 @@ IIgs:
 :       txa                             ; Promote char return value
         rts
 
+getClockSource:
+        ldy     #SER_PARAMS::BAUDRATE
+        lda     (ptr1),y                ; Baudrate index - cc65 value
+        ldy     #$01
+        cmp     #SER_BAUD_115200
+        beq     :+
+        ldy     #$00
+:       sty     ClockSource
+        rts
+
 ;----------------------------------------------------------------------------
 ; SER_OPEN: A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
@@ -364,6 +382,8 @@ SER_OPEN:
         lda     #$00
         jsr     writeSCCReg
 
+        jsr     getClockSource          ; Should we use BRG or XTAL?
+
         ldy     #SER_PARAMS::STOPBITS
         lda     (ptr1),y                ; Stop bits
         tay
@@ -377,16 +397,18 @@ SER_OPEN:
         ora     ParityTable,y           ; Get value
         bmi     InvParam
 
-        ora     #TX_RX_CLOCK_MUL
+        ldy     ClockSource             ; Setup clock multiplier
+        ora     ClockMultiplier,y
 
         ldy     #WR_TX_RX_CTRL          ; Setup stop & parity bits
         jsr     writeSCCReg
 
+        ldy     ClockSource
         cpx     #CHANNEL_B
         bne     ClockA
 ClockB:
+        lda     ClockSourceB,y
         ldy     #WR_CLOCK_CTRL
-        lda     #CLOCK_CTRL_CH_B
         jsr     writeSCCReg
 
         lda     #INTR_PENDING_RX_EXT_B  ; Store which IRQ bits we'll check
@@ -394,8 +416,8 @@ ClockB:
 
         bra     SetBaud
 ClockA:
+        lda     ClockSourceA,y
         ldy     #WR_CLOCK_CTRL
-        lda     #CLOCK_CTRL_CH_A
         jsr     writeSCCReg
 
         lda     #INTR_PENDING_RX_EXT_A  ; Store which IRQ bits we'll check
@@ -411,11 +433,16 @@ SetBaud:
 
 InvParam:
         lda     #SER_ERR_INIT_FAILED
-        ldy     #$00                    ; Mark port closed
-        bra     SetupOut
+        ldx     #$00                    ; Promote char return value
+        stz     Opened                  ; Mark port closed
+        cli
+        rts
 
 BaudOK:
         tay
+        cpy     #SER_BAUD_115200
+        beq     :+                      ; Skip baud rate generator setup:
+                                        ; For 115200bps, we use XTAL instead
 
         lda     BaudLowTable,y          ; Get low byte
 
@@ -428,8 +455,13 @@ BaudOK:
         ldy     #WR_BAUDH_CTRL
         jsr     writeSCCReg
 
-        ldy     #WR_MISC_CTRL           ; Time to turn this thing on
-        lda     #MISC_CTRL_RATE_GEN_ON
+:       lda     #MISC_CTRL_RATE_GEN_ON  ; Setup BRG according to selected rate
+        ldy     ClockSource
+        cpy     #$00
+        beq     :+
+        lda     #MISC_CTRL_RATE_GEN_OFF
+
+:       ldy     #WR_MISC_CTRL           ; Time to turn this thing on
         jsr     writeSCCReg
 
         ldy     #SER_PARAMS::DATABITS
@@ -486,11 +518,11 @@ StoreFlag:
         sta     SER_FLAG
 
         ldy     #$01                    ; Mark port opened
-        lda     #SER_ERR_OK
-
-SetupOut:
-        ldx     #$00                    ; Promote char return value
         sty     Opened
+
+        lda     #SER_ERR_OK
+        ldx     #$00                    ; Promote char return value
+
         cli
         rts
 

@@ -121,7 +121,7 @@ BaudTable:                      ; Table used to translate RS232 baudrate param
         .byte   $0F             ; SER_BAUD_19200
         .byte   $FF             ; SER_BAUD_38400
         .byte   $FF             ; SER_BAUD_57600
-        .byte   $FF             ; SER_BAUD_115200
+        .byte   $00             ; SER_BAUD_115200
         .byte   $FF             ; SER_BAUD_230400
 
 BitTable:                       ; Table used to translate RS232 databits param

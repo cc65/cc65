@@ -302,6 +302,7 @@ HandshakeOK:
         lda     (ptr1),y        ; Baudrate index
         tay
         lda     BaudTable,y     ; Get 6551 value
+        sta     tmp2            ; Backup for IRQ setting
         bpl     BaudOK          ; Check that baudrate is supported
 
         lda     #SER_ERR_BAUD_UNAVAIL
@@ -332,8 +333,13 @@ BaudOK: sta     tmp1
 
         ora     #%00000001      ; Set DTR active
         sta     RtsOff          ; Store value to easily handle flow control later
-        ora     #%00001000      ; Enable receive interrupts (RTS low)
-        sta     ACIA_CMD,x
+
+        ora     #%00001010      ; Disable interrupts and set RTS low
+
+        ldy     tmp2            ; Don't enable IRQs if 115200bps
+        beq     :+
+        and     #%11111101      ; Enable receive IRQs
+:       sta     ACIA_CMD,x
 
         ; Done
         stx     Index           ; Mark port as open

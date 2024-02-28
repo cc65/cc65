@@ -14,9 +14,9 @@ WORKDIR = ../testwrk
 
 .PHONY: test continue mostlyclean clean
 
-test: mostlyclean continue
+test: continue
 
-continue:
+continue: mostlyclean
 	@$(MAKE) -C asm all
 	@$(MAKE) -C dasm all
 	@$(MAKE) -C val all

@@ -1795,33 +1795,6 @@ static void CheckArrayElementType (const Type* T)
 
 
 
-static const Type* ParamTypeCvt (Type* T)
-/* If T is an array or a function, convert it to a pointer else do nothing.
-** Return the resulting type.
-*/
-{
-    Type* Tmp = 0;
-
-    if (IsTypeArray (T)) {
-        Tmp = ArrayToPtr (T);
-    } else if (IsTypeFunc (T)) {
-        Tmp = NewPointerTo (T);
-    }
-
-    if (Tmp != 0) {
-        /* Do several fixes on qualifiers */
-        FixQualifiers (Tmp);
-
-        /* Replace the type */
-        TypeCopy (T, Tmp);
-        TypeFree (Tmp);
-    }
-
-    return T;
-}
-
-
-
 static void ParseOldStyleParamList (FuncDesc* F)
 /* Parse an old-style (K&R) parameter list */
 {
@@ -1929,7 +1902,7 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
                     */
                     if (Param->Flags & SC_DEFTYPE) {
                         /* Found it, change the default type to the one given */
-                        SymChangeType (Param, ParamTypeCvt (Decl.Type));
+                        SymChangeType (Param, PtrConversion (Decl.Type));
                         /* Reset the "default type" flag */
                         Param->Flags &= ~SC_DEFTYPE;
                     } else {
@@ -2042,7 +2015,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         ParseAttribute (&Decl);
 
         /* Create a symbol table entry */
-        Param = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
+        Param = AddLocalSym (Decl.Ident, PtrConversion (Decl.Type), Decl.StorageClass, 0);
 
         /* Add attributes if we have any */
         SymUseAttr (Param, &Decl);

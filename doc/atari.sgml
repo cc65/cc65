@@ -332,6 +332,7 @@ See the <url url="funcref.html" name="function reference"> for declaration and u
 <item>_scroll
 <item>_setcolor
 <item>_setcolor_low
+<item>_sound
 <item>waitvsync
 </itemize>
 

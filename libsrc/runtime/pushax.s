@@ -7,6 +7,8 @@
         .export         push0, pusha0, pushax
         .importzp       sp
 
+        .macpack        cpu
+
 push0:  lda     #0
 pusha0: ldx     #0
 
@@ -29,7 +31,11 @@ pusha0: ldx     #0
         sta     (sp),y          ; (27)
         pla                     ; (31)
         dey                     ; (33)
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        sta     (sp)            ; (37)
+.else
         sta     (sp),y          ; (38)
-        rts                     ; (44)
+.endif
+        rts                     ; (44/43)
 
 .endproc

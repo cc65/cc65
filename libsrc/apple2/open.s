@@ -18,6 +18,7 @@
         .include        "fcntl.inc"
         .include        "mli.inc"
         .include        "filedes.inc"
+        .include        "time.inc"
 
         .segment        "ONCE"
 

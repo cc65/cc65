@@ -1,4 +1,6 @@
-This document contains all kinds of information that you should know if you want to contribute to the cc65 project. Before you start, please read all of it. If something is not clear to you, please ask - this document is an ongoing effort and may well be incomplete.
+This document contains all kinds of information that you should know if you want to contribute to the cc65 project. Before you start, please read all of it. If something is not clear to you, please ask - this document is an ongoing effort and may well be incomplete. 
+
+Also, before you put a lot of work into implementing something you want to contribute, please get in touch with one of the developers and ask if what you are going to do is actually wanted and has a chance of being merged. Perhaps someone else is already working on it, or perhaps what you have in mind is not how we'd expect it to be - talking to us before you start might save you a lot of work in those cases.
 
 (''Note:'' The word "must" indicates a requirement.  The word "should" indicates a recomendation.)
 
@@ -74,10 +76,12 @@ color  := $0787
 
 The following is still very incomplete - if in doubt please look at existing sourcefiles and adapt to the existing style
 
-* Your files should obey the C89 standard.
+* Your files should generally obey the C89 standard, with a few C99 things (this is a bit similar to what cc65 itself supports). The exceptions are:
+   * use stdint.h for variables that require a certain bit size
+   * In printf-style functions use the PRIX64 (and similar) macros to deal with 64bit values (from inttypes.h)
+This list is not necessarily complete - if in doubt, please ask.
 * We generally have a "no warnings" policy
-* Warnings must not be hidden by using typecasts - fix the code instead
-   * In printf-style functions use the PRIX64 (and similar) macros to deal with 64bit values
+   * Warnings must not be hidden by using typecasts - fix the code instead
 * The normal indentation width should be four spaces.
 * You must use ANSI C comments (```/* */```); you must not use C++ comments (```//```).
 * When you add functions to an existing file, you should separate them by the same number of blank lines that separate the functions that already are in that file.
@@ -134,7 +138,22 @@ You can refer to Annex B of the ISO C99 standard ([here](https://www.open-std.or
 * Hexadecimal number constants should be used except where decimal or binary numbers make much more sense in that constant's context.
 * Hexadecimal letters should be upper-case.
 * When you set two registers or two memory locations to an immediate 16-bit zero, you should use the expressions ```#<$0000``` and ```#>$0000``` (they make it obvious where you are putting the lower and upper bytes).
-* If a function is declared to return a char-sized value, it actually must return an integer-sized value.  (When cc65 promotes a returned value, it sometimes assumes that the value already is an integer.)
+* If a function is declared to return a char-sized value, it actually must return an integer-sized value.  (When cc65 promotes a returned value, it sometimes assumes that the value already is an integer.) This must be done in one of the following ways:
+<pre>
+    lda #RETURN_VALUE
+    ldx #0 ; Promote char return value
+</pre>
+or, if the value is 0, you can use:
+<pre>
+    lda #RETURN_VALUE
+    .assert RETURN_VALUE = 0
+    tax
+</pre>
+sometimes jumping to return0 could save a byte:
+<pre>
+    .assert RETURN_VALUE = 0
+    jmp return 0
+</pre>
 * Functions, that are intended for a platform's system library, should be optimized as much as possible.
 * Sometimes, there must be a trade-off between size and speed.  If you think that a library function won't be used often, then you should make it small.  Otherwise, you should make it fast.
 * Comments that are put on the right side of instructions must be aligned (start in the same character columns).
@@ -181,9 +200,13 @@ The only exception to the above are actions that are exclusive to the github act
 
 * the printf family of function does not completely implement all printf modifiers and does not behave as expected in some cases - all this should be documented in detail
 
-## Floating point support
+## Compiler
 
-The first step is implementing the datatype "float" as IEEE488 floats. Help welcomed!
+* We need a way that makes it possible to feed arbitrary assembler code into the optimzer, so we can have proper tests for it
+
+### Floating point support
+
+The first step is implementing the datatype "float" as IEEE 754 floats. Help welcomed!
 
 * WIP compiler/library changes are here: https://github.com/cc65/cc65/pull/1777
 

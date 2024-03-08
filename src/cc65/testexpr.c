@@ -39,6 +39,7 @@
 #include "expr.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "testexpr.h"
 
 

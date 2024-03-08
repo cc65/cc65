@@ -63,6 +63,7 @@
 
 /* sim65 */
 #include "6502.h"
+#include "error.h"
 #include "memory.h"
 #include "paravirt.h"
 
@@ -123,11 +124,7 @@ static unsigned PopParam (unsigned char Incr)
 static void PVExit (CPURegs* Regs)
 {
     Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
-    if (PrintCycles) {
-        Print (stdout, 0, "%lu cycles\n", GetCycles ());
-    }
-
-    exit (Regs->AC);
+    SimExit (Regs->AC); /* Error code in range 0-255. */
 }
 
 
@@ -166,7 +163,7 @@ static void PVArgs (CPURegs* Regs)
 
 static void PVOpen (CPURegs* Regs)
 {
-    char Path[1024];
+    char Path[PV_PATH_SIZE];
     int OFlag = O_INITIAL;
     int OMode = 0;
     unsigned RetVal, I = 0;
@@ -183,9 +180,15 @@ static void PVOpen (CPURegs* Regs)
     }
 
     do {
-        Path[I] = MemReadByte (Name++);
+        if (!(Path[I] = MemReadByte ((Name + I) & 0xFFFF))) {
+            break;
+        }
+        ++I;
+        if (I >= PV_PATH_SIZE) {
+            Error("PVOpen path too long at address $%04X",Name);
+        }
     }
-    while (Path[I++]);
+    while (1);
 
     Print (stderr, 2, "PVOpen (\"%s\", $%04X)\n", Path, Flags);
 
@@ -235,7 +238,44 @@ static void PVClose (CPURegs* Regs)
 
     Print (stderr, 2, "PVClose ($%04X)\n", FD);
 
-    RetVal = close (FD);
+    if (FD != 0xFFFF) {
+        RetVal = close (FD);
+    } else {
+        /* test/val/constexpr.c "abuses" close, expecting close(-1) to return -1.
+        ** This behaviour is not the same on all target platforms.
+        ** MSVC's close treats it as a fatal error instead and terminates.
+        */
+        RetVal = 0xFFFF;
+    }
+
+    SetAX (Regs, RetVal);
+}
+
+
+
+static void PVSysRemove (CPURegs* Regs)
+{
+    char Path[PV_PATH_SIZE];
+    unsigned RetVal, I = 0;
+
+    unsigned Name  = GetAX (Regs);
+
+    Print (stderr, 2, "PVSysRemove ($%04X)\n", Name);
+
+    do {
+        if (!(Path[I] = MemReadByte ((Name + I) & 0xFFFF))) {
+            break;
+        }
+        ++I;
+        if (I >= PV_PATH_SIZE) {
+            Error("PVSysRemove path too long at address $%04X", Name);
+        }
+    }
+    while (1);
+
+    Print (stderr, 2, "PVSysRemove (\"%s\")\n", Path);
+
+    RetVal = remove (Path);
 
     SetAX (Regs, RetVal);
 }
@@ -294,7 +334,17 @@ static void PVWrite (CPURegs* Regs)
 
 
 
+static void PVOSMapErrno (CPURegs* Regs)
+{
+    unsigned err = GetAX(Regs);
+    SetAX (Regs, err != 0 ? -1 : 0);
+}
+
+
+
 static const PVFunc Hooks[] = {
+    PVSysRemove,
+    PVOSMapErrno,
     PVOpen,
     PVClose,
     PVRead,

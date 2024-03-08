@@ -55,7 +55,7 @@
 
 
 
-static void DoConversion (ExprDesc* Expr, const Type* NewType)
+static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 /* Emit code to convert the given expression to a new type. */
 {
     const Type* OldType;
@@ -111,7 +111,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (CG_TypeOf (NewType), CG_TypeOf (OldType));
 
             /* Value is now in primary and an rvalue */
             ED_FinalizeRValLoad (Expr);
@@ -123,11 +123,23 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
         ** to handle sign extension correctly.
         */
 
+        /* If this is a floating point constant, convert to integer,
+        ** and warn if precision is discarded.
+        */
+        if (IsClassFloat (OldType) && IsClassInt (NewType)) {
+            long IVal = (long)Expr->V.FVal.V;
+            if ((Expr->V.FVal.V != FP_D_FromInt(IVal).V) && !Explicit) {
+                Warning ("Floating point constant (%f) converted to integer loses precision (%ld)",Expr->V.FVal.V,IVal);
+            }
+            Expr->IVal = IVal;
+        }
+
         /* Check if the new datatype will have a smaller range. If it
         ** has a larger range, things are OK, since the value is
         ** internally already represented by a long.
         */
         if (NewBits <= OldBits) {
+            long OldVal = Expr->IVal;
 
             /* Cut the value to the new size */
             Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));
@@ -138,6 +150,10 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
                     /* Beware: Use the safe shift routine here. */
                     Expr->IVal |= shl_l (~0UL, NewBits);
                 }
+            }
+
+            if ((OldVal != Expr->IVal) && IS_Get (&WarnConstOverflow) && !Explicit) {
+                Warning ("Implicit conversion of constant overflows %d-bit destination", NewBits);
             }
         }
 
@@ -162,7 +178,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code. */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (CG_TypeOf (NewType), CG_TypeOf (OldType));
 
             /* Value is now an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);
@@ -238,10 +254,10 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             **       void pointers, just with warnings.
             */
             if (Result.C == TC_PTR_SIGN_DIFF) {
-                /* Specific warning for pointee signedness difference */
+                /* Specific warning for pointer signedness difference */
                 if (IS_Get (&WarnPointerSign)) {
                     TypeCompatibilityDiagnostic (NewType, Expr->Type,
-                        0, "Pointer conversion to '%s' from '%s' changes pointee signedness");
+                        0, "Pointer conversion to '%s' from '%s' changes pointer signedness");
                 }
             } else if ((Result.C <= TC_PTR_INCOMPATIBLE ||
                  (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)) {
@@ -283,7 +299,7 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
         /* Both types must be complete */
         if (!IsIncompleteESUType (NewType) && !IsIncompleteESUType (Expr->Type)) {
             /* Do the actual conversion */
-            DoConversion (Expr, NewType);
+            DoConversion (Expr, NewType, 0);
         } else {
             /* We should have already generated error elsewhere so that we
             ** could just silently fail here to avoid excess errors, but to
@@ -305,14 +321,8 @@ void TypeCast (ExprDesc* Expr)
 {
     Type    NewType[MAXTYPELEN];
 
-    /* Skip the left paren */
-    NextToken ();
-
-    /* Read the type */
+    /* Read the type enclosed in parentheses */
     ParseType (NewType);
-
-    /* Closing paren */
-    ConsumeRParen ();
 
     /* Read the expression we have to cast */
     hie10 (Expr);
@@ -330,7 +340,7 @@ void TypeCast (ExprDesc* Expr)
                 ReplaceType (Expr, NewType);
             } else if (IsCastType (Expr->Type)) {
                 /* Convert the value. The result has always the new type */
-                DoConversion (Expr, NewType);
+                DoConversion (Expr, NewType, 1);
             } else {
                 TypeCompatibilityDiagnostic (NewType, Expr->Type, 1,
                     "Cast to incompatible type '%s' from '%s'");
@@ -417,10 +427,6 @@ void TypeComposition (Type* lhs, const Type* rhs)
 ** type or this fails with a critical check.
 */
 {
-    FuncDesc*   F1;
-    FuncDesc*   F2;
-    long LeftCount, RightCount;
-
     /* Compose two types */
     while (lhs->C != T_END) {
 
@@ -435,8 +441,8 @@ void TypeComposition (Type* lhs, const Type* rhs)
         /* Check for special type elements */
         if (IsTypeFunc (lhs)) {
             /* Compose the function descriptors */
-            F1 = GetFuncDesc (lhs);
-            F2 = GetFuncDesc (rhs);
+            FuncDesc* F1 = GetFuncDesc (lhs);
+            FuncDesc* F2 = GetFuncDesc (rhs);
 
             /* If F1 has an empty parameter list (which does also mean, it is
             ** not a function definition, because the flag is reset in this
@@ -460,8 +466,8 @@ void TypeComposition (Type* lhs, const Type* rhs)
             }
         } else if (IsTypeArray (lhs)) {
             /* Check member count */
-            LeftCount  = GetElementCount (lhs);
-            RightCount = GetElementCount (rhs);
+            long LeftCount  = GetElementCount (lhs);
+            long RightCount = GetElementCount (rhs);
 
             /* Set composite type if it is requested */
             if (LeftCount != UNSPECIFIED) {
@@ -469,41 +475,10 @@ void TypeComposition (Type* lhs, const Type* rhs)
             } else if (RightCount != UNSPECIFIED) {
                 SetElementCount (lhs, RightCount);
             }
-        } else {
-            /* Combine the qualifiers */
-            if (IsClassPtr (lhs)) {
-                ++lhs;
-                ++rhs;
-                lhs->C |= GetQualifier (rhs);
-            }
         }
 
         /* Next type string element */
         ++lhs;
         ++rhs;
     }
-
-    return;
-}
-
-
-
-FuncDesc* RefineFuncDesc (Type* OldType, const Type* NewType)
-/* Refine the existing function descriptor with a new one */
-{
-    FuncDesc* Old = GetFuncDesc (OldType);
-    FuncDesc* New = GetFuncDesc (NewType);
-
-    CHECK (Old != 0 && New != 0);
-
-    if ((New->Flags & FD_EMPTY) == 0) {
-        if ((Old->Flags & FD_EMPTY) == 0) {
-            TypeComposition (OldType, NewType);
-        } else {
-            TypeCopy (OldType, NewType);
-            Old->Flags &= ~FD_EMPTY;
-        }
-    }
-
-    return Old;
 }

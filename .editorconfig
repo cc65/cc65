@@ -1,0 +1,15 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+guidelines = 80, 120
+
+[*.{c,h}]
+cpp_new_line_before_open_brace_block=same_line
+cpp_new_line_before_open_brace_function=new_line
+cpp_space_before_function_open_parenthesis=insert
+cpp_new_line_before_else=false

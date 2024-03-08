@@ -1216,7 +1216,7 @@ static void OptPrintTargetPath (const char* Opt attribute ((unused)),
 
     SearchPaths* TargetPaths = NewSearchPath ();
     AddSubSearchPathFromEnv (TargetPaths, "CC65_HOME", "target");
-#if defined(CL65_TGT) && !defined(_WIN32)
+#if defined(CL65_TGT) && !defined(_WIN32) && !defined(_AMIGA)
     AddSearchPath (TargetPaths, CL65_TGT);
 #endif
     AddSubSearchPathFromBin (TargetPaths, "target");
@@ -1305,6 +1305,9 @@ static void OptStaticLocals (const char* Opt attribute ((unused)),
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
+    if (FirstInput) {
+        Error ("Target must be specified before input files");
+    }
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
         Error ("No such target system: '%s'", Arg);
@@ -1610,7 +1613,7 @@ int main (int argc, char* argv [])
             }
 
             /* Determine the file type by the extension */
-            switch (GetFileType (Arg)) {
+            switch (GetTypeOfFile (Arg)) {
 
                 case FILETYPE_C:
                     /* Compile the file */

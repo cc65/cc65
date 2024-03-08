@@ -68,7 +68,7 @@ MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$2
 
 ; Disable the TX/RX IRQ; set to 8E1.
 
-        lda     #%00011101
+        lda     #PAREN|RESETERR|TXOPEN|PAREVEN  ; #%00011101
         sta     SERCTL
 
 ; Clear all pending interrupts.

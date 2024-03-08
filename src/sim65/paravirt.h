@@ -44,8 +44,11 @@
 
 
 
-#define PARAVIRT_BASE        0xFFF4
+#define PARAVIRT_BASE        0xFFF2
 /* Lowest address used by a paravirtualization hook */
+
+#define PV_PATH_SIZE         1024
+/* Maximum path size supported by PVOpen/PVSysRemove */
 
 
 

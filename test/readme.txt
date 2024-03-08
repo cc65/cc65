@@ -68,7 +68,11 @@ compiler is working as expected (when the tests behave as described):
         which will require additional changes to the makefile(s).
 
 
-To run the tests use "make" in this (top) directory, the makefile should exit
+These tests only require a subset of the platform libraries. In the (top)
+directory above this one, "make libtest" can be used to build only those
+libraries needed for testing, instead of "make lib".
+
+To run the tests use "make" in this (test) directory, the makefile should exit
 with no error.
 
 When a test failed you can use "make continue" to run further tests.

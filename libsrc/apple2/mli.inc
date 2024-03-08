@@ -83,8 +83,8 @@ EOF_COUNT       = 2
                                 AUX_TYPE        .word
                                 STORAGE_TYPE    .byte
                                 BLOCKS          .word
-                                MODE_DATE       .word
-                                MODE_TIME       .word
+                                MOD_DATE        .word
+                                MOD_TIME        .word
                                 CREATE_DATE     .word
                                 CREATE_TIME     .word
                         .endstruct
@@ -139,3 +139,6 @@ LEVEL   :=      $BF94           ; File level: used in open, flush, close
 MACHID  :=      $BF98           ; Machine identification
 PFIXPTR :=      $BF9A           ; If = 0, no prefix active
 KVERSION:=      $BFFF           ; Kernel version number
+
+; Max filename length
+FILENAME_MAX =  64+1

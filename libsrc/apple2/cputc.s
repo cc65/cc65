@@ -14,6 +14,8 @@
 
         .include        "apple2.inc"
 
+        .macpack        cpu
+
         .segment        "ONCE"
 
         .ifdef  __APPLE2ENH__
@@ -51,8 +53,13 @@ cputdirect:
         cmp     WNDWDTH
         bcc     :+
         jsr     newline
-left:   lda     #$00            ; Goto left edge of screen
+left:
+        .if (.cpu .bitand CPU_ISET_65SC02)
+        stz     CH              ; Goto left edge of screen
+        .else
+        lda     #$00            ; Goto left edge of screen
         sta     CH
+        .endif
 :       rts
 
 newline:
@@ -78,17 +85,18 @@ mask:   and     INVFLG          ; Apply normal, inverse, flash
 
 putchardirect:
         pha
-        ldy     CH
         .ifdef  __APPLE2ENH__
+        lda     CH
         bit     RD80VID         ; In 80 column mode?
         bpl     put             ; No, just go ahead
-        tya
         lsr                     ; Div by 2
-        tay
         bcs     put             ; Odd cols go in main memory
         bit     HISCR           ; Assume SET80COL
+put:    tay
+        .else
+        ldy     CH
         .endif
-put:    lda     (BASL),Y        ; Get current character
+        lda     (BASL),Y        ; Get current character
         tax                     ; Return old character for _cgetc
         pla
         sta     (BASL),Y

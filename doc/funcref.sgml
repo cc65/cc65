@@ -71,18 +71,21 @@ function.
 <item><ref id="detect_c64dtv" name="detect_c64dtv">
 <item><ref id="detect_c65" name="detect_c65">
 <item><ref id="detect_chameleon" name="detect_chameleon">
+<item><ref id="detect_iigs" name="detect_iigs">
 <item><ref id="detect_scpu" name="detect_scpu">
 <item><ref id="detect_turbomaster" name="detect_turbomaster">
 <item><ref id="get_c128_speed" name="get_c128_speed">
 <item><ref id="get_c64dtv_speed" name="get_c64dtv_speed">
 <item><ref id="get_c65_speed" name="get_c65_speed">
 <item><ref id="get_chameleon_speed" name="get_chameleon_speed">
+<item><ref id="get_iigs_speed" name="get_iigs_speed">
 <item><ref id="get_scpu_speed" name="get_scpu_speed">
 <item><ref id="get_turbomaster_speed" name="get_turbomaster_speed">
 <item><ref id="set_c128_speed" name="set_c128_speed">
 <item><ref id="set_c64dtv_speed" name="set_c64dtv_speed">
 <item><ref id="set_c65_speed" name="set_c65_speed">
 <item><ref id="set_chameleon_speed" name="set_chameleon_speed">
+<item><ref id="set_iigs_speed" name="set_iigs_speed">
 <item><ref id="set_scpu_speed" name="set_scpu_speed">
 <item><ref id="set_turbomaster_speed" name="set_turbomaster_speed">
 </itemize>
@@ -92,7 +95,10 @@ function.
 
 <itemize>
 <item>_dos_type
+<item><ref id="beep" name="beep">
 <item><ref id="get_ostype" name="get_ostype">
+<item><ref id="gmtime_dt" name="gmtime_dt">
+<item><ref id="mktime_dt" name="mktime_dt">
 <item>rebootafterexit
 </itemize>
 
@@ -101,7 +107,10 @@ function.
 
 <itemize>
 <item>_dos_type
+<item><ref id="beep" name="beep">
 <item><ref id="get_ostype" name="get_ostype">
+<item><ref id="gmtime_dt" name="gmtime_dt">
+<item><ref id="mktime_dt" name="mktime_dt">
 <item>rebootafterexit
 <item><ref id="videomode" name="videomode">
 </itemize>
@@ -126,6 +135,7 @@ function.
 <!-- <item><ref id="_scroll" name="_scroll"> -->
 <!-- <item><ref id="_setcolor" name="_setcolor"> -->
 <!-- <item><ref id="_setcolor_low" name="_setcolor_low"> -->
+<item><ref id="_sound" name="_sound">
 <item><ref id="get_ostype" name="get_ostype">
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 </itemize>
@@ -333,9 +343,11 @@ function.
 
 <itemize>
 <!-- <item><ref id="get_numbanks" name="get_numbanks"> -->
-<!-- <item><ref id="get_ostype" name="get_ostype"> -->
+<item><ref id="get_ostype" name="get_ostype">
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 <!-- <item><ref id="set_tv" name="set_tv"> -->
+<!-- <item><ref id="vera_layer_enable" name="vera_layer_enable"> -->
+<!-- <item><ref id="vera_sprites_enable" name="vera_sprites_enable"> -->
 <item><ref id="videomode" name="videomode">
 <!-- <item><ref id="vpeek" name="vpeek"> -->
 <!-- <item><ref id="vpoke" name="vpoke"> -->
@@ -439,6 +451,16 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 <url url="geos.html" name="GEOS API">.
 
 
+<sect1><tt/inet.h/<label id="inet.h"><p>
+
+<itemize>
+<item><ref id="htonl" name="htonl">
+<item><ref id="htons" name="htons">
+<item><ref id="ntohl" name="ntohl">
+<item><ref id="ntohs" name="ntohs">
+</itemize>
+
+
 <sect1><tt/joystick.h/<label id="joystick.h"><p>
 
 <itemize>
@@ -449,6 +471,18 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 <item><ref id="joy_uninstall" name="joy_uninstall">
 <item><ref id="joy_unload" name="joy_unload">
 </itemize>
+
+
+<sect1><tt/kim1.h/<label id="kim1.h"><p>
+
+<itemize>
+<!-- <item><ref id="getkey" name="getkey"> -->
+<!-- <item><ref id="scandisplay" name="scandisplay"> -->
+<item><ref id="loadt" name="loadt">
+<item><ref id="dumpt" name="dumpt">
+</itemize>
+
+(incomplete)
 
 
 <sect1><tt/locale.h/<label id="locale.h"><p>
@@ -821,6 +855,20 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 (incomplete)
 
 
+<sect1><tt/stat.h/<label id="sys/stat.h"><p>
+
+<itemize>
+<item><ref id="stat" name="stat">
+</itemize>
+
+
+<sect1><tt/statvfs.h/<label id="sys/statvfs.h"><p>
+
+<itemize>
+<item><ref id="statvfs" name="statvfs">
+</itemize>
+
+
 <sect1><tt/vic20.h/<label id="vic20.h"><p>
 
 (incomplete)
@@ -975,7 +1023,7 @@ previously been allocated by <tt/<ref id="malloc" name="malloc">/, <tt/<ref
 id="calloc" name="calloc">/ or <tt/<ref id="realloc" name="realloc">/.
 <tag/Notes/<itemize>
 <item>Passing a pointer to a block that was is not the result of one of the
-allocation functions, or that has been free'd will give unpredicable results.
+allocation functions, or that has been free'd will give unpredictable results.
 <item>The function is available only as a fastcall function; so, it may be used
 only in the presence of a prototype.
 </itemize>
@@ -1108,6 +1156,46 @@ considered random to a certain degree.
 </descrip>
 </quote>
 
+<sect1>_sound<label id="_sound"><p>
+<quote>
+<descrip>
+<tag/Function/Use the speaker to produce sound in a specified voice. (Atari only)
+<tag/Header/<tt/<ref id="atari.h" name="atari.h">/
+<tag/Declaration/<tt/void __fastcall__ _sound (unsigned char voice, unsigned char pitch, unsigned char distortion, unsigned char volume);/
+<tag/Description/The function produces a sound with the specified parameters using any of the 4 available oscillators (voices) controlled by the POKEY chip. Sound is non cpu-blocking and it keeps oscillating until program sends 0 in all the other parameters.
+
+<tag/Notes/<itemize>
+<item>The function is available only as a fastcall function; so, it may be used
+only in the presence of a prototype.
+<item>The function is specific to the Atari 8 bit.
+<item> Voice can be any of 0-3 different sound channels.
+<item> Pitch goes from 0-255 (about 125 Hz to 32 Khz).
+<item> Distortion (0-14) uses poly dividers to reshape wave in order to create a noise effect. Use 10 for a "pure" square-wave sound.
+<item>Volume (0-15) is the intensity for the wave.
+<item>Extra bits in those parameters will be ignored.
+<item>Parameters are the same as for the AtariBASIC SOUND statement.
+</itemize>
+<tag/Availability/cc65 (<tt/atari/ and <tt/atarixl/ platforms)
+<tag/Example/
+<verb>
+
+#include <stdio.h>
+int main(void)
+{
+    int i=0;
+    unsigned char j;
+    printf("playing sound \n");
+    for (j=0; j<144; j++) {
+      _sound(1,144-j,10,8);     //change the pitch for voice 1
+      for (i=0; i<50; i++);     //pause for sound duration
+    }
+    _sound(1,0,0,0);  //use zero in other parameters to stop the sound
+    return 0;
+}
+
+</verb>
+</descrip>
+</quote>
 
 <sect1>_stroserror<label id="_stroserror"><p>
 
@@ -1685,16 +1773,17 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Beep sound.
 <tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
 <tag/Declaration/<tt/void beep(void);/
 <tag/Description/<tt/beep/ makes a brief tone.
 <tag/Notes/<itemize>
-<item>The function is specific to the Sym-1.
+<item>The function is specific to the Sym-1 and Apple2 platforms.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="fdisp" name="fdisp">,
 <ref id="loadt" name="loadt">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1839,7 +1928,7 @@ be used in presence of a prototype.
 <ref id="_swap" name="_swap">,
 <ref id="memcpy" name="memcpy">,
 <ref id="memmove" name="memmove">,
-<ref id="memset" name="memset">,
+<ref id="memset" name="memset">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1912,7 +2001,7 @@ sent a command to TALK and a secondary address if it needs one.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="cbm_k_talk" name="cbm_k_talk">,
+<ref id="cbm_k_talk" name="cbm_k_talk">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2314,8 +2403,8 @@ function, in order to provide input from the keyboard.
 <tag/See also/
 <ref id="cbm_k_getin" name="cbm_k_getin">,
 <ref id="cbm_k_udtim" name="cbm_k_udtim">,
-<ref id="cgetc" name="cgetc">,
-<!-- <ref id="getc" name="getc"> -->
+<ref id="cgetc" name="cgetc">
+<!-- <ref id="getc" name="getc">, -->
 <!-- <ref id="getchar" name="getchar"> -->
 <tag/Example/None.
 </descrip>
@@ -2786,6 +2875,79 @@ setting the time may not work. See also the platform-specific information.
 </quote>
 
 
+<sect1>gmtime_dt<label id="gmtime_dt"><p>
+
+<quote>
+<descrip>
+<tag/Function/Converts a ProDOS date to a struct tm.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
+<tag/Declaration/<tt/struct tm* __fastcall__ gmtime_dt (const struct datetime* dt);/
+<tag/Description/The <tt/gmtime_dt/ function converts the given
+proDOS date/time to a struct tm. On error, NULL is returned and <tt/errno/ is set
+to an error code describing the reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>This function is only available on Apple II.
+<item>On Apple II, you can't stat() an opened file. stat() before opening.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/
+<verb>
+
+#include <stdio.h>
+#include <time.h>
+#include <sys/stat.h>
+int main(void)
+{
+    struct stat st;
+    struct tm* tm;
+    if (stat ("/disk/file", &amp;st) == 0) {
+        tm = gmtime_dt (&amp;st.st_ctime);
+        if (tm)
+            printf ("File created on %s\n", asctime(tm));
+    }
+}
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>mktime_dt<label id="mktime_dt"><p>
+
+<quote>
+<descrip>
+<tag/Function/Converts a ProDOS date to a time_t.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
+<tag/Declaration/<tt/time_t __fastcall__ mktime_dt (const struct datetime* dt);/
+<tag/Description/The <tt/mktime_dt/ function parses the given
+proDOS date/time and returns a time_t timestamp. On error, 0 is returned,
+and errno is set.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>This function is only available on Apple II.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/
+<verb>
+
+#include <stdio.h>
+#include <time.h>
+#include <sys/stat.h>
+int main(void)
+{
+    struct stat st;
+    if (stat ("/disk/file", &amp;st) == 0) {
+        printf ("File created on %s\n",
+          localtime (mktime_dt (&amp;st.st_ctime)));
+    }
+}
+</verb>
+</descrip>
+</quote>
+
+
 <sect1>clrscr<label id="clrscr"><p>
 
 <quote>
@@ -3233,7 +3395,7 @@ used in presence of a prototype.
 <tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="get_c128_speed" name="get_c128_speed">,
-<ref id="set_c128_speed" name="set_c128_speed">,
+<ref id="set_c128_speed" name="set_c128_speed">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3273,7 +3435,7 @@ used in presence of a prototype.
 <tag/Availability/cc65 (not all platforms)
 <tag/See also/
 <ref id="get_c65_speed" name="get_c65_speed">,
-<ref id="set_c65_speed" name="set_c65_speed">,
+<ref id="set_c65_speed" name="set_c65_speed">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3294,6 +3456,26 @@ used in presence of a prototype.
 <tag/See also/
 <ref id="get_chameleon_speed" name="get_chameleon_speed">,
 <ref id="set_chameleon_speed" name="set_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>detect_iigs<label id="detect_iigs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check whether we are running on an Apple IIgs..
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char detect_iigs (void);/
+<tag/Description/The function returns a 1 if running on an Apple IIgs.
+<tag/Notes/<itemize>
+<item>The function is specific to the Apple2 and Apple2enh platforms.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="get_iigs_speed" name="get_iigs_speed">,
+<ref id="set_iigs_speed" name="set_iigs_speed">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3399,11 +3581,11 @@ int main(void)
 <quote>
 <descrip>
 <tag/Function/Dump memory to tape.
-<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/, <tt/<ref id="kim1.h" name="kim1.h">/
 <tag/Declaration/<tt/int __fastcall__ dumpt (unsigned char id, const void* start, const void* end);/
 <tag/Description/<tt/dumpt/ saves memory onto data tape.
 <tag/Notes/<itemize>
-<item>The function is specific to the Sym-1.
+<item>The function is specific to the Sym-1 and KIM-1.
 <item>The return value is status.  Non-zero status indicates an error.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -3412,7 +3594,7 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="fdisp" name="fdisp">,
-<ref id="loadt" name="loadt">,
+<ref id="loadt" name="loadt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3792,7 +3974,7 @@ switching the CPU into double clock mode.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="loadt" name="loadt">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3908,7 +4090,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/The function returns the operating system, the program runs on.
 <tag/Header/<tt/<ref id="apple2.h" name="apple2.h">,
-<ref id="atari.h" name="atari.h">, <ref id="c64.h" name="c64.h">/
+<ref id="atari.h" name="atari.h">, <ref id="c64.h" name="c64.h">,
+<ref id="cx16.h" name="cx16.h">/
 <tag/Declaration/<tt/unsigned char get_ostype (void);/
 <tag/Description/<tt/get_ostype/ is machine dependent and does not exist for
 all supported targets. If it exists, it returns a number that identifies the
@@ -4007,6 +4190,27 @@ header files define constants that can be used to check the return code.
 <tag/See also/
 <ref id="detect_chameleon" name="detect_chameleon">,
 <ref id="set_chameleon_speed" name="set_chameleon_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_iigs_speed<label id="get_iigs_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the current speed of the Apple IIgs.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char get_iigs_speed (void);/
+<tag/Description/The function returns the current speed of the Apple IIgs.
+<tag/Notes/<itemize>
+<item>The function is specific to the Apple2 and Apple2enh platforms.
+<item>See the accelerator.h header for the speed definitions.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_iigs" name="detect_iigs">,
+<ref id="set_iigs_speed" name="set_iigs_speed">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4148,7 +4352,7 @@ be used in presence of a prototype.
 <tag/Example/<verb>
 chdir (getdevicedir (device, buf, sizeof buf));
 </verb>
-cf. <tt/samples/enumdevdir.c/
+cf. <tt/samples&sol;enumdevdir.c/
 </descrip>
 </quote>
 
@@ -4344,6 +4548,45 @@ to undefined behaviour.
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
 <tag/Example/None.
+</descrip>
+</quote>
+
+<sect1>htonl<label id="htonl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 32 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int htonl(val)/
+<tag/Description/Converts a 32 bit word from from network byte order
+(big endian) to little endian (or vice-versa).
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="ntohl" name="ntohl">
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+
+<sect1>htons<label id="htons"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 16 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int htons(val)/
+<tag/Description/Converts a 16 bit word from from network byte order
+(big endian) to little endian (or vice-versa) by swapping both its bytes.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="ntohs" name="ntohs">
+<tag/Availability/cc65
 </descrip>
 </quote>
 
@@ -5043,11 +5286,11 @@ used in presence of a prototype.
 <quote>
 <descrip>
 <tag/Function/Load memory from tape.
-<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/
+<tag/Header/<tt/<ref id="sym1.h" name="sym1.h">/, <tt/<ref id="kim1.h" name="kim1.h">/
 <tag/Declaration/<tt/int __fastcall__ loadt (unsigned char id);/
 <tag/Description/<tt/loadt/ loads memory from data tape.
 <tag/Notes/<itemize>
-<item>The function is specific to the Sym-1.
+<item>The function is specific to the Sym-1 and KIM-1.
 <item>The return value is status.  Non-zero status indicates an error.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -5056,7 +5299,7 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="beep" name="beep">,
 <ref id="fdisp" name="fdisp">,
-<ref id="dumpt" name="dumpt">,
+<ref id="dumpt" name="dumpt">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -5716,6 +5959,44 @@ memory allocated for the driver.
 </descrip>
 </quote>
 
+<sect1>ntohl<label id="ntohl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 32 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int __fastcall__ ntohl (int val);/
+<tag/Description/Converts a 32 bit word from from host byte order (little endian)
+to big endian (or vice-versa).
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="htonl" name="htonl">
+<tag/Availability/cc65
+</descrip>
+</quote>
+
+<sect1>ntohs<label id="ntohs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swaps byte order in a 16 bit word.
+<tag/Header/<tt/<ref id="inet.h" name="arpa/inet.h">/
+<tag/Declaration/<tt/int __fastcall__ ntohs (int val);/
+<tag/Description/Converts a 16 bit word from from host byte order (little endian)
+to big endian (or vice-versa) by swapping both its bytes.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/See also/
+<ref id="htons" name="htons">
+<tag/Availability/cc65
+</descrip>
+</quote>
+
 <sect1>offsetof<label id="offsetof"><p>
 
 <quote>
@@ -6086,6 +6367,9 @@ be used in presence of a prototype.
 <item>The returned pointer may point to a statically allocated instance of
 <tt/struct dirent/, so it may get overwritten by subsequent calls to
 <tt/readdir/.
+<item>On the Apple II platform, the d_ctime and d_mtime returned are in the
+ProDOS format. You can convert them to more portable time representations using
+the ProDOS datetime conversion functions.
 <item>On several platforms, namely the CBMs and the Atari, the disk drives get
 confused when opening/closing files between directory reads. So for example a
 program that reads the list of files on a disk, and after each call to
@@ -6565,7 +6849,8 @@ be used in presence of a prototype.
 <tag/Function/Uninstall the currently loaded driver but do not unload it.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
 <tag/Declaration/<tt/unsigned char ser_uninstall (void);/
-<tag/Description/Uninstall the currently loaded driver but do not unload it.
+<tag/Description/Uninstall the currently loaded driver but do not unload it. This
+function returns SER_ERR_NO_DRIVER if no driver was installed, 0 otherwise.
 <tag/Availability/cc65
 <tag/See also/Other serial functions.
 <tag/Example/None.
@@ -6749,6 +7034,30 @@ clean-up when exiting the program.
 </quote>
 
 
+<sect1>set_iigs_speed<label id="set_iigs_speed"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the current speed of the Apple IIgs.
+<tag/Header/<tt/<ref id="accelerator.h" name="accelerator.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ set_iigs_speed (unsigned char speed);/
+<tag/Description/The function sets the speed of the Apple IIgs CPU (and returns
+the new speed).
+<tag/Notes/<itemize>
+<item>The function is specific to the Apple2 and Apple2enh platforms.
+<item>See the accelerator.h header for the speed definitions.
+<item>Accepted parameters are SPEED_SLOW and SPEED_FAST (all other values are
+considered SPEED_FAST).
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/See also/
+<ref id="detect_iigs" name="detect_iigs">,
+<ref id="get_iigs_speed" name="get_iigs_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>set_scpu_speed<label id="set_scpu_speed"><p>
 
 <quote>
@@ -6908,7 +7217,6 @@ switching the CPU into single clock mode.
 </descrip>
 </quote>
 
-
 <sect1>srand<label id="srand"><p>
 
 <quote>
@@ -6928,6 +7236,85 @@ be used in presence of a prototype.
 <ref id="_randomize" name="_randomize">,
 <ref id="rand" name="rand">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>stat<label id="stat"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get file status.
+<tag/Header/<tt/<ref id="sys/stat.h" name="sys/stat.h">/
+<tag/Declaration/<tt/int __fastcall__ stat (const char* pathname, struct stat* statbuf);/
+<tag/Description/<tt/stat/ gets information for the file with the given name. On success,
+zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
+code describing the reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>On the Apple II platform, the st_ctim, st_mtim and st_atim members are left
+to zero, for size and performance reasons. The ProDOS creation and modification dates
+are returned in the ProDOS format in st_ctime and st_mtime. The access date does
+not exist. You can convert them to POSIX-style time representations using
+the <url url="apple2.html#ss9.3" name="ProDOS datetime conversion functions">.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="statvfs" name="statvfs">
+<tag/Example/
+<verb>
+#include &lt;sys/stat.h&gt;
+
+#define FILENAME "helloworld"
+struct stat stbuf;
+if (stat (FILENAME, &amp;stbuf) == 0) {
+    printf ("%s size is %lu bytes (created on %s)\n", FILENAME, stbuf.st_size,
+#ifndef __APPLE2__
+    localtime (&amp;stbuf.st_ctim.tv_sec)
+#else
+    localtime (mktime_dt (&amp;stbuf.st_ctime))
+#endif
+    );
+} else {
+    printf ("There was a problem stat'ing %s: %d\n", FILENAME, errno);
+}
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>statvfs<label id="statvfs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get filesystem statistics.
+<tag/Header/<tt/<ref id="sys/statvfs.h" name="sys/statvfs.h">/
+<tag/Declaration/<tt/int __fastcall__ statvfs (const char* pathname, struct statvfs* buf);/
+<tag/Description/<tt/statvfs/ gets information for the filesytem on which the given file
+resides. On success,
+zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
+code describing the reason for the failure.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function requires an absolute pathname.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="stat" name="stat">
+<tag/Example/
+<verb>
+#include &lt;sys/statvfs.h&gt;
+
+#define FILENAME "/disk/helloworld"
+struct statvfs stvbuf;
+if (statvfs (FILENAME, &amp;stvbuf) == 0) {
+    printf ("%s filesystem has %u blocks of %u size, %u of them free.\n", FILENAME, stvbuf.f_blocks, stvbuf.f_bsize, stvbuf.f_bfree);
+} else {
+    printf ("There was a problem statvfs'ing %s: %d\n", FILENAME, errno);
+}
+</verb>
 </descrip>
 </quote>
 

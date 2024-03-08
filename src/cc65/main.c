@@ -299,6 +299,14 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SYM1__", 1);
             break;
 
+        case TGT_KIM1:
+            DefineNumericMacro ("__KIM1__", 1);
+            break;
+
+        case TGT_RP6502:
+            DefineNumericMacro ("__RP6502__", 1);
+            break;
+
         default:
             AbEnd ("Unknown target system '%s'", Sys);
     }
@@ -1081,7 +1089,7 @@ int main (int argc, char* argv[])
     Compile (InputFile);
 
     /* Create the output file if we didn't had any errors */
-    if (PreprocessOnly == 0 && (ErrorCount == 0 || Debug)) {
+    if (PreprocessOnly == 0 && (GetTotalErrors () == 0 || Debug)) {
 
         /* Emit literals, do cleanup and optimizations */
         FinishCompile ();
@@ -1107,5 +1115,5 @@ int main (int argc, char* argv[])
     DoneSegAddrSizes ();
 
     /* Return an apropriate exit code */
-    return (ErrorCount > 0)? EXIT_FAILURE : EXIT_SUCCESS;
+    return (GetTotalErrors () > 0)? EXIT_FAILURE : EXIT_SUCCESS;
 }

@@ -1,3 +1,4 @@
-bug1889-missing-identifier.c:3: Error: Identifier expected
-bug1889-missing-identifier.c:4: Error: Identifier expected
-bug1889-missing-identifier.c:4: Warning: Implicit 'int' is an obsolete feature
+bug1889-missing-identifier.c:3: Error: Identifier or ';' expected after declaration specifiers
+bug1889-missing-identifier.c:3: Warning: Implicit 'int' type specifier is an obsolete feature
+bug1889-missing-identifier.c:4: Error: 'inline' on empty declaration
+bug1889-missing-identifier.c:6: Error: Expression expected

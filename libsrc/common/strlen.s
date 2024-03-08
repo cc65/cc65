@@ -2,19 +2,20 @@
 ; Ullrich von Bassewitz, 31.05.1998
 ;
 ; Note: strspn & strcspn call internally this function and rely on
-; the usage of only ptr2 here! Keep in mind when appling changes
+; the usage of only ptr4 here! Keep in mind when appling changes
 ; and check the other implementations too!
 ;
 ; size_t __fastcall__ strlen (const char* s);
 ;
 
-        .export         _strlen
-        .importzp       ptr2
+        .export         _strlen, _strlen_ptr4
+        .importzp       ptr4
         .macpack        cpu
 
 _strlen:
-        sta     ptr2            ; Save s
-        stx     ptr2+1
+        sta     ptr4            ; Save s
+        stx     ptr4+1
+_strlen_ptr4:
 .if (.cpu .bitand ::CPU_ISET_HUC6280)
         clx
         cly
@@ -27,11 +28,11 @@ _strlen:
 .endif
 .endif
 
-L1:     lda     (ptr2),y
+L1:     lda     (ptr4),y
         beq     L9
         iny
         bne     L1
-        inc     ptr2+1
+        inc     ptr4+1
         inx
         bne     L1
 

@@ -133,8 +133,8 @@ next:   inc     ptr1+1
         bcc     :+
 
         ; Mouse firmware not found
-        lda     #<MOUSE_ERR_NO_DEVICE
-        ldx     #>MOUSE_ERR_NO_DEVICE
+        lda     #MOUSE_ERR_NO_DEVICE
+        ldx     #0 ; return value is char
         rts
 
         ; Check Pascal 1.1 Firmware Protocol ID bytes

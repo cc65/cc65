@@ -81,8 +81,42 @@ MATHJ       = $FC6F
 
 ; Suzy Misc
 
-SPRCTL0     = $FC80
+SPRCTL0          = $FC80
+; Sprite bits-per-pixel definitions
+BPP_MASK         = %11000000 ; Mask for settings bits per pixel
+BPP_1            = %00000000
+BPP_2            = %01000000
+BPP_3            = %10000000
+BPP_4            = %11000000
+; More sprite control 0 bit definitions
+HFLIP            = %00100000
+VFLIP            = %00010000
+; Sprite types - redefined to reflect the reality caused by the shadow error
+TYPE_SHADOW      = %00000111
+TYPE_XOR         = %00000110
+TYPE_NONCOLL     = %00000101 ; Non-colliding
+TYPE_NORMAL      = %00000100
+TYPE_BOUNDARY    = %00000011
+TYPE_BSHADOW     = %00000010 ; Background shadow
+TYPE_BACKNONCOLL = %00000001 ; Background non-colliding
+TYPE_BACKGROUND  = %00000000
+
 SPRCTL1     = $FC81
+LITERAL     = %10000000
+PACKED      = %00000000
+ALGO3       = %01000000 ; Broken, do not set this bit!
+; Sprite reload mask definitions
+RELOAD_MASK = %00110000
+RENONE      = %00000000 ; Reload nothing
+REHV        = %00010000 ; Reload hsize, vsize
+REHVS       = %00100000 ; Reload hsize, vsize, stretch
+REHVST      = %00110000 ; Reload hsize, vsize, stretch, tilt
+; More sprite control 1 bit definitions
+REUSEPAL    = %00001000
+SKIP        = %00000100
+DRAWUP      = %00000010
+DRAWLEFT    = %00000001
+
 SPRCOLL     = $FC82
 SPRINIT     = $FC83
 SUZYHREV    = $FC88
@@ -225,30 +259,44 @@ SND_INTERRUPT = TIMER7_INTERRUPT
 
 INTRST      = $FD80
 INTSET      = $FD81
+
 MAGRDY0     = $FD84
 MAGRDY1     = $FD85
 AUDIN       = $FD86
 SYSCTL1     = $FD87
 MIKEYHREV   = $FD88
 MIKEYSREV   = $FD89
-IODIR       = $FD8A
-IODAT       = $FD8B
-TxIntEnable = %10000000
-RxIntEnable = %01000000
-TxParEnable = %00010000
-ResetErr    = %00001000
-TxOpenColl  = %00000100
-TxBreak     = %00000010
-ParEven     = %00000001
-TxReady     = %10000000
-RxReady     = %01000000
-TxEmpty     = %00100000
-RxParityErr = %00010000
-RxOverrun   = %00001000
-RxFrameErr  = %00000100
-RxBreak     = %00000010
-ParityBit   = %00000001
-SERCTL      = $FD8C
+
+IODIR          = $FD8A
+IODAT          = $FD8B
+; IODIR and IODAT bit definitions
+AUDIN_BIT      = $10  ; Note that there is also the address AUDIN
+READ_ENABLE    = $10  ; Same bit for AUDIN_BIT
+RESTLESS       = $08
+NOEXP          = $04  ; If set, redeye is not connected
+CART_ADDR_DATA = $02
+CART_POWER_OFF = $02  ; Same bit for CART_ADDR_DATA
+EXTERNAL_POWER = $01
+
+SERCTL   = $FD8C
+; SERCTL bit definitions for write operations
+TXINTEN  = $80
+RXINTEN  = $40
+PAREN    = $10
+RESETERR = $08
+TXOPEN   = $04
+TXBRK    = $02
+PAREVEN  = $01
+; SERCTL bit definitions for read operations
+TXRDY   = $80
+RXRDY   = $40
+TXEMPTY = $20
+PARERR  = $10
+OVERRUN = $08
+FRAMERR = $04
+RXBRK   = $02
+PARBIT  = $01
+
 SERDAT      = $FD8D
 SDONEACK    = $FD90
 CPUSLEEP    = $FD91

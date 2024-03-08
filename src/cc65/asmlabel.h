@@ -44,7 +44,7 @@
 
 
 
-struct Segments;
+struct SegContext;
 
 
 
@@ -54,7 +54,7 @@ struct Segments;
 
 
 
-void UseLabelPoolFromSegments (struct Segments* Seg);
+void UseLabelPoolFromSegments (struct SegContext* Seg);
 /* Use the info in segments for generating new label numbers */
 
 unsigned GetLocalLabel (void);

@@ -44,19 +44,6 @@
 
 
 /*****************************************************************************/
-/*             Remove calls to the bool transformer subroutines              */
-/*****************************************************************************/
-
-
-
-unsigned OptBoolTrans (CodeSeg* S);
-/* Try to remove the call to boolean transformer routines where the call is
-** not really needed.
-*/
-
-
-
-/*****************************************************************************/
 /*                        Optimizations for compares                         */
 /*****************************************************************************/
 
@@ -134,13 +121,6 @@ unsigned OptCmp5 (CodeSeg* S);
 **      bne     L1
 **      cmp     #b
 **      jne/jeq L2
-*/
-
-unsigned OptCmp6 (CodeSeg* S);
-/* Search for calls to compare subroutines followed by a conditional branch
-** and replace them by cheaper versions, since the branch means that the
-** boolean value returned by these routines is not needed (we may also check
-** that explicitly, but for the current code generator it is always true).
 */
 
 unsigned OptCmp7 (CodeSeg* S);

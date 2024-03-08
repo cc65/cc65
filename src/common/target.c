@@ -163,6 +163,7 @@ static const TargetEntry TargetMap[] = {
     {   "geos",         TGT_GEOS_CBM     },
     {   "geos-apple",   TGT_GEOS_APPLE   },
     {   "geos-cbm",     TGT_GEOS_CBM     },
+    {   "kim1",         TGT_KIM1         },
     {   "lunix",        TGT_LUNIX        },
     {   "lynx",         TGT_LYNX         },
     {   "module",       TGT_MODULE       },
@@ -172,6 +173,7 @@ static const TargetEntry TargetMap[] = {
     {   "pce",          TGT_PCENGINE     },
     {   "pet",          TGT_PET          },
     {   "plus4",        TGT_PLUS4        },
+    {   "rp6502",       TGT_RP6502       },
     {   "sim6502",      TGT_SIM6502      },
     {   "sim65c02",     TGT_SIM65C02     },
     {   "supervision",  TGT_SUPERVISION  },
@@ -219,6 +221,8 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
     { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
     { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "rp6502",         CPU_65C02,      BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

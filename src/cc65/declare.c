@@ -905,6 +905,8 @@ static int ParseFieldWidth (Declarator* D)
 ** otherwise the width of the field.
 */
 {
+    ExprDesc Expr;
+
     if (CurTok.Tok != TOK_COLON) {
         /* No bit-field declaration */
         return -1;
@@ -918,7 +920,16 @@ static int ParseFieldWidth (Declarator* D)
         /* Avoid a diagnostic storm by giving the bit-field the widest valid
         ** signed type, and continuing to parse.
         */
-        D->Type[0].C = T_INT;
+        D->Type[0].C = T_LONG;
+    }
+
+    if (IsTypeEnum (D->Type) && IsIncompleteESUType (D->Type)) {
+        /* If the type is an enum, it must be complete */
+        Error ("Bit-field has incomplete type '%s'",
+               GetFullTypeName (D->Type));
+
+        /* Avoid a diagnostic storm */
+        D->Type[0].C = T_LONG;
     }
 
     /* We currently support integral types up to long */
@@ -927,12 +938,12 @@ static int ParseFieldWidth (Declarator* D)
         Error ("cc65 currently supports only long-sized and smaller bit-field types");
 
         /* Avoid a diagnostic storm */
-        D->Type[0].C = T_INT;
+        D->Type[0].C = T_LONG;
     }
 
     /* Read the width */
     NextToken ();
-    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
+    Expr = NoCodeConstAbsIntExpr (hie1);
 
     if (Expr.IVal < 0) {
         Error ("Negative width in bit-field");

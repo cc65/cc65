@@ -47,7 +47,8 @@
 /* Supported CPUs */
 typedef enum CPUType {
     CPU_6502,
-    CPU_65C02
+    CPU_65C02,
+    CPU_6502X
 } CPUType;
 
 /* Current CPU */

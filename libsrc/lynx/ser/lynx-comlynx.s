@@ -73,7 +73,12 @@ SER_UNINSTALL:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_CLOSE:
-        ; Disable interrupts
+        ; Disable interrupts and stop timer 4 (serial)
+        lda     #TXOPEN|RESETERR
+        sta     SERCTL
+        stz     TIM4CTLA    ; Disable count and no reload
+        stz     SerialStat  ; Reset status
+
         ; Done, return an error code
         lda     #SER_ERR_OK
         .assert SER_ERR_OK = 0, error
@@ -108,17 +113,17 @@ SER_OPEN:
         stz     TxPtrIn
         stz     TxPtrOut
 
-        ; clock = 8 * 15625
-        lda     #%00011000
-        sta     TIM4CTLA
         ldy     #SER_PARAMS::BAUDRATE
         lda     (ptr1),y
+
+        ; Source period is 1 us
+        ldy     #%00011000  ; ENABLE_RELOAD|ENABLE_COUNT|AUD_1
 
         ldx     #1
         cmp     #SER_BAUD_62500
         beq     setbaudrate
 
-        ldx     #2
+        ldx     #3
         cmp     #SER_BAUD_31250
         beq     setbaudrate
 
@@ -134,6 +139,10 @@ SER_OPEN:
         cmp     #SER_BAUD_2400
         beq     setbaudrate
 
+        ldx     #68
+        cmp     #SER_BAUD_1800
+        beq     setbaudrate
+
         ldx     #103
         cmp     #SER_BAUD_1200
         beq     setbaudrate
@@ -142,65 +151,22 @@ SER_OPEN:
         cmp     #SER_BAUD_600
         beq     setbaudrate
 
-        ; clock = 6 * 15625
-        ldx     #%00011010
-        stx     TIM4CTLA
+        ; Source period is 8 us
+        ldy     #%00011011 ; ENABLE_RELOAD|ENABLE_COUNT|AUD_8
 
-        ldx     #12
-        cmp     #SER_BAUD_7200
-        beq     setbaudrate
-
-        ldx     #25
-        cmp     #SER_BAUD_3600
-        beq     setbaudrate
-
-        ldx     #207
-        stx     TIM4BKUP
-
-        ; clock = 4 * 15625
-        ldx     #%00011100
+        ldx     #51
         cmp     #SER_BAUD_300
-        beq     setprescaler
-
-        ; clock = 6 * 15625
-        ldx     #%00011110
-        cmp     #SER_BAUD_150
-        beq     setprescaler
-
-        ; clock = 1 * 15625
-        ldx     #%00011111
-        stx     TIM4CTLA
-        cmp     #SER_BAUD_75
-        beq     baudsuccess
-
-        ldx     #141
-        cmp     #SER_BAUD_110
-        beq     setbaudrate
-
-        ; clock = 2 * 15625
-        ldx     #%00011010
-        stx     TIM4CTLA
-        ldx     #68
-        cmp     #SER_BAUD_1800
-        beq     setbaudrate
-
-        ; clock = 6 * 15625
-        ldx     #%00011110
-        stx     TIM4CTLA
-        ldx     #231
-        cmp     #SER_BAUD_134_5
         beq     setbaudrate
 
         lda     #SER_ERR_BAUD_UNAVAIL
         ldx     #0 ; return value is char
         rts
-setprescaler:
-        stx     TIM4CTLA
-        bra     baudsuccess
+
 setbaudrate:
+        sty     TIM4CTLA
         stx     TIM4BKUP
-baudsuccess:
-        ldx     #TxOpenColl|ParEven
+
+        ldx     #TXOPEN|PAREVEN
         stx     contrl
         ldy     #SER_PARAMS::DATABITS   ; Databits
         lda     (ptr1),y
@@ -218,15 +184,15 @@ baudsuccess:
         beq     checkhs
         cmp     #SER_PAR_SPACE
         bne     @L0
-        ldx     #TxOpenColl
+        ldx     #TXOPEN
         stx     contrl
         bra     checkhs
 @L0:
-        ldx     #TxParEnable|TxOpenColl|ParEven
+        ldx     #PAREN|TXOPEN|PAREVEN
         stx     contrl
         cmp     #SER_PAR_EVEN
         beq     checkhs
-        ldx     #TxParEnable|TxOpenColl
+        ldx     #PAREN|TXOPEN
         stx     contrl
 checkhs:
         ldx     contrl
@@ -234,15 +200,27 @@ checkhs:
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
         lda     (ptr1),y
         cmp     #SER_HS_NONE
+        beq     redeye_ok
+        cmp     #SER_HS_SW              ; Software handshake will check for connected redeye
         bne     invparameter
+
+        lda     IODAT
+        and     #NOEXP                  ; Check if redeye bit flag is unset
+        beq     redeye_ok
+        lda     #SER_ERR_NO_DEVICE      ; ComLynx cable is not inserted
+        ldx     #0
+        rts
+
+redeye_ok:
         lda     SERDAT
         lda     contrl
-        ora     #RxIntEnable|ResetErr
+        ora     #RXINTEN|RESETERR       ; Turn on interrupts for receive
         sta     SERCTL
         lda     #SER_ERR_OK
         .assert SER_ERR_OK = 0, error
         tax
         rts
+
 invparameter:
         lda     #SER_ERR_INIT_FAILED
         ldx     #0 ; return value is char
@@ -264,8 +242,8 @@ GetByte:
         ldy     RxPtrOut
         lda     RxBuffer,y
         inc     RxPtrOut
+        sta     (ptr1)
         ldx     #$00
-        sta     (ptr1,x)
         txa                     ; Return code = 0
         rts
 
@@ -279,24 +257,26 @@ SER_PUT:
         ina
         cmp     TxPtrOut
         bne     PutByte
+
         lda     #SER_ERR_OVERFLOW
         ldx     #0 ; return value is char
         rts
+
 PutByte:
         ldy     TxPtrIn
         txa
         sta     TxBuffer,y
         inc     TxPtrIn
 
-        bit     TxDone
-        bmi     @L1
+        bit     TxDone      ; Check bit 7 of TxDone (TXINTEN)
+        bmi     @L1         ; Was TXINTEN already set?
         php
         sei
-        lda     contrl
-        ora     #TxIntEnable|ResetErr
-        sta     SERCTL       ; Allow TX-IRQ to hang RX-IRQ
+        lda     contrl      ; contrl does not include RXINTEN setting
+        ora     #TXINTEN|RESETERR
+        sta     SERCTL      ; Allow TX-IRQ to hang RX-IRQ (no receive while transmitting)
         sta     TxDone
-        plp
+        plp                 ; Restore processor and interrupt enable
 @L1:
         lda     #SER_ERR_OK
         .assert SER_ERR_OK = 0, error
@@ -308,9 +288,9 @@ PutByte:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_STATUS:
-        ldy     SerialStat
+        lda     SerialStat
+        sta     (ptr1)
         ldx     #$00
-        sta     (ptr1,x)
         txa                     ; Return code = 0
         rts
 
@@ -342,48 +322,56 @@ SER_IRQ:
 @L0:
         bit     TxDone
         bmi     @tx_irq     ; Transmit in progress
-        ldx     SERDAT
-        lda     SERCTL
-        and     #RxParityErr|RxOverrun|RxFrameErr|RxBreak
-        beq     @rx_irq
+
+        ldx     SERDAT      ; Read received data
+        lda     contrl
+        and     #PAREN      ; Parity enabled implies SER_PAR_EVEN or SER_PAR_ODD
+        tay
+        ora     #OVERRUN|FRAMERR|RXBRK
+        and     SERCTL      ; Check presence of relevant error flags in SERCTL
+
+        beq     @rx_irq     ; No errors so far
+
         tsb     SerialStat  ; Save error condition
-        bit     #RxBreak
+        bit     #RXBRK      ; Check for break signal
         beq     @noBreak
+
         stz     TxPtrIn     ; Break received - drop buffers
         stz     TxPtrOut
         stz     RxPtrIn
         stz     RxPtrOut
 @noBreak:
-        lda     contrl
-        ora     #RxIntEnable|ResetErr
-        sta     SERCTL
-        lda     #$10
-        sta     INTRST
-        bra     @IRQexit
+        bra     @exit0
+
 @rx_irq:
+        tya
+        bne     @2          ; Parity was enabled so no marker bit check needed
+
         lda     contrl
-        ora     #RxIntEnable|ResetErr
-        sta     SERCTL
+        eor     SERCTL      ; Should match current parity bit
+        and     #PARBIT     ; Check for mark or space value
+        bne     @exit0
+
+@2:
         txa
         ldx     RxPtrIn
         sta     RxBuffer,x
         txa
         inx
 
-@cont0:
         cpx     RxPtrOut
         beq     @1
         stx     RxPtrIn
-        lda     #SERIAL_INTERRUPT
-        sta     INTRST
         bra     @IRQexit
 
 @1:
         sta     RxPtrIn
         lda     #$80
         tsb     SerialStat
+        bra     @exit0
+
 @tx_irq:
-        ldx     TxPtrOut    ; Has all bytes been sent?
+        ldx     TxPtrOut    ; Have all bytes been sent?
         cpx     TxPtrIn
         beq     @allSent
 
@@ -393,24 +381,24 @@ SER_IRQ:
 
 @exit1:
         lda     contrl
-        ora     #TxIntEnable|ResetErr
+        ora     #TXINTEN|RESETERR
         sta     SERCTL
-        lda     #SERIAL_INTERRUPT
-        sta     INTRST
         bra     @IRQexit
 
 @allSent:
         lda     SERCTL       ; All bytes sent
-        bit     #TxEmpty
+        bit     #TXEMPTY
         beq     @exit1
         bvs     @exit1
         stz     TxDone
+
+@exit0:
         lda     contrl
-        ora     #RxIntEnable|ResetErr
+        ora     #RXINTEN|RESETERR   ; Re-enable receive interrupt
         sta     SERCTL
 
+@IRQexit:
         lda     #SERIAL_INTERRUPT
         sta     INTRST
-@IRQexit:
         clc
         rts

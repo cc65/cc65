@@ -3847,7 +3847,7 @@ static void parsesub (ExprDesc* Expr)
             /* The right hand side is constant. Check left hand side. */
             if (ED_IsQuasiConst (Expr)) {
                 /* We can't do all 'ptr1 - ptr2' constantly at the moment */
-                if (Expr->Sym == Expr2.Sym) {
+                if (ED_GetLoc (Expr) == ED_GetLoc (&Expr2) && Expr->Sym == Expr2.Sym) {
                     Expr->IVal = (Expr->IVal - Expr2.IVal) / rscale;
                     /* Get rid of unneeded flags etc. */
                     ED_MakeConstAbsInt (Expr, Expr->IVal);

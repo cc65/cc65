@@ -66,33 +66,15 @@ HSType:         .res    1               ; Flow-control type
 RecvBuf:        .res    256             ; Receive buffers: 256 bytes
 SendBuf:        .res    256             ; Send buffers: 256 bytes
 
+CurClockSource: .res    1               ; Whether to use BRG or RTxC for clock
+
         .data
 
 Opened:         .byte   $00             ; 1 when opened
 Channel:        .byte   $00             ; Channel B by default
-CurChanIrqFlags:.byte   INTR_PENDING_RX_EXT_B
+CurChanIrqFlags:.byte   $00
 
 SerFlagOrig:    .byte   $00
-
-; Tables used to translate cc65 RS232 params into register values
-; (Ref page 5-18 and 5-19)
-BaudLowTable:   .byte   $7E             ; SER_BAUD_300
-                .byte   $5E             ; SER_BAUD_1200
-                .byte   $2E             ; SER_BAUD_2400
-                .byte   $16             ; SER_BAUD_4800
-                .byte   $0A             ; SER_BAUD_9600
-                .byte   $04             ; SER_BAUD_19200
-                .byte   $01             ; SER_BAUD_38400
-                .byte   $00             ; SER_BAUD_57600
-
-BaudHighTable:  .byte   $01             ; SER_BAUD_300
-                .byte   $00             ; SER_BAUD_1200
-                .byte   $00             ; SER_BAUD_2400
-                .byte   $00             ; SER_BAUD_4800
-                .byte   $00             ; SER_BAUD_9600
-                .byte   $00             ; SER_BAUD_19200
-                .byte   $00             ; SER_BAUD_38400
-                .byte   $00             ; SER_BAUD_57600
 
 RxBitTable:     .byte   %00000000       ; SER_BITS_5, in WR_RX_CTRL (WR3)
                 .byte   %10000000       ; SER_BITS_6  (Ref page 5-7)
@@ -106,29 +88,65 @@ TxBitTable:     .byte   %00000000       ; SER_BITS_5, in WR_TX_CTRL (WR5)
 
         .rodata
 
+ClockMultiplier:.byte   %01000000       ; Clock x16 (300-57600bps, WR4, ref page 5-8)
+                .byte   %10000000       ; Clock x32 (115200bps, ref page 5-8)
+
+ClockSource:    .byte   %01010000       ; Use baud rate generator (ch. B) (WR11, page 5-17)
+                .byte   %00000000       ; Use RTxC (115200bps) (ch. B)
+                .byte   %11010000       ; Use baud rate generator (ch. A)
+                .byte   %10000000       ; Use RTxC (115200bps) (ch. A)
+
+BrgEnabled:     .byte   %00000001       ; Baud rate generator on (WR14, page 5-19)
+                .byte   %00000000       ; BRG Off
+
+ChanIrqFlags:   .byte %00000101         ; ANDed (RX/special IRQ, ch. B) (page 5-25)
+                .byte %00101000         ; ANDed (RX/special IRQ, ch. A)
+
+ChanIrqMask:    .byte %00000111         ; Ch. B IRQ flags mask
+                .byte %00111000         ; Ch. A IRQ flags mask
+
 BaudTable:                              ; bit7 = 1 means setting is invalid
-                                        ; Otherwise refers to the index in
-                                        ; Baud(Low/High)Table
-                .byte   $FF             ; SER_BAUD_45_5
-                .byte   $FF             ; SER_BAUD_50
-                .byte   $FF             ; SER_BAUD_75
-                .byte   $FF             ; SER_BAUD_110
-                .byte   $FF             ; SER_BAUD_134_5
-                .byte   $FF             ; SER_BAUD_150
-                .byte   $00             ; SER_BAUD_300
-                .byte   $FF             ; SER_BAUD_600
-                .byte   $01             ; SER_BAUD_1200
-                .byte   $FF             ; SER_BAUD_1800
-                .byte   $02             ; SER_BAUD_2400
-                .byte   $FF             ; SER_BAUD_3600
-                .byte   $03             ; SER_BAUD_4800
-                .byte   $FF             ; SER_BAUD_7200
-                .byte   $04             ; SER_BAUD_9600
-                .byte   $05             ; SER_BAUD_19200
-                .byte   $06             ; SER_BAUD_38400
-                .byte   $07             ; SER_BAUD_57600
-                .byte   $FF             ; SER_BAUD_115200
-                .byte   $FF             ; SER_BAUD_230400
+                                        ; Indexes cc65 RS232 SER_BAUD enum
+                                        ; into WR12/13 register values
+                                        ; (Ref page 5-18 and 5-19)
+                .word   $FFFF           ; SER_BAUD_45_5
+                .word   $FFFF           ; SER_BAUD_50
+                .word   $FFFF           ; SER_BAUD_75
+                .word   $FFFF           ; SER_BAUD_110
+                .word   $FFFF           ; SER_BAUD_134_5
+                .word   $FFFF           ; SER_BAUD_150
+                .word   $017E           ; SER_BAUD_300
+                .word   $FFFF           ; SER_BAUD_600
+                .word   $005E           ; SER_BAUD_1200
+                .word   $FFFF           ; SER_BAUD_1800
+                .word   $002E           ; SER_BAUD_2400
+                .word   $FFFF           ; SER_BAUD_3600
+                .word   $0016           ; SER_BAUD_4800
+                .word   $FFFF           ; SER_BAUD_7200
+                .word   $000A           ; SER_BAUD_9600
+                .word   $0004           ; SER_BAUD_19200
+                .word   $0001           ; SER_BAUD_38400
+                .word   $0000           ; SER_BAUD_57600
+                .word   $0000           ; SER_BAUD_115200 (constant unused at that speed)
+                .word   $FFFF           ; SER_BAUD_230400
+
+; About the speed selection: either we use the baud rate generator:
+; - Load the time constants from BaudTable into WR12/WR13
+; - Setup the TX/RX clock source to BRG (ClockSource into WR11)
+; - Setup the clock multiplier (WR4)
+; - Enable the baud rate generator (WR14)
+; In this case, the baud rate will be:
+;    rate = crystal_clock/(2+BRG_time_constant))/(2*clock_multiplier)
+; Example: (3686400/(2+0x0004)) / (2*16) = 19200 bps
+;
+; Or we don't use the baud rate generator:
+; - Setup the TX/RX clock source to RTxC
+; - Setup the clock multiplier
+; - Disable the baud rate generator
+; - WR12 and 13 are ignored
+; In this case, the baud rate will be:
+;    rate = crystal_clock/clock_multiplier
+; Example: 3686400/32 = 115200 bps
 
 StopTable:      .byte   %00000100       ; SER_STOP_1, in WR_TX_RX_CTRL (WR4)
                 .byte   %00001100       ; SER_STOP_2  (Ref page 5-8)
@@ -156,6 +174,7 @@ SER_FLAG   := $E10104
 
 ; ------------------------------------------------------------------------
 ; Channels
+
 CHANNEL_B              = 0
 CHANNEL_A              = 1
 
@@ -180,7 +199,6 @@ RX_CTRL_OFF            = %11111110      ; ANDed,Rx disabled
 
 WR_TX_RX_CTRL          = 4
 RR_TX_RX_STATUS        = 4
-TX_RX_CLOCK_MUL        = %01000000      ; Clock x16 (Ref page 5-8)
 
 WR_TX_CTRL             = 5              ; (Ref page 5-9)
 RR_TX_STATUS           = 5              ; Corresponding status register
@@ -197,15 +215,11 @@ MASTER_IRQ_MIE_RST     = %00001010      ; STA'd
 MASTER_IRQ_SET         = %00011001      ; STA'd
 
 WR_CLOCK_CTRL          = 11             ; (Ref page 5-17)
-CLOCK_CTRL_CH_A        = %11010000
-CLOCK_CTRL_CH_B        = %01010000
 
 WR_BAUDL_CTRL          = 12             ; (Ref page 5-18)
 WR_BAUDH_CTRL          = 13             ; (Ref page 5-19)
 
 WR_MISC_CTRL           = 14             ; (Ref page 5-19)
-MISC_CTRL_RATE_GEN_ON  = %00000001      ; ORed
-MISC_CTRL_RATE_GEN_OFF = %11111110      ; ANDed
 
 WR_IRQ_CTRL            = 15             ; (Ref page 5-20)
 IRQ_CLEANUP_EIRQ       = %00001000
@@ -220,12 +234,7 @@ IRQ_RX                 = %00100000
 IRQ_SPECIAL            = %01100000
 
 RR_INTR_PENDING_STATUS = 3              ; (Ref page 5-25)
-INTR_PENDING_RX_EXT_A  = %00101000      ; ANDed (RX or special IRQ)
-INTR_PENDING_RX_EXT_B  = %00000101      ; ANDed (RX or special IRQ)
 INTR_IS_RX             = %00100100      ; ANDed (RX IRQ, channel A or B)
-
-SER_FLAG_CH_A          = %00111000
-SER_FLAG_CH_B          = %00000111
 
         .code
 
@@ -329,6 +338,15 @@ IIgs:
 :       txa                             ; Promote char return value
         rts
 
+getClockSource:
+        .assert SER_PARAMS::BAUDRATE = 0, error
+        lda     (ptr1)                  ; Baudrate index - cc65 value
+        cmp     #SER_BAUD_115200
+        lda     #$00
+        adc     #$00
+        sta     CurClockSource          ; 0 = BRG, 1 = RTxC
+        rts
+
 ;----------------------------------------------------------------------------
 ; SER_OPEN: A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
@@ -360,11 +378,13 @@ SER_OPEN:
         ldy     #RR_INIT_STATUS         ; Hit rr0 once to sync up
         jsr     readSSCReg
 
-        ldy     #WR_MISC_CTRL           ; Turn everything off
+        ldy     #WR_MISC_CTRL           ; WR14: Turn everything off
         lda     #$00
         jsr     writeSCCReg
 
-        ldy     #SER_PARAMS::STOPBITS
+        jsr     getClockSource          ; Should we use BRG or RTxC?
+
+        ldy     #SER_PARAMS::STOPBITS   ; WR4 setup: clock mult., stop & parity
         lda     (ptr1),y                ; Stop bits
         tay
         lda     StopTable,y             ; Get value
@@ -377,36 +397,33 @@ SER_OPEN:
         ora     ParityTable,y           ; Get value
         bmi     InvParam
 
-        ora     #TX_RX_CLOCK_MUL
+        ldy     CurClockSource          ; Clock multiplier
+        ora     ClockMultiplier,y
 
-        ldy     #WR_TX_RX_CTRL          ; Setup stop & parity bits
-        jsr     writeSCCReg
+        ldy     #WR_TX_RX_CTRL
+        jsr     writeSCCReg             ; End of WR4 setup
 
+        ldy     CurClockSource          ; WR11 setup: clock source
         cpx     #CHANNEL_B
-        bne     ClockA
-ClockB:
+        beq     SetClock
+        iny                             ; Shift to get correct ClockSource val
+        iny                             ; depending on our channel
+
+SetClock:
+        lda     ClockSource,y
         ldy     #WR_CLOCK_CTRL
-        lda     #CLOCK_CTRL_CH_B
-        jsr     writeSCCReg
+        jsr     writeSCCReg             ; End of WR11 setup
 
-        lda     #INTR_PENDING_RX_EXT_B  ; Store which IRQ bits we'll check
-        sta     CurChanIrqFlags
-
-        bra     SetBaud
-ClockA:
-        ldy     #WR_CLOCK_CTRL
-        lda     #CLOCK_CTRL_CH_A
-        jsr     writeSCCReg
-
-        lda     #INTR_PENDING_RX_EXT_A  ; Store which IRQ bits we'll check
+        lda     ChanIrqFlags,x          ; Store which IRQ bits we'll check
         sta     CurChanIrqFlags
 
 SetBaud:
-        ldy     #SER_PARAMS::BAUDRATE
-        lda     (ptr1),y                ; Baudrate index - cc65 value
+        .assert SER_PARAMS::BAUDRATE = 0, error
+        lda     (ptr1)                  ; Baudrate index - cc65 value
+        asl
         tay
 
-        lda     BaudTable,y             ; Get chip value from Low/High tables
+        lda     BaudTable,y             ; Get low byte of register value
         bpl     BaudOK                  ; Verify baudrate is supported
 
 InvParam:
@@ -415,59 +432,57 @@ InvParam:
         bra     SetupOut
 
 BaudOK:
-        tay
-
-        lda     BaudLowTable,y          ; Get low byte
-
-        phy
-        ldy     #WR_BAUDL_CTRL
-        jsr     writeSCCReg
+        phy                             ; WR12 setup: BRG time constant, low byte
+        ldy     #WR_BAUDL_CTRL          ; Setting WR12 & 13 is useless if we're using
+        jsr     writeSCCReg             ; RTxC, but doing it anyway makes code smaller
         ply
 
-        lda     BaudHighTable,y         ; Get high byte
+        iny
+        lda     BaudTable,y             ; WR13 setup: BRG time constant, high byte
         ldy     #WR_BAUDH_CTRL
         jsr     writeSCCReg
 
+        ldy     CurClockSource          ; WR14 setup: BRG enabling
+        lda     BrgEnabled,y
         ldy     #WR_MISC_CTRL           ; Time to turn this thing on
-        lda     #MISC_CTRL_RATE_GEN_ON
         jsr     writeSCCReg
 
-        ldy     #SER_PARAMS::DATABITS
-        lda     (ptr1),y                ; Data bits
+        ldy     #SER_PARAMS::DATABITS   ; WR3 setup: RX data bits
+        lda     (ptr1),y
         tay
-        lda     RxBitTable,y            ; Data bits for RX
-        ora     #RX_CTRL_ON             ; and turn RX on
+        lda     RxBitTable,y
+        ora     #RX_CTRL_ON             ; and turn receiver on
 
         phy
         ldy     #WR_RX_CTRL
-        jsr     writeSCCReg
+        jsr     writeSCCReg             ; End of WR3 setup
         ply
 
-        lda     TxBitTable,y            ; Data bits for TX
-        ora     #TX_CTRL_ON             ; and turn TX on
-        and     #TX_DTR_ON
+        lda     TxBitTable,y            ; WR5 setup: TX data bits
+        ora     #TX_CTRL_ON             ; and turn transmitter on
+        and     #TX_DTR_ON              ; and turn DTR on
 
         sta     RtsOff                  ; Save value for flow control
 
-        ora     #TX_RTS_ON
+        ora     #TX_RTS_ON              ; and turn RTS on
 
         ldy     #WR_TX_CTRL
-        jsr     writeSCCReg
+        jsr     writeSCCReg             ; End of WR5 setup
 
-        ldy     #WR_IRQ_CTRL
+        ldy     #WR_IRQ_CTRL            ; WR15 setup: IRQ
         lda     #IRQ_CLEANUP_EIRQ
         jsr     writeSCCReg
 
-        ldy     #WR_INIT_CTRL           ; Clear ext status (write twice)
+        ldy     #WR_INIT_CTRL           ; WR0 setup: clear existing IRQs
         lda     #INIT_CTRL_CLEAR_EIRQ
-        jsr     writeSCCReg
+        jsr     writeSCCReg             ; Clear (write twice)
         jsr     writeSCCReg
 
-        ldy     #WR_TX_RX_MODE_CTRL      ; Activate RX IRQ
+        ldy     #WR_TX_RX_MODE_CTRL     ; WR1 setup: Activate RX IRQ
         lda     #TX_RX_MODE_RXIRQ
         jsr     writeSCCReg
 
-        lda     SCCBREG                 ; Activate master IRQ
+        lda     SCCBREG                 ; WR9 setup: Activate master IRQ
         ldy     #WR_MASTER_IRQ_RST
         lda     #MASTER_IRQ_SET
         jsr     writeSCCReg
@@ -475,14 +490,7 @@ BaudOK:
         lda     SER_FLAG                ; Get SerFlag's current value
         sta     SerFlagOrig             ; and save it
 
-        cpx     #CHANNEL_B
-        bne     IntA
-IntB:
-        ora     #SER_FLAG_CH_B          ; Inform firmware we want channel B IRQs
-        bra     StoreFlag
-IntA:
-        ora     #SER_FLAG_CH_A          ; Inform firmware we want channel A IRQs
-StoreFlag:
+        ora     ChanIrqMask,x           ; Tell firmware which channel IRQs we want
         sta     SER_FLAG
 
         ldy     #$01                    ; Mark port opened

@@ -117,6 +117,7 @@ static void Usage (void)
             "  --create-full-dep name\tCreate a full make dependency file\n"
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
+            "  --expand-macros\t\tExpand macros in the listing\n"
             "  --feature name\t\tSet an emulation feature\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --ignore-case\t\t\tIgnore case of symbols\n"
@@ -130,8 +131,7 @@ static void Usage (void)
             "  --smart\t\t\tEnable smart mode\n"
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
-            "  --version\t\t\tPrint the assembler version\n"
-            "  --expand-macros\t\tExpand macros in the listing\n",
+            "  --version\t\t\tPrint the assembler version\n",
             ProgName);
 }
 
@@ -675,7 +675,7 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
 static void OptExpandMacros (const char* Opt attribute ((unused)),
     const char* Arg attribute ((unused)))
     /* Expand macros in listing
-    ** one -m means short listing
+    ** one -x means short listing
     ** two means full listing
     */
 {
@@ -960,6 +960,7 @@ int main (int argc, char* argv [])
         { "--create-full-dep",     1,      OptCreateFullDep        },
         { "--debug",               0,      OptDebug                },
         { "--debug-info",          0,      OptDebugInfo            },
+        { "--expand-macros",       0,      OptExpandMacros         },
         { "--feature",             1,      OptFeature              },
         { "--help",                0,      OptHelp                 },
         { "--ignore-case",         0,      OptIgnoreCase           },
@@ -975,7 +976,6 @@ int main (int argc, char* argv [])
         { "--verbose",             0,      OptVerbose              },
         { "--version",             0,      OptVersion              },
         { "--warnings-as-errors",  0,      OptWarningsAsErrors     },
-        { "--expand-macros",       0,      OptExpandMacros         },
     };
 
     /* Name of the global name space */

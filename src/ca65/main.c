@@ -105,9 +105,9 @@ static void Usage (void)
             "  -mm model\t\t\tSet the memory model\n"
             "  -o name\t\t\tName the output file\n"
             "  -s\t\t\t\tEnable smart mode\n"
+            "  -S\t\t\t\tEnable segment offset listing\n"
             "  -t sys\t\t\tSet the target system\n"
             "  -v\t\t\t\tIncrease verbosity\n"
-            "  -S\t\t\t\tEnable segment offset listing\n"
             "\n"
             "Long options:\n"
             "  --auto-import\t\t\tMark unresolved symbols as import\n"
@@ -127,11 +127,11 @@ static void Usage (void)
             "  --memory-model model\t\tSet the memory model\n"
             "  --pagelength n\t\tSet the page length for the listing\n"
             "  --relax-checks\t\tRelax some checks (see docs)\n"
+            "  --segment-list\t\tEnable segment offset listing\n"
             "  --smart\t\t\tEnable smart mode\n"
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
-            "  --version\t\t\tPrint the assembler version\n"
-            "  --segment-list\t\tEnable segment offset listing\n",
+            "  --version\t\t\tPrint the assembler version\n",
             ProgName);
 }
 
@@ -964,12 +964,12 @@ int main (int argc, char* argv [])
         { "--memory-model",        1,      OptMemoryModel          },
         { "--pagelength",          1,      OptPageLength           },
         { "--relax-checks",        0,      OptRelaxChecks          },
+        { "--segment-list",        0,      OptSeglist              },
         { "--smart",               0,      OptSmart                },
         { "--target",              1,      OptTarget               },
         { "--verbose",             0,      OptVerbose              },
         { "--version",             0,      OptVersion              },
         { "--warnings-as-errors",  0,      OptWarningsAsErrors     },
-        { "--segment-list",        0,      OptSeglist              },
     };
 
     /* Name of the global name space */
@@ -1049,7 +1049,11 @@ int main (int argc, char* argv [])
                 case 's':
                     OptSmart (Arg, 0);
                     break;
-
+                
+                case 'S':
+                    OptSeglist (Arg, 0);
+                    break;
+                    
                 case 't':
                     OptTarget (Arg, GetArg (&I, 2));
                     break;
@@ -1078,9 +1082,7 @@ int main (int argc, char* argv [])
                     WarnLevel = atoi (GetArg (&I, 2));
                     break;
 
-                case 'S':
-                    OptSeglist (Arg, 0);
-                    break;
+
 
                 default:
                     UnknownOption (Arg);

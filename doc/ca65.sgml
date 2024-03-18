@@ -100,6 +100,7 @@ Short options:
   -mm model                     Set the memory model
   -o name                       Name the output file
   -s                            Enable smart mode
+  -S                            Generate segment offsets in listing
   -t sys                        Set the target system
   -v                            Increase verbosity
 
@@ -121,6 +122,7 @@ Long options:
   --memory-model model          Set the memory model
   --pagelength n                Set the page length for the listing
   --relax-checks                Disables some error checks
+  --segment-list                Generate segment offsets in listing
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity

@@ -1049,11 +1049,11 @@ int main (int argc, char* argv [])
                 case 's':
                     OptSmart (Arg, 0);
                     break;
-                
+
                 case 'S':
                     OptSeglist (Arg, 0);
                     break;
-                    
+
                 case 't':
                     OptTarget (Arg, GetArg (&I, 2));
                     break;
@@ -1081,8 +1081,6 @@ int main (int argc, char* argv [])
                 case 'W':
                     WarnLevel = atoi (GetArg (&I, 2));
                     break;
-
-
 
                 default:
                     UnknownOption (Arg);

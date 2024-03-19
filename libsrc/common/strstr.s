@@ -5,16 +5,18 @@
 ;
 
         .export         _strstr, _strcasestr
-        .import         popptr1, _tolower
-        .importzp       ptr1, ptr2, ptr3, ptr4, tmp1, tmp2, tmp3
+        .import         popptr1, return0, tolower_a
+        .importzp       ptr1, ptr2, ptr3, ptr4, tmp1, tmp2
+
+maybe_lower:                    ; Lowercase char in A if needed
+        jmp     tolower_a       ; patched on entry with either JMP or RTS
 
 _strstr:
-        ldy     #$01
+        ldy     #$60            ; RTS
         bne     :+
 _strcasestr:
-        ldy     #$00
-:
-        sty     tmp2            ; Set case sensitivity
+        ldy     #$4C            ; JMP absolute
+:       sty     maybe_lower
 
         sta     ptr2            ; Save needle
         stx     ptr2+1
@@ -31,19 +33,13 @@ _strcasestr:
 ; Search for the beginning of the string (this is not an optimal search
 ; strategy [in fact, it's pretty dumb], but it's simple to implement).
 
-        ldx     tmp2            ; Lowercase if needed
-        bne     :+
-        jsr     _tolower
-
-:       sta     tmp1            ; Save start of needle
+        jsr     maybe_lower     ; Lowercase if needed
+        sta     tmp1            ; Save start of needle
 @L1:    lda     (ptr1),y        ; Get next char from haystack
         beq     @NotFound       ; Jump if end
 
-        ldx     tmp2            ; Lowercase if needed
-        bne     :+
-        jsr     _tolower
-
-:       cmp     tmp1            ; Start of needle found?
+        jsr     maybe_lower     ; Lowercase if needed
+        cmp     tmp1            ; Start of needle found?
         beq     @L2             ; Jump if so
         iny                     ; Next char
         bne     @L1
@@ -74,18 +70,13 @@ _strcasestr:
 @L4:    lda     (ptr4),y        ; Get char from needle
         beq     @Found          ; Jump if end of needle (-> found)
 
-        ldx     tmp2            ; Lowercase if needed
-        bne     :+
-        jsr     _tolower
-:       sta     tmp3
+        jsr     maybe_lower     ; Lowercase if needed
+        sta     tmp2
 
         lda     (ptr3),y        ; Compare with haystack
 
-        ldx     tmp2            ; Lowercase if needed
-        bne     :+
-        jsr     _tolower
-
-:       cmp     tmp3
+        jsr     maybe_lower     ; Lowercase if needed
+        cmp     tmp2
         bne     @L5             ; Jump if not equal
         iny                     ; Next char
         bne     @L4
@@ -107,6 +98,4 @@ _strcasestr:
 ; We reached end of haystack without finding needle
 
 @NotFound:
-        lda     #$00            ; return NULL
-        tax
-        rts
+        jmp     return0         ; return NULL

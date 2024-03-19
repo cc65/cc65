@@ -107,8 +107,12 @@ ExprNode* ULabRef (int Which)
     int     Index;
     ULabel* L;
 
-    /* Which can never be 0 */
-    PRECONDITION (Which != 0);
+    /* Which should not be 0 */
+    if (Which == 0) {
+        Error ("Invalid unnamed label reference");
+        /* We must return something valid */
+        return GenCurrentPC();
+    }
 
     /* Get the index of the referenced label */
     if (Which > 0) {

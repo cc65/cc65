@@ -31,7 +31,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+//#define DEBUG
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,7 +62,13 @@
 #include "standard.h"
 #include "symtab.h"
 
-
+#ifdef DEBUG
+#define LOG(x)  printf  x
+#define FIXME(x)  printf  x
+#else
+#define LOG(x)
+#define FIXME(x)
+#endif
 
 /*****************************************************************************/
 /*                                   data                                    */
@@ -696,6 +702,8 @@ static void NumericConst (void)
         /* Float constant */
         Double FVal = FP_D_FromInt (IVal);      /* Convert to double */
 
+        LOG(("NumericConst start IVal:%ld FVal: %f\n", IVal, FVal.V));
+
         /* Check for a fractional part and read it */
         if (SB_Peek (&Src) == '.') {
 
@@ -771,6 +779,8 @@ static void NumericConst (void)
             }
         }
 
+        LOG(("NumericConst end FVal: %f\n", FVal.V));
+
         /* Check for a suffix and determine the type of the constant */
         if (toupper (SB_Peek (&Src)) == 'F') {
             SB_Skip (&Src);
@@ -788,7 +798,7 @@ static void NumericConst (void)
         NextTok.Tok  = TOK_FCONST;
 
     }
-
+    LOG(("NumericConst exit IsFloat:%d IVal: %ld FVal: %f\n", IsFloat, NextTok.IVal, NextTok.FVal.V));
     /* We don't need the string buffer any longer */
     SB_Done (&Src);
 }

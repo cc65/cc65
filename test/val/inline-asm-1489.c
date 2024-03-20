@@ -42,10 +42,10 @@ int res = 0;
 
 void dotest1a(uint8_t *s, uint8_t *d)
 {
-    printf("dotest1a\n");
+    printf("dotest1a (and 0x3f)\n");
     while (*s != 0) {
         *d = (testasm1(*s));
-//        printf("%04x:%02x\n",d,*d);
+        printf("%04x:%02x\n",d,*d);
         d++;
         s++;
     }
@@ -53,9 +53,10 @@ void dotest1a(uint8_t *s, uint8_t *d)
 
 void dotest1b(uint8_t *s, uint8_t *d)
 {
-    printf("dotest1b\n");
+    printf("dotest1b (and 0x3f)\n");
     while (*s != 0) {
         *d = (testasm2(*s));
+        printf("%04x:%02x\n",d,*d);
         d++;
         s++;
     }

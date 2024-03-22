@@ -4,11 +4,20 @@
 ; char* strstr (const char* haystack, const char* needle);
 ;
 
-        .export         _strstr
-        .import         popptr1
-        .importzp       ptr1, ptr2, ptr3, ptr4, tmp1
+        .export         _strstr, _strcasestr
+        .import         popptr1, return0, tolowerdirect
+        .importzp       ptr1, ptr2, ptr3, ptr4, tmp1, tmp2
+
+maybe_lower:                    ; Lowercase char in A if needed
+        jmp     tolowerdirect   ; patched on entry with either JMP or RTS
 
 _strstr:
+        ldy     #$60            ; RTS
+        bne     :+
+_strcasestr:
+        ldy     #$4C            ; JMP absolute
+:       sty     maybe_lower
+
         sta     ptr2            ; Save needle
         stx     ptr2+1
         sta     ptr4            ; Setup temp copy for later
@@ -24,9 +33,12 @@ _strstr:
 ; Search for the beginning of the string (this is not an optimal search
 ; strategy [in fact, it's pretty dumb], but it's simple to implement).
 
+        jsr     maybe_lower     ; Lowercase if needed
         sta     tmp1            ; Save start of needle
 @L1:    lda     (ptr1),y        ; Get next char from haystack
         beq     @NotFound       ; Jump if end
+
+        jsr     maybe_lower     ; Lowercase if needed
         cmp     tmp1            ; Start of needle found?
         beq     @L2             ; Jump if so
         iny                     ; Next char
@@ -43,7 +55,7 @@ _strstr:
         bcc     @L3
         inc     ptr1+1
 
-; ptr1 points to the start of needle now. Setup temporary pointers for the
+; ptr1 points to the start of needle in haystack now. Setup temporary pointers for the
 ; search. The low byte of ptr4 is already set.
 
 @L3:    sta     ptr3
@@ -57,7 +69,14 @@ _strstr:
 
 @L4:    lda     (ptr4),y        ; Get char from needle
         beq     @Found          ; Jump if end of needle (-> found)
-        cmp     (ptr3),y        ; Compare with haystack
+
+        jsr     maybe_lower     ; Lowercase if needed
+        sta     tmp2
+
+        lda     (ptr3),y        ; Compare with haystack
+
+        jsr     maybe_lower     ; Lowercase if needed
+        cmp     tmp2
         bne     @L5             ; Jump if not equal
         iny                     ; Next char
         bne     @L4
@@ -79,17 +98,4 @@ _strstr:
 ; We reached end of haystack without finding needle
 
 @NotFound:
-        lda     #$00            ; return NULL
-        tax
-        rts
-
-
-
-
-
-
-
-
-
-
-
+        jmp     return0         ; return NULL

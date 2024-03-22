@@ -10,14 +10,14 @@
 ; int tolower (int c);
 ;
 
-        .export         _tolower, tolower_a
+        .export         _tolower, tolowerdirect
         .include        "ctype.inc"
         .import         ctypemaskdirect
 
 _tolower:
         cpx     #$00            ; out of range?
         bne     out             ; if so, return the argument unchanged
-tolower_a:
+tolowerdirect:
         pha                     ; save char
         jsr     ctypemaskdirect ; get character classification
         and     #CT_UPPER       ; upper case char?

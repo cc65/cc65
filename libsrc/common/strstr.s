@@ -5,11 +5,11 @@
 ;
 
         .export         _strstr, _strcasestr
-        .import         popptr1, return0, tolower_a
+        .import         popptr1, return0, tolowerdirect
         .importzp       ptr1, ptr2, ptr3, ptr4, tmp1, tmp2
 
 maybe_lower:                    ; Lowercase char in A if needed
-        jmp     tolower_a       ; patched on entry with either JMP or RTS
+        jmp     tolowerdirect   ; patched on entry with either JMP or RTS
 
 _strstr:
         ldy     #$60            ; RTS

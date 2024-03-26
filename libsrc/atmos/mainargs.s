@@ -40,15 +40,17 @@ L1:     sta     name,y
 
         ldx     #0
 L2:     lda     BASIC_BUF,x
-        beq     done            ; No "rem", no args.
+        beq     done            ; No remark, no args.
         inx
         cmp     #REM
+        beq     L4
+        cmp     #'''
         bne     L2
 
 ; The arguments must be copied to a safe place because BASIC's input buffer
 ; might be re-used by the stdin console.
 
-        ldy     #(SCREEN_XSIZE * 2 - 1) - 1
+L4:     ldy     #(SCREEN_XSIZE * 2 - 1) - 1
 L3:     lda     BASIC_BUF,y
         sta     args,y
         dey

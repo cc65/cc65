@@ -124,11 +124,28 @@ Exit codes are limited to 8 bits.
 
 The standard C library high level file input and output is functional.
 A sim65 application can be written like a command line application,
-providing arguments to <tt/main/ and using the <tt/stdio.h/ interfaces.
+providing command line arguments to <tt/main/ and using the <tt/stdio.h/ interfaces
+to interact with the console or access files.
 
 Internally, file input and output is provided at a lower level by
 a set of built-in paravirtualization functions (<ref id="paravirt-internal" name="see below">).
 
+Example:
+
+<tscreen><verb>
+#include <stdio.h>
+int main()
+{
+    printf("Hello!\n");
+    return 5;
+}
+
+// Build and run:
+//   cc65 -o example.s example.c
+//   ca65 -o example.o example.s
+//   ld65 -t sim6502 -o example.prg example.o sim6502.lib
+//   sim65 example.prg
+</verb></tscreen>
 
 <sect>Creating a Test in Assembly<p>
 
@@ -141,11 +158,25 @@ and the sim65 library provides two ways to return an 8-bit exit code:
 
 <item>Return from <tt/_main/ with the exit code in <tt/A/.
 
-<item><tt/jmp exit/ with the code in <tt/A/.
+<item><tt/jmp exit/ with the code in <tt/A/. (<tt/.import exit/ from the sim65 library.)
 
 </itemize>
 
-The binary file has a 12 byte header:
+Example:
+
+<tscreen><verb>
+.export _main
+_main:
+    lda #5
+    rts
+
+; Build and run:
+;   ca65 -o example.o example.s
+;   ld65 -t sim6502 -o example.prg example.o sim6502.lib
+;   sim65 example.prg
+</verb></tscreen>
+
+Internally, the binary program file has a 12 byte header provided by the library:
 
 <itemize>
 
@@ -181,6 +212,9 @@ These use cc65 calling conventions, and are intended for use with the sim65 targ
 
 <item><tt/IRQ/ and <tt/NMI/ events will not be generated, though <tt/BRK/
 can be used if the IRQ vector at <tt/$FFFE/ is manually prepared by the test code.
+
+<item>The sim6502 or sim65c02 targets provide a default configuration,
+but if customization is needed, <tt/sim6502.cfg/ or <tt/sim65c02.cfg/ might be used as a template.
 
 </itemize>
 

@@ -115,12 +115,12 @@ PVExit ($01)
 
 <sect>Creating a Test in C<p>
 
-For a C test compiled and linked with <tt/--target sim6502/ the
+For a C test linked with <tt/--target sim6502/ and the <tt/sim6502.lib/ library,
 command line arguments to <tt/sim65/ will be passed to <tt/main/,
 and the return value from <tt/main/ will become sim65's exit code.
-The <tt/exit/ function may also be used to terminate with an exit code.
+The <tt/stdlib.h/ <tt/exit/ function may also be used to terminate with an exit code.
 
-Exit codes are limited to 8 bits.
+Exit codes are limited to an unsigned 8 bit value.
 
 The standard C library high level file input and output is functional.
 A sim65 application can be written like a command line application,
@@ -128,7 +128,7 @@ providing command line arguments to <tt/main/ and using the <tt/stdio.h/ interfa
 to interact with the console or access files.
 
 Internally, file input and output is provided at a lower level by
-a set of built-in paravirtualization functions (<ref id="paravirt-internal" name="see below">).
+a set of built-in paravirtualization functions (see <ref id="paravirt-internal" name="below">).
 
 Example:
 
@@ -149,9 +149,11 @@ int main()
 
 <sect>Creating a Test in Assembly<p>
 
-Assembly tests may similarly be assembled and linked with
-<tt/--target sim6502/ or <tt/--target sim65c02/.
-Define and export <tt/_main/ as an entry point,
+Though a C test may also link with assembly code,
+a pure assembly test can also be created.
+
+Link with <tt/--target sim6502/ or <tt/--target sim65c02/ and the corresponding library,
+define and export <tt/_main/ as an entry point,
 and the sim65 library provides two ways to return an 8-bit exit code:
 
 <itemize>
@@ -213,8 +215,8 @@ These use cc65 calling conventions, and are intended for use with the sim65 targ
 <item><tt/IRQ/ and <tt/NMI/ events will not be generated, though <tt/BRK/
 can be used if the IRQ vector at <tt/$FFFE/ is manually prepared by the test code.
 
-<item>The sim6502 or sim65c02 targets provide a default configuration,
-but if customization is needed, <tt/sim6502.cfg/ or <tt/sim65c02.cfg/ might be used as a template.
+<item>The <tt/sim6502/ or <tt/sim65c02/ targets provide a default configuration,
+but if customization is needed <tt/sim6502.cfg/ or <tt/sim65c02.cfg/ might be used as a template.
 
 </itemize>
 

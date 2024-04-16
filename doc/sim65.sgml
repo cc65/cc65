@@ -120,7 +120,7 @@ command line arguments to <tt/sim65/ will be passed to <tt/main/,
 and the return value from <tt/main/ will become sim65's exit code.
 The <tt/stdlib.h/ <tt/exit/ function may also be used to terminate with an exit code.
 
-Exit codes are limited to an unsigned 8 bit value.
+Exit codes are limited to an unsigned 8 bit value. (E.g. returning -1 will give an exit code of 255.)
 
 The standard C library high level file input and output is functional.
 A sim65 application can be written like a command line application,

@@ -141,8 +141,8 @@ int main()
 }
 
 // Build and run:
-//   cc65 -o example.s example.c
-//   ca65 -o example.o example.s
+//   cc65 -t sim6502 -o example.s example.c
+//   ca65 -t sim6502 -o example.o example.s
 //   ld65 -t sim6502 -o example.prg example.o sim6502.lib
 //   sim65 example.prg
 </verb></tscreen>
@@ -173,7 +173,7 @@ _main:
     rts
 
 ; Build and run:
-;   ca65 -o example.o example.s
+;   ca65 -t sim6502 -o example.o example.s
 ;   ld65 -t sim6502 -o example.prg example.o sim6502.lib
 ;   sim65 example.prg
 </verb></tscreen>

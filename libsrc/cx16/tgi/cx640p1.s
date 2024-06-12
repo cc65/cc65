@@ -18,20 +18,10 @@
         .macpack        module
 
 
-; Macro that copies a word into a pseudo-register
-
-.mac    setReg  reg, src
-        lda     src
-        ldx     src+1
-        sta     gREG::reg
-        stx     gREG::reg+1
-.endmac
-
-
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-        module_header   _cx640p1_tgi    ; 640 pixels across, 1 pixel per byte
+        module_header   _cx640p1_tgi    ; 640 pixels across, 1 pixel per bit
 
 ; First part of the header is a structure that has a signature,
 ; and defines the capabilities of the driver.
@@ -588,23 +578,6 @@ TEXTSTYLE:
 ; Must set an error code: NO
 
 OUTTEXT:
-        jsr     Point
-
-        ldy     #$00
-@next:  lda     (ptr3),y
-        bze     @end
-        phy
-        jsr     GRAPH_PUT_CHAR
-        ply
-        iny
-        bnz     @next
-@end:   rts
-
-; ------------------------------------------------------------------------
-; Point: Set the arguments for the first point of a Kernal graphics function.
-
-Point:  setReg  r0, X1
-        setReg  r1, Y1
         rts
 
 

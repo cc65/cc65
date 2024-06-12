@@ -10,9 +10,9 @@
         .import         initlib, donelib
         .import         callmain, zerobss
         .import         MEMTOP, RESTOR, BSOUT, CLRCH
-        .importzp       ST
 
         .include        "zeropage.inc"
+        .include        "c16.inc"
 
 ; ------------------------------------------------------------------------
 ; Startup code
@@ -76,7 +76,7 @@ L2:     lda     zpsave,x
 ; Store the return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Restore the stack pointer.
 

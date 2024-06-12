@@ -5,14 +5,12 @@
 ;
 
         .export         READST
-        .importzp       ST
 
+        .include        "pet.inc"
 
 .proc   READST
 
-        lda     ST
+        lda     STATUS
         rts
 
 .endproc
-
-

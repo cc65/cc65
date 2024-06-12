@@ -472,105 +472,104 @@ GETPIXEL:
 ; Must set an error code: NO
 
 BAR:
-    ; Initialize tempY with Y1
-    LDA Y1
-    STA tempY
-    LDA Y1+1
-    STA tempY+1
+        ; Initialize tempY with Y1
+        lda Y1
+        sta tempY
+        lda Y1+1
+        sta tempY+1
 
 @outer_loop:
-    ; Compare tempY with Y2
-    LDA tempY+1
-    CMP Y2+1
-    BCC @outer_continue   ; If tempY high byte < Y2 high byte, continue
-    BNE @outer_end        ; If tempY high byte > Y2 high byte, end
-    LDA tempY
-    CMP Y2
-    BCC @outer_continue   ; If tempY low byte < Y2 low byte, continue
-    BEQ @outer_end        ; If tempY low byte = Y2 low byte, end
+        ; Compare tempY with Y2
+        lda tempY+1
+        cmp Y2+1
+        bcc @outer_continue   ; If tempY high byte < Y2 high byte, continue
+        bne @outer_end        ; If tempY high byte > Y2 high byte, end
+        lda tempY
+        cmp Y2
+        bcc @outer_continue   ; If tempY low byte < Y2 low byte, continue
+        beq @outer_end        ; If tempY low byte = Y2 low byte, end
 
 @outer_continue:
-    ; Initialize tempX with X1
-    LDA X1
-    STA tempX
-    LDA X1+1
-    STA tempX+1
+        ; Initialize tempX with X1
+        lda X1
+        sta tempX
+        lda X1+1
+        sta tempX+1
 
 @inner_loop:
-    ; Compare tempX with X2
-    LDA tempX+1
-    CMP X2+1
-    BCC @inner_continue   ; If tempX high byte < X2 high byte, continue
-    BNE @inner_end        ; If tempX high byte > X2 high byte, end
-    LDA tempX
-    CMP X2
-    BCC @inner_continue   ; If tempX low byte < X2 low byte, continue
+        ; Compare tempX with X2
+        lda tempX+1
+        cmp X2+1
+        bcc @inner_continue   ; If tempX high byte < X2 high byte, continue
+        bne @inner_end        ; If tempX high byte > X2 high byte, end
+        lda tempX
+        cmp X2
+        bcc @inner_continue   ; If tempX low byte < X2 low byte, continue
 
 @inner_end:
-    ; Increment tempY
-    INC tempY
-    BNE @outer_loop       ; If no overflow, continue outer loop
-    INC tempY+1           ; If overflow, increment high byte
+        ; Increment tempY
+        inc tempY
+        bne @outer_loop       ; If no overflow, continue outer loop
+        inc tempY+1           ; If overflow, increment high byte
 
 @inner_continue:
-    ; Call setpixel(tempX, tempY)
-    LDA X1
-    PHA
-    LDA X1+1
-    PHA
-    LDA Y1
-    PHA
-    LDA Y1+1
-    PHA
+        ; Call setpixel(tempX, tempY)
+        lda X1
+        pha
+        lda X1+1
+        pha
+        lda Y1
+        pha
+        lda Y1+1
+        pha
 
-    LDA tempX
-    LDX tempX+1
-    STA X1
-    STX X1+1
+        lda tempX
+        ldx tempX+1
+        sta X1
+        stx X1+1
 
-    LDA tempY
-    LDX tempY+1
-    STA Y1
-    STX Y1+1
+        lda tempY
+        ldx tempY+1
+        sta Y1
+        stx Y1+1
 
-    JSR SETPIXEL
+        jsr SETPIXEL
 
-    PLA
-    STA Y1+1
-    PLA
-    STA Y1
-    PLA
-    STA X1+1
-    PLA
-    STA X1
+        pla
+        sta Y1+1
+        pla
+        sta Y1
+        pla
+        sta X1+1
+        pla
+        sta X1
 
     ; Increment tempX
-    INC tempX
-    BNE @inner_loop_check ; If no overflow, continue
-    INC tempX+1           ; If overflow, increment high byte
+        inc tempX
+        bne @inner_loop_check ; If no overflow, continue
+        inc tempX+1           ; If overflow, increment high byte
 
 @inner_loop_check:
-    ; Compare tempX with X2 again after increment
-    LDA tempX+1
-    CMP X2+1
-    BCC @inner_continue   ; If tempX high byte < X2 high byte, continue
-    BNE @outer_increment  ; If tempX high byte > X2 high byte, increment tempY
-    LDA tempX
-    CMP X2
-    BCC @inner_continue   ; If tempX low byte < X2 low byte, continue
+        ; Compare tempX with X2 again after increment
+        lda tempX+1
+        cmp X2+1
+        bcc @inner_continue   ; If tempX high byte < X2 high byte, continue
+        bne @outer_increment  ; If tempX high byte > X2 high byte, increment tempY
+        lda tempX
+        cmp X2
+        bcc @inner_continue   ; If tempX low byte < X2 low byte, continue
 
 @outer_increment:
-    ; Increment tempY
-    INC tempY
-    BNE @outer_loop       ; If no overflow, continue outer loop
-    INC tempY+1           ; If overflow, increment high byte
+        ; Increment tempY
+        inc tempY
+        bne @outer_loop       ; If no overflow, continue outer loop
+        inc tempY+1           ; If overflow, increment high byte
 
 @outer_end:
-    ; End of outer loop, continue with program
-    JMP @done
+        jmp @done
 
 @done:
-    ; Continue with your program
+        rts
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y

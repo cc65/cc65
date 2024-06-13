@@ -80,17 +80,19 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   C1541 ?= c1541
 endif
 
-DISK_c64 = samples.d64
+DISK_$(SYS) = samples.d64
 
 EXELIST_c64 = \
         fire \
         plasma \
-        nachtm
+        nachtm \
+        hello
 
 EXELIST_c128 = \
         fire \
         plasma \
-        nachtm
+        nachtm \
+        hello
 
 EXELIST_cbm510 = \
         fire \
@@ -110,7 +112,7 @@ EXELIST_pet = \
         notavailable
 
 EXELIST_vic20 = \
-        notavailable
+        hello
 
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
@@ -135,6 +137,15 @@ plasma: plasma.c
 	$(CL) -t $(SYS) -O -o plasma -m plasma.map plasma.c
 nachtm: nachtm.c
 	$(CL) -t $(SYS) -O -o nachtm -m nachtm.map nachtm.c
+hello: hello.s
+        # Use separate assembler ...
+	$(AS) -t $(SYS) hello.s
+        # ... and linker commands ...
+	$(LD) -C $(SYS)-asm.cfg -o hello -m hello.map -u __EXEHDR__ hello.o $(SYS).lib
+	@$(DEL) hello.o 2>$(NULLDEV)
+        # ... or compile & link utility
+#	$(CL) -C $(SYS)-asm.cfg -o hello -m hello.map -u __EXEHDR__ hello.s
+
 
 # --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes

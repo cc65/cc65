@@ -394,7 +394,7 @@ SETPIXEL:
         stx VERA::ADDR + 2
 
         ldx TEMP
-        
+
         lda BITMASK
         beq @ahead
 
@@ -402,7 +402,6 @@ SETPIXEL:
         ; Set the bit in the byte at VERA_DATA0
         lda VERA::DATA0      ; Load the byte at memory address
         ora bitMasks1,X      ; OR with the bit mask
-        ;lda 0
         sta VERA::DATA0      ; Store back the modified byte
         rts
 
@@ -441,7 +440,7 @@ GETPIXEL:
         lda #$00
         rts
 
-        @ahead:
+    @ahead:
         ldx #$00
         lda #$01
         rts

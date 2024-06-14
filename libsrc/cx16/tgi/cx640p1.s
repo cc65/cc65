@@ -84,27 +84,7 @@ TEMP            = tmp3
 TEMP2           = tmp4          ; HORLINE
 TEMP3           = sreg          ; HORLINE
 
-tempX:
-.byte $00, $00
-tempY:
-.byte $00, $00
 
-ERR2:
-.byte $00
-ERR:
-.byte $00
-SY:
-.byte $00
-SX:
-.byte $00
-DY:
-.byte $00
-DX:
-.byte $00
-CURRENT_Y:
-.byte $00, $00
-CURRENT_X:
-.byte $00, $00
 ; Absolute variables used in the code
 
 .bss
@@ -124,9 +104,20 @@ bcolor          :=      palette + 0 ; Background color
 color:          .res    1           ; Stroke and fill index
 text_mode:      .res    1           ; Old text mode
 
+tempX:          .res    2
+tempY:          .res    2
+ERR2:           .res    1
+ERR:            .res    1
+SY:             .res    1
+SX:             .res    1
+DY:             .res    1
+DX:             .res    1
+CURRENT_Y:      .res    2
+CURRENT_X:      .res    2
+
 .data
 
-error:          .byte   TGI_ERR_OK  ; Error code
+ERROR:          .byte   TGI_ERR_OK  ; Error code
 
 
 ; Constants and tables
@@ -183,7 +174,7 @@ UNINSTALL:
 ;
 ; Must set an error code: YES
 
-INIT:   stz     error           ; #TGI_ERR_OK
+INIT:   stz     ERROR           ; #TGI_ERR_OK
 
 ; Save the current text mode.
 
@@ -220,8 +211,8 @@ DONE:
 ; GETERROR: Return the error code in .A, and clear it.
 
 GETERROR:
-        lda     error
-        stz     error
+        lda     ERROR
+        stz     ERROR
         rts
 
 ; ------------------------------------------------------------------------
@@ -231,7 +222,7 @@ GETERROR:
 
 CONTROL:
         lda     #TGI_ERR_INV_FUNC
-        sta     error
+        sta     ERROR
         rts
 
 ; ------------------------------------------------------------------------
@@ -254,10 +245,8 @@ CLEAR:
     lda #(6 << 1)
     sta VERA::CTRL
 
-    lda #$00 ; color
-    ; $00=black, $01=white
-    beq ahead
-    lda #$ff
+    lda #$00
+
 ahead:
     sta VERA::DISP::VIDEO
     sta VERA::DISP::HSCALE
@@ -324,16 +313,9 @@ SETDRAWPAGE:
 ; Must set an error code: YES
 
 SETPALETTE:
-        stz     error           ; #TGI_ERR_OK
-        ldy     #$00
-:       lda     (ptr1),y
-        sta     palette,y
-        iny
-        bnz     :-
-
-        lda     color           ; Get stroke and fill index
-
-        ; Fall through.
+        lda     #TGI_ERR_INV_FUNC
+        sta     ERROR
+        rts
 
 ; ------------------------------------------------------------------------
 ; SETCOLOR: Set the drawing color (in .A). The new color already is checked
@@ -398,7 +380,7 @@ SETPIXEL:
         lda BITMASK
         beq @ahead
 
-        ; if COLOR = 1, white is line color
+        ; if BITMASK = $00, white is line color
         ; Set the bit in the byte at VERA_DATA0
         lda VERA::DATA0      ; Load the byte at memory address
         ora bitMasks1,X      ; OR with the bit mask
@@ -406,7 +388,7 @@ SETPIXEL:
         rts
 
     @ahead:
-        ; if COLOR = 0, black is line color
+        ; if BITMASK = $FF, black is line color
         lda VERA::DATA0      ; Load the byte at memory address
         and bitMasks2,X      ; OR with the bit mask
         sta VERA::DATA0      ; Store back the modified byte

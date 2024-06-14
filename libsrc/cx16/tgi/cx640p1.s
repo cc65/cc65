@@ -113,20 +113,20 @@ CURRENT_X:
 ; VERA's palette.  Vera's palette is a table of Red, Green, and Blue levels.
 ; The first 16 RGB elements mimic the Commodore 64's colors.
 
-SCRBASE:        .res    1               ; High byte of screen base
-BITMASK:        .res    1               ; $00 = clear, $FF = set pixels
-OLDCOLOR:       .res    1       ; colors before entering gfx mode
+SCRBASE:        .res    1           ; High byte of screen base
+BITMASK:        .res    1           ; $00 = clear, $FF = set pixels
+OLDCOLOR:       .res    1           ; colors before entering gfx mode
 
 defpalette:     .res    $0100
 palette:        .res    $0100
 
-bcolor          :=      palette + 0     ; Background color
-color:          .res    1               ; Stroke and fill index
-text_mode:      .res    1               ; Old text mode
+bcolor          :=      palette + 0 ; Background color
+color:          .res    1           ; Stroke and fill index
+text_mode:      .res    1           ; Old text mode
 
 .data
 
-error:          .byte   TGI_ERR_OK      ; Error code
+error:          .byte   TGI_ERR_OK  ; Error code
 
 
 ; Constants and tables
@@ -193,13 +193,13 @@ INIT:   stz     error           ; #TGI_ERR_OK
 
 ; Switch into (640 x 480 x 2) graphics mode.
 
-        lda #%00000000      ; DCSEL = 0, VRAM port 1
+        lda #%00000000          ; DCSEL = 0, VRAM port 1
         sta VERA::CTRL
-        lda #%00100001      ; Disable sprites, layer 1 enable, VGA
+        lda #%00100001          ; Disable sprites, layer 1 enable, VGA
         sta VERA::DISP::VIDEO
-        lda #%00000100      ; Bitmap mode enable
+        lda #%00000100          ; Bitmap mode enable
         sta VERA::L1::CONFIG
-        lda #%00000001      ; Tile width 640
+        lda #%00000001          ; Tile width 640
         sta VERA::L1::TILE_BASE
         rts
 
@@ -248,7 +248,7 @@ CLEAR:
 
     ; set cache writes
     lda #$40
-    tsb $9f29 ;VERA_FX_CTRL
+    tsb $9F29 ;VERA_FX_CTRL
 
     ; set FX cache to all zeroes
     lda #(6 << 1)
@@ -260,24 +260,24 @@ CLEAR:
     lda #$ff
 ahead:
     sta VERA::DISP::VIDEO
-    sta VERA::DISP::HSCALE  ;$9f2a
-    sta VERA::DISP::VSCALE  ;$9f2b
-    sta VERA::DISP::FRAME   ;$9f2c
+    sta VERA::DISP::HSCALE
+    sta VERA::DISP::VSCALE
+    sta VERA::DISP::FRAME
 
     stz VERA::CTRL
     ; set address and increment for bitmap area
     stz VERA::ADDR
     stz VERA::ADDR + 1
-    lda #$30  ; increment +4
+    lda #$30                    ; increment +4
     sta VERA::ADDR + 2
 
-    ldy #240 ; number of rows
+    ldy #$F0
 blank_outer:
-    ldx #10 ; 10 iterations of 32 = one line of 640
+    ldx #$0A
 blank_loop:
 
     .repeat 8
-    stz VERA::DATA0 ; $9f23 each `stz` writes four zeroes to VRAM (cache contents) for a total of 32 pixels when repeated 8x
+    stz VERA::DATA0
     .endrep
 
     dex
@@ -287,10 +287,10 @@ blank_loop:
 
     ; set up DCSEL=2
     lda #(2 << 1)
-    sta VERA::CTRL ; $9f25
+    sta VERA::CTRL
 
     ; set FX off (cache write bit 1 -> 0)
-    stz $9f29   ;VERA_FX_CTRL
+    stz $9F29                   ;VERA_FX_CTRL
     stz VERA::CTRL
 
     .endscope

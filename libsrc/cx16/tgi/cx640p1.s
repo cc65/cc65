@@ -2,7 +2,7 @@
 ; Graphics driver for the 640 pixels across, 480 pixels down, 2 color mode
 ; on the Commander X16
 ;
-; 2024-06-11, Scott Hutter 
+; 2024-06-11, Scott Hutter
 ; Based on code by Greg King
 ;
 
@@ -239,7 +239,7 @@ CONTROL:
 ;
 ; Must set an error code: NO
 
-CLEAR   :
+CLEAR:
     .scope inner
 
     ; set up DCSEL=2
@@ -273,13 +273,13 @@ ahead:
 
     ldy #240 ; number of rows
 blank_outer:
-    ldx #10 ; 10 iterations of 32 = one line of 320 at 8bpp
+    ldx #10 ; 10 iterations of 32 = one line of 640
 blank_loop:
 
-    .repeat 8    
+    .repeat 8
     stz VERA::DATA0 ; $9f23 each `stz` writes four zeroes to VRAM (cache contents) for a total of 32 pixels when repeated 8x
     .endrep
-    
+
     dex
     bne blank_loop
     dey
@@ -295,7 +295,7 @@ blank_loop:
 
     .endscope
     rts
-    
+
 
 ; ------------------------------------------------------------------------
 ; SETVIEWPAGE: Set the visible page. Called with the new page in .A (0..n-1).

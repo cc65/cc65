@@ -103,10 +103,11 @@ EXELIST_cbm610 = \
         nachtm
 
 EXELIST_plus4 = \
-        plasma
+        plasma \
+        hello
 
 EXELIST_c16 = \
-        notavailable
+        hello
 
 EXELIST_pet = \
         notavailable

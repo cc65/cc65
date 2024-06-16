@@ -137,14 +137,14 @@ plasma: plasma.c
 	$(CL) -t $(SYS) -O -o plasma -m plasma.map plasma.c
 nachtm: nachtm.c
 	$(CL) -t $(SYS) -O -o nachtm -m nachtm.map nachtm.c
-hello: hello.s
+hello: hello-asm.s
         # Use separate assembler ...
-	$(AS) -t $(SYS) hello.s
+	$(AS) -t $(SYS) hello-asm.s
         # ... and linker commands ...
-	$(LD) -C $(SYS)-asm.cfg -o hello -m hello.map -u __EXEHDR__ hello.o $(SYS).lib
-	@$(DEL) hello.o 2>$(NULLDEV)
+	$(LD) -C $(SYS)-asm.cfg -o hello -m hello-asm.map -u __EXEHDR__ hello-asm.o $(SYS).lib
+	@$(DEL) hello-asm.o 2>$(NULLDEV)
         # ... or compile & link utility
-#	$(CL) -C $(SYS)-asm.cfg -o hello -m hello.map -u __EXEHDR__ hello.s
+#	$(CL) -C $(SYS)-asm.cfg -o hello -m hello-asm.map -u __EXEHDR__ hello-asm.s
 
 
 # --------------------------------------------------------------------------

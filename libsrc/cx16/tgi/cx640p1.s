@@ -361,7 +361,7 @@ SETPALETTE:
 
         lda     palette+1
         asl
-        tay     
+        tay
         lda     defpalette,y
         sta     VERA::DATA0
 

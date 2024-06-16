@@ -96,6 +96,7 @@ TEMP3           = sreg          ; HORLINE
 SCRBASE:        .res    1           ; High byte of screen base
 BITMASK:        .res    1           ; $00 = clear, $FF = set pixels
 
+defpalette:     .res    2
 palette:        .res    2
 
 color:          .res    1           ; Stroke and fill index
@@ -121,7 +122,7 @@ ERROR:          .byte   TGI_ERR_OK  ; Error code
 
 .rodata
 
-defpalette:
+veracolors:
 col_black:  .byte %00000000, %00000000
 col_white:  .byte %11111111, %00001111
 col_red:    .byte %00000000, %00001000
@@ -160,9 +161,9 @@ bitMasks2:
 INSTALL:
 ; Create the default palette.
         lda #$00
-        sta palette
+        sta defpalette
         lda #$01
-        sta palette+1
+        sta defpalette+1
 
         ; Fall through.
 
@@ -344,7 +345,7 @@ SETPALETTE:
         lda     palette
         asl
         tay
-        lda     defpalette,y
+        lda     veracolors,y
         sta     VERA::DATA0
 
         inc     VERA::ADDR      ; $1FA01
@@ -353,7 +354,7 @@ SETPALETTE:
         asl
         tay
         iny     ; second byte of color
-        lda     defpalette,y
+        lda     veracolors,y
         sta     VERA::DATA0
 
         ; set foreground color from palette color 1
@@ -362,7 +363,7 @@ SETPALETTE:
         lda     palette+1
         asl
         tay
-        lda     defpalette,y
+        lda     veracolors,y
         sta     VERA::DATA0
 
         inc     VERA::ADDR      ; $1FA03
@@ -371,7 +372,7 @@ SETPALETTE:
         asl
         tay
         iny     ; second byte of color
-        lda     defpalette,y
+        lda     veracolors,y
         sta     VERA::DATA0
         rts
 

@@ -31,7 +31,7 @@
         .addr   $0000                   ; Library reference
         .word   640                     ; X resolution
         .word   480                     ; Y resolution
-        .byte   2                       ; Number of drawing colors
+        .byte   2                      ; Number of drawing colors
         .byte   0                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
@@ -95,12 +95,9 @@ TEMP3           = sreg          ; HORLINE
 
 SCRBASE:        .res    1           ; High byte of screen base
 BITMASK:        .res    1           ; $00 = clear, $FF = set pixels
-OLDCOLOR:       .res    1           ; colors before entering gfx mode
 
-defpalette:     .res    $0100
-palette:        .res    $0100
+palette:        .res    2
 
-bcolor          :=      palette + 0 ; Background color
 color:          .res    1           ; Stroke and fill index
 text_mode:      .res    1           ; Old text mode
 
@@ -124,6 +121,24 @@ ERROR:          .byte   TGI_ERR_OK  ; Error code
 
 .rodata
 
+defpalette:
+col_black:  .byte %00000000, %00000000
+col_white:  .byte %11111111, %00001111
+col_red:    .byte %00000000, %00001000
+col_cyan:   .byte %11111110, %00001010
+col_purple: .byte %01001100, %00001100
+col_green:  .byte %11000101, %00000000
+col_blue:   .byte %00001010, %00000000
+col_yellow: .byte %11100111, %00001110
+col_orange: .byte %10000101, %00001101
+col_brown:  .byte %01000000, %00000110
+col_lred:   .byte %01110111, %00001111
+col_gray1:  .byte %00110011, %00000011
+col_gray2:  .byte %01110111, %00000111
+col_lgreen: .byte %11110110, %00001010
+col_lblue:  .byte %10001111, %00000000
+col_gray3:  .byte %10111011, %00001011
+
 ; Bit masks for setting pixels
 bitMasks1:
     .byte %10000000, %01000000, %00100000, %00010000
@@ -144,12 +159,10 @@ bitMasks2:
 
 INSTALL:
 ; Create the default palette.
-
-        ldx     #$00
-:       txa
-        sta     defpalette,x
-        inx
-        bnz     :-
+        lda #$00
+        sta palette
+        lda #$01
+        sta palette+1
 
         ; Fall through.
 
@@ -182,7 +195,7 @@ INIT:   stz     ERROR           ; #TGI_ERR_OK
         jsr     SCREEN_MODE
         sta     text_mode
 
-; Switch into (640 x 480 x 2) graphics mode.
+; Switch into (640 x 480 x 2 bpp) graphics mode.
 
         lda #%00000000          ; DCSEL = 0, VRAM port 1
         sta VERA::CTRL
@@ -313,8 +326,53 @@ SETDRAWPAGE:
 ; Must set an error code: YES
 
 SETPALETTE:
-        lda     #TGI_ERR_INV_FUNC
-        sta     ERROR
+        stz     ERROR           ; #TGI_ERR_OK
+        ldy     #$01            ; Palette size of 2 colors
+@L1:    lda     (ptr1),y        ; Copy the palette
+        sta     palette,y
+        dey
+        bpl     @L1
+
+        ; set background color from palette color 0
+        lda     #$00
+        sta     VERA::ADDR
+        lda     #$FA
+        sta     VERA::ADDR+1
+        lda     #$01
+        sta     VERA::ADDR+2    ; write color RAM @ $1FA00
+
+        lda     palette
+        asl
+        tay
+        lda     defpalette,y
+        sta     VERA::DATA0
+
+        inc     VERA::ADDR      ; $1FA01
+
+        lda     palette
+        asl
+        tay
+        iny     ; second byte of color
+        lda     defpalette,y
+        sta     VERA::DATA0
+
+        ; set foreground color from palette color 1
+        inc     VERA::ADDR      ; $1FA02
+
+        lda     palette+1
+        asl
+        tay     
+        lda     defpalette,y
+        sta     VERA::DATA0
+
+        inc     VERA::ADDR      ; $1FA03
+
+        lda     palette+1
+        asl
+        tay
+        iny     ; second byte of color
+        lda     defpalette,y
+        sta     VERA::DATA0
         rts
 
 ; ------------------------------------------------------------------------
@@ -328,6 +386,7 @@ SETCOLOR:
         beq     @L1
         lda     #$FF
 @L1:    sta     BITMASK
+        stx     color
         rts
 
 ; ------------------------------------------------------------------------

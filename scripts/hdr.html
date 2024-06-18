@@ -1,0 +1,1436 @@
+<html><body>
+<table><tr>
+<td><font size=-1><a href=#DbgDisAsm>DbgDisAsm</a></font></td><td><font size=-1><a href=#DbgDisAsmLen>DbgDisAsmLen</a></font></td><td><font size=-1><a href=#__seterrno>__seterrno</a></font></td><td><font size=-1><a href=#_cbm_filetype>_cbm_filetype</a></font></td><td><font size=-1><a href=#bgcolor>bgcolor</a></font></td></tr><tr>
+<td><font size=-1><a href=#bordercolor>bordercolor</a></font></td><td><font size=-1><a href=#cbm_load>cbm_load</a></font></td><td><font size=-1><a href=#cbm_opendir>cbm_opendir</a></font></td><td><font size=-1><a href=#cpeekcolor>cpeekcolor</a></font></td><td><font size=-1><a href=#cpeekrevers>cpeekrevers</a></font></td></tr><tr>
+<td><font size=-1><a href=#cursor>cursor</a></font></td><td><font size=-1><a href=#detect_c128>detect_c128</a></font></td><td><font size=-1><a href=#detect_c64dtv>detect_c64dtv</a></font></td><td><font size=-1><a href=#detect_c65>detect_c65</a></font></td><td><font size=-1><a href=#detect_chameleon>detect_chameleon</a></font></td></tr><tr>
+<td><font size=-1><a href=#detect_iigs>detect_iigs</a></font></td><td><font size=-1><a href=#detect_scpu>detect_scpu</a></font></td><td><font size=-1><a href=#detect_turbomaster>detect_turbomaster</a></font></td><td><font size=-1><a href=#dio_close>dio_close</a></font></td><td><font size=-1><a href=#dio_query_sectcount>dio_query_sectcount</a></font></td></tr><tr>
+<td><font size=-1><a href=#dio_query_sectsize>dio_query_sectsize</a></font></td><td><font size=-1><a href=#doesclrscrafterexit>doesclrscrafterexit</a></font></td><td><font size=-1><a href=#em_install>em_install</a></font></td><td><font size=-1><a href=#em_load_driver>em_load_driver</a></font></td><td><font size=-1><a href=#em_uninstall>em_uninstall</a></font></td></tr><tr>
+<td><font size=-1><a href=#em_unload>em_unload</a></font></td><td><font size=-1><a href=#get_c128_speed>get_c128_speed</a></font></td><td><font size=-1><a href=#get_c64dtv_speed>get_c64dtv_speed</a></font></td><td><font size=-1><a href=#get_c65_speed>get_c65_speed</a></font></td><td><font size=-1><a href=#get_chameleon_speed>get_chameleon_speed</a></font></td></tr><tr>
+<td><font size=-1><a href=#get_iigs_speed>get_iigs_speed</a></font></td><td><font size=-1><a href=#get_numbanks>get_numbanks</a></font></td><td><font size=-1><a href=#get_ostype>get_ostype</a></font></td><td><font size=-1><a href=#get_ostype>get_ostype</a></font></td><td><font size=-1><a href=#get_ostype>get_ostype</a></font></td></tr><tr>
+<td><font size=-1><a href=#get_scpu_speed>get_scpu_speed</a></font></td><td><font size=-1><a href=#get_turbomaster_speed>get_turbomaster_speed</a></font></td><td><font size=-1><a href=#get_tv>get_tv</a></font></td><td><font size=-1><a href=#get_tv>get_tv</a></font></td><td><font size=-1><a href=#get_tv>get_tv</a></font></td></tr><tr>
+<td><font size=-1><a href=#getcpu>getcpu</a></font></td><td><font size=-1><a href=#getcurrentdevice>getcurrentdevice</a></font></td><td><font size=-1><a href=#getfirstdevice>getfirstdevice</a></font></td><td><font size=-1><a href=#getnextdevice>getnextdevice</a></font></td><td><font size=-1><a href=#isfast>isfast</a></font></td></tr><tr>
+<td><font size=-1><a href=#isfast>isfast</a></font></td><td><font size=-1><a href=#joy_count>joy_count</a></font></td><td><font size=-1><a href=#joy_install>joy_install</a></font></td><td><font size=-1><a href=#joy_load_driver>joy_load_driver</a></font></td><td><font size=-1><a href=#joy_read>joy_read</a></font></td></tr><tr>
+<td><font size=-1><a href=#joy_uninstall>joy_uninstall</a></font></td><td><font size=-1><a href=#joy_unload>joy_unload</a></font></td><td><font size=-1><a href=#kbhit>kbhit</a></font></td><td><font size=-1><a href=#kbrepeat>kbrepeat</a></font></td><td><font size=-1><a href=#lynx_eeprom_read>lynx_eeprom_read</a></font></td></tr><tr>
+<td><font size=-1><a href=#lynx_eeprom_write>lynx_eeprom_write</a></font></td><td><font size=-1><a href=#lynx_eeread>lynx_eeread</a></font></td><td><font size=-1><a href=#lynx_eewrite>lynx_eewrite</a></font></td><td><font size=-1><a href=#lynx_snd_active>lynx_snd_active</a></font></td><td><font size=-1><a href=#mod_load>mod_load</a></font></td></tr><tr>
+<td><font size=-1><a href=#mouse_buttons>mouse_buttons</a></font></td><td><font size=-1><a href=#mouse_ioctl>mouse_ioctl</a></font></td><td><font size=-1><a href=#mouse_uninstall>mouse_uninstall</a></font></td><td><font size=-1><a href=#mouse_unload>mouse_unload</a></font></td><td><font size=-1><a href=#mul20>mul20</a></font></td></tr><tr>
+<td><font size=-1><a href=#mul40>mul40</a></font></td><td><font size=-1><a href=#o>o</a></font></td><td><font size=-1><a href=#revers>revers</a></font></td><td><font size=-1><a href=#s>s</a></font></td><td><font size=-1><a href=#ser_close>ser_close</a></font></td></tr><tr>
+<td><font size=-1><a href=#ser_get>ser_get</a></font></td><td><font size=-1><a href=#ser_install>ser_install</a></font></td><td><font size=-1><a href=#ser_ioctl>ser_ioctl</a></font></td><td><font size=-1><a href=#ser_load_driver>ser_load_driver</a></font></td><td><font size=-1><a href=#ser_open>ser_open</a></font></td></tr><tr>
+<td><font size=-1><a href=#ser_put>ser_put</a></font></td><td><font size=-1><a href=#ser_status>ser_status</a></font></td><td><font size=-1><a href=#ser_uninstall>ser_uninstall</a></font></td><td><font size=-1><a href=#ser_unload>ser_unload</a></font></td><td><font size=-1><a href=#set_c128_speed>set_c128_speed</a></font></td></tr><tr>
+<td><font size=-1><a href=#set_c64dtv_speed>set_c64dtv_speed</a></font></td><td><font size=-1><a href=#set_c65_speed>set_c65_speed</a></font></td><td><font size=-1><a href=#set_chameleon_speed>set_chameleon_speed</a></font></td><td><font size=-1><a href=#set_iigs_speed>set_iigs_speed</a></font></td><td><font size=-1><a href=#set_scpu_speed>set_scpu_speed</a></font></td></tr><tr>
+<td><font size=-1><a href=#set_turbomaster_speed>set_turbomaster_speed</a></font></td><td><font size=-1><a href=#t>t</a></font></td><td><font size=-1><a href=#t>t</a></font></td><td><font size=-1><a href=#textcolor>textcolor</a></font></td><td><font size=-1><a href=#tgi_getcolor>tgi_getcolor</a></font></td></tr><tr>
+<td><font size=-1><a href=#tgi_getcolorcount>tgi_getcolorcount</a></font></td><td><font size=-1><a href=#tgi_geterror>tgi_geterror</a></font></td><td><font size=-1><a href=#tgi_getmaxcolor>tgi_getmaxcolor</a></font></td><td><font size=-1><a href=#tgi_getpixel>tgi_getpixel</a></font></td><td><font size=-1><a href=#tgi_gettextheight>tgi_gettextheight</a></font></td></tr><tr>
+<td><font size=-1><a href=#tgi_gettextwidth>tgi_gettextwidth</a></font></td><td><font size=-1><a href=#tgi_ioctl>tgi_ioctl</a></font></td><td><font size=-1><a href=#udiv32by16r16>udiv32by16r16</a></font></td><td><font size=-1><a href=#umul16x16r32>umul16x16r32</a></font></td><td><font size=-1><a href=#umul16x8r32>umul16x8r32</a></font></td></tr><tr>
+<td><font size=-1><a href=#umul8x8r16>umul8x8r16</a></font></td><td><font size=-1><a href=#vera_layer_enable>vera_layer_enable</a></font></td><td><font size=-1><a href=#vera_sprites_enable>vera_sprites_enable</a></font></td><td><font size=-1><a href=#videomode>videomode</a></font></td><td><font size=-1><a href=#videomode>videomode</a></font></td></tr><tr>
+<td><font size=-1><a href=#videomode>videomode</a></font></td><td><font size=-1><a href=#vpeek>vpeek</a></font></td><td><font size=-1><a href=#wherex>wherex</a></font></td><td><font size=-1><a href=#wherey>wherey</a></font></td><td><font size=-1><a href=#x>x</a></font></td></tr><tr>
+<td><font size=-1><a href=#y>y</a></font></td></tr></table>
+<br/><br/><pre>
+<hr/>
+<a name=DbgDisAsm></a>
+<table width=100%>
+<tr><td>DbgDisAsm</td><td align=right>DbgDisAsm</td></tr>
+<tr><td>dbg.h</td><td align=right>dbg.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  DbgDisAsm();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Disassemble one instruction at address addr into the given buffer.
+ The resulting line has the format, "AAAA__BB_BB_BB___OPC_OPERAND",
+ where AAAA is the hexadecimal representation of addr, BB are the
+ bytes (in hex) that make the instruction, OPC is the mnemonic, and
+ OPERAND is an operand for the instruction.
+ The buffer is filled with spaces up to the given length and terminated as
+ a usual C string. NOTE: Buf must be able to hold Len+1 characters.
+ The function returns the length of the disassembled instruction, so,
+ to disassemble the next instruction, add the return value to addr
+ and call the function again.
+
+
+
+
+<hr/>
+<a name=DbgDisAsmLen></a>
+<table width=100%>
+<tr><td>DbgDisAsmLen</td><td align=right>DbgDisAsmLen</td></tr>
+<tr><td>dbg.h</td><td align=right>dbg.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  DbgDisAsmLen();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Disassemble one instruction, but do only return the length, do not
+ create a visible representation. This function is useful when
+ disassembling backwards, it is much faster than DbgDisAsm.
+
+
+
+
+<hr/>
+<a name=__seterrno></a>
+<table width=100%>
+<tr><td>__seterrno</td><td align=right>__seterrno</td></tr>
+<tr><td>errno.h</td><td align=right>errno.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ __seterrno();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Set errno to a specific error code and return zero. Used by the library 
+
+
+
+<hr/>
+<a name=_cbm_filetype></a>
+<table width=100%>
+<tr><td>_cbm_filetype</td><td align=right>_cbm_filetype</td></tr>
+<tr><td>cbm_filetype.h</td><td align=right>cbm_filetype.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ _cbm_filetype();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Map the start character for a file type to one of the file types above.
+ Note: 'd' will always mapped to CBM_T_DEL. The calling function has to
+ look at the following character to determine if the file type is actually
+ CBM_T_DIR.
+ This is a function used by the implementation. There is usually no need
+ to call it from user code.
+
+
+
+
+<hr/>
+<a name=bgcolor></a>
+<table width=100%>
+<tr><td>bgcolor</td><td align=right>bgcolor</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ bgcolor();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Set the color for the background. The old color setting is returned. 
+
+
+
+<hr/>
+<a name=bordercolor></a>
+<table width=100%>
+<tr><td>bordercolor</td><td align=right>bordercolor</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ bordercolor();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Set the color for the border. The old color setting is returned. 
+
+
+
+<hr/>
+<a name=cbm_load></a>
+<table width=100%>
+<tr><td>cbm_load</td><td align=right>cbm_load</td></tr>
+<tr><td>cbm.h</td><td align=right>cbm.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned int __fastcall__ cbm_load();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Loads file "name", from given device, to given address -- or, to the load
+ address of the file if "data" is the null pointer (like load"name",8,1
+ in BASIC).
+ Returns number of bytes that were loaded if loading was successful;
+ otherwise 0, "__oserror" contains an error-code, then (see table above).
+
+
+
+
+<hr/>
+<a name=cbm_opendir></a>
+<table width=100%>
+<tr><td>cbm_opendir</td><td align=right>cbm_opendir</td></tr>
+<tr><td>cbm.h</td><td align=right>cbm.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  cbm_opendir();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Opens directory listing. Returns 0 if opening directory was successful;
+ otherwise, an error-code corresponding to cbm_open(). As an optional
+ argument, the name of the directory may be passed to the function. If
+ no explicit name is specified, "$" is used.
+
+
+
+
+<hr/>
+<a name=cpeekcolor></a>
+<table width=100%>
+<tr><td>cpeekcolor</td><td align=right>cpeekcolor</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  cpeekcolor();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the color from the current cursor position 
+
+
+
+<hr/>
+<a name=cpeekrevers></a>
+<table width=100%>
+<tr><td>cpeekrevers</td><td align=right>cpeekrevers</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  cpeekrevers();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the reverse attribute from the current cursor position.
+ If the character is reversed, then return 1; return 0 otherwise.
+
+
+
+
+<hr/>
+<a name=cursor></a>
+<table width=100%>
+<tr><td>cursor</td><td align=right>cursor</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ cursor();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ If onoff is 1, a cursor is displayed when waiting for keyboard input. If
+ onoff is 0, the cursor is hidden when waiting for keyboard input. The
+ function returns the old cursor setting.
+
+
+
+
+<hr/>
+<a name=detect_c128></a>
+<table width=100%>
+<tr><td>detect_c128</td><td align=right>detect_c128</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  detect_c128();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=detect_c64dtv></a>
+<table width=100%>
+<tr><td>detect_c64dtv</td><td align=right>detect_c64dtv</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  detect_c64dtv();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=detect_c65></a>
+<table width=100%>
+<tr><td>detect_c65</td><td align=right>detect_c65</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  detect_c65();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=detect_chameleon></a>
+<table width=100%>
+<tr><td>detect_chameleon</td><td align=right>detect_chameleon</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  detect_chameleon();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=detect_iigs></a>
+<table width=100%>
+<tr><td>detect_iigs</td><td align=right>detect_iigs</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  detect_iigs();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=detect_scpu></a>
+<table width=100%>
+<tr><td>detect_scpu</td><td align=right>detect_scpu</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  detect_scpu();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=detect_turbomaster></a>
+<table width=100%>
+<tr><td>detect_turbomaster</td><td align=right>detect_turbomaster</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  detect_turbomaster();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=dio_close></a>
+<table width=100%>
+<tr><td>dio_close</td><td align=right>dio_close</td></tr>
+<tr><td>dio.h</td><td align=right>dio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ dio_close();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ close device, returns oserror (0 for success) 
+
+
+
+<hr/>
+<a name=dio_query_sectcount></a>
+<table width=100%>
+<tr><td>dio_query_sectcount</td><td align=right>dio_query_sectcount</td></tr>
+<tr><td>dio.h</td><td align=right>dio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  dio_query_sectcount();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ returns sector count 
+
+
+
+<hr/>
+<a name=dio_query_sectsize></a>
+<table width=100%>
+<tr><td>dio_query_sectsize</td><td align=right>dio_query_sectsize</td></tr>
+<tr><td>dio.h</td><td align=right>dio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  dio_query_sectsize();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ returns sector size 
+
+
+
+<hr/>
+<a name=doesclrscrafterexit></a>
+<table width=100%>
+<tr><td>doesclrscrafterexit</td><td align=right>doesclrscrafterexit</td></tr>
+<tr><td>cc65.h</td><td align=right>cc65.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  doesclrscrafterexit();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Indicates whether the screen automatically be cleared after program
+ termination.
+
+
+
+
+<hr/>
+<a name=em_install></a>
+<table width=100%>
+<tr><td>em_install</td><td align=right>em_install</td></tr>
+<tr><td>em.h</td><td align=right>em.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ em_install();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Install an already loaded driver. Return an error code. 
+
+
+
+<hr/>
+<a name=em_load_driver></a>
+<table width=100%>
+<tr><td>em_load_driver</td><td align=right>em_load_driver</td></tr>
+<tr><td>em.h</td><td align=right>em.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ em_load_driver();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Load and install an extended memory driver. Return an error code. 
+
+
+
+<hr/>
+<a name=em_uninstall></a>
+<table width=100%>
+<tr><td>em_uninstall</td><td align=right>em_uninstall</td></tr>
+<tr><td>em.h</td><td align=right>em.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  em_uninstall();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Uninstall the currently loaded driver and return an error code.
+ Note: This call does not free allocated memory.
+
+
+
+
+<hr/>
+<a name=em_unload></a>
+<table width=100%>
+<tr><td>em_unload</td><td align=right>em_unload</td></tr>
+<tr><td>em.h</td><td align=right>em.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  em_unload();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Uninstall, then unload the currently loaded driver. 
+
+
+
+<hr/>
+<a name=get_c128_speed></a>
+<table width=100%>
+<tr><td>get_c128_speed</td><td align=right>get_c128_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_c128_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=get_c64dtv_speed></a>
+<table width=100%>
+<tr><td>get_c64dtv_speed</td><td align=right>get_c64dtv_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_c64dtv_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=get_c65_speed></a>
+<table width=100%>
+<tr><td>get_c65_speed</td><td align=right>get_c65_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_c65_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=get_chameleon_speed></a>
+<table width=100%>
+<tr><td>get_chameleon_speed</td><td align=right>get_chameleon_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_chameleon_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=get_iigs_speed></a>
+<table width=100%>
+<tr><td>get_iigs_speed</td><td align=right>get_iigs_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_iigs_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=get_numbanks></a>
+<table width=100%>
+<tr><td>get_numbanks</td><td align=right>get_numbanks</td></tr>
+<tr><td>cx16.h</td><td align=right>cx16.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned short  get_numbanks();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the number of RAM banks that the machine has. 
+
+
+
+<hr/>
+<a name=get_ostype></a>
+<table width=100%>
+<tr><td>get_ostype</td><td align=right>get_ostype</td></tr>
+<tr><td>apple2.h</td><td align=right>apple2.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_ostype();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Get the machine type. Returns one of the APPLE_xxx codes. 
+
+
+
+<hr/>
+<a name=get_ostype></a>
+<table width=100%>
+<tr><td>get_ostype</td><td align=right>get_ostype</td></tr>
+<tr><td>c64.h</td><td align=right>c64.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_ostype();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Get the ROM version. Returns one of the C64_OS_xxx codes. 
+
+
+
+<hr/>
+<a name=get_ostype></a>
+<table width=100%>
+<tr><td>get_ostype</td><td align=right>get_ostype</td></tr>
+<tr><td>cx16.h</td><td align=right>cx16.h</td></tr>
+<tr height=10px/>
+<tr><td>signed char  get_ostype();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Get the ROM build version.
+ -1 -- custom build
+ Negative -- prerelease build
+ Positive -- release build
+
+
+
+
+<hr/>
+<a name=get_scpu_speed></a>
+<table width=100%>
+<tr><td>get_scpu_speed</td><td align=right>get_scpu_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_scpu_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=get_turbomaster_speed></a>
+<table width=100%>
+<tr><td>get_turbomaster_speed</td><td align=right>get_turbomaster_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_turbomaster_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=get_tv></a>
+<table width=100%>
+<tr><td>get_tv</td><td align=right>get_tv</td></tr>
+<tr><td>cbm.h</td><td align=right>cbm.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_tv();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the video mode the machine is using. 
+
+
+
+<hr/>
+<a name=get_tv></a>
+<table width=100%>
+<tr><td>get_tv</td><td align=right>get_tv</td></tr>
+<tr><td>cx16.h</td><td align=right>cx16.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_tv();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the video signal type that the machine is using.
+ Return a TV_xx constant.
+
+
+
+
+<hr/>
+<a name=get_tv></a>
+<table width=100%>
+<tr><td>get_tv</td><td align=right>get_tv</td></tr>
+<tr><td>nes.h</td><td align=right>nes.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  get_tv();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the video mode the machine is using. 
+
+
+
+<hr/>
+<a name=getcpu></a>
+<table width=100%>
+<tr><td>getcpu</td><td align=right>getcpu</td></tr>
+<tr><td>6502.h</td><td align=right>6502.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  getcpu();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Detect the CPU the program is running on 
+
+
+
+<hr/>
+<a name=getcurrentdevice></a>
+<table width=100%>
+<tr><td>getcurrentdevice</td><td align=right>getcurrentdevice</td></tr>
+<tr><td>device.h</td><td align=right>device.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  getcurrentdevice();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=getfirstdevice></a>
+<table width=100%>
+<tr><td>getfirstdevice</td><td align=right>getfirstdevice</td></tr>
+<tr><td>device.h</td><td align=right>device.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  getfirstdevice();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=getnextdevice></a>
+<table width=100%>
+<tr><td>getnextdevice</td><td align=right>getnextdevice</td></tr>
+<tr><td>device.h</td><td align=right>device.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ getnextdevice();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=isfast></a>
+<table width=100%>
+<tr><td>isfast</td><td align=right>isfast</td></tr>
+<tr><td>c128.h</td><td align=right>c128.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  isfast();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Returns 1 if the CPU is in 2MHz mode. 
+
+
+
+<hr/>
+<a name=isfast></a>
+<table width=100%>
+<tr><td>isfast</td><td align=right>isfast</td></tr>
+<tr><td>cbm264.h</td><td align=right>cbm264.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  isfast();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Returns 1 if the CPU is in double-clock mode. 
+
+
+
+<hr/>
+<a name=joy_count></a>
+<table width=100%>
+<tr><td>joy_count</td><td align=right>joy_count</td></tr>
+<tr><td>joystick.h</td><td align=right>joystick.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  joy_count();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the number of joysticks supported by the driver 
+
+
+
+<hr/>
+<a name=joy_install></a>
+<table width=100%>
+<tr><td>joy_install</td><td align=right>joy_install</td></tr>
+<tr><td>joystick.h</td><td align=right>joystick.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ joy_install();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Install an already loaded driver. Return an error code. 
+
+
+
+<hr/>
+<a name=joy_load_driver></a>
+<table width=100%>
+<tr><td>joy_load_driver</td><td align=right>joy_load_driver</td></tr>
+<tr><td>joystick.h</td><td align=right>joystick.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ joy_load_driver();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Load and install a joystick driver. Return an error code. 
+
+
+
+<hr/>
+<a name=joy_read></a>
+<table width=100%>
+<tr><td>joy_read</td><td align=right>joy_read</td></tr>
+<tr><td>joystick.h</td><td align=right>joystick.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ joy_read();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Read a particular joystick 
+
+
+
+<hr/>
+<a name=joy_uninstall></a>
+<table width=100%>
+<tr><td>joy_uninstall</td><td align=right>joy_uninstall</td></tr>
+<tr><td>joystick.h</td><td align=right>joystick.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  joy_uninstall();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Uninstall the currently loaded driver and return an error code.
+ Note: This call does not free allocated memory.
+
+
+
+
+<hr/>
+<a name=joy_unload></a>
+<table width=100%>
+<tr><td>joy_unload</td><td align=right>joy_unload</td></tr>
+<tr><td>joystick.h</td><td align=right>joystick.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  joy_unload();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Uninstall, then unload the currently loaded driver. 
+
+
+
+<hr/>
+<a name=kbhit></a>
+<table width=100%>
+<tr><td>kbhit</td><td align=right>kbhit</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  kbhit();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return true if there's a key waiting, return false if not 
+
+
+
+<hr/>
+<a name=kbrepeat></a>
+<table width=100%>
+<tr><td>kbrepeat</td><td align=right>kbrepeat</td></tr>
+<tr><td>cbm.h</td><td align=right>cbm.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ kbrepeat();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Changes which keys have automatic repeat. 
+
+
+
+<hr/>
+<a name=lynx_eeprom_read></a>
+<table width=100%>
+<tr><td>lynx_eeprom_read</td><td align=right>lynx_eeprom_read</td></tr>
+<tr><td>lynx.h</td><td align=right>lynx.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  lynx_eeprom_read();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Read a 16 bit word from the given address 
+
+
+
+<hr/>
+<a name=lynx_eeprom_write></a>
+<table width=100%>
+<tr><td>lynx_eeprom_write</td><td align=right>lynx_eeprom_write</td></tr>
+<tr><td>lynx.h</td><td align=right>lynx.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  lynx_eeprom_write();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Write the word at the given address 
+
+
+
+<hr/>
+<a name=lynx_eeread></a>
+<table width=100%>
+<tr><td>lynx_eeread</td><td align=right>lynx_eeread</td></tr>
+<tr><td>lynx.h</td><td align=right>lynx.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  lynx_eeread();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Read a 16 bit word from the given address 93C46 93C66 or 93C86
+
+
+
+<hr/>
+<a name=lynx_eewrite></a>
+<table width=100%>
+<tr><td>lynx_eewrite</td><td align=right>lynx_eewrite</td></tr>
+<tr><td>lynx.h</td><td align=right>lynx.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  lynx_eewrite();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Write the word at the given address 93C46 93C66 or 93C86
+
+
+
+<hr/>
+<a name=lynx_snd_active></a>
+<table width=100%>
+<tr><td>lynx_snd_active</td><td align=right>lynx_snd_active</td></tr>
+<tr><td>lynx.h</td><td align=right>lynx.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  lynx_snd_active();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Show which channels are active 
+
+
+
+<hr/>
+<a name=mod_load></a>
+<table width=100%>
+<tr><td>mod_load</td><td align=right>mod_load</td></tr>
+<tr><td>modload.h</td><td align=right>modload.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ mod_load();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Load a module into memory and relocate it. The function will return an
+ error code (see below). If MLOAD_OK is returned, the outgoing fields in
+ the passed mod_ctrl struct contain information about the module just
+ loaded.
+
+
+
+
+<hr/>
+<a name=mouse_buttons></a>
+<table width=100%>
+<tr><td>mouse_buttons</td><td align=right>mouse_buttons</td></tr>
+<tr><td>mouse.h</td><td align=right>mouse.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  mouse_buttons();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return a bit mask encoding the states of the mouse buttons. Use the
+ MOUSE_BTN_XXX flags to decode a specific button.
+
+
+
+
+<hr/>
+<a name=mouse_ioctl></a>
+<table width=100%>
+<tr><td>mouse_ioctl</td><td align=right>mouse_ioctl</td></tr>
+<tr><td>mouse.h</td><td align=right>mouse.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ mouse_ioctl();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Call the driver-specific ioctl function. Return an error code.
+ NON-PORTABLE!
+
+
+
+
+<hr/>
+<a name=mouse_uninstall></a>
+<table width=100%>
+<tr><td>mouse_uninstall</td><td align=right>mouse_uninstall</td></tr>
+<tr><td>mouse.h</td><td align=right>mouse.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  mouse_uninstall();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Uninstall the currently loaded driver. Return an error code. 
+
+
+
+<hr/>
+<a name=mouse_unload></a>
+<table width=100%>
+<tr><td>mouse_unload</td><td align=right>mouse_unload</td></tr>
+<tr><td>mouse.h</td><td align=right>mouse.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  mouse_unload();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Uninstall, then unload the currently loaded driver. 
+
+
+
+<hr/>
+<a name=mul20></a>
+<table width=100%>
+<tr><td>mul20</td><td align=right>mul20</td></tr>
+<tr><td>cc65.h</td><td align=right>cc65.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned int __fastcall__ mul20();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Multiply an 8 bit unsigned value by 20 and return the 16 bit unsigned
+ result
+
+
+
+
+<hr/>
+<a name=mul40></a>
+<table width=100%>
+<tr><td>mul40</td><td align=right>mul40</td></tr>
+<tr><td>cc65.h</td><td align=right>cc65.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned int __fastcall__ mul40();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Multiply an 8 bit unsigned value by 40 and return the 16 bit unsigned
+ result
+
+
+
+
+<hr/>
+<a name=o></a>
+<table width=100%>
+<tr><td>o</td><td align=right>o</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned tgi_getaspectrati  o();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Returns the aspect ratio for the loaded driver. The aspect ratio is an
+ 8.8 fixed point value.
+
+
+
+
+<hr/>
+<a name=revers></a>
+<table width=100%>
+<tr><td>revers</td><td align=right>revers</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ revers();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Enable/disable reverse character display. This may not be supported by
+ the output device. Return the old setting.
+
+
+
+
+<hr/>
+<a name=s></a>
+<table width=100%>
+<tr><td>s</td><td align=right>s</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned tgi_getyre  s();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the resolution in Y direction. 
+
+
+
+<hr/>
+<a name=ser_close></a>
+<table width=100%>
+<tr><td>ser_close</td><td align=right>ser_close</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  ser_close();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ "Close" the port. Clear buffers and disable interrupts. 
+
+
+
+<hr/>
+<a name=ser_get></a>
+<table width=100%>
+<tr><td>ser_get</td><td align=right>ser_get</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ ser_get();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Get a character from the serial port. If no characters are available, the
+ function will return SER_ERR_NO_DATA, so this is not a fatal error.
+
+
+
+
+<hr/>
+<a name=ser_install></a>
+<table width=100%>
+<tr><td>ser_install</td><td align=right>ser_install</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ ser_install();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Install an already loaded driver. Return an error code. 
+
+
+
+<hr/>
+<a name=ser_ioctl></a>
+<table width=100%>
+<tr><td>ser_ioctl</td><td align=right>ser_ioctl</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ ser_ioctl();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Driver specific entry. 
+
+
+
+<hr/>
+<a name=ser_load_driver></a>
+<table width=100%>
+<tr><td>ser_load_driver</td><td align=right>ser_load_driver</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ ser_load_driver();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Load and install a serial driver. Return an error code. 
+
+
+
+<hr/>
+<a name=ser_open></a>
+<table width=100%>
+<tr><td>ser_open</td><td align=right>ser_open</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ ser_open();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ "Open" the port by setting the port parameters and enable interrupts. 
+
+
+
+<hr/>
+<a name=ser_put></a>
+<table width=100%>
+<tr><td>ser_put</td><td align=right>ser_put</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ ser_put();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Send a character via the serial port. There is a transmit buffer, but
+ transmitting is not done via interrupt. The function returns
+ SER_ERR_OVERFLOW if there is no space left in the transmit buffer.
+
+
+
+
+<hr/>
+<a name=ser_status></a>
+<table width=100%>
+<tr><td>ser_status</td><td align=right>ser_status</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ ser_status();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the serial port status. 
+
+
+
+<hr/>
+<a name=ser_uninstall></a>
+<table width=100%>
+<tr><td>ser_uninstall</td><td align=right>ser_uninstall</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  ser_uninstall();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Uninstall the currently loaded driver and return an error code.
+ Note: This call does not free allocated memory.
+
+
+
+
+<hr/>
+<a name=ser_unload></a>
+<table width=100%>
+<tr><td>ser_unload</td><td align=right>ser_unload</td></tr>
+<tr><td>serial.h</td><td align=right>serial.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  ser_unload();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Uninstall, then unload the currently loaded driver. 
+
+
+
+<hr/>
+<a name=set_c128_speed></a>
+<table width=100%>
+<tr><td>set_c128_speed</td><td align=right>set_c128_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ set_c128_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=set_c64dtv_speed></a>
+<table width=100%>
+<tr><td>set_c64dtv_speed</td><td align=right>set_c64dtv_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ set_c64dtv_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=set_c65_speed></a>
+<table width=100%>
+<tr><td>set_c65_speed</td><td align=right>set_c65_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ set_c65_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=set_chameleon_speed></a>
+<table width=100%>
+<tr><td>set_chameleon_speed</td><td align=right>set_chameleon_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ set_chameleon_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=set_iigs_speed></a>
+<table width=100%>
+<tr><td>set_iigs_speed</td><td align=right>set_iigs_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ set_iigs_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=set_scpu_speed></a>
+<table width=100%>
+<tr><td>set_scpu_speed</td><td align=right>set_scpu_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ set_scpu_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=set_turbomaster_speed></a>
+<table width=100%>
+<tr><td>set_turbomaster_speed</td><td align=right>set_turbomaster_speed</td></tr>
+<tr><td>accelerator.h</td><td align=right>accelerator.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ set_turbomaster_speed();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+
+
+
+<hr/>
+<a name=t></a>
+<table width=100%>
+<tr><td>t</td><td align=right>t</td></tr>
+<tr><td>em.h</td><td align=right>em.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned em_pagecoun  t();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the total number of 256 byte pages available in extended memory. 
+
+
+
+<hr/>
+<a name=t></a>
+<table width=100%>
+<tr><td>t</td><td align=right>t</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned tgi_getpagecoun  t();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Returns the number of screen pages available. 
+
+
+
+<hr/>
+<a name=textcolor></a>
+<table width=100%>
+<tr><td>textcolor</td><td align=right>textcolor</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ textcolor();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Set the color for text output. The old color setting is returned. 
+
+
+
+<hr/>
+<a name=tgi_getcolor></a>
+<table width=100%>
+<tr><td>tgi_getcolor</td><td align=right>tgi_getcolor</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  tgi_getcolor();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the current drawing color. 
+
+
+
+<hr/>
+<a name=tgi_getcolorcount></a>
+<table width=100%>
+<tr><td>tgi_getcolorcount</td><td align=right>tgi_getcolorcount</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  tgi_getcolorcount();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Get the number of available colors. Zero means 256 colors. 
+
+
+
+<hr/>
+<a name=tgi_geterror></a>
+<table width=100%>
+<tr><td>tgi_geterror</td><td align=right>tgi_geterror</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  tgi_geterror();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the error code for the last operation. This will also clear the
+ error.
+
+
+
+
+<hr/>
+<a name=tgi_getmaxcolor></a>
+<table width=100%>
+<tr><td>tgi_getmaxcolor</td><td align=right>tgi_getmaxcolor</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  tgi_getmaxcolor();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the maximum supported color number (the number of colors would
+ then be getmaxcolor()+1).
+
+
+
+
+<hr/>
+<a name=tgi_getpixel></a>
+<table width=100%>
+<tr><td>tgi_getpixel</td><td align=right>tgi_getpixel</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ tgi_getpixel();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Get the color value of a pixel. 
+
+
+
+<hr/>
+<a name=tgi_gettextheight></a>
+<table width=100%>
+<tr><td>tgi_gettextheight</td><td align=right>tgi_gettextheight</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  tgi_gettextheight();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Calculate the height of the text in pixels according to the current text
+ style.
+
+
+
+
+<hr/>
+<a name=tgi_gettextwidth></a>
+<table width=100%>
+<tr><td>tgi_gettextwidth</td><td align=right>tgi_gettextwidth</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  tgi_gettextwidth();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Calculate the width of the text in pixels according to the current text
+ style.
+
+
+
+
+<hr/>
+<a name=tgi_ioctl></a>
+<table width=100%>
+<tr><td>tgi_ioctl</td><td align=right>tgi_ioctl</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  tgi_ioctl();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Call the driver specific control function. What this function does for
+ a specific code depends on the driver. The driver will set an error
+ for unknown codes or values.
+
+
+
+
+<hr/>
+<a name=udiv32by16r16></a>
+<table width=100%>
+<tr><td>udiv32by16r16</td><td align=right>udiv32by16r16</td></tr>
+<tr><td>cc65.h</td><td align=right>cc65.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned long __fastcall__ udiv32by16r16();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Divide a 32 bit unsigned value by a 16 bit unsigned value yielding a 16
+ bit result and a 16 bit remainder. The former is returned in the lower 16
+ bit of the result, the latter in the upper. If you don't need the
+ remainder, just assign (or cast) to an unsigned.
+
+
+
+
+<hr/>
+<a name=umul16x16r32></a>
+<table width=100%>
+<tr><td>umul16x16r32</td><td align=right>umul16x16r32</td></tr>
+<tr><td>cc65.h</td><td align=right>cc65.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned long __fastcall__ umul16x16r32();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Multiply two unsigned 16 bit to yield an unsigned 32 bit result 
+
+
+
+<hr/>
+<a name=umul16x8r32></a>
+<table width=100%>
+<tr><td>umul16x8r32</td><td align=right>umul16x8r32</td></tr>
+<tr><td>cc65.h</td><td align=right>cc65.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned long __fastcall__ umul16x8r32();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Multiply an unsigned 16 bit by an unsigned 8 bit number yielding a 24
+ bit unsigned result that is extended to 32 bits for easier handling from C.
+
+
+
+
+<hr/>
+<a name=umul8x8r16></a>
+<table width=100%>
+<tr><td>umul8x8r16</td><td align=right>umul8x8r16</td></tr>
+<tr><td>cc65.h</td><td align=right>cc65.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  umul8x8r16();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Multiply two unsigned 8 bit to yield an unsigned 16 bit result 
+
+
+
+<hr/>
+<a name=vera_layer_enable></a>
+<table width=100%>
+<tr><td>vera_layer_enable</td><td align=right>vera_layer_enable</td></tr>
+<tr><td>cx16.h</td><td align=right>cx16.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ vera_layer_enable();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Display the layers that are "named" by the bit flags in layers.
+ A value of 0b01 shows layer 0, a value of 0b10 shows layer 1,
+ a value of 0b11 shows both layers.  Return the previous value.
+
+
+
+
+<hr/>
+<a name=vera_sprites_enable></a>
+<table width=100%>
+<tr><td>vera_sprites_enable</td><td align=right>vera_sprites_enable</td></tr>
+<tr><td>cx16.h</td><td align=right>cx16.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ vera_sprites_enable();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Enable the sprite engine when mode is non-zero (true);
+ disable sprites when mode is zero.  Return the previous mode.
+
+
+
+
+<hr/>
+<a name=videomode></a>
+<table width=100%>
+<tr><td>videomode</td><td align=right>videomode</td></tr>
+<tr><td>apple2enh.h</td><td align=right>apple2enh.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  videomode();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
+ constants.
+
+
+
+
+<hr/>
+<a name=videomode></a>
+<table width=100%>
+<tr><td>videomode</td><td align=right>videomode</td></tr>
+<tr><td>c128.h</td><td align=right>c128.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned __fastcall__  videomode();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
+ constants.
+
+
+
+
+<hr/>
+<a name=videomode></a>
+<table width=100%>
+<tr><td>videomode</td><td align=right>videomode</td></tr>
+<tr><td>cx16.h</td><td align=right>cx16.h</td></tr>
+<tr height=10px/>
+<tr><td>signed char __fastcall__ videomode();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Set the video mode, return the old mode.
+ Return -1 if Mode isn't valid.
+ Call with one of the VIDEOMODE_xx constants.
+
+
+
+
+<hr/>
+<a name=vpeek></a>
+<table width=100%>
+<tr><td>vpeek</td><td align=right>vpeek</td></tr>
+<tr><td>cx16.h</td><td align=right>cx16.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char __fastcall__ vpeek();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Get a byte from a location in VERA's internal address space. 
+
+
+
+<hr/>
+<a name=wherex></a>
+<table width=100%>
+<tr><td>wherex</td><td align=right>wherex</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  wherex();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the X position of the cursor 
+
+
+
+<hr/>
+<a name=wherey></a>
+<table width=100%>
+<tr><td>wherey</td><td align=right>wherey</td></tr>
+<tr><td>conio.h</td><td align=right>conio.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned char  wherey();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the Y position of the cursor 
+
+
+
+<hr/>
+<a name=x></a>
+<table width=100%>
+<tr><td>x</td><td align=right>x</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned tgi_getmax  x();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the maximum x coordinate. The resolution in x direction is
+ getmaxx() + 1
+
+
+
+
+<hr/>
+<a name=y></a>
+<table width=100%>
+<tr><td>y</td><td align=right>y</td></tr>
+<tr><td>tgi.h</td><td align=right>tgi.h</td></tr>
+<tr height=10px/>
+<tr><td>unsigned tgi_getmax  y();</td><td align=right>[ <a href=#top>top</a> ]</rd></tr>
+</table>
+ Return the maximum y coordinate. The resolution in y direction is
+ getmaxy() + 1
+
+
+
+
+</pre></body></html>

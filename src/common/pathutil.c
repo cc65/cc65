@@ -1,8 +1,7 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 strpool.h                                 */
-/*                                                                           */
-/*                               A string pool                               */
+/*                                pathutil.c                                 */
+/*                         Path manipulation utilities                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -31,85 +30,90 @@
 /*                                                                           */
 /*****************************************************************************/
 
+#if defined(_WIN32)
 
+#if !defined(_WIN32_WINNT) && !defined(NTDDI_VERSION)
 
-/* A string pool is used to store identifiers and other strings. Each string
-** stored in the pool has a unique ID, which may be used to access the string
-** in the pool. Identical strings are only stored once in the pool and have
-** identical IDs. This means that instead of comparing strings, just the
-** string pool IDs must be compared.
-*/
+/* Set minimum windows version for GetFinalPathNameByHandleA */
+/* NTDDI_VISTA */
+#define NTDDI_VERSION 0x06000000
 
+/* _WIN32_WINNT_VISTA */
+#define _WIN32_WINNT 0x600
 
+#endif
 
-#ifndef STRPOOL_H
-#define STRPOOL_H
+#include "xmalloc.h"
+#include <windows.h>
+#include <fileapi.h>
 
+#endif
 
-
-/* common */
-#include "hashtab.h"
-#include "strbuf.h"
-
-
-
-/*****************************************************************************/
-/*                                     Data                                  */
-/*****************************************************************************/
-
-
-
-/* Opaque string pool entry */
-typedef struct StringPoolEntry StringPoolEntry;
-
-/* A string pool */
-typedef struct StringPool StringPool;
+#include <stdlib.h>
 
 
 
 /*****************************************************************************/
-/*                                     Code                                  */
+/*                                   code                                    */
 /*****************************************************************************/
 
 
 
-StringPool* NewStringPool (unsigned HashSlots);
-/* Allocate, initialize and return a new string pool */
+#if defined(_WIN32)
 
-void FreeStringPool (StringPool* P);
-/* Free a string pool */
-
-const StrBuf* SP_Get (const StringPool* P, unsigned Index);
-/* Return a string from the pool. Index must exist, otherwise FAIL is called. */
-
-unsigned SP_Add (StringPool* P, const StrBuf* S);
-/* Add a string buffer to the buffer and return the index. If the string does
-** already exist in the pool, SP_Add will just return the index of the
-** existing string.
-*/
-
-unsigned SP_AddStr (StringPool* P, const char* S);
-/* Add a string to the buffer and return the index. If the string does already
-** exist in the pool, SP_Add will just return the index of the existing string.
-*/
-
-unsigned SP_GetCount (const StringPool* P);
-/* Return the number of strings in the pool */
-
-unsigned SP_Lookup(StringPool *P, const StrBuf *S);
+char *FindRealPath (const char *Path)
 /*
-** Determine whether the given string is in the pool.
-** Returns 1 if the string is in the pool, 0 otherwise.
+** Returns a malloced buffer containing the canonical path of the given path.
+** If the path points to a non-existent file, or if any error occurs, NULL is returned.
+** If the path points to a symlink, the resolved symlink path is returned.
+** Note: The returned path's separator is system specific.
 */
+{
 
-unsigned SP_LookupStr(StringPool *P, const char *S);
+    HANDLE Handle = CreateFileA (Path,
+                                 FILE_READ_ATTRIBUTES,
+                                 FILE_SHARE_READ |
+                                 FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                 NULL,
+                                 OPEN_EXISTING,
+                                 FILE_FLAG_BACKUP_SEMANTICS,
+                                 NULL);
+
+    if (Handle == INVALID_HANDLE_VALUE) {
+        return NULL;
+    }
+
+    size_t BufferSize = MAX_PATH + 10;
+    char* Buffer = xmalloc (BufferSize);
+
+    DWORD Status = GetFinalPathNameByHandleA (Handle,
+                                              Buffer,
+                                              BufferSize,
+                                              FILE_NAME_NORMALIZED
+                                              | VOLUME_NAME_DOS);
+
+    if (Status == 0) {
+        xfree (Buffer);
+        CloseHandle (Handle);
+        return NULL;
+    }
+
+    CloseHandle (Handle);
+
+    return Buffer;
+}
+
+#else
+
+char* FindRealPath (const char* path)
 /*
-** Determine whether the given string is in the pool.
-** Returns 1 if the string is in the pool, 0 otherwise.
+** Returns a malloced buffer containing the canonical path of the given path.
+** If the path points to a non-existent file, or if any error occurs, NULL is returned.
+** If the path points to a symlink, the resolved symlink path is returned.
+** Note: The returned path's separator is system specific.
 */
-
-
-
-/* End of strpool.h */
+{
+    return realpath (path, NULL);
+}
 
 #endif

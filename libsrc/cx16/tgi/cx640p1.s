@@ -291,7 +291,7 @@ CLEAR:
         sta     VERA::CTRL
 
         ; set FX off (cache write bit 1 -> 0)
-        stz     $9F29                   ;VERA_FX_CTRL
+        stz     VERA::DISP::VIDEO        ; VERA_FX_CTRL when DCSEL=2
         stz     VERA::CTRL
 
         .endscope

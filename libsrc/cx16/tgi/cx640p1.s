@@ -31,7 +31,7 @@
         .addr   $0000                   ; Library reference
         .word   640                     ; X resolution
         .word   480                     ; Y resolution
-        .byte   2                      ; Number of drawing colors
+        .byte   2                       ; Number of drawing colors
         .byte   0                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
@@ -198,14 +198,14 @@ INIT:   stz     ERROR           ; #TGI_ERR_OK
 
 ; Switch into (640 x 480 x 2 bpp) graphics mode.
 
-        lda #%00000000          ; DCSEL = 0, VRAM port 1
-        sta VERA::CTRL
-        lda #%00100001          ; Disable sprites, layer 1 enable, VGA
-        sta VERA::DISP::VIDEO
-        lda #%00000100          ; Bitmap mode enable
-        sta VERA::L1::CONFIG
-        lda #%00000001          ; Tile width 640
-        sta VERA::L1::TILE_BASE
+        lda     #%00000000          ; DCSEL = 0, VRAM port 1
+        sta     VERA::CTRL
+        lda     #%00100001          ; Disable sprites, layer 1 enable, VGA
+        sta     VERA::DISP::VIDEO
+        lda     #%00000100          ; Bitmap mode enable
+        sta     VERA::L1::CONFIG
+        lda     #%00000001          ; Tile width 640
+        sta     VERA::L1::TILE_BASE
         rts
 
 ; ------------------------------------------------------------------------
@@ -245,59 +245,57 @@ CONTROL:
 ; Must set an error code: NO
 
 CLEAR:
-    .scope inner
+        .scope inner
 
-    ; set up DCSEL=2
-    lda #(2 << 1)
-    sta VERA::CTRL
+        ; set up DCSEL=2
+        lda     #(2 << 1)
+        sta     VERA::CTRL
 
-    ; set cache writes
-    lda #$40
-    tsb $9F29 ;VERA_FX_CTRL
+        ; set cache writes
+        lda     #$40
+        tsb     VERA::DISP::VIDEO        ; VERA_FX_CTRL when DCSEL=2
 
-    ; set FX cache to all zeroes
-    lda #(6 << 1)
-    sta VERA::CTRL
+        ; set FX cache to all zeroes
+        lda     #(6 << 1)
+        sta     VERA::CTRL
 
-    lda #$00
+        lda     #$00
+        sta     VERA::DISP::VIDEO
+        sta     VERA::DISP::HSCALE
+        sta     VERA::DISP::VSCALE
+        sta     VERA::DISP::FRAME
 
-ahead:
-    sta VERA::DISP::VIDEO
-    sta VERA::DISP::HSCALE
-    sta VERA::DISP::VSCALE
-    sta VERA::DISP::FRAME
+        stz     VERA::CTRL
+        ; set address and increment for bitmap area
+        stz     VERA::ADDR
+        stz     VERA::ADDR + 1
+        lda     #$30                    ; increment +4
+        sta     VERA::ADDR + 2
 
-    stz VERA::CTRL
-    ; set address and increment for bitmap area
-    stz VERA::ADDR
-    stz VERA::ADDR + 1
-    lda #$30                    ; increment +4
-    sta VERA::ADDR + 2
+        ldy     #$F0
+@blank_outer:
+        ldx     #$0A
+@blank_loop:
 
-    ldy #$F0
-blank_outer:
-    ldx #$0A
-blank_loop:
+        .repeat 8
+        stz VERA::DATA0
+        .endrep
 
-    .repeat 8
-    stz VERA::DATA0
-    .endrep
+        dex
+        bne     @blank_loop
+        dey
+        bne     @blank_outer
 
-    dex
-    bne blank_loop
-    dey
-    bne blank_outer
+        ; set up DCSEL=2
+        lda     #(2 << 1)
+        sta     VERA::CTRL
 
-    ; set up DCSEL=2
-    lda #(2 << 1)
-    sta VERA::CTRL
+        ; set FX off (cache write bit 1 -> 0)
+        stz     $9F29                   ;VERA_FX_CTRL
+        stz     VERA::CTRL
 
-    ; set FX off (cache write bit 1 -> 0)
-    stz $9F29                   ;VERA_FX_CTRL
-    stz VERA::CTRL
-
-    .endscope
-    rts
+        .endscope
+        rts
 
 
 ; ------------------------------------------------------------------------
@@ -447,7 +445,7 @@ SETPIXEL:
         sta VERA::DATA0      ; Store back the modified byte
         rts
 
-    @ahead:
+@ahead:
         ; if BITMASK = $FF, black is line color
         lda VERA::DATA0      ; Load the byte at memory address
         and bitMasks2,X      ; OR with the bit mask
@@ -482,7 +480,7 @@ GETPIXEL:
         lda #$00
         rts
 
-    @ahead:
+@ahead:
         ldx #$00
         lda #$01
         rts

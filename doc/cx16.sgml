@@ -243,6 +243,12 @@ point to <tt/cx320p1.tgi (cx320p1_tgi)/.
   a way that's compatible with some of the other color drivers).
 </descrip><p>
 
+<descrip>
+  <tag><tt/cx640p1.tgi (cx640p1_tgi)/</tag>
+  This driver features a resolution of 640 across and 480 down with 2 colors,
+  black and white.
+</descrip><p>
+
 
 <sect1>Extended memory drivers<p>
 

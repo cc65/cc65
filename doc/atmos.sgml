@@ -235,6 +235,7 @@ supported directly by BASIC, the following syntax was chosen:
 
 <tscreen><verb>
     RUN:REM arg1 " ARG2 IS QUOTED" ARG3 "" ARG5
+    RUN'arg1
 </verb></tscreen>
 
 <enum>

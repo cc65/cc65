@@ -52,7 +52,6 @@ char* __fastcall__ strchr (const char* s, int c);
 int __fastcall__ strcmp (const char* s1, const char* s2);
 int __fastcall__ strcoll (const char* s1, const char* s2);
 char* __fastcall__ strcpy (char* dest, const char* src);
-char* __fastcall__ stpcpy (char* dest, const char* src);
 size_t __fastcall__ strcspn (const char* s1, const char* s2);
 char* __fastcall__ strerror (int errcode);
 size_t __fastcall__ strlen (const char* s);
@@ -91,6 +90,7 @@ char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);
 char* __fastcall__ strupper (char* s);
 char* __fastcall__ strqtok (char* s1, const char* s2);
+char* __fastcall__ stpcpy (char* dest, const char* src);
 #endif
 
 const char* __fastcall__ __stroserror (unsigned char errcode);

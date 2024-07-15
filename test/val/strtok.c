@@ -1,5 +1,3 @@
-// 2024-02-14 Sven Michael Klose <pixel@hugbox.org>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +6,7 @@ void
 error (void)
 {
     printf ("strtok() test failed!\n");
-    exit (-1);
+    exit (EXIT_FAILURE);
 }
 
 void
@@ -39,5 +37,5 @@ main (void)
     test (s3);
     test (s4);
 
-    return 0;
+    return EXIT_SUCCESS;
 }

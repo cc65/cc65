@@ -31,7 +31,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+//#define DEBUG
 
 /* cc65 */
 #include "asmcode.h"
@@ -48,7 +48,13 @@
 #include "typecmp.h"
 #include "typeconv.h"
 
-
+#ifdef DEBUG
+#define LOG(x)  printf  x
+#define FIXME(x)  printf  x
+#else
+#define LOG(x)
+#define FIXME(x)
+#endif
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -451,6 +457,8 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     unsigned Flags;
     int MustScale;
 
+    LOG(("OpAssignArithmetic '%s' (Gen=%p)\n", Op, Gen));
+
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
@@ -465,7 +473,9 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     PushAddr (Expr);
 
     if (Gen == 0) {
-
+// printf("OpAssignArithmetic (gen=0) 1 lhs: %s rhs: %s\n",
+//        (TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "int",
+//        (TypeOf (Expr2.Type) == CF_FLOAT) ? "float" : "int");
         /* Read the expression on the right side of the '=' */
         MarkedExprWithCheck (hie1, &Expr2);
 
@@ -477,8 +487,11 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         /* If necessary, load the value into the primary register */
         LoadExpr (CF_NONE, &Expr2);
 
+        LOG(("OpAssignArithmetic '%s' (0) 2 lhs: %s rhs: %s\n",
+             Op,
+            (TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "int",
+            (TypeOf (Expr2.Type) == CF_FLOAT) ? "float" : "int"));
     } else {
-
         /* Load the original value if necessary */
         LoadExpr (CF_NONE, Expr);
 
@@ -489,8 +502,14 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         /* Read the expression on the right side of the '=' or 'op=' */
         MarkedExprWithCheck (hie1, &Expr2);
 
-        /* The rhs must be an integer (or a float, but we don't support that yet */
-        if (!IsClassInt (Expr2.Type)) {
+        LOG(("OpAssignArithmetic '%s' (!=0) 2 lhs: %s rhs: %s\n",
+             Op,
+            (TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "int",
+            (TypeOf (Expr2.Type) == CF_FLOAT) ? "float" : "int"));
+
+
+        /* The rhs must be an integer or a float */
+        if (!IsClassInt (Expr2.Type) && !IsClassFloat (Expr2.Type)) {
             Error ("Invalid right operand for binary operator '%s'", Op);
             /* Continue. Wrong code will be generated, but the compiler won't
             ** break, so this is the best error recovery.
@@ -523,9 +542,19 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
 
             /* Special handling for add and sub - some sort of a hack, but short code */
             if (Gen->Func == g_add) {
-                g_inc (Flags | CF_CONST, Expr2.IVal);
+                LOG(("OpAssignArithmetic '%s' gen g_add\n", Op));
+                if (IsClassFloat (Expr2.Type)) {
+                    g_inc (Flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    g_inc (Flags | CF_CONST, Expr2.IVal);
+                }
             } else if (Gen->Func == g_sub) {
-                g_dec (Flags | CF_CONST, Expr2.IVal);
+                LOG(("OpAssignArithmetic '%s' gen g_sub\n", Op));
+                if (IsClassFloat (Expr2.Type)) {
+                    g_dec (Flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    g_dec (Flags | CF_CONST, Expr2.IVal);
+                }
             } else {
                 if (!ED_IsUneval (Expr)) {
                     if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
@@ -605,6 +634,8 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 {
     const Type* ltype = Expr->Type;
 
+    LOG(("OpAssign\n"));
+
     ExprDesc Expr2;
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
@@ -677,8 +708,9 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
         return;
     }
 
-    /* There must be an integer or pointer on the left side */
-    if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type)) {
+    LOG(("OpAddSubAssign '%s'\n", Op));
+    /* There must be an integer, pointer or float on the left side */
+    if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type) && !IsTypeFloat (Expr->Type)) {
         Error ("Invalid left operand for binary operator '%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
@@ -706,11 +738,9 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* Evaluate the rhs. We expect an integer here, since float is not
-    ** supported
-    */
+    /* Evaluate the rhs. We expect an integer or float here */
     hie1 (&Expr2);
-    if (!IsClassInt (Expr2.Type)) {
+    if (!IsClassInt (Expr2.Type) && !IsClassFloat (Expr2.Type)) {
         Error ("Invalid right operand for binary operator '%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
@@ -721,7 +751,10 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     lflags |= CG_TypeOf (Expr->Type) | CG_AddrModeFlags (Expr) | CF_FORCECHAR;
     rflags |= CG_TypeOf (Expr2.Type) | CF_FORCECHAR;
 
+    LOG(("OpAddSubAssign '%s' lflags:%04x rflags:%04x\n", Op, lflags, rflags));
+
     if (ED_IsConstAbs (&Expr2)) {
+        LOG(("OpAddSubAssign '%s' result is constant\n", Op));
         /* The resulting value is a constant */
         rflags |= CF_CONST;
         lflags |= CF_CONST;
@@ -731,6 +764,7 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
             Expr2.IVal *= CheckedSizeOf (Indirect (Expr->Type));
         }
     } else {
+        LOG(("OpAddSubAssign '%s' result is not constant\n", Op));
         /* Not constant, load into the primary */
         LoadExpr (CF_NONE, &Expr2);
 
@@ -756,19 +790,40 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
             ** static variable, register variable, pooled literal or code
             ** label location.
             */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+            if (IsClassFloat (Expr->Type)) {
+                LOG(("OpAddSubAssign '%s' abs, float %08x (IVal:%08lx)\n", Op, FP_D_As32bitRaw(Expr2.V.FVal), Expr2.IVal));
+                /* FIXME: what about the case when expr2 is NOT float? */
+                if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                    g_addeqstatic (lflags, Expr->Name, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    g_subeqstatic (lflags, Expr->Name, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
             } else {
-                g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+                LOG(("OpAddSubAssign '%s' abs, int\n", Op));
+                if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                    g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+                } else {
+                    g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+                }
             }
             break;
 
         case E_LOC_STACK:
             /* Value on the stack */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqlocal (lflags, Expr->IVal, Expr2.IVal);
+            if (IsClassFloat (Expr->Type)) {
+                LOG(("OpAddSubAssign '%s' stack, float\n", Op));
+                if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                    g_addeqlocal (lflags, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    g_subeqlocal (lflags, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
             } else {
-                g_subeqlocal (lflags, Expr->IVal, Expr2.IVal);
+                LOG(("OpAddSubAssign '%s' stack, int\n", Op));
+                if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                    g_addeqlocal (lflags, Expr->IVal, Expr2.IVal);
+                } else {
+                    g_subeqlocal (lflags, Expr->IVal, Expr2.IVal);
+                }
             }
             break;
 

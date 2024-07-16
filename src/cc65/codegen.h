@@ -218,6 +218,10 @@ void g_reglong (unsigned from);
 ** is irrelevent of signedness).
 */
 
+void g_regfloat (unsigned from);
+/* Convert the value in the primary register to a float
+*/
+
 unsigned g_typeadjust (unsigned lhs, unsigned rhs);
 /* Adjust the integer operands before doing a binary operation. lhs is a flags
 ** value, that corresponds to the value on TOS, rhs corresponds to the value
@@ -274,8 +278,15 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 /*****************************************************************************/
 
 
-
-void g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
+#ifdef DEBUG
+// #define g_getimmed(a,b,c) _g_getimmed((a),(b),(c),(__FILE__),(__FUNCTION__),(__LINE__))
+// void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs, char *file, const char *func, int line);
+#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c))
+void _g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
+#else
+#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c))
+void _g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
+#endif
 /* Load a constant into the primary register */
 
 void g_getstatic (unsigned Flags, uintptr_t Label, long Offs);
@@ -396,6 +407,8 @@ void g_test (unsigned flags);
 
 void g_push (unsigned flags, unsigned long val);
 /* Push the primary register or a constant value onto the stack */
+void g_push_float (unsigned flags, double val);
+/* Push the primary register or a constant value onto the stack */
 
 void g_swap (unsigned flags);
 /* Swap the primary register and the top of the stack. flags give the type
@@ -466,6 +479,8 @@ void g_res (unsigned n);
 /* Reserve static storage, n bytes */
 
 void g_defdata (unsigned flags, uintptr_t val, long offs);
+/* Define data with the size given in flags */
+void g_defdata_float (unsigned flags, uintptr_t val, long offs);
 /* Define data with the size given in flags */
 
 void g_defbytes (const void* bytes, unsigned count);

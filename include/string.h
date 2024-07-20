@@ -90,6 +90,7 @@ char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);
 char* __fastcall__ strupper (char* s);
 char* __fastcall__ strqtok (char* s1, const char* s2);
+char* __fastcall__ stpcpy (char* dest, const char* src);
 #endif
 
 const char* __fastcall__ __stroserror (unsigned char errcode);

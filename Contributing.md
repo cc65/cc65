@@ -156,7 +156,8 @@ supports). The exceptions are:
   this:
 
 ~~~C
-int foo(int bar) /* Add 1 to bar, takes bar and returns the result */
+int foo(int bar)
+/* Add 1 to bar, takes bar and returns the result */
 {
     return bar + 1;
 }

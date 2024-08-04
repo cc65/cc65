@@ -378,6 +378,16 @@ static void IFMarkStart (CharSource* S)
 static void IFNextChar (CharSource* S)
 /* Read the next character from the input file */
 {
+    /* if expanding macros the next input line gets pushed too early
+    ** to the output. So defer the push.
+    ** Its harmless to do it regardless of expansion or not
+    */
+    static int pending_line = 0;
+    if (pending_line) {
+        NewListingLine (&S->V.File.Line, S->V.File.Pos.Name, FCount);
+        pending_line = 0;
+    };
+
     /* Check for end of line, read the next line if needed */
     while (SB_GetIndex (&S->V.File.Line) >= SB_GetLen (&S->V.File.Line)) {
 
@@ -443,7 +453,8 @@ static void IFNextChar (CharSource* S)
         S->V.File.Pos.Line++;
 
         /* Remember the new line for the listing */
-        NewListingLine (&S->V.File.Line, S->V.File.Pos.Name, FCount);
+
+        pending_line = 1;
 
     }
 

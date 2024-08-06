@@ -330,6 +330,7 @@ usage.
 <item>_dos_type
 <item>_filetype
 <item>_datetime
+<item>allow_lowercase
 <item>beep
 <item>get_ostype
 <item>gmtime_dt

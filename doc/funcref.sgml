@@ -95,6 +95,7 @@ function.
 
 <itemize>
 <item>_dos_type
+<item>allow_lowercase
 <item><ref id="beep" name="beep">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">

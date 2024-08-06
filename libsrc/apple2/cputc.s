@@ -11,6 +11,9 @@
         .export         _cputcxy, _cputc
         .export         cputdirect, newline, putchar, putchardirect
         .import         gotoxy, VTABZ
+        .ifndef __APPLE2ENH__
+        .import         uppercasemask
+        .endif
 
         .include        "apple2.inc"
 
@@ -43,7 +46,7 @@ _cputc:
         .ifndef __APPLE2ENH__
         cmp     #$E0            ; Test for lowercase
         bcc     cputdirect
-        and     #$DF            ; Convert to uppercase
+        and     uppercasemask
         .endif
 
 cputdirect:

@@ -9,14 +9,14 @@
 
 _allow_lowercase:
         tax
-        lda     values,x     
+        lda     values,x
         ldx     uppercasemask
         sta     uppercasemask
         cpx     #$FF
         beq     :+
         jmp     return0
 :       jmp     return1
-        
+
         .rodata
 
 values: .byte   $DF         ; Force uppercase

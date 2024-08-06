@@ -5,5 +5,5 @@
         .export         uppercasemask
 
         .data
-        
+
 uppercasemask:  .byte   $DF     ; Convert to uppercase

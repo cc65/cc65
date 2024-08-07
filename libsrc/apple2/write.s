@@ -7,6 +7,9 @@
         .export         _write
         .import         rwprolog, rwcommon, rwepilog
         .import         COUT
+        .ifndef __APPLE2ENH__
+        .import         uppercasemask
+        .endif
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -84,7 +87,7 @@ next:   lda     (ptr1),y
         .ifndef __APPLE2ENH__
         cmp     #$E0            ; Test for lowercase
         bcc     output
-        and     #$DF            ; Convert to uppercase
+        and     uppercasemask
         .endif
 output: jsr     COUT            ; Preserves X and Y
 

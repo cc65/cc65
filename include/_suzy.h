@@ -242,10 +242,38 @@ typedef struct PENPAL_1 {
 #define MIKEYSPACE      0x02
 #define SUZYSPACE       0x01
 
+// Structures for math registers
+struct _math_unsigned_multiply {
+    unsigned int factor1;         // 0xFC52 - 0xFC53
+    unsigned int factor2;         // 0xFC54 - 0xFC55  write starts multiply
+    unsigned char unused2[10];    // 0xFC56 - 0xFC5F  do not use
+    unsigned long product;        // 0xFC60 - 0xFC63
+    unsigned char unused3[8];     // 0xFC64 - 0xFC6B  do not use
+    unsigned long accumulate;     // 0xFC6C - 0xFC6F
+};
+
+struct _math_signed_multiply {
+    int factor1;                  // 0xFC52 - 0xFC53
+    int factor2;                  // 0xFC54 - 0xFC55  write starts multiply
+    unsigned char unused2[10];    // 0xFC56 - 0xFC5F  do not use
+    long product;                 // 0xFC60 - 0xFC63
+    unsigned char unused3[8];     // 0xFC64 - 0xFC6B  do not use
+    long accumulate;              // 0xFC6C - 0xFC6F
+};
+
+struct _math_divide {
+    unsigned long quotient;       // 0xFC52 - 0xFC55
+    unsigned int divisor;         // 0xFC56 - 0xFC57
+    unsigned char unused2[8];     // 0xFC58 - 0xFC5F  do not use
+    unsigned int dividend2;       // 0xFC60 - 0xFC61
+    unsigned int dividend1;       // 0xFC62 - 0xFC63 write starts divide
+    unsigned char unused3[8];     // 0xFC64 - 0xFC6B  do not use
+    unsigned long remainder;      // 0xFC6C - 0xFC6F
+};
 
 /* Suzy Hardware Registers */
 struct __suzy {
-  unsigned int  tmpadr;         // 0xFC00  Temporary address
+  unsigned char *tmpadr;         // 0xFC00  Temporary address
   unsigned int  tiltacc;        // 0xFC02  Tilt accumulator
   unsigned int  hoff;           // 0xFC04  Offset to H edge of screen
   unsigned int  voff;           // 0xFC06  Offset to V edge of screen
@@ -271,22 +299,29 @@ struct __suzy {
   unsigned char *procaddr;      // 0xFC2E  address of current spr data proc
   unsigned char unused0[32];    // 0xFC30 - 0xFC4F  reserved/unused
   unsigned char unused1[2];     // 0xFC50 - 0xFC51  do not use
-  unsigned char mathd;          // 0xFC52
-  unsigned char mathc;          // 0xFC53
-  unsigned char mathb;          // 0xFC54
-  unsigned char matha;          // 0xFC55
-  unsigned char mathp;          // 0xFC56
-  unsigned char mathn;          // 0xFC57
-  unsigned char unused2[8];     // 0xFC58 - 0xFC5F  do not use
-  unsigned char mathh;          // 0xFC60
-  unsigned char mathg;          // 0xFC61
-  unsigned char mathf;          // 0xFC62
-  unsigned char mathe;          // 0xFC63
-  unsigned char unused3[8];     // 0xFC64 - 0xFC6B  do not use
-  unsigned char mathm;          // 0xFC6C
-  unsigned char mathl;          // 0xFC6D
-  unsigned char mathk;          // 0xFC6E
-  unsigned char mathj;          // 0xFC6F
+  union {
+    struct {
+      unsigned char mathd;      // 0xFC52
+      unsigned char mathc;      // 0xFC53
+      unsigned char mathb;      // 0xFC54
+      unsigned char matha;      // 0xFC55  write starts a multiply operation
+      unsigned char mathp;      // 0xFC56
+      unsigned char mathn;      // 0xFC57
+      unsigned char unused2[8]; // 0xFC58 - 0xFC5F  do not use
+      unsigned char mathh;      // 0xFC60
+      unsigned char mathg;      // 0xFC61
+      unsigned char mathf;      // 0xFC62
+      unsigned char mathe;      // 0xFC63  write starts a divide operation
+      unsigned char unused3[8]; // 0xFC64 - 0xFC6B  do not use
+      unsigned char mathm;      // 0xFC6C
+      unsigned char mathl;      // 0xFC6D
+      unsigned char mathk;      // 0xFC6E
+      unsigned char mathj;      // 0xFC6F
+    };
+    struct _math_unsigned_multiply unsigned_multiply;
+    struct _math_signed_multiply signed_multiply;
+    struct _math_divide divide;
+  };
   unsigned char unused4[16];    // 0xFC70 - 0xFC7F  do not use
   unsigned char sprctl0;        // 0xFC80  sprite control bits 0
   unsigned char sprctl1;        // 0xFC81  sprite control bits 1

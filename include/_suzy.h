@@ -24,73 +24,62 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
 #ifndef __SUZY_H
 #define __SUZY_H
 
-/* Joypad $FCB0 */
-#define JOYPAD_RIGHT    0x10
-#define JOYPAD_LEFT     0x20
-#define JOYPAD_DOWN     0x40
-#define JOYPAD_UP       0x80
-#define BUTTON_OPTION1  0x08
-#define BUTTON_OPTION2  0x04
-#define BUTTON_INNER    0x02
-#define BUTTON_OUTER    0x01
+// JOYSTICK bit definitions
+enum {
+  JOYPAD_RIGHT   = 0x10,
+  JOYPAD_LEFT    = 0x20,
+  JOYPAD_DOWN    = 0x40,
+  JOYPAD_UP      = 0x80,
+  BUTTON_OPTION1 = 0x08,
+  BUTTON_OPTION2 = 0x04,
+  BUTTON_INNER   = 0x02,
+  BUTTON_OUTER   = 0x01
+};
 
-/* Switches $FCB1 */
-#define BUTTON_PAUSE    0x01
+// SWITCHES bit definitions
+enum {
+    CART1_IO_INACTIVE = 0x04,
+    CART0_IO_INACTIVE = 0x02,
+    BUTTON_PAUSE      = 0x01
+};
 
+// SPRCTL0 bit definitions
+enum {
+  BPP_4            = 0xC0,
+  BPP_3            = 0x80,
+  BPP_2            = 0x40,
+  BPP_1            = 0x00,
+  HFLIP            = 0x20,
+  VFLIP            = 0x10,
+  TYPE_SHADOW      = 0x07,
+  TYPE_XOR         = 0x06,
+  TYPE_NONCOLL     = 0x05,
+  TYPE_NORMAL      = 0x04,
+  TYPE_BOUNDARY    = 0x03,
+  TYPE_BSHADOW     = 0x02,
+  TYPE_BACKNONCOLL = 0x01,
+  TYPE_BACKGROUND  = 0x00
+};
 
-/* Hardware Math */
-#define FACTOR_A *(unsigned int *) 0xFC54
-#define FACTOR_B *(unsigned int *) 0xFC52
-#define PRODUCT0 *(unsigned int *) 0xFC60
-#define PRODUCT1 *(unsigned int *) 0xFC62
-#define PRODUCT *(long *) 0xFC60
+// SPRCTL1 bit definitions
+enum {
+  LITERAL  = 0x80,
+  PACKED   = 0x00,
+  ALGO3    = 0x40,
+  RENONE   = 0x00,
+  REHV     = 0x10,
+  REHVS    = 0x20,
+  REHVST   = 0x30,
+  REUSEPAL = 0x08,
+  SKIP     = 0x04,
+  DRAWUP   = 0x02,
+  DRAWLEFT = 0x01
+};
 
-#define DIVIDEND0 *(unsigned int *) 0xFC60
-#define DIVIDEND1 *(unsigned int *) 0xFC62
-#define DIVIDEND *(long *) 0xFC60
-#define DIVISOR *(unsigned int *) 0xFC56
-#define QUOTIENT0 *(unsigned int *) 0xFC52
-#define QUOTIENT1 *(unsigned int *) 0xFC54
-#define QUOTIENT *(long *) 0xFC52
-#define REMAINDER0 *(unsigned int *) 0xFC6C
-#define REMAINDER1 *(unsigned int *) 0xFC6E
-#define REMAINDER *(long *) 0xFC6C
-
-
-/* Sprite control block (SCB) defines */
-
-/* SPRCTL0 $FC80 */
-#define BPP_4            0xC0
-#define BPP_3            0x80
-#define BPP_2            0x40
-#define BPP_1            0x00
-#define HFLIP            0x20
-#define VFLIP            0x10
-#define TYPE_SHADOW      0x07
-#define TYPE_XOR         0x06
-#define TYPE_NONCOLL     0x05
-#define TYPE_NORMAL      0x04
-#define TYPE_BOUNDARY    0x03
-#define TYPE_BSHADOW     0x02
-#define TYPE_BACKNONCOLL 0x01
-#define TYPE_BACKGROUND  0x00
-
-/* SPRCTL1 $FC81 */
-#define LITERAL          0x80
-#define PACKED           0x00
-#define ALGO3            0x40
-#define RENONE           0x00
-#define REHV             0x10
-#define REHVS            0x20
-#define REHVST           0x30
-#define REUSEPAL         0x08
-#define SKIP             0x04
-#define DRAWUP           0x02
-#define DRAWLEFT         0x01
+// Sprite control block (SCB) definitions
 
 typedef struct SCB_REHVST_PAL {             // SCB with all attributes
   unsigned char sprctl0;
@@ -210,37 +199,33 @@ typedef struct PENPAL_1 {
   unsigned char penpal[1];
 } PENPAL_1;
 
-/* Misc system defines */
+// SPRGO bit definitions
+enum {
+    SPRITE_GO = 0x01,  // sprite process start bit
+    EVER_ON   = 0x04   // everon detector enable
+};
 
-/* SPRGO $FC91 */
-#define EVER_ON         0x04
-#define SPRITE_GO       0x01
-
-/* SPRSYS (write) $FC92 */
-#define SIGNMATH        0x80
-#define ACCUMULATE      0x40
-#define NO_COLLIDE      0x20
-#define VSTRETCH        0x10
-#define LEFTHAND        0x08
-#define CLR_UNSAFE      0x04
-#define SPRITESTOP      0x02
-
-/* SPRSYS (read) $FC92 */
-#define MATHWORKING     0x80
-#define MATHWARNING     0x40
-#define MATHCARRY       0x20
-#define VSTRETCHING     0x10
-#define LEFTHANDED      0x08
-#define UNSAFE_ACCESS   0x04
-#define SPRITETOSTOP    0x02
-#define SPRITEWORKING   0x01
-
-/* MAPCTL $FFF9 */
-#define HIGHSPEED       0x80
-#define VECTORSPACE     0x08
-#define ROMSPACE        0x04
-#define MIKEYSPACE      0x02
-#define SUZYSPACE       0x01
+// SPRSYS bit definitions for write operations
+enum {
+    SIGNMATH   = 0x80,  // signed math
+    ACCUMULATE = 0x40,  // accumulate multiplication results
+    NO_COLLIDE = 0x20,  // do not collide with any sprites (also SPRCOLL bit definition)
+    VSTRETCH   = 0x10,  // stretch v
+    LEFTHAND   = 0x08,
+    CLR_UNSAFE = 0x04,  // unsafe access reset
+    SPRITESTOP = 0x02   // request to stop sprite process
+};
+// SPRSYS bit definitions for read operations
+enum {
+    MATHWORKING   = 0x80,  // math operation in progress
+    MATHWARNING   = 0x40,  // accumulator overflow on multiple or divide by zero
+    MATHCARRY     = 0x20,  // last carry bit
+    VSTRETCHING   = 0x10,
+    LEFTHANDED    = 0x08,
+    UNSAFE_ACCESS = 0x04,  // unsafe access performed
+    SPRITETOSTOP  = 0x02,  // requested to stop
+    SPRITEWORKING = 0x01  // sprite process is active
+};
 
 // Structures for math registers
 struct _math_unsigned_multiply {
@@ -348,6 +333,31 @@ struct __suzy {
                                 // 0xFCC5 - 0xFCFF  unused
 };
 
+// Deprecated definitions
+
+/* Hardware Math */
+#define FACTOR_A *(unsigned int *) 0xFC54
+#define FACTOR_B *(unsigned int *) 0xFC52
+#define PRODUCT0 *(unsigned int *) 0xFC60
+#define PRODUCT1 *(unsigned int *) 0xFC62
+#define PRODUCT *(long *) 0xFC60
+
+#define DIVIDEND0 *(unsigned int *) 0xFC60
+#define DIVIDEND1 *(unsigned int *) 0xFC62
+#define DIVIDEND *(long *) 0xFC60
+#define DIVISOR *(unsigned int *) 0xFC56
+#define QUOTIENT0 *(unsigned int *) 0xFC52
+#define QUOTIENT1 *(unsigned int *) 0xFC54
+#define QUOTIENT *(long *) 0xFC52
+#define REMAINDER0 *(unsigned int *) 0xFC6C
+#define REMAINDER1 *(unsigned int *) 0xFC6E
+#define REMAINDER *(long *) 0xFC6C
+
+/* MAPCTL $FFF9 */
+#define HIGHSPEED       0x80
+#define VECTORSPACE     0x08
+#define ROMSPACE        0x04
+#define MIKEYSPACE      0x02
+#define SUZYSPACE       0x01
 
 #endif
-

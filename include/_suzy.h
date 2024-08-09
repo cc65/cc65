@@ -258,28 +258,28 @@ struct _math_divide {
 
 /* Suzy Hardware Registers */
 struct __suzy {
-  unsigned char *tmpadr;         // 0xFC00  Temporary address
-  unsigned int  tiltacc;        // 0xFC02  Tilt accumulator
-  unsigned int  hoff;           // 0xFC04  Offset to H edge of screen
-  unsigned int  voff;           // 0xFC06  Offset to V edge of screen
+  unsigned char *tmpadr;        // 0xFC00  Temporary address
+  unsigned int tiltacc;         // 0xFC02  Tilt accumulator
+  unsigned int hoff;            // 0xFC04  Offset to H edge of screen
+  unsigned int voff;            // 0xFC06  Offset to V edge of screen
   unsigned char *sprbase;       // 0xFC08  Base address of sprite
   unsigned char *colbase;       // 0xFC0A  Base address of collision buffer
   unsigned char *vidadr;        // 0xFC0C  Current vid buffer address
   unsigned char *coladr;        // 0xFC0E  Current col buffer address
   unsigned char *scbnext;       // 0xFC10  Address of next SCB
   unsigned char *sprdline;      // 0xFC12  start of sprite data line address
-  unsigned char *hposstrt;      // 0xFC14  start hpos
-  unsigned char *vposstrt;      // 0xFC16  start vpos
-  unsigned char *sprhsize;      // 0xFC18  sprite h size
-  unsigned char *sprvsize;      // 0xFC1A  sprite v size
-  unsigned int  stretchl;       // 0xFC1C  H size adder
-  unsigned int  tilt;           // 0xFC1E  H pos adder
-  unsigned int  sprdoff;        // 0xFC20  offset to next sprite data line
-  unsigned int  sprvpos;        // 0xFC22  current vpos
-  unsigned int  colloff;        // 0xFC24  offset to collision depository
-  unsigned int  vsizeacc;       // 0xFC26  vertical size accumulator
-  unsigned int  hsizeoff;       // 0xFC28  horizontal size offset
-  unsigned int  vsizeoff;       // 0xFC2A  vertical size offset
+  unsigned int hposstrt;        // 0xFC14  start hpos
+  unsigned int vposstrt;        // 0xFC16  start vpos
+  unsigned int sprhsize;        // 0xFC18  sprite h size
+  unsigned int sprvsize;        // 0xFC1A  sprite v size
+  unsigned int stretchl;        // 0xFC1C  H size adder
+  unsigned int tilt;            // 0xFC1E  H pos adder
+  unsigned int sprdoff;         // 0xFC20  offset to next sprite data line
+  unsigned int sprvpos;         // 0xFC22  current vpos
+  unsigned int colloff;         // 0xFC24  offset to collision depository
+  unsigned int vsizeacc;        // 0xFC26  vertical size accumulator
+  unsigned int hsizeoff;        // 0xFC28  horizontal size offset
+  unsigned int vsizeoff;        // 0xFC2A  vertical size offset
   unsigned char *scbaddr;       // 0xFC2C  address of current SCB
   unsigned char *procaddr;      // 0xFC2E  address of current spr data proc
   unsigned char unused0[32];    // 0xFC30 - 0xFC4F  reserved/unused
@@ -306,7 +306,7 @@ struct __suzy {
     struct _math_unsigned_multiply unsigned_multiply;
     struct _math_signed_multiply signed_multiply;
     struct _math_divide divide;
-  };
+  } math;
   unsigned char unused4[16];    // 0xFC70 - 0xFC7F  do not use
   unsigned char sprctl0;        // 0xFC80  sprite control bits 0
   unsigned char sprctl1;        // 0xFC81  sprite control bits 1

@@ -79,7 +79,7 @@ MATHL       = $FC6D
 MATHK       = $FC6E
 MATHJ       = $FC6F
 
-; Suzy Misc
+; Suzy sprite engine
 
 SPRCTL0          = $FC80
 ; Sprite bits-per-pixel definitions
@@ -117,15 +117,53 @@ SKIP        = %00000100
 DRAWUP      = %00000010
 DRAWLEFT    = %00000001
 
-SPRCOLL     = $FC82
-SPRINIT     = $FC83
-SUZYHREV    = $FC88
-SUZYSREV    = $FC89
-SUZYBUSEN   = $FC90
-SPRGO       = $FC91
-SPRSYS      = $FC92
-JOYSTICK    = $FCB0
+SPRCOLL   = $FC82
+SPRINIT   = $FC83
+SUZYHREV  = $FC88
+SUZYSREV  = $FC89
+SUZYBUSEN = $FC90
+
+SPRGO = $FC91
+; SPRGO bit definitions
+SPRITE_GO = %00000001  ; sprite process start bit
+EVER_ON   = %00000100  ; everon detector enable
+
+SPRSYS = $FC92
+; SPRSYS bit definitions for write operations
+SIGNMATH      = 0x80  ; signed math
+ACCUMULATE    = 0x40  ; accumulate multiplication results
+NO_COLLIDE    = 0x20  ; do not collide with any sprites (also SPRCOLL bit definition)
+VSTRETCH      = 0x10  ; stretch v
+LEFTHAND      = 0x08
+CLR_UNSAFE    = 0x04  ; unsafe access reset
+SPRITESTOP    = 0x02  ; request to stop sprite process
+; SPRSYS bit definitions for read operations
+MATHWORKING   = 0x80  ; math operation in progress
+MATHWARNING   = 0x40  ; accumulator overflow on multiple or divide by zero
+MATHCARRY     = 0x20  ; last carry bit
+VSTRETCHING   = 0x10
+LEFTHANDED    = 0x08
+UNSAFE_ACCESS = 0x04  ; unsafe access performed
+SPRITETOSTOP  = 0x02  ; requested to stop
+SPRITEWORKING = 0x01  ; sprite process is active
+
+JOYSTICK = $FCB0
+; JOYSTICK bit definitions
+JOYPAD_UP      = 0x80
+JOYPAD_DOWN    = 0x40
+JOYPAD_LEFT    = 0x20
+JOYPAD_RIGHT   = 0x10
+BUTTON_OPTION1 = 0x08
+BUTTON_OPTION2 = 0x04
+BUTTON_INNER   = 0x02
+BUTTON_OUTER   = 0x01
+
 SWITCHES    = $FCB1
+; SWITCHES bit definitions 
+CART1_IO_INACTIVE = 0x04
+CART0_IO_INACTIVE = 0x02
+BUTTON_PAUSE      = 0x01
+
 RCART0      = $FCB2
 RCART1      = $FCB3
 LEDS        = $FCC0
@@ -133,72 +171,71 @@ PARSTATUS   = $FCC2
 PARDATA     = $FCC3
 HOWIE       = $FCC4
 
-
-; ***
+;
 ; *** Mikey Addresses
 ; ***
 
 ; Mikey timers
 
 ; Logical timer names
-TIMER0      = $FD00
-TIMER1      = $FD04
-TIMER2      = $FD08
-TIMER3      = $FD0C
-TIMER4      = $FD10
-TIMER5      = $FD14
-TIMER6      = $FD18
-TIMER7      = $FD1C
-HTIMER      = TIMER0  ; horizontal line timer (timer 0)
-VTIMER      = TIMER2  ; vertical blank timer (timer 2)
-STIMER      = TIMER7  ; sound timer (timer 7)
+TIMER0 = $FD00
+TIMER1 = $FD04
+TIMER2 = $FD08
+TIMER3 = $FD0C
+TIMER4 = $FD10
+TIMER5 = $FD14
+TIMER6 = $FD18
+TIMER7 = $FD1C
+HTIMER = TIMER0  ; horizontal line timer (timer 0)
+VTIMER = TIMER2  ; vertical blank timer (timer 2)
+STIMER = TIMER7  ; sound timer (timer 7)
 
-HTIMBKUP    = $FD00  ; horizontal line timer (timer 0)
-HTIMCTLA    = $FD01
-HTIMCNT     = $FD02
-HTIMCTLB    = $FD03
-VTIMBKUP    = $FD08  ; vertical blank timer (timer 2)
-VTIMCTLA    = $FD09
-VTIMCNT     = $FD0A
-VTIMCTLB    = $FD0B
-BAUDBKUP    = $FD10  ; serial timer (timer 4)
-STIMBKUP    = $FD1C  ; sound timer (timer 7)
-STIMCTLA    = $FD1D
-STIMCNT     = $FD1E
-STIMCTLB    = $FD1F
+HTIMBKUP = $FD00  ; horizontal line timer (timer 0)
+HTIMCTLA = $FD01
+HTIMCNT  = $FD02
+HTIMCTLB = $FD03
+VTIMBKUP = $FD08  ; vertical blank timer (timer 2)
+VTIMCTLA = $FD09
+VTIMCNT  = $FD0A
+VTIMCTLB = $FD0B
+BAUDBKUP = $FD10  ; serial timer (timer 4)
+STIMBKUP = $FD1C  ; sound timer (timer 7)
+STIMCTLA = $FD1D
+STIMCNT  = $FD1E
+STIMCTLB = $FD1F
 
-TIM0BKUP    = $FD00
-TIM0CTLA    = $FD01
-TIM0CNT     = $FD02
-TIM0CTLB    = $FD03
-TIM1BKUP    = $FD04
-TIM1CTLA    = $FD05
-TIM1CNT     = $FD06
-TIM1CTLB    = $FD07
-TIM2BKUP    = $FD08
-TIM2CTLA    = $FD09
-TIM2CNT     = $FD0A
-TIM2CTLB    = $FD0B
-TIM3BKUP    = $FD0C
-TIM3CTLA    = $FD0D
-TIM3CNT     = $FD0E
-TIM3CTLB    = $FD0F
-TIM4BKUP    = $FD10
-TIM4CTLA    = $FD11
-TIM4CNT     = $FD12
-TIM4CTLB    = $FD13
-TIM5BKUP    = $FD14
-TIM5CTLA    = $FD15
-TIM5CNT     = $FD16
-TIM5CTLB    = $FD17
-TIM6BKUP    = $FD18
-TIM6CTLA    = $FD19
-TIM6CNT     = $FD1A
-TIM6CTLB    = $FD1B
-TIM7BKUP    = $FD1C
-TIM7CTLA    = $FD1D
-TIM7CNT     = $FD1E
-TIM7CTLB    = $FD1F
+TIM0BKUP = $FD00
+TIM0CTLA = $FD01
+TIM0CNT  = $FD02
+TIM0CTLB = $FD03
+TIM1BKUP = $FD04
+TIM1CTLA = $FD05
+TIM1CNT  = $FD06
+TIM1CTLB = $FD07
+TIM2BKUP = $FD08
+TIM2CTLA = $FD09
+TIM2CNT  = $FD0A
+TIM2CTLB = $FD0B
+TIM3BKUP = $FD0C
+TIM3CTLA = $FD0D
+TIM3CNT  = $FD0E
+TIM3CTLB = $FD0F
+TIM4BKUP = $FD10
+TIM4CTLA = $FD11
+TIM4CNT  = $FD12
+TIM4CTLB = $FD13
+TIM5BKUP = $FD14
+TIM5CTLA = $FD15
+TIM5CNT  = $FD16
+TIM5CTLB = $FD17
+TIM6BKUP = $FD18
+TIM6CTLA = $FD19
+TIM6CNT  = $FD1A
+TIM6CTLB = $FD1B
+TIM7BKUP = $FD1C
+TIM7CTLA = $FD1D
+TIM7CNT  = $FD1E
+TIM7CTLB = $FD1F
 
 ; Timer offsets
 TIM_BACKUP   = 0
@@ -212,7 +249,6 @@ RESET_DONE     = %01000000
 ENABLE_RELOAD  = %00010000
 ENABLE_COUNT   = %00001000
 AUD_CLOCK_MASK = %00000111
-
 ; Clock settings
 AUD_LINKING = %00000111
 AUD_64      = %00000110
@@ -278,15 +314,16 @@ ENABLE_INTEGRATE = %00100000
 ; Stereo capability does not exist in all Lynxes
 ; Left and right may be reversed, and if so will be corrected in a later
 ; release
+ATTENREG0 = $FD40 ; Stereo attenuation registers
+ATTENREG1 = $FD41
+ATTENREG2 = $FD42
+ATTENREG3 = $FD43
 
-ATTENREG0       = $FD40 ; Stereo attenuation registers
-ATTENREG1       = $FD41
-ATTENREG2       = $FD42
-ATTENREG3       = $FD43
+MPAN    = $FD44
+MSTEREO = $FD50
+; Bit definitions for MPAN and MSTEREO registers
 LEFT_ATTENMASK  = %11110000
 RIGHT_ATTENMASK = %00001111
-
-; Bit definitions for MPAN and MSTEREO registers
 LEFT3_SELECT  = %10000000
 LEFT2_SELECT  = %01000000
 LEFT1_SELECT  = %00100000
@@ -296,13 +333,10 @@ RIGHT2_SELECT = %00000100
 RIGHT1_SELECT = %00000010
 RIGHT0_SELECT = %00000001
 
-MPAN        = $FD44
-MSTEREO     = $FD50
-
 ; Mikey interrupts
 
-INTRST      = $FD80
-INTSET      = $FD81
+INTRST = $FD80
+INTSET = $FD81
 
 ; Interrupt bits in INTRST and INTSET
 TIMER0_INTERRUPT = %00000001

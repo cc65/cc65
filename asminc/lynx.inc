@@ -130,39 +130,39 @@ EVER_ON   = %00000100  ; everon detector enable
 
 SPRSYS = $FC92
 ; SPRSYS bit definitions for write operations
-SIGNMATH      = 0x80  ; signed math
-ACCUMULATE    = 0x40  ; accumulate multiplication results
-NO_COLLIDE    = 0x20  ; do not collide with any sprites (also SPRCOLL bit definition)
-VSTRETCH      = 0x10  ; stretch v
-LEFTHAND      = 0x08
-CLR_UNSAFE    = 0x04  ; unsafe access reset
-SPRITESTOP    = 0x02  ; request to stop sprite process
+SIGNMATH      = %10000000  ; signed math
+ACCUMULATE    = %01000000  ; accumulate multiplication results
+NO_COLLIDE    = %00100000  ; do not collide with any sprites (also SPRCOLL bit definition)
+VSTRETCH      = %00010000  ; stretch v
+LEFTHAND      = %00001000
+CLR_UNSAFE    = %00000100  ; unsafe access reset
+SPRITESTOP    = %00000010  ; request to stop sprite process
 ; SPRSYS bit definitions for read operations
-MATHWORKING   = 0x80  ; math operation in progress
-MATHWARNING   = 0x40  ; accumulator overflow on multiple or divide by zero
-MATHCARRY     = 0x20  ; last carry bit
-VSTRETCHING   = 0x10
-LEFTHANDED    = 0x08
-UNSAFE_ACCESS = 0x04  ; unsafe access performed
-SPRITETOSTOP  = 0x02  ; requested to stop
-SPRITEWORKING = 0x01  ; sprite process is active
+MATHWORKING   = %10000000  ; math operation in progress
+MATHWARNING   = %01000000  ; accumulator overflow on multiple or divide by zero
+MATHCARRY     = %00100000  ; last carry bit
+VSTRETCHING   = %00010000
+LEFTHANDED    = %00001000
+UNSAFE_ACCESS = %00000100  ; unsafe access performed
+SPRITETOSTOP  = %00000010  ; requested to stop
+SPRITEWORKING = %00000001  ; sprite process is active
 
 JOYSTICK = $FCB0
 ; JOYSTICK bit definitions
-JOYPAD_UP      = 0x80
-JOYPAD_DOWN    = 0x40
-JOYPAD_LEFT    = 0x20
-JOYPAD_RIGHT   = 0x10
-BUTTON_OPTION1 = 0x08
-BUTTON_OPTION2 = 0x04
-BUTTON_INNER   = 0x02
-BUTTON_OUTER   = 0x01
+JOYPAD_UP      = %10000000
+JOYPAD_DOWN    = %01000000
+JOYPAD_LEFT    = %00100000
+JOYPAD_RIGHT   = %00010000
+BUTTON_OPTION1 = %00001000
+BUTTON_OPTION2 = %00000100
+BUTTON_INNER   = %00000010
+BUTTON_OUTER   = %00000001
 
 SWITCHES    = $FCB1
 ; SWITCHES bit definitions
-CART1_IO_INACTIVE = 0x04
-CART0_IO_INACTIVE = 0x02
-BUTTON_PAUSE      = 0x01
+CART1_IO_INACTIVE = %00000100
+CART0_IO_INACTIVE = %00000010
+BUTTON_PAUSE      = %00000001
 
 RCART0      = $FCB2
 RCART1      = $FCB3

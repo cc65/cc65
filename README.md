@@ -17,8 +17,8 @@ the [cc65 web site](https://cc65.github.io):
 |                         | Atari 7800                          |
 |                         | Atari XL                            |
 |                         | Lynx                                |
-| Tangerine               | Atmos                               |
-|                         | Telestrat                           |
+| Tangerine               | Oric Atmos                          |
+| Eureka                  | Oric Telestrat                      |
 | Acorn                   | BBC series                          |
 | Commodore               | C128                                |
 |                         | C16                                 |

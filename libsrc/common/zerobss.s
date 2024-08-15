@@ -1,43 +1,21 @@
 ;
-; Ullrich von Bassewitz, 1998-09-17, 2005-02-26.
-;
 ; Zero the bss segment.
 ;
 
         .export         zerobss
         .import         __BSS_RUN__, __BSS_SIZE__
-        .importzp       ptr1
-
+        .import         _bzero
+        .import         pushax
 
 .code
 
 zerobss:
         lda     #<__BSS_RUN__
-        sta     ptr1
-        lda     #>__BSS_RUN__
-        sta     ptr1+1
-        lda     #0
-        tay
+        ldx     #>__BSS_RUN__
 
-; Clear full pages
+        jsr     pushax
 
-L1:     ldx     #>__BSS_SIZE__
-        beq     L3
-L2:     sta     (ptr1),y
-        iny
-        bne     L2
-        inc     ptr1+1
-        dex
-        bne     L2
+        lda     #<__BSS_SIZE__
+        ldx     #>__BSS_SIZE__
 
-; Clear remaining page (y is zero on entry)
-
-L3:     cpy     #<__BSS_SIZE__
-        beq     L4
-        sta     (ptr1),y
-        iny
-        bne     L3
-
-; Done
-
-L4:     rts
+        jmp     _bzero

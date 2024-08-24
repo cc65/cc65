@@ -4,10 +4,11 @@
 ; Startup code for cc65 (Apple2 version)
 ;
 
-        .export         _exit, done, return
+        .export         done, return
+        .export         zpsave, rvsave, reset
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
-        .import         initlib, donelib
+        .import         initlib, _exit
         .import         zerobss, callmain
         .import         __ONCE_LOAD__, __ONCE_SIZE__    ; Linker generated
         .import         __LC_START__, __LC_LAST__       ; Linker generated
@@ -33,44 +34,7 @@
         jsr     zerobss
 
         ; Push the command-line arguments; and, call main().
-        jsr     callmain
-
-        ; Avoid a re-entrance of donelib. This is also the exit() entry.
-_exit:  ldx     #<exit
-        lda     #>exit
-        jsr     reset           ; Setup RESET vector
-
-        ; Switch in LC bank 2 for R/O in case it was switched out by a RESET.
-        bit     $C080
-
-        ; Call the module destructors.
-        jsr     donelib
-
-        ; Switch in ROM.
-        bit     $C082
-
-        ; Restore the original RESET vector.
-exit:   ldx     #$02
-:       lda     rvsave,x
-        sta     SOFTEV,x
-        dex
-        bpl     :-
-
-        ; Copy back the zero-page stuff.
-        ldx     #zpspace-1
-:       lda     zpsave,x
-        sta     sp,x
-        dex
-        bpl     :-
-
-        ; ProDOS TechRefMan, chapter 5.2.1:
-        ; "System programs should set the stack pointer to $FF at the
-        ;  warm-start entry point."
-        ldx     #$FF
-        txs                     ; Re-init stack pointer
-
-        ; We're done
-        jmp     done
+        jmp     callmain
 
 ; ------------------------------------------------------------------------
 

@@ -28,7 +28,7 @@ _cbm_set_working_screen:
         jsr PLOT    ; Get cursor position ...
         clc
         jsr PLOT    ; ... and set it again to update address of char below cursor with new hi-byte
-        
+
         lda #0
         tax
         rts

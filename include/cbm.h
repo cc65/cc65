@@ -322,6 +322,6 @@ void __fastcall__ cbm_closedir (unsigned char lfn);
 int __fastcall__ cbm_set_working_screen(unsigned char screen_hi);
 /* Sets the address of the working screen (no switching of viewport) to screen_hi*0x100.
    Checks, if the screen_hi is a multiple of 4. If not, fails with EXIT_FAILURE. */
-   
+
 /* End of cbm.h */
 #endif

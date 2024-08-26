@@ -7,7 +7,6 @@
 
         .include        "c64.inc"
 
-        .import         cbm_update_working_screen_pointers
         .export         _cbm_set_working_screen
 
 _cbm_set_working_screen:
@@ -16,7 +15,7 @@ _cbm_set_working_screen:
         and #3
         bne @error
         txa
-        
+
         ldy #reject_range_count - 1
     @check_ranges:
             cmp reject_range_start, y
@@ -28,7 +27,7 @@ _cbm_set_working_screen:
         bpl @check_ranges
     
         sta SCREEN_HI  ; Tell kernal to which memory screen output will go
-        jsr cbm_update_working_screen_pointers
+        jsr $e56c
 
         lda #0
         tax

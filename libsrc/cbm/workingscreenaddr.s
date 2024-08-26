@@ -11,6 +11,7 @@
 
 _cbm_set_working_screen:
         tax
+        beq @error  ; Reject setting screen at zero page location
         and #3
         bne @error
         cpx #$10    ; Screen addr must not be set to $1000-$1fff nor $9000-$9fff
@@ -33,6 +34,6 @@ _cbm_set_working_screen:
         tax
         rts
     @error:
-        lda #$ff
-        tax
+        lda #$01
+        ldx #$00
         rts

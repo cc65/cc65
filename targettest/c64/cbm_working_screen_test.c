@@ -47,7 +47,7 @@ int test_boundaries(void)
     for (i = sizeof(testdata_input)/sizeof(testdata_input[0]) - 1; i>=0; --i){
         printf("Screen @$%04x: ", testdata_input[i].screen_hi*0x100);
         returncode = cbm_set_working_screen(testdata_input[i].screen_hi);
-        cbm_set_working_screen(0x04);
+        cbm_reset_working_screen();
 
         if (returncode == EXIT_SUCCESS){
             printf("OK\n");
@@ -82,12 +82,14 @@ int str_to_scrcode(char *str){
 
 
 int test_str_found_at(char *test_str, uint8_t scr_loc){
+    printf("Test printing to working screen at %hhx:\n", scr_loc);
+
     cbm_set_working_screen(scr_loc);
 
     putchar(CH_HOME + 0x80);
     puts(test_str);
     str_to_scrcode(test_str);
-    cbm_set_working_screen(0x04);
+    cbm_reset_working_screen();
     if (strnicmp(test_str, (char*)(scr_loc * 0x100), strlen(test_str)) != 0){
         printf("Failed to print to screen location at %04x", scr_loc * 0x100);
         return -1;
@@ -111,10 +113,10 @@ int main(void)
             returncode = test_boundaries();
             break;
         case 2:
-            returncode = test_str_found_at(test_string1, 0x3c);
+            returncode = test_str_found_at(test_string1, 0xc0);
             break;
         case 1:
-            returncode = test_str_found_at(test_string2, 0xc0);
+            returncode = test_str_found_at(test_string2, 0xc4);
             break;
         default:
             assert(0);  // Should never come here

@@ -15,12 +15,12 @@ _cbm_set_working_screen:
         bne @error
         cpx #$10    ; Screen addr must not be set to $1000-$1fff nor $9000-$9fff
         bcc @ok_1000
-        cpx #$1f
+        cpx #$20
         bcc @error
     @ok_1000:
         cpx #$90    ; Screen addr must not be set to $1000-$1fff nor $9000-$9fff
         bcc @ok_9000
-        cpx #$9f
+        cpx #$a0
         bcc @error
     @ok_9000:
         stx SCREEN_HI

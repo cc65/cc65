@@ -70,7 +70,7 @@ _cbm_reset_working_screen:
         jsr PLOT
 
         dec screen_selected
-        
+
         lda #0
         tax
         rts

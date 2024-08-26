@@ -93,7 +93,7 @@ int test_str_found_at(char *test_str, uint8_t scr_loc){
     if (strnicmp(test_str, (char*)(scr_loc * 0x100), strlen(test_str)) != 0){
         printf("Failed to print to screen location at %04x", scr_loc * 0x100);
         return -1;
-    }   
+    }
 
     return 0;
 }

@@ -1,3 +1,6 @@
+    ; Taken from https://codebase64.org/doku.php?id=base:petscii_to_screencode&s[]=petscii, by Mace
+
+
     .export _petscii2scrcode
 	
     

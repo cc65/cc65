@@ -4,9 +4,10 @@
 ; int __fastcall__ _set_working_screen(unsigned char screen_hi);
 ;
 
-        .include        "cbm.inc"
+
         .include        "c64.inc"
 
+        .import         cbm_update_working_screen_pointers
         .export         _cbm_set_working_screen
 
 _cbm_set_working_screen:
@@ -14,21 +15,20 @@ _cbm_set_working_screen:
         beq @error  ; Reject setting screen at zero page location
         and #3
         bne @error
-        cpx #$10    ; Screen addr must not be set to $1000-$1fff nor $9000-$9fff
-        bcc @ok_1000
-        cpx #$20
-        bcc @error
-    @ok_1000:
-        cpx #$90    ; Screen addr must not be set to $1000-$1fff nor $9000-$9fff
-        bcc @ok_9000
-        cpx #$a0
-        bcc @error
-    @ok_9000:
-        stx SCREEN_HI
-        sec
-        jsr PLOT    ; Get cursor position ...
-        clc
-        jsr PLOT    ; ... and set it again to update address of char below cursor with new hi-byte
+        txa
+        
+        ldy #reject_range_count - 1
+    @check_ranges:
+            cmp reject_range_start, y
+            bcc @accept
+            cmp reject_range_end, y
+            bcc @error
+    @accept:
+        dey
+        bpl @check_ranges
+    
+        sta SCREEN_HI  ; Tell kernal to which memory screen output will go
+        jsr cbm_update_working_screen_pointers
 
         lda #0
         tax
@@ -37,3 +37,11 @@ _cbm_set_working_screen:
         lda #$01
         ldx #$00
         rts
+
+; Screen addr must not be set to $1000-$1fff nor $9000-$9fff for shadowing reasons and not to $d000-$dfff, due to registers
+reject_range_start:
+    .byte $d0, $90, $10
+reject_range_end:
+    .byte $e0, $a0, $20
+
+reject_range_count = reject_range_end - reject_range_start

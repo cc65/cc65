@@ -49,8 +49,8 @@ else
 	@echo > $(NULLDEV)
 endif
 
-cbm_working_screen_test.prg: cbm_working_screen_test.c pet2scrcode.s
-	$(CL) -t c64 -o $@ $? ../../lib/$(SYS).lib
+cbm_working_screen_test.prg: cbm_working_screen_test.c pet2scrcode.s ../../lib/$(SYS).lib
+	$(CL) -t c64 -o $@ $^
 
 clean:
 	@$(DEL) cbm_working_screen_test.prg 2>$(NULLDEV)

@@ -25,11 +25,10 @@ int test_boundaries(void)
 
     struct testdata testdata_input[] = {
         0x00, EXIT_FAILURE,
-        0x04, EXIT_SUCCESS,
-        0x0c, EXIT_SUCCESS,
         0x10, EXIT_FAILURE, // Cannot set screen to $1000-$1c00 due to shadowing
         0x1c, EXIT_FAILURE,
         0x20, EXIT_SUCCESS,
+        0x3c, EXIT_SUCCESS,
         0x8c, EXIT_SUCCESS,
         0x90, EXIT_FAILURE, // Cannot set screen to $9000-$9c00 due to shadowing
         0x9c, EXIT_FAILURE,
@@ -43,11 +42,10 @@ int test_boundaries(void)
 
     int i, returncode;
 
-    printf("Testing different desired workscreen destinations:\n");
-    for (i = sizeof(testdata_input)/sizeof(testdata_input[0]) - 1; i>=0; --i){
+    printf("Testing different altscreen locations:\n");
+    for (i = sizeof(testdata_input)/sizeof(testdata_input[0]) - 1; i >= 0; --i){
         printf("Screen @$%04x: ", testdata_input[i].screen_hi*0x100);
-        returncode = cbm_set_working_screen(testdata_input[i].screen_hi);
-        cbm_reset_working_screen();
+        returncode = cbm_init_alt_screen(' ', testdata_input[i].screen_hi);
 
         if (returncode == EXIT_SUCCESS){
             printf("OK\n");
@@ -57,9 +55,9 @@ int test_boundaries(void)
 
         if (returncode != testdata_input[i].returncode){
             printf(
-                "Boundary check failed on screen hi %hhx!\n"
-                "Function cbm_set_working_screen returned %d instead of %d\n",
-                testdata_input[i].screen_hi,
+                "Boundary check failed on scraddr $%04x!\n"
+                "Function cbm_init_alt_screen returned %d instead of %d\n",
+                testdata_input[i].screen_hi * 0x100,
                 returncode, testdata_input[i].returncode);
 
                 return EXIT_FAILURE;
@@ -84,14 +82,17 @@ int str_to_scrcode(char *str){
 int test_str_found_at(char *test_str, uint8_t scr_loc){
     printf("Test printing to working screen at %hhx:\n", scr_loc);
 
-    cbm_set_working_screen(scr_loc);
+    cbm_init_alt_screen(' ', scr_loc);
 
+    cbm_set_alt_screen();
     putchar(CH_HOME + 0x80);
     puts(test_str);
     str_to_scrcode(test_str);
-    cbm_reset_working_screen();
-    if (strnicmp(test_str, (char*)(scr_loc * 0x100), strlen(test_str)) != 0){
-        printf("Failed to print to screen location at %04x", scr_loc * 0x100);
+    cbm_set_def_screen();
+    if (strnicmp(test_str, (char*)(scr_loc * 0x100), strlen(test_str)) == 0){
+        printf("Printing to screen location at %04x succeeded.\n", scr_loc * 0x100);
+    } else {
+        printf("Printing to screen location at %04x failed!\n", scr_loc * 0x100);
         return -1;
     }
 

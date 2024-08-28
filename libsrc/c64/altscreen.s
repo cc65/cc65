@@ -8,7 +8,7 @@
 
         .include        "c64.inc"
 
-        .importzp       ptr1
+        .importzp       sp, ptr1
         .import         popa, PLOT
         .import         _restorecursorfrom, _savecursorto
         .export         _cbm_init_alt_screen, _cbm_set_alt_screen, _cbm_set_def_screen
@@ -16,13 +16,14 @@
 
 .proc _cbm_set_alt_screen
         ldx     screen_selected     ; If alternate screen is already set, then error
-        bne     @error
+        sec                         ; set error flag
+        bne     @return
 
         ldx     SCREEN_HI
         stx     old_screen_hi
 
-        lda     alt_screen_addr 
-        beq     @error              ; not initialized
+        lda     alt_screen_addr
+        beq     @return             ; not initialized
         sta     SCREEN_HI           ; Tell kernal to which memory screen output will go
 
         lda     #<def_screen_crsr_pos
@@ -32,22 +33,19 @@
         lda     #<alt_screen_crsr_pos
         ldx     #>alt_screen_crsr_pos
         jsr     _restorecursorfrom
-    
+
         inc     screen_selected
 
-        lda     #0
-        tax
-        rts
-    @error:
-        lda     #$01
-        ldx     #$00
-        rts
+        clc                         ; clear error flag
+    @return:
+        jmp     return_exit_status
 .endproc
 
 
 .proc _cbm_set_def_screen
         lda     screen_selected     ; If original screen is already set, then error
-        beq     @error
+        sec                         ; set error flag
+        beq     return_exit_status
 
         lda     old_screen_hi
         sta     SCREEN_HI
@@ -58,33 +56,30 @@
 
         dec     screen_selected
 
-        lda     #0
-        tax
-        rts
-    @error:
-        lda     #$01
-        ldx     #$00
-        rts
+        clc                         ; clear error fla
+        bcc     return_exit_status
 .endproc
 
 
 .proc _cbm_init_alt_screen
         jsr     check_screen_addr
-        bcs     @error
+        bcs     @return
+
+        ; Pay attention, that carry is clear from here on
 
         sta     alt_screen_addr
         sta     ptr1 + 1
-        lda     #0
-        sta     ptr1
+        ldy     #0
+        sty     ptr1
 
-        jsr     popa                ; fetch fillchar
+        lda     (sp), y             ; fetch fillchar (does not influence carry)
         ldy     #0
         ldx     #4                  ; This may depend on the target system
     @fill_screen:
         sta     (ptr1), y
         iny
         bne     @fill_screen
-        
+
         inc     ptr1 + 1
         dex
         bne     @fill_screen
@@ -92,14 +87,9 @@
         stx     alt_screen_crsr_pos ; Init cursor pos to 0/0 on alt screen
         stx     alt_screen_crsr_pos + 1
 
-        lda     #0
-        tax
-        rts
-    @error:
+    @return:
         jsr     popa
-        lda     #$01
-        ldx     #$00
-        rts
+        jmp     return_exit_status
 .endproc
 
 
@@ -126,6 +116,17 @@
     @error:
         sec
         rts
+.endproc
+
+
+.proc return_exit_status
+        ; return EXIT_SUCCESS, if clc
+        ; return EXIT_FAILURE, if sec
+        lda     #0
+        tax
+        bcc     :+
+        adc     #0
+    :   rts
 .endproc
 
 

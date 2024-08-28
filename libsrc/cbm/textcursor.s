@@ -6,6 +6,7 @@
 
         .export         _savecursorto, _restorecursorfrom
         .import         CURS_X: zp, CURS_Y: zp
+        .import         pushax, staxspidx, ldaxi, PLOT
 
 
 .proc   _savecursorto
@@ -19,7 +20,8 @@
 
 .proc   _restorecursorfrom
         jsr ldaxi
-        sta CURS_X
-        stx CURS_Y
-        rts
+        tay
+        txa
+        clc
+        jmp PLOT
 .endproc

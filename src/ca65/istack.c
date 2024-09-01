@@ -93,6 +93,7 @@ void PushInput (int (*Func) (void*), void* Data, const char* Desc)
 
     /* Push it */
     E->Next = IStack;
+    ICount++;
     IStack  = E;
 }
 
@@ -111,7 +112,7 @@ void PopInput (void)
 
     /* Pop it */
     IStack = IStack->Next;
-
+    ICount--;
     /* And delete it */
     xfree (E);
 }
@@ -155,4 +156,9 @@ void CheckInputStack (void)
     if (IStack) {
         Error ("Open %s", IStack->Desc);
     }
+}
+
+unsigned GetStackDepth (void)
+{
+    return ICount;
 }

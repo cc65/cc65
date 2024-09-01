@@ -36,7 +36,7 @@
 #ifndef MACRO_H
 #define MACRO_H
 
-
+#include "toklist.h"
 
 /*****************************************************************************/
 /*                                 Forwards                                  */
@@ -105,7 +105,7 @@ void EnableDefineStyleMacros (void);
 ** DisableDefineStyleMacros.
 */
 
-
+StrBuf MakeLineFromTokens (TokNode* first);
 
 /* End of macro.h */
 

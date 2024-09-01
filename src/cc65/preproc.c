@@ -2812,11 +2812,30 @@ static void DoInclude (void)
     InputType   IT;
     StrBuf      Filename = AUTO_STRBUF_INITIALIZER;
 
-    /* Macro-replace a single line with special support for <filename> */
-    SB_Clear (MLine);
-    PreprocessDirective (Line, MLine, MSM_TOK_HEADER);
+    /* Skip whitespace so the input pointer points to the argument */
+    SkipWhitespace (0);
 
-    /* Read from the processed line */
+    /* We may have three forms of the #include directive:
+    **
+    ** - # include "q-char-sequence" new-line
+    ** - # include <h-char-sequence> new-line
+    ** - # include pp-tokens new-line
+    **
+    ** The former two are processed as is while the latter is preprocessed and
+    ** must then resemble one of the first two forms.
+    */
+    if (CurC == '"' || CurC == '<') {
+        /* Copy the argument part over to MLine */
+        unsigned Start = SB_GetIndex (Line);
+        unsigned Length = SB_GetLen (Line) - Start;
+        SB_Slice (MLine, Line, Start, Length);
+    } else {
+        /* Macro-replace a single line with special support for <filename> */
+        SB_Clear (MLine);
+        PreprocessDirective (Line, MLine, MSM_TOK_HEADER);
+    }
+
+    /* Read from the copied/preprocessed line */
     SB_Reset (MLine);
     MLine = InitLine (MLine);
 

@@ -113,6 +113,7 @@ struct CharSource {
     token_t                     Tok;    /* Last token */
     int                         C;      /* Last character */
     int                         SkipN;  /* For '\r\n' line endings, skip '\n\ if next */
+    InputStack                  IStack; /* Saved input stack */
     const CharSourceFunctions*  Func;   /* Pointer to function table */
     union {
         InputFile               File;   /* File data */
@@ -321,6 +322,9 @@ static void UseCharSource (CharSource* S)
     S->Tok      = CurTok.Tok;
     S->C        = C;
 
+    /* Remember the current input stack */
+    S->IStack   = RetrieveInputStack ();
+
     /* Use the new input source */
     S->Next     = Source;
     Source      = S;
@@ -347,7 +351,10 @@ static void DoneCharSource (void)
 
     /* Restore the old token */
     CurTok.Tok = Source->Tok;
-    C   = Source->C;
+    C = Source->C;
+
+    /* Restore the old input source */
+    RestoreInputStack (Source->IStack);
 
     /* Remember the last stacked input source */
     S = Source->Next;
@@ -1521,7 +1528,7 @@ CharAgain:
             /* In case of the main file, do not close it, but return EOF. */
             if (Source && Source->Next) {
                 DoneCharSource ();
-                goto Again;
+                goto Restart;
             } else {
                 CurTok.Tok = TOK_EOF;
             }

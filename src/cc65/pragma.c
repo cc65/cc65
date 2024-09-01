@@ -86,36 +86,49 @@ typedef enum {
     PRAGMA_WRAPPED_CALL,
     PRAGMA_WRITABLE_STRINGS,
     PRAGMA_ZPSYM,
-    PRAGMA_COUNT
 } pragma_t;
 
 /* Pragma table */
 static const struct Pragma {
     const char* Key;            /* Keyword */
     pragma_t    Tok;            /* Token */
-} Pragmas[PRAGMA_COUNT] = {
+} Pragmas[] = {
     { "align",                  PRAGMA_ALIGN              },
     { "allow-eager-inline",     PRAGMA_ALLOW_EAGER_INLINE },
+    { "allow_eager_inline",     PRAGMA_ALLOW_EAGER_INLINE },
     { "bss-name",               PRAGMA_BSS_NAME           },
+    { "bss_name",               PRAGMA_BSS_NAME           },
     { "charmap",                PRAGMA_CHARMAP            },
     { "check-stack",            PRAGMA_CHECK_STACK        },
+    { "check_stack",            PRAGMA_CHECK_STACK        },
     { "code-name",              PRAGMA_CODE_NAME          },
+    { "code_name",              PRAGMA_CODE_NAME          },
     { "codesize",               PRAGMA_CODESIZE           },
     { "data-name",              PRAGMA_DATA_NAME          },
+    { "data_name",              PRAGMA_DATA_NAME          },
     { "inline-stdfuncs",        PRAGMA_INLINE_STDFUNCS    },
+    { "inline_stdfuncs",        PRAGMA_INLINE_STDFUNCS    },
     { "local-strings",          PRAGMA_LOCAL_STRINGS      },
+    { "local_strings",          PRAGMA_LOCAL_STRINGS      },
     { "message",                PRAGMA_MESSAGE            },
     { "optimize",               PRAGMA_OPTIMIZE           },
     { "register-vars",          PRAGMA_REGISTER_VARS      },
+    { "register_vars",          PRAGMA_REGISTER_VARS      },
     { "regvaraddr",             PRAGMA_REGVARADDR         },
     { "rodata-name",            PRAGMA_RODATA_NAME        },
+    { "rodata_name",            PRAGMA_RODATA_NAME        },
     { "signed-chars",           PRAGMA_SIGNED_CHARS       },
+    { "signed_chars",           PRAGMA_SIGNED_CHARS       },
     { "static-locals",          PRAGMA_STATIC_LOCALS      },
+    { "static_locals",          PRAGMA_STATIC_LOCALS      },
     { "warn",                   PRAGMA_WARN               },
     { "wrapped-call",           PRAGMA_WRAPPED_CALL       },
+    { "wrapped_call",           PRAGMA_WRAPPED_CALL       },
     { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
+    { "writable_strings",       PRAGMA_WRITABLE_STRINGS   },
     { "zpsym",                  PRAGMA_ZPSYM              },
 };
+#define PRAGMA_COUNT    (sizeof (Pragmas) / sizeof (Pragmas[0]))
 
 /* Result of ParsePushPop */
 typedef enum {

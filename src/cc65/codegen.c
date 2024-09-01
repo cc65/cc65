@@ -507,34 +507,39 @@ void g_enter (unsigned flags, unsigned argsize)
 
 
 
-void g_leave (void)
+void g_leave (int IsMainFunc)
 /* Function epilogue */
 {
-    /* How many bytes of locals do we have to drop? */
-    unsigned ToDrop = (unsigned) -StackPtr;
+    /* In the main function nothing has to be dropped because the program
+    ** is terminated anyway.
+    */
+    if (!IsMainFunc) {
+        /* How many bytes of locals do we have to drop? */
+        unsigned ToDrop = (unsigned) -StackPtr;
 
-    /* If we didn't have a variable argument list, don't call leave */
-    if (funcargs >= 0) {
+        /* If we didn't have a variable argument list, don't call leave */
+        if (funcargs >= 0) {
 
-        /* Drop stackframe if needed */
-        g_drop (ToDrop + funcargs);
+            /* Drop stackframe if needed */
+            g_drop (ToDrop + funcargs);
 
-    } else if (StackPtr != 0) {
+        } else if (StackPtr != 0) {
 
-        /* We've a stack frame to drop */
-        if (ToDrop > 255) {
-            g_drop (ToDrop);            /* Inlines the code */
-            AddCodeLine ("jsr leave");
+            /* We've a stack frame to drop */
+            if (ToDrop > 255) {
+                g_drop (ToDrop);            /* Inlines the code */
+                AddCodeLine ("jsr leave");
+            } else {
+                AddCodeLine ("ldy #$%02X", ToDrop);
+                AddCodeLine ("jsr leavey");
+            }
+
         } else {
-            AddCodeLine ("ldy #$%02X", ToDrop);
-            AddCodeLine ("jsr leavey");
+
+            /* Nothing to drop */
+            AddCodeLine ("jsr leave");
+
         }
-
-    } else {
-
-        /* Nothing to drop */
-        AddCodeLine ("jsr leave");
-
     }
 
     /* Add the final rts */

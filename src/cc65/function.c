@@ -646,11 +646,13 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Output the function exit code label */
     g_defcodelabel (F_GetRetLab (CurrentFunc));
 
-    /* Restore the register variables */
-    F_RestoreRegVars (CurrentFunc);
+    /* Restore the register variables (not necessary for main function) */
+    if (!F_IsMainFunc (CurrentFunc)) {
+        F_RestoreRegVars (CurrentFunc);
+    }
 
     /* Generate the exit code */
-    g_leave ();
+    g_leave (F_IsMainFunc (CurrentFunc));
 
     /* Emit references to imports/exports */
     EmitExternals ();

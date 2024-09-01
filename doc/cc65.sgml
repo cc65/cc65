@@ -1273,6 +1273,12 @@ If the first parameter is <tt/push/, the old value is saved onto a stack
 before changing it. The value may later be restored by using the <tt/pop/
 parameter with the <tt/#pragma/.
 
+For all pragma names that contain hyphens, the same name using underlines
+instead of the hyphens is available as an alternative. While the former
+resembles the corresponding command line option and is more orthogonal, the
+latter may be more compatible with external tools that rewrite the token
+sequences of the input.
+
 
 <sect1><tt>#pragma allow-eager-inline ([push,] on|off)</tt><label id="pragma-allow-eager-inline"><p>
 

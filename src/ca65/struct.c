@@ -37,6 +37,7 @@
 #include "scopedefs.h"
 
 /* ca65 */
+#include "anonname.h"
 #include "condasm.h"
 #include "error.h"
 #include "expr.h"
@@ -96,7 +97,7 @@ static long Member (long AllocSize)
 
 
 
-static long DoStructInternal (long Offs, unsigned Type)
+static long DoStructInternal (long Offs, unsigned Type, unsigned Nesting)
 /* Handle the .STRUCT command */
 {
     long Size = 0;
@@ -106,7 +107,14 @@ static long DoStructInternal (long Offs, unsigned Type)
     ** is started.
     */
     int Anon = (CurTok.Tok != TOK_IDENT);
-
+    if (Anon && Nesting == 0) {
+        StrBuf Name = AUTO_STRBUF_INITIALIZER;
+        Error ("Top level struct/union must have a name");
+        AnonName (&Name, "struct");
+        SymEnterLevel (&Name, SCOPE_STRUCT, ADDR_SIZE_ABS, 0);
+        /* Start at zero offset in the new scope */
+        Offs = 0;
+    }
     if (!Anon) {
         /* Enter a new scope, then skip the name */
         SymEnterLevel (&CurTok.SVal, SCOPE_STRUCT, ADDR_SIZE_ABS, 0);
@@ -222,12 +230,12 @@ static long DoStructInternal (long Offs, unsigned Type)
 
             case TOK_STRUCT:
                 NextTok ();
-                MemberSize = DoStructInternal (Offs, STRUCT);
+                MemberSize = DoStructInternal (Offs, STRUCT, Nesting + 1);
                 break;
 
             case TOK_UNION:
                 NextTok ();
-                MemberSize = DoStructInternal (Offs, UNION);
+                MemberSize = DoStructInternal (Offs, UNION, Nesting + 1);
                 break;
 
             default:
@@ -264,7 +272,7 @@ static long DoStructInternal (long Offs, unsigned Type)
     ** by user code.
     ** Leave the struct scope level.
     */
-    if (!Anon) {
+    if ((Anon && Nesting == 0) || !Anon) {
         /* Add a symbol */
         SymEntry* SizeSym = GetSizeOfScope (CurrentScope);
         SymDef (SizeSym, GenLiteralExpr (Size), ADDR_SIZE_DEFAULT, SF_NONE);
@@ -303,7 +311,7 @@ long GetStructSize (SymTable* Struct)
 void DoStruct (void)
 /* Handle the .STRUCT command */
 {
-    DoStructInternal (0, STRUCT);
+    DoStructInternal (0, STRUCT, 0);
 }
 
 
@@ -311,5 +319,5 @@ void DoStruct (void)
 void DoUnion (void)
 /* Handle the .UNION command */
 {
-    DoStructInternal (0, UNION);
+    DoStructInternal (0, UNION, 0);
 }

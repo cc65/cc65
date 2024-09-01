@@ -63,7 +63,9 @@ void DoEnum (void)
     long      Offs     = 0;
     ExprNode* BaseExpr = GenLiteral0 ();
 
-    /* Check for a name */
+    /* Check for a name. We allow anon structs even on top level. This will
+    ** generate a set of constants in the current scope.
+    */
     int Anon = (CurTok.Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */

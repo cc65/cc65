@@ -61,7 +61,7 @@ Short options:
   -Os                           Inline some standard functions
   -T                            Include source as comment
   -V                            Print the compiler version number
-  -W warning[,...]              Suppress warnings
+  -W [-+]warning[,...]          Control warnings ('-' disables, '+' enables)
   -d                            Debug mode
   -g                            Add debug info to object file
   -h                            Help (this text)
@@ -84,8 +84,9 @@ Long options:
   --create-full-dep name        Create a full make dependency file
   --data-name seg               Set the name of the DATA segment
   --debug                       Debug mode
+  --debug-tables name           Write symbol table debug info to a file
   --debug-info                  Add debug info to object file
-  --debug-opt name              Configure optimizations with a file
+  --debug-opt name              Debug optimization steps
   --debug-opt-output            Debug output of each optimization step
   --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step

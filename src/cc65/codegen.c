@@ -507,13 +507,13 @@ void g_enter (unsigned flags, unsigned argsize)
 
 
 
-void g_leave (int IsMainFunc)
+void g_leave (int DoCleanup)
 /* Function epilogue */
 {
-    /* In the main function nothing has to be dropped because the program
-    ** is terminated anyway.
+    /* In the main function in cc65 mode nothing has to be dropped because
+    ** the program is terminated anyway.
     */
-    if (!IsMainFunc) {
+    if (DoCleanup) {
         /* How many bytes of locals do we have to drop? */
         unsigned ToDrop = (unsigned) -StackPtr;
 

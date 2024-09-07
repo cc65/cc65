@@ -1219,9 +1219,6 @@ static void Primary (ExprDesc* E)
             /* Is the symbol known? */
             if (Sym) {
 
-                /* We found the symbol - skip the name token */
-                NextToken ();
-
                 /* Check for illegal symbol types */
                 CHECK ((Sym->Flags & SC_TYPEMASK) != SC_LABEL);
                 if ((Sym->Flags & SC_TYPEMASK) == SC_TYPEDEF) {
@@ -1230,8 +1227,13 @@ static void Primary (ExprDesc* E)
                     /* Assume an int type to make E valid */
                     E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
                     E->Type  = type_int;
+                    /* Skip the erroneous token */
+                    NextToken ();
                     break;
                 }
+
+                /* Skip the name token */
+                NextToken ();
 
                 /* Mark the symbol as referenced */
                 Sym->Flags |= SC_REF;
@@ -1286,7 +1288,23 @@ static void Primary (ExprDesc* E)
                 ** rvalue, too, because we cannot store anything in a function.
                 ** So fix the flags depending on the type.
                 */
-                if (IsTypeArray (E->Type) || IsTypeFunc (E->Type)) {
+                if (IsTypeArray (E->Type)) {
+                    ED_AddrExpr (E);
+                } else if (IsTypeFunc (E->Type)) {
+                    /* In cc65 mode we cannot call or take the address of
+                    ** main().
+                    */
+                    if (IS_Get (&Standard) == STD_CC65 &&
+                        strcmp (Sym->Name, "main") == 0) {
+                        /* Adjust the error message depending on a call or an
+                        ** address operation.
+                        */
+                        if (CurTok.Tok == TOK_LPAREN) {
+                            Error ("'main' must not be called recursively");
+                        } else {
+                            Error ("The address of 'main' cannot be taken");
+                        }
+                    }
                     ED_AddrExpr (E);
                 }
 

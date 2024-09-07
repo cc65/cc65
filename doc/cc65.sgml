@@ -824,6 +824,11 @@ and the one defined by the ISO standard:
         as it sounds, since the 6502 has so few registers that it isn't
         possible to keep values in registers anyway.
         <p>
+<item>  In <tt/cc65/ mode, <tt/main()/ cannot be called recursively. If this
+        is necessary, the program must be compiled in <tt/c89/ or <tt/c99/ mode
+        using the <tt><ref id="option--standard" name="--standard"></tt>
+        command line option.
+        <p>
 </itemize>
 
 There may be some more minor differences I'm currently not aware of. The

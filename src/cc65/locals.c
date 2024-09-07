@@ -111,6 +111,13 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
     /* Get the size of the variable */
     unsigned Size = SizeOf (Decl->Type);
 
+    /* Check if this is the main function and we are in cc65 mode. If so, we
+    ** won't save the old contents of the register variables since in cc65
+    ** mode main() may not be called recursively.
+    */
+    int SaveRegVars = (IS_Get (&Standard) != STD_CC65) ||
+                      !F_IsMainFunc (CurrentFunc);
+
     /* Check for an optional initialization */
     if (CurTok.Tok == TOK_ASSIGN) {
 
@@ -126,13 +133,13 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
         /* Save the current contents of the register variable on stack. This is
         ** not necessary for the main function.
         */
-        if (!F_IsMainFunc (CurrentFunc)) {
+        if (SaveRegVars) {
             g_save_regvars (Reg, Size);
         }
 
         /* Add the symbol to the symbol table. We do that now, because for
         ** register variables the current stack pointer is implicitly used
-        ** as location for the save area (unused in case of main()).
+        ** as location for the save area (maybe unused in case of main()).
         */
         Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
 
@@ -187,14 +194,14 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
         /* Save the current contents of the register variable on stack. This is
         ** not necessary for the main function.
         */
-        if (!F_IsMainFunc (CurrentFunc)) {
+        if (SaveRegVars) {
             F_AllocLocalSpace (CurrentFunc);
             g_save_regvars (Reg, Size);
         }
 
         /* Add the symbol to the symbol table. We do that now, because for
         ** register variables the current stack pointer is implicitly used
-        ** as location for the save area (unused in case of main()).
+        ** as location for the save area (maybe unused in case of main()).
         */
         Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
     }

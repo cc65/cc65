@@ -117,21 +117,37 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
     /* Get the size of the variable */
     unsigned Size = SizeOf (Decl->Type);
 
-    /* Save the current contents of the register variable on stack */
-    F_AllocLocalSpace (CurrentFunc);
-    g_save_regvars (Reg, Size);
-
-    /* Add the symbol to the symbol table. We do that now, because for register
-    ** variables the current stack pointer is implicitly used as location for
-    ** the save area.
+    /* Check if this is the main function and we are in cc65 mode. If so, we
+    ** won't save the old contents of the register variables since in cc65
+    ** mode main() may not be called recursively.
     */
-    Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
+    int SaveRegVars = (IS_Get (&Standard) != STD_CC65) ||
+                      !F_IsMainFunc (CurrentFunc);
 
     /* Check for an optional initialization */
     if (CurTok.Tok == TOK_ASSIGN) {
 
         /* Skip the '=' */
         NextToken ();
+
+        /* If the register variable is initialized, the initialization code may
+        ** access other already declared variables. This means that we have to
+        ** allocate them now.
+        */
+        F_AllocLocalSpace (CurrentFunc);
+
+        /* Save the current contents of the register variable on stack. This is
+        ** not necessary for the main function.
+        */
+        if (SaveRegVars) {
+            g_save_regvars (Reg, Size);
+        }
+
+        /* Add the symbol to the symbol table. We do that now, because for
+        ** register variables the current stack pointer is implicitly used
+        ** as location for the save area (maybe unused in case of main()).
+        */
+        Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
 
         /* Special handling for compound types */
         if (IsCompound) {
@@ -179,6 +195,21 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
 
         /* Mark the variable as referenced */
         Sym->Flags |= SC_REF;
+    } else {
+
+        /* Save the current contents of the register variable on stack. This is
+        ** not necessary for the main function.
+        */
+        if (SaveRegVars) {
+            F_AllocLocalSpace (CurrentFunc);
+            g_save_regvars (Reg, Size);
+        }
+
+        /* Add the symbol to the symbol table. We do that now, because for
+        ** register variables the current stack pointer is implicitly used
+        ** as location for the save area (maybe unused in case of main()).
+        */
+        Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
     }
 
     /* Cannot allocate a variable of unknown size */

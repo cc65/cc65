@@ -91,7 +91,7 @@ static void Usage (void)
             "  -Os\t\t\t\tInline some standard functions\n"
             "  -T\t\t\t\tInclude source as comment\n"
             "  -V\t\t\t\tPrint the compiler version number\n"
-            "  -W warning[,...]\t\tSuppress warnings\n"
+            "  -W [-+]warning[,...]\t\tControl warnings ('-' disables, '+' enables)\n"
             "  -d\t\t\t\tDebug mode\n"
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"

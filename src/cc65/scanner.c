@@ -1277,7 +1277,7 @@ static int CloseBrace (Collection* C, token_t Tok)
 */
 {
     if (CollCount (C) > 0) {
-        token_t LastTok = (token_t)CollLast (C);
+        token_t LastTok = (token_t)(intptr_t)CollLast (C);
         if (LastTok == Tok) {
             CollPop (C);
             NextToken ();

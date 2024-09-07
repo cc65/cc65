@@ -50,7 +50,7 @@ ISEQUAL = ..$S..$Stestwrk$Sisequal$(EXE)
 #       will have to change that, and create said special cases here.
 #       see discussion in https://github.com/cc65/cc65/issues/2277
 CC = gcc
-CFLAGS = -std=gnu17 -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow
+CFLAGS = -std=gnu17 -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow -Wno-error=implicit-int -Wno-error=int-conversion
 
 .PHONY: all clean
 

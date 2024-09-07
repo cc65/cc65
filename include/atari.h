@@ -220,17 +220,17 @@
 /* Color register functions                                                  */
 /*****************************************************************************/
 
-extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminance);
-extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
-extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
+void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminance);
+void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
+unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 
 /*****************************************************************************/
 /* Other screen functions                                                    */
 /*****************************************************************************/
 
-extern void waitvsync (void);                            /* wait for start of next frame */
-extern int  __fastcall__ _graphics (unsigned char mode); /* mode value same as in BASIC */
-extern void __fastcall__ _scroll (signed char numlines);
+void waitvsync (void);                            /* wait for start of next frame */
+int  __fastcall__ _graphics (unsigned char mode); /* mode value same as in BASIC */
+void __fastcall__ _scroll (signed char numlines);
                                           /* numlines > 0  scrolls up */
                                           /* numlines < 0  scrolls down */
 
@@ -239,18 +239,18 @@ extern void __fastcall__ _scroll (signed char numlines);
 /*    Sound function                                                         */
 /*****************************************************************************/
 
-extern void  __fastcall__ _sound (unsigned char voice, unsigned char frequency, unsigned char distortion, unsigned char volume);
+void  __fastcall__ _sound (unsigned char voice, unsigned char frequency, unsigned char distortion, unsigned char volume);
 
 /*****************************************************************************/
 /* Misc. functions                                                           */
 /*****************************************************************************/
 
-extern unsigned char get_ostype(void);       /* get ROM version */
-extern unsigned char get_tv(void);           /* get TV system */
-extern void _save_vecs(void);                /* save system vectors */
-extern void _rest_vecs(void);                /* restore system vectors */
-extern char *_getdefdev(void);               /* get default floppy device */
-extern unsigned char _is_cmdline_dos(void);  /* does DOS support command lines */
+unsigned char get_ostype(void);       /* get ROM version */
+unsigned char get_tv(void);           /* get TV system */
+void _save_vecs(void);                /* save system vectors */
+void _rest_vecs(void);                /* restore system vectors */
+char *_getdefdev(void);               /* get default floppy device */
+unsigned char _is_cmdline_dos(void);  /* does DOS support command lines */
 
 
 /*****************************************************************************/

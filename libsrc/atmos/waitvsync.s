@@ -10,8 +10,8 @@
 
 .proc   _waitvsync
 
-        lda     #%00010000
-wait:   and     VIA::PRA2       ; CB1
+        lda     #%00010000      ; CB1
+wait:   and     VIA::PRA2
         bne     wait
         rts
 

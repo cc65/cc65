@@ -788,8 +788,7 @@ unsigned OptBinOps (CodeSeg* S)
                         ** The instruction can be removed if the flags aren't
                         ** used later.
                         */
-                        CodeEntry* N = CS_GetNextEntry (S, I);
-                        if (N && !CE_UseLoadFlags (N)) {
+                        if (!LoadFlagsUsed (S, I+1)) {
                             Delete = 1;
                         }
                     } else if (Operand >= 0) {
@@ -822,8 +821,7 @@ unsigned OptBinOps (CodeSeg* S)
                         ** The instruction can be removed if the flags aren't
                         ** used later.
                         */
-                        CodeEntry* N = CS_GetNextEntry (S, I);
-                        if (N && !CE_UseLoadFlags (N)) {
+                        if (!LoadFlagsUsed (S, I+1)) {
                             Delete = 1;
                         }
                     } else if (Operand >= 0) {
@@ -861,8 +859,7 @@ unsigned OptBinOps (CodeSeg* S)
                         ** The instruction can be removed if the flags aren't
                         ** used later.
                         */
-                        CodeEntry* N = CS_GetNextEntry (S, I);
-                        if (N && !CE_UseLoadFlags (N)) {
+                        if (!LoadFlagsUsed (S, I+1)) {
                             Delete = 1;
                         }
                     } else if (Operand == 0xFF) {

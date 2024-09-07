@@ -151,8 +151,8 @@ static short ZPRegVal (unsigned short Use, const RegContents* RC)
 
 
 unsigned OptUnusedLoads (CodeSeg* S)
-/* Remove loads of or operations with registers where the value loaded or 
-** produced is not used later. 
+/* Remove loads of or operations with registers where the value loaded or
+** produced is not used later.
 */
 {
     unsigned Changes = 0;
@@ -173,7 +173,7 @@ unsigned OptUnusedLoads (CodeSeg* S)
                    E->OPC == OP65_ORA;
 
         /* Check for the necessary preconditions */
-        if (IsOp && (N = CS_GetNextEntry (S, I)) != 0 && !CE_UseLoadFlags (N)) {
+        if (IsOp && (N = CS_GetNextEntry (S, I)) != 0 && !LoadFlagsUsed (S, I+1)) {
 
             /* Check which sort of load or transfer it is */
             unsigned R;

@@ -155,6 +155,7 @@ function.
 <item><ref id="atmos_tick" name="atmos_tick">
 <item><ref id="atmos_tock" name="atmos_tock">
 <item><ref id="atmos_zap" name="atmos_zap">
+<item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
 
@@ -8358,6 +8359,7 @@ only in the presence of a prototype.
 <descrip>
 <tag/Function/Wait until the start of the next video frame.
 <tag/Header/<tt/
+<ref id="atmos.h" name="atmos.h">,
 <ref id="cbm.h" name="cbm.h">,
 <ref id="gamate.h" name="gamate.h">,
 <ref id="nes.h" name="nes.h">,
@@ -8365,6 +8367,7 @@ only in the presence of a prototype.
 <tag/Declaration/<tt/void waitvsync (void);/
 <tag/Description/Wait for vertical sync, to reduce flickering.
 <tag/Availability/Platforms served by the headers above
+(Atmos requires the VSync hack)
 <tag/Example/None.
 </descrip>
 </quote>

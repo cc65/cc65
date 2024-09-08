@@ -694,7 +694,6 @@ static void NumericConst (void)
         /* Float constant */
         Double FVal = FP_D_FromInt (IVal);      /* Convert to double */
 
-
         /* Check for a fractional part and read it */
         if (SB_Peek (&Src) == '.') {
 
@@ -769,7 +768,6 @@ static void NumericConst (void)
                 FVal = FP_D_Mul (FVal, FP_D_Make (pow ((Base == 16) ? 2.0 : 10.0, (Sign ? -1.0 : 1.0) * Exp)));
             }
         }
-
 
         /* Check for a suffix and determine the type of the constant */
         if (toupper (SB_Peek (&Src)) == 'F') {

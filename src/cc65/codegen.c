@@ -31,6 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
+
+
 #include <inttypes.h>
 #include <limits.h>
 #include <stdio.h>
@@ -703,18 +705,11 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 /*                           Fetching memory cells                           */
 /*****************************************************************************/
 
-#ifdef DEBUG
-//#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c),(__FILE__),(__FUNCTION__),(__LINE__))
-// void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs, char *file, const char *func, int line)
-#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c))
-void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
-#else
-#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c))
-void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
-#endif
+void g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
+
 
     if ((Flags & CF_CONST) != 0) {
 
@@ -1993,17 +1988,17 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
             if (flags & CF_CONST) {
                 g_getimmed (flags, val, 0);
             }
-            // value to add is in primary (a/x/sreg/sgreg+1)
+            /* value to add is in primary (a/x/sreg/sgreg+1) */
 
             AddCodeLine ("jsr pusheax");
 
-            // variable to add to is at sp+y
+            /* variable to add to is at sp+y */
             AddCodeLine ("ldy #$%02X", Offs+4+3);
             AddCodeLine ("jsr ldeaxysp");
 
             AddCodeLine ("jsr ftosaddeax");
-            // result is in primary
-            // store primary to stack offset
+            /* result is in primary
+               store primary to stack offset */
             AddCodeLine ("ldy #$%02X", Offs);
             AddCodeLine ("jsr steaxysp");
             break;
@@ -2856,7 +2851,6 @@ void g_add (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
     }
-
     oper (flags, val, ops);
 }
 
@@ -2877,7 +2871,6 @@ void g_sub (unsigned flags, unsigned long val)
         flags &= ~CF_FORCECHAR; /* Handle chars as ints */
         g_push (flags & ~CF_CONST, 0);
     }
-
     oper (flags, val, ops);
 }
 
@@ -2893,7 +2886,6 @@ void g_rsub (unsigned flags, unsigned long val)
         "tosrsubeax",
         "ftosrsubeax"
     };
-
     oper (flags, val, ops);
 }
 
@@ -4840,11 +4832,8 @@ void g_defdata_float (unsigned flags, uintptr_t val, long offs)
 
             case CF_FLOAT:
                 /* FIXME: float */
-//                AddDataLine ("\t.float\t%f", (float)(val & 0xFFFFFFFF));
-//                AddDataLine ("\t.dword\t$%08"PRIXPTR"\t; float", val & 0xFFFFFFFF);
                 {
                     /* FIXME: float - convert to binary format, this is super NOGO :) */
-//                    float f = (float)(val);
                     unsigned char *p = (unsigned char*)&val;
                     AddDataLine ("\t.dword\t$%02x%02x%02x%02x\t; float",
                                  p[3],p[2],p[1],p[0]);

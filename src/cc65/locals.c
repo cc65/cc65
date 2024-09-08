@@ -228,7 +228,6 @@ static void ParseAutoDecl (Declarator* Decl)
     /* Get the size of the variable */
     unsigned Size = SizeOf (Decl->Type);
 
-
     /* Check if this is a variable on the stack or in static memory */
     if (IS_Get (&StaticLocals) == 0) {
 

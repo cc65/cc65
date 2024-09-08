@@ -31,6 +31,8 @@
 /*                                                                           */
 /*****************************************************************************/
 
+
+
 /* cc65 */
 #include "asmcode.h"
 #include "assignment.h"
@@ -45,6 +47,7 @@
 #include "symentry.h"
 #include "typecmp.h"
 #include "typeconv.h"
+
 
 
 /*****************************************************************************/
@@ -723,7 +726,6 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     rflags |= CG_TypeOf (Expr2.Type) | CF_FORCECHAR;
 
     if (ED_IsConstAbs (&Expr2)) {
-
         /* The resulting value is a constant */
         rflags |= CF_CONST;
         lflags |= CF_CONST;
@@ -733,7 +735,6 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
             Expr2.IVal *= CheckedSizeOf (Indirect (Expr->Type));
         }
     } else {
-
         /* Not constant, load into the primary */
         LoadExpr (CF_NONE, &Expr2);
 

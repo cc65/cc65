@@ -278,8 +278,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 /*****************************************************************************/
 
 
-#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c))
-void _g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
+void g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
 
 /* Load a constant into the primary register */
 

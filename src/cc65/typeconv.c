@@ -32,6 +32,7 @@
 /*****************************************************************************/
 
 
+
 /* common */
 #include "shift.h"
 
@@ -45,6 +46,7 @@
 #include "loadexpr.h"
 #include "typecmp.h"
 #include "typeconv.h"
+
 
 
 /*****************************************************************************/
@@ -95,6 +97,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 
     /* lvalue? */
     if (ED_IsLVal (Expr)) {
+
         /* We have an lvalue. If the new size is smaller than the old one,
         ** we don't need to do anything. The compiler will generate code
         ** to load only the portion of the value that is actually needed.
@@ -116,6 +119,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             /* Value is now in primary and an rvalue */
             ED_FinalizeRValLoad (Expr);
         }
+
     } else if (ED_IsConstAbs (Expr)) {
 
         /* A cast of a constant numeric value to another type. Be sure
@@ -210,6 +214,15 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
 ** impossible.
 */
 {
+#if 0
+    /* Debugging */
+    printf ("Expr:\n=======================================\n");
+    PrintExprDesc (stdout, Expr);
+    printf ("Type:\n=======================================\n");
+    PrintType (stdout, NewType);
+    printf ("\n");
+    PrintRawType (stdout, NewType);
+#endif
     /* First, do some type checking */
     typecmp_t Result    = TYPECMP_INITIALIZER;
     int HasError        = 0;

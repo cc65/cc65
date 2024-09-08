@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//#define DEBUG_VALUE
+/*#define DEBUG_VALUE*/
 
-// This is really a terrible function that should get completely rewritten and
-// tested by someone who knows what he is doing =P
+/* This is really a terrible function that should get completely rewritten and
+   tested by someone who knows what he is doing =P */
 char *_ftostr(char *buffer, float f) {
     signed long intpart;
     float fracpart;
@@ -14,7 +14,7 @@ char *_ftostr(char *buffer, float f) {
     int is_negative;
     unsigned long raw_value = *((unsigned long*)(&f));
 
-    is_negative = (raw_value & 0x80000000) ? 1 : 0;     // very hacky indeed
+    is_negative = (raw_value & 0x80000000) ? 1 : 0;     /* very hacky indeed */
 
     if (!is_negative) {
         intpart = (signed long)(f);
@@ -37,7 +37,7 @@ char *_ftostr(char *buffer, float f) {
                 --intpart;
             }
         }
-//                ++intpart;
+        /* ++intpart; */
     }
 
     if (!is_negative) {
@@ -63,12 +63,12 @@ char *_ftostr(char *buffer, float f) {
 
     n0 = (signed long)f1;
 #if 0
-    // caution: make sure fracpart can never be negative
+    /* caution: make sure fracpart can never be negative */
     if (n0 < 0) {
         n0 *= -1;
     }
 #endif
-//    printf("n0:%ld\n",n0);
+
 #ifdef DEBUG_VALUE
     if (n0 >= 1000) {
         sprintf(buffer, "<0x%08lx:%s%ld.%ld>", raw_value, is_negative ? "-" : "", intpart, n0);

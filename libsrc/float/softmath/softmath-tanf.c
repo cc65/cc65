@@ -1,7 +1,6 @@
 
 #include <math.h>
 
-#if 1
 /*  The input argument is in radians. Note that the function
     computes tan(pi*x/4), NOT tan(x); it's up to the range
     reduction algorithm that calls this to scale things properly.
@@ -41,12 +40,3 @@ float tanf(float x){
         case 7: return -       _tan(((2.0f * M_PI)-x)          * (4.0f / M_PI));
     }
 }
-#endif
-
-#if 0
-float tanf(float x)
-{
-    x = x;
-    return 0.0f;
-}
-#endif

@@ -4,6 +4,9 @@
 
 char buffer[32];
 
+/* FIXME: this is a really hacky implementation meant to be used while developing
+ * the floating point support (it does not use floating point operations). Once
+ * the support is more stable, it should be rewritten */
 char * __fastcall__ _ftostr(char *d, float s)
 {
     float f;
@@ -14,7 +17,6 @@ char * __fastcall__ _ftostr(char *d, float s)
     unsigned long val;
     int sign;
     unsigned char n;
-    static char digits[10]={0,1,2,3,4,5,6,7,8,9};
 
     unsigned long mantissa_mod = 1000000000;
     unsigned long mantissa_rest;
@@ -27,8 +29,6 @@ char * __fastcall__ _ftostr(char *d, float s)
 
     f = s;
     p = (unsigned char*)&f;
-
-//    printf("%02x %02x %02x %02x\n", p[3], p[2], p[1], p[0]);
 
     sign = (p[3] & 0x80) ? 1 : 0;
     exp = ((p[3] << 1) & 0xfe) | ((p[2] >> 7) & 1);
@@ -45,14 +45,11 @@ char * __fastcall__ _ftostr(char *d, float s)
     *bp++ = '.';
 
     val = 0xff;
-//    printf("mantissa: %ld\n", mantissa);
+
     mantissa_rest = mantissa;
     for (n = 0; n < 10; n++) {
-//         printf("n:%2d rest:%ld mod:%ld\n", n, mantissa_rest, mantissa_mod);
          if ((mantissa_mod <= mantissa_rest) && (mantissa_rest > 0)) {
              val = mantissa_rest / mantissa_mod;
-//             printf("n:%2d val:%ld\n", n, val);
-//            *bp++ = digits[(int)val];
             *bp++ = '0' + val;
             mantissa_rest -= (val * mantissa_mod);
          }
@@ -62,13 +59,10 @@ char * __fastcall__ _ftostr(char *d, float s)
          *bp++ = '0';
      }
 
-//    *bp++ = 'e';
-//    *bp++ = 0;
     *bp++ = '*';
     *bp++ = '2';
     *bp++ = '^';
 
-//    printf("exp: %ld\n", exp);
     mantissa_mod = 1000;
     if (exp < 0) {
         mantissa_rest = -1 * exp;
@@ -78,11 +72,8 @@ char * __fastcall__ _ftostr(char *d, float s)
     }
     val = 0xff;
     for (n = 0; n < 10; n++) {
-//         printf("n:%2d rest:%ld mod:%ld\n", n, mantissa_rest, mantissa_mod);
          if ((mantissa_mod <= mantissa_rest) && (mantissa_rest > 0)) {
              val = mantissa_rest / mantissa_mod;
-//             printf("n:%2d val:%ld\n", n, val);
-//            *bp++ = digits[(int)val];
             *bp++ = '0' + val;
             mantissa_rest -= (val * mantissa_mod);
          }

@@ -4,8 +4,6 @@
 ** 2020-11-20, Greg King
 */
 
-//#define DEBUG
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -41,13 +39,6 @@
 #include "typeconv.h"
 #include "expr.h"
 
-#ifdef DEBUG
-#define LOG(x)  printf  x
-#define FIXME(x)  printf  x
-#else
-#define LOG(x)
-#define FIXME(x)
-#endif
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -498,8 +489,6 @@ static void DoInc (ExprDesc* Expr, unsigned KeepResult)
 
     /* Get the increment value in bytes */
     Val = IsTypePtr (Expr->Type) ? CheckedSizeOf (Expr->Type + 1) : 1;
-
-    LOG(("DoInc Val:%d KeepResult:%d\n", Val, KeepResult));
 
     /* Special treatment is needed for bit-fields */
     if (IsTypeFragBitField (Expr->Type)) {
@@ -2202,7 +2191,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
     int rconst;                         /* Right operand is a constant */
     int floatop = 0;
 
-//LOG(("hie_internal\n"));
     ExprWithCheck (hienext, Expr);
 
     *UsedGen = 0;
@@ -2257,10 +2245,8 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             */
             if ((Gen->Flags & GEN_COMM) == 0) {
                 if (ltype == CF_FLOAT) {
-                    LOG(("hie_internal push left side const (float)\n"));
                     g_push (ltype | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal));
                 } else {
-                    LOG(("hie_internal push left side const (int)\n"));
                     g_push (ltype | CF_CONST, Expr->IVal);
                 }
             }
@@ -2268,7 +2254,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             /* Value not constant */
             LoadExpr (CF_NONE, Expr);
             GetCodePos (&Mark2);
-            LOG(("hie_internal push left side var\n"));
             g_push (ltype, 0);
         }
 
@@ -2289,15 +2274,13 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             ) {
             Error ("RHS Integer expression expected (hie_internal)");
         }
-        LOG(("hie_internal lconst:%d rconst:%d\n", lconst, rconst));
+
         /* Check for const operands */
         if (lconst && rconst) {
 
             /* Evaluate the result for operands */
             unsigned long Val1 = Expr->IVal;
             unsigned long Val2 = Expr2.IVal;
-
-            LOG(("hie_internal lhs is const and rhs is const"));
 
             /* Both operands are constant, remove the generated code */
             RemoveCode (&Mark1);
@@ -2306,26 +2289,20 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* FIXME: float --- newcode start */
-LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
-       (IsClassFloat (Expr->Type) == CF_FLOAT) ? "float" : "int",
-       (IsClassFloat (Expr2.Type) == CF_FLOAT) ? "float" : "int"
-       ));
-LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
-       (Expr->Type == type_float) ? "float" : "int",
-       (Expr2.Type == type_float) ? "float" : "int"
-       ));
 
             /* FIXME: float */
             /* FIXME: right now this works only when both rhs and lhs are float,
                       this must be extended to handle mixed operations */
-//             if ((IsClassFloat (Expr->Type) == CF_FLOAT) &&
-//                 (IsClassFloat (Expr2.Type) == CF_FLOAT)) {
+#if 0
+            if ((IsClassFloat (Expr->Type) == CF_FLOAT) &&
+                (IsClassFloat (Expr2.Type) == CF_FLOAT)) {
+#endif
             if ((ltype == CF_FLOAT) ||
                 (Expr2.Type == type_float)) {
                 /* Evaluate the result for float operands */
                 Double Val1;
                 Double Val2;
-                LOG(("hie_internal float X float %d %d\n", Expr->IVal, Expr2.IVal));
+
                 if (ltype == CF_FLOAT) {
                     Val1 = Expr->V.FVal;
                 } else {
@@ -2336,11 +2313,10 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 } else {
                     Val2 = FP_D_FromInt(Expr2.IVal);
                 }
-                LOG(("hie_internal float X float %f %f\n", Expr->V.FVal.V, Expr2.V.FVal.V));
 
                 switch (Tok) {
                     case TOK_DIV:
-#if 0 // TODO
+#if 0 /* TODO */
                         if (Val2 == 0.0f) {
                             Error ("Division by zero");
                             Expr->V.FVal = FP_D_FromInt(0);
@@ -2358,7 +2334,6 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 }
             /* FIXME: float --- newcode end */
             } else {
-                LOG(("hie_internal (un)signed int X signed int\n"));
                 /* Handle the op differently for signed and unsigned types */
                 switch (Tok) {
                     case TOK_OR:
@@ -2418,7 +2393,7 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             ** returned without this modification).  This allows more efficient operations,
             ** but does not affect correctness for the same reasons explained in g_typeadjust.
             */
-            LOG(("hie_internal lhs is const, rhs is not const\n"));
+
             if (ltype == CF_INT && Expr->IVal >= 0 && Expr->IVal < 256) {
                 ltype = CF_CHAR | CF_UNSIGNED;
             }
@@ -2436,7 +2411,6 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             } else {
                 ltype |= CF_PRIMARY;        /* Value is in register */
             }
-            LOG(("hie_internal swap lhs/rhs\n"));
 
             /* Determine the type of the operation result. */
             type |= g_typeadjust (ltype, rtype);
@@ -2444,10 +2418,8 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
 
             /* Generate code */
             if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
-                LOG(("hie_internal lhs is not const, rhs is const\n"));
                 Gen->Func (type, FP_D_As32bitRaw(Expr->V.FVal));
             } else {
-                LOG(("hie_internal lhs is not const, rhs is const\n"));
                 Gen->Func (type, Expr->IVal);
             }
 
@@ -2462,17 +2434,15 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
             */
             unsigned rtype = CG_TypeOf (Expr2.Type);
             type = 0;
-            LOG(("hie_internal ?2  ltype:%4x rconst: %d rtype:%4x\n", ltype, rconst, rtype));
+
             if (rconst) {
                 /* As above, but for the RHS. */
                 if (rtype == CF_INT && Expr2.IVal >= 0 && Expr2.IVal < 256) {
                     rtype = CF_CHAR | CF_UNSIGNED;
                 }
                 /* Second value is constant - check for div */
-                LOG(("rtype float is %x\n", CF_FLOAT));
                 if (rtype == CF_FLOAT) {
-                    // FIXME add respective checks for float
-                    FIXME(("FIXME: add div checks for float\n"));
+                    /* FIXME add respective checks for float */
                 } else {
                     if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
                         if (Tok == TOK_DIV) {
@@ -2486,94 +2456,64 @@ LOG(("hie_internal Expr->Type:%s Expr2->Type:%s\n",
                 rtype |= CF_CONST;
 
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
-                    FIXME(("hie_internal ?2 removing code\n"));
                     RemoveCode (&Mark2);
                     ltype |= CF_PRIMARY;    /* Value is in register */
                 }
             }
-            LOG(("hie_internal ?2a ltype:%4x rconst: %d rtype:%4x\n", ltype, rconst, rtype));
 
             /* Determine the type of the operation result. */
             type |= g_typeadjust (ltype, rtype);
-            LOG(("hie_internal ?2b ltype:%4x rconst: %d rtype:%4x type:%04x .Expr.Type:%04x Expr2.Type:%04x\n", ltype, rconst, rtype, type, TypeOf (Expr->Type), TypeOf (Expr2.Type)));
+
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
-            LOG(("hie_internal ?2c Expr->Type:%4x\n", TypeOf (Expr->Type)));
 
             /* Generate code */
             if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
 #if 0
                 Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
 #else
-                // right side is float
-                LOG(("hie_internal ?2 rhs float:%x\n", FP_D_As32bitRaw(Expr2.V.FVal)));
+                /* right side is float */
                 if (((ltype & CF_TYPEMASK) != CF_FLOAT) && (!(rtype & CF_CONST))) {
-                    // left side is not float, right side is non-constant float
-                    LOG(("hie_internal ?2 lhs not float: %ld ltype const?:%d\n", Expr->IVal, ltype & CF_CONST));
+                    /* left side is not float, right side is non-constant float */
 #if 1
                     RemoveCode (&Mark2);
                     LoadExpr(ltype, Expr);
                     /* Adjust lhs primary if needed  */
-//                  type = typeadjust (&Expr2, Expr, 0);
-//                    type = typeadjust (Expr, &Expr2, 1);
-//                    Expr->Type = type_float;
                     g_regfloat(ltype);
-//                    g_push_float(type & ~CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal)));
-//                    g_push_float(type & ~CF_CONST, 0);
-//                    RemoveCode (&Mark2);
                     g_push(type, 0);
                     LoadExpr(CF_FLOAT, &Expr2);
-                    // left side is not float, right side is float
+                    /* left side is not float, right side is float */
                     Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
 #else
                     if (lconst) {
-                        LOG(("hie_internal lhs int const\n"));
 #if 1
-                        // lhs is constant
-                          RemoveCode (&Mark2);
-                          LoadExpr(ltype, Expr);
+                        /* lhs is constant */
+                        RemoveCode (&Mark2);
+                        LoadExpr(ltype, Expr);
     //                     /* Adjust lhs primary if needed  */
-    // //                  type = typeadjust (&Expr2, Expr, 0);
                          type = typeadjust (Expr, &Expr2, 1);
-    // //                    Expr->Type = type_float;
-    //                     g_regfloat(type);
-    // //                    g_push_float(type & ~CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal)));
-    // //                    g_push_float(type & ~CF_CONST, 0);
-    // //                    RemoveCode (&Mark2);
-    //                     g_push(type, 0);
-    //                     LoadExpr(CF_FLOAT, &Expr2);
-                        // left side is not float, right side is float
+                        /* left side is not float, right side is float */
                         Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
 #endif
                     } else {
-                        LOG(("hie_internal lhs int var\n"));
 #if 1
                         RemoveCode (&Mark2);
                         LoadExpr(ltype, Expr);
                         /* Adjust lhs primary if needed  */
-    //                  type = typeadjust (&Expr2, Expr, 0);
-    //                    type = typeadjust (Expr, &Expr2, 1);
-    //                    Expr->Type = type_float;
                         g_regfloat(ltype);
-    //                    g_push_float(type & ~CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal)));
-    //                    g_push_float(type & ~CF_CONST, 0);
-    //                    RemoveCode (&Mark2);
                         g_push(type, 0);
                         LoadExpr(CF_FLOAT, &Expr2);
-                        // left side is not float, right side is float
+                        /* left side is not float, right side is float */
                         Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
 #endif
                     }
 #endif
                 } else {
-                    // left side is float, right side is float
-                    LOG(("hie_internal ?2 lhs is float: %08x\n", FP_D_As32bitRaw(Expr2.V.FVal)));
+                    /* left side is float, right side is float */
                     Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
                 }
-//                Gen->Func (CF_FLOAT, FP_D_As32bitRaw(Expr2.V.FVal));
-//                Gen->Func (type, Expr2.IVal);
 #endif
             } else {
-                // right side is not float
+                /* right side is not float */
                 Gen->Func (type, Expr2.IVal);
             }
 
@@ -2601,7 +2541,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     int rconst;                         /* Operand is a constant */
 
     int flags = 0;
-//    LOG(("hie_compare\n"));
 
     ExprWithCheck (hienext, Expr);
 
@@ -2629,7 +2568,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (ED_IsConstAbs (Expr)) {
             /* Numeric constant value */
             GetCodePos (&Mark2);
-            LOG(("hie_compare Numeric constant value iVal:%ld FVal:%f\n", Expr->IVal, Expr->V.FVal.V));
+
             if (ltype == CF_FLOAT) {
                 g_push_float (ltype | CF_CONST, Expr->V.FVal.V);
             } else {
@@ -2644,12 +2583,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* Get the right hand side */
         MarkedExprWithCheck (hienext, &Expr2);
-//printf("Expr: %d Expr2: %d\n", (CG_TypeOf (Expr->Type) == CF_FLOAT), (CG_TypeOf (Expr2.Type) == CF_FLOAT));
+
 #if 1
         if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
             if (ltype != CF_FLOAT) {
                 /* left hand is NOT a float (but a constant), right IS a float (but not necessarily constant) */
-                LOG(("hie_compare check lhs const vs rhs float\n"));
                 if (ED_IsConstAbs (&Expr2)) {
 #if 1 // for rhs const
                     RemoveCode (&Mark2);             /* Remove pushed value from stack */
@@ -2697,9 +2635,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (!rconst) {
             /* Not numeric constant, load into the primary */
             LoadExpr (CF_NONE, &Expr2);
-        }
-        else {
-            LOG(("hie_compare rhs is constant value iVal:%ld FVal:%f\n", Expr2.IVal, Expr2.V.FVal.V));
         }
 
         /* Check if operands have allowed types for this operation */
@@ -2756,7 +2691,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Check for numeric constant operands */
         if ((ED_IsEntityAddr (Expr) && ED_IsNullPtr (&Expr2)) ||
             (ED_IsNullPtr (Expr) && ED_IsEntityAddr (&Expr2))) {
-            LOG(("hie_compare numeric constant operands\n"));
             /* Object addresses are inequal to null pointer */
             Expr->IVal = (Tok != TOK_EQ);
             if (ED_IsNullPtr (&Expr2)) {
@@ -2779,7 +2713,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             if (ED_CodeRangeIsEmpty (&Expr2)) {
                 /* Both operands are static, remove the load code */
-                LOG(("hie_compare remove code\n"));
                 RemoveCode (&Mark1);
             } else {
                 /* Drop pushed lhs */
@@ -2793,7 +2726,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             /* Evaluate the result for static addresses */
             unsigned long Val1 = Expr->IVal;
             unsigned long Val2 = Expr2.IVal;
-            LOG(("hie_compare static addresses\n"));
 
             switch (Tok) {
                 case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
@@ -2825,19 +2757,12 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         } else if (ED_IsConstAbs (Expr) && rconst) {
 
             /* Both operands are numeric constant, remove the generated code */
-            LOG(("hie_compare remove code\n"));
             RemoveCode (&Mark1);
-            LOG(("hie_compare (Both operands are numeric constant) (float %ld:%ld) (int %ld:%ld)\n",
-                 (signed long)FP_D_ToFloat(Expr->V.FVal),
-                 (signed long)FP_D_ToFloat(Expr2.V.FVal),
-                  Expr->IVal, Expr2.IVal
-                 ));
 
              if ((CG_TypeOf (Expr->Type) == CF_FLOAT) || (CG_TypeOf (Expr2.Type) == CF_FLOAT)) {
                 /* at least one of the operands is a float */
                 if ((CG_TypeOf (Expr->Type) == CF_FLOAT) &&
                     (CG_TypeOf (Expr2.Type) == CF_FLOAT)) {
-                    LOG(("FIXME: comparing float constant with float constant\n"));
                     /* compare float vs float */
                     float Val1 = (float)FP_D_ToFloat(Expr->V.FVal);
                     float Val2 = (float)FP_D_ToFloat(Expr2.V.FVal);
@@ -2850,9 +2775,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
                         default:     Internal ("hie_compare: got token 0x%X\n", Tok);
                     }
-                    LOG(("FIXME: float:%ld float:%ld res:%d\n", (long)Val1, (long)Val2, Expr->IVal));
                 } else if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
-                    LOG(("FIXME: comparing non float constant with float constant\n"));
                     /* FIXME: compare non float vs float */
                     signed long Val1 = Expr->IVal;
                     float Val2 = (float)FP_D_ToFloat(Expr2.V.FVal);
@@ -2865,9 +2788,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
                         default:     Internal ("hie_compare: got token 0x%X\n", Tok);
                     }
-                    LOG(("FIXME: int:%ld float:%ld res:%d\n", Val1, (long)Val2, Expr->IVal));
                 } else {
-                    LOG(("FIXME: comparing float constant with non float constant\n"));
                     /* FIXME: compare float vs non float */
                     float Val1 = (float)FP_D_ToFloat(Expr->V.FVal);
                     signed long Val2 = Expr2.IVal;
@@ -2880,11 +2801,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
                         default:     Internal ("hie_compare: got token 0x%X\n", Tok);
                     }
-                    LOG(("FIXME: float:%ld int:%ld res:%d\n", (long)Val1, Val2, Expr->IVal));
                 }
             } else {
-
-                LOG(("hie_compare: not float\n"));
 
                 /* Determine if this is a signed or unsigned compare */
                 if (IsClassInt (Expr->Type) && IsSignSigned (Expr->Type) &&
@@ -2936,10 +2854,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             int RightSigned = IsSignSigned (Expr2.Type);
             int CmpSigned   = IsClassInt (Expr->Type) && IsClassInt (Expr2.Type) &&
                               IsSignSigned (ArithmeticConvert (Expr->Type, Expr2.Type));
-            LOG(("hie_compare Determine the signedness of the operands\n"));
-
-            LOG(("hie_compare LeftSigned:%d RightSigned:%d CmpSigned:%d %x %x\n",
-                 LeftSigned, RightSigned, CmpSigned, Expr2.IVal, Expr->IVal));
 
             /* If the right hand side is constant, and the generator function
             ** expects the lhs in the primary, remove the push of the primary
@@ -2949,7 +2863,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             if (rconst) {
                 flags |= CF_CONST;
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
-                    LOG(("hie_compare remove code\n"));
                     RemoveCode (&Mark2);
                     ltype |= CF_PRIMARY;    /* Value is in register */
                 }
@@ -2957,8 +2870,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             /* Determine the type of the operation. */
             if (IsRankChar (Expr->Type) && rconst && (!LeftSigned || RightSigned)) {
-                LOG(("hie_compare 1\n"));
-
                 /* Left side is unsigned char, right side is constant.
                 ** Determine the minimum and maximum values
                 */
@@ -3042,7 +2953,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             } else if (IsRankChar (Expr->Type) && IsRankChar (Expr2.Type) &&
                 GetSignedness (Expr->Type) == GetSignedness (Expr2.Type)) {
-                LOG(("hie_compare 2\n"));
 
                 /* Both are chars with the same signedness. We can encode the
                 ** operation as a char operation.
@@ -3059,9 +2969,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             } else {
                 /* generic case */
                 unsigned rtype = CG_TypeOf (Expr2.Type) | (flags & CF_CONST);
-                LOG(("hie_compare 3a: %d:%d %x:%x\n",
-                     CG_TypeOf (Expr->Type) == CF_FLOAT, CG_TypeOf (Expr2.Type) == CF_FLOAT,
-                     ltype, rtype));
+
                 if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
                     /* left is float */
                     flags |= CF_FLOAT;
@@ -3070,11 +2978,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 } else {
                     flags |= g_typeadjust (ltype, rtype);
                 }
-                LOG(("hie_compare 3b: %d:%d %x:%x\n",
-                     CG_TypeOf (Expr->Type) == CF_FLOAT, CG_TypeOf (Expr2.Type) == CF_FLOAT,
-                     ltype, rtype));
             }
-            LOG(("hie_compare rconst:%d CmpSigned:%d \n", rconst, CmpSigned));
 
             /* If the comparison is made as unsigned types and the right is a
             ** constant, we may be able to change the compares to something more
@@ -3084,7 +2988,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                 /* FIXME: float --- startcode end */
                 if (Expr2.Type == type_float) {
-                    LOG(("FIXME: special cases for comparison with float constant\n"));
+                    /* TODO */
                 } else {
                 /* FIXME: float --- newcode end */
 
@@ -3137,20 +3041,15 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             /* FIXME: float --- startcode end */
             if (IsClassFloat(Expr2.Type)) {
-//            if (Expr2.Type == type_float) {
                 /* Generate code */
-                LOG(("hie_compare generate code for Expr2 as float (flags:$%02x)\n", flags));
                 GenFunc (flags, FP_D_As32bitRaw(Expr2.V.FVal));
             } else if (IsClassFloat(Expr->Type)) {
                 /* Generate code */
-                LOG(("hie_compare generate code for Expr as float (flags:$%02x)\n", flags));
                 GenFunc (flags, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal)));
             } else {
                 /* Generate code */
-                LOG(("hie_compare generate code for Expr2 as int (=%d) (flags:$%02x)\n", Expr2.IVal, flags));
                 GenFunc (flags, Expr2.IVal);
             }
-            LOG(("hie_compare generate code done\n"));
             /* FIXME: float --- newcode end */
 
             /* The result is an rvalue in the primary */
@@ -3166,7 +3065,6 @@ Done:   Expr->Type = type_bool;
         /* Propagate viral flags */
         ED_PropagateFrom (Expr, &Expr2);
     }
-//    LOG(("hie_compare generate end\n"));
 }
 
 
@@ -3181,7 +3079,7 @@ static void hie9 (ExprDesc *Expr)
         { TOK_INVALID,  0,                      0       }
     };
     int UsedGen;
-//    LOG(("hie9\n"));
+
     hie_internal (hie9_ops, Expr, hie10, &UsedGen);
 }
 
@@ -3229,7 +3127,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
     **   - (integer)(base + offset) * 1 + (pointer)numeric
     */
     if (ED_IsQuasiConst (Expr)) {
-        LOG(("parseadd lhs is const\n"));
 
         /* The left hand side is a constant of some sort. Good. Get rhs */
         ExprWithCheck (DoArrayRef ? hie0 : hie9, &Expr2);
@@ -3237,7 +3134,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
         /* Right hand side is constant. Get the rhs type */
         rhst = Expr2.Type;
         if (ED_IsQuasiConst (&Expr2)) {
-            LOG(("parseadd lhs and rhs are const\n"));
 
             /* Both expressions are constants. Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -3255,25 +3151,21 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags = CF_INT;
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float addition (const + const) */
-                LOG(("%s:%d float addition (float const + float const)\n", __FILE__, __LINE__));
                 /* Integer addition */
                 flags = CF_FLOAT;
 #if 1
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
                 /* FIXME: float addition (const + const int) */
-                LOG(("%s:%d float addition (float const + const int)\n", __FILE__, __LINE__));
                 /* Integer addition */
                 flags = CF_FLOAT;
 #endif
 #if 1
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float addition (const int + const) */
-                LOG(("%s:%d float addition (const int + float const)\n", __FILE__, __LINE__));
                 /* Integer addition */
                 flags = CF_FLOAT;
 #endif
             } else {
-                LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 /* OOPS */
                 AddDone = -1;
                 /* Avoid further errors */
@@ -3289,7 +3181,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     Expr->Type = type_float;
                     //Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     AddDone = 1;
-                    LOG(("%s:%d parseadd (float const + float const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V));
 #if 1
                 } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
                     /* float + int */
@@ -3298,7 +3189,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     Expr->Type = type_float;
                     //Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     AddDone = 1;
-                    LOG(("%s:%d parseadd (float const + int const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V));
 #endif
 #if 1
                 } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
@@ -3308,7 +3198,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     Expr->Type = type_float;
                     //Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
                     AddDone = 1;
-                    LOG(("%s:%d parseadd (int const + float const) res:%f\n", __FILE__, __LINE__,  Expr->V.FVal.V));
 #endif
                 } else {
                     /* integer + integer */
@@ -3433,25 +3322,20 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags |= typeadjust (Expr, &Expr2, 1);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* Float const + float var addition */
-                LOG(("%s:%d parseadd float addition (const + var)\n", __FILE__, __LINE__));
                 flags |= typeadjust (Expr, &Expr2, 1);
 #if 1
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
-//printf("const 1\n");
                 /* Float const + int var addition */
-                LOG(("%s:%d parseadd float addition (float const + int var)\n", __FILE__, __LINE__));
                 flags |= typeadjust (Expr, &Expr2, 1);
 #endif
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: int const + Float var addition */
-                LOG(("%s:%d parseadd float addition (int const + float var)\n", __FILE__, __LINE__));
                 RemoveCode (&Mark);
                 LoadExpr (CF_FLOAT, &Expr2);
                 //flags |= typeadjust (Expr, &Expr2, 0);
                 flags |= CF_FLOAT;
             } else {
                 /* OOPS */
-                LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 AddDone = -1;
             }
 
@@ -3461,20 +3345,19 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     if (ED_IsAbs (Expr) &&
                         Expr->IVal >= 0 &&
                         Expr->IVal * lscale < 256) {
-                        LOG(("%s:%d call g_inc for integer\n", __FILE__, __LINE__));
                         /* Numeric constant */
                         g_inc (flags, Expr->IVal * lscale);
                         AddDone = 1;
                     }
                 }
             }
-            LOG(("%s:%d AddDone:%d\n", __FILE__, __LINE__, AddDone));
+
             if (!AddDone) {
                 if (ED_IsLocQuasiConst (&Expr2)  &&
                     !IsTypeBitField (Expr2.Type) &&
                     rscale == 1                  &&
                     CheckedSizeOf (rhst) == SIZEOF_CHAR) {
-                    LOG(("%s:%d char\n", __FILE__, __LINE__));
+
                     /* Change the order back */
                     RemoveCode (&Mark);
                     /* Load lhs */
@@ -3489,28 +3372,23 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     }
                 } else if (ED_IsAbs (Expr)) {
                     /* Numeric constant */
-                    LOG(("%s:%d parseadd lhs is numeric constant\n", __FILE__, __LINE__));
+
                     if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
-                        // lhs = float
-                        LOG(("%s:%d parseadd lhs const float\n", __FILE__, __LINE__));
+                        /* lhs = float */
                         Double res = FP_D_Mul(Expr->V.FVal, FP_D_FromInt(lscale));
                         g_inc (flags, FP_D_As32bitRaw(res));
                     } else {
-                        // lhs = int
-                        LOG(("%s:%d parseadd lhs const int:%d\n", __FILE__, __LINE__, Expr->IVal));
+                        /* lhs = int */
                         if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
-                            // lhs = int, rhs float
-                            LOG(("%s:%d parseadd rhs float:%08x\n", __FILE__, __LINE__, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal * lscale))));
+                            /* lhs = int, rhs float */
                             g_inc (flags, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal * lscale)));
                             Expr->Type = Expr2.Type;    // HACK!
                         } else {
-                            // lhs = int, rhs int
-                            LOG(("%s:%d parseadd rhs int:%d\n", __FILE__, __LINE__, Expr->IVal));
+                            /* lhs = int, rhs int */
                             g_inc (flags, Expr->IVal * lscale);
                         }
                     }
                 } else if (lscale == 1) {
-                    LOG(("%s:%d addr\n", __FILE__, __LINE__));
                     if (ED_IsLocStack (Expr)) {
                         /* Constant address */
                         g_addaddr_local (flags, Expr->IVal);
@@ -3518,7 +3396,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                         g_addaddr_static (flags, Expr->Name, Expr->IVal);
                     }
                 } else {
-                    LOG(("%s:%d call long way\n", __FILE__, __LINE__));
+
                     /* Since we do already have rhs in the primary, if lhs is
                     ** not a numeric constant, and the scale factor is not one
                     ** (no scaling), we must take the long way over the stack.
@@ -3571,7 +3449,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags = typeadjust (Expr, &Expr2, 1);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float - what to do here exactly? */
-                LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
                 /* Float addition (float variable + float constant) */
                 /*flags = typeadjust (Expr, &Expr2, 1);*/
                 flags |= CF_FLOAT;
@@ -3579,7 +3456,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 #if 1
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float - what to do here exactly? */
-                LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
                 /* Float addition (int variable + float constant) */
                 /* adjust lhs */
                 flags = typeadjust (Expr, &Expr2, 1);
@@ -3589,7 +3465,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 #if 1
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
                 /* FIXME: float - what to do here exactly? */
-                LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
                 /* Float addition (float variable + int constant) */
                 /*flags = typeadjust (Expr, &Expr2, 1);*/
                 flags |= CF_FLOAT;
@@ -3600,7 +3475,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 #endif
             } else {
                 /* OOPS */
-                LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 AddDone = -1;
             }
 
@@ -3661,7 +3535,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 flags = typeadjust (Expr, &Expr2, 0);
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float - what to do here exactly? */
-                LOG(("%s:%d float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
                 /* Float addition */
                 /* flags = typeadjust (Expr, &Expr2, 0); */
                 flags |= CF_FLOAT;
@@ -3670,7 +3543,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 #if 1
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
                 /* FIXME: float - what to do here exactly? */
-                LOG(("%s:%d float+int addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
                 /* Float addition (float + integer) */
 //                flags = typeadjust (Expr, &Expr2, 0);
 //                flags |= CF_FLOAT;
@@ -3682,7 +3554,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 #if 1
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float - what to do here exactly? */
-                LOG(("%s:%d int+float addition (Expr2.V.FVal.V:%f)\n", __FILE__, __LINE__, Expr2.V.FVal.V));
                 /* Float addition (integer + float) */
                 RemoveCode (&Mark);             /* Remove pushed value from stack */
                 /* Adjust lhs primary if needed  */
@@ -3699,7 +3570,6 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 #endif
             } else {
                 /* OOPS */
-                LOG(("%s:%d OOPS\n", __FILE__, __LINE__));
                 AddDone = -1;
                 /* We can't just goto End as that would leave the stack unbalanced */
             }
@@ -3907,12 +3777,8 @@ static void parsesub (ExprDesc* Expr)
 
     } else if (ED_IsQuasiConst (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
-        LOG(("parsesub: rhs is const\n"));
-
         /* Right hand side is constant. Check left hand side. */
         if (ED_IsQuasiConst (Expr)) {
-
-            LOG(("parsesub: lhs and rhs are const\n"));
 
             /* Both sides are constant. Check for pointer arithmetic */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -3933,7 +3799,6 @@ static void parsesub (ExprDesc* Expr)
             }
 
             if (!IsClassFloat (lhst) && !IsClassFloat (rhst)) {
-                LOG(("parsesub const int - const int\n"));
                 /* We can't make all subtraction expressions constant */
                 if (ED_IsConstAbs (&Expr2)) {
                     Expr->IVal -= Expr2.IVal * rscale;
@@ -3948,21 +3813,18 @@ static void parsesub (ExprDesc* Expr)
                     SubDone = 1;
                 }
             } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
-                LOG(("parsesub const float - const int\n"));
                 if (ED_IsConstAbs (&Expr2)) {
                     Expr->V.FVal = FP_D_Sub(Expr->V.FVal, FP_D_FromInt(Expr2.IVal));
                     /* No runtime code */
                     SubDone = 1;
                 }
             } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
-                LOG(("parsesub const int - const float\n"));
                 if (ED_IsConstAbs (&Expr2)) {
                     Expr->V.FVal = FP_D_Sub(FP_D_FromInt(Expr->IVal), Expr2.V.FVal);
                     /* No runtime code */
                     SubDone = 1;
                 }
             } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
-                LOG(("FIXME: parsesub const float - const float\n"));
                 if (ED_IsConstAbs (&Expr2)) {
                     Expr->V.FVal = FP_D_Sub(Expr->V.FVal, Expr2.V.FVal);
                     /* No runtime code */
@@ -4025,7 +3887,6 @@ static void parsesub (ExprDesc* Expr)
             }
 
         } else {
-            LOG(("parsesub: lhs not const, rhs is const\n"));
 
             /* Left hand side is not constant, right hand side is */
             if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -4035,14 +3896,11 @@ static void parsesub (ExprDesc* Expr)
 #if 1
             } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
                 /* Float subtraction. We'll adjust the types later */
-                LOG(("parsesub: float - float\n"));
             } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
                 /* Float/Int subtraction. We'll adjust the types later */
-                LOG(("parsesub: float - int\n"));
                 flags = CF_FLOAT;
             } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
                 /* Int/Float subtraction. We'll adjust the types later */
-                LOG(("parsesub: int - float\n"));
                 flags = CF_FLOAT;
 #endif
             } else {
@@ -4056,8 +3914,7 @@ static void parsesub (ExprDesc* Expr)
                 /* Remove pushed value from stack */
                 RemoveCode (&Mark2);
                 if (IsClassInt (lhst)) {
-                    // lhs is integer, rhs is constant
-                    LOG(("parsesub: lhst int\n"));
+                    /* lhs is integer, rhs is constant */
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 1);
                     /* Do the subtraction */
@@ -4068,16 +3925,13 @@ static void parsesub (ExprDesc* Expr)
                     }
                 }
                 else if (IsClassFloat (lhst)) {
-                    // lhs is float, rhs is constant
-                    LOG(("parsesub: lhst float\n"));
+                    /* lhs is float, rhs is constant */
                     /* Do the subtraction */
                     if (IsClassFloat(rhst)) {
-                        LOG(("parsesub: rhst const float %f\n", Expr2.V.FVal.V));
                         flags = typeadjust (&Expr2, Expr, 1);
 //                        flags = typeadjust (Expr, &Expr2, 1);
                         g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
                     } else {
-                        LOG(("parsesub: rhst const int: %d\n", Expr2.IVal * rscale));
                         /* Adjust rhs type */
                         LoadExpr(CF_FLOAT, Expr);
                         if (rscale != 1) {
@@ -4094,12 +3948,10 @@ static void parsesub (ExprDesc* Expr)
                 }
             } else {
                 if (IsClassInt (lhst)) {
-                    LOG(("non const int sub 1\n"));
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 0);
                 }
                 else if (IsClassFloat (lhst)) {
-                    LOG(("non const float sub 2\n"));
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 1);
                 }
@@ -4115,7 +3967,6 @@ static void parsesub (ExprDesc* Expr)
         }
 
     } else {
-        LOG(("parsesub: rhs not const\n"));
 
         /* We'll use the pushed lhs on stack instead of the original source */
         ED_FinalizeRValLoad (Expr);
@@ -4133,14 +3984,12 @@ static void parsesub (ExprDesc* Expr)
         } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
             /* Float substraction */
             /* FIXME: float - what to do here exactly? */
-            LOG(("%s:%d parsesub float - float var\n", __FILE__, __LINE__));
             /* Adjust operand types */
             /*flags = typeadjust (Expr, &Expr2, 0);*/
             flags = CF_FLOAT;
         } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
             /* Float substraction */
             /* FIXME: float - what to do here exactly? */
-            LOG(("%s:%d parsesub float - int var\n", __FILE__, __LINE__));
 #if 1
             /* Adjust operand types */
             flags = typeadjust (Expr, &Expr2, 0);
@@ -4149,7 +3998,6 @@ static void parsesub (ExprDesc* Expr)
         } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
             /* Float substraction */
             /* FIXME: float - what to do here exactly? */
-            LOG(("FIXME: %s:%d parsesub int - float var\n", __FILE__, __LINE__));
 #if 1
             /* Remove pushed value from stack */
             RemoveCode (&Mark2);

@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-//#define DEBUG
-
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,13 +65,6 @@
 #include "typeconv.h"
 #include "initdata.h"
 
-#ifdef DEBUG
-#define LOG(x)  printf  x
-#define FIXME(x)  printf  x
-#else
-#define LOG(x)
-#define FIXME(x)
-#endif
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -174,8 +165,6 @@ static void DefineData (ExprDesc* Expr)
 {
     int isfloat = (CG_TypeOf (Expr->Type) == CF_FLOAT);
 
-    LOG(("%s:%d DefineData IVal: %ld V.FVal: %f isfloat:%d %d\n", __FILE__, __LINE__,
-           Expr->IVal, (double)(Expr->V.FVal.V), isfloat, ED_GetLoc (Expr)));
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_NONE:
@@ -187,7 +176,7 @@ static void DefineData (ExprDesc* Expr)
                 g_defdata (CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             }
             break;
-/* FIXME: float - other cases */
+        /* FIXME: float - other cases */
         case E_LOC_ABS:
             if (isfloat) { printf("%s:%d FIXME: E_LOC_ABS\n", __FILE__, __LINE__); exit(-1); }
             /* Absolute numeric address */

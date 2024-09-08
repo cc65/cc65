@@ -25,18 +25,16 @@ float _atan(float x)
 float atanf(float x)
 {
     float y;
-    int complement= 0;  // true if arg was >1
-    int region= 0;      // true depending on region arg is in
-    int sign= 0;        // true if arg was < 0
+    int complement= 0;  /* true if arg was >1 */
+    int region= 0;      /* true depending on region arg is in */
+    int sign= 0;        /* true if arg was < 0 */
 
     if (x < 0.0f ) {
-//        x = -x;
-//        x = x * -1.0f;
         x = -1.0f * x;
-        sign = 1;       // arctan(-x)=-arctan(x)
+        sign = 1;       /* arctan(-x)=-arctan(x) */
     }
     if (x > 1.0f) {
-        x = 1.0f / x;   // keep arg between 0 and 1
+        x = 1.0f / x;   /* keep arg between 0 and 1 */
         complement = 1;
     }
     if (x > TAN_TWELFTHPI) {
@@ -45,7 +43,6 @@ float atanf(float x)
         float n, m;
         n = (TAN_SIXTHPI * x) + 1.0f;
         m = (x - TAN_SIXTHPI);
-//        x = (x - TAN_SIXTHPI) / (1.0f + (TAN_SIXTHPI * x));
         x = m / n;
 #else
         x = fmodf(x, TAN_SIXTHPI);
@@ -61,12 +58,3 @@ float atanf(float x)
     return y;
 }
 #endif
-
-#if 0
-float atanf(float x)
-{
-    x = x;
-    return 0.0f;
-}
-#endif
-

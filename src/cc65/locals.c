@@ -31,7 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-//#define DEBUG
 
 /* common */
 #include "xmalloc.h"
@@ -57,13 +56,6 @@
 #include "typeconv.h"
 #include "input.h"
 
-#ifdef DEBUG
-#define LOG(x)  printf  x
-#define FIXME(x)  printf  x
-#else
-#define LOG(x)
-#define FIXME(x)
-#endif
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -236,7 +228,6 @@ static void ParseAutoDecl (Declarator* Decl)
     /* Get the size of the variable */
     unsigned Size = SizeOf (Decl->Type);
 
-    LOG(("ParseAutoDecl SIze:%d IsCompound:%d\n", Size, IsCompound));
 
     /* Check if this is a variable on the stack or in static memory */
     if (IS_Get (&StaticLocals) == 0) {
@@ -320,7 +311,6 @@ static void ParseAutoDecl (Declarator* Decl)
 #pragma warning( disable : 4244 )   // conversion from double to float
 #endif
                     /* FIXME: float */
-                    LOG(("ParseAutoDecl Expr.V.FVal.V: %f\n", Expr.V.FVal.V));
                     g_push_float (Flags | CG_TypeOf (Sym->Type), Expr.V.FVal.V);
 #if defined(_MSC_VER)
 #pragma warning( pop )

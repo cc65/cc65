@@ -51,7 +51,7 @@ full math.h is available for C64 when linking agains fp754kernal.o (see below)
   - If you create a new one, keep in mind that the compiler *right now* will
     currently work with IEEE754 floats, which your library calls must also work
     with (which will involve converting forth and back to whatever other format
-    at runtime), and there is no easy way tp change that.
+    at runtime), and there is no easy way to change that.
 
 ### Roadmap
 

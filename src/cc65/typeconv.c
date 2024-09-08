@@ -31,7 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-//#define DEBUG
 
 /* common */
 #include "shift.h"
@@ -47,13 +46,6 @@
 #include "typecmp.h"
 #include "typeconv.h"
 
-#ifdef DEBUG
-#define LOG(x)  printf  x
-#define FIXME(x)  printf  x
-#else
-#define LOG(x)
-#define FIXME(x)
-#endif
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -103,10 +95,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 
     /* lvalue? */
     if (ED_IsLVal (Expr)) {
-        LOG(("DoConversion 1 Old: %s New: %s\n",
-            (IsTypeFloat (OldType)) ? "float" : "int",
-            (IsTypeFloat (NewType)) ? "float" : "int"
-            ));
         /* We have an lvalue. If the new size is smaller than the old one,
         ** we don't need to do anything. The compiler will generate code
         ** to load only the portion of the value that is actually needed.
@@ -128,12 +116,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             /* Value is now in primary and an rvalue */
             ED_FinalizeRValLoad (Expr);
         }
-        LOG(("DoConversion 1 done\n"));
     } else if (ED_IsConstAbs (Expr)) {
-        LOG(("DoConversion 2 Old: %s New: %s\n",
-            (IsTypeFloat (OldType)) ? "float" : "int",
-            (IsTypeFloat (NewType)) ? "float" : "int"
-            ));
 
         /* A cast of a constant numeric value to another type. Be sure
         ** to handle sign extension correctly.
@@ -143,11 +126,9 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         if (IsTypeFloat (OldType) && !IsTypeFloat (NewType)) {
             OldBits = 32;
             Expr->IVal = FP_D_ToLong(Expr->V.FVal);
-            LOG(("DoConversion 2 new ival: %ld\n", Expr->IVal));
         } else if (!IsTypeFloat (OldType) && IsTypeFloat (NewType)) {
             OldBits = 0;
             Expr->V.FVal = FP_D_FromInt(Expr->IVal);
-            LOG(("DoConversion 2 new fval: %f\n", Expr->V.FVal.V));
         }
 
         /* If this is a floating point constant, convert to integer,
@@ -166,7 +147,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         ** has a larger range, things are OK, since the value is
         ** internally already represented by a long.
         */
-        LOG(("DoConversion 2 NewBits: %d OldBits: %d\n", NewBits, OldBits));
         if (NewBits <= OldBits) {
             long OldVal = Expr->IVal;
 
@@ -186,12 +166,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             }
         }
 
-        if (IsTypeFloat (NewType)) {
-            LOG(("DoConversion 2 new fval: %f\n", Expr->V.FVal.V));
-        } else {
-            LOG(("DoConversion 2 new ival: %ld\n", Expr->IVal));
-        }
-
         /* Do the integer constant <-> absolute address conversion if necessary */
         if (IsClassPtr (NewType)) {
             Expr->Flags &= ~E_MASK_LOC;
@@ -202,10 +176,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         }
 
     } else {
-        LOG(("DoConversion 3 Old: %s New: %s\n",
-            (IsTypeFloat (OldType)) ? "float" : "int",
-            (IsTypeFloat (NewType)) ? "float" : "int"
-            ));
 
         /* The value is not a constant. If the sizes of the types are
         ** not equal, add conversion code. Be sure to convert chars
@@ -240,18 +210,6 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
 ** impossible.
 */
 {
-    LOG(("TypeConversion\n"));
-#if 0
-    /* Debugging */
-    LOG(("=======================================\n"));
-    LOG(("Expr:\n---------------------------------------\n"));
-    PrintExprDesc (stdout, Expr);
-    LOG(("\nType:\n---------------------------------------\n"));
-    PrintType (stdout, NewType);
-    LOG(("\n");
-    PrintRawType (stdout, NewType);
-    LOG(("=======================================\n"));
-#endif
     /* First, do some type checking */
     typecmp_t Result    = TYPECMP_INITIALIZER;
     int HasError        = 0;

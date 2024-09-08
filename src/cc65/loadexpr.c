@@ -31,8 +31,6 @@
 /*                                                                           */
 /*****************************************************************************/
 
-//#define DEBUG
-
 #include <stdlib.h>
 
 /* cc65 */
@@ -43,13 +41,6 @@
 #include "global.h"
 #include "loadexpr.h"
 
-#ifdef DEBUG
-#define LOG(x)  printf  x
-#define FIXME(x)  printf  x
-#else
-#define LOG(x)
-#define FIXME(x)
-#endif
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -60,7 +51,6 @@
 static void LoadAddress (unsigned Flags, ExprDesc* Expr)
 /* Load the primary register with some address value. */
 {
-    LOG(("LoadAddress flags:%04x\n", Flags));
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_ABS:
@@ -128,7 +118,6 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
 ** unfortunately.
 */
 {
-    /*LOG(("LoadExpr flags:%4x\n", Flags));*/
     if (!ED_IsAddrExpr (Expr)) {
 
         /* Lvalue. If this is a bit field its type is unsigned. But if the
@@ -181,12 +170,10 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         }
 
         /* Load the content of Expr */
-        /*LOG(("LoadExpr ED_GetLoc:%04x\n", ED_GetLoc (Expr)));*/
         switch (ED_GetLoc (Expr)) {
 
             case E_LOC_NONE:
                 /* FIXME: float */
-                /*LOG(("LoadExpr E_LOC_NONE (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer"));*/
                 /* Immediate number constant */
                 if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
                     g_getimmed (Flags | CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal), 0);
@@ -196,56 +183,48 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 break;
 
             case E_LOC_ABS:
-                LOG(("LoadExpr E_LOC_ABS (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer"));
                 if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_ABS\n", __FILE__, __LINE__); exit(-1); }
                 /* Absolute numeric addressed variable */
                 g_getstatic (Flags | CF_ABSOLUTE, Expr->IVal, 0);
                 break;
 
             case E_LOC_GLOBAL:
-                /* LOG(("LoadExpr E_LOC_GLOBAL (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer")); */
                 /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_GLOBAL\n", __FILE__, __LINE__); exit(-1); } */
                 /* Global variable, offset in IVal */
                 g_getstatic (Flags | CF_EXTERNAL, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_STATIC:
-                /* LOG(("LoadExpr E_LOC_STATIC (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer")); */
                 /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_STATIC\n", __FILE__, __LINE__); exit(-1); } */
                 /* Static variable, offset in IVal */
                 g_getstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_LITERAL:
-                /* LOG(("LoadExpr E_LOC_LITERAL (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer")); */
                 /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_LITERAL\n", __FILE__, __LINE__); exit(-1); } */
                 /* Literal in the literal pool, offset in IVal */
                 g_getstatic (Flags | CF_LITERAL, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_REGISTER:
-                /* LOG(("LoadExpr E_LOC_REGISTER (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer")); */
                 /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_REGISTER\n", __FILE__, __LINE__); exit(-1); } */
                 /* Register variable, offset in IVal */
                 g_getstatic (Flags | CF_REGVAR, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_CODE:
-                /* LOG(("LoadExpr E_LOC_CODE (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer")); */
                 /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_CODE\n", __FILE__, __LINE__); exit(-1); } */
                 /* Code label location, offset in IVal */
                 g_getstatic (Flags | CF_CODE, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_STACK:
-                /* LOG(("LoadExpr E_LOC_STACK (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer")); */
                 /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_STACK\n", __FILE__, __LINE__); exit(-1); } */
                 /* Fetch value on the stack (with offset in IVal) */
                 g_getlocal (Flags, Expr->IVal);
                 break;
 
             case E_LOC_PRIMARY:
-                /*LOG(("LoadExpr E_LOC_PRIMARY (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer"));*/
                 /*if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_PRIMARY\n", __FILE__, __LINE__); exit(-1); }*/
                 /* The primary register */
                 if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
@@ -270,7 +249,6 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 break;
 
             case E_LOC_EXPR:
-                /*LOG(("LoadExpr E_LOC_EXPR (%s)\n", (CG_TypeOf (Expr->Type) == CF_FLOAT) ? "float" : "integer"));*/
                 /*if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_EXPR\n", __FILE__, __LINE__); exit(-1); }*/
                 /* Reference to address in primary with offset in IVal */
                 g_getind (Flags, Expr->IVal);

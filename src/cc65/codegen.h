@@ -278,15 +278,9 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 /*****************************************************************************/
 
 
-#ifdef DEBUG
-// #define g_getimmed(a,b,c) _g_getimmed((a),(b),(c),(__FILE__),(__FUNCTION__),(__LINE__))
-// void _g_getimmed(unsigned Flags, uintptr_t Val, long Offs, char *file, const char *func, int line);
 #define g_getimmed(a,b,c) _g_getimmed((a),(b),(c))
 void _g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
-#else
-#define g_getimmed(a,b,c) _g_getimmed((a),(b),(c))
-void _g_getimmed (unsigned Flags, uintptr_t Val, long Offs);
-#endif
+
 /* Load a constant into the primary register */
 
 void g_getstatic (unsigned Flags, uintptr_t Label, long Offs);

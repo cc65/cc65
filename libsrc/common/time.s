@@ -6,7 +6,7 @@
 
         .export         _time
 
-        .import         decsp1, ldeaxi
+        .import         pusha, ldeaxi
         .importzp       ptr1, sreg, tmp1, tmp2
 
         .include        "time.inc"
@@ -22,7 +22,8 @@
 
 ; Get the time (machine dependent)
 
-        jsr     decsp1
+        lda     #CLOCK_REALTIME
+        jsr     pusha
         lda     #<time
         ldx     #>time
         jsr     _clock_gettime

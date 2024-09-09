@@ -82,6 +82,7 @@
 /*****************************************************************************/
 
 
+
 static void _typeerror (char *func, int line, unsigned type)
 /* Print an error message about an invalid operand type */
 {
@@ -705,6 +706,8 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 /*                           Fetching memory cells                           */
 /*****************************************************************************/
 
+
+
 void g_getimmed(unsigned Flags, uintptr_t Val, long Offs)
 /* Load a constant into the primary register */
 {
@@ -1301,6 +1304,7 @@ static void g_regchar (unsigned to)
 }
 
 
+
 void g_regint (unsigned from)
 /* Convert the value in the primary register to an int (whose representation
 ** is irrelevent of signedness).
@@ -1341,6 +1345,7 @@ void g_regint (unsigned from)
             typeerror (from);
     }
 }
+
 
 
 void g_reglong (unsigned from)

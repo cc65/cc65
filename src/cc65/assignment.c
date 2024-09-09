@@ -465,6 +465,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
     PushAddr (Expr);
 
     if (Gen == 0) {
+
         /* Read the expression on the right side of the '=' */
         MarkedExprWithCheck (hie1, &Expr2);
 
@@ -477,6 +478,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         LoadExpr (CF_NONE, &Expr2);
 
     } else {
+
         /* Load the original value if necessary */
         LoadExpr (CF_NONE, Expr);
 

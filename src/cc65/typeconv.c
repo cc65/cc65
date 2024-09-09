@@ -125,7 +125,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         /* A cast of a constant numeric value to another type. Be sure
         ** to handle sign extension correctly.
         */
-        /* FIXME: float --- start of new code */
+
         /* convert from float to (signed) long first */
         if (IsTypeFloat (OldType) && !IsTypeFloat (NewType)) {
             OldBits = 32;
@@ -145,7 +145,6 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
             }
             Expr->IVal = IVal;
         }
-        /* FIXME: float --- end of new code */
 
         /* Check if the new datatype will have a smaller range. If it
         ** has a larger range, things are OK, since the value is

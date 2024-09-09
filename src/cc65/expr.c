@@ -1922,44 +1922,6 @@ static void UnaryOp (ExprDesc* Expr)
     /* Get the expression */
     hie10 (Expr);
 
-#if 0
-    /* We can only handle integer types */
-    if (!IsClassInt (Expr->Type)
-        && !IsClassFloat (Expr->Type)  /* FIXME: float */
-    ) {
-        Error ("Argument must have integer type");
-        ED_MakeConstAbsInt (Expr, 1);
-    }
-
-    /* Check for a constant numeric expression */
-    if (ED_IsConstAbs (Expr)) {
-        /* Value is numeric */
-
-        /* FIXME: float ---- start new code */
-        if (IsClassFloat (Expr->Type)) {
-            switch (Tok) {
-                case TOK_MINUS: Expr->V.FVal = FP_D_Mul(Expr->V.FVal, FP_D_FromInt(-1));   break;
-                case TOK_PLUS:                                                         break;
-                default:        Internal ("Unexpected token: %d", Tok);
-            }
-        }
-        else {
-        /* FIXME: float ---- end new code */
-            switch (Tok) {
-                case TOK_MINUS: Expr->IVal = -Expr->IVal;   break;
-                case TOK_PLUS:                              break;
-                case TOK_COMP:  Expr->IVal = ~Expr->IVal;   break;
-                default:        Internal ("Unexpected token: %d", Tok);
-            }
-
-            /* Adjust the type of the expression */
-            Expr->Type = IntPromotion (Expr->Type);
-        }
-
-        /* Limit the calculated value to the range of its type */
-        LimitExprValue (Expr, 1);
-
-#else
     /* Check for a constant numeric expression */
     if (ED_IsConstAbs (Expr)) {
 
@@ -1991,7 +1953,6 @@ static void UnaryOp (ExprDesc* Expr)
             LimitExprValue (Expr, 1);
         }
 
-#endif
     } else {
         unsigned Flags;
 #if 0
@@ -2205,7 +2166,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
         /* Tell the caller that we handled it's ops */
         *UsedGen = 1;
 
-        /* FIXME: float ---start new code*/
         /* Remember the operator token, then skip it */
         Tok = CurTok.Tok;
         NextToken ();
@@ -2218,8 +2178,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             default:
                 break;
         }
-
-        /* FIXME: float ---start end code*/
 
         /* All operators that call this function expect an int on the lhs */
         if (!IsClassInt (Expr->Type) &&
@@ -2292,8 +2250,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             /* Get the type of the result */
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
-            /* FIXME: float --- newcode start */
-
             /* FIXME: float */
             /* FIXME: right now this works only when both rhs and lhs are float,
                       this must be extended to handle mixed operations */
@@ -2336,7 +2292,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                     default:
                         Internal ("hie_internal: got token 0x%X\n", Tok);
                 }
-            /* FIXME: float --- newcode end */
             } else {
                 /* Handle the op differently for signed and unsigned types */
                 switch (Tok) {
@@ -2470,9 +2425,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 
             /* Generate code */
             if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
-#if 0
-                Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
-#else
                 /* right side is float */
                 if (((ltype & CF_TYPEMASK) != CF_FLOAT) && (!(rtype & CF_CONST))) {
                     /* left side is not float, right side is non-constant float */
@@ -2487,7 +2439,6 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                     Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
 #else
                     if (lconst) {
-#if 1
                         /* lhs is constant */
                         RemoveCode (&Mark2);
                         LoadExpr(ltype, Expr);
@@ -2495,9 +2446,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                          type = typeadjust (Expr, &Expr2, 1);
                         /* left side is not float, right side is float */
                         Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
-#endif
                     } else {
-#if 1
                         RemoveCode (&Mark2);
                         LoadExpr(ltype, Expr);
                         /* Adjust lhs primary if needed  */
@@ -2506,14 +2455,12 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                         LoadExpr(CF_FLOAT, &Expr2);
                         /* left side is not float, right side is float */
                         Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
-#endif
                     }
 #endif
                 } else {
                     /* left side is float, right side is float */
                     Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
                 }
-#endif
             } else {
                 /* right side is not float */
                 Gen->Func (type, Expr2.IVal);
@@ -2585,12 +2532,10 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Get the right hand side */
         MarkedExprWithCheck (hienext, &Expr2);
 
-#if 1
         if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
             if (ltype != CF_FLOAT) {
                 /* left hand is NOT a float (but a constant), right IS a float (but not necessarily constant) */
                 if (ED_IsConstAbs (&Expr2)) {
-#if 1
                     /* for rhs const */
                     RemoveCode (&Mark2);             /* Remove pushed value from stack */
                     /* Load lhs into the primary */
@@ -2601,16 +2546,14 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     /* Load rhs into the primary */
                     LoadExpr (CF_FLOAT, &Expr2);
                     ltype = CF_FLOAT;
-#endif
                 } else {
-#if 1
                     /* for rhs variable */
                     RemoveCode (&Mark2);             /* Remove pushed value from stack */
                     /* Load lhs into the primary */
                     LoadExpr (CF_NONE, Expr);
                     /* Adjust lhs primary if needed  */
                     flags = typeadjust (Expr, &Expr2, 0);
-                    // // convert lhs to float
+                    /* convert lhs to float */
                     g_regfloat (flags);
                     g_push (CF_FLOAT, 0);             /* --> stack */
                     /* Load rhs into the primary */
@@ -2619,11 +2562,10 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                     flags = typeadjust (Expr, &Expr2, 0);
 
                     ltype = CF_FLOAT;
-#endif
                 }
             }
         }
-#endif
+
         /* If rhs is a function, convert it to the address of the function */
         if (IsTypeFunc (Expr2.Type)) {
             Expr2.Type = AddressOf (Expr2.Type);
@@ -2640,7 +2582,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (!IsRelationType (Expr->Type) || !IsRelationType (Expr2.Type)) {
             /* Output only one message even if both sides are wrong */
             TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                "a Comparing types '%s' with '%s' is invalid");
+                "Comparing types '%s' with '%s' is invalid");
             /* Avoid further errors */
             ED_MakeConstAbsInt (Expr, 0);
             ED_MakeConstAbsInt (&Expr2, 0);
@@ -2665,7 +2607,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         "Comparing integer '%s' with pointer '%s'");
                 } else {
                     TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                        "b Comparing types '%s' with '%s' is invalid");
+                        "Comparing types '%s' with '%s' is invalid");
                 }
             }
         } else if (IsClassPtr (Expr->Type)) {
@@ -2682,7 +2624,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         "Comparing pointer type '%s' with integer type '%s'");
                 } else {
                     TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                        "c Comparing types '%s' with '%s' is invalid");
+                        "Comparing types '%s' with '%s' is invalid");
                 }
             }
         }
@@ -2690,6 +2632,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         /* Check for numeric constant operands */
         if ((ED_IsEntityAddr (Expr) && ED_IsNullPtr (&Expr2)) ||
             (ED_IsNullPtr (Expr) && ED_IsEntityAddr (&Expr2))) {
+
             /* Object addresses are inequal to null pointer */
             Expr->IVal = (Tok != TOK_EQ);
             if (ED_IsNullPtr (&Expr2)) {
@@ -2986,11 +2929,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             */
             if (!CmpSigned && rconst) {
 
-                /* FIXME: float --- startcode end */
                 if (Expr2.Type == type_float) {
                     /* TODO */
                 } else {
-                /* FIXME: float --- newcode end */
 
                     switch (Tok) {
 
@@ -3040,7 +2981,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
             }
 
-            /* FIXME: float --- startcode end */
             if (IsClassFloat(Expr2.Type)) {
                 /* Generate code */
                 GenFunc (flags, FP_D_As32bitRaw(Expr2.V.FVal));
@@ -3051,7 +2991,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 /* Generate code */
                 GenFunc (flags, Expr2.IVal);
             }
-            /* FIXME: float --- newcode end */
 
             /* The result is an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);
@@ -3154,18 +3093,14 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 /* FIXME: float addition (const + const) */
                 /* Integer addition */
                 flags = CF_FLOAT;
-#if 1
             } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
                 /* FIXME: float addition (const + const int) */
                 /* Integer addition */
                 flags = CF_FLOAT;
-#endif
-#if 1
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
                 /* FIXME: float addition (const int + const) */
                 /* Integer addition */
                 flags = CF_FLOAT;
-#endif
             } else {
                 /* OOPS */
                 AddDone = -1;
@@ -3181,22 +3116,18 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     Expr->V.FVal.V = Expr->V.FVal.V + Expr2.V.FVal.V;
                     Expr->Type = type_float;
                     AddDone = 1;
-#if 1
                 } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
                     /* float + int */
                     /* FIXME: float - this is probably completely wrong */
                     Expr->V.FVal.V = Expr->V.FVal.V + Expr2.IVal;
                     Expr->Type = type_float;
                     AddDone = 1;
-#endif
-#if 1
                 } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
                     /* int + float */
                     /* FIXME: float - this is probably completely wrong */
                     Expr->V.FVal.V = Expr->IVal + Expr2.V.FVal.V;
                     Expr->Type = type_float;
                     AddDone = 1;
-#endif
                 } else {
                     /* integer + integer */
                     if (ED_IsAbs (&Expr2) &&
@@ -3535,8 +3466,7 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 RemoveCode (&Mark);             /* Remove pushed value from stack */
                 /* Adjust lhs primary if needed  */
                 flags = typeadjust (Expr, &Expr2, 0);
-                // convert lhs to float
-                // g_regfloat (flags);
+                /* convert lhs to float */
                 g_push (CF_FLOAT, 0);             /* --> stack */
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);

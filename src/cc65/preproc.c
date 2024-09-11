@@ -2640,6 +2640,18 @@ static void DoDefine (void)
             goto Error_Handler;
         }
         NextChar ();
+
+    } else {
+
+        /* Object like macro. Check ISO/IEC 9899:1999 (E) 6.10.3p3:
+        ** "There shall be white-space between the identifier and the
+        ** replacement list in the definition of an object-like macro."
+        ** Note: C89 doesn't have this constraint.
+        */
+        if (Std == STD_C99 && !IsSpace (CurC)) {
+            PPWarning ("ISO C99 requires whitespace after the macro name");
+        }
+
     }
 
     /* Remove whitespace and comments from the line, store the preprocessed

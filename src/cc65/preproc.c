@@ -2913,7 +2913,7 @@ static unsigned GetLineDirectiveNum (void)
 
     /* Ensure the buffer is terminated with a '\0' */
     SB_Terminate (&Buf);
-    if (SkipWhitespace (0) != 0 || CurC == '\0') {
+    if (SB_GetLen (&Buf) > 0) {
         const char* Str = SB_GetConstBuf (&Buf);
         if (Str[0] == '\0') {
             PPWarning ("#line directive interprets number as decimal, not octal");
@@ -2929,9 +2929,10 @@ static unsigned GetLineDirectiveNum (void)
             }
         }
     } else {
-        PPError ("#line directive requires a simple decimal digit sequence");
+        PPError ("#line directive requires a decimal digit sequence");
         ClearLine ();
     }
+    SkipWhitespace (0);
 
     /* Done with the buffer */
     SB_Done (&Buf);

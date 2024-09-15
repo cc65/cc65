@@ -102,6 +102,14 @@ $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
 
+# should not compile, but gives different diagnostics in C99 mode than in others
+$(WORKDIR)/bug2515.$1.$2.prg: bug2515.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug2515.$1.$2.prg)
+	$(NOT) $(CC65) --standard c99 -t sim$2 -$1 -o $$(@:.prg=.s) $$< 2>$(WORKDIR)/bug2515.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/bug2515.$1.$2.out bug2515.c99.ref
+	$(NOT) $(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< 2>$(WORKDIR)/bug2515.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/bug2515.$1.$2.out bug2515.ref
+
 # this one requires -Werror
 $(WORKDIR)/bug1768.$1.$2.prg: bug1768.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1768.$1.$2.prg)

@@ -726,7 +726,7 @@ static void PPhieQuest (PPExpr* Expr)
         PPhieQuest (&Expr3);
 
         /* Set the result */
-        Expr->IVal = Expr->IVal ? Expr2.IVal != 0 : Expr3.IVal != 0;
+        Expr->IVal = Expr->IVal ? Expr2.IVal : Expr3.IVal;
 
         /* Restore evaluation as before */
         PPEvaluationEnabled = PPEvaluationEnabledPrev;

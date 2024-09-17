@@ -55,7 +55,6 @@ static int PPEvaluationFailed  = 0;
 
 
 
-static void PPhie0 (PPExpr* Expr);
 static void PPhie1 (PPExpr* Expr);
 
 
@@ -138,7 +137,7 @@ static void PPhiePrimary (PPExpr* Expr)
             ** recursively.
             */
             NextToken ();
-            PPhie0 (Expr);
+            PPhie1 (Expr);
             ConsumeRParen ();
             break;
 
@@ -263,6 +262,7 @@ void PPhie10 (PPExpr* Expr)
             NextToken ();
             PPhie10 (Expr);
             Expr->IVal = !Expr->IVal;
+            Expr->Flags &= ~PPEXPR_UNSIGNED;    /* Result is signed */
             break;
 
         case TOK_CEOF:
@@ -424,10 +424,10 @@ static void PPhie_compare (const token_t* Ops,    /* List of generators */
                 }
             }
         }
-    }
 
-    /* The result is signed */
-    Expr->Flags &= ~PPEXPR_UNSIGNED;
+        /* The result is signed */
+        Expr->Flags &= ~PPEXPR_UNSIGNED;
+    }
 }
 
 
@@ -711,7 +711,7 @@ static void PPhieQuest (PPExpr* Expr)
 
         /* Parse second expression */
         PPExprInit (&Expr2);
-        PPhie0 (&Expr2);
+        PPhie1 (&Expr2);
 
         /* Skip the colon */
         ConsumeColon ();
@@ -809,23 +809,6 @@ static void PPhie1 (PPExpr* Expr)
 
 
 
-static void PPhie0 (PPExpr* Expr)
-/* Handle the comma "," operator */
-{
-    PPhie1 (Expr);
-
-    while (CurTok.Tok == TOK_COMMA) {
-        /* Skip the comma */
-        NextToken ();
-        /* Reset the expression */
-        PPExprInit (Expr);
-        /* Use the next operand as the value instead */
-        PPhie1 (Expr);
-    }
-}
-
-
-
 void ParsePPExprInLine (PPExpr* Expr)
 /* Parse a line for PP expression */
 {
@@ -836,7 +819,7 @@ void ParsePPExprInLine (PPExpr* Expr)
 
     /* Parse */
     PPExprInit (Expr);
-    PPhie0 (Expr);
+    PPhie1 (Expr);
 
     /* If the evaluation fails, the result is always zero */
     if (PPEvaluationFailed) {

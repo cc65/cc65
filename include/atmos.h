@@ -169,6 +169,9 @@ void atmos_tock (void);
 void atmos_zap (void);
 /* Raygun sound effect */
 
+void waitvsync (void);
+/* Wait for start of next frame */
+
 
 
 /* End of atmos.h */

@@ -59,7 +59,7 @@ jobs:
         run: make -j2 lib QUIET=1
       - name: Run the regression tests.
         shell: bash
-        run: make test QUIET=1
+        run: make -j2 test QUIET=1
       - name: Test that the samples can be built.
         shell: bash
         run: make -j2 samples

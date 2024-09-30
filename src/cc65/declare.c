@@ -71,14 +71,30 @@
 
 
 
-static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags);
-/* Parse a type specifier */
+static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags);
+/* Parse an enum specifier */
+
+static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags);
+/* Parse a union specifier */
+
+static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags);
+/* Parse a struct specifier */
 
 
 
 /*****************************************************************************/
-/*                            Internal functions                             */
+/*                         Type specification parser                         */
 /*****************************************************************************/
+
+
+
+static void InitDeclSpec (DeclSpec* Spec)
+/* Initialize the DeclSpec struct for use */
+{
+    Spec->StorageClass  = 0;
+    Spec->Type[0].C     = T_END;
+    Spec->Flags         = 0;
+}
 
 
 
@@ -421,252 +437,281 @@ static void UseDefaultType (DeclSpec* Spec, typespec_t TSFlags)
 
 
 
-static void InitDeclSpec (DeclSpec* Spec)
-/* Initialize the DeclSpec struct for use */
-{
-    Spec->StorageClass  = 0;
-    Spec->Type[0].C     = T_END;
-    Spec->Flags         = 0;
-}
-
-
-
-static void InitDeclarator (Declarator* D)
-/* Initialize the Declarator struct for use */
-{
-    D->Ident[0]   = '\0';
-    D->Type[0].C  = T_END;
-    D->Index      = 0;
-    D->Attributes = 0;
-}
-
-
-
-static void NeedTypeSpace (Declarator* D, unsigned Count)
-/* Check if there is enough space for Count type specifiers within D */
-{
-    if (D->Index + Count >= MAXTYPELEN) {
-        /* We must call Fatal() here, since calling Error() will try to
-        ** continue, and the declaration type is not correctly terminated
-        ** in case we come here.
-        */
-        Fatal ("Too many type specifiers");
-    }
-}
-
-
-
-static void AddTypeCodeToDeclarator (Declarator* D, TypeCode T)
-/* Add a type specifier to the type of a declarator */
-{
-    NeedTypeSpace (D, 1);
-    D->Type[D->Index++].C = T;
-}
-
-
-
-static void FixQualifiers (Type* DataType)
-/* Apply several fixes to qualifiers */
-{
-    Type*    T;
-    TypeCode Q;
-
-    /* Using typedefs, it is possible to generate declarations that have
-    ** type qualifiers attached to an array, not the element type. Go and
-    ** fix these here.
-    */
-    T = DataType;
-    Q = T_QUAL_NONE;
-    while (T->C != T_END) {
-        if (IsTypeArray (T)) {
-            /* Extract any type qualifiers */
-            Q |= GetQualifier (T);
-            T->C = GetUnqualRawTypeCode (T);
-        } else {
-            /* Add extracted type qualifiers here */
-            T->C |= Q;
-            Q = T_QUAL_NONE;
-        }
-        ++T;
-    }
-    /* Q must be empty now */
-    CHECK (Q == T_QUAL_NONE);
-
-    /* Do some fixes on pointers and functions. */
-    T = DataType;
-    while (T->C != T_END) {
-        if (IsTypePtr (T)) {
-            /* Calling convention qualifier on the pointer? */
-            if (IsQualCConv (T)) {
-                /* Pull the convention off of the pointer */
-                Q = T[0].C & T_QUAL_CCONV;
-                T[0].C &= ~T_QUAL_CCONV;
-
-                /* Pointer to a function which doesn't have an explicit convention? */
-                if (IsTypeFunc (T + 1)) {
-                    if (IsQualCConv (T + 1)) {
-                        if ((T[1].C & T_QUAL_CCONV) == Q) {
-                            Warning ("Pointer duplicates function's calling convention");
-                        } else {
-                            Error ("Function's and pointer's calling conventions are different");
-                        }
-                    } else {
-                        if (Q == T_QUAL_FASTCALL && IsVariadicFunc (T + 1)) {
-                            Error ("Variadic-function pointers cannot be __fastcall__");
-                        } else {
-                            /* Move the qualifier from the pointer to the function. */
-                            T[1].C |= Q;
-                        }
-                    }
-                } else {
-                    Error ("Not pointer to a function; can't use a calling convention");
-                }
-            }
-
-            /* Apply the default far and near qualifiers if none are given */
-            Q = (T[0].C & T_QUAL_ADDRSIZE);
-            if (Q == T_QUAL_NONE) {
-                /* No address size qualifiers specified */
-                if (IsTypeFunc (T+1)) {
-                    /* Pointer to function. Use the qualifier from the function,
-                    ** or the default if the function doesn't have one.
-                    */
-                    Q = (T[1].C & T_QUAL_ADDRSIZE);
-                    if (Q == T_QUAL_NONE) {
-                        Q = CodeAddrSizeQualifier ();
-                    }
-                } else {
-                    Q = DataAddrSizeQualifier ();
-                }
-                T[0].C |= Q;
-            } else {
-                /* We have address size qualifiers. If followed by a function,
-                ** apply them to the function also.
-                */
-                if (IsTypeFunc (T+1)) {
-                    TypeCode FQ = (T[1].C & T_QUAL_ADDRSIZE);
-                    if (FQ == T_QUAL_NONE) {
-                        T[1].C |= Q;
-                    } else if (FQ != Q) {
-                        Error ("Address size qualifier mismatch");
-                        T[1].C = (T[1].C & ~T_QUAL_ADDRSIZE) | Q;
-                    }
-                }
-            }
-
-        } else if (IsTypeFunc (T)) {
-
-            /* Apply the default far and near qualifiers if none are given */
-            if ((T[0].C & T_QUAL_ADDRSIZE) == 0) {
-                T[0].C |= CodeAddrSizeQualifier ();
-            }
-
-        } else {
-
-            /* If we have remaining qualifiers, flag them as invalid */
-            Q = T[0].C;
-
-            if (Q & T_QUAL_NEAR) {
-                Error ("Invalid '__near__' qualifier");
-                Q &= ~T_QUAL_NEAR;
-            }
-            if (Q & T_QUAL_FAR) {
-                Error ("Invalid '__far__' qualifier");
-                Q &= ~T_QUAL_FAR;
-            }
-            if (Q & T_QUAL_FASTCALL) {
-                Error ("Invalid '__fastcall__' qualifier");
-                Q &= ~T_QUAL_FASTCALL;
-            }
-            if (Q & T_QUAL_CDECL) {
-                Error ("Invalid '__cdecl__' qualifier");
-                Q &= ~T_QUAL_CDECL;
-            }
-
-            /* Clear the invalid qualifiers */
-            T[0].C &= Q;
-
-        }
-        ++T;
-    }
-}
-
-
-
-static void FixFunctionReturnType (Type* T)
-/* Check if the data type consists of any functions returning forbidden return
-** types and remove qualifiers from the return types if they are not void.
+static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
+/* Parse a type specifier.  Store whether one of "signed" or "unsigned" was
+** specified, so bit-fields of unspecified signedness can be treated as
+** unsigned; without special handling, it would be treated as signed.
 */
 {
-    while (T->C != T_END) {
-        if (IsTypeFunc (T)) {
-            ++T;
+    ident       Ident;
+    SymEntry*   TagEntry;
+    TypeCode    Qualifiers = T_QUAL_NONE;
 
-            /* Functions may not return functions or arrays */
-            if (IsTypeFunc (T)) {
-                Error ("Functions are not allowed to return functions");
-            } else if (IsTypeArray (T)) {
-                Error ("Functions are not allowed to return arrays");
+    /* Assume we have an explicitly specified type */
+    Spec->Flags = (Spec->Flags & ~DS_TYPE_MASK) | DS_EXPLICIT_TYPE;
+
+    /* Read storage specifiers and/or type qualifiers if we have any */
+    OptionalSpecifiers (Spec, &Qualifiers, TSFlags);
+
+    /* Look at the data type */
+    switch (CurTok.Tok) {
+
+        case TOK_VOID:
+            NextToken ();
+            Spec->Type[0].C = T_VOID;
+            Spec->Type[0].A.U = 0;
+            Spec->Type[1].C = T_END;
+            break;
+
+        case TOK_CHAR:
+            NextToken ();
+            Spec->Type[0].C = T_CHAR;
+            Spec->Type[1].C = T_END;
+            break;
+
+        case TOK_LONG:
+            NextToken ();
+            if (CurTok.Tok == TOK_UNSIGNED) {
+                Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
+                NextToken ();
+                OptionalInt ();
+                Spec->Type[0].C = T_ULONG;
+                Spec->Type[1].C = T_END;
+            } else {
+                OptionalSigned (Spec);
+                OptionalInt ();
+                Spec->Type[0].C = T_LONG;
+                Spec->Type[1].C = T_END;
             }
+            break;
 
-            /* The return type must not be qualified */
-            if ((GetQualifier (T) & T_QUAL_CVR) != T_QUAL_NONE) {
-                /* We are stricter than the standard here */
-                if (GetRawTypeRank (T) == T_RANK_VOID) {
-                    /* A qualified void type is always an error */
-                    Error ("Function definition has qualified void return type");
-                } else {
-                    /* For others, qualifiers are ignored */
-                    Warning ("Type qualifiers ignored on function return type");
-                    T[0].C &= ~T_QUAL_CVR;
-                }
+        case TOK_SHORT:
+            NextToken ();
+            if (CurTok.Tok == TOK_UNSIGNED) {
+                Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
+                NextToken ();
+                OptionalInt ();
+                Spec->Type[0].C = T_USHORT;
+                Spec->Type[1].C = T_END;
+            } else {
+                OptionalSigned (Spec);
+                OptionalInt ();
+                Spec->Type[0].C = T_SHORT;
+                Spec->Type[1].C = T_END;
             }
-        } else {
-            ++T;
-        }
-    }
-}
+            break;
 
+        case TOK_INT:
+            NextToken ();
+            Spec->Type[0].C = T_INT;
+            Spec->Type[1].C = T_END;
+            break;
 
+        case TOK_SIGNED:
+            Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
+            NextToken ();
+            switch (CurTok.Tok) {
 
-static void CheckArrayElementType (const Type* T)
-/* Check recursively if type consists of arrays of forbidden element types */
-{
-    while (T->C != T_END) {
-        if (IsTypeArray (T)) {
-            /* If the array is multi-dimensional, keep going until we get the
-            ** true element type.
+                case TOK_CHAR:
+                    NextToken ();
+                    Spec->Type[0].C = T_SCHAR;
+                    Spec->Type[1].C = T_END;
+                    break;
+
+                case TOK_SHORT:
+                    NextToken ();
+                    OptionalInt ();
+                    Spec->Type[0].C = T_SHORT;
+                    Spec->Type[1].C = T_END;
+                    break;
+
+                case TOK_LONG:
+                    NextToken ();
+                    OptionalInt ();
+                    Spec->Type[0].C = T_LONG;
+                    Spec->Type[1].C = T_END;
+                    break;
+
+                case TOK_INT:
+                    NextToken ();
+                    /* FALL THROUGH */
+
+                default:
+                    Spec->Type[0].C = T_INT;
+                    Spec->Type[1].C = T_END;
+                    break;
+            }
+            break;
+
+        case TOK_UNSIGNED:
+            Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
+            NextToken ();
+            switch (CurTok.Tok) {
+
+                case TOK_CHAR:
+                    NextToken ();
+                    Spec->Type[0].C = T_UCHAR;
+                    Spec->Type[1].C = T_END;
+                    break;
+
+                case TOK_SHORT:
+                    NextToken ();
+                    OptionalInt ();
+                    Spec->Type[0].C = T_USHORT;
+                    Spec->Type[1].C = T_END;
+                    break;
+
+                case TOK_LONG:
+                    NextToken ();
+                    OptionalInt ();
+                    Spec->Type[0].C = T_ULONG;
+                    Spec->Type[1].C = T_END;
+                    break;
+
+                case TOK_INT:
+                    NextToken ();
+                    /* FALL THROUGH */
+
+                default:
+                    Spec->Type[0].C = T_UINT;
+                    Spec->Type[1].C = T_END;
+                    break;
+            }
+            break;
+
+        case TOK_FLOAT:
+            NextToken ();
+            Spec->Type[0].C = T_FLOAT;
+            Spec->Type[1].C = T_END;
+            break;
+
+        case TOK_DOUBLE:
+            NextToken ();
+            Spec->Type[0].C = T_DOUBLE;
+            Spec->Type[1].C = T_END;
+            break;
+
+        case TOK_UNION:
+            NextToken ();
+            /* Remember we have an extra type decl */
+            Spec->Flags |= DS_EXTRA_TYPE;
+            /* Check for tag name */
+            if (CurTok.Tok == TOK_IDENT) {
+                strcpy (Ident, CurTok.Ident);
+                NextToken ();
+            } else if (CurTok.Tok == TOK_LCURLY) {
+                AnonName (Ident, "union");
+            } else {
+                Error ("Tag name identifier or '{' expected");
+                UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
+                break;
+            }
+            /* Declare the union in the current scope */
+            TagEntry = ParseUnionSpec (Ident, &Spec->Flags);
+            /* Encode the union entry into the type */
+            Spec->Type[0].C = T_UNION;
+            SetESUTagSym (Spec->Type, TagEntry);
+            Spec->Type[1].C = T_END;
+            break;
+
+        case TOK_STRUCT:
+            NextToken ();
+            /* Remember we have an extra type decl */
+            Spec->Flags |= DS_EXTRA_TYPE;
+            /* Check for tag name */
+            if (CurTok.Tok == TOK_IDENT) {
+                strcpy (Ident, CurTok.Ident);
+                NextToken ();
+            } else if (CurTok.Tok == TOK_LCURLY) {
+                AnonName (Ident, "struct");
+            } else {
+                Error ("Tag name identifier or '{' expected");
+                UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
+                break;
+            }
+            /* Declare the struct in the current scope */
+            TagEntry = ParseStructSpec (Ident, &Spec->Flags);
+            /* Encode the struct entry into the type */
+            Spec->Type[0].C = T_STRUCT;
+            SetESUTagSym (Spec->Type, TagEntry);
+            Spec->Type[1].C = T_END;
+            break;
+
+        case TOK_ENUM:
+            NextToken ();
+            /* Remember we have an extra type decl */
+            Spec->Flags |= DS_EXTRA_TYPE;
+            /* Check for tag name */
+            if (CurTok.Tok == TOK_IDENT) {
+                strcpy (Ident, CurTok.Ident);
+                NextToken ();
+            } else if (CurTok.Tok == TOK_LCURLY) {
+                AnonName (Ident, "enum");
+            } else {
+                Error ("Tag name identifier or '{' expected");
+                UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
+                break;
+            }
+            /* Parse the enum decl */
+            TagEntry = ParseEnumSpec (Ident, &Spec->Flags);
+            /* Encode the enum entry into the type */
+            Spec->Type[0].C |= T_ENUM;
+            SetESUTagSym (Spec->Type, TagEntry);
+            Spec->Type[1].C = T_END;
+            /* The signedness of enums is determined by the type, so say this is specified to avoid
+            ** the int -> unsigned int handling for plain int bit-fields in AddBitField.
             */
-            ++T;
-            if (SizeOf (T) == 0) {
-                if (IsTypeArray (T) || IsIncompleteESUType (T)) {
-                    /* We cannot have an array of incomplete elements */
-                    if (!IsTypeArray (T) || GetElementCount (T) == UNSPECIFIED) {
-                        Error ("Array of incomplete element type '%s'",
-                               GetFullTypeName (T));
-                        return;
-                    }
-                } else if (!IsTypeVoid (T) || IS_Get (&Standard) != STD_CC65) {
-                    /* We could support certain 0-size element types as an extension */
-                    Error ("Array of 0-size element type '%s'",
-                           GetFullTypeName (T));
-                    return;
+            Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
+            break;
+
+        case TOK_IDENT:
+            /* This could be a label */
+            if (NextTok.Tok != TOK_COLON || GetLexicalLevel () == LEX_LEVEL_STRUCT) {
+                TagEntry = FindSym (CurTok.Ident);
+                if (TagEntry && SymIsTypeDef (TagEntry)) {
+                    /* It's a typedef */
+                    NextToken ();
+                    TypeCopy (Spec->Type, TagEntry->Type);
+                    /* If it's a typedef, we should actually use whether the signedness was
+                    ** specified on the typedef, but that information has been lost.  Treat the
+                    ** signedness as being specified to work around the ICE in #1267.
+                    ** Unforunately, this will cause plain int bit-fields defined via typedefs
+                    ** to be treated as signed rather than unsigned.
+                    */
+                    Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
+                    break;
+                } else if ((TSFlags & TS_MASK_DEFAULT_TYPE) == TS_DEFAULT_TYPE_NONE) {
+                    /* Treat this identifier as an unknown type */
+                    Error ("Unknown type name '%s'", CurTok.Ident);
+                    TypeCopy (Spec->Type, type_int);
+                    NextToken ();
+                    break;
                 }
             } else {
-                /* Elements cannot contain flexible array members themselves */
-                if (IsClassStruct (T)) {
-                    SymEntry* TagEntry = GetESUTagSym (T);
-                    if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
-                        Error ("Invalid use of struct with flexible array member");
-                        return;
-                    }
-                }
+                /* This is a label. Use the default type flag to end the loop
+                ** in DeclareLocals. The type code used here doesn't matter as
+                ** long as it has no qualifiers.
+                */
+                UseDefaultType (Spec, TS_DEFAULT_TYPE_INT);
+                break;
             }
-        } else {
-            ++T;
-        }
+            /* FALL THROUGH */
+
+        default:
+            UseDefaultType (Spec, TSFlags);
+            break;
     }
+
+    /* There may also be specifiers/qualifiers *after* the initial type */
+    OptionalSpecifiers (Spec, &Qualifiers, TSFlags);
+    Spec->Type[0].C |= Qualifiers;
 }
+
+
+
+/*****************************************************************************/
+/*                         Enum/struct/union parser                          */
+/*****************************************************************************/
 
 
 
@@ -731,7 +776,7 @@ static const Type* GetEnumeratorType (long Min, unsigned long Max, int Signed)
 
 
 static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
-/* Process an enum specifier */
+/* Parse an enum specifier */
 {
     SymTable*       FieldTab;
     long            EnumVal;
@@ -905,6 +950,8 @@ static int ParseFieldWidth (Declarator* D)
 ** otherwise the width of the field.
 */
 {
+    ExprDesc Expr;
+
     if (CurTok.Tok != TOK_COLON) {
         /* No bit-field declaration */
         return -1;
@@ -918,7 +965,16 @@ static int ParseFieldWidth (Declarator* D)
         /* Avoid a diagnostic storm by giving the bit-field the widest valid
         ** signed type, and continuing to parse.
         */
-        D->Type[0].C = T_INT;
+        D->Type[0].C = T_LONG;
+    }
+
+    if (IsTypeEnum (D->Type) && IsIncompleteESUType (D->Type)) {
+        /* If the type is an enum, it must be complete */
+        Error ("Bit-field has incomplete type '%s'",
+               GetFullTypeName (D->Type));
+
+        /* Avoid a diagnostic storm */
+        D->Type[0].C = T_LONG;
     }
 
     /* We currently support integral types up to long */
@@ -927,12 +983,12 @@ static int ParseFieldWidth (Declarator* D)
         Error ("cc65 currently supports only long-sized and smaller bit-field types");
 
         /* Avoid a diagnostic storm */
-        D->Type[0].C = T_INT;
+        D->Type[0].C = T_LONG;
     }
 
     /* Read the width */
     NextToken ();
-    ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
+    Expr = NoCodeConstAbsIntExpr (hie1);
 
     if (Expr.IVal < 0) {
         Error ("Negative width in bit-field");
@@ -1505,301 +1561,247 @@ EndOfDecl:
 
 
 
-static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
-/* Parse a type specifier.  Store whether one of "signed" or "unsigned" was
-** specified, so bit-fields of unspecified signedness can be treated as
-** unsigned; without special handling, it would be treated as signed.
-*/
+/*****************************************************************************/
+/*                             Declarator parser                             */
+/*****************************************************************************/
+
+
+
+static void InitDeclarator (Declarator* D)
+/* Initialize the Declarator struct for use */
 {
-    ident       Ident;
-    SymEntry*   TagEntry;
-    TypeCode    Qualifiers = T_QUAL_NONE;
-
-    /* Assume we have an explicitly specified type */
-    Spec->Flags = (Spec->Flags & ~DS_TYPE_MASK) | DS_EXPLICIT_TYPE;
-
-    /* Read storage specifiers and/or type qualifiers if we have any */
-    OptionalSpecifiers (Spec, &Qualifiers, TSFlags);
-
-    /* Look at the data type */
-    switch (CurTok.Tok) {
-
-        case TOK_VOID:
-            NextToken ();
-            Spec->Type[0].C = T_VOID;
-            Spec->Type[0].A.U = 0;
-            Spec->Type[1].C = T_END;
-            break;
-
-        case TOK_CHAR:
-            NextToken ();
-            Spec->Type[0].C = T_CHAR;
-            Spec->Type[1].C = T_END;
-            break;
-
-        case TOK_LONG:
-            NextToken ();
-            if (CurTok.Tok == TOK_UNSIGNED) {
-                Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
-                NextToken ();
-                OptionalInt ();
-                Spec->Type[0].C = T_ULONG;
-                Spec->Type[1].C = T_END;
-            } else {
-                OptionalSigned (Spec);
-                OptionalInt ();
-                Spec->Type[0].C = T_LONG;
-                Spec->Type[1].C = T_END;
-            }
-            break;
-
-        case TOK_SHORT:
-            NextToken ();
-            if (CurTok.Tok == TOK_UNSIGNED) {
-                Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
-                NextToken ();
-                OptionalInt ();
-                Spec->Type[0].C = T_USHORT;
-                Spec->Type[1].C = T_END;
-            } else {
-                OptionalSigned (Spec);
-                OptionalInt ();
-                Spec->Type[0].C = T_SHORT;
-                Spec->Type[1].C = T_END;
-            }
-            break;
-
-        case TOK_INT:
-            NextToken ();
-            Spec->Type[0].C = T_INT;
-            Spec->Type[1].C = T_END;
-            break;
-
-        case TOK_SIGNED:
-            Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
-            NextToken ();
-            switch (CurTok.Tok) {
-
-                case TOK_CHAR:
-                    NextToken ();
-                    Spec->Type[0].C = T_SCHAR;
-                    Spec->Type[1].C = T_END;
-                    break;
-
-                case TOK_SHORT:
-                    NextToken ();
-                    OptionalInt ();
-                    Spec->Type[0].C = T_SHORT;
-                    Spec->Type[1].C = T_END;
-                    break;
-
-                case TOK_LONG:
-                    NextToken ();
-                    OptionalInt ();
-                    Spec->Type[0].C = T_LONG;
-                    Spec->Type[1].C = T_END;
-                    break;
-
-                case TOK_INT:
-                    NextToken ();
-                    /* FALL THROUGH */
-
-                default:
-                    Spec->Type[0].C = T_INT;
-                    Spec->Type[1].C = T_END;
-                    break;
-            }
-            break;
-
-        case TOK_UNSIGNED:
-            Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
-            NextToken ();
-            switch (CurTok.Tok) {
-
-                case TOK_CHAR:
-                    NextToken ();
-                    Spec->Type[0].C = T_UCHAR;
-                    Spec->Type[1].C = T_END;
-                    break;
-
-                case TOK_SHORT:
-                    NextToken ();
-                    OptionalInt ();
-                    Spec->Type[0].C = T_USHORT;
-                    Spec->Type[1].C = T_END;
-                    break;
-
-                case TOK_LONG:
-                    NextToken ();
-                    OptionalInt ();
-                    Spec->Type[0].C = T_ULONG;
-                    Spec->Type[1].C = T_END;
-                    break;
-
-                case TOK_INT:
-                    NextToken ();
-                    /* FALL THROUGH */
-
-                default:
-                    Spec->Type[0].C = T_UINT;
-                    Spec->Type[1].C = T_END;
-                    break;
-            }
-            break;
-
-        case TOK_FLOAT:
-            NextToken ();
-            Spec->Type[0].C = T_FLOAT;
-            Spec->Type[1].C = T_END;
-            break;
-
-        case TOK_DOUBLE:
-            NextToken ();
-            Spec->Type[0].C = T_DOUBLE;
-            Spec->Type[1].C = T_END;
-            break;
-
-        case TOK_UNION:
-            NextToken ();
-            /* Remember we have an extra type decl */
-            Spec->Flags |= DS_EXTRA_TYPE;
-            /* Check for tag name */
-            if (CurTok.Tok == TOK_IDENT) {
-                strcpy (Ident, CurTok.Ident);
-                NextToken ();
-            } else if (CurTok.Tok == TOK_LCURLY) {
-                AnonName (Ident, "union");
-            } else {
-                Error ("Tag name identifier or '{' expected");
-                UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
-                break;
-            }
-            /* Declare the union in the current scope */
-            TagEntry = ParseUnionSpec (Ident, &Spec->Flags);
-            /* Encode the union entry into the type */
-            Spec->Type[0].C = T_UNION;
-            SetESUTagSym (Spec->Type, TagEntry);
-            Spec->Type[1].C = T_END;
-            break;
-
-        case TOK_STRUCT:
-            NextToken ();
-            /* Remember we have an extra type decl */
-            Spec->Flags |= DS_EXTRA_TYPE;
-            /* Check for tag name */
-            if (CurTok.Tok == TOK_IDENT) {
-                strcpy (Ident, CurTok.Ident);
-                NextToken ();
-            } else if (CurTok.Tok == TOK_LCURLY) {
-                AnonName (Ident, "struct");
-            } else {
-                Error ("Tag name identifier or '{' expected");
-                UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
-                break;
-            }
-            /* Declare the struct in the current scope */
-            TagEntry = ParseStructSpec (Ident, &Spec->Flags);
-            /* Encode the struct entry into the type */
-            Spec->Type[0].C = T_STRUCT;
-            SetESUTagSym (Spec->Type, TagEntry);
-            Spec->Type[1].C = T_END;
-            break;
-
-        case TOK_ENUM:
-            NextToken ();
-            /* Remember we have an extra type decl */
-            Spec->Flags |= DS_EXTRA_TYPE;
-            /* Check for tag name */
-            if (CurTok.Tok == TOK_IDENT) {
-                strcpy (Ident, CurTok.Ident);
-                NextToken ();
-            } else if (CurTok.Tok == TOK_LCURLY) {
-                AnonName (Ident, "enum");
-            } else {
-                Error ("Tag name identifier or '{' expected");
-                UseDefaultType (Spec, TS_DEFAULT_TYPE_NONE);
-                break;
-            }
-            /* Parse the enum decl */
-            TagEntry = ParseEnumSpec (Ident, &Spec->Flags);
-            /* Encode the enum entry into the type */
-            Spec->Type[0].C |= T_ENUM;
-            SetESUTagSym (Spec->Type, TagEntry);
-            Spec->Type[1].C = T_END;
-            /* The signedness of enums is determined by the type, so say this is specified to avoid
-            ** the int -> unsigned int handling for plain int bit-fields in AddBitField.
-            */
-            Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
-            break;
-
-        case TOK_IDENT:
-            /* This could be a label */
-            if (NextTok.Tok != TOK_COLON || GetLexicalLevel () == LEX_LEVEL_STRUCT) {
-                TagEntry = FindSym (CurTok.Ident);
-                if (TagEntry && SymIsTypeDef (TagEntry)) {
-                    /* It's a typedef */
-                    NextToken ();
-                    TypeCopy (Spec->Type, TagEntry->Type);
-                    /* If it's a typedef, we should actually use whether the signedness was
-                    ** specified on the typedef, but that information has been lost.  Treat the
-                    ** signedness as being specified to work around the ICE in #1267.
-                    ** Unforunately, this will cause plain int bit-fields defined via typedefs
-                    ** to be treated as signed rather than unsigned.
-                    */
-                    Spec->Flags |= DS_EXPLICIT_SIGNEDNESS;
-                    break;
-                } else if ((TSFlags & TS_MASK_DEFAULT_TYPE) == TS_DEFAULT_TYPE_NONE) {
-                    /* Treat this identifier as an unknown type */
-                    Error ("Unknown type name '%s'", CurTok.Ident);
-                    TypeCopy (Spec->Type, type_int);
-                    NextToken ();
-                    break;
-                }
-            } else {
-                /* This is a label. Use the default type flag to end the loop
-                ** in DeclareLocals. The type code used here doesn't matter as
-                ** long as it has no qualifiers.
-                */
-                UseDefaultType (Spec, TS_DEFAULT_TYPE_INT);
-                break;
-            }
-            /* FALL THROUGH */
-
-        default:
-            UseDefaultType (Spec, TSFlags);
-            break;
-    }
-
-    /* There may also be specifiers/qualifiers *after* the initial type */
-    OptionalSpecifiers (Spec, &Qualifiers, TSFlags);
-    Spec->Type[0].C |= Qualifiers;
+    D->Ident[0]   = '\0';
+    D->Type[0].C  = T_END;
+    D->Index      = 0;
+    D->Attributes = 0;
 }
 
 
 
-static const Type* ParamTypeCvt (Type* T)
-/* If T is an array or a function, convert it to a pointer else do nothing.
-** Return the resulting type.
+static void NeedTypeSpace (Declarator* D, unsigned Count)
+/* Check if there is enough space for Count type specifiers within D */
+{
+    if (D->Index + Count >= MAXTYPELEN) {
+        /* We must call Fatal() here, since calling Error() will try to
+        ** continue, and the declaration type is not correctly terminated
+        ** in case we come here.
+        */
+        Fatal ("Too many type specifiers");
+    }
+}
+
+
+
+static void AddTypeCodeToDeclarator (Declarator* D, TypeCode T)
+/* Add a type specifier to the type of a declarator */
+{
+    NeedTypeSpace (D, 1);
+    D->Type[D->Index++].C = T;
+}
+
+
+
+static void FixQualifiers (Type* DataType)
+/* Apply several fixes to qualifiers */
+{
+    Type*    T;
+    TypeCode Q;
+
+    /* Using typedefs, it is possible to generate declarations that have
+    ** type qualifiers attached to an array, not the element type. Go and
+    ** fix these here.
+    */
+    T = DataType;
+    Q = T_QUAL_NONE;
+    while (T->C != T_END) {
+        if (IsTypeArray (T)) {
+            /* Extract any type qualifiers */
+            Q |= GetQualifier (T);
+            T->C = GetUnqualRawTypeCode (T);
+        } else {
+            /* Add extracted type qualifiers here */
+            T->C |= Q;
+            Q = T_QUAL_NONE;
+        }
+        ++T;
+    }
+    /* Q must be empty now */
+    CHECK (Q == T_QUAL_NONE);
+
+    /* Do some fixes on pointers and functions. */
+    T = DataType;
+    while (T->C != T_END) {
+        if (IsTypePtr (T)) {
+            /* Calling convention qualifier on the pointer? */
+            if (IsQualCConv (T)) {
+                /* Pull the convention off of the pointer */
+                Q = T[0].C & T_QUAL_CCONV;
+                T[0].C &= ~T_QUAL_CCONV;
+
+                /* Pointer to a function which doesn't have an explicit convention? */
+                if (IsTypeFunc (T + 1)) {
+                    if (IsQualCConv (T + 1)) {
+                        if ((T[1].C & T_QUAL_CCONV) == Q) {
+                            Warning ("Pointer duplicates function's calling convention");
+                        } else {
+                            Error ("Function's and pointer's calling conventions are different");
+                        }
+                    } else {
+                        if (Q == T_QUAL_FASTCALL && IsVariadicFunc (T + 1)) {
+                            Error ("Variadic-function pointers cannot be __fastcall__");
+                        } else {
+                            /* Move the qualifier from the pointer to the function. */
+                            T[1].C |= Q;
+                        }
+                    }
+                } else {
+                    Error ("Not pointer to a function; can't use a calling convention");
+                }
+            }
+
+            /* Apply the default far and near qualifiers if none are given */
+            Q = (T[0].C & T_QUAL_ADDRSIZE);
+            if (Q == T_QUAL_NONE) {
+                /* No address size qualifiers specified */
+                if (IsTypeFunc (T+1)) {
+                    /* Pointer to function. Use the qualifier from the function,
+                    ** or the default if the function doesn't have one.
+                    */
+                    Q = (T[1].C & T_QUAL_ADDRSIZE);
+                    if (Q == T_QUAL_NONE) {
+                        Q = CodeAddrSizeQualifier ();
+                    }
+                } else {
+                    Q = DataAddrSizeQualifier ();
+                }
+                T[0].C |= Q;
+            } else {
+                /* We have address size qualifiers. If followed by a function,
+                ** apply them to the function also.
+                */
+                if (IsTypeFunc (T+1)) {
+                    TypeCode FQ = (T[1].C & T_QUAL_ADDRSIZE);
+                    if (FQ == T_QUAL_NONE) {
+                        T[1].C |= Q;
+                    } else if (FQ != Q) {
+                        Error ("Address size qualifier mismatch");
+                        T[1].C = (T[1].C & ~T_QUAL_ADDRSIZE) | Q;
+                    }
+                }
+            }
+
+        } else if (IsTypeFunc (T)) {
+
+            /* Apply the default far and near qualifiers if none are given */
+            if ((T[0].C & T_QUAL_ADDRSIZE) == 0) {
+                T[0].C |= CodeAddrSizeQualifier ();
+            }
+
+        } else {
+
+            /* If we have remaining qualifiers, flag them as invalid */
+            Q = T[0].C;
+
+            if (Q & T_QUAL_NEAR) {
+                Error ("Invalid '__near__' qualifier");
+                Q &= ~T_QUAL_NEAR;
+            }
+            if (Q & T_QUAL_FAR) {
+                Error ("Invalid '__far__' qualifier");
+                Q &= ~T_QUAL_FAR;
+            }
+            if (Q & T_QUAL_FASTCALL) {
+                Error ("Invalid '__fastcall__' qualifier");
+                Q &= ~T_QUAL_FASTCALL;
+            }
+            if (Q & T_QUAL_CDECL) {
+                Error ("Invalid '__cdecl__' qualifier");
+                Q &= ~T_QUAL_CDECL;
+            }
+
+            /* Clear the invalid qualifiers */
+            T[0].C &= Q;
+
+        }
+        ++T;
+    }
+}
+
+
+
+static void FixFunctionReturnType (Type* T)
+/* Check if the data type consists of any functions returning forbidden return
+** types and remove qualifiers from the return types if they are not void.
 */
 {
-    Type* Tmp = 0;
+    while (T->C != T_END) {
+        if (IsTypeFunc (T)) {
+            ++T;
 
-    if (IsTypeArray (T)) {
-        Tmp = ArrayToPtr (T);
-    } else if (IsTypeFunc (T)) {
-        Tmp = NewPointerTo (T);
+            /* Functions may not return functions or arrays */
+            if (IsTypeFunc (T)) {
+                Error ("Functions are not allowed to return functions");
+            } else if (IsTypeArray (T)) {
+                Error ("Functions are not allowed to return arrays");
+            }
+
+            /* The return type must not be qualified */
+            if ((GetQualifier (T) & T_QUAL_CVR) != T_QUAL_NONE) {
+                /* We are stricter than the standard here */
+                if (GetRawTypeRank (T) == T_RANK_VOID) {
+                    /* A qualified void type is always an error */
+                    Error ("Function definition has qualified void return type");
+                } else {
+                    /* For others, qualifiers are ignored */
+                    Warning ("Type qualifiers ignored on function return type");
+                    T[0].C &= ~T_QUAL_CVR;
+                }
+            }
+        } else {
+            ++T;
+        }
     }
+}
 
-    if (Tmp != 0) {
-        /* Do several fixes on qualifiers */
-        FixQualifiers (Tmp);
 
-        /* Replace the type */
-        TypeCopy (T, Tmp);
-        TypeFree (Tmp);
+
+static void CheckArrayElementType (const Type* T)
+/* Check recursively if type consists of arrays of forbidden element types */
+{
+    while (T->C != T_END) {
+        if (IsTypeArray (T)) {
+            /* If the array is multi-dimensional, keep going until we get the
+            ** true element type.
+            */
+            ++T;
+            if (SizeOf (T) == 0) {
+                if (IsTypeArray (T) || IsIncompleteESUType (T)) {
+                    /* We cannot have an array of incomplete elements */
+                    if (!IsTypeArray (T) || GetElementCount (T) == UNSPECIFIED) {
+                        Error ("Array of incomplete element type '%s'",
+                               GetFullTypeName (T));
+                        return;
+                    }
+                } else if (!IsTypeVoid (T) || IS_Get (&Standard) != STD_CC65) {
+                    /* We could support certain 0-size element types as an extension */
+                    Error ("Array of 0-size element type '%s'",
+                           GetFullTypeName (T));
+                    return;
+                }
+            } else {
+                /* Elements cannot contain flexible array members themselves */
+                if (IsClassStruct (T)) {
+                    SymEntry* TagEntry = GetESUTagSym (T);
+                    if (TagEntry && SymHasFlexibleArrayMember (TagEntry)) {
+                        Error ("Invalid use of struct with flexible array member");
+                        return;
+                    }
+                }
+            }
+        } else {
+            ++T;
+        }
     }
-
-    return T;
 }
 
 
@@ -1911,7 +1913,7 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
                     */
                     if (Param->Flags & SC_DEFTYPE) {
                         /* Found it, change the default type to the one given */
-                        SymChangeType (Param, ParamTypeCvt (Decl.Type));
+                        SymChangeType (Param, PtrConversion (Decl.Type));
                         /* Reset the "default type" flag */
                         Param->Flags &= ~SC_DEFTYPE;
                     } else {
@@ -2024,7 +2026,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         ParseAttribute (&Decl);
 
         /* Create a symbol table entry */
-        Param = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
+        Param = AddLocalSym (Decl.Ident, PtrConversion (Decl.Type), Decl.StorageClass, 0);
 
         /* Add attributes if we have any */
         SymUseAttr (Param, &Decl);

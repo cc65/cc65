@@ -70,7 +70,7 @@ jobs:
       - name: Run the regression tests (make test)
         if: steps.check-sha.outputs.cache-hit != 'true'
         shell: cmd
-        run: make test QUIET=1 SHELL=cmd
+        run: make -j2 test QUIET=1 SHELL=cmd
 
       - name: Test that the samples can be built (make samples)
         if: steps.check-sha.outputs.cache-hit != 'true'

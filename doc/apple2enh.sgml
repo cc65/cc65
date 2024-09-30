@@ -453,9 +453,14 @@ The names in the parentheses denote the symbols to be used for static linking of
   (RTS/CTS) and does interrupt driven receives. Speeds faster than 9600 baud
   aren't reachable because the ROM and ProDOS IRQ handlers are too slow.
   Software flow control (XON/XOFF) is not supported.
+
   Note that because of the peculiarities of the 6551 chip transmits are not
   interrupt driven, and the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
+
+  Note that using the driver at SER_BAUD_115200 will disable IRQs. It will be up
+  to the users to use the serial port, either by re-enabling IRQs themselves,
+  or by directly poll-reading the ACIA DATA register without the help of ser_get().
 
   The driver defaults to slot 2. Call <tt/ser_apple2_slot()/ prior to
   <tt/ser_open()/ in order to select a different slot. <tt/ser_apple2_slot()/

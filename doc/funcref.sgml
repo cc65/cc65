@@ -95,6 +95,7 @@ function.
 
 <itemize>
 <item>_dos_type
+<item>allow_lowercase
 <item><ref id="beep" name="beep">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
@@ -154,6 +155,7 @@ function.
 <item><ref id="atmos_tick" name="atmos_tick">
 <item><ref id="atmos_tock" name="atmos_tock">
 <item><ref id="atmos_zap" name="atmos_zap">
+<item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
 
@@ -780,6 +782,7 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <item><ref id="strqtok" name="strqtok">
 <item><ref id="strrchr" name="strrchr">
 <item><ref id="strspn" name="strspn">
+<item><ref id="strcasestr" name="strcasestr">
 <item><ref id="strstr" name="strstr">
 <item><ref id="strtok" name="strtok">
 <item><ref id="strxfrm" name="strxfrm">
@@ -7899,22 +7902,47 @@ be used in presence of a prototype.
 </quote>
 
 
-<sect1>strstr<label id="strstr"><p>
+<sect1>strcasestr<label id="strcasestr"><p>
 
 <quote>
 <descrip>
-<tag/Function/Find a substring.
+<tag/Function/Find a substring, case-insensitive.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
-<tag/Declaration/<tt/char* __fastcall__ strstr (const char* str, const char* substr);/
-<tag/Description/<tt/strstr/ searches for the first occurrence of the string
-<tt/substr/ within <tt/str/. If found, it returns a pointer to the copy,
-otherwise it returns <tt/NULL/.
+<tag/Declaration/<tt/char* __fastcall__ strcasestr (const char* str, const char* substr);/
+<tag/Description/<tt/strcasestr/ searches for the first occurrence of the string
+<tt/substr/ within <tt/str/. If found, it returns a pointer to the start of the
+match in <tt/str/, otherwise it returns <tt/NULL/.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="strstr" name="strstr">,
+<ref id="strcspn" name="strcspn">,
+<ref id="strspn" name="strspn">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strstr<label id="strstr"><p>
+
+<quote>
+<descrip>
+<tag/Function/Find a substring, case-sensitive.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strstr (const char* str, const char* substr);/
+<tag/Description/<tt/strstr/ searches for the first occurrence of the string
+<tt/substr/ within <tt/str/. If found, it returns a pointer to the start of the
+match in <tt/str/, otherwise it returns <tt/NULL/.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcasestr" name="strcasestr">,
 <ref id="strcspn" name="strcspn">,
 <ref id="strspn" name="strspn">
 <tag/Example/None.
@@ -8331,6 +8359,7 @@ only in the presence of a prototype.
 <descrip>
 <tag/Function/Wait until the start of the next video frame.
 <tag/Header/<tt/
+<ref id="atmos.h" name="atmos.h">,
 <ref id="cbm.h" name="cbm.h">,
 <ref id="gamate.h" name="gamate.h">,
 <ref id="nes.h" name="nes.h">,
@@ -8338,6 +8367,7 @@ only in the presence of a prototype.
 <tag/Declaration/<tt/void waitvsync (void);/
 <tag/Description/Wait for vertical sync, to reduce flickering.
 <tag/Availability/Platforms served by the headers above
+(Atmos requires the VSync hack)
 <tag/Example/None.
 </descrip>
 </quote>

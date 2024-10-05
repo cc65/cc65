@@ -151,7 +151,9 @@ static short ZPRegVal (unsigned short Use, const RegContents* RC)
 
 
 unsigned OptUnusedLoads (CodeSeg* S)
-/* Remove loads of registers where the value loaded is not used later. */
+/* Remove loads of or operations with registers where the value loaded or
+** produced is not used later.
+*/
 {
     unsigned Changes = 0;
 
@@ -164,17 +166,24 @@ unsigned OptUnusedLoads (CodeSeg* S)
         /* Get next entry */
         CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if it's a register load or transfer insn */
-        if ((E->Info & (OF_LOAD | OF_XFR | OF_REG_INCDEC)) != 0         &&
-            (N = CS_GetNextEntry (S, I)) != 0                           &&
-            !CE_UseLoadFlags (N)) {
+        /* Check if this is one of the instruction we can operate on */
+        int IsOp = (E->Info & (OF_LOAD | OF_XFR | OF_REG_INCDEC)) != 0  ||
+                   E->OPC == OP65_AND                                   ||
+                   E->OPC == OP65_EOR                                   ||
+                   E->OPC == OP65_ORA;
+
+        /* Check for the necessary preconditions */
+        if (IsOp && (N = CS_GetNextEntry (S, I)) != 0 && !LoadFlagsUsed (S, I+1)) {
 
             /* Check which sort of load or transfer it is */
             unsigned R;
             switch (E->OPC) {
+                case OP65_AND:
                 case OP65_DEA:
+                case OP65_EOR:
                 case OP65_INA:
                 case OP65_LDA:
+                case OP65_ORA:
                 case OP65_TXA:
                 case OP65_TYA:  R = REG_A;      break;
                 case OP65_DEX:
@@ -1330,6 +1339,97 @@ unsigned OptPushPop2 (CodeSeg* S)
                 State = Searching;
                 break;
 
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPushPop3 (CodeSeg* S)
+/* Remove a pha/pla sequence where the contents of A are known */
+{
+    unsigned Changes    = 0;
+    unsigned Pha        = 0;          /* Index of PHA insn */
+    unsigned Pla        = 0;          /* Index of PLA insn */
+    CodeEntry* PhaEntry = 0;          /* Pointer to PHA */
+
+    enum {
+        Searching,
+        FoundPha,
+        FoundPla
+    } State = Searching;
+
+    /* Walk over the entries. Look for a PHA instruction where the contents
+    ** of A is known followed by a PLA later.
+    */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Get the input registers */
+        const RegInfo* RI = E->RI;
+
+
+        const char* Arg;
+        CodeEntry* X;
+        switch (State) {
+
+            case Searching:
+                if (E->OPC == OP65_PHA && RegValIsKnown (RI->In.RegA)) {
+                    /* Found start of sequence */
+                    Pha = I;
+                    PhaEntry = E;
+                    State = FoundPha;
+                }
+                break;
+
+            case FoundPha:
+                /* Check for several things that abort the sequence:
+                ** - End of the basic block
+                ** - Another PHA or any other stack manipulating instruction
+                ** If we find something that aborts the sequence, start over
+                ** searching for the next PHA.
+                */
+                if (CE_HasLabel (E)) {
+                    /* Switch back to searching at this instruction */
+                    State = Searching;
+                    continue;
+                }
+                if (E->OPC == OP65_PHA) {
+                    /* Start over at this instruction */
+                    State = Searching;
+                    continue;
+                }
+                if (E->OPC == OP65_PHP || E->OPC == OP65_PLP || E->OPC == OP65_TXS) {
+                    /* Start over at the next instruction */
+                    State = Searching;
+                } else if (E->OPC == OP65_PLA) {
+                    /* Switch state. This will also switch to the next insn
+                    ** which is ok.
+                    */
+                    Pla = I;
+                    State = FoundPla;
+                }
+                break;
+
+            case FoundPla:
+                /* We found the sequence we were looking for. Replace it. */
+                Arg = MakeHexArg (PhaEntry->RI->In.RegA);
+                X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+                CS_InsertEntry (S, X, Pla + 1);
+                CS_DelEntry (S, Pla);
+                CS_DelEntry (S, Pha);
+                ++Changes;
+                State = Searching;
+                break;
         }
 
         /* Next entry */

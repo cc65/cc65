@@ -36,7 +36,7 @@
 #ifndef SEGMENT_H
 #define SEGMENT_H
 
-
+#include <stdio.h>
 
 /* common */
 #include "coll.h"
@@ -95,6 +95,9 @@ extern Segment* ActiveSeg;
 
 Fragment* GenFragment (unsigned char Type, unsigned short Len);
 /* Generate a new fragment, add it to the current segment and return it. */
+
+void ListSegments (FILE* destination);
+/* List the segments to the given file when seglist set */
 
 void UseSeg (const SegDef* D);
 /* Use the given segment */

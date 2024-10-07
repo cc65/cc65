@@ -60,7 +60,7 @@ struct StrBuf;
 
 
 /* Length of the header of a listing line */
-#define LINE_HEADER_LEN         24
+#define LINE_HEADER_LEN         27
 
 /* One listing line as it is stored in memory */
 typedef struct ListLine ListLine;
@@ -68,6 +68,7 @@ struct ListLine {
     ListLine*           Next;           /* Pointer to next line */
     Fragment*           FragList;       /* List of fragments for this line */
     Fragment*           FragLast;       /* Last entry in fragment list */
+    unsigned            Seg;            /* Which segment this line targets */
     unsigned long       PC;             /* Program counter for this line */
     unsigned char       Reloc;          /* Relocatable mode? */
     unsigned char       File;           /* From which file is the line? */

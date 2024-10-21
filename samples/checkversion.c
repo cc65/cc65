@@ -10,11 +10,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if (((__CC65__ & 0xff00) >> 8) > 3) || ((__CC65__ & 0x000f) > 0)
+#if ((__CC65__ >> 8) > 3) || ((__CC65__ & 0x000f) > 0)
 /* compiler version is 2.19-git or higher */
 # define VER_MAJOR       ((__CC65__ >> 8) & 0xff)
 # define VER_MINOR       (__CC65__ & 0xff)
-#elif (((__CC65__ & 0xff00) >> 8) == 3)
+#elif ((__CC65__ >> 8) == 3)
 /* broken values in version 2.16 - 2.19-git before the bug was fixed */
 # define VER_MAJOR       2
 # define VER_MINOR       (((__CC65__ >> 4) & 0x0f) + 16)

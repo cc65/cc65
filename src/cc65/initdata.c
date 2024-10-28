@@ -302,6 +302,13 @@ static unsigned ParsePointerInit (const Type* T)
     /* Optional opening brace */
     unsigned BraceCount = OpeningCurlyBraces (0);
 
+    /* We warn if an initializer for a scalar contains braces, because this is
+    ** quite unusual and often a sign for some problem in the input.
+    */
+    if (BraceCount > 0) {
+        Warning ("Braces around scalar initializer");
+    }
+
     /* Expression */
     ExprDesc ED = NoCodeConstExpr (hie1);
     TypeConversion (&ED, T);

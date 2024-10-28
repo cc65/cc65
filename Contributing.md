@@ -204,6 +204,18 @@ char* nextLine (FILE* f);
 
 ### Header files
 
+* All Headers should start with a copyright/license banner
+* Function prototypes must be a single line, not contain the redundant
+  "extern" keyword, and followed by a brief comment that explains what
+  the function does, and separated from the next prototype by a blank
+  line:
+
+~~~C
+void __fastcall__ cclear (unsigned char length);
+/* Clear part of a line (write length spaces). */
+
+~~~
+
 Headers that belong to the standard library (libc) must
 conform with the C standard. That means:
 

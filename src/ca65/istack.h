@@ -39,6 +39,17 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Opaque pointer to an input stack */
+typedef void* InputStack;
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
@@ -62,6 +73,15 @@ void CheckInputStack (void);
 /* Called from the scanner before closing an input file. Will check for any
 ** stuff on the input stack.
 */
+
+InputStack RetrieveInputStack (void);
+/* Retrieve the current input stack. This will also clear it. Used when
+** including a file. The current input stack is stored together with the old
+** input file and restored when the file is closed.
+ */
+
+void RestoreInputStack (InputStack S);
+/* Restore an old input stack that was retrieved by RetrieveInputStack(). */
 
 
 

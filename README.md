@@ -10,15 +10,15 @@ the [cc65 web site](https://cc65.github.io):
 | Company / People        | Machine / Environment               |
 |-------------------------|-------------------------------------|
 | Apple                   | Apple II                            |
-|                         | Apple IIe                           |
+|                         | Apple IIe enhanced                  |
 | Atari                   | Atari 400/800                       |
 |                         | Atari 2600                          |
 |                         | Atari 5200                          |
 |                         | Atari 7800                          |
 |                         | Atari XL                            |
 |                         | Lynx                                |
-| Oric                    | Atmos                               |
-|                         | Telestrat                           |
+| Tangerine               | Oric Atmos                          |
+| Eureka                  | Oric Telestrat                      |
 | Acorn                   | BBC series                          |
 | Commodore               | C128                                |
 |                         | C16                                 |

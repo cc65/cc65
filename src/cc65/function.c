@@ -646,11 +646,17 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Output the function exit code label */
     g_defcodelabel (F_GetRetLab (CurrentFunc));
 
-    /* Restore the register variables */
-    F_RestoreRegVars (CurrentFunc);
+    /* Restore the register variables (not necessary for the main function in
+    ** cc65 mode)
+    */
+    int CleanupOnExit = (IS_Get (&Standard) != STD_CC65) ||
+                        !F_IsMainFunc (CurrentFunc);
+    if (CleanupOnExit) {
+        F_RestoreRegVars (CurrentFunc);
+    }
 
     /* Generate the exit code */
-    g_leave ();
+    g_leave (CleanupOnExit);
 
     /* Emit references to imports/exports */
     EmitExternals ();

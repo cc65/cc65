@@ -889,6 +889,7 @@ static void ParseO65 (void)
         CfgOptionalAssign ();
 
         /* Check which attribute was given */
+        CfgSymbol* Sym;
         switch (AttrTok) {
 
             case CFGTOK_EXPORT:
@@ -896,8 +897,11 @@ static void ParseO65 (void)
                 AttrFlags |= atExport;
                 /* We expect an identifier */
                 CfgAssureIdent ();
-                /* Remember it as an export for later */
-                NewCfgSymbol (CfgSymO65Export, GetStrBufId (&CfgSVal));
+                /* Remember it as an export for later. We do not support o65
+                 * output for the 65816, so the address size is always 16 bit.
+                 */
+                Sym = NewCfgSymbol (CfgSymO65Export, GetStrBufId (&CfgSVal));
+                Sym->AddrSize = ADDR_SIZE_ABS;
                 /* Eat the identifier token */
                 CfgNextTok ();
                 break;
@@ -907,8 +911,11 @@ static void ParseO65 (void)
                 AttrFlags |= atImport;
                 /* We expect an identifier */
                 CfgAssureIdent ();
-                /* Remember it as an import for later */
-                NewCfgSymbol (CfgSymO65Import, GetStrBufId (&CfgSVal));
+                /* Remember it as an import for later. We do not support o65
+                 * output for the 65816, so the address size is always 16 bit.
+                 */
+                Sym = NewCfgSymbol (CfgSymO65Import, GetStrBufId (&CfgSVal));
+                Sym->AddrSize = ADDR_SIZE_ABS;
                 /* Eat the identifier token */
                 CfgNextTok ();
                 break;

@@ -94,7 +94,7 @@ extern void atr5200std_joy[];        /* referred to by joy_static_stddrv[] */
 #define _bordercolor(color) 0
 
 /* wait for start of next frame */
-extern void waitvsync (void);
+void waitvsync (void);
 
 /* end of atari5200.h */
 #endif

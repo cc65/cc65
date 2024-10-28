@@ -66,3 +66,9 @@
 .global         _clock_settime
 .global         _localtime
 .global         _mktime
+
+
+;------------------------------------------------------------------------------
+; Constants
+
+CLOCK_REALTIME = 0

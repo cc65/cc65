@@ -808,6 +808,15 @@ static int CmpExpName (const void* K1, const void* K2)
 
 
 
+static int CmpExpValue (const void* K1, const void* K2)
+/* Compare function for qsort */
+{
+    long Diff = GetExportVal (*(Export**)K1) - GetExportVal (*(Export**)K2);
+    return Diff < 0? -1 : Diff > 0? 1 : 0;
+}
+
+
+
 static void CreateExportPool (void)
 /* Create an array with pointer to all exports */
 {
@@ -880,19 +889,25 @@ static char GetAddrSizeCode (unsigned char AddrSize)
 
 
 
-void PrintExportMapByName (FILE* F)
-/* Print an export map, sorted by symbol name, to the given file */
+static void PrintExportMap (Export** Pool, unsigned Count, FILE* F)
+/* Print an export map to the given file */
 {
     unsigned I;
-    unsigned Count;
 
     /* Print all exports */
-    Count = 0;
-    for (I = 0; I < ExpCount; ++I) {
-        const Export* E = ExpPool [I];
+    unsigned Col = 0;
+    for (I = 0; I < Count; ++I) {
+        const Export* E = Pool [I];
 
-        /* Print unreferenced symbols only if explictly requested */
-        if (VerboseMap || E->ImpCount > 0 || SYM_IS_CONDES (E->Type)) {
+        /* Print unreferenced symbols only if explictly requested. If Expr is
+        ** NULL, the export is undefined. This happens for imports that don't
+        ** have a matching export, but if we have one of those, we don't come
+        ** here. It does also happen for imports that where satisfied from
+        ** elsewhere, like o65 imports defined in the linker config.
+        ** So ignore exports here that have an invalid Expr.
+        */
+        if (E->Expr != 0 &&
+            (VerboseMap || E->ImpCount > 0 || SYM_IS_CONDES (E->Type))) {
             fprintf (F,
                      "%-25s %06lX %c%c%c%c   ",
                      GetString (E->Name),
@@ -901,8 +916,8 @@ void PrintExportMapByName (FILE* F)
                      SYM_IS_LABEL (E->Type)? 'L' : 'E',
                      GetAddrSizeCode ((unsigned char) E->AddrSize),
                      SYM_IS_CONDES (E->Type)? 'I' : ' ');
-            if (++Count == 2) {
-                Count = 0;
+            if (++Col == 2) {
+                Col = 0;
                 fprintf (F, "\n");
             }
         }
@@ -912,13 +927,10 @@ void PrintExportMapByName (FILE* F)
 
 
 
-static int CmpExpValue (const void* I1, const void* I2)
-/* Compare function for qsort */
+void PrintExportMapByName (FILE* F)
+/* Print an export map, sorted by symbol name, to the given file */
 {
-    long V1 = GetExportVal (ExpPool [*(unsigned *)I1]);
-    long V2 = GetExportVal (ExpPool [*(unsigned *)I2]);
-
-    return V1 < V2 ? -1 : V1 == V2 ? 0 : 1;
+    PrintExportMap (ExpPool, ExpCount, F);
 }
 
 
@@ -926,43 +938,16 @@ static int CmpExpValue (const void* I1, const void* I2)
 void PrintExportMapByValue (FILE* F)
 /* Print an export map, sorted by symbol value, to the given file */
 {
-    unsigned I;
-    unsigned Count;
-    unsigned *ExpValXlat;
+    /* Create a new pool that is sorted by value */
+    Export** Pool = xmalloc (ExpCount * sizeof (Export*));
+    memcpy (Pool, ExpPool, ExpCount * sizeof (Export*));
+    qsort (Pool, ExpCount, sizeof (Export*), CmpExpValue);
 
-    /* Create a translation table where the symbols are sorted by value. */
-    ExpValXlat = xmalloc (ExpCount * sizeof (unsigned));
-    for (I = 0; I < ExpCount; ++I) {
-        /* Initialize table with current sort order.  */
-        ExpValXlat [I] = I;
-    }
+    /* Print the exports */
+    PrintExportMap (Pool, ExpCount, F);
 
-    /* Sort them by value */
-    qsort (ExpValXlat, ExpCount, sizeof (unsigned), CmpExpValue);
-
-    /* Print all exports */
-    Count = 0;
-    for (I = 0; I < ExpCount; ++I) {
-        const Export* E = ExpPool [ExpValXlat [I]];
-
-        /* Print unreferenced symbols only if explictly requested */
-        if (VerboseMap || E->ImpCount > 0 || SYM_IS_CONDES (E->Type)) {
-            fprintf (F,
-                     "%-25s %06lX %c%c%c%c   ",
-                     GetString (E->Name),
-                     GetExportVal (E),
-                     E->ImpCount? 'R' : ' ',
-                     SYM_IS_LABEL (E->Type)? 'L' : 'E',
-                     GetAddrSizeCode ((unsigned char) E->AddrSize),
-                     SYM_IS_CONDES (E->Type)? 'I' : ' ');
-            if (++Count == 2) {
-                Count = 0;
-                fprintf (F, "\n");
-            }
-        }
-    }
-    fprintf (F, "\n");
-    xfree (ExpValXlat);
+    /* Free the allocated buffer */
+    xfree (Pool);
 }
 
 

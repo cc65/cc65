@@ -1,15 +1,15 @@
 <!doctype linuxdoc system>
 
 <article>
-<title>Oric Atmos-specific information for cc65
+<title>Tangerine Oric Atmos-specific information for cc65
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
-<url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
+<url url="mailto:polluks@sdf.org" name="Stefan A. Haubenthal">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
 
 <abstract>
-An overview over the Atmos runtime system as it is implemented for the cc65 C
-compiler.
+An overview over the Oric Atmos runtime system as it is implemented for the cc65
+C compiler. This target is not Oric-1 compatible.
 </abstract>
 
 <!-- Table of contents -->

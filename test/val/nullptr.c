@@ -28,6 +28,8 @@ struct S {
         } \
     } while(0);
 
+void func() { }
+
 int main()
 {
     int a;
@@ -60,7 +62,7 @@ int main()
     TEST_NON_NULL(((struct S*)&a)->a)
 
     /* Non-null pointer obtained with cast and -> */
-    TEST_NON_NULL(((struct S*)&main)->a)
+    TEST_NON_NULL(((struct S*)&func)->a)
 
     if (failures != 0)
     {

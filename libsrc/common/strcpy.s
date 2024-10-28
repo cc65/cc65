@@ -25,6 +25,9 @@ L1:     lda     (ptr1),y
         inc     ptr2+1
         bne     L1
 
-L9:     lda     ptr2            ; X still contains high byte
-        rts
+L9:     lda     ptr2            ; X still contains dest's original high byte
 
+        ; On exit, we want AX to be dest (as this is what strcpy returns).
+        ; We also want (ptr2),y to still point to dest's terminator, as this
+        ; is used by stpcpy().
+        rts

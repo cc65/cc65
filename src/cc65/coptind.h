@@ -50,7 +50,9 @@
 
 
 unsigned OptUnusedLoads (CodeSeg* S);
-/* Remove loads of registers where the value loaded is not used later. */
+/* Remove loads of or operations with registers where the value loaded or
+** produced is not used later.
+*/
 
 unsigned OptUnusedStores (CodeSeg* S);
 /* Remove stores into zero page registers that aren't used later */
@@ -90,6 +92,9 @@ unsigned OptPushPop1 (CodeSeg* S);
 
 unsigned OptPushPop2 (CodeSeg* S);
 /* Remove a PHP/PLP sequence were no processor flags changed inside */
+
+unsigned OptPushPop3 (CodeSeg* S);
+/* Remove a pha/pla sequence where the contents of A are known */
 
 unsigned OptPrecalc (CodeSeg* S);
 /* Replace immediate operations with the accu where the current contents are

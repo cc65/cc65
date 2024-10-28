@@ -9,8 +9,7 @@
         .include        "pet.inc"
 
 _waitvsync:
-@l1:
-        lda     VIA_PB
-        and     #%00100000
-        bne     @l1
+        lda     #%00100000
+:       and     VIA_PB
+        bne     :-
         rts

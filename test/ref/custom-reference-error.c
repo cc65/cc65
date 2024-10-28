@@ -22,6 +22,5 @@ return_t main(int argc, char* argv[])
     n = 0;                /* produce an error */
     /* produce a warning */
 }
-
-int arr[main(0, 0)]; /* produce an error */
 int b = 0;
+int arr[b]; /* produce an error */

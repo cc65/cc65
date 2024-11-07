@@ -326,8 +326,14 @@ void LimitExprValue (ExprDesc* Expr, int WarnOverflow)
             Expr->IVal = (uint8_t)Expr->IVal;
             break;
 
+        /* FIXME: float */
+        case T_FLOAT:
+        case T_DOUBLE:
+            Expr->V.FVal.V = (double)Expr->V.FVal.V;
+            break;
+
         default:
-            Internal ("hie_internal: constant result type %s\n", GetFullTypeName (Expr->Type));
+            Internal ("hie_internal: constant result type '%s' not implemented.\n", GetFullTypeName (Expr->Type));
     }
 }
 
@@ -1949,18 +1955,21 @@ static void UnaryOp (ExprDesc* Expr)
 
     } else {
         unsigned Flags;
-
+#if 0
         /* If not constant, we can only handle integer types */
         if (!IsClassInt (Expr->Type)) {
             Error ("Non-constant argument must have integer type");
             ED_MakeConstAbsInt (Expr, 1);
         }
-
+#endif
         /* Value is not constant */
         LoadExpr (CF_NONE, Expr);
 
         /* Adjust the type of the expression */
-        Expr->Type = IntPromotion (Expr->Type);
+        /* FIXME: float */
+        if (!IsClassFloat (Expr->Type)) {
+            Expr->Type = IntPromotion (Expr->Type);
+        }
         TypeConversion (Expr, Expr->Type);
 
         /* Get code generation flags */
@@ -1999,6 +2008,7 @@ void hie10 (ExprDesc* Expr)
         case TOK_PLUS:
         case TOK_MINUS:
         case TOK_COMP:
+            /* FIXME: whats with floats? */
             UnaryOp (Expr);
             break;
 
@@ -2142,7 +2152,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
     unsigned ltype, type;
     int lconst;                         /* Left operand is a constant */
     int rconst;                         /* Right operand is a constant */
-
+    int floatop = 0;
 
     ExprWithCheck (hienext, Expr);
 
@@ -2156,16 +2166,34 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
         /* Tell the caller that we handled it's ops */
         *UsedGen = 1;
 
+        /* Remember the operator token, then skip it */
+        Tok = CurTok.Tok;
+        NextToken ();
+
+        switch (Tok) {
+            case TOK_STAR:
+            case TOK_DIV:
+                floatop = 1;
+                break;
+            default:
+                break;
+        }
+
         /* All operators that call this function expect an int on the lhs */
-        if (!IsClassInt (Expr->Type)) {
-            Error ("Integer expression expected");
+        if (!IsClassInt (Expr->Type) &&
+            /* FIXME: float */
+            !(floatop && IsClassFloat (Expr->Type))
+        ) {
+            Error ("LHS Integer expression expected (hie_internal)");
             /* To avoid further errors, make Expr a valid int expression */
             ED_MakeConstAbsInt (Expr, 1);
         }
 
+#if 0
         /* Remember the operator token, then skip it */
         Tok = CurTok.Tok;
         NextToken ();
+#endif
 
         /* Get the lhs on stack */
         GetCodePos (&Mark1);
@@ -2178,7 +2206,11 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             ** it's a constant, since we will exchange both operands.
             */
             if ((Gen->Flags & GEN_COMM) == 0) {
-                g_push (ltype | CF_CONST, Expr->IVal);
+                if (ltype == CF_FLOAT) {
+                    g_push (ltype | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal));
+                } else {
+                    g_push (ltype | CF_CONST, Expr->IVal);
+                }
             }
         } else {
             /* Value not constant */
@@ -2198,8 +2230,11 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
         }
 
         /* Check the type of the rhs */
-        if (!IsClassInt (Expr2.Type)) {
-            Error ("Integer expression expected");
+        if (!IsClassInt (Expr2.Type) &&
+            /* FIXME: float */
+            !(floatop && IsClassFloat (Expr2.Type))
+            ) {
+            Error ("RHS Integer expression expected (hie_internal)");
         }
 
         /* Check for const operands */
@@ -2215,52 +2250,96 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             /* Get the type of the result */
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
-            /* Handle the op differently for signed and unsigned types */
-            switch (Tok) {
-                case TOK_OR:
-                    Expr->IVal = (Val1 | Val2);
-                    break;
-                case TOK_XOR:
-                    Expr->IVal = (Val1 ^ Val2);
-                    break;
-                case TOK_AND:
-                    Expr->IVal = (Val1 & Val2);
-                    break;
-                case TOK_STAR:
-                    Expr->IVal = (Val1 * Val2);
-                    break;
-                case TOK_DIV:
-                    if (Val2 == 0) {
-                        if (!ED_IsUneval (Expr)) {
-                            Warning ("Division by zero");
+            /* FIXME: float */
+            /* FIXME: right now this works only when both rhs and lhs are float,
+                      this must be extended to handle mixed operations */
+#if 0
+            if ((IsClassFloat (Expr->Type) == CF_FLOAT) &&
+                (IsClassFloat (Expr2.Type) == CF_FLOAT)) {
+#endif
+            if ((ltype == CF_FLOAT) ||
+                (Expr2.Type == type_float)) {
+                /* Evaluate the result for float operands */
+                Double Val1;
+                Double Val2;
+
+                if (ltype == CF_FLOAT) {
+                    Val1 = Expr->V.FVal;
+                } else {
+                    Val1 = FP_D_FromInt(Expr->IVal);
+                }
+                if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
+                    Val2 = Expr2.V.FVal;
+                } else {
+                    Val2 = FP_D_FromInt(Expr2.IVal);
+                }
+
+                switch (Tok) {
+                    case TOK_DIV:
+#if 0 /* TODO */
+                        if (Val2 == 0.0f) {
+                            Error ("Division by zero");
+                            Expr->V.FVal = FP_D_FromInt(0);
+                        } else
+#endif
+                        {
+                            Expr->V.FVal = FP_D_Div(Val1, Val2);
                         }
-                        Expr->IVal = 0xFFFFFFFF;
-                    } else {
-                        /* Handle signed and unsigned operands differently */
-                        if (IsSignSigned (Expr->Type)) {
-                            Expr->IVal = ((long)Val1 / (long)Val2);
+                        break;
+                    case TOK_STAR:
+                        Expr->V.FVal = FP_D_Mul(Val1, Val2);
+                        break;
+                    default:
+                        Internal ("hie_internal: got token 0x%X\n", Tok);
+                }
+            } else {
+                /* Handle the op differently for signed and unsigned types */
+                switch (Tok) {
+                    case TOK_OR:
+                        Expr->IVal = (Val1 | Val2);
+                        break;
+                    case TOK_XOR:
+                        Expr->IVal = (Val1 ^ Val2);
+                        break;
+                    case TOK_AND:
+                        Expr->IVal = (Val1 & Val2);
+                        break;
+                    case TOK_STAR:
+                        Expr->IVal = (Val1 * Val2);
+                        break;
+                    case TOK_DIV:
+                        if (Val2 == 0) {
+                            if (!ED_IsUneval (Expr)) {
+                                Warning ("Division by zero");
+                            }
+                            Expr->IVal = 0xFFFFFFFF;
                         } else {
-                            Expr->IVal = (Val1 / Val2);
+                            /* Handle signed and unsigned operands differently */
+                            if (IsSignSigned (Expr->Type)) {
+                                Expr->IVal = ((long)Val1 / (long)Val2);
+                            } else {
+                                Expr->IVal = (Val1 / Val2);
+                            }
                         }
-                    }
-                    break;
-                case TOK_MOD:
-                    if (Val2 == 0) {
-                        if (!ED_IsUneval (Expr)) {
-                            Warning ("Modulo operation with zero");
-                        }
-                        Expr->IVal = 0;
-                    } else {
-                        /* Handle signed and unsigned operands differently */
-                        if (IsSignSigned (Expr->Type)) {
-                            Expr->IVal = ((long)Val1 % (long)Val2);
+                        break;
+                    case TOK_MOD:
+                        if (Val2 == 0) {
+                            if (!ED_IsUneval (Expr)) {
+                                Warning ("Modulo operation with zero");
+                            }
+                            Expr->IVal = 0;
                         } else {
-                            Expr->IVal = (Val1 % Val2);
+                            /* Handle signed and unsigned operands differently */
+                            if (IsSignSigned (Expr->Type)) {
+                                Expr->IVal = ((long)Val1 % (long)Val2);
+                            } else {
+                                Expr->IVal = (Val1 % Val2);
+                            }
                         }
-                    }
-                    break;
-                default:
-                    Internal ("hie_internal: got token 0x%X\n", Tok);
+                        break;
+                    default:
+                        Internal ("hie_internal: got token 0x%X\n", Tok);
+                }
             }
 
             /* Limit the calculated value to the range of its type */
@@ -2296,7 +2375,11 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Generate code */
-            Gen->Func (type, Expr->IVal);
+            if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
+                Gen->Func (type, FP_D_As32bitRaw(Expr->V.FVal));
+            } else {
+                Gen->Func (type, Expr->IVal);
+            }
 
             /* We have an rvalue in the primary now */
             ED_FinalizeRValLoad (Expr);
@@ -2315,15 +2398,20 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                     rtype = CF_CHAR | CF_UNSIGNED;
                 }
                 /* Second value is constant - check for div */
-                type |= CF_CONST;
-                rtype |= CF_CONST;
-                if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
-                    if (Tok == TOK_DIV) {
-                        Warning ("Division by zero");
-                    } else if (Tok == TOK_MOD) {
-                        Warning ("Modulo operation with zero");
+                if (rtype == CF_FLOAT) {
+                    /* FIXME add respective checks for float */
+                } else {
+                    if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
+                        if (Tok == TOK_DIV) {
+                            Warning ("Division by zero");
+                        } else if (Tok == TOK_MOD) {
+                            Warning ("Modulo operation with zero");
+                        }
                     }
                 }
+                type |= CF_CONST;
+                rtype |= CF_CONST;
+
                 if ((Gen->Flags & GEN_NOPUSH) != 0) {
                     RemoveCode (&Mark2);
                     ltype |= CF_PRIMARY;    /* Value is in register */
@@ -2332,10 +2420,51 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 
             /* Determine the type of the operation result. */
             type |= g_typeadjust (ltype, rtype);
+
             Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
 
             /* Generate code */
-            Gen->Func (type, Expr2.IVal);
+            if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
+                /* right side is float */
+                if (((ltype & CF_TYPEMASK) != CF_FLOAT) && (!(rtype & CF_CONST))) {
+                    /* left side is not float, right side is non-constant float */
+#if 1
+                    RemoveCode (&Mark2);
+                    LoadExpr(ltype, Expr);
+                    /* Adjust lhs primary if needed  */
+                    g_regfloat(ltype);
+                    g_push(type, 0);
+                    LoadExpr(CF_FLOAT, &Expr2);
+                    /* left side is not float, right side is float */
+                    Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+#else
+                    if (lconst) {
+                        /* lhs is constant */
+                        RemoveCode (&Mark2);
+                        LoadExpr(ltype, Expr);
+                        /* Adjust lhs primary if needed  */
+                         type = typeadjust (Expr, &Expr2, 1);
+                        /* left side is not float, right side is float */
+                        Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+                    } else {
+                        RemoveCode (&Mark2);
+                        LoadExpr(ltype, Expr);
+                        /* Adjust lhs primary if needed  */
+                        g_regfloat(ltype);
+                        g_push(type, 0);
+                        LoadExpr(CF_FLOAT, &Expr2);
+                        /* left side is not float, right side is float */
+                        Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+                    }
+#endif
+                } else {
+                    /* left side is float, right side is float */
+                    Gen->Func (type, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
+            } else {
+                /* right side is not float */
+                Gen->Func (type, Expr2.IVal);
+            }
 
             /* We have an rvalue in the primary now */
             ED_FinalizeRValLoad (Expr);
@@ -2360,6 +2489,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     unsigned ltype;
     int rconst;                         /* Operand is a constant */
 
+    int flags = 0;
 
     ExprWithCheck (hienext, Expr);
 
@@ -2387,7 +2517,11 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (ED_IsConstAbs (Expr)) {
             /* Numeric constant value */
             GetCodePos (&Mark2);
-            g_push (ltype | CF_CONST, Expr->IVal);
+            if (ltype == CF_FLOAT) {
+                g_push_float (ltype | CF_CONST, Expr->V.FVal.V);
+            } else {
+                g_push (ltype | CF_CONST, Expr->IVal);
+            }
         } else {
             /* Value not numeric constant */
             LoadExpr (CF_NONE, Expr);
@@ -2397,6 +2531,40 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* Get the right hand side */
         MarkedExprWithCheck (hienext, &Expr2);
+
+        if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
+            if (ltype != CF_FLOAT) {
+                /* left hand is NOT a float (but a constant), right IS a float (but not necessarily constant) */
+                if (ED_IsConstAbs (&Expr2)) {
+                    /* for rhs const */
+                    RemoveCode (&Mark2);             /* Remove pushed value from stack */
+                    /* Load lhs into the primary */
+                    LoadExpr (CF_NONE, Expr);
+                    // convert lhs to float
+                    g_regfloat (CF_FLOAT);
+                    g_push (CF_FLOAT, 0);             /* --> stack */
+                    /* Load rhs into the primary */
+                    LoadExpr (CF_FLOAT, &Expr2);
+                    ltype = CF_FLOAT;
+                } else {
+                    /* for rhs variable */
+                    RemoveCode (&Mark2);             /* Remove pushed value from stack */
+                    /* Load lhs into the primary */
+                    LoadExpr (CF_NONE, Expr);
+                    /* Adjust lhs primary if needed  */
+                    flags = typeadjust (Expr, &Expr2, 0);
+                    /* convert lhs to float */
+                    g_regfloat (flags);
+                    g_push (CF_FLOAT, 0);             /* --> stack */
+                    /* Load rhs into the primary */
+                    LoadExpr (CF_NONE, &Expr2);
+                    /* Adjust rhs primary if needed  */
+                    flags = typeadjust (Expr, &Expr2, 0);
+
+                    ltype = CF_FLOAT;
+                }
+            }
+        }
 
         /* If rhs is a function, convert it to the address of the function */
         if (IsTypeFunc (Expr2.Type)) {
@@ -2433,7 +2601,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
         /* Make sure, the types are compatible */
         if (IsClassInt (Expr->Type)) {
-            if (!IsClassInt (Expr2.Type) && !ED_IsNullPtr (Expr)) {
+            if (!IsClassInt (Expr2.Type) && !IsClassFloat (Expr2.Type) && !ED_IsNullPtr (Expr)) {
                 if (IsClassPtr (Expr2.Type)) {
                     TypeCompatibilityDiagnostic (Expr->Type, PtrConversion (Expr2.Type), 0,
                         "Comparing integer '%s' with pointer '%s'");
@@ -2533,36 +2701,82 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             /* Both operands are numeric constant, remove the generated code */
             RemoveCode (&Mark1);
 
-            /* Determine if this is a signed or unsigned compare */
-            if (IsClassInt (Expr->Type) && IsSignSigned (Expr->Type) &&
-                IsClassInt (Expr2.Type) && IsSignSigned (Expr2.Type)) {
-
-                /* Evaluate the result for signed operands */
-                signed long Val1 = Expr->IVal;
-                signed long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
-                    case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
-                    case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
-                    case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
-                    case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
-                    case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
-                    default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+             if ((CG_TypeOf (Expr->Type) == CF_FLOAT) || (CG_TypeOf (Expr2.Type) == CF_FLOAT)) {
+                /* at least one of the operands is a float */
+                if ((CG_TypeOf (Expr->Type) == CF_FLOAT) &&
+                    (CG_TypeOf (Expr2.Type) == CF_FLOAT)) {
+                    /* compare float vs float */
+                    float Val1 = (float)FP_D_ToFloat(Expr->V.FVal);
+                    float Val2 = (float)FP_D_ToFloat(Expr2.V.FVal);
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
+                } else if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
+                    /* FIXME: compare non float vs float */
+                    signed long Val1 = Expr->IVal;
+                    float Val2 = (float)FP_D_ToFloat(Expr2.V.FVal);
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
+                } else {
+                    /* FIXME: compare float vs non float */
+                    float Val1 = (float)FP_D_ToFloat(Expr->V.FVal);
+                    signed long Val2 = Expr2.IVal;
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
                 }
-
             } else {
 
-                /* Evaluate the result for unsigned operands */
-                unsigned long Val1 = Expr->IVal;
-                unsigned long Val2 = Expr2.IVal;
-                switch (Tok) {
-                    case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
-                    case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
-                    case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
-                    case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
-                    case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
-                    case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
-                    default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                /* Determine if this is a signed or unsigned compare */
+                if (IsClassInt (Expr->Type) && IsSignSigned (Expr->Type) &&
+                    IsClassInt (Expr2.Type) && IsSignSigned (Expr2.Type)) {
+
+                    /* Evaluate the result for signed operands */
+                    signed long Val1 = Expr->IVal;
+                    signed long Val2 = Expr2.IVal;
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
+
+                } else {
+
+                    /* Evaluate the result for unsigned operands */
+                    unsigned long Val1 = Expr->IVal;
+                    unsigned long Val2 = Expr2.IVal;
+                    switch (Tok) {
+                        case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                        case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                        case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                        case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                        case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                        case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                        default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                    }
                 }
             }
 
@@ -2575,6 +2789,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             WarnConstCompareResult (Expr);
 
         } else {
+            /* at least one side of the expression is not constant */
 
             /* Determine the signedness of the operands */
             int LeftSigned  = IsSignSigned (Expr->Type);
@@ -2695,8 +2910,17 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 }
 
             } else {
+                /* generic case */
                 unsigned rtype = CG_TypeOf (Expr2.Type) | (flags & CF_CONST);
-                flags |= g_typeadjust (ltype, rtype);
+
+                if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
+                    /* left is float */
+                    flags |= CF_FLOAT;
+                } else if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
+                    /* right is float */
+                } else {
+                    flags |= g_typeadjust (ltype, rtype);
+                }
             }
 
             /* If the comparison is made as unsigned types and the right is a
@@ -2705,55 +2929,68 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             */
             if (!CmpSigned && rconst) {
 
-                switch (Tok) {
+                if (Expr2.Type == type_float) {
+                    /* TODO */
+                } else {
 
-                    case TOK_LT:
-                        if (Expr2.IVal == 1) {
-                            /* An unsigned compare to one means that the value
-                            ** must be zero.
-                            */
-                            GenFunc = g_eq;
-                            Expr2.IVal = 0;
-                        }
-                        break;
+                    switch (Tok) {
 
-                    case TOK_LE:
-                        if (Expr2.IVal == 0) {
-                            /* An unsigned compare to zero means that the value
-                            ** must be zero.
-                            */
-                            GenFunc = g_eq;
-                        }
-                        break;
+                        case TOK_LT:
+                            if (Expr2.IVal == 1) {
+                                /* An unsigned compare to one means that the value
+                                ** must be zero.
+                                */
+                                GenFunc = g_eq;
+                                Expr2.IVal = 0;
+                            }
+                            break;
 
-                    case TOK_GE:
-                        if (Expr2.IVal == 1) {
-                            /* An unsigned compare to one means that the value
-                            ** must not be zero.
-                            */
-                            GenFunc = g_ne;
-                            Expr2.IVal = 0;
-                        }
-                        break;
+                        case TOK_LE:
+                            if (Expr2.IVal == 0) {
+                                /* An unsigned compare to zero means that the value
+                                ** must be zero.
+                                */
+                                GenFunc = g_eq;
+                            }
+                            break;
 
-                    case TOK_GT:
-                        if (Expr2.IVal == 0) {
-                            /* An unsigned compare to zero means that the value
-                            ** must not be zero.
-                            */
-                            GenFunc = g_ne;
-                        }
-                        break;
+                        case TOK_GE:
+                            if (Expr2.IVal == 1) {
+                                /* An unsigned compare to one means that the value
+                                ** must not be zero.
+                                */
+                                GenFunc = g_ne;
+                                Expr2.IVal = 0;
+                            }
+                            break;
 
-                    default:
-                        break;
+                        case TOK_GT:
+                            if (Expr2.IVal == 0) {
+                                /* An unsigned compare to zero means that the value
+                                ** must not be zero.
+                                */
+                                GenFunc = g_ne;
+                            }
+                            break;
 
+                        default:
+                            break;
+
+                    }
                 }
 
             }
 
-            /* Generate code */
-            GenFunc (flags, Expr2.IVal);
+            if (IsClassFloat(Expr2.Type)) {
+                /* Generate code */
+                GenFunc (flags, FP_D_As32bitRaw(Expr2.V.FVal));
+            } else if (IsClassFloat(Expr->Type)) {
+                /* Generate code */
+                GenFunc (flags, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal)));
+            } else {
+                /* Generate code */
+                GenFunc (flags, Expr2.IVal);
+            }
 
             /* The result is an rvalue in the primary */
             ED_FinalizeRValLoad (Expr);
@@ -2852,6 +3089,18 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags = CF_INT;
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float addition (const + const) */
+                /* Integer addition */
+                flags = CF_FLOAT;
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* FIXME: float addition (const + const int) */
+                /* Integer addition */
+                flags = CF_FLOAT;
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float addition (const int + const) */
+                /* Integer addition */
+                flags = CF_FLOAT;
             } else {
                 /* OOPS */
                 AddDone = -1;
@@ -2861,24 +3110,45 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 
             if (!AddDone) {
                 /* Do constant calculation if we can */
-                if (ED_IsAbs (&Expr2) &&
-                    (ED_IsAbs (Expr) || lscale == 1)) {
-                    if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                        Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
-                    }
-                    Expr->IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                    /* float + float */
+                    /* FIXME: float - this is probably completely wrong */
+                    Expr->V.FVal.V = Expr->V.FVal.V + Expr2.V.FVal.V;
+                    Expr->Type = type_float;
                     AddDone = 1;
-                } else if (ED_IsAbs (Expr) &&
-                    (ED_IsAbs (&Expr2) || rscale == 1)) {
-                    if (IsClassInt (lhst) && IsClassInt (rhst)) {
-                        Expr2.Type = ArithmeticConvert (Expr2.Type, Expr->Type);
-                    }
-                    Expr2.IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
-                    /* Adjust the flags */
-                    Expr2.Flags |= Expr->Flags & ~E_MASK_KEEP_SUBEXPR;
-                    /* Get the symbol and the name */
-                    *Expr = Expr2;
+                } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+                    /* float + int */
+                    /* FIXME: float - this is probably completely wrong */
+                    Expr->V.FVal.V = Expr->V.FVal.V + Expr2.IVal;
+                    Expr->Type = type_float;
                     AddDone = 1;
+                } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+                    /* int + float */
+                    /* FIXME: float - this is probably completely wrong */
+                    Expr->V.FVal.V = Expr->IVal + Expr2.V.FVal.V;
+                    Expr->Type = type_float;
+                    AddDone = 1;
+                } else {
+                    /* integer + integer */
+                    if (ED_IsAbs (&Expr2) &&
+                        (ED_IsAbs (Expr) || lscale == 1)) {
+                        if (IsClassInt (lhst) && IsClassInt (rhst)) {
+                            Expr->Type = ArithmeticConvert (Expr->Type, Expr2.Type);
+                        }
+                        Expr->IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                        AddDone = 1;
+                    } else if (ED_IsAbs (Expr) &&
+                        (ED_IsAbs (&Expr2) || rscale == 1)) {
+                        if (IsClassInt (lhst) && IsClassInt (rhst)) {
+                            Expr2.Type = ArithmeticConvert (Expr2.Type, Expr->Type);
+                        }
+                        Expr2.IVal = Expr->IVal * lscale + Expr2.IVal * rscale;
+                        /* Adjust the flags */
+                        Expr2.Flags |= Expr->Flags & ~E_MASK_KEEP_SUBEXPR;
+                        /* Get the symbol and the name */
+                        *Expr = Expr2;
+                        AddDone = 1;
+                    }
                 }
             }
 
@@ -2979,6 +3249,17 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags |= typeadjust (Expr, &Expr2, 1);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* Float const + float var addition */
+                flags |= typeadjust (Expr, &Expr2, 1);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* Float const + int var addition */
+                flags |= typeadjust (Expr, &Expr2, 1);
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: int const + Float var addition */
+                RemoveCode (&Mark);
+                LoadExpr (CF_FLOAT, &Expr2);
+                flags |= CF_FLOAT;
             } else {
                 /* OOPS */
                 AddDone = -1;
@@ -2986,12 +3267,14 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
 
             /* Generate the code for the add */
             if (!AddDone) {
-                if (ED_IsAbs (Expr) &&
-                    Expr->IVal >= 0 &&
-                    Expr->IVal * lscale < 256) {
-                    /* Numeric constant */
-                    g_inc (flags, Expr->IVal * lscale);
-                    AddDone = 1;
+                if (!IsClassFloat (lhst) && !IsClassFloat (rhst)) {
+                    if (ED_IsAbs (Expr) &&
+                        Expr->IVal >= 0 &&
+                        Expr->IVal * lscale < 256) {
+                        /* Numeric constant */
+                        g_inc (flags, Expr->IVal * lscale);
+                        AddDone = 1;
+                    }
                 }
             }
 
@@ -3014,7 +3297,22 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                     }
                 } else if (ED_IsAbs (Expr)) {
                     /* Numeric constant */
-                    g_inc (flags, Expr->IVal * lscale);
+
+                    if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
+                        /* lhs = float */
+                        Double res = FP_D_Mul(Expr->V.FVal, FP_D_FromInt(lscale));
+                        g_inc (flags, FP_D_As32bitRaw(res));
+                    } else {
+                        /* lhs = int */
+                        if (CG_TypeOf (Expr2.Type) == CF_FLOAT) {
+                            /* lhs = int, rhs float */
+                            g_inc (flags, FP_D_As32bitRaw(FP_D_FromInt(Expr->IVal * lscale)));
+                            Expr->Type = Expr2.Type;    // HACK!
+                        } else {
+                            /* lhs = int, rhs int */
+                            g_inc (flags, Expr->IVal * lscale);
+                        }
+                    }
                 } else if (lscale == 1) {
                     if (ED_IsLocStack (Expr)) {
                         /* Constant address */
@@ -3073,13 +3371,38 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
                 flags = typeadjust (Expr, &Expr2, 1);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                /* Float addition (float variable + float constant) */
+                /*flags = typeadjust (Expr, &Expr2, 1);*/
+                flags |= CF_FLOAT;
+                Expr->Type = Expr2.Type;
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                /* Float addition (int variable + float constant) */
+                /* adjust lhs */
+                flags = typeadjust (Expr, &Expr2, 1);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                /* Float addition (float variable + int constant) */
+                flags |= CF_FLOAT;
             } else {
                 /* OOPS */
                 AddDone = -1;
             }
 
-            /* Generate code for the add */
-            g_inc (flags | CF_CONST, Expr2.IVal);
+            /* add rhs constant value */
+            if (flags & CF_FLOAT) {
+                /* FIXME: float - what to do here exactly? */
+                if (IsClassInt (rhst)) {
+                    g_inc (flags | CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal)));
+                } else {
+                    g_inc (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
+            } else {
+                /* Generate code for the add */
+                g_inc (flags | CF_CONST, Expr2.IVal);
+            }
 
         } else {
 
@@ -3119,6 +3442,32 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 Expr->Type = Expr2.Type;
             } else if (!DoArrayRef && IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer addition */
+                /* Load rhs into the primary */
+                LoadExpr (CF_NONE, &Expr2);
+                /* Adjust rhs primary if needed  */
+                flags = typeadjust (Expr, &Expr2, 0);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                /* Float addition */
+                /* flags = typeadjust (Expr, &Expr2, 0); */
+                flags |= CF_FLOAT;
+                /* Load rhs into the primary */
+                LoadExpr (CF_NONE, &Expr2);
+            } else if (!DoArrayRef && IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                /* Float addition (float + integer) */
+                /* Load rhs into the primary */
+                LoadExpr (CF_NONE, &Expr2);
+                /* Adjust rhs primary if needed  */
+                flags = typeadjust (Expr, &Expr2, 0);
+            } else if (!DoArrayRef && IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* FIXME: float - what to do here exactly? */
+                /* Float addition (integer + float) */
+                RemoveCode (&Mark);             /* Remove pushed value from stack */
+                /* Adjust lhs primary if needed  */
+                flags = typeadjust (Expr, &Expr2, 0);
+                /* convert lhs to float */
+                g_push (CF_FLOAT, 0);             /* --> stack */
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
                 /* Adjust rhs primary if needed  */
@@ -3340,23 +3689,49 @@ static void parsesub (ExprDesc* Expr)
                 /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
+            } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* Float subtraction. We'll adjust the types later */
+            } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* Float/Int subtraction. We'll adjust the types later */
+            } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* Int/Float subtraction. We'll adjust the types later */
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
             }
 
-            /* We can't make all subtraction expressions constant */
-            if (ED_IsConstAbs (&Expr2)) {
-                Expr->IVal -= Expr2.IVal * rscale;
-                /* No runtime code */
-                SubDone = 1;
-            } else if (rscale == 1 && Expr->Sym == Expr2.Sym) {
-                /* The result is the diff of the offsets */
-                Expr->IVal -= Expr2.IVal;
-                /* Get rid of unneeded bases and flags etc. */
-                ED_MakeConstAbs (Expr, Expr->IVal, Expr->Type);
-                /* No runtime code */
-                SubDone = 1;
+            if (!IsClassFloat (lhst) && !IsClassFloat (rhst)) {
+                /* We can't make all subtraction expressions constant */
+                if (ED_IsConstAbs (&Expr2)) {
+                    Expr->IVal -= Expr2.IVal * rscale;
+                    /* No runtime code */
+                    SubDone = 1;
+                } else if (rscale == 1 && Expr->Sym == Expr2.Sym) {
+                    /* The result is the diff of the offsets */
+                    Expr->IVal -= Expr2.IVal;
+                    /* Get rid of unneeded bases and flags etc. */
+                    ED_MakeConstAbs (Expr, Expr->IVal, Expr->Type);
+                    /* No runtime code */
+                    SubDone = 1;
+                }
+            } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
+                if (ED_IsConstAbs (&Expr2)) {
+                    Expr->V.FVal = FP_D_Sub(Expr->V.FVal, FP_D_FromInt(Expr2.IVal));
+                    /* No runtime code */
+                    SubDone = 1;
+                }
+            } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
+                if (ED_IsConstAbs (&Expr2)) {
+                    Expr->V.FVal = FP_D_Sub(FP_D_FromInt(Expr->IVal), Expr2.V.FVal);
+                    /* No runtime code */
+                    SubDone = 1;
+                }
+            } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                if (ED_IsConstAbs (&Expr2)) {
+                    Expr->V.FVal = FP_D_Sub(Expr->V.FVal, Expr2.V.FVal);
+                    /* No runtime code */
+                    SubDone = 1;
+                }
             }
 
             if (SubDone) {
@@ -3371,17 +3746,35 @@ static void parsesub (ExprDesc* Expr)
                 /* The result is always an rvalue */
                 ED_MarkExprAsRVal (Expr);
             } else {
+                /* NOTE: float always uses this codepath right now */
                 if (ED_IsConstAbs (&Expr2)) {
                     /* Remove pushed value from stack */
                     RemoveCode (&Mark2);
                     if (IsClassInt (lhst)) {
                         /* Adjust the types */
                         flags = typeadjust (Expr, &Expr2, 1);
+                        /* Do the subtraction */
+                        g_dec (flags | CF_CONST, Expr2.IVal * rscale);
                     }
-                    /* Do the subtraction */
-                    g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                    else if (IsClassFloat (lhst)) {
+                        /* Adjust the types */
+                        flags = typeadjust (Expr, &Expr2, 1);
+                        if (rscale != 1) {
+                            Internal("scale != 1 for float");
+                        }
+                        /* Do the subtraction */
+                        g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                    }
+                    else {
+                        /* Do the subtraction */
+                        g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                    }
                 } else {
                     if (IsClassInt (lhst)) {
+                        /* Adjust the types */
+                        flags = typeadjust (Expr, &Expr2, 0);
+                    }
+                    else if (IsClassFloat (lhst)) {
                         /* Adjust the types */
                         flags = typeadjust (Expr, &Expr2, 0);
                     }
@@ -3402,6 +3795,14 @@ static void parsesub (ExprDesc* Expr)
                 /* Pointer subtraction. We've got the scale factor and flags above */
             } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
                 /* Integer subtraction. We'll adjust the types later */
+            } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
+                /* Float subtraction. We'll adjust the types later */
+            } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
+                /* Float/Int subtraction. We'll adjust the types later */
+                flags = CF_FLOAT;
+            } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
+                /* Int/Float subtraction. We'll adjust the types later */
+                flags = CF_FLOAT;
             } else {
                 /* OOPS */
                 Error ("Invalid operands for binary operator '-'");
@@ -3409,18 +3810,47 @@ static void parsesub (ExprDesc* Expr)
             }
 
             if (ED_IsConstAbs (&Expr2)) {
+                /* rhs is constant */
                 /* Remove pushed value from stack */
                 RemoveCode (&Mark2);
                 if (IsClassInt (lhst)) {
+                    /* lhs is integer, rhs is constant */
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 1);
+                    /* Do the subtraction */
+                    if (IsClassFloat(rhst)) {
+                        g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                    } else {
+                        g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                    }
                 }
-                /* Do the subtraction */
-                g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                else if (IsClassFloat (lhst)) {
+                    /* lhs is float, rhs is constant */
+                    /* Do the subtraction */
+                    if (IsClassFloat(rhst)) {
+                        flags = typeadjust (&Expr2, Expr, 1);
+                        g_dec (flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                    } else {
+                        /* Adjust rhs type */
+                        LoadExpr(CF_FLOAT, Expr);
+                        if (rscale != 1) {
+                            Internal("scale != 1 for float");
+                        }
+                        g_dec (flags | CF_CONST, FP_D_As32bitRaw(FP_D_FromInt(Expr2.IVal * rscale)));
+                    }
+                }
+                else {
+                    /* Do the subtraction */
+                    g_dec (flags | CF_CONST, Expr2.IVal * rscale);
+                }
             } else {
                 if (IsClassInt (lhst)) {
                     /* Adjust the types */
                     flags = typeadjust (Expr, &Expr2, 0);
+                }
+                else if (IsClassFloat (lhst)) {
+                    /* Adjust the types */
+                    flags = typeadjust (Expr, &Expr2, 1);
                 }
                 /* Load rhs into the primary */
                 LoadExpr (CF_NONE, &Expr2);
@@ -3448,6 +3878,25 @@ static void parsesub (ExprDesc* Expr)
         } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
             /* Adjust operand types */
             flags = typeadjust (Expr, &Expr2, 0);
+        } else if (IsClassFloat (lhst) && IsClassFloat (rhst)) {
+            /* Float substraction */
+            /* FIXME: float - what to do here exactly? */
+            /* Adjust operand types */
+            /*flags = typeadjust (Expr, &Expr2, 0);*/
+            flags = CF_FLOAT;
+        } else if (IsClassFloat (lhst) && IsClassInt (rhst)) {
+            /* Float substraction */
+            /* FIXME: float - what to do here exactly? */
+            /* Adjust operand types */
+            flags = typeadjust (Expr, &Expr2, 0);
+        } else if (IsClassInt (lhst) && IsClassFloat (rhst)) {
+            /* Float substraction */
+            /* FIXME: float - what to do here exactly? */
+            /* Remove pushed value from stack */
+            RemoveCode (&Mark2);
+            flags = typeadjust (&Expr2, Expr, 0);
+            g_push (CF_FLOAT, 0);             /* --> stack */
+            LoadExpr (CF_FLOAT, &Expr2);   /* --> primary register */
         } else {
             /* OOPS */
             Error ("Invalid operands for binary operator '-'");
@@ -3460,8 +3909,12 @@ static void parsesub (ExprDesc* Expr)
         ED_FinalizeRValLoad (Expr);
     }
 
-    /* Result type is either a pointer or an integer */
-    Expr->Type = StdConversion (Expr->Type);
+    if (IsClassFloat (lhst) || IsClassFloat (rhst)) {
+        Expr->Type = type_float;
+    } else {
+        /* Result type is either a pointer or an integer */
+        Expr->Type = StdConversion (Expr->Type);
+    }
 
     /* Condition code not set */
     ED_MarkAsUntested (Expr);
@@ -4112,6 +4565,9 @@ static void hieQuest (ExprDesc* Expr)
         } else if (IsTypeVoid (Expr2.Type) && IsTypeVoid (Expr3.Type)) {
             /* Result type is void */
             ResultType = TypeDup (type_void);
+        } else if (IsTypeFloat (Expr2.Type) && IsTypeFloat (Expr3.Type)) {
+            /* Result type is float */
+            ResultType = TypeDup (type_float);
         } else {
             if (IsClassStruct (Expr2.Type) && IsClassStruct (Expr3.Type) &&
                 TypeCmp (Expr2.Type, Expr3.Type).C == TC_IDENTICAL) {

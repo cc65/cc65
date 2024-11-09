@@ -27,7 +27,7 @@
 #ifndef __SUZY_H
 #define __SUZY_H
 
-// JOYSTICK bit definitions
+/* JOYSTICK bit definitions */
 enum {
   JOYPAD_RIGHT   = 0x10,
   JOYPAD_LEFT    = 0x20,
@@ -39,14 +39,14 @@ enum {
   BUTTON_OUTER   = 0x01
 };
 
-// SWITCHES bit definitions
+/* SWITCHES bit definitions */
 enum {
     CART1_IO_INACTIVE = 0x04,
     CART0_IO_INACTIVE = 0x02,
     BUTTON_PAUSE      = 0x01
 };
 
-// SPRCTL0 bit definitions
+/* SPRCTL0 bit definitions */
 enum {
   BPP_4            = 0xC0,
   BPP_3            = 0x80,
@@ -64,7 +64,7 @@ enum {
   TYPE_BACKGROUND  = 0x00
 };
 
-// SPRCTL1 bit definitions
+/* SPRCTL1 bit definitions */
 enum {
   LITERAL  = 0x80,
   PACKED   = 0x00,
@@ -79,9 +79,10 @@ enum {
   DRAWLEFT = 0x01
 };
 
-// Sprite control block (SCB) definitions
+/* Sprite control block (SCB) definitions */
 
-typedef struct SCB_REHVST_PAL {             // SCB with all attributes
+/* SCB with all attributes */
+typedef struct SCB_REHVST_PAL {
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -96,7 +97,8 @@ typedef struct SCB_REHVST_PAL {             // SCB with all attributes
   unsigned char penpal[8];
 } SCB_REHVST_PAL;
 
-typedef struct SCB_REHVST {                  // SCB without pallette
+/* SCB without pallette */
+typedef struct SCB_REHVST {
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -110,7 +112,8 @@ typedef struct SCB_REHVST {                  // SCB without pallette
   unsigned int tilt;
 } SCB_REHVST;
 
-typedef struct SCB_REHV {                 // SCB without stretch/tilt
+/* SCB without stretch/tilt */
+typedef struct SCB_REHV { 
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -122,7 +125,8 @@ typedef struct SCB_REHV {                 // SCB without stretch/tilt
   unsigned int vsize;
 } SCB_REHV;
 
-typedef struct SCB_REHV_PAL {             // SCB without str/tilt, w/ penpal
+/* SCB without stretch/tilt, with penpal */
+typedef struct SCB_REHV_PAL {
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -135,7 +139,8 @@ typedef struct SCB_REHV_PAL {             // SCB without str/tilt, w/ penpal
   unsigned char penpal[8];
 } SCB_REHV_PAL;
 
-typedef struct SCB_REHVS {                // SCB w/o tilt & penpal
+/* SCB without tilt/penpal */
+typedef struct SCB_REHVS {
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -148,7 +153,8 @@ typedef struct SCB_REHVS {                // SCB w/o tilt & penpal
   unsigned int stretch;
 } SCB_REHVS;
 
-typedef struct SCB_REHVS_PAL {            // SCB w/o tilt w/penpal
+/* SCB without tilt, with penpal */
+typedef struct SCB_REHVS_PAL {
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -162,7 +168,8 @@ typedef struct SCB_REHVS_PAL {            // SCB w/o tilt w/penpal
   unsigned char penpal[8];
 } SCB_REHVS_PAL;
 
-typedef struct SCB_RENONE {                 // SCB w/o size/stretch/tilt/pal
+/* SCB without size/stretch/tilt/penpal */
+typedef struct SCB_RENONE {
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -172,7 +179,8 @@ typedef struct SCB_RENONE {                 // SCB w/o size/stretch/tilt/pal
   signed int vpos;
 } SCB_RENONE;
 
-typedef struct SCB_RENONE_PAL {             // SCB w/o size/str/tilt w/penpal
+/* SCB without size/str/tilt, with penpal */
+typedef struct SCB_RENONE_PAL { 
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -199,13 +207,13 @@ typedef struct PENPAL_1 {
   unsigned char penpal[1];
 } PENPAL_1;
 
-// SPRGO bit definitions
+/* SPRGO bit definitions */
 enum {
     SPRITE_GO = 0x01,  // sprite process start bit
     EVER_ON   = 0x04   // everon detector enable
 };
 
-// SPRSYS bit definitions for write operations
+/* SPRSYS bit definitions for write operations */
 enum {
     SIGNMATH   = 0x80,  // signed math
     ACCUMULATE = 0x40,  // accumulate multiplication results
@@ -215,7 +223,8 @@ enum {
     CLR_UNSAFE = 0x04,  // unsafe access reset
     SPRITESTOP = 0x02   // request to stop sprite process
 };
-// SPRSYS bit definitions for read operations
+
+/* SPRSYS bit definitions for read operations */
 enum {
     MATHWORKING   = 0x80,  // math operation in progress
     MATHWARNING   = 0x40,  // accumulator overflow on multiple or divide by zero
@@ -227,7 +236,7 @@ enum {
     SPRITEWORKING = 0x01  // sprite process is active
 };
 
-// Suzy hardware registers
+/* Suzy hardware registers */
 struct __suzy {
   unsigned char *tmpadr;        // 0xFC00  Temporary address
   unsigned int tiltacc;         // 0xFC02  Tilt accumulator
@@ -297,7 +306,7 @@ struct __suzy {
                                 // 0xFCC5 - 0xFCFF  unused
 };
 
-// Hardware math registers
+/* Hardware math registers */
 #define FACTOR_A *(unsigned int *) 0xFC54
 #define FACTOR_B *(unsigned int *) 0xFC52
 #define PRODUCT0 *(unsigned int *) 0xFC60
@@ -315,7 +324,7 @@ struct __suzy {
 #define REMAINDER1 *(unsigned int *) 0xFC6E
 #define REMAINDER *(long *) 0xFC6C
 
-// Deprecated definitions
+/* Deprecated definitions */
 
 /* MAPCTL $FFF9 */
 #define HIGHSPEED       0x80

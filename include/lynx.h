@@ -79,12 +79,12 @@
 /* No support for dynamically loadable drivers */
 #define DYN_DRV 0
 
-// Addresses of static drivers
+/* Addresses of static drivers */
 extern void lynx_stdjoy_joy[];        // Referred to by joy_static_stddrv[]
 extern void lynx_comlynx_ser[];       // Referred to by ser_static_stddrv[]
 extern void lynx_160_102_16_tgi[];    // Referred to by tgi_static_stddrv[]
 
-// Sound support
+/* Sound support */
 void lynx_snd_init (void); // Initialize the sound driver
 void lynx_snd_pause (void); // Pause sound
 void lynx_snd_continue (void); // Continue sound after pause
@@ -93,18 +93,18 @@ void lynx_snd_stop (void); // Stop sound on all channels
 void __fastcall__ lynx_snd_stop_channel (unsigned char channel); // Stop sound on all channels
 unsigned char lynx_snd_active(void); // Show which channels are active
 
-// Cartridge access
+/* Cartridge access */
 void __fastcall__ lynx_load (int file_number); // Load a file into RAM using a zero-based index
 void __fastcall__ lynx_exec (int file_number); // Load a file into ram and execute it
 
-// EEPROM access
+/* EEPROM access */
 unsigned __fastcall__ lynx_eeprom_read (unsigned char cell); // Read a 16 bit word from the given address
 unsigned __fastcall__ lynx_eeprom_write (unsigned char cell, unsigned val); // Write the word at the given address
 void __fastcall__ lynx_eeprom_erase (unsigned char cell); // Clear the word at the given address
 unsigned __fastcall__ lynx_eeread (unsigned cell); // Read a 16 bit word from the given address 93C46, 93C66 or 93C86
 unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val); // Write the word at the given address 93C46, 93C66 or 93C86
 
-// TGI extras
+/* TGI extras */
 #define tgi_sprite(spr) tgi_ioctl(0, spr)
 #define tgi_flip() tgi_ioctl(1, (void*)0)
 #define tgi_setbgcolor(bgcol) tgi_ioctl(2, (void*)(bgcol))

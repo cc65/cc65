@@ -113,7 +113,7 @@ typedef struct SCB_REHVST {
 } SCB_REHVST;
 
 /* SCB without stretch/tilt */
-typedef struct SCB_REHV { 
+typedef struct SCB_REHV {
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;
@@ -180,7 +180,7 @@ typedef struct SCB_RENONE {
 } SCB_RENONE;
 
 /* SCB without size/str/tilt, with penpal */
-typedef struct SCB_RENONE_PAL { 
+typedef struct SCB_RENONE_PAL {
   unsigned char sprctl0;
   unsigned char sprctl1;
   unsigned char sprcoll;

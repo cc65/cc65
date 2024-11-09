@@ -53,59 +53,59 @@ typedef struct _mikey_audio {
 
 /* Define a structure with the mikey register offsets */
 struct __mikey {
-  struct _mikey_timer timer0;    // 0xFD00
-  struct _mikey_timer timer1;    // 0xFD04
-  struct _mikey_timer timer2;    // 0xFD08
-  struct _mikey_timer timer3;    // 0xFD0C
-  struct _mikey_timer timer4;    // 0xFD10
-  struct _mikey_timer timer5;    // 0xFD14
-  struct _mikey_timer timer6;    // 0xFD18
-  struct _mikey_timer timer7;    // 0xFD1C
-  struct _mikey_audio channel_a; // 0xFD20
-  struct _mikey_audio channel_b; // 0xFD28
-  struct _mikey_audio channel_c; // 0xFD30
-  struct _mikey_audio channel_d; // 0xFD38
-  unsigned char attena;          // 0xFD40  ?? not yet allocated?
-  unsigned char attenb;          // 0xFD41      |
-  unsigned char attenc;          // 0xFD42      |
-  unsigned char attend;          // 0xFD43      |
-  unsigned char panning;         // 0xFD44      |
-  unsigned char unused0[11];     // 0xFD45 - 0xFD4F  not used
-  unsigned char mstereo;         // 0xFD50  stereo control bits
-  unsigned char unused1[47];     // 0xFD51 - 0xFD7F  not used
-  unsigned char intrst;          // 0xFD80  interrupt poll 0
-  unsigned char intset;          // 0xFD81  interrupt poll 1
-  unsigned char unused2[2];      // 0xFD82 - 0xFD83  not used
-  unsigned char magrdy0;         // 0xFD84  mag tape channel0 ready bit
-  unsigned char magrdy1;         // 0xFD85  mag tape channel1 ready bit
-  unsigned char audin;           // 0xFD86  audio in
-  unsigned char sysctl1;         // 0xFD87  control bits
-  unsigned char mikeyrev;        // 0xFD88  mikey hardware rev
-  unsigned char mikeysrev;       // 0xFD89  mikey software rev
-  unsigned char iodir;           // 0xFD8A  parallel i/o data dir
-  unsigned char iodat;           // 0xFD8B  parallel data
-  unsigned char serctl;          // 0xFD8C  serial control register
-  unsigned char serdat;          // 0xFD8D  serial data
-  unsigned char unused3[2];      // 0xFD8E - 0xFD8F  not used
-  unsigned char sdoneack;        // 0xFD90  suzy done acknowledge
-  unsigned char cpusleep;        // 0xFD91  cpu bus request disable
-  unsigned char dispctl;         // 0xFD92  video bus request enable, viddma
-  unsigned char pkbkup;          // 0xFD93  magic 'P' count
-  unsigned char *scrbase;        // 0xFD94  start address of video display
-  unsigned char unused4[6];      // 0xFD96 - 0xFD9B  not used
-  unsigned char mtest0;          // 0xFD9C
-  unsigned char mtest1;          // 0xFD9D
-  unsigned char mtest2;          // 0xFD9E
-  unsigned char unused5;         // 0xFD9F  not used
-  unsigned char palette[32];     // 0xFDA0 - 0xFDBF  palette 32 bytes
-  unsigned char unused6[64];     // 0xFDC0 - 0xFDFF  not used
-  unsigned char bootrom[504];    // 0xFE00 - 0xFFD8  boot rom
-  unsigned char reserved;        // 0xFFD8  reserved for future hardware
-  unsigned char mapctl;          // 0xFFF9  map control register
+  struct _mikey_timer timer0;    /* 0xFD00 */
+  struct _mikey_timer timer1;    /* 0xFD04 */
+  struct _mikey_timer timer2;    /* 0xFD08 */
+  struct _mikey_timer timer3;    /* 0xFD0C */
+  struct _mikey_timer timer4;    /* 0xFD10 */
+  struct _mikey_timer timer5;    /* 0xFD14 */
+  struct _mikey_timer timer6;    /* 0xFD18 */
+  struct _mikey_timer timer7;    /* 0xFD1C */
+  struct _mikey_audio channel_a; /* 0xFD20 */
+  struct _mikey_audio channel_b; /* 0xFD28 */
+  struct _mikey_audio channel_c; /* 0xFD30 */
+  struct _mikey_audio channel_d; /* 0xFD38 */
+  unsigned char attena;          /* 0xFD40  ?? not yet allocated? */
+  unsigned char attenb;          /* 0xFD41      | */
+  unsigned char attenc;          /* 0xFD42      | */
+  unsigned char attend;          /* 0xFD43      | */
+  unsigned char panning;         /* 0xFD44      | */
+  unsigned char unused0[11];     /* 0xFD45 - 0xFD4F  not used */
+  unsigned char mstereo;         /* 0xFD50  stereo control bits */
+  unsigned char unused1[47];     /* 0xFD51 - 0xFD7F  not used */
+  unsigned char intrst;          /* 0xFD80  interrupt poll 0 */
+  unsigned char intset;          /* 0xFD81  interrupt poll 1 */
+  unsigned char unused2[2];      /* 0xFD82 - 0xFD83  not used */
+  unsigned char magrdy0;         /* 0xFD84  mag tape channel0 ready bit */
+  unsigned char magrdy1;         /* 0xFD85  mag tape channel1 ready bit */
+  unsigned char audin;           /* 0xFD86  audio in */
+  unsigned char sysctl1;         /* 0xFD87  control bits */
+  unsigned char mikeyrev;        /* 0xFD88  mikey hardware rev */
+  unsigned char mikeysrev;       /* 0xFD89  mikey software rev */
+  unsigned char iodir;           /* 0xFD8A  parallel i/o data dir */
+  unsigned char iodat;           /* 0xFD8B  parallel data */
+  unsigned char serctl;          /* 0xFD8C  serial control register */
+  unsigned char serdat;          /* 0xFD8D  serial data */
+  unsigned char unused3[2];      /* 0xFD8E - 0xFD8F  not used */
+  unsigned char sdoneack;        /* 0xFD90  suzy done acknowledge */
+  unsigned char cpusleep;        /* 0xFD91  cpu bus request disable */
+  unsigned char dispctl;         /* 0xFD92  video bus request enable, viddma */
+  unsigned char pkbkup;          /* 0xFD93  magic 'P' count */
+  unsigned char *scrbase;        /* 0xFD94  start address of video display */
+  unsigned char unused4[6];      /* 0xFD96 - 0xFD9B  not used */
+  unsigned char mtest0;          /* 0xFD9C */
+  unsigned char mtest1;          /* 0xFD9D */
+  unsigned char mtest2;          /* 0xFD9E */
+  unsigned char unused5;         /* 0xFD9F  not used */
+  unsigned char palette[32];     /* 0xFDA0 - 0xFDBF  palette 32 bytes */
+  unsigned char unused6[64];     /* 0xFDC0 - 0xFDFF  not used */
+  unsigned char bootrom[504];    /* 0xFE00 - 0xFFD8  boot rom */
+  unsigned char reserved;        /* 0xFFD8  reserved for future hardware */
+  unsigned char mapctl;          /* 0xFFF9  map control register */
   struct {
-    unsigned char *nmi;          // 0xFFFA  NMI vector
-    unsigned char *reset;        // 0xFFFB  reset vector
-    unsigned char *irq;          // 0xFFFC  IRQ vector
+    unsigned char *nmi;          /* 0xFFFA  NMI vector */
+    unsigned char *reset;        /* 0xFFFB  reset vector */
+    unsigned char *irq;          /* 0xFFFC  IRQ vector */
   } vectors;
 };
 
@@ -180,12 +180,12 @@ enum {
 
 /* IODIR and IODAT bit definitions */
 enum {
-    AUDIN_BIT        = 0x10, // different from AUDIN address
-    READ_ENABLE      = 0x10, // same bit for AUDIN_BIT
+    AUDIN_BIT        = 0x10, /* different from AUDIN address */
+    READ_ENABLE      = 0x10, /* same bit for AUDIN_BIT */
     RESTLESS         = 0x08,
-    NOEXP            = 0x04, // if set, redeye is not connected
-    CART_ADDR_DATA   = 0x02, //
-    CART_POWER_OFF   = 0x02, // same bit for CART_ADDR_DATA
+    NOEXP            = 0x04, /* if set, redeye is not connected */
+    CART_ADDR_DATA   = 0x02,
+    CART_POWER_OFF   = 0x02, /* same bit for CART_ADDR_DATA */
     EXTERNAL_POWER   = 0x01
 };
 
@@ -214,10 +214,10 @@ enum {
 
 /* DISPCTL bit definitions */
 enum {
-    DISP_COLOR       = 0x08, // must be set to 1
-    DISP_FOURBIT     = 0x04, // must be set to 1
-    DISP_FLIP        = 0x02, //
-    DMA_ENABLE       = 0x01 // must be set to 1
+    DISP_COLOR       = 0x08, /* must be set to 1 */
+    DISP_FOURBIT     = 0x04, /* must be set to 1 */
+    DISP_FLIP        = 0x02,
+    DMA_ENABLE       = 0x01  /* must be set to 1 */
 };
 
 /* MTEST0 bit definitions */
@@ -262,4 +262,3 @@ enum {
 };
 
 #endif
-

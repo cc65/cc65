@@ -80,29 +80,29 @@
 #define DYN_DRV 0
 
 /* Addresses of static drivers */
-extern void lynx_stdjoy_joy[];        // Referred to by joy_static_stddrv[]
-extern void lynx_comlynx_ser[];       // Referred to by ser_static_stddrv[]
-extern void lynx_160_102_16_tgi[];    // Referred to by tgi_static_stddrv[]
+extern void lynx_stdjoy_joy[];        /* Referred to by joy_static_stddrv[] */
+extern void lynx_comlynx_ser[];       /* Referred to by ser_static_stddrv[] */
+extern void lynx_160_102_16_tgi[];    /* Referred to by tgi_static_stddrv[] */
 
 /* Sound support */
-void lynx_snd_init (void); // Initialize the sound driver
-void lynx_snd_pause (void); // Pause sound
-void lynx_snd_continue (void); // Continue sound after pause
-void __fastcall__ lynx_snd_play (unsigned char channel, unsigned char *music); // Play tune on channel
-void lynx_snd_stop (void); // Stop sound on all channels
-void __fastcall__ lynx_snd_stop_channel (unsigned char channel); // Stop sound on all channels
-unsigned char lynx_snd_active(void); // Show which channels are active
+void lynx_snd_init (void); /* Initialize the sound driver */
+void lynx_snd_pause (void); /* Pause sound */
+void lynx_snd_continue (void); /* Continue sound after pause */
+void __fastcall__ lynx_snd_play (unsigned char channel, unsigned char *music); /* Play tune on channel */
+void lynx_snd_stop (void); /* Stop sound on all channels */
+void __fastcall__ lynx_snd_stop_channel (unsigned char channel); /* Stop sound on all channels */
+unsigned char lynx_snd_active(void); /* Show which channels are active */
 
 /* Cartridge access */
-void __fastcall__ lynx_load (int file_number); // Load a file into RAM using a zero-based index
-void __fastcall__ lynx_exec (int file_number); // Load a file into ram and execute it
+void __fastcall__ lynx_load (int file_number); /* Load a file into RAM using a zero-based index */
+void __fastcall__ lynx_exec (int file_number); /* Load a file into ram and execute it */
 
 /* EEPROM access */
-unsigned __fastcall__ lynx_eeprom_read (unsigned char cell); // Read a 16 bit word from the given address
-unsigned __fastcall__ lynx_eeprom_write (unsigned char cell, unsigned val); // Write the word at the given address
-void __fastcall__ lynx_eeprom_erase (unsigned char cell); // Clear the word at the given address
-unsigned __fastcall__ lynx_eeread (unsigned cell); // Read a 16 bit word from the given address 93C46, 93C66 or 93C86
-unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val); // Write the word at the given address 93C46, 93C66 or 93C86
+unsigned __fastcall__ lynx_eeprom_read (unsigned char cell); /* Read a 16 bit word from the given address */
+unsigned __fastcall__ lynx_eeprom_write (unsigned char cell, unsigned val); /* Write the word at the given address */
+void __fastcall__ lynx_eeprom_erase (unsigned char cell); /* Clear the word at the given address */
+unsigned __fastcall__ lynx_eeread (unsigned cell); /* Read a 16 bit word from the given address 93C46, 93C66 or 93C86 */
+unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val); /* Write the word at the given address 93C46, 93C66 or 93C86 */
 
 /* TGI extras */
 #define tgi_sprite(spr) tgi_ioctl(0, spr)
@@ -117,11 +117,11 @@ unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val); // Write the w
 #include <_mikey.h>
 #define MIKEY (*(struct __mikey *)0xFD00)
 
-#define _MIKEY_TIMERS (*(struct _mikey_all_timers *) 0xFD00)  // mikey_timers[8]
-#define _HBL_TIMER (*(struct _mikey_timer *) 0xFD00)          // timer0 (HBL)
-#define _VBL_TIMER (*(struct _mikey_timer *) 0xFD08)          // timer2 (VBL)
-#define _UART_TIMER (*(struct _mikey_timer *) 0xFD14)         // timer4 (UART)
-#define _VIDDMA (*(unsigned int *) 0xFD92)                    // dispctl/viddma
+#define _MIKEY_TIMERS (*(struct _mikey_all_timers *) 0xFD00)  /* mikey_timers[8] */
+#define _HBL_TIMER (*(struct _mikey_timer *) 0xFD00)          /* timer0 (HBL) */
+#define _VBL_TIMER (*(struct _mikey_timer *) 0xFD08)          /* timer2 (VBL) */
+#define _UART_TIMER (*(struct _mikey_timer *) 0xFD14)         /* timer4 (UART) */
+#define _VIDDMA (*(unsigned int *) 0xFD92)                    /* DISPCTL/VIDDMA */
 
 #include <_suzy.h>
 #define SUZY (*(volatile struct __suzy*)0xFC00)

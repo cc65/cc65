@@ -232,6 +232,11 @@ struct tm* __fastcall__ gmtime_dt (const struct datetime* dt);
 time_t __fastcall__ mktime_dt (const struct datetime* dt);
 /* Converts a ProDOS date/time structure to a time_t UNIX timestamp */
 
+typedef struct DIR DIR;
+
+unsigned int __fastcall__ dir_file_count(DIR *dir);
+/* Returns the number of active files in a ProDOS directory */
+
 #if !defined(__APPLE2ENH__)
 unsigned char __fastcall__ allow_lowercase (unsigned char onoff);
 /* If onoff is 0, lowercase characters printed to the screen via STDIO and

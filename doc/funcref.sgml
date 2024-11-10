@@ -97,6 +97,7 @@ function.
 <item>_dos_type
 <item>allow_lowercase
 <item><ref id="beep" name="beep">
+<item><ref id="dir_file_count" name="dir_file_count">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
 <item><ref id="mktime_dt" name="mktime_dt">
@@ -109,6 +110,7 @@ function.
 <itemize>
 <item>_dos_type
 <item><ref id="beep" name="beep">
+<item><ref id="dir_file_count" name="dir_file_count">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
 <item><ref id="mktime_dt" name="mktime_dt">
@@ -3519,6 +3521,25 @@ used in presence of a prototype.
 <tag/See also/
 <ref id="get_turbomaster_speed" name="get_turbomaster_speed">,
 <ref id="set_turbomaster_speed" name="set_turbomaster_speed">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>dir_file_count<label id="dir_file_count"><p>
+
+<quote>
+<descrip>
+<tag/Function/Returns the number of files in the directory.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
+<tag/Declaration/<tt/unsigned int __fastcall__ dir_file_count(DIR *dir);/
+<tag/Description/<tt/dir_file_count/ is machine dependent and does not exist for
+all supported targets. If it exists, it returns the number of active
+(non-deleted) files in the directory.
+<tag/Notes/<itemize>
+<item>The function does not exist on all platforms.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
 <tag/Example/None.
 </descrip>
 </quote>

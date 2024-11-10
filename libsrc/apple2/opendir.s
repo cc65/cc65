@@ -128,24 +128,23 @@
         ; Read succeeded, populate dir struct
         jsr       popptr1     ; Restore our dir pointer
 
-        ldy       #$24 + DIR::BYTES
-        lda       (ptr1),y    ; ENTRIES_PER_BLOCK
-        pha                   ; Back it up
-
+        ; Get file_count to entry_length from block
+        ldy       #$26 + DIR::BYTES
+:       lda       (ptr1),y
+        pha
         dey
-        lda       (ptr1),y    ; ENTRY_LENGTH
+        cpy       #$23 + DIR::BYTES - 1
+        bne       :-
 
+        ; Set entry_length to file_count in struct
         ldy       #DIR::ENTRY_LENGTH
+:       pla
         sta       (ptr1),y
-
-        pla
-        .assert   DIR::ENTRIES_PER_BLOCK = DIR::ENTRY_LENGTH + 1, error
         iny
-        sta       (ptr1),y
+        cpy       #DIR::CURRENT_ENTRY
+        bne       :-
 
         ; Skip directory header entry
-        .assert   DIR::CURRENT_ENTRY = DIR::ENTRIES_PER_BLOCK + 1, error
-        iny
         lda       #$01
         sta       (ptr1),y
 

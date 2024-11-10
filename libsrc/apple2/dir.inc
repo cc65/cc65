@@ -2,8 +2,8 @@
         FD                .word
         ENTRY_LENGTH      .byte
         ENTRIES_PER_BLOCK .byte
+        FILE_COUNT        .word
         CURRENT_ENTRY     .byte
-
         .union
                 BYTES               .byte 512
                 .struct CONTENT

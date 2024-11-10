@@ -332,6 +332,7 @@ usage.
 <item>_filetype
 <item>_datetime
 <item>beep
+<item>dir_file_count
 <item>get_ostype
 <item>gmtime_dt
 <item>mktime_dt

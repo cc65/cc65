@@ -147,7 +147,5 @@ void __fastcall__ seekdir (DIR* dir, long offs);
 
 void __fastcall__ rewinddir (DIR* dir);
 
-
-
 /* End of dirent.h */
 #endif

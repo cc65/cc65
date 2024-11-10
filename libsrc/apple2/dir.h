@@ -45,6 +45,7 @@ struct DIR {
     int           fd;
     unsigned char entry_length;
     unsigned char entries_per_block;
+    unsigned int  file_count;
     unsigned char current_entry;
     union {
         unsigned char bytes[512];

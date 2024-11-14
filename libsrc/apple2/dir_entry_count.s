@@ -1,17 +1,17 @@
 ;
 ; Colin Leroy-Mira <colin@colino.net>, 2024
 ;
-; unsigned int __fastcall__ dir_file_count(DIR *dir);
+; unsigned int __fastcall__ dir_entry_count(DIR *dir);
 ;
 
-        .export   _dir_file_count
+        .export   _dir_entry_count
 
         .importzp ptr1
 
         .include  "apple2.inc"
         .include  "dir.inc"
 
-.proc _dir_file_count
+.proc _dir_entry_count
         sta       ptr1
         stx       ptr1+1
 

@@ -234,7 +234,7 @@ time_t __fastcall__ mktime_dt (const struct datetime* dt);
 
 typedef struct DIR DIR;
 
-unsigned int __fastcall__ dir_file_count(DIR *dir);
+unsigned int __fastcall__ dir_entry_count(DIR *dir);
 /* Returns the number of active files in a ProDOS directory */
 
 #if !defined(__APPLE2ENH__)

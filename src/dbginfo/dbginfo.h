@@ -521,6 +521,7 @@ struct cc65_segmentdata {
     cc65_size           segment_size;   /* Size of segment */
     const char*         output_name;    /* Output file this seg was written to */
     unsigned long       output_offs;    /* Offset of this seg in output file */
+    unsigned            segment_bank;
 };
 
 typedef struct cc65_segmentinfo cc65_segmentinfo;

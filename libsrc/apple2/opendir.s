@@ -4,16 +4,18 @@
 ; DIR* __fastcall__ opendir (register const char* name)
 ;
 
-        .export   _opendir
+        .export   _opendir, read_dir_block_ptr1
 
+        .import   closedir_ptr1
         .import   _open, _read, _close
-        .import   _malloc, _free
+        .import   _malloc
         .import    ___directerrno
 
         .import   ___oserror, __cwd
 
         .import   pushptr1, popptr1
         .import   pushax, pusha0
+        .import   return0, returnFFFF
 
         .importzp ptr1
 
@@ -37,7 +39,7 @@
         sta       ptr1
         stx       ptr1+1
 
-:       ; open directory
+:       ; Open directory
         jsr       pushptr1
         lda       #O_RDONLY
         jsr       pusha0
@@ -58,22 +60,16 @@
         ; We failed to allocate
         pla                   ; Get fd back
         ldx       #$00
-        jsr       _close      ; close it
+        jsr       _close      ; Close it
 
         lda       #ENOMEM     ; Set error
         jsr       ___directerrno
-
 @return_null:
-        lda       #$00
-        tax
-        rts
+        jmp       return0
 
 :       ; Store dir struct to pointer
         sta       ptr1
         stx       ptr1+1
-
-        ; Push ptr1, read will destroy it
-        jsr       pushptr1
 
         ; Save fd to dir struct
         lda       #$00
@@ -84,49 +80,15 @@
         pla                   ; Get fd back
         sta       (ptr1),y
 
-        jsr       pusha0      ; push fd for read
-        lda       #<DIR::BYTES
-        clc
-        adc       ptr1
-        pha
-        lda       #>DIR::BYTES
-        adc       ptr1+1
-        tax
-        pla
-        jsr       pushax      ; Push dir->block.bytes for read
+        jsr       read_dir_block_ptr1
+        bcc       @read_ok
 
-        lda       #<.sizeof(DIR::BYTES)
-        ldx       #>.sizeof(DIR::BYTES)
-
-        jsr       _read       ; Read directory block
-        cpx       #>.sizeof(DIR::BYTES)
-        bne       @err_read
-        cmp       #<.sizeof(DIR::BYTES)
-        beq       @read_ok
-
-@err_read:
-        ; Read failed, exit
-        lda       ___oserror
-        bne       :+
-        lda       #EINVAL
-        jsr       ___directerrno
-
-:       ; Close fd
-        jsr       popptr1     ; Restore our dir pointer
-        ldy       #$00
-        lda       (ptr1),y    ; Get fd
-        ldx       #$00
-        jsr       _close
-
-        ; Free dir structure
-        lda       ptr1
-        ldx       ptr1+1
-        jsr       _free
-        jmp       @return_null
+        ; Close directory, free it
+        jsr       closedir_ptr1
+        jmp       return0     ; Return NULL
 
 @read_ok:
         ; Read succeeded, populate dir struct
-        jsr       popptr1     ; Restore our dir pointer
 
         ; Get file_count to entry_length from block
         ldy       #$26 + DIR::BYTES
@@ -153,3 +115,45 @@
         ldx       ptr1+1
         rts
 .endproc
+
+; Read a directory for the DIR* pointer in ptr1
+; Return with carry clear on success
+read_dir_block_ptr1:
+        ; Push ptr1, read will destroy it
+        jsr       pushptr1
+
+        ldy       #DIR::FD
+        lda       (ptr1),y
+
+        jsr       pusha0      ; Push fd for read
+        lda       #<DIR::BYTES
+        clc
+        adc       ptr1
+        pha
+        lda       #>DIR::BYTES
+        adc       ptr1+1
+        tax
+        pla
+        jsr       pushax      ; Push dir->block.bytes for read
+
+        lda       #<.sizeof(DIR::BYTES)
+        ldx       #>.sizeof(DIR::BYTES)
+
+        jsr       _read       ; Read directory block
+        cpx       #>.sizeof(DIR::BYTES)
+        bne       @read_err
+        cmp       #<.sizeof(DIR::BYTES)
+        beq       @read_ok
+
+@read_err:
+        ; Read failed, exit
+        lda       ___oserror
+        bne       :+
+        lda       #EINVAL
+        jsr       ___directerrno
+:       sec
+        bcs       @out
+@read_ok:
+        clc
+@out:
+        jmp       popptr1

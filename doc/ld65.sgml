@@ -1268,7 +1268,7 @@ exactly one parent and may have several child scopes. Scopes may not cross modul
 </itemize>
 
 
-<sect1>Segments<p>
+<sect1>Segment Info<p>
 
 <itemize>
 <item> Segment id
@@ -1366,13 +1366,13 @@ was defined in the assembler source.
 
 <table>
 <tabular ca="clc">
-<bf/Assembler Command/| <bf/Generated Type Information//@<hline>
+<bf/Assembler Command/| <bf/Generated Type Information/@<hline>
 .ADDR| ARRAY OF LITTLE ENDIAN POINTER WITH SIZE 2 TO VOID@
 .BYTE| ARRAY OF UNSIGNED WITH SIZE 1@
 .DBYT| ARRAY OF BIG ENDIAN UNSIGNED WITH SIZE 2@
 .DWORD| ARRAY OF LITTLE ENDIAN UNSIGNED WITH SIZE 4@
 .FARADDR| ARRAY OF LITTLE ENDIAN POINTER WITH SIZE 3 TO VOID@
-.WORD| ARRAY OF LITTLE ENDIAN UNSIGNED WITH SIZE 2@
+.WORD| ARRAY OF LITTLE ENDIAN UNSIGNED WITH SIZE 2
 </tabular>
 </table>
 

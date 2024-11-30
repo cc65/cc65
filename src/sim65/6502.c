@@ -1964,25 +1964,17 @@ static void OPC_6502_6C (void)
     PC = Regs.PC;
     Lo = MemReadWord (PC+1);
 
-    if (CPU == CPU_6502)
-    {
-         /* Emulate the 6502 bug */
-        Cycles = 5;
-        Regs.PC = MemReadByte (Lo);
-        Hi = (Lo & 0xFF00) | ((Lo + 1) & 0xFF);
-        Regs.PC |= (MemReadByte (Hi) << 8);
+    /* Emulate the buggy 6502 behavior */
+    Cycles = 5;
+    Regs.PC = MemReadByte (Lo);
+    Hi = (Lo & 0xFF00) | ((Lo + 1) & 0xFF);
+    Regs.PC |= (MemReadByte (Hi) << 8);
 
-        /* Output a warning if the bug is triggered */
-        if (Hi != Lo + 1)
-        {
-            Warning ("6502 indirect jump bug triggered at $%04X, ind addr = $%04X",
-                     PC, Lo);
-        }
-    }
-    else
+    /* Output a warning if the bug is triggered */
+    if (Hi != Lo + 1)
     {
-        Cycles = 6;
-        Regs.PC = MemReadWord(Lo);
+        Warning ("6502 indirect jump bug triggered at $%04X, ind addr = $%04X",
+                    PC, Lo);
     }
 
     ParaVirtHooks (&Regs);

@@ -707,7 +707,7 @@ static unsigned HaveIRQRequest;
         unsigned char OldPCH;                                   \
         ++Cycles;                                               \
         Offs = (signed char) MemReadByte (Regs.PC+1);           \
-        Regs.PC +=2;                                            \
+        Regs.PC += 2;                                           \
         OldPCH = PCH;                                           \
         Regs.PC = (Regs.PC + (int) Offs) & 0xFFFF;              \
         if (PCH != OldPCH) {                                    \

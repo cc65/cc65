@@ -824,6 +824,12 @@ static unsigned HaveIRQRequest;
     SET_OF (Val & 0x40);                                        \
     SET_ZF ((Val & Regs.AC) == 0)
 
+/* BITIMM */
+/* The BIT instruction with immediate mode addressing only sets
+   the zero flag; the sign and overflow flags are not changed. */
+#define BITIMM(Val)                                             \
+    SET_ZF ((Val & Regs.AC) == 0)
+
 /* LDA */
 #define LDA(Val)                                                \
     Regs.AC = Val;                                              \
@@ -2250,7 +2256,9 @@ static void OPC_6502_88 (void)
 static void OPC_65SC02_89 (void)
 /* Opcode $89: BIT #imm */
 {
-    ALU_OP_IMM (BIT);
+    /* Note: BIT #imm behaves differently from BIT with other addressing modes,
+     * hence the different 'op' argument to the macro. */
+    ALU_OP_IMM (BITIMM);
 }
 
 

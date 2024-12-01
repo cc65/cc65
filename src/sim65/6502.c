@@ -4104,7 +4104,7 @@ unsigned ExecuteInsn (void)
         PUSH (PCL);
         PUSH (Regs.SR & ~BF);
         SET_IF (1);
-        if (CPU != CPU_6502)
+        if (CPU == CPU_65C02)
         {
             SET_DF (0);
         }
@@ -4118,7 +4118,7 @@ unsigned ExecuteInsn (void)
         PUSH (PCL);
         PUSH (Regs.SR & ~BF);
         SET_IF (1);
-        if (CPU != CPU_6502)
+        if (CPU == CPU_65C02)
         {
             SET_DF (0);
         }

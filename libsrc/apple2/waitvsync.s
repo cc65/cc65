@@ -29,7 +29,8 @@ iigs:   bit     RDVBLBAR
         rts
 
         ; Apple IIc TechNote #9, Detecting VBL
-iic:    sei
+iic:    php
+        sei
         sta     IOUDISOFF
         lda     RDVBLMSK
         bit     ENVBL
@@ -40,7 +41,7 @@ iic:    sei
         bcs     :+              ; VBL interrupts were already enabled
         bit     DISVBL
 :       sta     IOUDISON        ; IIc Tech Ref Man: The firmware normally leaves IOUDIS on.
-        cli
+        plp
         rts
 
         .endif                  ; __APPLE2ENH__

@@ -60,7 +60,6 @@ struct CPURegs {
     unsigned    AC;             /* Accumulator */
     unsigned    XR;             /* X register */
     unsigned    YR;             /* Y register */
-    unsigned    ZR;             /* Z register */
     unsigned    SR;             /* Status register */
     unsigned    SP;             /* Stackpointer */
     unsigned    PC;             /* Program counter */

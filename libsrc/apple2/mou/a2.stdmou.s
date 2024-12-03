@@ -155,6 +155,7 @@ next:   inc     ptr1+1
         ; Disable interrupts now because setting the slot number makes
         ; the IRQ handler (maybe called due to some non-mouse IRQ) try
         ; calling the firmware which isn't correctly set up yet
+        php
         sei
 
         ; Convert to and save slot number
@@ -211,7 +212,7 @@ next:   inc     ptr1+1
 common: jsr     firmware
 
         ; Enable interrupts and return success
-        cli
+        plp
         lda     #<MOUSE_ERR_OK
         ldx     #>MOUSE_ERR_OK
         rts
@@ -220,6 +221,7 @@ common: jsr     firmware
 ; No return code required (the driver is removed from memory on return).
 UNINSTALL:
         ; Hide cursor
+        php
         sei
         jsr     CHIDE
 
@@ -249,7 +251,8 @@ SETBOX:
         ; Apple II Mouse TechNote #1, Interrupt Environment with the Mouse:
         ; "Disable interrupts before placing position information in the
         ;  screen holes."
-:       sei
+:       php
+        sei
 
         ; Set low clamp
         lda     (ptr1),y
@@ -298,6 +301,7 @@ GETBOX:
 ; the screen). No return code required.
 MOVE:
         ldy     slot
+        php
         sei
 
         ; Set y
@@ -328,9 +332,10 @@ MOVE:
 ; no special action is required besides hiding the mouse cursor.
 ; No return code required.
 HIDE:
+        php
         sei
         jsr     CHIDE
-        cli
+        plp
         rts
 
 ; SHOW: Is called to show the mouse cursor. The mouse kernel manages a
@@ -339,9 +344,10 @@ HIDE:
 ; no special action is required besides enabling the mouse cursor.
 ; No return code required.
 SHOW:
+        php
         sei
         jsr     CSHOW
-        cli
+        plp
         rts
 
 ; BUTTONS: Return the button mask in A/X.
@@ -360,12 +366,13 @@ POS:
 ; struct pointed to by ptr1. No return code required.
 INFO:
         ldy     #.sizeof(MOUSE_INFO)-1
-copy:   sei
+copy:   php
+        sei
 :       lda     info,y
         sta     (ptr1),y
         dey
         bpl     :-
-        cli
+        plp
         rts
 
 ; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl

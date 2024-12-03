@@ -737,23 +737,29 @@ static unsigned HaveIRQRequest;
 
 /* ROL */
 #define ROL(Val)                                                \
-    Val <<= 1;                                                  \
-    if (GET_CF ()) {                                            \
-        Val |= 0x01;                                            \
-    }                                                           \
-    TEST_ZF (Val);                                              \
-    TEST_SF (Val);                                              \
-    TEST_CF (Val)
+    do {                                                        \
+        unsigned ShiftOut = (Val & 0x80);                       \
+        Val <<= 1;                                              \
+        if (GET_CF ()) {                                        \
+            Val |= 0x01;                                        \
+        }                                                       \
+        TEST_ZF (Val);                                          \
+        TEST_SF (Val);                                          \
+        SET_CF (ShiftOut);                                      \
+    } while (0)
 
 /* ROR */
 #define ROR(Val)                                                \
-    if (GET_CF ()) {                                            \
-        Val |= 0x100;                                           \
-    }                                                           \
-    SET_CF (Val & 0x01);                                        \
-    Val >>= 1;                                                  \
-    TEST_ZF (Val);                                              \
-    TEST_SF (Val)
+    do {                                                        \
+        unsigned ShiftOut = (Val & 0x01);                       \
+        Val >>= 1;                                              \
+        if (GET_CF ()) {                                        \
+            Val |= 0x80;                                        \
+        }                                                       \
+        TEST_ZF (Val);                                          \
+        TEST_SF (Val);                                          \
+        SET_CF (ShiftOut);                                      \
+    } while(0)
 
 /* ASL */
 #define ASL(Val)                                                \

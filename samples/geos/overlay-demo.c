@@ -27,7 +27,7 @@ void show(char *name)
 ** rather place the all the code of certain source files into the overlay by
 ** compiling them with --code-name OVERLAY1.
 */
-#pragma code-name(push, "OVERLAY1");
+#pragma code-name(push, "OVERLAY1")
 
 void foo(void)
 {
@@ -39,27 +39,27 @@ void foo(void)
     show("One");
 }
 
-#pragma code-name(pop);
+#pragma code-name(pop)
 
 
-#pragma code-name(push, "OVERLAY2");
+#pragma code-name(push, "OVERLAY2")
 
 void bar(void)
 {
     show("Two");
 }
 
-#pragma code-name(pop);
+#pragma code-name(pop)
 
 
-#pragma code-name(push, "OVERLAY3");
+#pragma code-name(push, "OVERLAY3")
 
 void foobar (void)
 {
     show("Three");
 }
 
-#pragma code-name(pop);
+#pragma code-name(pop)
 
 
 void main(int /*argc*/, char *argv[])

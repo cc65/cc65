@@ -39,7 +39,7 @@ void log (char *msg)
 ** rather place all the code of certain source files into the overlay by
 ** compiling them with --code-name OVERLAY1.
 */
-#pragma code-name (push, "OVERLAY1");
+#pragma code-name (push, "OVERLAY1")
 
 void foo (void)
 {
@@ -51,27 +51,27 @@ void foo (void)
     log ("Calling main from overlay 1");
 }
 
-#pragma code-name (pop);
+#pragma code-name (pop)
 
 
-#pragma code-name (push, "OVERLAY2");
+#pragma code-name (push, "OVERLAY2")
 
 void bar (void)
 {
     log ("Calling main from overlay 2");
 }
 
-#pragma code-name (pop);
+#pragma code-name (pop)
 
 
-#pragma code-name (push, "OVERLAY3");
+#pragma code-name (push, "OVERLAY3")
 
 void foobar (void)
 {
     log ("Calling main from overlay 3");
 }
 
-#pragma code-name(pop);
+#pragma code-name(pop)
 
 
 unsigned char loadfile (char *name, void *addr, void *size)

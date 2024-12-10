@@ -377,6 +377,7 @@ char* SearchFile (const SearchPaths* P, const char* File)
         SB_AppendStr (&PathName, File);
         SB_Terminate (&PathName);
 
+
         /* Check if this file exists */
         if (access (SB_GetBuf (&PathName), 0) == 0) {
             /* The file exists, we're done */

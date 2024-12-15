@@ -1059,7 +1059,7 @@ The namespace token (<tt/::/) is used to access other scopes:
         .endscope
 
                 ...
-                lda     foo::bar        ; Access foo in scope bar
+                lda     #foo::bar        ; Access bar in scope foo
 </verb></tscreen>
 
 The only way to deny access to a scope from the outside is to declare a scope

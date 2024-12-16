@@ -391,7 +391,7 @@ CPUType CPU;
 typedef void (*OPFunc) (void);
 
 /* The CPU registers */
-static CPURegs Regs;
+CPURegs Regs;
 
 /* Cycles for the current insn */
 static unsigned Cycles;

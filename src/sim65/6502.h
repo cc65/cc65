@@ -65,6 +65,9 @@ struct CPURegs {
     unsigned    PC;             /* Program counter */
 };
 
+/* Current CPU registers */
+extern CPURegs Regs;
+
 /* Status register bits */
 #define CF      0x01            /* Carry flag */
 #define ZF      0x02            /* Zero flag */

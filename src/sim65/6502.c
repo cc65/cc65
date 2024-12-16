@@ -556,15 +556,15 @@ static unsigned HaveIRQRequest;
 /* #imm */
 #define ALU_OP_IMM(op)                                          \
     unsigned char immediate;                                    \
-        MEM_AD_OP_IMM(immediate);                               \
-        Cycles = 2;                                             \
+    MEM_AD_OP_IMM(immediate);                                   \
+    Cycles = 2;                                                 \
     op (immediate)
 
 /* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y / (zp) */
 #define ALU_OP(mode, op)                                        \
     unsigned address, operand;                                  \
-        Cycles = ALU_CY_##mode;                                 \
-        MEM_AD_OP (mode, address, operand);                     \
+    Cycles = ALU_CY_##mode;                                     \
+    MEM_AD_OP (mode, address, operand);                         \
     op (operand)
 
 /* Store opcode helpers */

@@ -304,8 +304,9 @@ IIgs:
 
         ldx     Channel
 
-        ; Deactivate interrupts
-        sei
+        php                             ; Deactivate interrupts
+        sei                             ; if enabled
+
         ldy     #WR_MASTER_IRQ_RST
         lda     #MASTER_IRQ_SHUTDOWN
         jsr     writeSCCReg
@@ -334,7 +335,7 @@ IIgs:
         ldx     #$00
         stx     Opened                  ; Mark port as closed
 
-        cli
+        plp                             ; Reenable interrupts if needed
 :       txa                             ; Promote char return value
         rts
 
@@ -352,7 +353,8 @@ getClockSource:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_OPEN:
-        sei
+        php                             ; Deactivate interrupts
+        sei                             ; if enabled
 
         ; Check if the handshake setting is valid
         ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
@@ -497,9 +499,9 @@ BaudOK:
         lda     #SER_ERR_OK
 
 SetupOut:
+        plp                             ; Reenable interrupts if needed
         ldx     #$00                    ; Promote char return value
         sty     Opened
-        cli
         rts
 
 ;----------------------------------------------------------------------------

@@ -47,6 +47,7 @@
 #include "6502.h"
 #include "error.h"
 #include "memory.h"
+#include "peripherals.h"
 #include "paravirt.h"
 
 
@@ -59,9 +60,6 @@
 
 /* Name of program file */
 const char* ProgramFile;
-
-/* count of total cycles executed */
-unsigned long long TotalCycles = 0;
 
 /* exit simulator after MaxCycles Cccles */
 unsigned long long MaxCycles = 0;
@@ -309,6 +307,7 @@ int main (int argc, char* argv[])
     }
 
     MemInit ();
+    PeripheralsInit ();
 
     SPAddr = ReadProgramFile ();
     ParaVirtInit (I, SPAddr);
@@ -318,7 +317,6 @@ int main (int argc, char* argv[])
     RemainCycles = MaxCycles;
     while (1) {
         Cycles = ExecuteInsn ();
-        TotalCycles += Cycles;
         if (MaxCycles) {
             if (Cycles > RemainCycles) {
                 ErrorCode (SIM65_ERROR_TIMEOUT, "Maximum number of cycles reached.");

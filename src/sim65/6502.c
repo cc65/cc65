@@ -42,6 +42,7 @@
 */
 
 #include "memory.h"
+#include "peripherals.h"
 #include "error.h"
 #include "6502.h"
 #include "paravirt.h"
@@ -391,7 +392,7 @@ CPUType CPU;
 typedef void (*OPFunc) (void);
 
 /* The CPU registers */
-static CPURegs Regs;
+CPURegs Regs;
 
 /* Cycles for the current insn */
 static unsigned Cycles;
@@ -4107,6 +4108,8 @@ unsigned ExecuteInsn (void)
     if (HaveNMIRequest) {
 
         HaveNMIRequest = 0;
+        PRegs.counter_nmi_events += 1;
+
         PUSH (PCH);
         PUSH (PCL);
         PUSH (Regs.SR & ~BF);
@@ -4121,6 +4124,8 @@ unsigned ExecuteInsn (void)
     } else if (HaveIRQRequest && GET_IF () == 0) {
 
         HaveIRQRequest = 0;
+        PRegs.counter_irq_events += 1;
+
         PUSH (PCH);
         PUSH (PCL);
         PUSH (Regs.SR & ~BF);
@@ -4139,7 +4144,13 @@ unsigned ExecuteInsn (void)
 
         /* Execute it */
         Handlers[CPU][OPC] ();
+
+        /* Increment the instruction counter by one.NMIs and IRQs are counted separately. */
+        PRegs.counter_instructions += 1;
     }
+
+    /* Increment the 64-bit clock cycle counter with the cycle count for the instruction that we just executed */
+    PRegs.counter_clock_cycles += Cycles;
 
     /* Return the number of clock cycles needed by this insn */
     return Cycles;

@@ -8,6 +8,8 @@
         .import         _fgetc, popptr1, pushptr1, popax, pushax, return0, ___errno
         .importzp       ptr1, ptr4
 
+        .feature        string_escapes
+
         .include        "errno.inc"
         .include        "stdio.inc"
         .include        "_file.inc"
@@ -88,7 +90,22 @@ read_loop:
         bne     :+
         inc     ptr4+1
 
-:       cmp     #$0A            ; Stop at \n
+        ; The next code line:
+        ;
+        ;     .byte $c9, "\n"
+        ;
+        ; corresponds to a CMP #imm with the target-specific newline value as its operand.
+        ; This works because (with the 'string_escapes' feature enabled), the "\n" string
+        ; assembles to the target-specific value for the newline character.
+        ;
+        ; It would be better if we could just write:
+        ;
+        ; cmp #'\n'
+        ;
+        ; Unfortunately, ca65 doesn't currently handle escape characters in character
+        ; constants. In the longer term, fixing that would be the preferred solution.
+
+:       .byte   $c9, "\n"       ; cmp #'\n'
         beq     done
         bne     read_loop
 

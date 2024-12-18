@@ -82,10 +82,10 @@ void PeripheralWriteByte (uint8_t Addr, uint8_t Val)
             PRegs.latched_wallclock_time = get_uint64_wallclock_time();
 
             /* Now latch all the cycles maintained by the processor. */
-            PRegs.latched_counter_clock_cycles = PRegs.latched_counter_clock_cycles;
-            PRegs.latched_counter_instructions = PRegs.latched_counter_instructions;
-            PRegs.latched_counter_irq_events = PRegs.latched_counter_irq_events;
-            PRegs.latched_counter_nmi_events = PRegs.latched_counter_nmi_events;
+            PRegs.latched_counter_clock_cycles = PRegs.counter_clock_cycles;
+            PRegs.latched_counter_instructions = PRegs.counter_instructions;
+            PRegs.latched_counter_irq_events = PRegs.counter_irq_events;
+            PRegs.latched_counter_nmi_events = PRegs.counter_nmi_events;
             break;
         }
         case PERIPHERALS_ADDRESS_OFFSET_SELECT: {

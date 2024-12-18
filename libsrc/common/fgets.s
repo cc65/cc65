@@ -100,7 +100,7 @@ read_loop:
         ;
         ; It would be better if we could just write:
         ;
-        ; cmp #'\n'
+        ;     cmp #'\n'
         ;
         ; Unfortunately, ca65 doesn't currently handle escape characters in character
         ; constants. In the longer term, fixing that would be the preferred solution.

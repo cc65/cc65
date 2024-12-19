@@ -37,6 +37,8 @@
 #define _6502_H
 
 
+#include <stdint.h>
+
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -57,12 +59,12 @@ extern CPUType CPU;
 /* 6502 CPU registers */
 typedef struct CPURegs CPURegs;
 struct CPURegs {
-    unsigned    AC;             /* Accumulator */
-    unsigned    XR;             /* X register */
-    unsigned    YR;             /* Y register */
-    unsigned    SR;             /* Status register */
-    unsigned    SP;             /* Stackpointer */
-    unsigned    PC;             /* Program counter */
+    uint8_t     AC;             /* Accumulator */
+    uint8_t     XR;             /* X register */
+    uint8_t     YR;             /* Y register */
+    uint8_t     SR;             /* Status register */
+    uint8_t     SP;             /* Stackpointer */
+    uint16_t    PC;             /* Program counter */
 };
 
 /* Current CPU registers */

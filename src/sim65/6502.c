@@ -664,15 +664,12 @@ static unsigned HaveIRQRequest;
 
 
 /* ADC, binary mode (6502 and 65C02) */
-/* TODO: once the Regs fields are properly sized, get rid of the
- * "& 0xff" in the Regs.AC asignment.
- */
 #define ADC_BINARY_MODE(v)                                      \
     do {                                                        \
         const uint8_t op = v;                                   \
         const uint8_t OldAC = Regs.AC;                          \
         bool carry = GET_CF();                                  \
-        Regs.AC = (OldAC + op + carry) & 0xff;                  \
+        Regs.AC = (OldAC + op + carry);                         \
         const bool NV = Regs.AC >= 0x80;                        \
         carry = OldAC + op + carry >= 0x100;                    \
         SET_SF(NV);                                             \
@@ -1027,15 +1024,12 @@ static unsigned HaveIRQRequest;
     TEST_ZF (Val)
 
 /* SBC, binary mode (6502 and 65C02) */
-/* TODO: once the Regs fields are properly sized, get rid of the
- * "& 0xff" in the Regs.AC asignment.
- */
 #define SBC_BINARY_MODE(v)                                      \
     do {                                                        \
         const uint8_t op = v;                                   \
         const uint8_t OldAC = Regs.AC;                          \
         const bool borrow = !GET_CF();                          \
-        Regs.AC = (OldAC - op - borrow) & 0xff;                 \
+        Regs.AC = (OldAC - op - borrow);                        \
         const bool NV = Regs.AC >= 0x80;                        \
         SET_SF(NV);                                             \
         SET_OF(((OldAC >= 0x80) ^ NV) & ((op < 0x80) ^ NV));    \

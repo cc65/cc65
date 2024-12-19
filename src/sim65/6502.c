@@ -37,9 +37,10 @@
 /* Known bugs and limitations of the 65C02 simulation:
  * support currently only on the level of 65SC02:
    BBRx, BBSx, RMBx, SMBx, WAI, and STP are unsupported
- * BCD flag handling equals 6502 (unchecked if bug is simulated or wrong for
-   6502)
 */
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "memory.h"
 #include "error.h"
@@ -662,40 +663,88 @@ static unsigned HaveIRQRequest;
     TEST_SF (Regs.AC)
 
 
-/* ADC */
-#define ADC(v)                                                  \
+/* ADC, binary mode (6502 and 65C02) */
+/* TODO: once the Regs fields are properly sized, get rid of the
+ * "& 0xff" in the Regs.AC asignment.
+ */
+#define ADC_BINARY_MODE(v)                                      \
     do {                                                        \
-        unsigned old = Regs.AC;                                 \
-        unsigned rhs = (v & 0xFF);                              \
-        if (GET_DF ()) {                                        \
-            unsigned lo;                                        \
-            int res;                                            \
-            lo = (old & 0x0F) + (rhs & 0x0F) + GET_CF ();       \
-            if (lo >= 0x0A) {                                   \
-                lo = ((lo + 0x06) & 0x0F) + 0x10;               \
-            }                                                   \
-            Regs.AC = (old & 0xF0) + (rhs & 0xF0) + lo;         \
-            res = (signed char)(old & 0xF0) +                   \
-                  (signed char)(rhs & 0xF0) +                   \
-                  (signed char)lo;                              \
-            TEST_ZF (old + rhs + GET_CF ());                    \
-            TEST_SF (Regs.AC);                                  \
-            if (Regs.AC >= 0xA0) {                              \
-                Regs.AC += 0x60;                                \
-            }                                                   \
-            TEST_CF (Regs.AC);                                  \
-            SET_OF ((res < -128) || (res > 127));               \
-            if (CPU == CPU_65C02) {                             \
-                ++Cycles;                                       \
-            }                                                   \
+        const uint8_t op = v;                                   \
+        const uint8_t OldAC = Regs.AC;                          \
+        bool carry = GET_CF();                                  \
+        Regs.AC = (OldAC + op + carry) & 0xff;                  \
+        const bool NV = Regs.AC >= 0x80;                        \
+        carry = OldAC + op + carry >= 0x100;                    \
+        SET_SF(NV);                                             \
+        SET_OF(((OldAC >= 0x80) ^ NV) & ((op >= 0x80) ^ NV));   \
+        SET_ZF(Regs.AC == 0);                                   \
+        SET_CF(carry);                                          \
+    } while (0)
+
+/* ADC, decimal mode (6502 behavior) */
+#define ADC_DECIMAL_MODE_6502(v)                                \
+    do {                                                        \
+        const uint8_t op = v;                                   \
+        const uint8_t OldAC = Regs.AC;                          \
+        bool carry = GET_CF();                                  \
+        const uint8_t binary_result = OldAC + op + carry;       \
+        uint8_t low_nibble = (OldAC & 15) + (op & 15) + carry;  \
+        if ((carry = low_nibble > 9))                           \
+            low_nibble = (low_nibble - 10) & 15;                \
+        uint8_t high_nibble = (OldAC >> 4) + (op >> 4) + carry; \
+        const bool NV = (high_nibble & 8) != 0;                 \
+        if ((carry = high_nibble > 9))                          \
+            high_nibble = (high_nibble - 10) & 15;              \
+        Regs.AC = (high_nibble << 4) | low_nibble;              \
+        SET_SF(NV);                                             \
+        SET_OF(((OldAC >= 0x80) ^ NV) & ((op >= 0x80) ^ NV));   \
+        SET_ZF(binary_result == 0);                             \
+        SET_CF(carry);                                          \
+    } while (0)
+
+/* ADC, decimal mode (65C02 behavior) */
+#define ADC_DECIMAL_MODE_65C02(v)                               \
+    do {                                                        \
+        const uint8_t op = v;                                   \
+        const uint8_t OldAC = Regs.AC;                          \
+        const bool OldCF = GET_CF();                            \
+        bool carry = OldCF;                                     \
+        uint8_t low_nibble = (OldAC & 15) + (op & 15) + carry;  \
+        if ((carry = low_nibble > 9))                           \
+            low_nibble = (low_nibble - 10) & 15;                \
+        uint8_t high_nibble = (OldAC >> 4) + (op >> 4) + carry; \
+        const bool PrematureSF = (high_nibble & 8) != 0;        \
+        if ((carry = high_nibble > 9))                          \
+            high_nibble = (high_nibble - 10) & 15;              \
+        Regs.AC = (high_nibble << 4) | low_nibble;              \
+        const bool NewZF = Regs.AC == 0;                        \
+        const bool NewSF = Regs.AC >= 0x80;                     \
+        const bool NewOF = ((OldAC >= 0x80) ^ PrematureSF) &    \
+                           ((op    >= 0x80) ^ PrematureSF);     \
+        SET_SF(NewSF);                                          \
+        SET_OF(NewOF);                                          \
+        SET_ZF(NewZF);                                          \
+        SET_CF(carry);                                          \
+        ++Cycles;                                               \
+    } while (0)
+
+/* ADC, 6502 version */
+#define ADC_6502(v)                                             \
+    do {                                                        \
+        if (GET_DF()) {                                         \
+            ADC_DECIMAL_MODE_6502(v);                           \
         } else {                                                \
-            Regs.AC += rhs + GET_CF ();                         \
-            TEST_ZF (Regs.AC);                                  \
-            TEST_SF (Regs.AC);                                  \
-            TEST_CF (Regs.AC);                                  \
-            SET_OF (!((old ^ rhs) & 0x80) &&                    \
-                    ((old ^ Regs.AC) & 0x80));                  \
-            Regs.AC &= 0xFF;                                    \
+            ADC_BINARY_MODE(v);                                 \
+        }                                                       \
+    } while (0)
+
+/* ADC, 65C02 version */
+#define ADC_65C02(v)                                                          \
+    do {                                                        \
+        if (GET_DF()) {                                         \
+            ADC_DECIMAL_MODE_65C02(v);                          \
+        } else {                                                \
+            ADC_BINARY_MODE(v);                                 \
         }                                                       \
     } while (0)
 
@@ -822,7 +871,7 @@ static unsigned HaveIRQRequest;
     }                                                           \
     SET_CF (Val & 0x01);                                        \
     Val >>= 1;                                                  \
-    ADC (Val)
+    ADC_6502 (Val)
 
 /* BIT */
 #define BIT(Val)                                                \
@@ -879,7 +928,7 @@ static unsigned HaveIRQRequest;
 /* ISC */
 #define ISC(Val)                                                \
     Val = (Val + 1) & 0xFF;                                     \
-    SBC(Val)
+    SBC_6502(Val)
 
 /* ASR */
 #define ASR(Val)                                                \
@@ -977,33 +1026,88 @@ static unsigned HaveIRQRequest;
     TEST_SF (Val);                                              \
     TEST_ZF (Val)
 
-
-/* SBC */
-#define SBC(v)                                                  \
+/* SBC, binary mode (6502 and 65C02) */
+/* TODO: once the Regs fields are properly sized, get rid of the
+ * "& 0xff" in the Regs.AC asignment.
+ */
+#define SBC_BINARY_MODE(v)                                      \
     do {                                                        \
-        unsigned r_a = Regs.AC;                                 \
-        unsigned src = (v) & 0xFF;                              \
-        unsigned ccc = (Regs.SR & CF) ^ CF;                     \
-        unsigned tmp = r_a - src - ccc;                         \
-                                                                \
-        SET_CF(tmp < 0x100);                                    \
-        TEST_SF(tmp);                                           \
-        TEST_ZF(tmp);                                           \
-        SET_OF((r_a ^ tmp) & (r_a ^ src) & 0x80);               \
-                                                                \
-        if (GET_DF ()) {                                        \
-            unsigned low = (r_a & 0x0f) - (src & 0x0f) - ccc;   \
-            tmp = (r_a & 0xf0) - (src & 0xf0);                  \
-            if (low & 0x10) {                                   \
-                low -= 6;                                       \
-                tmp -= 0x10;                                    \
-            }                                                   \
-            tmp = (low & 0xf) | tmp;                            \
-            if (tmp & 0x100) {                                  \
-                tmp -= 0x60;                                    \
-            }                                                   \
+        const uint8_t op = v;                                   \
+        const uint8_t OldAC = Regs.AC;                          \
+        const bool borrow = !GET_CF();                          \
+        Regs.AC = (OldAC - op - borrow) & 0xff;                 \
+        const bool NV = Regs.AC >= 0x80;                        \
+        SET_SF(NV);                                             \
+        SET_OF(((OldAC >= 0x80) ^ NV) & ((op < 0x80) ^ NV));    \
+        SET_ZF(Regs.AC == 0);                                   \
+        SET_CF(OldAC >= op + borrow);                           \
+    } while (0)
+
+/* SBC, decimal mode (6502 behavior) */
+#define SBC_DECIMAL_MODE_6502(v)                                \
+    do {                                                        \
+        const uint8_t op = v;                                   \
+        const uint8_t OldAC = Regs.AC;                          \
+        bool borrow = !GET_CF();                                \
+        const uint8_t binary_result = OldAC - op - borrow;      \
+        const bool NV = binary_result >= 0x80;                  \
+        uint8_t low_nibble = (OldAC & 15) - (op & 15) - borrow; \
+        if ((borrow = low_nibble >= 0x80))                      \
+            low_nibble = (low_nibble + 10) & 15;                \
+        uint8_t high_nibble = (OldAC >> 4) - (op >> 4) - borrow;\
+        if ((borrow = high_nibble >= 0x80))                     \
+            high_nibble = (high_nibble + 10) & 15;              \
+        Regs.AC = (high_nibble << 4) | low_nibble;              \
+        SET_SF(NV);                                             \
+        SET_OF(((OldAC >= 0x80) ^ NV) & ((op < 0x80) ^ NV));    \
+        SET_ZF(binary_result == 0);                             \
+        SET_CF(!borrow);                                        \
+    } while (0)
+
+/* SBC, decimal mode (65C02 behavior) */
+#define SBC_DECIMAL_MODE_65C02(v)                               \
+    do {                                                        \
+        const uint8_t op = v;                                   \
+        const uint8_t OldAC = Regs.AC;                          \
+        bool borrow = !GET_CF();                                \
+        uint8_t low_nibble = (OldAC & 15) - (op & 15) - borrow; \
+        if ((borrow = low_nibble >= 0x80))                      \
+            low_nibble += 10;                                   \
+        const bool low_nibble_still_negative =                  \
+            (low_nibble >= 0x80);                               \
+        low_nibble &= 15;                                       \
+        uint8_t high_nibble = (OldAC >> 4) - (op >> 4) - borrow;\
+        const bool PN = (high_nibble & 8) != 0;                 \
+        if ((borrow = high_nibble >= 0x80))                     \
+            high_nibble += 10;                                  \
+        high_nibble -= low_nibble_still_negative;               \
+        high_nibble &= 15;                                      \
+        Regs.AC = (high_nibble << 4) | low_nibble;              \
+        SET_SF(Regs.AC >= 0x80);                                \
+        SET_OF(((OldAC >= 0x80) ^ PN) & ((op < 0x80) ^ PN));    \
+        SET_ZF(Regs.AC == 0x00);                                \
+        SET_CF(!borrow);                                        \
+        ++Cycles;                                               \
+    } while (0)
+
+/* SBC, 6502 version */
+#define SBC_6502(v)                                             \
+    do {                                                        \
+        if (GET_DF()) {                                         \
+            SBC_DECIMAL_MODE_6502(v);                           \
+        } else {                                                \
+            SBC_BINARY_MODE(v);                                 \
         }                                                       \
-        Regs.AC = tmp & 0xFF;                                   \
+    } while (0)
+
+/* SBC, 65C02 version */
+#define SBC_65C02(v)                                            \
+    do {                                                        \
+        if (GET_DF()) {                                         \
+            SBC_DECIMAL_MODE_65C02(v);                          \
+        } else {                                                \
+            SBC_BINARY_MODE(v);                                 \
+        }                                                       \
     } while (0)
 
 
@@ -1887,10 +1991,16 @@ static void OPC_6502_60 (void)
 static void OPC_6502_61 (void)
 /* Opcode $61: ADC (zp,x) */
 {
-    ALU_OP (ZPXIND, ADC);
+    ALU_OP (ZPXIND, ADC_6502);
 }
 
 
+
+static void OPC_65C02_61 (void)
+/* Opcode $61: ADC (zp,x) */
+{
+    ALU_OP (ZPXIND, ADC_65C02);
+}
 
 static void OPC_6502_63 (void)
 /* Opcode $63: RRA (zp,x) */
@@ -1911,7 +2021,15 @@ static void OPC_65SC02_64 (void)
 static void OPC_6502_65 (void)
 /* Opcode $65: ADC zp */
 {
-    ALU_OP (ZP, ADC);
+    ALU_OP (ZP, ADC_6502);
+}
+
+
+
+static void OPC_65C02_65 (void)
+/* Opcode $65: ADC zp */
+{
+    ALU_OP (ZP, ADC_65C02);
 }
 
 
@@ -1947,10 +2065,16 @@ static void OPC_6502_68 (void)
 static void OPC_6502_69 (void)
 /* Opcode $69: ADC #imm */
 {
-    ALU_OP_IMM (ADC);
+    ALU_OP_IMM (ADC_6502);
 }
 
 
+
+static void OPC_65C02_69 (void)
+/* Opcode $69: ADC #imm */
+{
+    ALU_OP_IMM (ADC_65C02);
+}
 
 static void OPC_6502_6A (void)
 /* Opcode $6A: ROR a */
@@ -2010,7 +2134,15 @@ static void OPC_65C02_6C (void)
 static void OPC_6502_6D (void)
 /* Opcode $6D: ADC abs */
 {
-    ALU_OP (ABS, ADC);
+    ALU_OP (ABS, ADC_6502);
+}
+
+
+
+static void OPC_65C02_6D (void)
+/* Opcode $6D: ADC abs */
+{
+    ALU_OP (ABS, ADC_65C02);
 }
 
 
@@ -2042,15 +2174,23 @@ static void OPC_6502_70 (void)
 static void OPC_6502_71 (void)
 /* Opcode $71: ADC (zp),y */
 {
-    ALU_OP (ZPINDY, ADC);
+    ALU_OP (ZPINDY, ADC_6502);
 }
 
 
 
-static void OPC_65SC02_72 (void)
+static void OPC_65C02_71 (void)
+/* Opcode $71: ADC (zp),y */
+{
+    ALU_OP (ZPINDY, ADC_65C02);
+}
+
+
+
+static void OPC_65C02_72 (void)
 /* Opcode $72: ADC (zp) */
 {
-    ALU_OP (ZPIND, ADC);
+    ALU_OP (ZPIND, ADC_65C02);
 }
 
 
@@ -2074,10 +2214,16 @@ static void OPC_65SC02_74 (void)
 static void OPC_6502_75 (void)
 /* Opcode $75: ADC zp,x */
 {
-    ALU_OP (ZPX, ADC);
+    ALU_OP (ZPX, ADC_6502);
 }
 
 
+
+static void OPC_65C02_75 (void)
+/* Opcode $75: ADC zp,x */
+{
+    ALU_OP (ZPX, ADC_65C02);
+}
 
 static void OPC_6502_76 (void)
 /* Opcode $76: ROR zp,x */
@@ -2108,7 +2254,15 @@ static void OPC_6502_78 (void)
 static void OPC_6502_79 (void)
 /* Opcode $79: ADC abs,y */
 {
-    ALU_OP (ABSY, ADC);
+    ALU_OP (ABSY, ADC_6502);
+}
+
+
+
+static void OPC_65C02_79 (void)
+/* Opcode $79: ADC abs,y */
+{
+    ALU_OP (ABSY, ADC_65C02);
 }
 
 
@@ -2150,7 +2304,15 @@ static void OPC_65SC02_7C (void)
 static void OPC_6502_7D (void)
 /* Opcode $7D: ADC abs,x */
 {
-    ALU_OP (ABSX, ADC);
+    ALU_OP (ABSX, ADC_6502);
+}
+
+
+
+static void OPC_65C02_7D (void)
+/* Opcode $7D: ADC abs,x */
+{
+    ALU_OP (ABSX, ADC_65C02);
 }
 
 
@@ -2992,10 +3154,16 @@ static void OPC_6502_E0 (void)
 static void OPC_6502_E1 (void)
 /* Opcode $E1: SBC (zp,x) */
 {
-    ALU_OP (ZPXIND, SBC);
+    ALU_OP (ZPXIND, SBC_6502);
 }
 
 
+
+static void OPC_65C02_E1 (void)
+/* Opcode $E1: SBC (zp,x) */
+{
+    ALU_OP (ZPXIND, SBC_65C02);
+}
 
 static void OPC_6502_E3 (void)
 /* Opcode $E3: ISC (zp,x) */
@@ -3016,7 +3184,15 @@ static void OPC_6502_E4 (void)
 static void OPC_6502_E5 (void)
 /* Opcode $E5: SBC zp */
 {
-    ALU_OP (ZP, SBC);
+    ALU_OP (ZP, SBC_6502);
+}
+
+
+
+static void OPC_65C02_E5 (void)
+/* Opcode $E5: SBC zp */
+{
+    ALU_OP (ZP, SBC_65C02);
 }
 
 
@@ -3047,16 +3223,22 @@ static void OPC_6502_E8 (void)
 
 
 
-/* Aliases of opcode $EA */
+/* Aliases of opcode $E9 */
 #define OPC_6502_EB OPC_6502_E9
 
 static void OPC_6502_E9 (void)
 /* Opcode $E9: SBC #imm */
 {
-    ALU_OP_IMM (SBC);
+    ALU_OP_IMM (SBC_6502);
 }
 
 
+
+static void OPC_65C02_E9 (void)
+/* Opcode $E9: SBC #imm */
+{
+    ALU_OP_IMM (SBC_65C02);
+}
 
 /* Aliases of opcode $EA */
 #define OPC_6502_1A OPC_6502_EA
@@ -3123,7 +3305,15 @@ static void OPC_6502_EC (void)
 static void OPC_6502_ED (void)
 /* Opcode $ED: SBC abs */
 {
-    ALU_OP (ABS, SBC);
+    ALU_OP (ABS, SBC_6502);
+}
+
+
+
+static void OPC_65C02_ED (void)
+/* Opcode $ED: SBC abs */
+{
+    ALU_OP (ABS, SBC_65C02);
 }
 
 
@@ -3154,15 +3344,24 @@ static void OPC_6502_F0 (void)
 static void OPC_6502_F1 (void)
 /* Opcode $F1: SBC (zp),y */
 {
-    ALU_OP (ZPINDY, SBC);
+    ALU_OP (ZPINDY, SBC_6502);
 }
 
 
 
-static void OPC_65SC02_F2 (void)
+
+static void OPC_65C02_F1 (void)
+/* Opcode $F1: SBC (zp),y */
+{
+    ALU_OP (ZPINDY, SBC_65C02);
+}
+
+
+
+static void OPC_65C02_F2 (void)
 /* Opcode $F2: SBC (zp) */
 {
-    ALU_OP (ZPIND, SBC);
+    ALU_OP (ZPIND, SBC_65C02);
 }
 
 
@@ -3178,7 +3377,15 @@ static void OPC_6502_F3 (void)
 static void OPC_6502_F5 (void)
 /* Opcode $F5: SBC zp,x */
 {
-    ALU_OP (ZPX, SBC);
+    ALU_OP (ZPX, SBC_6502);
+}
+
+
+
+static void OPC_65C02_F5 (void)
+/* Opcode $F5: SBC zp,x */
+{
+    ALU_OP (ZPX, SBC_65C02);
 }
 
 
@@ -3212,7 +3419,15 @@ static void OPC_6502_F8 (void)
 static void OPC_6502_F9 (void)
 /* Opcode $F9: SBC abs,y */
 {
-    ALU_OP (ABSY, SBC);
+    ALU_OP (ABSY, SBC_6502);
+}
+
+
+
+static void OPC_65C02_F9 (void)
+/* Opcode $F9: SBC abs,y */
+{
+    ALU_OP (ABSY, SBC_65C02);
 }
 
 
@@ -3240,7 +3455,15 @@ static void OPC_6502_FB (void)
 static void OPC_6502_FD (void)
 /* Opcode $FD: SBC abs,x */
 {
-    ALU_OP (ABSX, SBC);
+    ALU_OP (ABSX, SBC_6502);
+}
+
+
+
+static void OPC_65C02_FD (void)
+/* Opcode $FD: SBC abs,x */
+{
+    ALU_OP (ABSX, SBC_65C02);
 }
 
 
@@ -3890,35 +4113,35 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_5E,
     OPC_Illegal,        // $5F: BBR5 currently unsupported
     OPC_6502_60,
-    OPC_6502_61,
+    OPC_65C02_61,
     OPC_65C02_NOP22,    // $62
     OPC_65C02_NOP11,    // $63
     OPC_65SC02_64,
-    OPC_6502_65,
+    OPC_65C02_65,
     OPC_6502_66,
     OPC_Illegal,        // $67: RMB6 currently unsupported
     OPC_6502_68,
-    OPC_6502_69,
+    OPC_65C02_69,
     OPC_6502_6A,
     OPC_65C02_NOP11,    // $6B
     OPC_65C02_6C,
-    OPC_6502_6D,
+    OPC_65C02_6D,
     OPC_6502_6E,
     OPC_Illegal,        // $6F: BBR6 currently unsupported
     OPC_6502_70,
-    OPC_6502_71,
-    OPC_65SC02_72,
+    OPC_65C02_71,
+    OPC_65C02_72,
     OPC_65C02_NOP11,    // $73
     OPC_65SC02_74,
-    OPC_6502_75,
+    OPC_65C02_75,
     OPC_6502_76,
     OPC_Illegal,        // $77: RMB7 currently unsupported
     OPC_6502_78,
-    OPC_6502_79,
+    OPC_65C02_79,
     OPC_65SC02_7A,
     OPC_65C02_NOP11,    // $7B
     OPC_65SC02_7C,
-    OPC_6502_7D,
+    OPC_65C02_7D,
     OPC_65C02_7E,
     OPC_Illegal,        // $7F: BBR7 currently unsupported
     OPC_65SC02_80,
@@ -4018,35 +4241,35 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_DE,
     OPC_Illegal,        // $DF: BBS5 currently unsupported
     OPC_6502_E0,
-    OPC_6502_E1,
+    OPC_65C02_E1,
     OPC_65C02_NOP22,    // $E2
     OPC_65C02_NOP11,    // $E3
     OPC_6502_E4,
-    OPC_6502_E5,
+    OPC_65C02_E5,
     OPC_6502_E6,
     OPC_Illegal,        // $E7: SMB6 currently unsupported
     OPC_6502_E8,
-    OPC_6502_E9,
+    OPC_65C02_E9,
     OPC_6502_EA,
     OPC_65C02_NOP11,    // $EB
     OPC_6502_EC,
-    OPC_6502_ED,
+    OPC_65C02_ED,
     OPC_6502_EE,
     OPC_Illegal,        // $EF: BBS6 currently unsupported
     OPC_6502_F0,
-    OPC_6502_F1,
-    OPC_65SC02_F2,
+    OPC_65C02_F1,
+    OPC_65C02_F2,
     OPC_65C02_NOP11,    // $F3
     OPC_65C02_NOP24,    // $F4
-    OPC_6502_F5,
+    OPC_65C02_F5,
     OPC_6502_F6,
     OPC_Illegal,        // $F7: SMB7 currently unsupported
     OPC_6502_F8,
-    OPC_6502_F9,
+    OPC_65C02_F9,
     OPC_65SC02_FA,
     OPC_65C02_NOP11,    // $FB
     OPC_65C02_NOP34,    // $FC
-    OPC_6502_FD,
+    OPC_65C02_FD,
     OPC_6502_FE,
     OPC_Illegal,        // $FF: BBS7 currently unsupported
 };

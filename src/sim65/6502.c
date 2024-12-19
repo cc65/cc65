@@ -969,8 +969,14 @@ static unsigned HaveIRQRequest;
     } while (0);
 
 /* ANE */
+/* An "unstable" illegal opcode that depends on a "constant" value that isn't
+ * really constant. It varies between machines, with temperature, and so on.
+ * Original sim65 behavior was to use the constant 0xEF here. To get behavior
+ * in line with the 65x02 testsuite, we now use the value 0xEE instead,
+ * which is also a reasonable choice that can be observed in practice.
+ */
 #define ANE(Val)                                                \
-    Val = (Regs.AC | 0xEF) & Regs.XR & Val;                     \
+    Val = (Regs.AC | 0xEE) & Regs.XR & Val;                     \
     Regs.AC = Val;                                              \
     TEST_SF (Val);                                              \
     TEST_ZF (Val)

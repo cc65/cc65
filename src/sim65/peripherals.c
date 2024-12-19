@@ -55,6 +55,9 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 /* Write a byte to a memory location in the peripherals address aperture. */
 {
     switch (Addr) {
+
+        /* Handle writes to the Counter peripheral. */
+
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_LATCH: {
             /* A write to the "latch" register performs a simultaneous latch of all registers. */
 
@@ -63,29 +66,33 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
             int result = clock_gettime(CLOCK_REALTIME, &ts);
             if (result != 0) {
                 /* Unable to read time. Report max uint64 value for both fields. */
-                Peripherals.Counter.latched_wallclock_time = 0xffffffffffffffff;
-                Peripherals.Counter.latched_wallclock_time_split = 0xffffffffffffffff;
+                Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
+                Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
             } else {
-                /* Number of nanoseconds since 1-1-1970. */
-                Peripherals.Counter.latched_wallclock_time = 1000000000u * ts.tv_sec + ts.tv_nsec;
-                /* High word is number of seconds, low word is number of nanoseconds. */
-                Peripherals.Counter.latched_wallclock_time_split = (ts.tv_sec << 32) | ts.tv_nsec;
+                /* Wallclock time: number of nanoseconds since 1-1-1970. */
+                Peripherals.Counter.LatchedWallclockTime = 1000000000u * ts.tv_sec + ts.tv_nsec;
+                /* Wallclock time, split: high word is number of seconds since 1-1-1970,
+		 * low word is number of nanoseconds since the start of that second. */
+                Peripherals.Counter.LatchedWallclockTimeSplit = (ts.tv_sec << 32) | ts.tv_nsec;
             }
 
             /* Latch the counters that reflect the state of the processor. */
-            Peripherals.Counter.latched_clock_cycles = Peripherals.Counter.clock_cycles;
-            Peripherals.Counter.latched_cpu_instructions = Peripherals.Counter.cpu_instructions;
-            Peripherals.Counter.latched_irq_events = Peripherals.Counter.irq_events;
-            Peripherals.Counter.latched_nmi_events = Peripherals.Counter.nmi_events;
+            Peripherals.Counter.LatchedClockCycles = Peripherals.Counter.ClockCycles;
+            Peripherals.Counter.LatchedCpuInstructions = Peripherals.Counter.CpuInstructions;
+            Peripherals.Counter.LatchedIrqEvents = Peripherals.Counter.IrqEvents;
+            Peripherals.Counter.LatchedNmiEvents = Peripherals.Counter.NmiEvents;
             break;
         }
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_SELECT: {
             /* Set the value of the visibility-selection register. */
-            Peripherals.Counter.visible_latch_register = Val;
+            Peripherals.Counter.LatchedValueSelected = Val;
             break;
         }
+
+        /* Handle writes to unused and read-only peripheral addresses. */
+
         default: {
-            /* Any other write is ignored */
+            /* No action. */
         }
     }
 }
@@ -96,8 +103,11 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
 /* Read a byte from a memory location in the peripherals address aperture. */
 {
     switch (Addr) {
+
+        /* Handle reads from the Counter peripheral. */
+      
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_SELECT: {
-            return Peripherals.Counter.visible_latch_register;
+            return Peripherals.Counter.LatchedValueSelected;
         }
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE + 0:
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE + 1:
@@ -110,22 +120,25 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
             /* Read from any of the eight counter bytes.
              * The first byte is the 64 bit value's LSB, the seventh byte is its MSB.
              */
-            unsigned byte_select = Addr - PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE; /* 0 .. 7 */
-            uint64_t value;
-            switch (Peripherals.Counter.visible_latch_register) {
-                case PERIPHERALS_COUNTER_SELECT_CLOCKCYCLE_COUNTER: value = Peripherals.Counter.latched_clock_cycles; break;
-                case PERIPHERALS_COUNTER_SELECT_INSTRUCTION_COUNTER: value = Peripherals.Counter.latched_cpu_instructions; break;
-                case PERIPHERALS_COUNTER_SELECT_IRQ_COUNTER: value = Peripherals.Counter.latched_irq_events; break;
-                case PERIPHERALS_COUNTER_SELECT_NMI_COUNTER: value = Peripherals.Counter.latched_nmi_events; break;
-                case PERIPHERALS_COUNTER_SELECT_WALLCLOCK_TIME: value = Peripherals.Counter.latched_wallclock_time; break;
-                case PERIPHERALS_COUNTER_SELECT_WALLCLOCK_TIME_SPLIT: value = Peripherals.Counter.latched_wallclock_time_split; break;
-                default: value = 0; /* Reading from a non-existent register will yield 0. */
+            unsigned ByteIndex = Addr - PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE; /* 0 .. 7 */
+            uint64_t Value;
+            switch (Peripherals.Counter.LatchedValueSelected) {
+                case PERIPHERALS_COUNTER_SELECT_CLOCKCYCLE_COUNTER: Value = Peripherals.Counter.LatchedClockCycles; break;
+                case PERIPHERALS_COUNTER_SELECT_INSTRUCTION_COUNTER: Value = Peripherals.Counter.LatchedCpuInstructions; break;
+                case PERIPHERALS_COUNTER_SELECT_IRQ_COUNTER: Value = Peripherals.Counter.LatchedIrqEvents; break;
+                case PERIPHERALS_COUNTER_SELECT_NMI_COUNTER: Value = Peripherals.Counter.LatchedNmiEvents; break;
+                case PERIPHERALS_COUNTER_SELECT_WALLCLOCK_TIME: Value = Peripherals.Counter.LatchedWallclockTime; break;
+                case PERIPHERALS_COUNTER_SELECT_WALLCLOCK_TIME_SPLIT: Value = Peripherals.Counter.LatchedWallclockTimeSplit; break;
+                default: Value = 0; /* Reading from a non-existent latch register will yield 0. */
             }
             /* Return the desired byte of the latched counter. 0==LSB, 7==MSB. */
-            return value >> (byte_select * 8);
+            return Value >> (ByteIndex * 8);
         }
+
+        /* Handle reads from unused peripheral and write-only addresses. */
+
         default: {
-            /* Any other read yields a zero value. */
+            /* Return zero value. */
             return 0;
         }
     }
@@ -136,19 +149,19 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
 void PeripheralsInit (void)
 /* Initialize the peripherals. */
 {
-    /* Initialize the COUNTER peripheral */
+    /* Initialize the Counter peripheral */
 
-    Peripherals.Counter.clock_cycles = 0;
-    Peripherals.Counter.cpu_instructions = 0;
-    Peripherals.Counter.irq_events = 0;
-    Peripherals.Counter.nmi_events = 0;
+    Peripherals.Counter.ClockCycles = 0;
+    Peripherals.Counter.CpuInstructions = 0;
+    Peripherals.Counter.IrqEvents = 0;
+    Peripherals.Counter.NmiEvents = 0;
 
-    Peripherals.Counter.latched_clock_cycles = 0;
-    Peripherals.Counter.latched_cpu_instructions = 0;
-    Peripherals.Counter.latched_irq_events = 0;
-    Peripherals.Counter.latched_nmi_events = 0;
-    Peripherals.Counter.latched_wallclock_time = 0;
-    Peripherals.Counter.latched_wallclock_time_split = 0;
+    Peripherals.Counter.LatchedClockCycles = 0;
+    Peripherals.Counter.LatchedCpuInstructions = 0;
+    Peripherals.Counter.LatchedIrqEvents = 0;
+    Peripherals.Counter.LatchedNmiEvents = 0;
+    Peripherals.Counter.LatchedWallclockTime = 0;
+    Peripherals.Counter.LatchedWallclockTimeSplit = 0;
 
-    Peripherals.Counter.visible_latch_register = 0;
+    Peripherals.Counter.LatchedValueSelected = 0;
 }

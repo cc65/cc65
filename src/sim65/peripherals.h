@@ -59,27 +59,29 @@
 
 typedef struct {
     /* The invisible counters that keep processor state. */
-    uint64_t clock_cycles;
-    uint64_t cpu_instructions;
-    uint64_t irq_events;
-    uint64_t nmi_events;
-    /* Latched counters upon a write to the PERIPHERALS_COUNTER_LATCH address.
+    uint64_t ClockCycles;
+    uint64_t CpuInstructions;
+    uint64_t IrqEvents;
+    uint64_t NmiEvents;
+    /* The 'latched_...' fields below hold values that are sampled upon a write
+     * to the PERIPHERALS_COUNTER_LATCH address.
      * One of these will be visible (read only) through an eight-byte aperture.
      * The purpose of these latched registers is to read 64-bit values one byte
      * at a time, without having to worry that their content will change along
      * the way.
      */
-    uint64_t latched_clock_cycles;
-    uint64_t latched_cpu_instructions;
-    uint64_t latched_irq_events;
-    uint64_t latched_nmi_events;
-    uint64_t latched_wallclock_time;
-    uint64_t latched_wallclock_time_split;
+    uint64_t LatchedClockCycles;
+    uint64_t LatchedCpuInstructions;
+    uint64_t LatchedIrqEvents;
+    uint64_t LatchedNmiEvents;
+    uint64_t LatchedWallclockTime;
+    uint64_t LatchedWallclockTimeSplit;
     /* Select which of the six latched registers will be visible.
-     * This is a single byte, read/write register, accessible via address PERIPHERALS_COUNTER_SELECT.
-     * If a non-existent latch register is selected, the PERIPHERALS_REGS64 value will be zero.
+     * This is a single byte, read/write register, accessible via address
+     * PERIPHERALS_COUNTER_SELECT. If a non-existent latch register is selected,
+     * the PERIPHERALS_COUNTER_VALUE will be zero.
      */
-    uint8_t  visible_latch_register;
+    uint8_t LatchedValueSelected;
 } CounterPeripheral;
 
 
@@ -87,8 +89,8 @@ typedef struct {
 /* Declare the 'Sim65Peripherals' type and its single instance 'Peripherals'. */
 
 typedef struct {
-    /* State of the peripherals simulated by sim65.
-     * Currently, there is only one: the COUNTER peripheral. */
+    /* State of the peripherals available in sim65.
+     * Currently, there is only one peripheral: the Counter. */
     CounterPeripheral Counter;
 } Sim65Peripherals;
 

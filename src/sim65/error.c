@@ -118,7 +118,7 @@ void SimExit (int Code)
 /* Exit the simulation with an exit code */
 {
     if (PrintCycles) {
-        fprintf (stdout, PRIu64 " cycles\n", PRegs.counter_clock_cycles);
+        fprintf (stdout, "%" PRIu64 " cycles\n", PRegs.counter_clock_cycles);
     }
     exit (Code);
 }

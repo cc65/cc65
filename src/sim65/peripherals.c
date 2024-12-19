@@ -29,7 +29,6 @@
 /*****************************************************************************/
 
 
-
 #include <time.h>
 #include "peripherals.h"
 
@@ -72,7 +71,7 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
                 /* Wallclock time: number of nanoseconds since 1-1-1970. */
                 Peripherals.Counter.LatchedWallclockTime = 1000000000u * ts.tv_sec + ts.tv_nsec;
                 /* Wallclock time, split: high word is number of seconds since 1-1-1970,
-		 * low word is number of nanoseconds since the start of that second. */
+                 * low word is number of nanoseconds since the start of that second. */
                 Peripherals.Counter.LatchedWallclockTimeSplit = (ts.tv_sec << 32) | ts.tv_nsec;
             }
 
@@ -105,7 +104,7 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
     switch (Addr) {
 
         /* Handle reads from the Counter peripheral. */
-      
+
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_SELECT: {
             return Peripherals.Counter.LatchedValueSelected;
         }

@@ -4108,7 +4108,7 @@ unsigned ExecuteInsn (void)
     if (HaveNMIRequest) {
 
         HaveNMIRequest = 0;
-        PRegs.counter_nmi_events += 1;
+        Peripherals.Counter.nmi_events += 1;
 
         PUSH (PCH);
         PUSH (PCL);
@@ -4124,7 +4124,7 @@ unsigned ExecuteInsn (void)
     } else if (HaveIRQRequest && GET_IF () == 0) {
 
         HaveIRQRequest = 0;
-        PRegs.counter_irq_events += 1;
+        Peripherals.Counter.irq_events += 1;
 
         PUSH (PCH);
         PUSH (PCL);
@@ -4146,11 +4146,11 @@ unsigned ExecuteInsn (void)
         Handlers[CPU][OPC] ();
 
         /* Increment the instruction counter by one.NMIs and IRQs are counted separately. */
-        PRegs.counter_instructions += 1;
+        Peripherals.Counter.cpu_instructions += 1;
     }
 
     /* Increment the 64-bit clock cycle counter with the cycle count for the instruction that we just executed */
-    PRegs.counter_clock_cycles += Cycles;
+    Peripherals.Counter.clock_cycles += Cycles;
 
     /* Return the number of clock cycles needed by this insn */
     return Cycles;

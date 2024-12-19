@@ -62,7 +62,7 @@ void MemWriteByte (uint16_t Addr, uint8_t Val)
     if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) && (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS))
     {
         /* Defer the the memory-mapped peripherals handler for this write. */
-        PeripheralWriteByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS, Val);
+        PeripheralsWriteByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS, Val);
     } else {
         /* Write to the Mem array. */
         Mem[Addr] = Val;
@@ -86,7 +86,7 @@ uint8_t MemReadByte (uint16_t Addr)
     if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) && (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS))
     {
         /* Defer the the memory-mapped peripherals handler for this read. */
-        return PeripheralReadByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS);
+        return PeripheralsReadByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS);
     } else {
         /* Read from the Mem array. */
         return Mem[Addr];

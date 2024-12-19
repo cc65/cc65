@@ -109,7 +109,7 @@ uint8_t PeripheralsReadByte (uint8_t Addr);
 
 
 void PeripheralsInit (void);
-/* Initialize the peripheral registers */
+/* Initialize the peripherals. */
 
 
 

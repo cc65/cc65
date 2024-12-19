@@ -59,16 +59,16 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
             /* A write to the "latch" register performs a simultaneous latch of all registers. */
 
             /* Latch the current wallclock time first. */
-	    struct timespec ts;
+            struct timespec ts;
             int result = clock_gettime(CLOCK_REALTIME, &ts);
-	    if (result != 0) {
-	        /* Unable to read time. Report max uint64 value for both fields. */
-  	        Peripherals.Counter.latched_wallclock_time = 0xffffffffffffffff;
+            if (result != 0) {
+                /* Unable to read time. Report max uint64 value for both fields. */
+                Peripherals.Counter.latched_wallclock_time = 0xffffffffffffffff;
                 Peripherals.Counter.latched_wallclock_time_split = 0xffffffffffffffff;
-	    } else {
-	        /* Number of nanoseconds since 1-1-1970. */
+            } else {
+                /* Number of nanoseconds since 1-1-1970. */
                 Peripherals.Counter.latched_wallclock_time = 1000000000u * ts.tv_sec + ts.tv_nsec;
-	        /* High word is number of seconds, low word is number of nanoseconds. */
+                /* High word is number of seconds, low word is number of nanoseconds. */
                 Peripherals.Counter.latched_wallclock_time_split = (ts.tv_sec << 32) | ts.tv_nsec;
             }
 
@@ -134,7 +134,7 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
 
 
 void PeripheralsInit (void)
-/* Initialize the peripheral registers */
+/* Initialize the peripherals. */
 {
     /* Initialize the COUNTER peripheral */
 

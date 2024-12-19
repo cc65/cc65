@@ -1456,13 +1456,37 @@ static void OPC_6502_1F (void)
 static void OPC_6502_20 (void)
 /* Opcode $20: JSR */
 {
-    unsigned Addr;
+    /* The obvious way to implement JSR for the 6502 is to (a) read the target address,
+     * and then (b) push the return address minus one. Or do (b) first, then (a).
+     *
+     * However, there is a non-obvious case where this conflicts with the actual order
+     * of operations that the 6502 does, which is:
+     *
+     * (a) Load the LSB of the target address.
+     * (b) Push the MSB of the return address, minus one.
+     * (c) Push the LSB of the return address, minus one.
+     * (d) Load the MSB of the target address.
+     *
+     * This can make a difference in a pretty esoteric case, if the JSR target is located,
+     * wholly or in part, inside the stack page (!). This won't happen in normal code
+     * but it can happen in specifically constructed examples.
+     *
+     * To deal with this, we load the LSB and MSB of the target address separately,
+     * with the pushing of the return address sandwiched in between, to mimic
+     * the order of the bus operations on a real 6502.
+     */
+
+    unsigned AddrLo, AddrHi;
+
     Cycles = 6;
-    Addr = MemReadWord (Regs.PC+1);
-    Regs.PC += 2;
+    Regs.PC += 1;
+    AddrLo = MemReadByte(Regs.PC);
+    Regs.PC += 1;
     PUSH (PCH);
     PUSH (PCL);
-    Regs.PC = Addr;
+    AddrHi = MemReadByte(Regs.PC);
+
+    Regs.PC = AddrLo + (AddrHi << 8);
 
     ParaVirtHooks (&Regs);
 }

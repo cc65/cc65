@@ -61,6 +61,7 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
             /* A write to the "latch" register performs a simultaneous latch of all registers. */
 
             /* Latch the current wallclock time first. */
+#if 0
             struct timespec ts;
             int result = clock_gettime(CLOCK_REALTIME, &ts);
             if (result != 0) {
@@ -74,6 +75,11 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
                  * low word is number of nanoseconds since the start of that second. */
                 Peripherals.Counter.LatchedWallclockTimeSplit = (ts.tv_sec << 32) | ts.tv_nsec;
             }
+#else
+            /* Temporarily skip call to clock_gettime() to check that we can build for Windows */
+            Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
+            Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
+#endif
 
             /* Latch the counters that reflect the state of the processor. */
             Peripherals.Counter.LatchedClockCycles = Peripherals.Counter.ClockCycles;

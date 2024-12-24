@@ -35,9 +35,8 @@
 /*****************************************************************************/
 
 /* Known bugs and limitations of the 65C02 simulation:
- * support currently only on the level of 65SC02:
-   BBRx, BBSx, RMBx, SMBx, WAI, and STP are unsupported
-*/
+ * the WAI ($CB) and STP ($DB) instructions are unsupported.
+ */
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -624,14 +623,14 @@ static unsigned HaveIRQRequest;
 /* 2 x Read-Modify-Write opcode helpers (illegal opcodes) */
 
 /* Execution cycles for 2 x R-M-W opcodes */
-#define RMW2_CY_ZP       5
-#define RMW2_CY_ZPX      6
+#define RMW2_CY_ZP          5
+#define RMW2_CY_ZPX         6
 #define RMW2_CY_ZPY      6
-#define RMW2_CY_ABS      6
-#define RMW2_CY_ABSX     7
-#define RMW2_CY_ABSY     7
-#define RMW2_CY_ZPXIND   8
-#define RMW2_CY_ZPINDY   8
+#define RMW2_CY_ABS         6
+#define RMW2_CY_ABSX        7
+#define RMW2_CY_ABSY        7
+#define RMW2_CY_ZPXIND      8
+#define RMW2_CY_ZPINDY      8
 
 /* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y */
 #define ILLx2_OP(mode, op)                                      \
@@ -1113,6 +1112,46 @@ static unsigned HaveIRQRequest;
 
 
 
+/* Set/reset a specific bit in a zero-page byte. This macro
+ * macro is used to implement the 65C02 RMBx and SMBx instructions.
+ */
+#define ZP_BITOP(bitnr, bitval)                                 \
+    do {                                                        \
+        uint8_t zp_address = MemReadByte (Regs.PC + 1);         \
+        uint8_t zp_value = MemReadByte (zp_address);            \
+        if (bitval) {                                           \
+            zp_value |= (1 << bitnr);                           \
+        } else {                                                \
+            zp_value &= ~(1 << bitnr);                          \
+        }                                                       \
+        MemWriteByte (zp_address, zp_value);                    \
+        Regs.PC += 2;                                           \
+        Cycles = 5;                                             \
+    } while (0)
+
+/* Branch depending on the state of a specific bit of a zero page
+ * address. This macro is used to implement the 65C02 BBRx and
+ * BBSx instructions.
+ */
+#define ZP_BIT_BRANCH(bitnr, bitval)                            \
+    do {                                                        \
+        uint8_t zp_address = MemReadByte (Regs.PC + 1);         \
+        uint8_t zp_value = MemReadByte (zp_address);            \
+        int displacement = (int8_t)MemReadByte (Regs.PC + 2);   \
+        if (((zp_value & (1 << bitnr)) != 0) == bitval) {       \
+            Regs.PC += 3;                                       \
+            uint8_t OldPCH = PCH;                               \
+            Regs.PC += displacement;                            \
+            Cycles = 6;                                         \
+            if (PCH != OldPCH) {                                \
+                Cycles += 1;                                    \
+            }                                                   \
+        } else {                                                \
+            Regs.PC += 3;                                       \
+            Cycles = 5;                                         \
+        }                                                       \
+    } while (0)
+
 /*****************************************************************************/
 /*                         Opcode handling functions                         */
 /*****************************************************************************/
@@ -1205,6 +1244,14 @@ static void OPC_6502_07 (void)
 
 
 
+static void OPC_65C02_07 (void)
+/* Opcode $07: RMB0 zp */
+{
+    ZP_BITOP(0, 0);
+}
+
+
+
 static void OPC_6502_08 (void)
 /* Opcode $08: PHP */
 {
@@ -1284,6 +1331,14 @@ static void OPC_6502_0F (void)
 
 
 
+static void OPC_65C02_0F (void)
+/* Opcode $0F: BBR0 zp, rel */
+{
+    ZP_BIT_BRANCH (0, 0);
+}
+
+
+
 static void OPC_6502_10 (void)
 /* Opcode $10: BPL */
 {
@@ -1359,6 +1414,14 @@ static void OPC_6502_17 (void)
 /* Opcode $17: SLO zp,x */
 {
     ILLx2_OP (ZPX, SLO);
+}
+
+
+
+static void OPC_65C02_17 (void)
+/* Opcode $17: RMB1 zp */
+{
+    ZP_BITOP(1, 0);
 }
 
 
@@ -1454,6 +1517,15 @@ static void OPC_6502_1F (void)
 
 
 
+
+static void OPC_65C02_1F (void)
+/* Opcode $1F: BBR1 zp, rel */
+{
+    ZP_BIT_BRANCH (1, 0);
+}
+
+
+
 static void OPC_6502_20 (void)
 /* Opcode $20: JSR */
 {
@@ -1542,6 +1614,14 @@ static void OPC_6502_27 (void)
 
 
 
+static void OPC_65C02_27 (void)
+/* Opcode $27: RMB2 zp */
+{
+    ZP_BITOP(2, 0);
+}
+
+
+
 static void OPC_6502_28 (void)
 /* Opcode $28: PLP */
 {
@@ -1601,6 +1681,14 @@ static void OPC_6502_2F (void)
 /* Opcode $2F: RLA abs */
 {
     ILLx2_OP (ABS, RLA);
+}
+
+
+
+static void OPC_65C02_2F (void)
+/* Opcode $2F: BBR2 zp, rel */
+{
+    ZP_BIT_BRANCH (2, 0);
 }
 
 
@@ -1665,6 +1753,14 @@ static void OPC_6502_37 (void)
 /* Opcode $37: RLA zp,x */
 {
     ILLx2_OP (ZPX, RLA);
+}
+
+
+
+static void OPC_65C02_37 (void)
+/* Opcode $37: RMB3 zp */
+{
+    ZP_BITOP(3, 0);
 }
 
 
@@ -1745,6 +1841,14 @@ static void OPC_6502_3F (void)
 
 
 
+static void OPC_65C02_3F (void)
+/* Opcode $3F: BBR3 zp, rel */
+{
+    ZP_BIT_BRANCH (3, 0);
+}
+
+
+
 static void OPC_6502_40 (void)
 /* Opcode $40: RTI */
 {
@@ -1794,6 +1898,14 @@ static void OPC_6502_47 (void)
 /* Opcode $47: SRE zp */
 {
     ILLx2_OP (ZP, SRE);
+}
+
+
+
+static void OPC_65C02_47 (void)
+/* Opcode $47: RMB4 zp */
+{
+    ZP_BITOP(4, 0);
 }
 
 
@@ -1869,6 +1981,14 @@ static void OPC_6502_4F (void)
 
 
 
+static void OPC_65C02_4F (void)
+/* Opcode $4F: BBR4 zp, rel */
+{
+    ZP_BIT_BRANCH (4, 0);
+}
+
+
+
 static void OPC_6502_50 (void)
 /* Opcode $50: BVC */
 {
@@ -1921,6 +2041,14 @@ static void OPC_6502_57 (void)
 /* Opcode $57: SRE zp,x */
 {
     ILLx2_OP (ZPX, SRE);
+}
+
+
+
+static void OPC_65C02_57 (void)
+/* Opcode $57: RMB5 zp */
+{
+    ZP_BITOP(5, 0);
 }
 
 
@@ -2002,6 +2130,14 @@ static void OPC_6502_5F (void)
 
 
 
+static void OPC_65C02_5F (void)
+/* Opcode $5F: BBR5 zp, rel */
+{
+    ZP_BIT_BRANCH (5, 0);
+}
+
+
+
 static void OPC_6502_60 (void)
 /* Opcode $60: RTS */
 {
@@ -2071,6 +2207,14 @@ static void OPC_6502_67 (void)
 /* Opcode $67: RRA zp */
 {
     ILLx2_OP (ZP, RRA);
+}
+
+
+
+static void OPC_65C02_67 (void)
+/* Opcode $67: RMB6 zp */
+{
+    ZP_BITOP(6, 0);
 }
 
 
@@ -2188,6 +2332,14 @@ static void OPC_6502_6F (void)
 
 
 
+static void OPC_65C02_6F (void)
+/* Opcode $6F: BBR6 zp, rel */
+{
+    ZP_BIT_BRANCH (6, 0);
+}
+
+
+
 static void OPC_6502_70 (void)
 /* Opcode $70: BVS */
 {
@@ -2262,6 +2414,14 @@ static void OPC_6502_77 (void)
 /* Opcode $77: RRA zp,x */
 {
     ILLx2_OP (ZPX, RRA);
+}
+
+
+
+static void OPC_65C02_77 (void)
+/* Opcode $77: RMB7 zp */
+{
+    ZP_BITOP(7, 0);
 }
 
 
@@ -2366,6 +2526,14 @@ static void OPC_6502_7F (void)
 
 
 
+static void OPC_65C02_7F (void)
+/* Opcode $7F: BBR7 zp, rel */
+{
+    ZP_BIT_BRANCH (7, 0);
+}
+
+
+
 /* Aliases of opcode $80 */
 #define OPC_6502_82 OPC_6502_80
 #define OPC_6502_C2 OPC_6502_80
@@ -2432,6 +2600,14 @@ static void OPC_6502_87 (void)
 /* Opcode $87: SAX zp */
 {
     STO_OP (ZP, Regs.AC & Regs.XR);
+}
+
+
+
+static void OPC_65C02_87 (void)
+/* Opcode $87: SMB0 zp */
+{
+    ZP_BITOP(0, 1);
 }
 
 
@@ -2508,6 +2684,14 @@ static void OPC_6502_8F (void)
 
 
 
+static void OPC_65C02_8F (void)
+/* Opcode $8F: BBS0 zp, rel */
+{
+    ZP_BIT_BRANCH (0, 1);
+}
+
+
+
 static void OPC_6502_90 (void)
 /* Opcode $90: BCC */
 {
@@ -2535,7 +2719,20 @@ static void OPC_65SC02_92 (void)
 static void OPC_6502_93 (void)
 /* Opcode $93: SHA (zp),y */
 {
-    STO_CB (ZPINDY, SHA);
+    ++Regs.PC;
+    uint8_t zp_ptr_lo = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t zp_ptr_hi = zp_ptr_lo + 1;
+    uint8_t baselo = MemReadByte(zp_ptr_lo);
+    uint8_t basehi = MemReadByte(zp_ptr_hi);
+    uint8_t basehi_incremented = basehi + 1;
+    uint8_t write_value = Regs.AC & Regs.XR & basehi_incremented;
+    uint8_t write_address_lo = (baselo + Regs.YR);
+    bool pagecross = (baselo + Regs.YR) > 0xff;
+    uint8_t write_address_hi = pagecross ? write_value : basehi;
+    uint16_t write_address = write_address_lo + (write_address_hi << 8);
+    MemWriteByte(write_address, write_value);
+    Cycles=6;
 }
 
 
@@ -2568,6 +2765,14 @@ static void OPC_6502_97 (void)
 /* Opcode $97: SAX zp,y */
 {
     STO_OP (ZPY, Regs.AC & Regs.XR);
+}
+
+
+
+static void OPC_65C02_97 (void)
+/* Opcode $97: SMB1 zp */
+{
+    ZP_BITOP(1, 1);
 }
 
 
@@ -2605,7 +2810,20 @@ static void OPC_6502_9A (void)
 static void OPC_6502_9B (void)
 /* Opcode $9B: TAS abs,y */
 {
-    STO_CB (ABSY, TAS);
+    ++Regs.PC;
+    uint8_t baselo = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t basehi = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t basehi_incremented = basehi + 1;
+    uint8_t write_value = Regs.AC & Regs.XR & basehi_incremented;
+    uint8_t write_address_lo = (baselo + Regs.YR);
+    bool pagecross = (baselo + Regs.YR) > 0xff;
+    uint8_t write_address_hi = pagecross ? write_value : basehi;
+    uint16_t write_address = write_address_lo + (write_address_hi << 8);
+    MemWriteByte(write_address, write_value);
+    Regs.SP = Regs.AC & Regs.XR;
+    Cycles=5;
 }
 
 
@@ -2613,7 +2831,19 @@ static void OPC_6502_9B (void)
 static void OPC_6502_9C (void)
 /* Opcode $9D: SHY abs,x */
 {
-    STO_OP (ABSX, Regs.YR & ((address >> 8) + 1));
+    ++Regs.PC;
+    uint8_t baselo = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t basehi = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t basehi_incremented = basehi + 1;
+    uint8_t write_value = Regs.YR & basehi_incremented;
+    uint8_t write_address_lo = (baselo + Regs.XR);
+    bool pagecross = (baselo + Regs.XR) > 0xff;
+    uint8_t write_address_hi = pagecross ? write_value : basehi;
+    uint16_t write_address = write_address_lo + (write_address_hi << 8);
+    MemWriteByte(write_address, write_value);
+    Cycles=5;
 }
 
 
@@ -2637,15 +2867,19 @@ static void OPC_6502_9D (void)
 static void OPC_6502_9E (void)
 /* Opcode $9E: SHX abs,x */
 {
-    STO_OP (ABSY, Regs.XR & ((address >> 8) + 1));
-}
-
-
-
-static void OPC_6502_9F (void)
-/* Opcode $9F: SHA abs,y */
-{
-    STO_CB (ABSY, SHA);
+    ++Regs.PC;
+    uint8_t baselo = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t basehi = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t basehi_incremented = basehi + 1;
+    uint8_t write_value = Regs.XR & basehi_incremented;
+    uint8_t write_address_lo = (baselo + Regs.YR);
+    bool pagecross = (baselo + Regs.YR) > 0xff;
+    uint8_t write_address_hi = pagecross ? write_value : basehi;
+    uint16_t write_address = write_address_lo + (write_address_hi << 8);
+    MemWriteByte(write_address, write_value);
+    Cycles=5;
 }
 
 
@@ -2654,6 +2888,34 @@ static void OPC_65SC02_9E (void)
 /* Opcode $9E: STZ abs,x */
 {
     STO_OP (ABSX, 0);
+}
+
+
+
+static void OPC_6502_9F (void)
+/* Opcode $9F: SHA abs,y */
+{
+    ++Regs.PC;
+    uint8_t baselo = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t basehi = MemReadByte(Regs.PC);
+    ++Regs.PC;
+    uint8_t basehi_incremented = basehi + 1;
+    uint8_t write_value = Regs.AC & Regs.XR & basehi_incremented;
+    uint8_t write_address_lo = (baselo + Regs.YR);
+    bool pagecross = (baselo + Regs.YR) > 0xff;
+    uint8_t write_address_hi = pagecross ? write_value : basehi;
+    uint16_t write_address = write_address_lo + (write_address_hi << 8);
+    MemWriteByte(write_address, write_value);
+    Cycles=5;
+}
+
+
+
+static void OPC_65C02_9F (void)
+/* Opcode $9F: BBS1 zp, rel */
+{
+    ZP_BIT_BRANCH (1, 1);
 }
 
 
@@ -2718,6 +2980,14 @@ static void OPC_6502_A7 (void)
 /* Opcode $A7: LAX zp */
 {
     ALU_OP (ZP, LAX);
+}
+
+
+
+static void OPC_65C02_A7 (void)
+/* Opcode $A7: SMB2 zp */
+{
+    ZP_BITOP(2, 1);
 }
 
 
@@ -2794,6 +3064,14 @@ static void OPC_6502_AF (void)
 
 
 
+static void OPC_65C02_AF (void)
+/* Opcode $AF: BBS2 zp, rel */
+{
+    ZP_BIT_BRANCH (2, 1);
+}
+
+
+
 static void OPC_6502_B0 (void)
 /* Opcode $B0: BCS */
 {
@@ -2854,6 +3132,14 @@ static void OPC_6502_B7 (void)
 /* Opcode $B7: LAX zp,y */
 {
     ALU_OP (ZPY, LAX);
+}
+
+
+
+static void OPC_65C02_B7 (void)
+/* Opcode $B7: SMB3 zp */
+{
+    ZP_BITOP(3, 1);
 }
 
 
@@ -2928,6 +3214,14 @@ static void OPC_6502_BF (void)
 
 
 
+static void OPC_65C02_BF (void)
+/* Opcode $BF: BBS3 zp, rel */
+{
+    ZP_BIT_BRANCH (3, 1);
+}
+
+
+
 static void OPC_6502_C0 (void)
 /* Opcode $C0: CPY #imm */
 {
@@ -2980,6 +3274,14 @@ static void OPC_6502_C7 (void)
 /* Opcode $C7: DCP zp */
 {
     MEM_OP (ZP, DCP);
+}
+
+
+
+static void OPC_65C02_C7 (void)
+/* Opcode $C7: SMB4 zp */
+{
+    ZP_BITOP(4, 1);
 }
 
 
@@ -3052,6 +3354,14 @@ static void OPC_6502_CF (void)
 
 
 
+static void OPC_65C02_CF (void)
+/* Opcode $CF: BBS4 zp, rel */
+{
+    ZP_BIT_BRANCH (4, 1);
+}
+
+
+
 static void OPC_6502_D0 (void)
 /* Opcode $D0: BNE */
 {
@@ -3104,6 +3414,14 @@ static void OPC_6502_D7 (void)
 /* Opcode $D7: DCP zp,x */
 {
     MEM_OP (ZPX, DCP);
+}
+
+
+
+static void OPC_65C02_D7 (void)
+/* Opcode $D7: SMB5 zp */
+{
+    ZP_BITOP(5, 1);
 }
 
 
@@ -3164,6 +3482,14 @@ static void OPC_6502_DF (void)
 /* Opcode $DF: DCP abs,x */
 {
     MEM_OP (ABSX, DCP);
+}
+
+
+
+static void OPC_65C02_DF (void)
+/* Opcode $DF: BBS5 zp, rel */
+{
+    ZP_BIT_BRANCH (5, 1);
 }
 
 
@@ -3234,6 +3560,14 @@ static void OPC_6502_E7 (void)
 /* Opcode $E7: ISC zp */
 {
     MEM_OP (ZP, ISC);
+}
+
+
+
+static void OPC_65C02_E7 (void)
+/* Opcode $E7: SMB6 zp */
+{
+    ZP_BITOP(6, 1);
 }
 
 
@@ -3358,6 +3692,14 @@ static void OPC_6502_EF (void)
 
 
 
+static void OPC_65C02_EF (void)
+/* Opcode $EF: BBS6 zp, rel */
+{
+    ZP_BIT_BRANCH (6, 1);
+}
+
+
+
 static void OPC_6502_F0 (void)
 /* Opcode $F0: BEQ */
 {
@@ -3427,6 +3769,14 @@ static void OPC_6502_F7 (void)
 /* Opcode $F7: ISC zp,x */
 {
     MEM_OP (ZPX, ISC);
+}
+
+
+
+static void OPC_65C02_F7 (void)
+/* Opcode $F7: SMB7 zp */
+{
+    ZP_BITOP(7, 1);
 }
 
 
@@ -3505,6 +3855,14 @@ static void OPC_6502_FF (void)
 /* Opcode $FF: ISC abs,x */
 {
     MEM_OP (ABSX, ISC);
+}
+
+
+
+static void OPC_65C02_FF (void)
+/* Opcode $FF: BBS7 zp, rel */
+{
+    ZP_BIT_BRANCH (7, 1);
 }
 
 
@@ -4048,7 +4406,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_04,
     OPC_6502_05,
     OPC_6502_06,
-    OPC_Illegal,        // $07: RMB0 currently unsupported
+    OPC_65C02_07,
     OPC_6502_08,
     OPC_6502_09,
     OPC_6502_0A,
@@ -4056,7 +4414,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_0C,
     OPC_6502_0D,
     OPC_6502_0E,
-    OPC_Illegal,        // $0F: BBR0 currently unsupported
+    OPC_65C02_0F,
     OPC_6502_10,
     OPC_6502_11,
     OPC_65SC02_12,
@@ -4064,7 +4422,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_14,
     OPC_6502_15,
     OPC_6502_16,
-    OPC_Illegal,        // $17: RMB1 currently unsupported
+    OPC_65C02_17,
     OPC_6502_18,
     OPC_6502_19,
     OPC_65SC02_1A,
@@ -4072,7 +4430,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_1C,
     OPC_6502_1D,
     OPC_65C02_1E,
-    OPC_Illegal,        // $1F: BBR1 currently unsupported
+    OPC_65C02_1F,
     OPC_6502_20,
     OPC_6502_21,
     OPC_65C02_NOP22,    // $22
@@ -4080,7 +4438,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_24,
     OPC_6502_25,
     OPC_6502_26,
-    OPC_Illegal,        // $27: RMB2 currently unsupported
+    OPC_65C02_27,
     OPC_6502_28,
     OPC_6502_29,
     OPC_6502_2A,
@@ -4088,7 +4446,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_2C,
     OPC_6502_2D,
     OPC_6502_2E,
-    OPC_Illegal,        // $2F: BBR2 currently unsupported
+    OPC_65C02_2F,
     OPC_6502_30,
     OPC_6502_31,
     OPC_65SC02_32,
@@ -4096,7 +4454,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_34,
     OPC_6502_35,
     OPC_6502_36,
-    OPC_Illegal,        // $37: RMB3 currently unsupported
+    OPC_65C02_37,
     OPC_6502_38,
     OPC_6502_39,
     OPC_65SC02_3A,
@@ -4104,7 +4462,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_3C,
     OPC_6502_3D,
     OPC_65C02_3E,
-    OPC_Illegal,        // $3F: BBR3 currently unsupported
+    OPC_65C02_3F,
     OPC_6502_40,
     OPC_6502_41,
     OPC_65C02_NOP22,    // $42
@@ -4112,7 +4470,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_44,        // $44
     OPC_6502_45,
     OPC_6502_46,
-    OPC_Illegal,        // $47: RMB4 currently unsupported
+    OPC_65C02_47,
     OPC_6502_48,
     OPC_6502_49,
     OPC_6502_4A,
@@ -4120,7 +4478,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_4C,
     OPC_6502_4D,
     OPC_6502_4E,
-    OPC_Illegal,        // $4F: BBR4 currently unsupported
+    OPC_65C02_4F,
     OPC_6502_50,
     OPC_6502_51,
     OPC_65SC02_52,
@@ -4128,7 +4486,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP24,    // $54
     OPC_6502_55,
     OPC_6502_56,
-    OPC_Illegal,        // $57: RMB5 currently unsupported
+    OPC_65C02_57,
     OPC_6502_58,
     OPC_6502_59,
     OPC_65SC02_5A,
@@ -4136,7 +4494,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_5C,
     OPC_6502_5D,
     OPC_65C02_5E,
-    OPC_Illegal,        // $5F: BBR5 currently unsupported
+    OPC_65C02_5F,
     OPC_6502_60,
     OPC_65C02_61,
     OPC_65C02_NOP22,    // $62
@@ -4144,7 +4502,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_64,
     OPC_65C02_65,
     OPC_6502_66,
-    OPC_Illegal,        // $67: RMB6 currently unsupported
+    OPC_65C02_67,
     OPC_6502_68,
     OPC_65C02_69,
     OPC_6502_6A,
@@ -4152,7 +4510,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_6C,
     OPC_65C02_6D,
     OPC_6502_6E,
-    OPC_Illegal,        // $6F: BBR6 currently unsupported
+    OPC_65C02_6F,
     OPC_6502_70,
     OPC_65C02_71,
     OPC_65C02_72,
@@ -4160,7 +4518,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_74,
     OPC_65C02_75,
     OPC_6502_76,
-    OPC_Illegal,        // $77: RMB7 currently unsupported
+    OPC_65C02_77,
     OPC_6502_78,
     OPC_65C02_79,
     OPC_65SC02_7A,
@@ -4168,7 +4526,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_7C,
     OPC_65C02_7D,
     OPC_65C02_7E,
-    OPC_Illegal,        // $7F: BBR7 currently unsupported
+    OPC_65C02_7F,
     OPC_65SC02_80,
     OPC_6502_81,
     OPC_65C02_NOP22,    // $82
@@ -4176,7 +4534,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_84,
     OPC_6502_85,
     OPC_6502_86,
-    OPC_Illegal,        // $87: SMB0 currently unsupported
+    OPC_65C02_87,
     OPC_6502_88,
     OPC_65SC02_89,
     OPC_6502_8A,
@@ -4184,7 +4542,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_8C,
     OPC_6502_8D,
     OPC_6502_8E,
-    OPC_Illegal,        // $8F: BBS0 currently unsupported
+    OPC_65C02_8F,
     OPC_6502_90,
     OPC_6502_91,
     OPC_65SC02_92,
@@ -4192,7 +4550,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_94,
     OPC_6502_95,
     OPC_6502_96,
-    OPC_Illegal,        // $97: SMB1 currently unsupported
+    OPC_65C02_97,
     OPC_6502_98,
     OPC_6502_99,
     OPC_6502_9A,
@@ -4200,7 +4558,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65SC02_9C,
     OPC_6502_9D,
     OPC_65SC02_9E,
-    OPC_Illegal,        // $9F: BBS1 currently unsupported
+    OPC_65C02_9F,
     OPC_6502_A0,
     OPC_6502_A1,
     OPC_6502_A2,
@@ -4208,7 +4566,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_A4,
     OPC_6502_A5,
     OPC_6502_A6,
-    OPC_Illegal,        // $A7: SMB2 currently unsupported
+    OPC_65C02_A7,
     OPC_6502_A8,
     OPC_6502_A9,
     OPC_6502_AA,
@@ -4216,7 +4574,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_AC,
     OPC_6502_AD,
     OPC_6502_AE,
-    OPC_Illegal,        // $AF: BBS2 currently unsupported
+    OPC_65C02_AF,
     OPC_6502_B0,
     OPC_6502_B1,
     OPC_65SC02_B2,
@@ -4224,7 +4582,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_B4,
     OPC_6502_B5,
     OPC_6502_B6,
-    OPC_Illegal,        // $B7: SMB3 currently unsupported
+    OPC_65C02_B7,
     OPC_6502_B8,
     OPC_6502_B9,
     OPC_6502_BA,
@@ -4232,7 +4590,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_BC,
     OPC_6502_BD,
     OPC_6502_BE,
-    OPC_Illegal,        // $BF: BBS3 currently unsupported
+    OPC_65C02_BF,
     OPC_6502_C0,
     OPC_6502_C1,
     OPC_65C02_NOP22,    // $C2
@@ -4240,7 +4598,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_C4,
     OPC_6502_C5,
     OPC_6502_C6,
-    OPC_Illegal,        // $C7: SMB4 currently unsupported
+    OPC_65C02_C7,
     OPC_6502_C8,
     OPC_6502_C9,
     OPC_6502_CA,
@@ -4248,7 +4606,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_CC,
     OPC_6502_CD,
     OPC_6502_CE,
-    OPC_Illegal,        // $CF: BBS4 currently unsupported
+    OPC_65C02_CF,
     OPC_6502_D0,
     OPC_6502_D1,
     OPC_65SC02_D2,
@@ -4256,7 +4614,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP24,    // $D4
     OPC_6502_D5,
     OPC_6502_D6,
-    OPC_Illegal,        // $D7: SMB5 currently unsupported
+    OPC_65C02_D7,
     OPC_6502_D8,
     OPC_6502_D9,
     OPC_65SC02_DA,
@@ -4264,7 +4622,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP34,    // $DC
     OPC_6502_DD,
     OPC_6502_DE,
-    OPC_Illegal,        // $DF: BBS5 currently unsupported
+    OPC_65C02_DF,
     OPC_6502_E0,
     OPC_65C02_E1,
     OPC_65C02_NOP22,    // $E2
@@ -4272,7 +4630,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_E4,
     OPC_65C02_E5,
     OPC_6502_E6,
-    OPC_Illegal,        // $E7: SMB6 currently unsupported
+    OPC_65C02_E7,
     OPC_6502_E8,
     OPC_65C02_E9,
     OPC_6502_EA,
@@ -4280,7 +4638,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_EC,
     OPC_65C02_ED,
     OPC_6502_EE,
-    OPC_Illegal,        // $EF: BBS6 currently unsupported
+    OPC_65C02_EF,
     OPC_6502_F0,
     OPC_65C02_F1,
     OPC_65C02_F2,
@@ -4288,7 +4646,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP24,    // $F4
     OPC_65C02_F5,
     OPC_6502_F6,
-    OPC_Illegal,        // $F7: SMB7 currently unsupported
+    OPC_65C02_F7,
     OPC_6502_F8,
     OPC_65C02_F9,
     OPC_65SC02_FA,
@@ -4296,7 +4654,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_65C02_NOP34,    // $FC
     OPC_65C02_FD,
     OPC_6502_FE,
-    OPC_Illegal,        // $FF: BBS7 currently unsupported
+    OPC_65C02_FF
 };
 
 

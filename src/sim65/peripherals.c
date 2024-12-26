@@ -65,7 +65,11 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 
             struct timespec ts;
 
-#if defined(_MSC_VER)
+#if defined(__MINGW64__)
+            bool time_valid = false;
+#elif defined(__MINGW32__)
+            bool time_valid = false;
+#elif defined(_MSC_VER)
             /* clock_gettime() is not available in the Visual Studio compiler. Use timespec_get() instead. */
             bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
 #else

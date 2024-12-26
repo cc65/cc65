@@ -28,8 +28,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-#include <sys/time.h>
+#include <stdbool.h>
 #include <time.h>
 #include "peripherals.h"
 
@@ -64,37 +63,25 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 
             /* Latch the current wallclock time first (if possible). */
 
-#if defined(_WIN32)
-            /* clock_gettime() is not available on Windows. Report max uint64 value for both fields. */
-            struct timeval tv;
-            int result = gettimeofday(&tv, NULL);
-            if (result != 0) {
-                /* Unable to get time. Report max uint64 value for both fields. */
-                Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
-                Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
-            } else {
-                /* Wallclock time: number of nanoseconds since 1-1-1970. */
-                Peripherals.Counter.LatchedWallclockTime = 1000000000 * (uint64_t)ts.tv_sec + 1000 * ts.tv_usec;
-                /* Wallclock time, split: high word is number of seconds since 1-1-1970,
-                 * low word is number of nanoseconds since the start of that second. */
-                Peripherals.Counter.LatchedWallclockTimeSplit = ((uint64_t)ts.tv_sec << 32) | (1000 * ts.tv_usec);
-            }
-#else
-            /* Other targets are presumed to have it. */
             struct timespec ts;
-            int result = clock_gettime(CLOCK_REALTIME, &ts);
-            if (result != 0) {
-                /* Unable to get time. Report max uint64 value for both fields. */
-                Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
-                Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
-            } else {
+
+#if defined(_WIN32)
+            /* clock_gettime() is not available on Windows. Use timespec_get() instead. */
+            bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
+#else
+            bool time_valid = clock_gettime(CLOCK_REALTIME, &ts) == 0;
+#endif
+            if (time_valid) {
                 /* Wallclock time: number of nanoseconds since 1-1-1970. */
                 Peripherals.Counter.LatchedWallclockTime = 1000000000 * (uint64_t)ts.tv_sec + ts.tv_nsec;
                 /* Wallclock time, split: high word is number of seconds since 1-1-1970,
                  * low word is number of nanoseconds since the start of that second. */
                 Peripherals.Counter.LatchedWallclockTimeSplit = ((uint64_t)ts.tv_sec << 32) | ts.tv_nsec;
+            } else {
+                /* Unable to get time. Report max uint64 value for both fields. */
+                Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
+                Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
             }
-#endif
 
             /* Latch the counters that reflect the state of the processor. */
             Peripherals.Counter.LatchedClockCycles = Peripherals.Counter.ClockCycles;

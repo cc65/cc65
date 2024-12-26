@@ -58,28 +58,30 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
         /* Handle writes to the Counter peripheral. */
 
         case PERIPHERALS_COUNTER_ADDRESS_OFFSET_LATCH: {
+
             /* A write to the "latch" register performs a simultaneous latch of all registers. */
 
-            /* Latch the current wallclock time first. */
-#if 1
-            /* Enabling clock_gettime dependent codepath (expected to fail at least on Windows build.) */
+            /* Latch the current wallclock time first (if possible). */
+
+#if defined(_WIN32)
+            /* clock_gettime() is not available on Windows. Report max uint64 value for both fields. */
+            Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
+            Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
+#else
+            /* Other targets are presumed to have it. */
             struct timespec ts;
             int result = clock_gettime(CLOCK_REALTIME, &ts);
             if (result != 0) {
-                /* Unable to read time. Report max uint64 value for both fields. */
+                /* Unable to get time. Report max uint64 value for both fields. */
                 Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
                 Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
             } else {
                 /* Wallclock time: number of nanoseconds since 1-1-1970. */
-                Peripherals.Counter.LatchedWallclockTime = 1000000000u * ts.tv_sec + ts.tv_nsec;
+                Peripherals.Counter.LatchedWallclockTime = 1000000000 * (uint64_t)ts.tv_sec + ts.tv_nsec;
                 /* Wallclock time, split: high word is number of seconds since 1-1-1970,
                  * low word is number of nanoseconds since the start of that second. */
-                Peripherals.Counter.LatchedWallclockTimeSplit = (ts.tv_sec << 32) | ts.tv_nsec;
+                Peripherals.Counter.LatchedWallclockTimeSplit = ((uint64_t)ts.tv_sec << 32) | ts.tv_nsec;
             }
-#else
-            /* Temporarily skip call to clock_gettime() to check that we can build for Windows */
-            Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
-            Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
 #endif
 
             /* Latch the counters that reflect the state of the processor. */

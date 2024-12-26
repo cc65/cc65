@@ -137,7 +137,7 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
                 default: Value = 0; /* Reading from a non-existent latch register will yield 0. */
             }
             /* Return the desired byte of the latched counter. 0==LSB, 7==MSB. */
-            return Value >> (ByteIndex * 8);
+            return (uint8_t)(Value >> (ByteIndex * 8));
         }
 
         /* Handle reads from unused peripheral and write-only addresses. */

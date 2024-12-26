@@ -579,6 +579,10 @@ static unsigned HaveIRQRequest;
 #define STO_CY_ZPINDY   6
 #define STO_CY_ZPIND    5
 
+#define STO_CY_ABSX_NP    STO_CY_ABSX
+#define STO_CY_ABSY_NP    STO_CY_ABSY
+#define STO_CY_ZPINDY_NP  STO_CY_ZPINDY
+
 /* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y / (zp) */
 #define STO_OP(mode, op)                                        \
     unsigned address;                                           \
@@ -599,13 +603,11 @@ static unsigned HaveIRQRequest;
 /* Execution cycles for R-M-W opcodes */
 #define RMW_CY_ZP       5
 #define RMW_CY_ZPX      6
-#define RMW_CY_ZPY      6
 #define RMW_CY_ABS      6
 #define RMW_CY_ABSX     7
 #define RMW_CY_ABSY     7
-#define RMW_CY_ZPXIND   6
-#define RMW_CY_ZPINDY   5
-#define RMW_CY_ZPIND    5
+#define RMW_CY_ZPXIND   8
+#define RMW_CY_ZPINDY   8
 
 #define RMW_CY_ABSX_NP      RMW_CY_ABSX
 #define RMW_CY_ABSY_NP      RMW_CY_ABSY
@@ -624,12 +626,15 @@ static unsigned HaveIRQRequest;
 /* Execution cycles for 2 x R-M-W opcodes */
 #define RMW2_CY_ZP          5
 #define RMW2_CY_ZPX         6
-#define RMW2_CY_ZPY      6
 #define RMW2_CY_ABS         6
 #define RMW2_CY_ABSX        7
 #define RMW2_CY_ABSY        7
 #define RMW2_CY_ZPXIND      8
 #define RMW2_CY_ZPINDY      8
+
+#define RMW2_CY_ZPINDY_NP   RMW2_CY_ZPINDY
+#define RMW2_CY_ABSY_NP     RMW2_CY_ABSY
+#define RMW2_CY_ABSX_NP     RMW2_CY_ABSX
 
 /* zp / zp,x / zp,y / abs / abs,x / abs,y / (zp,x) / (zp),y */
 #define ILLx2_OP(mode, op)                                      \
@@ -1365,7 +1370,7 @@ static void OPC_65SC02_12 (void)
 static void OPC_6502_13 (void)
 /* Opcode $03: SLO (zp),y */
 {
-    ILLx2_OP (ZPINDY, SLO);
+    ILLx2_OP (ZPINDY_NP, SLO);
 }
 
 
@@ -1456,7 +1461,7 @@ static void OPC_65SC02_1A (void)
 static void OPC_6502_1B (void)
 /* Opcode $1B: SLO abs,y */
 {
-    ILLx2_OP (ABSY, SLO);
+    ILLx2_OP (ABSY_NP, SLO);
 }
 
 
@@ -1495,7 +1500,7 @@ static void OPC_6502_1D (void)
 static void OPC_6502_1E (void)
 /* Opcode $1E: ASL abs,x */
 {
-    MEM_OP (ABSX, ASL);
+    MEM_OP (ABSX_NP, ASL);
 }
 
 
@@ -1503,7 +1508,8 @@ static void OPC_6502_1E (void)
 static void OPC_65C02_1E (void)
 /* Opcode $1E: ASL abs,x */
 {
-    MEM_OP (ABSX_NP, ASL);
+    MEM_OP (ABSX, ASL);
+    --Cycles;
 }
 
 
@@ -1511,9 +1517,8 @@ static void OPC_65C02_1E (void)
 static void OPC_6502_1F (void)
 /* Opcode $1F: SLO abs,x */
 {
-    ILLx2_OP (ABSX, SLO);
+    ILLx2_OP (ABSX_NP, SLO);
 }
-
 
 
 
@@ -1719,7 +1724,7 @@ static void OPC_65SC02_32 (void)
 static void OPC_6502_33 (void)
 /* Opcode $33: RLA (zp),y */
 {
-    ILLx2_OP (ZPINDY, RLA);
+    ILLx2_OP (ZPINDY_NP, RLA);
 }
 
 
@@ -1795,7 +1800,7 @@ static void OPC_65SC02_3A (void)
 static void OPC_6502_3B (void)
 /* Opcode $3B: RLA abs,y */
 {
-    ILLx2_OP (ABSY, RLA);
+    ILLx2_OP (ABSY_NP, RLA);
 }
 
 
@@ -1819,7 +1824,7 @@ static void OPC_6502_3D (void)
 static void OPC_6502_3E (void)
 /* Opcode $3E: ROL abs,x */
 {
-    MEM_OP (ABSX, ROL);
+    MEM_OP (ABSX_NP, ROL);
 }
 
 
@@ -1827,15 +1832,16 @@ static void OPC_6502_3E (void)
 static void OPC_65C02_3E (void)
 /* Opcode $3E: ROL abs,x */
 {
-    MEM_OP (ABSX_NP, ROL);
+    MEM_OP (ABSX, ROL);
+    --Cycles;
 }
 
 
 
 static void OPC_6502_3F (void)
-/* Opcode $3B: RLA abs,x */
+/* Opcode $3F: RLA abs,x */
 {
-    ILLx2_OP (ABSX, RLA);
+    ILLx2_OP (ABSX_NP, RLA);
 }
 
 
@@ -2015,7 +2021,7 @@ static void OPC_65SC02_52 (void)
 static void OPC_6502_53 (void)
 /* Opcode $43: SRE (zp),y */
 {
-    ILLx2_OP (ZPINDY, SRE);
+    ILLx2_OP (ZPINDY_NP, SRE);
 }
 
 
@@ -2083,7 +2089,7 @@ static void OPC_65SC02_5A (void)
 static void OPC_6502_5B (void)
 /* Opcode $5B: SRE abs,y */
 {
-    ILLx2_OP (ABSY, SRE);
+    ILLx2_OP (ABSY_NP, SRE);
 }
 
 
@@ -2091,6 +2097,14 @@ static void OPC_6502_5B (void)
 static void OPC_65C02_5C (void)
 /* Opcode $5C: 'Absolute' 8 cycle NOP */
 {
+    /* This instruction takes 8 cycles, as per the following sources:
+     *
+     * - http://www.6502.org/tutorials/65c02opcodes.html
+     * - Tests on a WDC 65C02 in hardware.
+     *
+     * The 65x02 testsuite however claims that this instruction takes 4 cycles.
+     * See issue: https://github.com/SingleStepTests/65x02/issues/12
+     */
     Cycles = 8;
     Regs.PC += 3;
 }
@@ -2108,7 +2122,7 @@ static void OPC_6502_5D (void)
 static void OPC_6502_5E (void)
 /* Opcode $5E: LSR abs,x */
 {
-    MEM_OP (ABSX, LSR);
+    MEM_OP (ABSX_NP, LSR);
 }
 
 
@@ -2116,7 +2130,8 @@ static void OPC_6502_5E (void)
 static void OPC_65C02_5E (void)
 /* Opcode $5E: LSR abs,x */
 {
-    MEM_OP (ABSX_NP, LSR);
+    MEM_OP (ABSX, LSR);
+    --Cycles;
 }
 
 
@@ -2124,7 +2139,7 @@ static void OPC_65C02_5E (void)
 static void OPC_6502_5F (void)
 /* Opcode $5F: SRE abs,x */
 {
-    ILLx2_OP (ABSX, SRE);
+    ILLx2_OP (ABSX_NP, SRE);
 }
 
 
@@ -2290,8 +2305,8 @@ static void OPC_6502_6C (void)
 static void OPC_65C02_6C (void)
 /* Opcode $6C: JMP (ind) */
 {
-    /* 6502 bug fixed here */
-    Cycles = 5;
+    /* The 6502 bug is fixed on the 65C02, at the cost of an extra cycle. */
+    Cycles = 6;
     Regs.PC = MemReadWord (MemReadWord (Regs.PC+1));
 
     ParaVirtHooks (&Regs);
@@ -2374,7 +2389,7 @@ static void OPC_65C02_72 (void)
 static void OPC_6502_73 (void)
 /* Opcode $73: RRA (zp),y */
 {
-    ILLx2_OP (ZPINDY, RRA);
+    ILLx2_OP (ZPINDY_NP, RRA);
 }
 
 
@@ -2466,7 +2481,7 @@ static void OPC_65SC02_7A (void)
 static void OPC_6502_7B (void)
 /* Opcode $7B: RRA abs,y */
 {
-    ILLx2_OP (ABSY, RRA);
+    ILLx2_OP (ABSY_NP, RRA);
 }
 
 
@@ -2504,7 +2519,7 @@ static void OPC_65C02_7D (void)
 static void OPC_6502_7E (void)
 /* Opcode $7E: ROR abs,x */
 {
-    MEM_OP (ABSX, ROR);
+    MEM_OP (ABSX_NP, ROR);
 }
 
 
@@ -2512,7 +2527,8 @@ static void OPC_6502_7E (void)
 static void OPC_65C02_7E (void)
 /* Opcode $7E: ROR abs,x */
 {
-    MEM_OP (ABSX_NP, ROR);
+    MEM_OP (ABSX, ROR);
+    --Cycles;
 }
 
 
@@ -2520,7 +2536,7 @@ static void OPC_65C02_7E (void)
 static void OPC_6502_7F (void)
 /* Opcode $7F: RRA abs,x */
 {
-    ILLx2_OP (ABSX, RRA);
+    ILLx2_OP (ABSX_NP, RRA);
 }
 
 
@@ -2702,7 +2718,7 @@ static void OPC_6502_90 (void)
 static void OPC_6502_91 (void)
 /* Opcode $91: sta (zp),y */
 {
-    STO_OP (ZPINDY, Regs.AC);
+    STO_OP (ZPINDY_NP, Regs.AC);
 }
 
 
@@ -2791,7 +2807,7 @@ static void OPC_6502_98 (void)
 static void OPC_6502_99 (void)
 /* Opcode $99: STA abs,y */
 {
-    STO_OP (ABSY, Regs.AC);
+    STO_OP (ABSY_NP, Regs.AC);
 }
 
 
@@ -2858,7 +2874,7 @@ static void OPC_65SC02_9C (void)
 static void OPC_6502_9D (void)
 /* Opcode $9D: STA abs,x */
 {
-    STO_OP (ABSX, Regs.AC);
+    STO_OP (ABSX_NP, Regs.AC);
 }
 
 
@@ -2886,7 +2902,7 @@ static void OPC_6502_9E (void)
 static void OPC_65SC02_9E (void)
 /* Opcode $9E: STZ abs,x */
 {
-    STO_OP (ABSX, 0);
+    STO_OP (ABSX_NP, 0);
 }
 
 
@@ -3388,7 +3404,7 @@ static void OPC_65SC02_D2 (void)
 static void OPC_6502_D3 (void)
 /* Opcode $D3: DCP (zp),y */
 {
-    MEM_OP (ZPINDY, DCP);
+    MEM_OP (ZPINDY_NP, DCP);
 }
 
 
@@ -3456,7 +3472,7 @@ static void OPC_65SC02_DA (void)
 static void OPC_6502_DB (void)
 /* Opcode $DB: DCP abs,y */
 {
-    MEM_OP (ABSY, DCP);
+    MEM_OP (ABSY_NP, DCP);
 }
 
 
@@ -3472,7 +3488,7 @@ static void OPC_6502_DD (void)
 static void OPC_6502_DE (void)
 /* Opcode $DE: DEC abs,x */
 {
-    MEM_OP (ABSX, DEC);
+    MEM_OP (ABSX_NP, DEC);
 }
 
 
@@ -3480,7 +3496,7 @@ static void OPC_6502_DE (void)
 static void OPC_6502_DF (void)
 /* Opcode $DF: DCP abs,x */
 {
-    MEM_OP (ABSX, DCP);
+    MEM_OP (ABSX_NP, DCP);
 }
 
 
@@ -3735,7 +3751,7 @@ static void OPC_65C02_F2 (void)
 static void OPC_6502_F3 (void)
 /* Opcode $F3: ISC (zp),y */
 {
-    MEM_OP (ZPINDY, ISC);
+    MEM_OP (ZPINDY_NP, ISC);
 }
 
 
@@ -3821,7 +3837,7 @@ static void OPC_65SC02_FA (void)
 static void OPC_6502_FB (void)
 /* Opcode $FB: ISC abs,y */
 {
-    MEM_OP (ABSY, ISC);
+    MEM_OP (ABSY_NP, ISC);
 }
 
 
@@ -3845,7 +3861,7 @@ static void OPC_65C02_FD (void)
 static void OPC_6502_FE (void)
 /* Opcode $FE: INC abs,x */
 {
-    MEM_OP (ABSX, INC);
+    MEM_OP (ABSX_NP, INC);
 }
 
 
@@ -3853,7 +3869,7 @@ static void OPC_6502_FE (void)
 static void OPC_6502_FF (void)
 /* Opcode $FF: ISC abs,x */
 {
-    MEM_OP (ABSX, ISC);
+    MEM_OP (ABSX_NP, ISC);
 }
 
 

@@ -29,6 +29,7 @@
 /*****************************************************************************/
 
 
+#include <sys/time.h>
 #include <time.h>
 #include "peripherals.h"
 
@@ -65,8 +66,19 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 
 #if defined(_WIN32)
             /* clock_gettime() is not available on Windows. Report max uint64 value for both fields. */
-            Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
-            Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
+            struct timeval tv;
+            int result = gettimeofday(&tv, NULL);
+            if (result != 0) {
+                /* Unable to get time. Report max uint64 value for both fields. */
+                Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
+                Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
+            } else {
+                /* Wallclock time: number of nanoseconds since 1-1-1970. */
+                Peripherals.Counter.LatchedWallclockTime = 1000000000 * (uint64_t)ts.tv_sec + 1000 * ts.tv_usec;
+                /* Wallclock time, split: high word is number of seconds since 1-1-1970,
+                 * low word is number of nanoseconds since the start of that second. */
+                Peripherals.Counter.LatchedWallclockTimeSplit = ((uint64_t)ts.tv_sec << 32) | (1000 * ts.tv_usec);
+            }
 #else
             /* Other targets are presumed to have it. */
             struct timespec ts;

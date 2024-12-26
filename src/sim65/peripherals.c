@@ -61,7 +61,8 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
             /* A write to the "latch" register performs a simultaneous latch of all registers. */
 
             /* Latch the current wallclock time first. */
-#if 0
+#if 1
+            /* Enabling clock_gettime dependent codepath (expected to fail at least on Windows build.) */
             struct timespec ts;
             int result = clock_gettime(CLOCK_REALTIME, &ts);
             if (result != 0) {

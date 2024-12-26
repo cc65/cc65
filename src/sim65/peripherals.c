@@ -61,19 +61,25 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 
             /* A write to the "latch" register performs a simultaneous latch of all registers. */
 
-            /* Latch the current wallclock time first (if possible). */
+            /* Latch the current wallclock time before doing anything else. */
 
-            struct timespec ts;
+            struct timespec ts; /* Available on all compilers we use. */
 
 #if defined(__MINGW64__)
+            /* We check for MINGW64 before MINGW32, since MINGW64 also defines __MINGW32__. */
+            /* does timespec_get work? */
+            bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
+            /* does clock_gettime work? */
             bool time_valid = false;
 #elif defined(__MINGW32__)
+            /* does timespec_get work? */
+            /* does clock_gettime work? */
             bool time_valid = false;
 #elif defined(_MSC_VER)
-            /* clock_gettime() is not available in the Visual Studio compiler. Use timespec_get() instead. */
+            /* clock_gettime() is not available when using the Microsoft compiler. Use timespec_get() instead. */
             bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
 #else
-            /* clock_gettime() is available on Linux, MacOS, MinGW32, and MinGW64. */
+            /* clock_gettime() is available on Linux and MacOS. */
             bool time_valid = clock_gettime(CLOCK_REALTIME, &ts) == 0;
 #endif
             if (time_valid) {

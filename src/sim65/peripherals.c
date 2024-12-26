@@ -65,10 +65,11 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 
             struct timespec ts;
 
-#if defined(_WIN32)
-            /* clock_gettime() is not available on Windows. Use timespec_get() instead. */
+#if defined(_MSC_VER)
+            /* clock_gettime() is not available in the Visual Studio compiler. Use timespec_get() instead. */
             bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
 #else
+            /* clock_gettime() is available on Linux, MacOS, MinGW32, and MinGW64.
             bool time_valid = clock_gettime(CLOCK_REALTIME, &ts) == 0;
 #endif
             if (time_valid) {

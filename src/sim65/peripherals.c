@@ -52,6 +52,44 @@ Sim65Peripherals Peripherals;
 /*                                   Code                                    */
 /*****************************************************************************/
 
+static bool GetWallclockTime (struct timespec * ts)
+{
+    /* Note: the 'struct timespec' type is supported on all compilers we want to support. */
+
+#if defined(__MINGW64__)
+    /* This check comes before the check on symbol __MINGW32__, as MinGW64 defines both.
+     *
+     * When using the MinGW64 compiler, neither timespec_get() nor clock_gettime()
+     * are available; this makes the Linux workflow build fail.
+     * The gettimeofday() function works, so use that.
+     */
+    struct timeval tv;
+    bool time_valid = (gettimeofday(&tv, NULL) == 0);
+    if (time_valid)
+    {
+        ts->tv_sec = tv.tv_sec;
+        ts->tv_nsec = tv.tv_usec * 1000;
+    }
+#elif defined(__MINGW32__)
+    /* The MinGW32 compiler is not used in the build process.
+     * Support can be added when the need arises.
+     */
+#error "The MinGW32 compiler is not supported."
+#elif defined(_MSC_VER)
+    /* Using the Microsoft C++ compiler.
+     * clock_gettime() is not available; use timespec_get() instead.
+     */
+    bool time_valid = timespec_get(ts, TIME_UTC) == TIME_UTC;
+#else
+    /* Other platforms (Linux, MacOS, ...): assume that clock_gettime()
+     * is available.
+     */
+    bool time_valid = clock_gettime(CLOCK_REALTIME, ts) == 0;
+#endif
+
+    return time_valid;
+}
+
 
 
 void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
@@ -67,28 +105,9 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 
             /* Latch the current wallclock time before doing anything else. */
 
-            struct timespec ts; /* Available on all compilers we use. */
+            struct timespec ts; /* The type is available on all compilers we use. */
+            bool time_valid = GetWallclockTime (&ts);
 
-#if defined(__MINGW64__)
-            /* Note: we check for MINGW64 before MINGW32, since MINGW64 also defines __MINGW32__. */
-            /* Using timespec_get() in the MinGW64 compiler makes the Linux workflow build fail. */
-            /* Using clock_gettime() in the MinGW64 compiler makes the Linux workflow build fail. */
-            struct timeval tv;
-            bool time_valid = (gettimeofday(&tv, NULL) == 0);
-            if (time_valid)
-            {
-                ts.tv_sec = tv.tv_sec;
-                ts.tv_nsec = tv.tv_usec * 1000;
-            }
-#elif defined(__MINGW32__)
-            #error "MinGW32 compiler detected, but we're not handling it."
-#elif defined(_MSC_VER)
-            /* clock_gettime() is not available when using the Microsoft compiler. Use timespec_get() instead. */
-            bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
-#else
-            /* clock_gettime() is available on Linux and MacOS. */
-            bool time_valid = clock_gettime(CLOCK_REALTIME, &ts) == 0;
-#endif
             if (time_valid) {
                 /* Wallclock time: number of nanoseconds since 1-1-1970. */
                 Peripherals.Counter.LatchedWallclockTime = 1000000000 * (uint64_t)ts.tv_sec + ts.tv_nsec;

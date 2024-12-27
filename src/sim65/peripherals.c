@@ -53,38 +53,34 @@ Sim65Peripherals Peripherals;
 /*****************************************************************************/
 
 static bool GetWallclockTime (struct timespec * ts)
+/* Get the wallclock time with nanosecond resolution. */
 {
-    /* Note: the 'struct timespec' type is supported on all compilers we want to support. */
+    /* Note: the 'struct timespec' type is available on all compilers we want to support. */
+
+    bool time_valid;
 
 #if defined(__MINGW64__)
-    /* This check comes before the check on symbol __MINGW32__, as MinGW64 defines both.
-     *
-     * When using the MinGW64 compiler, neither timespec_get() nor clock_gettime()
-     * are available; this makes the Linux workflow build fail.
-     * The gettimeofday() function works, so use that.
+    /* When using the MinGW64 compiler, neither timespec_get() nor clock_gettime()
+     * are available; using either of them makes the Linux workflow build fail.
+     * The gettimeofday() function does work, so use that; its microsecond resulution
+     * is plenty for most applications.
      */
     struct timeval tv;
-    bool time_valid = (gettimeofday(&tv, NULL) == 0);
+    time_valid = (gettimeofday(&tv, NULL) == 0);
     if (time_valid)
     {
         ts->tv_sec = tv.tv_sec;
         ts->tv_nsec = tv.tv_usec * 1000;
     }
-#elif defined(__MINGW32__)
-    /* The MinGW32 compiler is not used in the build process.
-     * Support can be added when the need arises.
-     */
-#error "The MinGW32 compiler is not supported."
 #elif defined(_MSC_VER)
     /* Using the Microsoft C++ compiler.
      * clock_gettime() is not available; use timespec_get() instead.
      */
-    bool time_valid = timespec_get(ts, TIME_UTC) == TIME_UTC;
+    time_valid = timespec_get(ts, TIME_UTC) == TIME_UTC;
 #else
-    /* Other platforms (Linux, MacOS, ...): assume that clock_gettime()
-     * is available.
+    /* On all other compilers, assume that the clock_gettime() function is available.
      */
-    bool time_valid = clock_gettime(CLOCK_REALTIME, ts) == 0;
+    time_valid = clock_gettime(CLOCK_REALTIME, ts) == 0;
 #endif
 
     return time_valid;

@@ -32,6 +32,10 @@
 #include <time.h>
 #include "peripherals.h"
 
+#if defined(__MINGW64__)
+/* For gettimeofday() */
+#include <sys/time.h>
+#endif
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -66,17 +70,18 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
             struct timespec ts; /* Available on all compilers we use. */
 
 #if defined(__MINGW64__)
-            /* We check for MINGW64 before MINGW32, since MINGW64 also defines __MINGW32__. */
+            /* Note: we check for MINGW64 before MINGW32, since MINGW64 also defines __MINGW32__. */
             /* Using timespec_get() in the MinGW64 compiler makes the Linux workflow build fail. */
             /* Using clock_gettime() in the MinGW64 compiler makes the Linux workflow build fail. */
-            bool time_valid = false;
+            struct timeval tv;
+            bool time_valid = (gettimeofday(&tv, NULL) == 0);
+            if (time_valid)
+            {
+                ts.tv_sec = tv.tv_sec;
+                ts.tv_nsec = tv.tv_usec * 1000;
+            }
 #elif defined(__MINGW32__)
-            /* does timespec_get work? -- yes! */
-            /* does clock_gettime work? -- yes! */
-            //bool time_valid = false;
-            //bool time_valid = clock_gettime(CLOCK_REALTIME, &ts) == 0;
-            #error "MinGW32 compiler was used; we're not handling it."
-            //bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
+            #error "MinGW32 compiler detected, but we're not handling it."
 #elif defined(_MSC_VER)
             /* clock_gettime() is not available when using the Microsoft compiler. Use timespec_get() instead. */
             bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;

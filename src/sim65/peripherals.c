@@ -72,9 +72,10 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
             bool time_valid = false;
 #elif defined(__MINGW32__)
             /* does timespec_get work? -- yes! */
-            /* does clock_gettime work? */
+            /* does clock_gettime work? -- yes! */
             //bool time_valid = false;
-            bool time_valid = clock_gettime(CLOCK_REALTIME, &ts) == 0;
+            //bool time_valid = clock_gettime(CLOCK_REALTIME, &ts) == 0;
+            #error "MinGW32 compiler was used; we're not handling it."
             //bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
 #elif defined(_MSC_VER)
             /* clock_gettime() is not available when using the Microsoft compiler. Use timespec_get() instead. */

@@ -68,13 +68,14 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 #if defined(__MINGW64__)
             /* We check for MINGW64 before MINGW32, since MINGW64 also defines __MINGW32__. */
             /* Using timespec_get() in the MinGW64 compiler makes the Linux workflow build fail. */
-            bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
+            //bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
             /* does clock_gettime work? */
-            //bool time_valid = false;
+            bool time_valid = false;
 #elif defined(__MINGW32__)
             /* does timespec_get work? */
             /* does clock_gettime work? */
-            bool time_valid = false;
+            //bool time_valid = false;
+            bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;
 #elif defined(_MSC_VER)
             /* clock_gettime() is not available when using the Microsoft compiler. Use timespec_get() instead. */
             bool time_valid = timespec_get(&ts, TIME_UTC) == TIME_UTC;

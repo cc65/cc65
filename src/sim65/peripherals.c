@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                             peripherals.c                                 */
 /*                                                                           */
-/*        Memory-mapped peripheral subsystem for the 6502 simulator          */
+/*         Memory-mapped peripheral subsystem for the 6502 simulator         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -30,12 +30,14 @@
 
 #include <stdbool.h>
 #include <time.h>
-#include "peripherals.h"
-
 #if defined(__MINGW64__)
 /* For gettimeofday() */
 #include <sys/time.h>
 #endif
+
+
+#include "peripherals.h"
+
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -62,13 +64,12 @@ static bool GetWallclockTime (struct timespec * ts)
 #if defined(__MINGW64__)
     /* When using the MinGW64 compiler, neither timespec_get() nor clock_gettime()
      * are available; using either of them makes the Linux workflow build fail.
-     * The gettimeofday() function does work, so use that; its microsecond resulution
-     * is plenty for most applications.
+     * The gettimeofday() function does work, so use that; its microsecond resolution
+     * is fine for most applications.
      */
     struct timeval tv;
     time_valid = (gettimeofday(&tv, NULL) == 0);
-    if (time_valid)
-    {
+    if (time_valid) {
         ts->tv_sec = tv.tv_sec;
         ts->tv_nsec = tv.tv_usec * 1000;
     }
@@ -78,7 +79,8 @@ static bool GetWallclockTime (struct timespec * ts)
      */
     time_valid = timespec_get(ts, TIME_UTC) == TIME_UTC;
 #else
-    /* On all other compilers, assume that the clock_gettime() function is available.
+    /* On all other compilers, assume that clock_gettime() is available.
+     * This is true on Linux and MacOS, at least.
      */
     time_valid = clock_gettime(CLOCK_REALTIME, ts) == 0;
 #endif
@@ -101,7 +103,7 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
 
             /* Latch the current wallclock time before doing anything else. */
 
-            struct timespec ts; /* The type is available on all compilers we use. */
+            struct timespec ts;
             bool time_valid = GetWallclockTime (&ts);
 
             if (time_valid) {
@@ -109,11 +111,11 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
                 Peripherals.Counter.LatchedWallclockTime = 1000000000 * (uint64_t)ts.tv_sec + ts.tv_nsec;
                 /* Wallclock time, split: high word is number of seconds since 1-1-1970,
                  * low word is number of nanoseconds since the start of that second. */
-                Peripherals.Counter.LatchedWallclockTimeSplit = ((uint64_t)ts.tv_sec << 32) | ts.tv_nsec;
+                Peripherals.Counter.LatchedWallclockTimeSplit = (uint64_t)ts.tv_sec << 32 | ts.tv_nsec;
             } else {
                 /* Unable to get time. Report max uint64 value for both fields. */
-                Peripherals.Counter.LatchedWallclockTime = 0xffffffffffffffff;
-                Peripherals.Counter.LatchedWallclockTimeSplit = 0xffffffffffffffff;
+                Peripherals.Counter.LatchedWallclockTime = -1;
+                Peripherals.Counter.LatchedWallclockTimeSplit = -1;
             }
 
             /* Latch the counters that reflect the state of the processor. */
@@ -160,8 +162,9 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
             /* Read from any of the eight counter bytes.
              * The first byte is the 64 bit value's LSB, the seventh byte is its MSB.
              */
-            unsigned ByteIndex = Addr - PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE; /* 0 .. 7 */
+            unsigned SelectedByteIndex = Addr - PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE; /* 0 .. 7 */
             uint64_t Value;
+            uint8_t SelectedByteValue;
             switch (Peripherals.Counter.LatchedValueSelected) {
                 case PERIPHERALS_COUNTER_SELECT_CLOCKCYCLE_COUNTER: Value = Peripherals.Counter.LatchedClockCycles; break;
                 case PERIPHERALS_COUNTER_SELECT_INSTRUCTION_COUNTER: Value = Peripherals.Counter.LatchedCpuInstructions; break;
@@ -172,7 +175,8 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
                 default: Value = 0; /* Reading from a non-existent latch register will yield 0. */
             }
             /* Return the desired byte of the latched counter. 0==LSB, 7==MSB. */
-            return (uint8_t)(Value >> (ByteIndex * 8));
+            SelectedByteValue = Value >> (SelectedByteIndex * 8);
+            return SelectedByteValue;
         }
 
         /* Handle reads from unused peripheral and write-only addresses. */

@@ -164,7 +164,6 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
              */
             unsigned SelectedByteIndex = Addr - PERIPHERALS_COUNTER_ADDRESS_OFFSET_VALUE; /* 0 .. 7 */
             uint64_t Value;
-            uint8_t SelectedByteValue;
             switch (Peripherals.Counter.LatchedValueSelected) {
                 case PERIPHERALS_COUNTER_SELECT_CLOCKCYCLE_COUNTER: Value = Peripherals.Counter.LatchedClockCycles; break;
                 case PERIPHERALS_COUNTER_SELECT_INSTRUCTION_COUNTER: Value = Peripherals.Counter.LatchedCpuInstructions; break;
@@ -174,9 +173,8 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
                 case PERIPHERALS_COUNTER_SELECT_WALLCLOCK_TIME_SPLIT: Value = Peripherals.Counter.LatchedWallclockTimeSplit; break;
                 default: Value = 0; /* Reading from a non-existent latch register will yield 0. */
             }
-            /* Return the desired byte of the latched counter. 0==LSB, 7==MSB. */
-            SelectedByteValue = Value >> (SelectedByteIndex * 8);
-            return SelectedByteValue;
+            /* Return the desired byte of the latched counter; 0==LSB, 7==MSB. */
+            return (uint8_t)(Value >> (SelectedByteIndex * 8));
         }
 
         /* Handle reads from unused peripheral and write-only addresses. */

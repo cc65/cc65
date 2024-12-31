@@ -151,70 +151,73 @@ int main()
 //   sim65 example.prg
 </verb></tscreen>
 
-<sect>Counter peripheral<p>
+<sect>Counter peripheral
 
-The sim65 simulator supports a memory-mapped counter peripheral that manages
+<p>The sim65 simulator supports a memory-mapped counter peripheral that manages
 a number of 64-bit counters that are continuously updated as the simulator is
 running. For each counter, it also provides a 64 bit "latching" register.
 
-The functionality of the counter peripheral is accessible through 3 registers:
+<p>The functionality of the counter peripheral is accessible through 3 registers:
 
-* PERIPHERALS_COUNTER_LATCH ($FFC0, write-only)
-* PERIPHERALS_COUNTER_SELECT ($FFC1, read/write)
-* PERIPHERALS_COUNTER_VALUE ($FFC2..$FFC9, read-only)
+<itemize>
+<item><tt>PERIPHERALS_COUNTER_LATCH</tt> ($FFC0, write-only)
+<item><tt>PERIPHERALS_COUNTER_SELECT</tt> ($FFC1, read/write)
+<item><tt>PERIPHERALS_COUNTER_VALUE</tt> ($FFC2..$FFC9, read-only)
+</itemize>
 
-These three registers are used as follows.
+<p>These three registers are used as follows.
 
-When a program explicitly requests a "counter latch" operation by writing any value
-to the PERIPHERALS_COUNTER_LATCH address ($FFC0), all live registers are copied to
+<p>When a program explicitly requests a "counter latch" operation by writing any value
+to the <tt>PERIPHERALS_COUNTER_LATCH</tt> address ($FFC0), all live registers are copied to
 the latch registers. They will keep the latched value until another latch operation
 updates them.
 
-The PERIPHERALS_COUNTER_SELECT address ($FFC1) register holds an 8-bit value that
-specifies which 64-bit value is currently readable through the PERIPHERALS_COUNTER_VALUE
-address range. Possible values are:
+<p>The <tt>PERIPHERALS_COUNTER_SELECT</tt> address ($FFC1) register holds an 8-bit value that
+specifies which 64-bit value is currently readable through the <tt>PERIPHERALS_COUNTER_VALUE</tt>
+address range. Six values are currently defined:
 
-$00: latched clock cycle counter selected.
-$01: latched CPU instruction counter selected.
-$02: latched IRQ interrupt counter selected.
-$03: latched NMI interrupt counter selected.
+<itemize>
+<item>$00: latched clock cycle counter selected.
+<item>$01: latched CPU instruction counter selected.
+<item>$02: latched IRQ interrupt counter selected.
+<item>$03: latched NMI interrupt counter selected.
+<item>$80: latched wallclock time (nanoseconds) selected.
+<item>$81: latched wallclock time (split s/ns) selected.
+</itemize>
 
-In addition to these counters, two other latch registers are available that are also
-updated when the PERIPHERALS_COUNTER_LATCH address is written:
+<p>Values $00 to $03 provide access to the latched (frozen) value of their respective live
+counters at the time of the last write to <tt>PERIPHERALS_COUNTER_LATCH</tt> .
 
-$80: latched wallclock time (nanoseconds) selected.
-$81: latched wallclock time (split s/ns) selected.
-
-When PERIPHERALS_COUNTER_LATCH equals $80, the PERIPHERALS_COUNTER_VALUE will be a
-64-bit value corresponding to the number of nanoseconds elapsed since Midnight, Jan 1st,
+<p>When <tt>PERIPHERALS_COUNTER_LATCH</tt> equals $80, the <tt>PERIPHERALS_COUNTER_VALUE</tt>
+will be a 64-bit value corresponding to the number of nanoseconds elapsed since Midnight, Jan 1st,
 1970 UTC.
 
-When PERIPHERALS_COUNTER_LATCH equals $81, the high 32 bits of PERIPHERALS_COUNTER_VALUE
+<p>When <tt>PERIPHERALS_COUNTER_LATCH</tt> equals $81, the high 32 bits of <tt>PERIPHERALS_COUNTER_VALUE</tt>
 will be a 32-bit value corresponding to the number of seconds elapsed since Midnight,
-Jan 1st, 1970 UTC. The low 32 bits of PERIPHERALS_COUNTER_VALUE will hold the
+Jan 1st, 1970 UTC. The low 32 bits of <tt>PERIPHERALS_COUNTER_VALUE</tt> will hold the
 nanoseconds since the start of that seconds.
 
-The two different wallclock-time latch registers are provided for different applications.
+<p>The two different wallclock-time latch registers are provided for different applications.
 For some applications, the single 64-bit value will be more convenient, while for other
 applications, the split 32/32 bits representations with separate seconds and nanoseconds
 is more convenient.
 
-Note that the definition above given as "time since Midnight, Jan 1st, 1970 UTC" is an
+<p>Note that the definition above given as time since Midnight, Jan 1st, 1970 UTC is an
 approximation, as the implementation depends on the POSIX definition of time which does
 not account for leap seconds.
 
-If the PERIPHERALS_COUNTER_SELECT register holds a value other than one of the six values
-described above, all PERIPHERALS_COUNTER_VALUE bytes will read as zero.
+<p>If the <tt>PERIPHERALS_COUNTER_SELECT</tt> register holds a value other than one of the six
+values described above, all <tt>PERIPHERALS_COUNTER_VALUE</tt> bytes will read as zero.
 
-On reset, PERIPHERALS_COUNTER_SELECT is initialized to zero.
+<p>On reset, <tt>PERIPHERALS_COUNTER_SELECT</tt> is initialized to zero.
 
-The PERIPHERALS_COUNTER_VALUE addresses ($FFC2..$FFC9) are used to read to currently
+<p>The <tt>PERIPHERALS_COUNTER_VALUE</tt> addresses ($FFC2..$FFC9) are used to read to currently
 selected latch register value. Address $FFF2 holds the least significant byte (LSB),
 while address $FFC9 holds the most significant byte (MSB).
 
-On reset, all latch registers are reset to zero. this means that reading any of the
-PERIPHERALS_COUNTER_VALUE bytes before a write to PERIPHERALS_COUNTER_LATCH will
-yield zero.
+<p>On reset, all latch registers are reset to zero. this means that reading any of the
+<tt>PERIPHERALS_COUNTER_VALUE</tt> bytes before a write to <tt>PERIPHERALS_COUNTER_LATCH</tt>
+will yield zero.
 
 <sect>Creating a Test in Assembly<p>
 

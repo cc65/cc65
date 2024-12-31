@@ -46,6 +46,7 @@
 #include <stdint.h>
 
 #include "memory.h"
+#include "peripherals.h"
 #include "error.h"
 #include "6502.h"
 #include "paravirt.h"
@@ -4730,6 +4731,8 @@ unsigned ExecuteInsn (void)
     if (HaveNMIRequest) {
 
         HaveNMIRequest = false;
+        Peripherals.Counter.NmiEvents += 1;
+
         PUSH (PCH);
         PUSH (PCL);
         PUSH (Regs.SR & ~BF);
@@ -4744,6 +4747,8 @@ unsigned ExecuteInsn (void)
     } else if (HaveIRQRequest && GET_IF () == 0) {
 
         HaveIRQRequest = false;
+        Peripherals.Counter.IrqEvents += 1;
+
         PUSH (PCH);
         PUSH (PCL);
         PUSH (Regs.SR & ~BF);
@@ -4762,7 +4767,13 @@ unsigned ExecuteInsn (void)
 
         /* Execute it */
         Handlers[CPU][OPC] ();
+
+        /* Increment the instruction counter by one.NMIs and IRQs are counted separately. */
+        Peripherals.Counter.CpuInstructions += 1;
     }
+
+    /* Increment the 64-bit clock cycle counter with the cycle count for the instruction that we just executed. */
+    Peripherals.Counter.ClockCycles += Cycles;
 
     /* Return the number of clock cycles needed by this instruction */
     return Cycles;

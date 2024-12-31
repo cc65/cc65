@@ -276,13 +276,12 @@ Jan 1st, 1970 UTC, at the time of the last latch operation. The low 32 bits of
 
 <p>The two different wallclock-time latch registers will always refer to precisely the same time instant.
 For some applications, the single 64-bit value measured in nanoseconds will be more convenient, while
-for other applications, the split 32/32 bits representations with separate seconds and nanosecond
+for other applications, the split 32/32 bits representations with separate second and nanosecond
 values will be more convenient.
 
-<p>Note that the definition above, with time elapsed measured since Midnight, Jan 1st, 1970 UTC is
-an approximation, as the implementation depends on the way POSIX definition time, which does
-not account for leap seconds (POSIX falsely assumes that all days are precisely 86400 seconds
-long).
+<p>Note that the definition above, with time elapsed measured since Midnight, Jan 1st, 1970 UTC, is
+an approximation, as the implementation depends on the way POSIX definition time, and POSIX does
+not account for leap seconds; it falsely assumes that all days are precisely 86400 seconds long.
 
 <p>On reset, <tt>PERIPHERALS_COUNTER_SELECT</tt> is initialized to zero. If the <tt>PERIPHERALS_COUNTER_SELECT</tt>
 register holds a value other than one of the six values described above, all <tt>PERIPHERALS_COUNTER_VALUE</tt>
@@ -294,6 +293,39 @@ while address $FFC9 holds the most significant byte (MSB).
 
 <p>On reset, all latch registers are reset to zero. Reading any of the <tt>PERIPHERALS_COUNTER_VALUE</tt>
 bytes before the first write to <tt>PERIPHERALS_COUNTER_LATCH</tt> will yield zero.
+
+Example:
+
+<tscreen><verb>
+#include <stdio.h>
+#include <stdint.h>
+
+volatile uint8_t  * CounterLatch  = (uint8_t *)0xffc0;
+volatile uint8_t  * CounterSelect = (uint8_t *)0xffc1;
+volatile uint32_t * CounterValue  = (uint32_t *)0xffc1;
+
+static void print_current_counters(void)
+{
+    *CounterLatch = 0; /* latch values */
+
+    *CounterSelect = 0x00;
+    printf("clock cycles ............... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
+    *CounterSelect = 0x01;
+    printf("instructions ............... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
+    *CounterSelect = 0x80;
+    printf("wallclock time ............. : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
+    *CounterSelect = 0x81;
+    printf("wallclock time, split ...... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
+    printf("\n");
+}
+
+int main(void)
+{
+    print_current_counters();
+    print_current_counters();
+    return 0;
+}
+</verb></tscreen>
 
 <sect>Copyright<p>
 

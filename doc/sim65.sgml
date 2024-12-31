@@ -246,7 +246,7 @@ running. For each counter, it also provides a 64 bit "latching" register.
 
 <p>When a program explicitly requests a "counter latch" operation by writing any value
 to the <tt>PERIPHERALS_COUNTER_LATCH</tt> address ($FFC0), all live registers are simultaneously
-copied to the latch registers. They will keep the newly latched value until another latch
+copied to the latch registers. They will keep their newly latched values until another latch
 operation is requested.
 
 <p>The <tt>PERIPHERALS_COUNTER_SELECT</tt> address ($FFC1) register holds an 8-bit value that
@@ -259,7 +259,7 @@ address range. Six values are currently defined:
 <item>$02: latched IRQ interrupt counter selected.
 <item>$03: latched NMI interrupt counter selected.
 <item>$80: latched wallclock time (nanoseconds) selected.
-<item>$81: latched wallclock time (split s/ns) selected.
+<item>$81: latched wallclock time (split: seconds, nanoseconds) selected.
 </itemize>
 
 <p>Values $00 to $03 provide access to the latched (frozen) value of their respective live
@@ -276,12 +276,13 @@ Jan 1st, 1970 UTC, at the time of the last latch operation. The low 32 bits of
 
 <p>The two different wallclock-time latch registers will always refer to precisely the same time instant.
 For some applications, the single 64-bit value measured in nanoseconds will be more convenient, while
-for other applications, the split 32/32 bits representations with separate second and nanosecond
+for other applications, the split 32/32 bits representation with separate second and nanosecond
 values will be more convenient.
 
 <p>Note that the definition above, with time elapsed measured since Midnight, Jan 1st, 1970 UTC, is
-an approximation, as the implementation depends on the way POSIX definition time, and POSIX does
-not account for leap seconds; it falsely assumes that all days are precisely 86400 seconds long.
+an approximation, as the implementation depends on the way POSIX definition time. Unfortunately,
+POSIX does not account for leap seconds; it incorrectly assumes that all days are precisely 86400 seconds
+long.
 
 <p>On reset, <tt>PERIPHERALS_COUNTER_SELECT</tt> is initialized to zero. If the <tt>PERIPHERALS_COUNTER_SELECT</tt>
 register holds a value other than one of the six values described above, all <tt>PERIPHERALS_COUNTER_VALUE</tt>
@@ -302,7 +303,7 @@ Example:
 
 volatile uint8_t  * CounterLatch  = (uint8_t *)0xffc0;
 volatile uint8_t  * CounterSelect = (uint8_t *)0xffc1;
-volatile uint32_t * CounterValue  = (uint32_t *)0xffc1;
+volatile uint32_t * CounterValue  = (uint32_t *)0xffc2;
 
 static void print_current_counters(void)
 {

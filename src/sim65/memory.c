@@ -36,7 +36,7 @@
 #include <string.h>
 
 #include "memory.h"
-
+#include "peripherals.h"
 
 
 /*****************************************************************************/
@@ -59,7 +59,14 @@ uint8_t Mem[0x10000];
 void MemWriteByte (uint16_t Addr, uint8_t Val)
 /* Write a byte to a memory location */
 {
-    Mem[Addr] = Val;
+    if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) && (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS))
+    {
+        /* Defer the the memory-mapped peripherals handler for this write. */
+        PeripheralsWriteByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS, Val);
+    } else {
+        /* Write to the Mem array. */
+        Mem[Addr] = Val;
+    }
 }
 
 
@@ -76,7 +83,14 @@ void MemWriteWord (uint16_t Addr, uint16_t Val)
 uint8_t MemReadByte (uint16_t Addr)
 /* Read a byte from a memory location */
 {
-    return Mem[Addr];
+    if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) && (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS))
+    {
+        /* Defer the the memory-mapped peripherals handler for this read. */
+        return PeripheralsReadByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS);
+    } else {
+        /* Read from the Mem array. */
+        return Mem[Addr];
+    }
 }
 
 

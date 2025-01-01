@@ -159,6 +159,30 @@ static void PVArgs (CPURegs* Regs)
     SetAX (Regs, ArgC);
 }
 
+/* Match between standard POSIX whence and cc65 whence. */
+static unsigned SEEK_MODE_MATCH[3] = {
+  SEEK_CUR,
+  SEEK_END,
+  SEEK_SET
+};
+
+static void PVLseek (CPURegs* Regs)
+{
+    unsigned RetVal;
+
+    unsigned Whence = GetAX (Regs);
+    unsigned Offset = PopParam (4);
+    unsigned FD     = PopParam (2);
+
+    Print (stderr, 2, "PVLseek ($%04X, $%08X, $%04X (%d))\n",
+           FD, Offset, Whence, SEEK_MODE_MATCH[Whence]);
+
+    RetVal = lseek(FD, (off_t)Offset, SEEK_MODE_MATCH[Whence]);
+    Print (stderr, 2, "PVLseek returned %04X\n", RetVal);
+
+    SetAX (Regs, RetVal);
+}
+
 
 
 static void PVOpen (CPURegs* Regs)
@@ -343,6 +367,7 @@ static void PVOSMapErrno (CPURegs* Regs)
 
 
 static const PVFunc Hooks[] = {
+    PVLseek,
     PVSysRemove,
     PVOSMapErrno,
     PVOpen,

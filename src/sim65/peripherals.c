@@ -30,7 +30,7 @@
 
 #include <stdbool.h>
 #include <time.h>
-#if defined(__MINGW64__)
+#if defined(__MINGW64__) || defined(__MINGW32__)
 /* For gettimeofday() */
 #include <sys/time.h>
 #endif

@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! fgets test
+  !!DESCRIPTION!! rewind test
   !!LICENCE!!     Public domain
 */
 

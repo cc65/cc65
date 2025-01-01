@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! fgets test
+  !!DESCRIPTION!! fread test
   !!LICENCE!!     Public domain
 */
 

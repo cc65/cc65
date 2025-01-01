@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! fgets test
+  !!DESCRIPTION!! fseek test
   !!LICENCE!!     Public domain
 */
 

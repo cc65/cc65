@@ -63,7 +63,22 @@ static bool GetWallclockTime (struct timespec * ts)
 
 #if defined(__MINGW64__)
     /* When using the MinGW64 compiler, neither timespec_get() nor clock_gettime()
-     * are available; using either of them makes the Linux workflow build fail.
+     * are available; using either of them makes the Linux PR build workflow build fail.
+     * The gettimeofday() function does work, so use that; its microsecond resolution
+     * is fine for most applications.
+     */
+    struct timeval tv;
+    time_valid = (gettimeofday(&tv, NULL) == 0);
+    if (time_valid) {
+        ts->tv_sec = tv.tv_sec;
+        ts->tv_nsec = tv.tv_usec * 1000;
+    }
+#elif defined(__MINGW32__)
+    /* Note: we test for MinGW32 after the test for MinGW64, as the __MINGW32__ symbol is also
+     * defined in MinGW64. This allows us to distinguish MinGW32 and MinGW64 build.
+     *
+     * When using the MinGW32 compiler, neither timespec_get() nor clock_gettime()
+     * are available; using either of them makes the Linux snapshot workflow build fail.
      * The gettimeofday() function does work, so use that; its microsecond resolution
      * is fine for most applications.
      */

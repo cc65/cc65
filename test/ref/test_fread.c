@@ -51,6 +51,7 @@ int main(int argc,char **argv)
 
     if (r == 0) {
       printf("Error: could not start reading.\n");
+      return EXIT_FAILURE;
     }
     fwrite(buf, 1, r, stdout);
 
@@ -63,6 +64,7 @@ int main(int argc,char **argv)
     if (!feof(in))
     {
         printf("We should have EOF!\n");
+        return EXIT_FAILURE;
     }
 
     fclose(in);

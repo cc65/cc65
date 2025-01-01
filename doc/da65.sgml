@@ -255,7 +255,7 @@ disassembler may be told to recognize either the 65SC02 or 65C02 CPUs. The
 latter understands the same opcodes as the former, plus 16 additional bit
 manipulation and bit test-and-branch commands. Using 6502x as CPU the illegal
 opcodes of 6502 CPU are detected and displayed. 6502dtv setting recognizes the
-emulated CPU instructons of the C64DTV device.
+emulated CPU instructions of the C64DTV device.
 
 
 When disassembling 4510 code, due to handling of 16-bit wide branches, da65

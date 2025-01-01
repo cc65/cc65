@@ -2436,7 +2436,7 @@ the address must first be ORed with $60.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cbm_k_listen" name="cbm_k_listen">
-<tag/Exampe/None.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -7315,7 +7315,7 @@ if (stat (FILENAME, &amp;stbuf) == 0) {
 <tag/Function/Get filesystem statistics.
 <tag/Header/<tt/<ref id="sys/statvfs.h" name="sys/statvfs.h">/
 <tag/Declaration/<tt/int __fastcall__ statvfs (const char* pathname, struct statvfs* buf);/
-<tag/Description/<tt/statvfs/ gets information for the filesytem on which the given file
+<tag/Description/<tt/statvfs/ gets information for the filesystem on which the given file
 resides. On success,
 zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
 code describing the reason for the failure.

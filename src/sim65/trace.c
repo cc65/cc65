@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <inttypes.h>
-#include <assert.h>
 
 #include "6502.h"
 #include "memory.h"
@@ -926,7 +925,7 @@ static unsigned GetInstructionLength (uint8_t opcode)
     }
 
     /* We should never get here. */
-    assert(false);
+    return -1;
 }
 
 

@@ -346,7 +346,7 @@ int main(void)
 <p>The sim65 simulator supports a memory-mapped peripheral that allows control
 of the simulator behavior itself.
 
-<p>The functionality of the counter peripheral is accessible through 2 registers:
+<p>The sim65 control peripheral interface consists of 2 registers:
 
 <itemize>
 <item><tt>PERIPHERALS_SIMCONTROL_CPUMODE</tt> ($FFCA, read/write)
@@ -356,15 +356,15 @@ of the simulator behavior itself.
 <p>Address <tt>PERIPHERALS_SIMCONTROL_CPUMODE</tt> allows access to the currently active CPU mode.
 
 <p>Possible values are CPU_6502 (0), CPU_65C02 (1), and CPU_6502X (2). For specialized applications,
-it may be useful to be able to switch CPU models at runtime; this is supported by writing a value 0, 1,
-or 2 to this address. Writing any other value will be ignored.
+it may be useful to switch CPU models at runtime; this is supported by writing 0, 1, or 2 to this address.
+Writing any other value will be ignored.
 
 <p>Address <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> allows inspection and control of the currently active
 CPU tracing mode.
 
 <p>A value of 0 means tracing is disabled; a value of $7F fully enables tracing. The 7
-lower bits of the value actually provide control over which fields are printed; see 'sim65/trace.h'
-for details.
+lower bits of the value actually provide control over which fields are printed; see below
+for an explanation of the seven fields.
 
 <p>Having the ability to enable/disable tracing on the fly can be a useful debugging aid. For example,
 it can be used to enable tracing for short fragments of code. Consider the following example:
@@ -375,10 +375,10 @@ it can be used to enable tracing for short fragments of code. Consider the follo
 
 volatile uint8_t  * TraceMode = (uint8_t *)0xffcb;
 
+unsigned x;
+
 int main(void)
 {
-    unsigned x;
-
     *TraceMode = 0x7f; /* Enable tracing */
 
     x = 0x1234; /* We want to see what happens here. */
@@ -388,6 +388,58 @@ int main(void)
     return 0;
 }
 </verb></tscreen>
+
+<p>This small test program produces the output trace below:
+
+<tscreen><verb>
+75           250  0239  A2 12     ldx  #$12         A=7F X=00 Y=00 S=FD Flags=nvdiZC    SP=FFBC
+76           252  023B  A9 34     lda  #$34         A=7F X=12 Y=00 S=FD Flags=nvdizC    SP=FFBC
+77           254  023D  8D DD 02  sta  $02DD        A=34 X=12 Y=00 S=FD Flags=nvdizC    SP=FFBC
+78           258  0240  8E DE 02  stx  $02DE        A=34 X=12 Y=00 S=FD Flags=nvdizC    SP=FFBC
+79           262  0243  AD B3 02  lda  $02B3        A=34 X=12 Y=00 S=FD Flags=nvdizC    SP=FFBC
+80           266  0246  85 09     sta  $09          A=FF X=12 Y=00 S=FD Flags=NvdizC    SP=FFBC
+81           269  0248  AD B2 02  lda  $02B2        A=FF X=12 Y=00 S=FD Flags=NvdizC    SP=FFBC
+82           273  024B  85 08     sta  $08          A=CB X=12 Y=00 S=FD Flags=NvdizC    SP=FFBC
+83           276  024D  98        tya               A=CB X=12 Y=00 S=FD Flags=NvdizC    SP=FFBC
+84           278  024E  91 08     sta  ($08),Y      A=00 X=12 Y=00 S=FD Flags=nvdiZC    SP=FFBC
+</verb></tscreen>
+
+<p>The example output shows the full trace format, consisting of the following seven fields:
+
+<itemize>
+<item>The first field is an instruction counter. We see here that the assignment <tt>x = 0x1234;</tt>tt>
+starts at the 75th CPU instruction since the start of the simulator, and takes four 6502 instructions.
+The six instructions that follow correspond to the statement <tt>*TraceMode = 0x00;</tt> that disables
+tracing.
+<item>The second field shows the clock cycles since the start of the program. Here we see that the
+first four instructions take 12 clock cycles in total (262 - 250 = 12).
+<item>The third field shows the program counter as a four-digit, i.e., the PC register. Its 16-bit
+      value is displayed as a 4-digit hecadecimal number.
+<item>The fourth field shows one to three hexadecimal byte values that make up the instruction.
+<item>The fifth field shows the instruction in human-readable assembly language.
+<item>The sixth field shows the CPU registers before execution of the instruction. The A, X, Y, and
+      S registers are each shown as a single byte value. The six status bits of the CPU are shown in
+      the order NVDIZC (Negative, Overflow, Decimal, Interrupt, Zero, Carry). They are displayed as
+      a capital letter if the flag is set, or a small letter if the flag is unset.
+<item>The seventh and last field shows the software stack pointer SP as used by CC65 programs that
+      conform to the CC65 conventions.
+</itemize>
+
+<p>Writing a specific value to <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> will control which of these
+seven fields are displayed. The following values are defined to denote the seven fields:
+
+<itemize>
+<item>TRACE_FIELD_INSTR_COUNTER   = 0x40
+<item>TRACE_FIELD_CLOCK_COUNTER   = 0x20
+<item>TRACE_FIELD_PC              = 0x10
+<item>TRACE_FIELD_INSTR_BYTES     = 0x08
+<item>TRACE_FIELD_INSTR_ASSEMBLY  = 0x04
+<item>TRACE_FIELD_CPU_REGISTERS   = 0x02
+<item>TRACE_FIELD_CC65_SP         = 0x01
+</itemize>
+
+<p>For example, writing the value $16 to <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> will only display
+the program counter, instruction assembly, and CPU register fields.
 
 <sect>Copyright<p>
 

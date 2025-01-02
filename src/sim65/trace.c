@@ -1082,7 +1082,7 @@ static void PrintTraceInstructionOrInterrupt (const char * InterruptType)
         }
 
         /* Fill out the field to 16 characters */
-        num_bytes = traceline_ptr - save_ptr;
+        num_bytes = (unsigned)(traceline_ptr - save_ptr);
         if (num_bytes < 16) {
             traceline_ptr += sprintf (traceline_ptr, "%*s", 16 - num_bytes, "");
         }

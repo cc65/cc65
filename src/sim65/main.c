@@ -358,7 +358,7 @@ int main (int argc, char* argv[])
     PeripheralsInit ();
 
     /* Read program file into memory.
-     * This also sets the CPU type, unless a CPU override is in effect. 
+     * This also sets the CPU type, unless a CPU override is in effect.
      */
     SPAddr = ReadProgramFile ();
 

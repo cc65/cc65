@@ -41,7 +41,7 @@
 /* Current Trace Mode. Tracing is off by default, and needs to be explicitly enabled. */
 uint8_t TraceMode = TRACE_DISABLED;
 
-/* CC65 stack pointer */ 
+/* CC65 stack pointer */
 uint8_t StackPointerZPageAddress;
 
 /* 6502, 65C02 addressing modes. */
@@ -1150,5 +1150,5 @@ void PrintTraceIRQ (void)
 
 void PrintTraceInstruction (void)
 {
-    PrintTraceInstructionOrInterrupt(NULL);    
+    PrintTraceInstructionOrInterrupt(NULL);
 }

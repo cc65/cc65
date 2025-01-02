@@ -129,7 +129,7 @@ static void OptCPU (const char* Opt, const char* Arg)
     } else if (strcmp(Arg, "65C02") == 0 || strcmp(Arg, "65c02") == 0) {
         CPU = CPU_65C02;
         CPUOverrideActive = true;
-    } else if (strcmp(Arg, "6502X") == 0 || strcmp(Arg, "6502X") == 0) {
+    } else if (strcmp(Arg, "6502X") == 0 || strcmp(Arg, "6502x") == 0) {
         CPU = CPU_6502X;
         CPUOverrideActive = true;
     } else {
@@ -174,12 +174,16 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
+
+
 static void OptQuitXIns (const char* Opt attribute ((unused)),
                         const char* Arg)
 /* Quit after MaxCycles cycles */
 {
     MaxCycles = strtoull(Arg, NULL, 0);
 }
+
+
 
 static unsigned char ReadProgramFile (void)
 /* Load program into memory */

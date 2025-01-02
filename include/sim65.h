@@ -107,9 +107,14 @@ extern volatile struct {
 #define SIM65_TRACE_MODE_DISABLE               0x00
 #define SIM65_TRACE_MODE_ENABLE_FULL           0x7F
 
-/* Convenience macros to enable / disable tracing. */
-#define TRACE_ON()      do peripherals.sim65.trace_mode = SIM65_TRACE_MODE_ENABLE_FULL; while(0)
-#define TRACE_OFF()     do peripherals.sim65.trace_mode = SIM65_TRACE_MODE_DISABLE; while(0)
+/* Convenience macros to enable / disable tracing at runtime. */
+#define TRACE_ON()  do peripherals.sim65.trace_mode = SIM65_TRACE_MODE_ENABLE_FULL; while(0)
+#define TRACE_OFF() do peripherals.sim65.trace_mode = SIM65_TRACE_MODE_DISABLE;     while(0)
+
+/* Convenience macros to set the CPU mode at runtime. */
+#define CPU_MODE_6502()  do peripherals.sim65.cpu_mode = SIM65_CPU_MODE_6502;  while(0)
+#define CPU_MODE_65C02() do peripherals.sim65.cpu_mode = SIM65_CPU_MODE_65C02; while(0)
+#define CPU_MODE_6502X() do peripherals.sim65.cpu_mode = SIM65_CPU_MODE_6502X; while(0)
 
 /* End of sim65.h */
 #endif

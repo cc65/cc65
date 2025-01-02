@@ -38,7 +38,7 @@
 /* The memory range where the memory-mapped peripherals can be accessed. */
 
 #define PERIPHERALS_APERTURE_BASE_ADDRESS  0xffc0
-#define PERIPHERALS_APERTURE_LAST_ADDRESS  0xffc9
+#define PERIPHERALS_APERTURE_LAST_ADDRESS  0xffcb
 
 /* Declarations for the COUNTER peripheral */
 

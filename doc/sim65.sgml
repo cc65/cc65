@@ -407,9 +407,9 @@ int main(void)
 <p>The example output shows the full trace format, consisting of the following seven fields:
 
 <itemize>
-<item>The first field is an instruction counter. We see here that the assignment <tt>x = 0x1234;</tt>tt>
+<item>The first field is an instruction counter. We see here that the assignment '<tt>x = 0x1234;</tt>'
 starts at the 75th CPU instruction since the start of the simulator, and takes four 6502 instructions.
-The six instructions that follow correspond to the statement <tt>*TraceMode = 0x00;</tt> that disables
+The six instructions that follow correspond to the statement '<tt>*TraceMode = 0x00;</tt>' that disables
 tracing.
 <item>The second field shows the clock cycles since the start of the program. Here we see that the
 first four instructions take 12 clock cycles in total (262 - 250 = 12).
@@ -439,7 +439,7 @@ seven fields are displayed. The following values are defined to denote the seven
 </itemize>
 
 <p>For example, writing the value $16 to <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> will only display
-the program counter, instruction assembly, and CPU register fields.
+the program counter, instruction assembly, and CPU registers fields.
 
 <sect>Copyright<p>
 

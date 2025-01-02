@@ -92,16 +92,11 @@ typedef struct {
 #define PERIPHERALS_SIMCONTROL_CPUMODE   (PERIPHERALS_APERTURE_BASE_ADDRESS + PERIPHERALS_SIMCONTROL_ADDRESS_OFFSET_CPUMODE)
 #define PERIPHERALS_SIMCONTROL_TRACEMODE (PERIPHERALS_APERTURE_BASE_ADDRESS + PERIPHERALS_SIMCONTROL_ADDRESS_OFFSET_TRACEMODE)
 
-typedef struct {
-    /* The SimControl peripheral has no state. */
-} SimControlPeripheral;
-
 /* Declare the 'Sim65Peripherals' type and its single instance 'Peripherals'. */
 
 typedef struct {
     /* State of the peripherals available in sim65. */
     CounterPeripheral Counter;
-    SimControlPeripheral SimControl;
 } Sim65Peripherals;
 
 extern Sim65Peripherals Peripherals;

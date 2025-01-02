@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <assert.h>
 
 #include "6502.h"
 #include "memory.h"
@@ -923,6 +924,9 @@ static unsigned GetInstructionLength (uint8_t opcode)
         case ABS_X_IND:
             return 3;
     }
+
+    /* We should never get here. */
+    assert(false);
 }
 
 

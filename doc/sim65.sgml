@@ -72,7 +72,7 @@ Here is a description of all the command line options:
   count.
 
 
-  <tag><tt>--cpu <type></tt></tag>
+  <tag><tt>--cpu &lt;type&gt;</tt></tag>
 
   Specify the CPU type to use while executing the program. This CPU type
   is normally determined from the program file header, but it can be useful
@@ -354,16 +354,19 @@ of the simulator behavior itself.
 </itemize>
 
 <p>Address <tt>PERIPHERALS_SIMCONTROL_CPUMODE</tt> allows access to the currently active CPU mode.
-Possible values are CPU_6502 (0), CPU_65C02 (1), and CPU_6502X (2). For specialized applications,
+
+<p>Possible values are CPU_6502 (0), CPU_65C02 (1), and CPU_6502X (2). For specialized applications,
 it may be useful to be able to switch CPU models at runtime; this is supported by writing a value 0, 1,
 or 2 to this address. Writing any other value will be ignored.
 
-<p>Address <tt> PERIPHERALS_SIMCONTROL_TRACEMODE</p>tt> allows inspection and control of the currently active
-CPU tracing facility. A value of 0 means tracing is disabled; a value of $7F fully enables tracing. The 7
+<p>Address <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> allows inspection and control of the currently active
+CPU tracing mode.
+
+<p>A value of 0 means tracing is disabled; a value of $7F fully enables tracing. The 7
 lower bits of the value actually provide control over which fields are printed; see 'sim65/trace.h'
 for details.
 
-Having the ability to enable/disable tracing on the fly can be a useful debugging aid. For example,
+<p>Having the ability to enable/disable tracing on the fly can be a useful debugging aid. For example,
 it can be used to enable tracing for short fragments of code. Consider the following example:
 
 <tscreen><verb>

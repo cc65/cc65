@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                paravirt.h                                 */
+/*                                 trace.h                                   */
 /*                                                                           */
-/*                Paravirtualization for the sim65 6502 simulator            */
+/*             Instruction tracing functionality sim65 6502 simulator        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2013-2013 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2025, Sidney Cadot                                                    */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -32,41 +29,61 @@
 /*****************************************************************************/
 
 
-#ifndef PARAVIRT_H
-#define PARAVIRT_H
+#ifndef TRACE_H
+#define TRACE_H
+
+
+#include <stdint.h>
 
 
 #include "6502.h"
 
+/* The trace mode is a bitfield that determines how trace lines are displayed.
+ *
+ * The value zero indicates that tracing is disabled (the default).
+ *
+ * In case TraceMode is not equal to zero, the value is interpreted as a bitfield:
+ *
+ * Bit    Bit value     Enables
+ * ---    -----------   -------------------------------
+ *  6      0x40 ( 64)   Print the instruction counter.
+ *  5      0x20 ( 32)   Print the clock cycle counter.
+ *  4      0x10 ( 16)   Print the PC (program counter).
+ *  3      0x08 (  8)   Print the instruction bytes.
+ *  2      0x04 (  4)   Print the instruction assembly.
+ *  1      0x02 (  2)   Print the CPU registers.
+ *  0      0x01 (  1)   Print the CC65 stack pointer.
+ *
+ */
 
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
+#define TRACE_FIELD_INSTR_COUNTER   0x40
+#define TRACE_FIELD_CLOCK_COUNTER   0x20
+#define TRACE_FIELD_PC              0x10
+#define TRACE_FIELD_INSTR_BYTES     0x08
+#define TRACE_FIELD_INSTR_ASSEMBLY  0x04
+#define TRACE_FIELD_CPU_REGISTERS   0x02
+#define TRACE_FIELD_CC65_SP         0x01
+
+#define TRACE_DISABLED              0x00
+#define TRACE_ENABLE_FULL           0x7f
+
+/* Currently active tracing mode. */
+extern uint8_t TraceMode;
+
+void TraceInit (uint8_t SPAddr);
+/* Initialize the trace subsystem. */
+
+void PrintTraceNMI(void);
+/* Print trace line for an NMI interrupt. */
+
+void PrintTraceIRQ(void);
+/* Print trace line for an IRQ interrupt. */
+
+void PrintTraceInstruction (void);
+/* Print trace line for the instruction at the currrent program counter. */
 
 
 
-#define PARAVIRT_BASE        0xFFF2
-/* Lowest address used by a paravirtualization hook */
-
-#define PV_PATH_SIZE         1024
-/* Maximum path size supported by PVOpen/PVSysRemove */
-
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
-
-void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr);
-/* Initialize the paravirtualization subsystem */
-
-void ParaVirtHooks (CPURegs* Regs);
-/* Potentially execute paravirtualization hooks */
-
-
-
-/* End of paravirt.h */
+/* End of trace.h */
 
 #endif

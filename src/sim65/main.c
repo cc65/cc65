@@ -100,8 +100,8 @@ static void Usage (void)
             "Long options:\n"
             "  --help\t\tHelp (this text)\n"
             "  --cycles\t\tPrint amount of executed CPU cycles\n"
-            "  --cpu <type>\t\tSet CPU type\n"
-            "  --trace\t\tEnable trace mode\n"
+            "  --cpu <type>\t\tOverride CPU type (6502, 65C02, 6502X)\n"
+            "  --trace\t\tEnable CPU trace\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
             ProgName);

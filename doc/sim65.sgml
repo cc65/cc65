@@ -40,6 +40,8 @@ The simulator is called as follows:
         Long options:
           --help                Help (this text)
           --cycles              Print amount of executed CPU cycles
+          --cpu <type>          Override CPU type (6502, 65C02, 6502X)
+          --trace               Enable CPU trace
           --verbose             Increase verbosity
           --version             Print the simulator version number
 </verb></tscreen>
@@ -69,6 +71,17 @@ Here is a description of all the command line options:
   The cycles for the final "<tt>jmp exit</tt>" are not included in this
   count.
 
+
+  <tag><tt>--cpu <type></tt></tag>
+
+  Specify the CPU type to use while executing the program. This CPU type
+  is normally determined from the program file header, but it can be useful
+  to override it.
+
+  <tag><tt>--trace</tt></tag>
+
+  Print a single line of information for each instruction or interrupt that
+  is executed by the CPU to stdout.
 
   <tag><tt>-v, --verbose</tt></tag>
 

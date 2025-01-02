@@ -10,6 +10,7 @@ VARTAB          := $2A          ; Pointer to start of BASIC variables
 MEMSIZE         := $34          ; Size of memory installed
 TXTPTR          := $77          ; Pointer into BASIC source code
 TIME            := $8D          ; 60HZ clock
+STATUS          := $96          ; IEC status byte
 KEY_COUNT       := $9E          ; Number of keys in input buffer
 RVS             := $9F          ; Reverse flag
 CURS_FLAG       := $A7          ; 1 = cursor off

@@ -8,7 +8,6 @@
         .import         zerobss, push0
         .import         callmain
         .import         CLRCH, BSOUT
-        .importzp       ST
 
         .include        "zeropage.inc"
         .include        "pet.inc"
@@ -80,7 +79,7 @@ L2:     lda     zpsave,x
 ; Store the program return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Restore the stack pointer.
 

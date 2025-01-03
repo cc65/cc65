@@ -311,25 +311,23 @@ bytes before the first write to <tt>PERIPHERALS_COUNTER_LATCH</tt> will yield ze
 Example:
 
 <tscreen><verb>
-#include <stdio.h>
-#include <stdint.h>
+/* This example uses the peripheral support in sim65.h */
 
-volatile uint8_t  * CounterLatch  = (uint8_t *)0xffc0;
-volatile uint8_t  * CounterSelect = (uint8_t *)0xffc1;
-volatile uint32_t * CounterValue  = (uint32_t *)0xffc2;
+#include <stdio.h>
+#include <sim65.h>
 
 static void print_current_counters(void)
 {
-    *CounterLatch = 0; /* latch values */
+    peripherals.counter.latch = 0; /* latch values */
 
-    *CounterSelect = 0x00;
-    printf("clock cycles ............... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
-    *CounterSelect = 0x01;
-    printf("instructions ............... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
-    *CounterSelect = 0x80;
-    printf("wallclock time ............. : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
-    *CounterSelect = 0x81;
-    printf("wallclock time, split ...... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
+    peripherals.counter.select = COUNTER_SELECT_CLOCKCYCLE_COUNTER;
+    printf("clock cycles ............... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_INSTRUCTION_COUNTER;
+    printf("instructions ............... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_WALLCLOCK_TIME;
+    printf("wallclock time ............. : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_WALLCLOCK_TIME_SPLIT;
+    printf("wallclock time, split ...... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
     printf("\n");
 }
 
@@ -370,47 +368,43 @@ for an explanation of the seven fields.
 it can be used to enable tracing for short fragments of code. Consider the following example:
 
 <tscreen><verb>
-#include <stdio.h>
-#include <stdint.h>
+/* This example uses the TRACE_ON and TRACE_OFF macros defined in sim65.h */
 
-volatile uint8_t  * TraceMode = (uint8_t *)0xffcb;
+#include <stdio.h>
+#include <sim65.h>
 
 unsigned x;
 
 int main(void)
 {
-    *TraceMode = 0x7f; /* Enable tracing */
+    TRACE_ON();
 
     x = 0x1234; /* We want to see what happens here. */
 
-    *TraceMode = 0x00; /* Disable tracing */
+    TRACE_OFF();
 
     return 0;
 }
 </verb></tscreen>
 
-<p>This small test program produces the output trace below:
+<p>This small test program, when compiled with optimizations enabled (-O), produces the output trace below:
 
 <tscreen><verb>
-75           250  0239  A2 12     ldx  #$12         A=7F X=00 Y=00 S=FD Flags=nvdiZC    SP=FFBC
-76           252  023B  A9 34     lda  #$34         A=7F X=12 Y=00 S=FD Flags=nvdizC    SP=FFBC
-77           254  023D  8D DD 02  sta  $02DD        A=34 X=12 Y=00 S=FD Flags=nvdizC    SP=FFBC
-78           258  0240  8E DE 02  stx  $02DE        A=34 X=12 Y=00 S=FD Flags=nvdizC    SP=FFBC
-79           262  0243  AD B3 02  lda  $02B3        A=34 X=12 Y=00 S=FD Flags=nvdizC    SP=FFBC
-80           266  0246  85 09     sta  $09          A=FF X=12 Y=00 S=FD Flags=NvdizC    SP=FFBC
-81           269  0248  AD B2 02  lda  $02B2        A=FF X=12 Y=00 S=FD Flags=NvdizC    SP=FFBC
-82           273  024B  85 08     sta  $08          A=CB X=12 Y=00 S=FD Flags=NvdizC    SP=FFBC
-83           276  024D  98        tya               A=CB X=12 Y=00 S=FD Flags=NvdizC    SP=FFBC
-84           278  024E  91 08     sta  ($08),Y      A=00 X=12 Y=00 S=FD Flags=nvdiZC    SP=FFBC
+70           232  022E  A2 12     ldx  #$12         A=7F X=00 Y=04 S=FD Flags=nvdizC    SP=FFBC
+71           234  0230  A9 34     lda  #$34         A=7F X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+72           236  0232  8D C8 02  sta  $02C8        A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+73           240  0235  8E C9 02  stx  $02C9        A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+74           244  0238  A9 00     lda  #$00         A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+75           246  023A  8D CB FF  sta  $FFCB        A=00 X=12 Y=04 S=FD Flags=nvdiZC    SP=FFBC
 </verb></tscreen>
 
 <p>The example output shows the full trace format, consisting of the following seven fields:
 
 <itemize>
 <item>The first field is an instruction counter. We see here that the assignment '<tt>x = 0x1234;</tt>'
-starts at the 75th CPU instruction since the start of the simulator, and takes four 6502 instructions.
-The six instructions that follow correspond to the statement '<tt>*TraceMode = 0x00;</tt>' that disables
-tracing.
+starts at the 70th CPU instruction since the start of the simulator, and takes four 6502 instructions.
+The two instructions that follow correspond to the execution of the <tt>TRACE_OFF</tt>' macro
+that disables tracing.
 <item>The second field shows the clock cycles since the start of the program. Here we see that the
 first four instructions take 12 clock cycles in total (262 - 250 = 12).
 <item>The third field shows the program counter as a four-digit, i.e., the PC register. Its 16-bit

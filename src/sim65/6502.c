@@ -42,14 +42,16 @@
  * the WAI ($CB) and STP ($DB) instructions are unsupported.
  */
 
-#include <stdbool.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "memory.h"
 #include "peripherals.h"
 #include "error.h"
-#include "6502.h"
 #include "paravirt.h"
+#include "trace.h"
+
+#include "6502.h"
 
 /*
 
@@ -4485,7 +4487,7 @@ static const OPFunc OP65C02Table[256] = {
     OPC_6502_41,
     OPC_65C02_NOP22,    // $42
     OPC_65C02_NOP11,    // $43
-    OPC_6502X_44,        // $44
+    OPC_6502X_44,       // $44
     OPC_6502_45,
     OPC_6502_46,
     OPC_65C02_47,
@@ -4730,6 +4732,10 @@ unsigned ExecuteInsn (void)
     /* If we have an NMI request, handle it */
     if (HaveNMIRequest) {
 
+        if (TraceMode != TRACE_DISABLED) {
+            PrintTraceNMI ();
+        }
+
         HaveNMIRequest = false;
         Peripherals.Counter.NmiEvents += 1;
 
@@ -4745,6 +4751,10 @@ unsigned ExecuteInsn (void)
         Cycles = 7;
 
     } else if (HaveIRQRequest && GET_IF () == 0) {
+
+        if (TraceMode != TRACE_DISABLED) {
+            PrintTraceIRQ ();
+        }
 
         HaveIRQRequest = false;
         Peripherals.Counter.IrqEvents += 1;
@@ -4765,11 +4775,16 @@ unsigned ExecuteInsn (void)
         /* Normal instruction - read the next opcode */
         uint8_t OPC = MemReadByte (Regs.PC);
 
-        /* Execute it */
-        Handlers[CPU][OPC] ();
+        /* Print a trace line, if trace mode is enabled. */
+        if (TraceMode != TRACE_DISABLED) {
+            PrintTraceInstruction ();
+        }
 
-        /* Increment the instruction counter by one.NMIs and IRQs are counted separately. */
+        /* Increment the instruction counter by one. */
         Peripherals.Counter.CpuInstructions += 1;
+
+        /* Execute the instruction. The handler sets the 'Cycles' variable. */
+        Handlers[CPU][OPC] ();
     }
 
     /* Increment the 64-bit clock cycle counter with the cycle count for the instruction that we just executed. */

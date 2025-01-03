@@ -87,6 +87,7 @@
     <ClInclude Include="sim65\memory.h" />
     <ClInclude Include="sim65\paravirt.h" />
     <ClInclude Include="sim65\peripherals.h" />
+    <ClInclude Include="sim65\trace.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sim65\6502.c" />
@@ -95,6 +96,7 @@
     <ClCompile Include="sim65\memory.c" />
     <ClCompile Include="sim65\paravirt.c" />
     <ClCompile Include="sim65\peripherals.c" />
+    <ClCompile Include="sim65\trace.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

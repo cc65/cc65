@@ -37,6 +37,8 @@
 
 
 #include "peripherals.h"
+#include "trace.h"
+#include "6502.h"
 
 
 /*****************************************************************************/
@@ -146,6 +148,20 @@ void PeripheralsWriteByte (uint8_t Addr, uint8_t Val)
             break;
         }
 
+        /* Handle writes to the SimControl peripheral. */
+
+        case PERIPHERALS_SIMCONTROL_ADDRESS_OFFSET_CPUMODE: {
+            if (Val == CPU_6502 || Val == CPU_65C02 || Val == CPU_6502X) {
+                CPU = Val;
+            }
+            break;
+        }
+
+        case PERIPHERALS_SIMCONTROL_ADDRESS_OFFSET_TRACEMODE: {
+            TraceMode = Val;
+            break;
+        }
+
         /* Handle writes to unused and read-only peripheral addresses. */
 
         default: {
@@ -190,6 +206,16 @@ uint8_t PeripheralsReadByte (uint8_t Addr)
             }
             /* Return the desired byte of the latched counter; 0==LSB, 7==MSB. */
             return (uint8_t)(Value >> (SelectedByteIndex * 8));
+        }
+
+        /* Handle reads from the SimControl peripheral. */
+
+        case PERIPHERALS_SIMCONTROL_ADDRESS_OFFSET_CPUMODE: {
+            return CPU;
+        }
+
+        case PERIPHERALS_SIMCONTROL_ADDRESS_OFFSET_TRACEMODE: {
+            return TraceMode;
         }
 
         /* Handle reads from unused peripheral and write-only addresses. */

@@ -1,4 +1,4 @@
-/* 
+/*
  * Sim65 trace functionailty example.
  *
  * Description

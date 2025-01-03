@@ -1,4 +1,4 @@
-/* 
+/*
  * Sim65 cpu-mode switching example.
  *
  * Description

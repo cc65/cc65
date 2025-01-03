@@ -1,4 +1,4 @@
-/* 
+/*
  * Sim65 timer example.
  *
  * Description

@@ -33,8 +33,8 @@ unsigned x;
 
 int main(void)
 {
-	TRACE_ON();
-	x = 0x1234;
-	TRACE_OFF();
-	return 0;
+    TRACE_ON();
+    x = 0x1234;
+    TRACE_OFF();
+    return 0;
 }

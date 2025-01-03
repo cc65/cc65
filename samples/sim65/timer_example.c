@@ -44,7 +44,7 @@
 #include <stdlib.h>
 #include <sim65.h>
 
-uint32_t static timestamp(void)
+static uint32_t timestamp(void)
 {
     peripherals.counter.select = COUNTER_SELECT_CLOCKCYCLE_COUNTER;
     peripherals.counter.latch = 0;

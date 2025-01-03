@@ -111,10 +111,26 @@ extern volatile struct {
 #define TRACE_ON()  do peripherals.sim65.trace_mode = SIM65_TRACE_MODE_ENABLE_FULL; while(0)
 #define TRACE_OFF() do peripherals.sim65.trace_mode = SIM65_TRACE_MODE_DISABLE;     while(0)
 
-/* Convenience macros to set the CPU mode at runtime. */
-#define CPU_MODE_6502()  do peripherals.sim65.cpu_mode = SIM65_CPU_MODE_6502;  while(0)
-#define CPU_MODE_65C02() do peripherals.sim65.cpu_mode = SIM65_CPU_MODE_65C02; while(0)
-#define CPU_MODE_6502X() do peripherals.sim65.cpu_mode = SIM65_CPU_MODE_6502X; while(0)
+/* Convenience macro to query the CPU mode at runtime. */
+#define GET_CPU_MODE() peripherals.sim65.cpu_mode
+
+/* Convenience macro to set the CPU mode at runtime.
+ *
+ * Use SIM65_CPU_MODE_6502, SIM65_CPU_MODE_65C02, or SIM65_CPU_MODE_6502 as argument.
+ *
+ * Important Note:
+ *
+ * When running in a program compiled for the "sim6502" target, it is safe to switch to
+ * 65C02 or 6502X mode, since the runtime library will only use plain 6502 opcodes, and
+ * those work the same in 65C02 and 6502X mode.
+ *
+ * However, when running in a program compiled for the "sim65c02" target, it is NOT safe
+ * to switch to 6502 or 6502X mode, since many routines in the runtime library use
+ * 65C02-specific opcodes, and these will not work as expected when the CPU is switched
+ * to 6502 or 6502X mode. When such an instruction is encountered, the program will
+ * exhibit undefined behavior.
+ */
+#define SET_CPU_MODE(mode)  do peripherals.sim65.cpu_mode = mode; while(0)
 
 /* End of sim65.h */
 #endif

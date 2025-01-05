@@ -60,12 +60,12 @@ static bool __fastcall__ is_65c02(void)
      * warning that can be safely ignored. While no return statement is present, the
      * return value is correctly loaded into AX by the assembly code.
      */
-    __asm__("ldx #0");
     __asm__("sed");
+    __asm__("ldx #0");
     __asm__("txa");
-    __asm__("sbc #28");
-    __asm__("asl a");
-    __asm__("sbc #28");
+    __asm__("sbc #155");
+    __asm__("asl");
+    __asm__("rol");
     __asm__("and #1");
     __asm__("cld");
 }

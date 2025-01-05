@@ -40,6 +40,8 @@ The simulator is called as follows:
         Long options:
           --help                Help (this text)
           --cycles              Print amount of executed CPU cycles
+          --cpu <type>          Override CPU type (6502, 65C02, 6502X)
+          --trace               Enable CPU trace
           --verbose             Increase verbosity
           --version             Print the simulator version number
 </verb></tscreen>
@@ -69,6 +71,17 @@ Here is a description of all the command line options:
   The cycles for the final "<tt>jmp exit</tt>" are not included in this
   count.
 
+
+  <tag><tt>--cpu &lt;type&gt;</tt></tag>
+
+  Specify the CPU type to use while executing the program. This CPU type
+  is normally determined from the program file header, but it can be useful
+  to override it.
+
+  <tag><tt>--trace</tt></tag>
+
+  Print a single line of information for each instruction or interrupt that
+  is executed by the CPU to stdout.
 
   <tag><tt>-v, --verbose</tt></tag>
 
@@ -298,25 +311,23 @@ bytes before the first write to <tt>PERIPHERALS_COUNTER_LATCH</tt> will yield ze
 Example:
 
 <tscreen><verb>
-#include <stdio.h>
-#include <stdint.h>
+/* This example uses the peripheral support in sim65.h */
 
-volatile uint8_t  * CounterLatch  = (uint8_t *)0xffc0;
-volatile uint8_t  * CounterSelect = (uint8_t *)0xffc1;
-volatile uint32_t * CounterValue  = (uint32_t *)0xffc2;
+#include <stdio.h>
+#include <sim65.h>
 
 static void print_current_counters(void)
 {
-    *CounterLatch = 0; /* latch values */
+    peripherals.counter.latch = 0; /* latch values */
 
-    *CounterSelect = 0x00;
-    printf("clock cycles ............... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
-    *CounterSelect = 0x01;
-    printf("instructions ............... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
-    *CounterSelect = 0x80;
-    printf("wallclock time ............. : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
-    *CounterSelect = 0x81;
-    printf("wallclock time, split ...... : %08lx %08lx\n", CounterValue[1], CounterValue[0]);
+    peripherals.counter.select = COUNTER_SELECT_CLOCKCYCLE_COUNTER;
+    printf("clock cycles ............... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_INSTRUCTION_COUNTER;
+    printf("instructions ............... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_WALLCLOCK_TIME;
+    printf("wallclock time ............. : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_WALLCLOCK_TIME_SPLIT;
+    printf("wallclock time, split ...... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
     printf("\n");
 }
 
@@ -327,6 +338,102 @@ int main(void)
     return 0;
 }
 </verb></tscreen>
+
+<sect>SIM65 control peripheral
+
+<p>The sim65 simulator supports a memory-mapped peripheral that allows control
+of the simulator behavior itself.
+
+<p>The sim65 control peripheral interface consists of 2 registers:
+
+<itemize>
+<item><tt>PERIPHERALS_SIMCONTROL_CPUMODE</tt> ($FFCA, read/write)
+<item><tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> ($FFCB, read/write)
+</itemize>
+
+<p>Address <tt>PERIPHERALS_SIMCONTROL_CPUMODE</tt> allows access to the currently active CPU mode.
+
+<p>Possible values are CPU_6502 (0), CPU_65C02 (1), and CPU_6502X (2). For specialized applications,
+it may be useful to switch CPU models at runtime; this is supported by writing 0, 1, or 2 to this address.
+Writing any other value will be ignored.
+
+<p>Address <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> allows inspection and control of the currently active
+CPU tracing mode.
+
+<p>A value of 0 means tracing is disabled; a value of $7F fully enables tracing. The 7
+lower bits of the value actually provide control over which fields are printed; see below
+for an explanation of the seven fields.
+
+<p>Having the ability to enable/disable tracing on the fly can be a useful debugging aid. For example,
+it can be used to enable tracing for short fragments of code. Consider the following example:
+
+<tscreen><verb>
+/* This example uses the TRACE_ON and TRACE_OFF macros defined in sim65.h */
+
+#include <stdio.h>
+#include <sim65.h>
+
+unsigned x;
+
+int main(void)
+{
+    TRACE_ON();
+
+    x = 0x1234; /* We want to see what happens here. */
+
+    TRACE_OFF();
+
+    return 0;
+}
+</verb></tscreen>
+
+<p>This small test program, when compiled with optimizations enabled (-O), produces the output trace below:
+
+<tscreen><verb>
+70           232  022E  A2 12     ldx  #$12         A=7F X=00 Y=04 S=FD Flags=nvdizC    SP=FFBC
+71           234  0230  A9 34     lda  #$34         A=7F X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+72           236  0232  8D C8 02  sta  $02C8        A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+73           240  0235  8E C9 02  stx  $02C9        A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+74           244  0238  A9 00     lda  #$00         A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+75           246  023A  8D CB FF  sta  $FFCB        A=00 X=12 Y=04 S=FD Flags=nvdiZC    SP=FFBC
+</verb></tscreen>
+
+<p>The example output shows the full trace format, consisting of the following seven fields:
+
+<itemize>
+<item>The first field is an instruction counter. We see here that the assignment '<tt>x = 0x1234;</tt>'
+starts at the 70th CPU instruction since the start of the simulator, and takes four 6502 instructions.
+The two instructions that follow correspond to the execution of the <tt>TRACE_OFF</tt>' macro
+that disables tracing.
+<item>The second field shows the clock cycles since the start of the program. Here we see that the
+first four instructions take 12 clock cycles in total (262 - 250 = 12).
+<item>The third field shows the program counter as a four-digit, i.e., the PC register. Its 16-bit
+      value is displayed as a 4-digit hecadecimal number.
+<item>The fourth field shows one to three hexadecimal byte values that make up the instruction.
+<item>The fifth field shows the instruction in human-readable assembly language.
+<item>The sixth field shows the CPU registers before execution of the instruction. The A, X, Y, and
+      S registers are each shown as a single byte value. The six status bits of the CPU are shown in
+      the order NVDIZC (Negative, Overflow, Decimal, Interrupt, Zero, Carry). They are displayed as
+      a capital letter if the flag is set, or a small letter if the flag is unset.
+<item>The seventh and last field shows the software stack pointer SP as used by CC65 programs that
+      conform to the CC65 conventions.
+</itemize>
+
+<p>Writing a specific value to <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> will control which of these
+seven fields are displayed. The following values are defined to denote the seven fields:
+
+<itemize>
+<item>TRACE_FIELD_INSTR_COUNTER   = 0x40
+<item>TRACE_FIELD_CLOCK_COUNTER   = 0x20
+<item>TRACE_FIELD_PC              = 0x10
+<item>TRACE_FIELD_INSTR_BYTES     = 0x08
+<item>TRACE_FIELD_INSTR_ASSEMBLY  = 0x04
+<item>TRACE_FIELD_CPU_REGISTERS   = 0x02
+<item>TRACE_FIELD_CC65_SP         = 0x01
+</itemize>
+
+<p>For example, writing the value $16 to <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> will only display
+the program counter, instruction assembly, and CPU registers fields.
 
 <sect>Copyright<p>
 

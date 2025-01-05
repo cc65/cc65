@@ -104,9 +104,9 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 
     } else {
 
-        /* The rhs cannot happen to be loaded in the primary as it is too big */
+        /* Load the address of rhs into the primary */
+        ED_AddrExpr (RExpr);
         if (!ED_IsLocExpr (RExpr)) {
-            ED_AddrExpr (RExpr);
             LoadExpr (CF_NONE, RExpr);
         }
 

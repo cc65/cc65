@@ -45,7 +45,7 @@
 
 
 
-#define PARAVIRT_BASE        0xFFF2
+#define PARAVIRT_BASE        0xFFF1
 /* Lowest address used by a paravirtualization hook */
 
 #define PV_PATH_SIZE         1024

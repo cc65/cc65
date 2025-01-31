@@ -31,6 +31,8 @@ _cas_hdr:
         ldy     #80
         sta     (SAVMSC),y
 .endif
+        lda     #$3c
+        sta     PACTL
         clc
         rts
 

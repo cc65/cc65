@@ -394,7 +394,7 @@ _exit:  pha                     ; Save the return code
 ; Place the program return code into BASIC's status variable.
 
         pla
-        ldy     #$9C            ; ST
+        ldy     #STATUS
         sta     (sysp0),y
 
 ; Set up the welcome code at the stack bottom in the system bank.

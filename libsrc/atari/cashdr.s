@@ -10,10 +10,10 @@
 
         .include "atari.inc"
 
-        .import __BSS_RUN__, __STARTADDRESS__, _cas_init
+        .import __INIT_RUN__, __STARTADDRESS__, _cas_init
         .export _cas_hdr
 
-.assert ((__BSS_RUN__ - __STARTADDRESS__ + 127) / 128) < $101, error, "File to big to load from cassette"
+.assert ((__INIT_RUN__ - __STARTADDRESS__ + 127) / 128) < $101, error, "File to big to load from cassette"
 
 
 ; for a description of the cassette header, see De Re Atari, appendix C
@@ -22,7 +22,7 @@
 
 _cas_hdr:
         .byte   0                       ; ignored
-        .byte   <((__BSS_RUN__ - __STARTADDRESS__ + 127) / 128)         ; # of 128-byte records to read
+        .byte   <((__INIT_RUN__ - __STARTADDRESS__ + 127) / 128)        ; # of 128-byte records to read
         .word   __STARTADDRESS__        ; load address
         .word   _cas_init               ; init address
 

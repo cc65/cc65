@@ -214,7 +214,8 @@ struct Token {
     token_t         Tok;        /* The token itself */
     long            IVal;       /* The integer attribute */
     Double          FVal;       /* The float attribute */
-    struct Literal* SVal;       /* String literal is any */
+    struct Literal* SVal;       /* String literal, translated */
+    struct Literal* RVal;       /* String literal, NOT translated */
     ident           Ident;      /* Identifier if IDENT */
     LineInfo*       LI;         /* Source line where the token comes from */
     const Type*     Type;       /* Type if integer or float constant */

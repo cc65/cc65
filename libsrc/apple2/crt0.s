@@ -10,6 +10,7 @@
 
         .import         initlib, _exit
         .import         zerobss, callmain
+        .import         bltu2
         .import         __ONCE_LOAD__, __ONCE_SIZE__    ; Linker generated
         .import         __LC_START__, __LC_LAST__       ; Linker generated
 
@@ -93,6 +94,7 @@ basic:  lda     HIMEM
         ; Call the module constructors.
         jsr     initlib
 
+        ; Copy the LC segment to its destination
         ; Switch in LC bank 2 for W/O.
         bit     $C081
         bit     $C081
@@ -120,7 +122,7 @@ basic:  lda     HIMEM
 
         ; Call into Applesoft Block Transfer Up -- which handles zero-
         ; sized blocks well -- to move the content of the LC memory area.
-        jsr     $D39A           ; BLTU2
+        jsr     bltu2           ; BLTU2
 
         ; Switch in LC bank 2 for R/O and return.
         bit     $C080

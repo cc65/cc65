@@ -58,6 +58,9 @@ StrBuf FullDepName = STATIC_STRBUF_INITIALIZER; /* Full dependency file */
 const char ObjExt[]              = ".o";/* Default object extension */
 
 char LocalStart                  = '@'; /* This char starts local symbols */
+unsigned char ProcessingConst    = 0;   /* Currently processed expression
+                                        ** is supposed to be const
+                                        */
 
 unsigned char IgnoreCase         = 0;   /* Ignore case on identifiers? */
 unsigned char AutoImport         = 0;   /* Mark unresolveds as import */

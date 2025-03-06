@@ -122,7 +122,7 @@ basic:  lda     HIMEM
 
         ; Call into Applesoft Block Transfer Up -- which handles zero-
         ; sized blocks well -- to move the content of the LC memory area.
-        jsr     bltu2           ; BLTU2
+        jsr     bltu2
 
         ; Switch in LC bank 2 for R/O and return.
         bit     $C080

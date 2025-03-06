@@ -43,6 +43,7 @@
 /* common */
 #include "coll.h"
 #include "strbuf.h"
+#include "strpool.h"
 
 
 
@@ -83,8 +84,10 @@ extern char NextC;
 void OpenMainFile (const char* Name);
 /* Open the main file. Will call Fatal() in case of failures. */
 
-void OpenIncludeFile (const char* Name, InputType IT);
-/* Open an include file and insert it into the tables. */
+void OpenIncludeFile (const char* Name, InputType IT, StringPool* FilesToIgnore);
+/* Open an include file and insert it into the tables.
+** Does nothing if the resolved file is present in the pool.
+*/
 
 void CloseIncludeFile (void);
 /* Close an include file and switch to the higher level file. Set Input to

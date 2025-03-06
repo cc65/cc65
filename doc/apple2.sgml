@@ -92,7 +92,28 @@ several useful settings:
 
 </descrip><p>
 
+<descrip>
 
+  <tag/Installing your code in the Language Card/
+  The code in the LC segment will automatically be copied from the end of the
+  binary into the Language Card at startup, even if the segment is empty (a
+  0-byte copy). This allows for tighter code. This code will be copied using the
+  Applesoft BLTU2 function that is available starting with the Apple ][+,
+  but not in the original Apple ][ with an Integer BASIC ROM. This shows as
+  a "RANGE ERROR. STOPPING AT ..." message on startup.
+
+  If you want to target the Integer BASIC original Apple ][, you can link in an
+  alternative implementation of the LC segment loading, at the cost of linking
+  in memcpy (60 bytes):
+
+  Using <tt/apple2-integer-basic-compat.o/ is as simple as placing it on the linker
+  command line like this:
+
+  <tscreen><verb>
+  cl65 -t apple2 myprog.c apple2-integer-basic-compat.o
+  </verb></tscreen>
+
+</descrip>
 
 <sect>Linker configurations<label id="link-configs"><p>
 

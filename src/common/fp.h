@@ -52,6 +52,7 @@
 
 
 #include <stddef.h>
+#include <stdint.h>
 
 
 
@@ -92,7 +93,7 @@ Float FP_F_Make (float Val);
 Float FP_F_FromInt (long Val);
 /* Convert an integer into a floating point variable */
 
-float FP_F_ToFloat (Float Val);
+float FP_F_ToFloat (Float Val);     /* FIXME: better name */
 /* Convert a Float into a native float */
 
 Float FP_F_Add (Float Left, Float Right);
@@ -118,8 +119,9 @@ Double FP_D_Make (double Val);
 
 Double FP_D_FromInt (long Val);
 /* Convert an integer into a floating point variable */
+long FP_D_ToLong (Double Val);
 
-double FP_D_ToFloat (Double Val);
+double FP_D_ToFloat (Double Val);     /* FIXME: better name */
 /* Convert a Double into a native double */
 
 Double FP_D_Add (Double Left, Double Right);
@@ -134,7 +136,8 @@ Double FP_D_Mul (Double Left, Double Right);
 Double FP_D_Div (Double Left, Double Right);
 /* Divide two floats */
 
-
+uint32_t FP_D_As32bitRaw(Double Val);
+/* converts double into 32bit (float) and then returns its raw content as a 32bit int */
 
 /* End of fp.h */
 

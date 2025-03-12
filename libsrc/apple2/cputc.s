@@ -15,6 +15,7 @@
         .import         uppercasemask
         .endif
 
+        .include        "zeropage.inc"
         .include        "apple2.inc"
 
         .macpack        cpu
@@ -87,23 +88,28 @@ putchar:
 mask:   and     INVFLG          ; Apply normal, inverse, flash
 
 putchardirect:
-        pha
+        tax
         .ifdef  __APPLE2ENH__
         lda     CH
+        sec                     ; Assume main memory
         bit     RD80VID         ; In 80 column mode?
         bpl     put             ; No, just go ahead
         lsr                     ; Div by 2
         bcs     put             ; Odd cols go in main memory
+        php
+        sei                     ; No valid MSLOT et al. in aux memory
         bit     HISCR           ; Assume SET80COL
 put:    tay
         .else
         ldy     CH
         .endif
         lda     (BASL),Y        ; Get current character
-        tax                     ; Return old character for _cgetc
-        pla
+        sta     tmp3            ; Save old character for _cgetc
+        txa
         sta     (BASL),Y
         .ifdef  __APPLE2ENH__
-        bit     LOWSCR          ; Doesn't hurt in 40 column mode
-        .endif
+        bcs     :+              ; In main memory
+        bit     LOWSCR
+        plp
+:       .endif
         rts

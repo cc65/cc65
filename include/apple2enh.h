@@ -82,8 +82,8 @@
 #define CH_F10  0xB0
 
 /* Video modes */
-#define VIDEOMODE_40x24     0x0011
-#define VIDEOMODE_80x24     0x0012
+#define VIDEOMODE_40x24     0x15
+#define VIDEOMODE_80x24     0x00
 #define VIDEOMODE_40COL     VIDEOMODE_40x24
 #define VIDEOMODE_80COL     VIDEOMODE_80x24
 

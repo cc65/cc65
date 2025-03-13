@@ -353,7 +353,7 @@ SHOW:
 ; BUTTONS: Return the button mask in A/X.
 BUTTONS:
         lda     info + MOUSE_INFO::BUTTONS
-        ldx     #$00
+        ldx     #>$0000
         rts
 
 ; POS: Return the mouse position in the MOUSE_POS struct pointed to by ptr1.

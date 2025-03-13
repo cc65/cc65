@@ -16,7 +16,7 @@ _get_iigs_speed:
         lda     CYAREG          ; Check current setting
         bpl     :+
         lda     #SPEED_FAST
-        ldx     #$00
+        ldx     #>$0000
         rts
         .assert SPEED_SLOW = 0, error
 :       jmp     return0         ; SPEED_SLOW

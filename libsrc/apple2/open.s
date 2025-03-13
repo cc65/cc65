@@ -209,7 +209,7 @@ done:   lda     tmp1            ; Restore fd
         jsr     popname         ; Preserves A
 
         ; Return success
-        ldx     #$00
+        ldx     #>$0000
         stx     ___oserror
         rts
 

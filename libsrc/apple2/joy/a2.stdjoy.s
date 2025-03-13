@@ -92,7 +92,7 @@ COUNT:
         bvc     noiic           ; Not $4x
         dex                     ; Only one joystick for the //c
 noiic:  txa                     ; Number of joysticks we support
-        ldx     #$00
+        ldx     #>$0000
         rts
 
 ; READ routine. Read a particular joystick passed in A.
@@ -170,5 +170,5 @@ nogs2:  lda     #$00            ; 0 0 0 0 0 0 0 0
 
         ; Finalize
         eor     #%00010100      ; BTN_2 BTN_1 DOWN UP RIGHT LEFT 0 0
-        ldx     #$00
+        ldx     #>$0000
         rts

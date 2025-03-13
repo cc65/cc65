@@ -5,16 +5,16 @@
 ;
 
         .export         _beep
-        .import         BELL
 
         .include        "apple2.inc"
 
         .segment        "LOWCODE"
 
 _beep:
-        lda     CH              ; Bell scrambles CH in 80col mode on IIgs, storing
-        pha                     ; it in OURCH and resetting CH to 0. Save it.
-        jsr     BELL
-        pla
-        sta     CH              ; Restore CH
+        ; Switch in ROM and call BELL
+        bit     $C082
+        jsr     $FF3A           ; BELL
+
+        ; Switch in LC bank 2 for R/O and return
+        bit     $C080
         rts

@@ -14,7 +14,7 @@ _cpeekc:
         sec                     ; Assume main memory
         bit     RD80VID         ; In 80 column mode?
         bpl     peek            ; No, just go ahead
-        tya
+        lda     OURCH
         lsr                     ; Div by 2
         tay
         bcs     peek            ; Odd cols are in main memory

@@ -22,4 +22,9 @@ _gotoxy:
 
 _gotox:
         sta     CH              ; Store X
+        .ifdef  __APPLE2ENH__
+        bit     RD80VID         ; In 80 column mode?
+        bpl     :+
+        sta     OURCH           ; Store X
+:       .endif
         rts

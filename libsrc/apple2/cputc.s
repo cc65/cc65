@@ -52,19 +52,29 @@ _cputc:
 
 cputdirect:
         jsr     putchar
+        .ifdef  __APPLE2ENH__
+        bit     RD80VID         ; In 80 column mode?
+        bpl     :+
+        inc     OURCH           ; Bump to next column
+        lda     OURCH
+        bra     check           ; Must leave CH alone
+:       .endif
         inc     CH              ; Bump to next column
         lda     CH
-        cmp     WNDWDTH
-        bcc     :+
+check:  cmp     WNDWDTH
+        bcc     done
         jsr     newline
 left:
-        .if (.cpu .bitand CPU_ISET_65SC02)
+        .ifdef  __APPLE2ENH__
         stz     CH              ; Goto left edge of screen
+        bit     RD80VID         ; In 80 column mode?
+        bpl     done
+        stz     OURCH           ; Goto left edge of screen
         .else
         lda     #$00            ; Goto left edge of screen
         sta     CH
         .endif
-:       rts
+done:   rts
 
 newline:
         inc     CV              ; Bump to next line
@@ -89,21 +99,20 @@ mask:   and     INVFLG          ; Apply normal, inverse, flash
 
 putchardirect:
         tax
+        ldy     CH
         .ifdef  __APPLE2ENH__
-        lda     CH
         sec                     ; Assume main memory
         bit     RD80VID         ; In 80 column mode?
         bpl     put             ; No, just go ahead
+        lda     OURCH
         lsr                     ; Div by 2
+        tay
         bcs     put             ; Odd cols go in main memory
         php
         sei                     ; No valid MSLOT et al. in aux memory
         bit     HISCR           ; Assume SET80COL
-put:    tay
-        .else
-        ldy     CH
         .endif
-        lda     (BASL),Y        ; Get current character
+put:    lda     (BASL),Y        ; Get current character
         sta     tmp3            ; Save old character for _cgetc
         txa
         sta     (BASL),Y

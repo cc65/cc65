@@ -121,7 +121,7 @@ eoferr:
         beq     done
         lda     #$FF
 done:
-        tax
+        tax                     ; Promote char return value
         rts
 
         .bss

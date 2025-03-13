@@ -25,5 +25,5 @@ _set_iigs_speed:
 set_speed:
         sta     CYAREG
         txa
-        ldx     #$00
+        ldx     #>$0000
         rts

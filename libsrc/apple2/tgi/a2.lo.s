@@ -321,7 +321,7 @@ GETPIXEL:
         jsr     SCRN
         tax
         lda     COL2TGI,x
-        ldx     #$00
+        ldx     #>$0000
         bit     $C080           ; Switch in LC bank 2 for R/O
         rts
 

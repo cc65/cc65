@@ -345,7 +345,7 @@ BaudOK: sta     tmp1
         stx     Index           ; Mark port as open
         lda     #SER_ERR_OK
 Out:
-        ldx     #$00            ; Promote char return value
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------
@@ -360,7 +360,7 @@ SER_GET:
         cmp     #$FF
         bne     :+
         lda     #SER_ERR_NO_DATA
-        ldx     #$00            ; Promote char return value
+        ldx     #>$0000
         rts
 
 :       ldy     Stopped         ; Check for flow stopped
@@ -408,7 +408,7 @@ SER_PUT:
         ldy     SendFreeCnt     ; Reload SendFreeCnt after TryToSend
         bne     :+
         lda     #SER_ERR_OVERFLOW
-        ldx     #$00            ; Promote char return value
+        ldx     #>$0000
         rts
 
 :       ldy     SendTail        ; Put byte into send buffer
@@ -456,7 +456,7 @@ SER_IOCTL:
         rts
 
 :       lda     #SER_ERR_INV_IOCTL
-        ldx     #$00            ; Promote char return value
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------

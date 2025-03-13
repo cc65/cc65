@@ -295,7 +295,7 @@ SER_CLOSE:
         bcc     IIgs
 
         lda     #SER_ERR_NO_DEVICE      ; Not a IIgs
-        ldx     #$00                    ; Promote char return value
+        ldx     #>$0000
         rts
 
 IIgs:
@@ -500,7 +500,7 @@ BaudOK:
 
 SetupOut:
         plp                             ; Reenable interrupts if needed
-        ldx     #$00                    ; Promote char return value
+        ldx     #>$0000
         sty     Opened
         rts
 
@@ -539,7 +539,7 @@ SER_GET:
         rts
 NoData:
         lda     #SER_ERR_NO_DATA
-        ldx     #$00                    ; Promote char return value
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------
@@ -560,7 +560,7 @@ SER_PUT:
 :       ldy     SendFreeCnt             ; Do we have room to store byte?
         bne     :+
         lda     #SER_ERR_OVERFLOW
-        ldx     #$00
+        ldx     #>$0000
         rts
 
 :       ldy     SendTail                ; Put byte into send buffer & send
@@ -571,7 +571,7 @@ SER_PUT:
         jsr     TryToSend
         lda     #SER_ERR_OK
         .assert SER_ERR_OK = 0, error
-        tax
+        tax                             ; Promote char return value
         rts
 
 ;----------------------------------------------------------------------------
@@ -608,11 +608,11 @@ SER_IOCTL:
 
         stx     Channel
         .assert SER_ERR_OK = 0, error
-        tax
+        tax                             ; Promote char return value
         rts
 
 :       lda     #SER_ERR_INV_IOCTL
-        ldx     #$00                    ; Promote char return value
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------

@@ -8380,6 +8380,7 @@ only in the presence of a prototype.
 <descrip>
 <tag/Function/Wait until the start of the next video frame.
 <tag/Header/<tt/
+<ref id="apple2enh.h" name="apple2enh.h">,
 <ref id="atmos.h" name="atmos.h">,
 <ref id="cbm.h" name="cbm.h">,
 <ref id="gamate.h" name="gamate.h">,

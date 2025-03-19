@@ -163,6 +163,12 @@ static const struct Keyword {
 typedef uint32_t scan_t;
 
 
+/* ParseChar return values */
+typedef struct {
+    int SourceVal;
+    int TargetVal;
+} parsedchar_t;
+
 /*****************************************************************************/
 /*                                   code                                    */
 /*****************************************************************************/
@@ -326,9 +332,11 @@ static void SetTok (int tok)
 
 
 
-static int ParseChar (void)
+static parsedchar_t ParseChar (void)
 /* Parse a character token. Converts escape chars into character codes. */
 {
+    parsedchar_t Result;
+    int NeedTranslate = 1;
     int C;
     int HadError;
     int Count;
@@ -345,6 +353,14 @@ static int ParseChar (void)
                 break;
             case 'b':
                 C = '\b';
+                break;
+            case 'e':
+                if (IS_Get(&Standard) != STD_CC65) {
+                    goto IllegalEscape;
+                }
+                /* we'd like to use \e here, but */
+                /* not all build systems support it */
+                C = '\x1B';
                 break;
             case 'f':
                 C = '\f';
@@ -373,6 +389,7 @@ static int ParseChar (void)
             case 'x':
             case 'X':
                 /* Hex character constant */
+                NeedTranslate = 0;
                 if (!IsXDigit (NextC)) {
                     Error ("\\x used with no following hex digits");
                     C = ' ';
@@ -401,6 +418,7 @@ static int ParseChar (void)
             case '6':
             case '7':
                 /* Octal constant */
+                NeedTranslate = 0;
                 Count = 1;
                 C = HexVal (CurC);
                 while (IsODigit (NextC) && Count++ < 3) {
@@ -411,6 +429,7 @@ static int ParseChar (void)
                     Error ("Octal character constant out of range");
                 break;
             default:
+IllegalEscape:
                 C = CurC;
                 Error ("Illegal escaped character: 0x%02X", CurC);
                 break;
@@ -422,8 +441,17 @@ static int ParseChar (void)
     /* Skip the character read */
     NextChar ();
 
+    Result.SourceVal = Result.TargetVal = C;
+
+    if (NeedTranslate) {
+        Result.TargetVal = TgtTranslateChar(C);
+    }
+
     /* Do correct sign extension */
-    return SignExtendChar (C);
+    Result.SourceVal = SignExtendChar(Result.SourceVal);
+    Result.TargetVal = SignExtendChar(Result.TargetVal);
+
+    return Result;
 }
 
 
@@ -431,7 +459,7 @@ static int ParseChar (void)
 static void CharConst (void)
 /* Parse a character constant token */
 {
-    int C;
+    parsedchar_t C;
 
     if (CurC == 'L') {
         /* Wide character constant */
@@ -456,8 +484,9 @@ static void CharConst (void)
         NextChar ();
     }
 
+    /* Character constants don't need reverse translation (?) */
     /* Translate into target charset */
-    NextTok.IVal = SignExtendChar (C);
+    NextTok.IVal = SignExtendChar (C.TargetVal);
 
     /* Character constants have type int */
     NextTok.Type = type_int;
@@ -468,8 +497,12 @@ static void CharConst (void)
 static void StringConst (void)
 /* Parse a quoted string token */
 {
+    /* result from ParseChar */
+    parsedchar_t ParsedChar;
+
     /* String buffer */
-    StrBuf S = AUTO_STRBUF_INITIALIZER;
+    StrBuf R = AUTO_STRBUF_INITIALIZER;
+    StrBuf T = AUTO_STRBUF_INITIALIZER;
 
     /* Assume next token is a string constant */
     NextTok.Tok  = TOK_SCONST;
@@ -494,7 +527,13 @@ static void StringConst (void)
             Error ("Unexpected newline");
             break;
         }
-        SB_AppendChar (&S, ParseChar ());
+        ParsedChar = ParseChar ();
+        if (ParsedChar.SourceVal) {
+            SB_AppendChar (&R, ParsedChar.SourceVal);
+        }
+        if (ParsedChar.TargetVal) {
+            SB_AppendChar (&T, ParsedChar.TargetVal);
+        }
     }
 
     /* Skip closing quote char if there was one */
@@ -503,13 +542,16 @@ static void StringConst (void)
 ExitPoint:
 
     /* Terminate the string */
-    SB_AppendChar (&S, '\0');
+    SB_AppendChar (&R, '\0');
+    SB_AppendChar (&T, '\0');
 
     /* Add the whole string to the literal pool */
-    NextTok.SVal = AddLiteralStr (&S);
+    NextTok.SVal = AddLiteralStr (&T);
+    NextTok.RVal = AddLiteralStr (&R);
 
     /* Free the buffer */
-    SB_Done (&S);
+    SB_Done (&R);
+    SB_Done (&T);
 }
 
 
@@ -800,6 +842,8 @@ static void GetNextInputToken (void)
 {
     ident token;
 
+#if 0
+    /* no longer needed, translation happens in ParseChar */
     if (!NoCharMap && !InPragmaParser) {
         /* Translate string and character literals into target charset */
         if (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST) {
@@ -808,6 +852,7 @@ static void GetNextInputToken (void)
             NextTok.IVal = SignExtendChar (TgtTranslateChar (NextTok.IVal));
         }
     }
+#endif
 
     /* Current token is the lookahead token */
     if (CurTok.LI) {
@@ -1164,6 +1209,7 @@ void NextToken (void)
 
                 /* Concatenate strings */
                 ConcatLiteral (PrevTok.SVal, CurTok.SVal);
+                ConcatLiteral (PrevTok.RVal, CurTok.RVal);
 
                 /* If at least one of the concatenated strings is a wide
                 ** character literal, the whole string is a wide char

@@ -1,8 +1,7 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 strpool.h                                 */
-/*                                                                           */
-/*                               A string pool                               */
+/*                                pathutil.h                                 */
+/*                         Path manipulation utilities                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,38 +32,8 @@
 
 
 
-/* A string pool is used to store identifiers and other strings. Each string
-** stored in the pool has a unique ID, which may be used to access the string
-** in the pool. Identical strings are only stored once in the pool and have
-** identical IDs. This means that instead of comparing strings, just the
-** string pool IDs must be compared.
-*/
-
-
-
-#ifndef STRPOOL_H
-#define STRPOOL_H
-
-
-
-/* common */
-#include "hashtab.h"
-#include "strbuf.h"
-
-
-
-/*****************************************************************************/
-/*                                     Data                                  */
-/*****************************************************************************/
-
-
-
-/* Opaque string pool entry */
-typedef struct StringPoolEntry StringPoolEntry;
-
-/* A string pool */
-typedef struct StringPool StringPool;
-
+#ifndef PATHUTIL_H
+#define PATHUTIL_H
 
 
 /*****************************************************************************/
@@ -72,44 +41,15 @@ typedef struct StringPool StringPool;
 /*****************************************************************************/
 
 
-
-StringPool* NewStringPool (unsigned HashSlots);
-/* Allocate, initialize and return a new string pool */
-
-void FreeStringPool (StringPool* P);
-/* Free a string pool */
-
-const StrBuf* SP_Get (const StringPool* P, unsigned Index);
-/* Return a string from the pool. Index must exist, otherwise FAIL is called. */
-
-unsigned SP_Add (StringPool* P, const StrBuf* S);
-/* Add a string buffer to the buffer and return the index. If the string does
-** already exist in the pool, SP_Add will just return the index of the
-** existing string.
-*/
-
-unsigned SP_AddStr (StringPool* P, const char* S);
-/* Add a string to the buffer and return the index. If the string does already
-** exist in the pool, SP_Add will just return the index of the existing string.
-*/
-
-unsigned SP_GetCount (const StringPool* P);
-/* Return the number of strings in the pool */
-
-unsigned SP_Lookup(StringPool *P, const StrBuf *S);
+char *FindRealPath (const char *path);
 /*
-** Determine whether the given string is in the pool.
-** Returns 1 if the string is in the pool, 0 otherwise.
-*/
-
-unsigned SP_LookupStr(StringPool *P, const char *S);
-/*
-** Determine whether the given string is in the pool.
-** Returns 1 if the string is in the pool, 0 otherwise.
+** Returns a malloced buffer containing the canonical path of the given path.
+** If the path points to a non-existent file, or if any error occurs, NULL is returned.
+** If the path points to a symlink, the resolved symlink path is returned.
+** Note: The returned path's separator is system specific.
 */
 
 
-
-/* End of strpool.h */
+/* End of pathutil.h */
 
 #endif

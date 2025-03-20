@@ -82,6 +82,18 @@ Platforms:      Runs on all platforms that have TGI support:
                 and NES.
 
 -----------------------------------------------------------------------------
+Name:           mandelfloat
+Description:    A very simple mandelbrot calculator, which uses floats and out-
+                puts the result to console.
+Platforms:      Runs on all platforms that have putchar();
+
+-----------------------------------------------------------------------------
+Name:           mathtest
+Description:    Uses the floating point math.h functions to plot some more or
+                less interesting pattern
+Platforms:      Runs on all platforms that have putchar();
+
+-----------------------------------------------------------------------------
 Name:           mousedemo
 Description:    Shows how to use the mouse.
 Platforms:      All systems with mouse and conio support:

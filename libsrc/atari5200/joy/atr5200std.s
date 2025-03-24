@@ -79,7 +79,7 @@ COUNT:
 ;
 
 CENTER  =       228 / 2
-SENSITIVITY   = 16
+SENSIVITY       = 16
 
 READJOY:
         and     #3              ; put joystick number in range, just in case
@@ -96,27 +96,27 @@ READJOY:
 ; Read joystick
 
 @notrg: ldy     PADDL0,x        ; get horizontal position
-        cpy     #CENTER-SENSITIVITY
+        cpy     #CENTER-SENSIVITY
         bcs     @chkleft
 
         ora     #4              ; JOY_LEFT
         bne     @updown
 
 @chkleft:
-        cpy     #CENTER+SENSITIVITY
+        cpy     #CENTER+SENSIVITY
         bcc     @updown
 
         ora     #8              ; JOY_RIGHT
 
 @updown:ldy     PADDL0+1,x      ; get vertical position
-        cpy     #CENTER-SENSITIVITY
+        cpy     #CENTER-SENSIVITY
         bcs     @chkdown
 
         ora     #1              ; JOY_UP
         bne     @done
 
 @chkdown:
-        cpy     #CENTER+SENSITIVITY
+        cpy     #CENTER+SENSIVITY
         bcc     @done
 
         ora     #2              ; JOY_DOWN

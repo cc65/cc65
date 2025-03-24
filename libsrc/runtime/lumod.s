@@ -22,7 +22,7 @@ tosumod0ax:
 .endif
 
 tosumodeax:
-        jsr     getlop          ; Get the paramameters
+        jsr     getlop          ; Get the parameters
         jsr     udiv32          ; Do the division
         lda     tmp3            ; Remainder is in ptr2:tmp3:tmp4
         sta     sreg

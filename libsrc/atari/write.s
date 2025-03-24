@@ -21,7 +21,7 @@ write9:
         lda     ICBLH,x         ; buf len high
         tax
         lda     #0
-        sta     ___oserror      ; clear system dependend error code
+        sta     ___oserror      ; clear system dependent error code
         pla
         rts
 

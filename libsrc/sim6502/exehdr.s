@@ -22,7 +22,7 @@
 .elseif (.cpu .bitand ::CPU_ISET_6502)
         .byte   0
 .else
-        .error Unknow CPU type.
+        .error Unknown CPU type.
 .endif
         .byte   sp                             ; sp address
         .addr   __MAIN_START__                 ; load address

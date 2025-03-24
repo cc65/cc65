@@ -24,7 +24,7 @@
 ;         /* the kernal routine BASIN sets ST to EOF if the end of file
 ;         ** is reached the first time, then we have store tmp.
 ;         ** every subsequent call returns EOF and READ ERROR in ST, then
-;         ** we have to exit the loop here immediatly.
+;         ** we have to exit the loop here immediately.
 ;         */
 ;         if (cbm_k_readst() & 0xBF) break;
 ;

@@ -39,7 +39,7 @@ _cputcxy:
         pla                     ; Restore C and run into _cputc
 
 _cputc:
-        cmp     #$0D            ; Test for \r = carrage return
+        cmp     #$0D            ; Test for \r = carriage return
         beq     left
         cmp     #$0A            ; Test for \n = line feed
         beq     newline

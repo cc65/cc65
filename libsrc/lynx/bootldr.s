@@ -15,7 +15,7 @@
         .segment "BOOTLDR"
 ;**********************************
 ; Here is the bootloader in plaintext
-; The idea is to make the smalles possible encrypted loader as decryption
+; The idea is to make the smallest possible encrypted loader as decryption
 ; is very slow. The minimum size is 49 bytes plus a zero byte.
 ;**********************************
 ;                  EXE = $fb68

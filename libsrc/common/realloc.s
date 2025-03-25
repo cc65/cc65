@@ -110,7 +110,7 @@ _realloc:
 
         tya                     ; Put ___heapptr back in A
         sec                     ; Check if we have enough memory at heap top
-        sbc     oldsize         ; Substract oldsize
+        sbc     oldsize         ; Subtract oldsize
         sta     newblock
         lda     ___heapptr+1
         sbc     oldsize+1

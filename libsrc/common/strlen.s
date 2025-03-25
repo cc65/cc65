@@ -2,7 +2,7 @@
 ; Ullrich von Bassewitz, 31.05.1998
 ;
 ; Note: strspn & strcspn call internally this function and rely on
-; the usage of only ptr4 here! Keep in mind when appling changes
+; the usage of only ptr4 here! Keep in mind when applying changes
 ; and check the other implementations too!
 ;
 ; size_t __fastcall__ strlen (const char* s);

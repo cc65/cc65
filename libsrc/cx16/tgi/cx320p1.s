@@ -91,7 +91,7 @@ Y2              := ptr4
 
 .bss
 
-; The colors are indicies into a TGI palette.  The TGI palette is indicies into
+; The colors are indices into a TGI palette.  The TGI palette is indices into
 ; VERA's palette.  Vera's palette is a table of Red, Green, and Blue levels.
 ; The first 16 RGB elements mimic the Commodore 64's colors.
 
@@ -267,7 +267,7 @@ GETPALETTE:
 ; GETDEFPALETTE: Return the default palette for the driver in .XA. All
 ; drivers should return something reasonable here, even drivers that don't
 ; support palettes, otherwise the caller has no way to determine the colors
-; of the (not changable) palette.
+; of the (not changeable) palette.
 ;
 ; Must set an error code: NO (all drivers must have a default palette)
 

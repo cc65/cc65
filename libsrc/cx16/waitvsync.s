@@ -6,7 +6,7 @@
 ;
 ; VERA's vertical sync causes IRQs which increment the jiffy timer.
 ;
-; Updated by ZeroByteOrg to use Kernal API RDTIM to retreive the TIMER variable
+; Updated by ZeroByteOrg to use Kernal API RDTIM to retrieve the TIMER variable
 ;
 
         .export         _waitvsync

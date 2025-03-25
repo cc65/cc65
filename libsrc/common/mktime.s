@@ -423,10 +423,10 @@ finish_calc:
         jsr     tosaddeax       ; Simple addition there
 
         ; No need to store/load/push the counter here, simply to push it
-        ; for the last substraction
+        ; for the last subtraction
         jsr     pusheax
 
-        ; Substract timezone
+        ; Subtract timezone
         lda     __tz+1+3
         sta     sreg+1
         lda     __tz+1+2

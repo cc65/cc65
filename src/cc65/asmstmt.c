@@ -52,6 +52,7 @@
 #include "stackptr.h"
 #include "symtab.h"
 #include "asmstmt.h"
+#include "tgttrans.h"
 
 
 
@@ -343,9 +344,9 @@ static void ParseAsm (void)
     /* Create a target string buffer */
     StrBuf T = AUTO_STRBUF_INITIALIZER;
 
-    /* Create a string buffer from the string literal */
+    /* Create a string buffer from the untranslated string literal */
     StrBuf S = AUTO_STRBUF_INITIALIZER;
-    SB_Append (&S, GetLiteralStrBuf (CurTok.SVal));
+    SB_Append (&S, GetLiteralStrBuf (CurTok.RVal));
 
     /* Skip the string token */
     NextToken ();

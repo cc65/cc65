@@ -290,9 +290,9 @@ the memory from &dollar;800 to &dollar;1FFF can be added to the heap by calling
 
 ProDOS 8 requires for every open file a page-aligned 1 KB I/O buffer. By default
 these buffers are allocated by the cc65 runtime system on the heap using
-<tt/posix_memalign()/. While this is generally the best solution it means quite
-some overhead for (especially rather small) cc65 programs which do open files
-but don't make use of the heap otherwise.
+<url url="funcref.html#posix_memalign" name="posix_memalign()">. While this is
+generally the best solution it means quite some overhead for (especially rather
+small) cc65 programs which do open files but don't make use of the heap otherwise.
 
 The apple2enh package comes with the alternative ProDOS 8 I/O buffer allocation
 module <tt/apple2enh-iobuf-0800.o/ which uses the memory between &dollar;800 and

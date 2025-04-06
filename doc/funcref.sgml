@@ -738,7 +738,7 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <item><ref id="ltoa" name="ltoa">
 <item><ref id="malloc" name="malloc">
 <item><ref id="perror" name="perror">
-<!-- <item><ref id="posix_memalign" name="posix_memalign"> -->
+<item><ref id="posix_memalign" name="posix_memalign">
 <!-- <item><ref id="putenv" name="putenv"> -->
 <item><ref id="qsort" name="qsort">
 <item><ref id="rand" name="rand">
@@ -6218,6 +6218,32 @@ be used in presence of a prototype.
 <ref id="peekbsys" name="peekbsys">,
 <ref id="peekwsys" name="peekwsys">,
 <ref id="pokebsys" name="pokebsys">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>posix_memalign<label id="posix_memalign"><p>
+
+<quote>
+<descrip>
+<tag/Function/Allocate aligned dynamic memory.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size);/
+<tag/Description/Allocate a block of memory with the given "size", which is aligned to a
+memory address that is a multiple of "alignment".  "alignment" <em/must not/ be
+zero, and <em/must/ be a power of two; otherwise, this function will return
+EINVAL.  The function returns ENOMEM if not enough memory is available
+to satisfy the request.  "memptr" must point to a variable; that variable
+will return the address of the allocated memory.  Use free() to release that
+allocated block.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="free" name="free">
 <tag/Example/None.
 </descrip>
 </quote>

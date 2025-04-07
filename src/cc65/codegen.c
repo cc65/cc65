@@ -1489,7 +1489,7 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     ** both operands are converted to unsigned long int.
     */
     if ((ltype == CF_LONG && rtype == CF_INT && (rhs & CF_UNSIGNED)) ||
-        (rtype == CF_LONG && ltype == CF_INT && (rhs & CF_UNSIGNED))) {
+        (rtype == CF_LONG && ltype == CF_INT && (lhs & CF_UNSIGNED))) {
         /* long can represent all unsigneds, so we are in the first sub-case. */
         return const_flag | CF_LONG;
     }

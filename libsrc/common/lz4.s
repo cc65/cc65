@@ -6,6 +6,60 @@
 ; Almost 7 times faster, uses no RAM (vs 14 bytes BSS), and takes 1/4 the space
 ; vs the official C source.
 ;
+;
+; C implementation was:
+
+; void decompress_lz4 (unsigned char *in, unsigned char *out, const int outlen) {
+;   unsigned char token, tmp;
+;   unsigned int offset;
+;   unsigned char *end = out+outlen;
+;   unsigned char *copysrc;
+;
+;   while (out < end) {
+;     token = *in++;
+;     offset = token >> 4;
+;
+;     token &= 0x0f;
+;     token += 4; // Minmatch
+;
+;     if (offset == 15) {
+; moreliterals:
+;       tmp = *in++;
+;       offset += tmp;
+;       if (tmp == 255)
+;         goto moreliterals;
+;     }
+;
+;     if (offset) {
+;       memcpy(out, in, offset);
+;       out += offset;
+;       in += offset;
+;     }
+;
+;     if (out >= end) {
+;       return;
+;     }
+;
+;     offset = (*in);
+;     in++;
+;     offset += (*in)<<8;
+;     in++;
+;
+;     copysrc = out - offset;
+;     offset = token;
+;
+;     if (token == 19) {
+; morematches:
+;       tmp = *in++;
+;       offset += tmp;
+;       if (tmp == 255)
+;         goto morematches;
+;     }
+;
+;     memcpy(out, copysrc, offset);
+;     out += offset;
+;   }
+; }
 
         .importzp       sp, sreg, regsave, regbank
         .importzp       tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4

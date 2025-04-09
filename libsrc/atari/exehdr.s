@@ -9,3 +9,7 @@
 .segment        "MAINHDR"
         .word   __MAIN_START__
         .word   __INIT_LOAD__ - 1
+
+; Define the INIT segment so that __INIT_LOAD__ from above '.import' is always defined.
+; The segment is normally present when linking a C program, but not necessarily when linking an assembler program.
+.segment        "INIT"

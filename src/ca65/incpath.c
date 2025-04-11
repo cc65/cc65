@@ -79,10 +79,11 @@ void FinishIncludePaths (void)
     AddSearchPath (IncSearchPath, CA65_INC);
 #endif
 
-#if defined(_WIN32)
     /* Add paths relative to the parent directory of the Windows binary. */
+    /* Also needed for "make test" to work. */
     AddSubSearchPathFromBin (IncSearchPath, "asminc");
-#else
+
+#if !defined(_WIN32)
     /* Add paths relative to the parent directory of the POSIX binary. */
     AddSubSearchPathFromBin (IncSearchPath, "share/cc65/asminc");
 #endif

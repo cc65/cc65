@@ -874,11 +874,9 @@ static void ParsePragmaString (void)
     pragma_t Pragma;
     StrBuf   Ident = AUTO_STRBUF_INITIALIZER;
 
-    /* Create a string buffer from the string literal */
+    /* Create a string buffer from the untranslated string literal */
     StrBuf B = AUTO_STRBUF_INITIALIZER;
-
-
-    SB_Append (&B, GetLiteralStrBuf (CurTok.SVal));
+    SB_Append (&B, GetLiteralStrBuf (CurTok.RVal));
 
     /* Skip the string token */
     NextToken ();

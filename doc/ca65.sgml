@@ -833,11 +833,9 @@ names like "Loop". Here is an example:
 <sect1>Unnamed labels<p>
 
 If you really want to write messy code, there are also unnamed labels. To define
-an unnamed label, use either <tt>@:</tt> (<tt>.LOCALCHAR</tt> is respected if it
-is set) or sole <tt>:</tt>.
+an unnamed label, use sole <tt>:</tt>.
 
-To reference an unnamed label, use <tt>@</tt> (<tt>.LOCALCHAR</tt> is respected
-if it is set) or <tt>:</tt> with several <tt>-</tt> or <tt>+</tt> characters.
+To reference an unnamed label, use <tt>:</tt> with several <tt>-</tt> or <tt>+</tt> characters.
 The <tt>-</tt> characters will create a back reference (n'th label backwards),
 the <tt>+</tt> will create a forward reference (n'th label in forward direction).
 As an alternative, angle brackets <tt>&lt;</tt> and <tt>&gt;</tt> may be used
@@ -847,12 +845,12 @@ Example:
 
 <tscreen><verb>
         cpy #0
-        beq @++
-    @:
+        beq :++
+    :
         sta $2007
         dey
-        bne @-
-    @:
+        bne :-
+    :
         rts
 </verb></tscreen>
 

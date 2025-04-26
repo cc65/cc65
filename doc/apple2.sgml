@@ -354,6 +354,7 @@ usage.
 <item>allow_lowercase
 <item>beep
 <item>dir_entry_count
+<item>get_tv
 <item>get_ostype
 <item>gmtime_dt
 <item>mktime_dt

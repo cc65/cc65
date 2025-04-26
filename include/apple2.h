@@ -122,6 +122,11 @@
 #define APPLE_IIGS1     0x81  /* Apple IIgs (ROM 1)          */
 #define APPLE_IIGS3     0x83  /* Apple IIgs (ROM 3)          */
 
+/* Return codes for get_tv() */
+#define TV_NTSC  0
+#define TV_PAL   1
+#define TV_OTHER 2
+
 extern unsigned char _dos_type;
 /* Valid _dos_type values:
 **
@@ -199,6 +204,9 @@ extern void a2_lo_tgi[];
 
 void beep (void);
 /* Beep beep. */
+
+unsigned char get_tv (void);
+/* Get the machine vblank frequency. Returns one of the TV_xxx codes. */
 
 unsigned char get_ostype (void);
 /* Get the machine type. Returns one of the APPLE_xxx codes. */

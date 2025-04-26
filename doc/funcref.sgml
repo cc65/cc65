@@ -98,6 +98,7 @@ function.
 <item>allow_lowercase
 <item><ref id="beep" name="beep">
 <item><ref id="dir_entry_count" name="dir_entry_count">
+<item><ref id="get_tv" name="get_tv">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
 <item><ref id="mktime_dt" name="mktime_dt">
@@ -111,6 +112,7 @@ function.
 <item>_dos_type
 <item><ref id="beep" name="beep">
 <item><ref id="dir_entry_count" name="dir_entry_count">
+<item><ref id="get_tv" name="get_tv">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
 <item><ref id="mktime_dt" name="mktime_dt">
@@ -140,7 +142,7 @@ function.
 <!-- <item><ref id="_setcolor_low" name="_setcolor_low"> -->
 <item><ref id="_sound" name="_sound">
 <item><ref id="get_ostype" name="get_ostype">
-<!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="get_tv" name="get_tv">
 </itemize>
 
 (incomplete)
@@ -227,7 +229,7 @@ function.
 <!-- <item><ref id="cbm_readdir" name="cbm_readdir"> -->
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
-<!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="get_tv" name="get_tv">
 <item><ref id="kbrepeat" name="kbrepeat">
 <item><ref id="waitvsync" name="waitvsync">
 </itemize>
@@ -348,7 +350,7 @@ function.
 <itemize>
 <!-- <item><ref id="get_numbanks" name="get_numbanks"> -->
 <item><ref id="get_ostype" name="get_ostype">
-<!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="get_tv" name="get_tv">
 <!-- <item><ref id="set_tv" name="set_tv"> -->
 <!-- <item><ref id="vera_layer_enable" name="vera_layer_enable"> -->
 <!-- <item><ref id="vera_sprites_enable" name="vera_sprites_enable"> -->
@@ -443,7 +445,7 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 <sect1><tt/gamate.h/<label id="gamate.h"><p>
 
 <itemize>
-<!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="get_tv" name="get_tv">
 <item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
@@ -550,7 +552,7 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 <sect1><tt/nes.h/<label id="nes.h"><p>
 
 <itemize>
-<!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="get_tv" name="get_tv">
 <item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
@@ -568,7 +570,7 @@ It does not declare any functions.
 <sect1><tt/pce.h/<label id="pce.h"><p>
 
 <itemize>
-<!-- <item><ref id="get_tv" name="get_tv"> -->
+<item><ref id="get_tv" name="get_tv">
 <item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
@@ -4103,6 +4105,31 @@ be used in presence of a prototype.
 <ref id="calloc" name="calloc">,
 <ref id="malloc" name="malloc">,
 <ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_tv<label id="get_tv"><p>
+
+<quote>
+<descrip>
+<tag/Function/The function returns the system's vertical blank frequency.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">,
+<ref id="atari.h" name="atari.h">, <ref id="cbm.h" name="cbm.h">,
+<ref id="cx16.h" name="cx16.h">, <ref id="gamate.h" name="gamate.h">,
+<ref id="nes.h" name="nes.h">, <ref id="pce.h" name="pce.h">/
+<tag/Declaration/<tt/unsigned char get_tv (void);/
+<tag/Description/<tt/get_tv/ is machine dependent and does not exist for
+all supported targets. If it exists, it returns a number that identifies the
+frequency at which the screen vertical blank happens (either 50 or 60Hz),
+if possible.
+<tag/Notes/<itemize>
+<item>The function does not exist on all platforms.
+<item>Return TV_NTSC for 60Hz systems, TV_PAL for 50Hz systems, or
+TV_OTHER if the scan frequency can not be determined.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
 <tag/Example/None.
 </descrip>
 </quote>

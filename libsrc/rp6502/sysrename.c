@@ -8,7 +8,8 @@ unsigned char __fastcall__ _sysrename (const char* oldpath, const char* newpath)
     oldpathlen = strlen (oldpath);
     newpathlen = strlen (newpath);
     if (oldpathlen + newpathlen > 510) {
-        return _mappederrno (EINVAL);
+        RIA.errno = EINVAL;
+        return __mappederrno(RIA.errno);
     }
     while (oldpathlen) {
         ria_push_char (oldpath[--oldpathlen]);

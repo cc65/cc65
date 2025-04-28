@@ -1,5 +1,5 @@
 #include <rp6502.h>
-#include <errno.h>
+#include <fcntl.h>
 
 int __fastcall__ close (int fd)
 {

@@ -5,7 +5,8 @@ int __fastcall__ write_xstack (const void* buf, unsigned count, int fildes)
 {
     unsigned i;
     if (count > 512) {
-        return _mappederrno (EINVAL);
+        RIA.errno = EINVAL;
+        return __mappederrno(RIA.errno);
     }
     for (i = count; i;) {
         ria_push_char (((char*)buf)[--i]);

@@ -1,12 +1,14 @@
 #include <rp6502.h>
 #include <errno.h>
 #include <string.h>
+#include <fcntl.h>
 
 int __cdecl__ open (const char* name, int flags, ...)
 {
     size_t namelen = strlen (name);
     if (namelen > 255) {
-        return _mappederrno (EINVAL);
+        RIA.errno = EINVAL;
+        return _mappederrno(RIA.errno);
     }
     while (namelen) {
         ria_push_char (name[--namelen]);

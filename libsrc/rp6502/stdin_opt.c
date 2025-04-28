@@ -1,4 +1,3 @@
-
 #include <rp6502.h>
 
 int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length)

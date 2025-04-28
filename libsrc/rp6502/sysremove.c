@@ -7,7 +7,8 @@ unsigned char __fastcall__ _sysremove (const char* name)
     size_t namelen;
     namelen = strlen (name);
     if (namelen > 255) {
-        return _mappederrno (EINVAL);
+        RIA.errno = EINVAL;
+        return __mappederrno(RIA.errno);
     }
     while (namelen) {
         ria_push_char (name[--namelen]);

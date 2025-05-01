@@ -60,7 +60,7 @@ doneirq:
         .addr   i_param
 :       rts
 
-        .segment        "LOWCODE"
+        .segment        "CODE"
 
 intptr:
         ; ProDOS TechRefMan, chapter 6.2:

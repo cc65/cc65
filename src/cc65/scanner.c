@@ -346,6 +346,14 @@ static int ParseChar (void)
             case 'b':
                 C = '\b';
                 break;
+            case 'e':
+                if (IS_Get(&Standard) != STD_CC65) {
+                    goto IllegalEscape;
+                }
+                /* we'd like to use \e here, but */
+                /* not all build systems support it */
+                C = '\x1B';
+                break;
             case 'f':
                 C = '\f';
                 break;
@@ -411,6 +419,7 @@ static int ParseChar (void)
                     Error ("Octal character constant out of range");
                 break;
             default:
+IllegalEscape:
                 C = CurC;
                 Error ("Illegal escaped character: 0x%02X", CurC);
                 break;

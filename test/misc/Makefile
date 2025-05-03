@@ -110,6 +110,12 @@ $(WORKDIR)/bug2515.$1.$2.prg: bug2515.c | $(WORKDIR)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< 2>$(WORKDIR)/bug2515.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/bug2515.$1.$2.out bug2515.ref
 
+# should not issue any warnings in C99 mode
+$(WORKDIR)/bug2637.$1.$2.prg: bug2637.c | $(WORKDIR)
+	$(if $(QUIET),echo misc/bug2637.$1.$2.prg)
+	$(CC65) --standard c99 -t sim$2 -$1 -o $$(@:.prg=.s) $$< 2>$(WORKDIR)/bug2637.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/bug2637.$1.$2.out bug2637.ref
+
 # this one requires -Werror
 $(WORKDIR)/bug1768.$1.$2.prg: bug1768.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1768.$1.$2.prg)

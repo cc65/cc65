@@ -5,13 +5,15 @@
 ; void __fastcall__ cputc (char c);
 ;
 
-        .ifdef  __APPLE2ENH__
-        .constructor    initconio
-        .endif
+        ; Call constructor *after* the 80-columns card detection
+        ; in videomode.s
+        .constructor    initconio, 23
         .export         _cputcxy, _cputc
         .export         cputdirect, newline, putchar, putchardirect
         .import         gotoxy, VTABZ
+
         .ifndef __APPLE2ENH__
+        .import         has_80cols_card
         .import         uppercasemask
         .endif
 
@@ -22,12 +24,16 @@
 
         .segment        "ONCE"
 
-        .ifdef  __APPLE2ENH__
 initconio:
+        .ifndef __APPLE2ENH__
+        bit     has_80cols_card
+        bmi     :+
+        rts
+:
+        .endif
         sta     SETALTCHAR      ; Switch in alternate charset
         bit     LORES           ; Limit SET80COL-HISCR to text
         rts
-        .endif
 
         .code
 
@@ -52,14 +58,22 @@ _cputc:
 
 cputdirect:
         jsr     putchar
-        .ifdef  __APPLE2ENH__
+
+        .ifndef __APPLE2ENH__
+        bit     has_80cols_card
+        bpl     :+
+        .endif
         bit     RD80VID         ; In 80 column mode?
         bpl     :+
         inc     OURCH           ; Bump to next column
         lda     OURCH
+        .ifdef __APPLE2ENH__
         bra     check           ; Must leave CH alone
-:       .endif
-        inc     CH              ; Bump to next column
+        .else
+        jmp     check
+        .endif
+
+:       inc     CH              ; Bump to next column
         lda     CH
 check:  cmp     WNDWDTH
         bcc     done
@@ -67,13 +81,24 @@ check:  cmp     WNDWDTH
 left:
         .ifdef  __APPLE2ENH__
         stz     CH              ; Goto left edge of screen
-        bit     RD80VID         ; In 80 column mode?
-        bpl     done
-        stz     OURCH           ; Goto left edge of screen
         .else
-        lda     #$00            ; Goto left edge of screen
+        lda     #$00
         sta     CH
         .endif
+
+        .ifndef __APPLE2ENH__
+        bit     has_80cols_card
+        bpl     done
+        .endif
+
+        bit     RD80VID         ; In 80 column mode?
+        bpl     done
+        .ifdef  __APPLE2ENH__
+        stz     OURCH           ; Goto left edge of screen
+        .else
+        sta     OURCH
+        .endif
+
 done:   rts
 
 newline:
@@ -100,8 +125,14 @@ mask:   and     INVFLG          ; Apply normal, inverse, flash
 putchardirect:
         tax
         ldy     CH
-        .ifdef  __APPLE2ENH__
+
         sec                     ; Assume main memory
+
+        .ifndef __APPLE2ENH__
+        bit     has_80cols_card
+        bpl     put
+        .endif
+
         bit     RD80VID         ; In 80 column mode?
         bpl     put             ; No, just go ahead
         lda     OURCH
@@ -111,14 +142,13 @@ putchardirect:
         php
         sei                     ; No valid MSLOT et al. in aux memory
         bit     HISCR           ; Assume SET80COL
-        .endif
+
 put:    lda     (BASL),Y        ; Get current character
         sta     tmp3            ; Save old character for _cgetc
         txa
         sta     (BASL),Y
-        .ifdef  __APPLE2ENH__
+
         bcs     :+              ; In main memory
         bit     LOWSCR
         plp
-:       .endif
-        rts
+:       rts

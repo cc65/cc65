@@ -10,6 +10,7 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
         .include        "apple2.inc"
+        .include        "../mli.inc"
 
         .macpack        module
 
@@ -124,6 +125,10 @@ pages:  .byte   2               ; Number of screens available
 
 ERROR:  .res    1               ; Error code
 
+.ifndef __APPLE2ENH__
+has_80cols_card:                ; Our own copy of the standard variable,
+        .res    1               ; as we don't have access to it from here.
+.endif
 ; ------------------------------------------------------------------------
 
         .rodata
@@ -146,13 +151,21 @@ FONT:
 ; most of the time.
 ; Must set an error code: NO
 INSTALL:
-        .ifdef  __APPLE2ENH__
+        .ifndef __APPLE2ENH__
+        lda     MACHID
+        and     #$02
+        lsr                   ; Move to bit 7 for easy bit-based check
+        lsr
+        ror
+        sta     has_80cols_card
+        bpl     :+
+        .endif
         ; No page switching if 80 column store is enabled
         bit     RD80COL
         bpl     :+
         lda     #$01
         sta     pages
-:       .endif
+:
 
         ; Fall through
 
@@ -175,10 +188,16 @@ INIT:
         ; Switch into graphics mode
         bit     MIXCLR
         bit     HIRES
-        .ifdef  __APPLE2ENH__
+
+        .ifndef __APPLE2ENH__
+        bit     has_80cols_card
+        bpl     clr_txt
+        .endif
+
         sta     IOUDISON
         bit     DHIRESOFF
-        .endif
+
+clr_txt:
         bit     TXTCLR
 
         ; Beagle Bros Shape Mechanic fonts don't
@@ -200,11 +219,14 @@ DONE:
         bit     TXTSET
         bit     LOWSCR
 
-        .ifdef  __APPLE2ENH__
+        .ifndef __APPLE2ENH__
+        bit     has_80cols_card
+        bpl     reset_wndtop
+        .endif
         ; Limit SET80COL-HISCR to text
         bit     LORES
-        .endif
 
+reset_wndtop:
         ; Reset the text window top
         lda     #$00
         sta     WNDTOP

@@ -14,11 +14,11 @@ _cpeekc:
         st0     #VDC_MARR       ; Memory-Address Read
         ldy     SCREEN_PTR
         ldx     SCREEN_PTR+1
-        sty     VDC_DATA_LO
-        stx     VDC_DATA_HI
+        sty     a:VDC_DATA_LO
+        stx     a:VDC_DATA_HI
 
         st0     #VDC_VRR        ; VRAM Read Register
-        lda     VDC_DATA_LO     ; character
+        lda     a:VDC_DATA_LO   ; character
         and     #<~$80          ; remove reverse bit
         ldx     #0
         rts

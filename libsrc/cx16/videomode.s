@@ -2,15 +2,22 @@
 ; 2022-03-28, Greg King
 ;
 ; /* Video mode defines */
-; #define VIDEOMODE_80x60         0x00
-; #define VIDEOMODE_80x30         0x01
-; #define VIDEOMODE_40x60         0x02
-; #define VIDEOMODE_40x30         0x03
-; #define VIDEOMODE_40x15         0x04
-; #define VIDEOMODE_20x30         0x05
-; #define VIDEOMODE_20x15         0x06
-; #define VIDEOMODE_320x240       0x80
-; #define VIDEOMODE_SWAP          (-1)
+; #define VIDEOMODE_80x60	0x00
+; #define VIDEOMODE_80x30	0x01
+; #define VIDEOMODE_40x60	0x02
+; #define VIDEOMODE_40x30	0x03
+; #define VIDEOMODE_40x15	0x04
+; #define VIDEOMODE_20x30	0x05
+; #define VIDEOMODE_20x15	0x06
+; #define VIDEOMODE_22x23	0x07
+; #define VIDEOMODE_64x50	0x08
+; #define VIDEOMODE_64x25	0x09
+; #define VIDEOMODE_32x50	0x0A
+; #define VIDEOMODE_32x25	0x0B
+; #define VIDEOMODE_80COL	VIDEOMODE_80x60
+; #define VIDEOMODE_40COL	VIDEOMODE_40x30
+; #define VIDEOMODE_320x240	0x80
+; #define VIDEOMODE_SWAP	(-1)
 ;
 ; signed char __fastcall__ videomode (signed char Mode);
 ; /* Set the video mode, return the old mode.

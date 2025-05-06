@@ -3,7 +3,7 @@
 /*                                  cx16.h                                   */
 /*                                                                           */
 /*                      CX16 system-specific definitions                     */
-/*                             For prerelease 39                             */
+/*                             For prerelease 43                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided "as-is", without any expressed or implied       */
@@ -176,6 +176,11 @@ enum {
 #define VIDEOMODE_40x15         0x04
 #define VIDEOMODE_20x30         0x05
 #define VIDEOMODE_20x15         0x06
+#define VIDEOMODE_22x23		0x07
+#define VIDEOMODE_64x50		0x08
+#define VIDEOMODE_64x25		0x09
+#define VIDEOMODE_32x50		0x0A
+#define VIDEOMODE_32x25		0x0B
 #define VIDEOMODE_80COL         VIDEOMODE_80x60
 #define VIDEOMODE_40COL         VIDEOMODE_40x30
 #define VIDEOMODE_320x240       0x80

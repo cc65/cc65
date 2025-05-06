@@ -107,6 +107,12 @@ unsigned OptLoad1 (CodeSeg* S);
 unsigned OptLoad2 (CodeSeg* S);
 /* Replace calls to ldaxysp by inline code */
 
+unsigned OptBinOps (CodeSeg* S);
+/* Search for an AND/EOR/ORA where the value of A or the operand is known and
+** replace it by something simpler.
+*/
+
+
 
 /* End of coptmisc.h */
 

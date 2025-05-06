@@ -82,8 +82,8 @@
 #define CH_F10  0xB0
 
 /* Video modes */
-#define VIDEOMODE_40x24     0x0011
-#define VIDEOMODE_80x24     0x0012
+#define VIDEOMODE_40x24     0x15
+#define VIDEOMODE_80x24     0x00
 #define VIDEOMODE_40COL     VIDEOMODE_40x24
 #define VIDEOMODE_80COL     VIDEOMODE_80x24
 
@@ -99,7 +99,8 @@
 extern void a2e_auxmem_emd[];
 extern void a2e_stdjoy_joy[];     /* Referred to by joy_static_stddrv[]   */
 extern void a2e_stdmou_mou[];     /* Referred to by mouse_static_stddrv[] */
-extern void a2e_ssc_ser[];
+extern void a2e_ssc_ser[];        /* Referred to by ser_static_stddrv[]   */
+extern void a2e_gs_ser[];         /* IIgs serial driver                   */
 extern void a2e_hi_tgi[];         /* Referred to by tgi_static_stddrv[]   */
 extern void a2e_lo_tgi[];
 

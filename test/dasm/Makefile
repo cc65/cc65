@@ -19,6 +19,8 @@ ifdef QUIET
 endif
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
+CA65 := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
+LD65 := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 DA65 := $(if $(wildcard ../../bin/da65*),../../bin/da65,da65)
 
 WORKDIR = ../../testwrk/dasm
@@ -28,12 +30,12 @@ ISEQUAL = ../../testwrk/isequal$(EXE)
 CC = gcc
 CFLAGS = -O2
 
-START = --start-addr 0x8000
+START = --start-addr 0x7000
 
 .PHONY: all clean
 
 SOURCES := $(wildcard *.s)
-BINS = $(SOURCES:%disass.s=$(WORKDIR)/%reass.bin)
+BINS = $(SOURCES:%disass.s=$(WORKDIR)/%reass.bin) $(WORKDIR)/65816-reass.bin
 CPUS = $(SOURCES:%-disass.s=%)
 
 all: $(BINS)
@@ -60,6 +62,19 @@ $(WORKDIR)/$1-reass.bin: $(WORKDIR)/$1-reass.s $(ISEQUAL)
 endef # DISASS_template
 
 $(foreach cpu,$(CPUS),$(eval $(call DISASS_template,$(cpu))))
+
+$(WORKDIR)/test65816.bin: test65816.s | $(WORKDIR)
+	$(CA65) -o $(WORKDIR)/test65816.o $<
+	$(LD65) -o $@ -C 65816.cfg $(WORKDIR)/test65816.o
+
+$(WORKDIR)/65816-reass.s: $(WORKDIR)/test65816.bin
+	$(DA65) --cpu 65816 -i 65816.info -o $@ $<
+
+$(WORKDIR)/65816-reass.bin: $(WORKDIR)/65816-reass.s $(ISEQUAL)
+	$(if $(QUIET),echo dasm/65816-reass.bin)
+	$(CA65) -o $(WORKDIR)/65816-reass.o $<
+	$(LD65) -o $@ -C 65816.cfg $(WORKDIR)/65816-reass.o
+	$(ISEQUAL) --binary $(WORKDIR)/test65816.bin $@
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

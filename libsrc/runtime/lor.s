@@ -8,7 +8,7 @@
         .export         tosor0ax, tosoreax
         .import         addysp1
         .importzp       sp, sreg, tmp1
-                                  
+
         .macpack        cpu
 
 tosor0ax:
@@ -19,7 +19,7 @@ tosor0ax:
         ldy     #$00
         sty     sreg
         sty     sreg+1
-.endif  
+.endif
 
 tosoreax:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
@@ -29,7 +29,7 @@ tosoreax:
         ldy     #0
         ora     (sp),y          ; byte 0
         iny
-.endif        
+.endif
         sta     tmp1
         txa
         ora     (sp),y          ; byte 1

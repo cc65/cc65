@@ -140,7 +140,7 @@ FEATURES {
 
 SYMBOLS {
     # Define the stack size for the application
-    __STACKSIZE__:  value = $0200, weak = yes;
+    __STACKSIZE__:  value = $0200, type = weak;
 }
 </code></tscreen>
 

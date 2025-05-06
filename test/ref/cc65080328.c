@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! 
+  !!DESCRIPTION!!
   !!ORIGIN!!      testsuite
   !!LICENCE!!     Public Domain
   !!AUTHOR!!

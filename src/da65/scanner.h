@@ -48,6 +48,7 @@
 typedef enum token_t {
     INFOTOK_NONE,
     INFOTOK_INTCON,
+    INFOTOK_OFFSET_INTCON,
     INFOTOK_STRCON,
     INFOTOK_CHARCON,
     INFOTOK_IDENT,
@@ -89,6 +90,8 @@ typedef enum token_t {
     INFOTOK_START,
     INFOTOK_END,
     INFOTOK_TYPE,
+    INFOTOK_ADDRMODE,
+    INFOTOK_UNIT,
 
     INFOTOK_CODE,
     INFOTOK_BYTETAB,

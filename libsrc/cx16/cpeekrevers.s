@@ -1,6 +1,6 @@
 ;
 ; 2016-02-28, Groepaz
-; 2020-04-30, Greg King
+; 2022-03-29, Greg King
 ;
 ; unsigned char cpeekrevers (void);
 ; /* Return the reverse attribute from the current cursor position.
@@ -11,7 +11,10 @@
         .export         _cpeekrevers
 
         .include        "cx16.inc"
+        .macpack        generic
 
+
+screen_addr     :=      $1B000  ; VRAM address of text screen
 
 _cpeekrevers:
         php
@@ -25,8 +28,10 @@ _cpeekrevers:
 
 @L1:    stz     VERA::CTRL      ; use port 0
         lda     CURS_Y
+        add     #<(>screen_addr)
         sta     VERA::ADDR+1    ; set row number
-        stz     VERA::ADDR+2
+        lda     #^screen_addr
+        sta     VERA::ADDR+2
         lda     CURS_X          ; get character column
         asl     a               ; each character has two bytes
         sta     VERA::ADDR

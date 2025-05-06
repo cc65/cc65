@@ -41,7 +41,7 @@
 #include <stdarg.h>
 
 
-                   
+
 /* No action if we have a working va_copy */
 #if !defined(va_copy)
 

@@ -10,5 +10,10 @@
 
 _wherex:
         lda     CH
-        ldx     #$00
+        .ifdef  __APPLE2ENH__
+        bit     RD80VID         ; In 80 column mode?
+        bpl     :+
+        lda     OURCH
+:       .endif
+        ldx     #>$0000
         rts

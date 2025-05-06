@@ -18,7 +18,7 @@
         .import         ldeaxysp, decsp2, pushax, incsp8
         .import         tosandeax,decax1,tosdiveax,axlong,ldaxysp
         .import         lynxskip0, lynxblock,tosasreax
-        .import         __BLOCKSIZE__
+        .import         __BANK0BLOCKSIZE__
         .importzp       _FileCurrBlock
 
 .segment        "CODE"
@@ -32,15 +32,15 @@
         jsr     ldeaxysp
         jsr     pusheax
         ldx     #$00
-        lda     #<(__BLOCKSIZE__/1024 + 9)
+        lda     #<(__BANK0BLOCKSIZE__/1024 + 9)
         jsr     tosasreax
         sta     _FileCurrBlock
         jsr     lynxblock
         ldy     #$05
         jsr     ldeaxysp
         jsr     pusheax
-        lda     #<(__BLOCKSIZE__-1)
-        ldx     #>(__BLOCKSIZE__-1)
+        lda     #<(__BANK0BLOCKSIZE__-1)
+        ldx     #>(__BANK0BLOCKSIZE__-1)
         jsr     axlong
         jsr     tosandeax
         eor     #$FF

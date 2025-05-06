@@ -4,7 +4,7 @@
 ;
 ; created : 11.05.95
 ; last modified :
-; 
+;
 ; 16.02.96      leaner (thanks to Harry)
 ; 12.03.96      test for busy after write and erase (well, Harry ;)) )
 ; 22.08.97      ported to ra65 for use with cc65
@@ -40,7 +40,7 @@ EE_C_WRITE      =    $14
 EE_C_READ       =    $18
 EE_C_ERASE      =    $1C
 EE_C_EWEN       =    $13
-EE_C_EWEN2      =    $FF   ;; C0 schould be enough
+EE_C_EWEN2      =    $FF   ;; C0 should be enough
 EE_C_EWDS       =    $10
 EE_C_EWDS2      =    $00
 

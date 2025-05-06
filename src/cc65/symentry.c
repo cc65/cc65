@@ -40,6 +40,7 @@
 
 /* cc65 */
 #include "anonname.h"
+#include "asmlabel.h"
 #include "declare.h"
 #include "error.h"
 #include "symentry.h"
@@ -65,13 +66,12 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     E->NextHash = 0;
     E->PrevSym  = 0;
     E->NextSym  = 0;
-    E->Link     = 0;
     E->Owner    = 0;
     E->Flags    = Flags;
     E->Type     = 0;
     E->Attr     = 0;
     E->AsmName  = 0;
-    E->V.BssName = 0;
+    memset (&E->V, 0, sizeof (E->V));
     memcpy (E->Name, Name, Len+1);
 
     /* Return the new entry */
@@ -88,7 +88,7 @@ void FreeSymEntry (SymEntry* E)
     TypeFree (E->Type);
     xfree (E->AsmName);
 
-    if (E->Flags & SC_LABEL) {
+    if ((E->Flags & SC_TYPEMASK) == SC_LABEL) {
         for (i = 0; i < CollCount (E->V.L.DefsOrRefs); i++) {
             xfree (CollAt (E->V.L.DefsOrRefs, i));
         }
@@ -109,21 +109,17 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
         unsigned            Val;
     } SCFlagTable;
 
-    static SCFlagTable ESUTypes[] = {
-        { "SC_TYPEDEF",     SC_TYPEDEF          },
-        { "SC_UNION",       SC_UNION            },
-        { "SC_STRUCT",      SC_STRUCT           },
-        { "SC_ENUM",        SC_ENUM             },
-    };
-
     static SCFlagTable Types[] = {
-        { "SC_BITFIELD",    SC_BITFIELD         },
-        { "SC_STRUCTFIELD", SC_STRUCTFIELD      },
-        { "SC_ENUMERATOR",  SC_ENUMERATOR       },
-        { "SC_CONST",       SC_CONST            },
+        { "SC_NONE",        SC_NONE             },
+        { "SC_STRUCT",      SC_STRUCT           },
+        { "SC_UNION",       SC_UNION            },
+        { "SC_ENUM",        SC_ENUM             },
         { "SC_LABEL",       SC_LABEL            },
-        { "SC_PARAM",       SC_PARAM            },
+        { "SC_BITFIELD",    SC_BITFIELD         },
+        { "SC_TYPEDEF",     SC_TYPEDEF          },
+        { "SC_ENUMERATOR",  SC_ENUMERATOR       },
         { "SC_FUNC",        SC_FUNC             },
+        { "SC_ARRAY",       SC_ARRAY            },
     };
 
     static SCFlagTable Storages[] = {
@@ -131,11 +127,31 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
         { "SC_REGISTER",    SC_REGISTER         },
         { "SC_STATIC",      SC_STATIC           },
         { "SC_EXTERN",      SC_EXTERN           },
-        { "SC_STORAGE",     SC_STORAGE          },
+    };
+
+    static SCFlagTable Properties[] = {
+        { "SC_CONST",       SC_CONST            },
+        { "SC_STRUCTFIELD", SC_STRUCTFIELD      },
+        { "SC_PARAM",       SC_PARAM            },
+        { "SC_DEFTYPE",     SC_DEFTYPE          },
         { "SC_ZEROPAGE",    SC_ZEROPAGE         },
-        { "SC_DECL",        SC_DECL             },
+        { "SC_HAVEALIGN",   SC_HAVEALIGN        },
+        { "SC_HAVEATTR",    SC_HAVEATTR         },
+        { "SC_TU_STORAGE",  SC_TU_STORAGE       },
+        { "SC_ASSIGN_INIT", SC_ASSIGN_INIT      },
+        { "SC_ALIAS",       SC_ALIAS            },
+        { "SC_FICTITIOUS",  SC_FICTITIOUS       },
+        { "SC_HAVEFAM",     SC_HAVEFAM          },
+        { "SC_HAVECONST",   SC_HAVECONST        },
+    };
+
+    static SCFlagTable Status[] = {
         { "SC_DEF",         SC_DEF              },
         { "SC_REF",         SC_REF              },
+        { "SC_GOTO",        SC_GOTO             },
+        { "SC_GOTO_IND",    SC_GOTO_IND         },
+        { "SC_LOCALSCOPE",  SC_LOCALSCOPE       },
+        { "SC_NOINLINEDEF", SC_NOINLINEDEF      },
     };
 
     unsigned I;
@@ -152,28 +168,38 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     /* Print the flags */
     SymFlags = E->Flags;
     fprintf (F, "    Flags:");
-    /* Enum, struct, union and typedefs */
-    if ((SymFlags & SC_ESUTYPEMASK) != 0) {
-        for (I = 0; I < sizeof (ESUTypes) / sizeof (ESUTypes[0]); ++I) {
-            if ((SymFlags & SC_ESUTYPEMASK) == ESUTypes[I].Val) {
-                SymFlags &= ~SC_ESUTYPEMASK;
-                fprintf (F, " %s", ESUTypes[I].Name);
+    /* Symbol types */
+    if ((SymFlags & SC_TYPEMASK) != 0) {
+        for (I = 0; I < sizeof (Types) / sizeof (Types[0]); ++I) {
+            if ((SymFlags & SC_TYPEMASK) == Types[I].Val) {
+                SymFlags &= ~SC_TYPEMASK;
+                fprintf (F, " %s", Types[I].Name);
                 break;
             }
         }
     }
-    /* Other type flags */
-    for (I = 0; I < sizeof (Types) / sizeof (Types[0]) && SymFlags != 0; ++I) {
-        if ((SymFlags & Types[I].Val) == Types[I].Val) {
-            SymFlags &= ~Types[I].Val;
-            fprintf (F, " %s", Types[I].Name);
+    /* Storage classes */
+    if ((SymFlags & SC_STORAGEMASK) != 0) {
+        for (I = 0; I < sizeof (Storages) / sizeof (Storages[0]); ++I) {
+            if ((SymFlags & SC_STORAGEMASK) == Storages[I].Val) {
+                SymFlags &= ~SC_STORAGEMASK;
+                fprintf (F, " %s", Storages[I].Name);
+                break;
+            }
         }
     }
-    /* Storage flags */
-    for (I = 0; I < sizeof (Storages) / sizeof (Storages[0]) && SymFlags != 0; ++I) {
-        if ((SymFlags & Storages[I].Val) == Storages[I].Val) {
-            SymFlags &= ~Storages[I].Val;
-            fprintf (F, " %s", Storages[I].Name);
+    /* Special property flags */
+    for (I = 0; I < sizeof (Properties) / sizeof (Properties[0]) && SymFlags != 0; ++I) {
+        if ((SymFlags & Properties[I].Val) == Properties[I].Val) {
+            SymFlags &= ~Properties[I].Val;
+            fprintf (F, " %s", Properties[I].Name);
+        }
+    }
+    /* Status flags */
+    for (I = 0; I < sizeof (Status) / sizeof (Status[0]) && SymFlags != 0; ++I) {
+        if ((SymFlags & Status[I].Val) == Status[I].Val) {
+            SymFlags &= ~Status[I].Val;
+            fprintf (F, " %s", Status[I].Name);
         }
     }
     if (SymFlags != 0) {
@@ -199,9 +225,10 @@ int SymIsOutputFunc (const SymEntry* Sym)
     /* Symbol must be a function which is defined and either extern or
     ** static and referenced.
     */
-    return IsTypeFunc (Sym->Type)               &&
-           SymIsDef (Sym)                       &&
-           (Sym->Flags & (SC_REF | SC_EXTERN));
+    return IsTypeFunc (Sym->Type)                       &&
+           SymIsDef (Sym)                               &&
+           ((Sym->Flags & SC_REF) ||
+            (Sym->Flags & SC_STORAGEMASK) != SC_STATIC);
 }
 
 
@@ -230,8 +257,8 @@ const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType)
 
 
 
-void SymUseAttr (SymEntry* Sym, struct Declaration* D)
-/* Use the attributes from the declaration for this symbol */
+void SymUseAttr (SymEntry* Sym, struct Declarator* D)
+/* Use the attributes from the declarator for this symbol */
 {
     /* We cannot specify attributes twice */
     if ((Sym->Flags & SC_HAVEATTR) != 0) {
@@ -250,7 +277,9 @@ void SymUseAttr (SymEntry* Sym, struct Declaration* D)
 
 
 void SymSetAsmName (SymEntry* Sym)
-/* Set the assembler name for an external symbol from the name of the symbol */
+/* Set the assembler name for an external symbol from the name of the symbol.
+** The symbol must have no assembler name set yet.
+*/
 {
     unsigned Len;
 
@@ -266,11 +295,11 @@ void SymSetAsmName (SymEntry* Sym)
 
 
 
-void CvtRegVarToAuto (SymEntry* Sym)
+void SymCvtRegVarToAuto (SymEntry* Sym)
 /* Convert a register variable to an auto variable */
 {
     /* Change the storage class */
-    Sym->Flags = (Sym->Flags & ~(SC_REGISTER | SC_STATIC | SC_EXTERN)) | SC_AUTO;
+    Sym->Flags = (Sym->Flags & ~SC_STORAGEMASK) | SC_AUTO;
 
     /* Transfer the stack offset from register save area to actual offset */
     Sym->V.Offs = Sym->V.R.SaveOffs;
@@ -278,59 +307,26 @@ void CvtRegVarToAuto (SymEntry* Sym)
 
 
 
-SymEntry* GetSymType (const Type* T)
-/* Get the symbol entry of the enum/struct/union type
-** Return 0 if it is not an enum/struct/union.
-*/
-{
-    if ((IsClassStruct (T) || IsTypeEnum (T))) {
-        return T->A.S;
-    }
-    return 0;
-}
-
-
-
-const char* GetSymTypeName (const Type* T)
-/* Return a name string of the type or the symbol name if it is an ESU type.
-** Note: This may use a static buffer that could be overwritten by other calls.
-*/
-{
-    static char TypeName [IDENTSIZE + 16];
-    SymEntry* Sym;
-
-    Sym = GetSymType (T);
-    if (Sym == 0) {
-        return GetBasicTypeName (T);
-    }
-    sprintf (TypeName, "%s %s", GetBasicTypeName (T),
-             Sym->Name[0] != '\0' ? Sym->Name : "<unknown>");
-
-    return TypeName;
-}
-
-
-
-void ChangeSymType (SymEntry* Entry, const Type* T)
+void SymChangeType (SymEntry* Sym, const Type* T)
 /* Change the type of the given symbol */
 {
-    TypeFree (Entry->Type);
-    Entry->Type = TypeDup (T);
+    TypeFree (Sym->Type);
+    Sym->Type = TypeDup (T);
 }
 
 
 
-void ChangeAsmName (SymEntry* Entry, const char* NewAsmName)
+void SymChangeAsmName (SymEntry* Sym, const char* NewAsmName)
 /* Change the assembler name of the symbol */
 {
-    xfree (Entry->AsmName);
-    Entry->AsmName = xstrdup (NewAsmName);
+    xfree (Sym->AsmName);
+    Sym->AsmName = xstrdup (NewAsmName);
 }
 
 
 
-int HasAnonName (const SymEntry* Entry)
+int SymHasAnonName (const SymEntry* Sym)
 /* Return true if the symbol entry has an anonymous name */
 {
-    return IsAnonName (Entry->Name);
+    return IsAnonName (Sym->Name);
 }

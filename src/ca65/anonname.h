@@ -58,7 +58,7 @@ StrBuf* AnonName (StrBuf* Buf, const char* Spec);
 int IsAnonName (const StrBuf* Name);
 /* Check if the given symbol name is that of an anonymous symbol */
 
-      
+
 
 /* End of anonname.h */
 

@@ -17,6 +17,6 @@ utsteax:
         beq     L9
         tya
         ldy     #1              ; Force NE
-L9:     rts                               
+L9:     rts
 
 

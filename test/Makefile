@@ -12,9 +12,11 @@ endif
 
 WORKDIR = ../testwrk
 
-.PHONY: test continue mostlyclean clean
+.PHONY: test continue mostlyclean clean success_message
 
-test: mostlyclean continue
+test:
+	@$(MAKE) mostlyclean
+	@$(MAKE) continue
 
 continue:
 	@$(MAKE) -C asm all
@@ -22,8 +24,16 @@ continue:
 	@$(MAKE) -C val all
 	@$(MAKE) -C ref all
 	@$(MAKE) -C err all
+	@$(MAKE) -C standard all
+	@$(MAKE) -C standard_err all
 	@$(MAKE) -C misc all
 	@$(MAKE) -C todo all
+	@$(MAKE) success_message
+
+success_message:
+	$(info ###################################)
+	$(info ### validation suite successful ###)
+	$(info ###################################)
 
 mostlyclean:
 	@$(MAKE) -C asm clean
@@ -31,6 +41,8 @@ mostlyclean:
 	@$(MAKE) -C val clean
 	@$(MAKE) -C ref clean
 	@$(MAKE) -C err clean
+	@$(MAKE) -C standard clean
+	@$(MAKE) -C standard_err clean
 	@$(MAKE) -C misc clean
 	@$(MAKE) -C todo clean
 

@@ -9,6 +9,7 @@
         .export         _cgetc
         .import         cursor, putchardirect
 
+        .include        "zeropage.inc"
         .include        "apple2.inc"
 
 _cgetc:
@@ -22,7 +23,7 @@ _cgetc:
         .else
         lda     #' ' | $40      ; Blank, flashing
         .endif
-        jsr     putchardirect   ; Returns old character in X
+        jsr     putchardirect   ; Saves old character in tmp3
 
         ; Wait for keyboard strobe.
 :       inc     RNDL            ; Increment random counter low
@@ -37,7 +38,7 @@ _cgetc:
 
         ; Restore old character.
         pha
-        txa
+        lda     tmp3
         jsr     putchardirect
         pla
 

@@ -1,4 +1,4 @@
-;  
+;
 ; Ullrich von Bassewitz, 06.08.1998
 ; Christian Krueger, 11-Mar-2017, added 65SC02 optimization
 ;

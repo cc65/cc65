@@ -1,5 +1,5 @@
 ; Convert characters to screen codes
-                                                              
+
 ; Helper macro that converts and outputs one character
 .macro _scrcode char
         .if (char >= 0) .and (char <= 31)

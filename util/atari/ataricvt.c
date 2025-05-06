@@ -8,7 +8,7 @@ int main (void)
             putchar ('\n');
         } else if (C == 0x7F) {
             putchar ('\t');
-        } else {  
+        } else {
             putchar (C);
         }
     }

@@ -164,9 +164,11 @@ EXELIST_apple2 =   \
         checkversion \
         diodemo    \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         multdemo   \
         ovrldemo   \
@@ -180,9 +182,11 @@ EXELIST_apple2enh = $(EXELIST_apple2)
 EXELIST_atari =    \
         ascii      \
         checkversion \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         multdemo   \
         ovrldemo   \
@@ -202,8 +206,10 @@ EXELIST_atari5200 = \
 EXELIST_atmos =    \
         ascii      \
         checkversion \
+        floattest  \
         hello      \
         mandelbrot \
+        mandelfloat \
         sieve      \
         terminal   \
         tgidemo
@@ -215,24 +221,30 @@ EXELIST_c64 =      \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
+        mathtest \
         mousedemo  \
         multdemo   \
         ovrldemo   \
         sieve      \
         terminal   \
         tinyshell  \
-        tgidemo
+        tgidemo \
+        tgisincos
 
 EXELIST_c128 =     \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         sieve      \
         terminal   \
@@ -249,8 +261,10 @@ EXELIST_c16 =      \
 EXELIST_cbm510 =   \
         ascii      \
         checkversion \
+        floattest  \
         gunzip65   \
         hello      \
+        mandelfloat \
         mousedemo  \
         terminal   \
         tinyshell  \
@@ -259,8 +273,10 @@ EXELIST_cbm510 =   \
 EXELIST_cbm610 =   \
         ascii      \
         checkversion \
+        floattest  \
         gunzip65   \
         hello      \
+        mandelfloat \
         terminal   \
         tinyshell  \
         sieve
@@ -273,9 +289,11 @@ EXELIST_cx16 =     \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
         mandelbrot \
+        mandelfloat \
         mousedemo  \
         sieve      \
         tinyshell  \
@@ -311,7 +329,9 @@ EXELIST_pet =      \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         hello      \
+        mandelfloat \
         tinyshell  \
         sieve
 
@@ -319,8 +339,10 @@ EXELIST_plus4 =    \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         gunzip65   \
         hello      \
+        mandelfloat \
         terminal   \
         tinyshell  \
         sieve
@@ -343,9 +365,11 @@ EXELIST_kim1 =     \
 EXELIST_telestrat = \
         ascii       \
         checkversion \
+        floattest  \
         gunzip65    \
         hello       \
         mandelbrot  \
+        mandelfloat \
         sieve       \
         tgidemo
 
@@ -353,8 +377,10 @@ EXELIST_vic20 =    \
         ascii      \
         checkversion \
         enumdevdir \
+        floattest  \
         hello      \
         mandelbrot \
+        mandelfloat \
         sieve      \
         tgidemo
 
@@ -446,6 +472,22 @@ ovrldemo: overlaydemo.o
 	$(LD) $(LDFLAGS) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
 OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
+
+# link float examples against the (much faster) kernal lib, if available
+ifeq ($(SYS),c64)
+floattest: override CFLAGS += -D DYN_DRV=0
+floattest: floattest.o
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
+mandelfloat.o: override CFLAGS += -D DYN_DRV=0
+mandelfloat: mandelfloat.o
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
+mathtest.o: override CFLAGS += -D DYN_DRV=0
+mathtest: mathtest.o
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
+tgisincos.o: override CFLAGS += -D DYN_DRV=0
+tgisincos: tgisincos.o
+	$(LD) $(LDFLAGS) -o $@ -C c64.cfg -m $@.map $^ c64-fp754kernal.o $(SYS).lib
+endif
 
 # --------------------------------------------------------------------------
 # TGI programs on the VIC-20 need a special ld65 configuration file.

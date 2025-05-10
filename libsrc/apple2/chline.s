@@ -6,7 +6,7 @@
 ;
 
         .export         _chlinexy, _chline, chlinedirect
-        .import         gotoxy, cputdirect
+        .import         gotoxy, iie_or_newer, cputdirect
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
@@ -17,11 +17,12 @@ _chlinexy:
         pla                     ; Restore the length and run into _chline
 
 _chline:
-        .ifdef  __APPLE2ENH__
         ldx     #'_' | $80      ; Underscore, screen code
-        .else
+        .ifndef  __APPLE2ENH__
+        bit     iie_or_newer
+        bmi     :+
         ldx     #'-' | $80      ; Minus, screen code
-        .endif
+:       .endif
 
 chlinedirect:
         stx     tmp1

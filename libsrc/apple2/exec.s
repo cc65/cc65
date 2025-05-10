@@ -6,6 +6,7 @@
 
         .export         _exec
         .import         mli_file_info_direct
+        .import         _videomode
         .import         pushname, popname, popax, done, _exit
 
         .include        "zeropage.inc"
@@ -115,20 +116,8 @@ setbuf: lda     #$00            ; Low byte
         sta     io_buffer
         stx     io_buffer+1
 
-        .ifdef  __APPLE2ENH__
-        ; Calling the 80 column firmware needs the ROM switched
-        ; in, otherwise it copies the F8 ROM to the LC (@ $CEF4)
-        bit     $C082
-
-        ; ProDOS TechRefMan, chapter 5.3.1.3:
-        ; "80-column text cards -- and other Apple IIe features -- can
-        ;  be turned off using the following sequence of instructions:"
         lda     #$15
-        jsr     $C300
-
-        ; Switch in LC bank 2 for R/O
-        bit     $C080
-        .endif
+        jsr     _videomode
 
         ; Reset stack as we already passed
         ; the point of no return anyway

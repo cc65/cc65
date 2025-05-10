@@ -26,13 +26,16 @@
 initconio:
         .ifndef __APPLE2ENH__
         bit     iie_or_newer
-        bmi     :+
-        rts
-:
+        bpl     :+
         .endif
         sta     SETALTCHAR      ; Switch in alternate charset
         bit     LORES           ; Limit SET80COL-HISCR to text
+
+        .ifndef __APPLE2ENH__
+:       rts
+        .else
         rts
+        .endif
 
         .code
 

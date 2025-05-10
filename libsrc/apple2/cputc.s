@@ -13,7 +13,7 @@
         .import         gotoxy, VTABZ
 
         .ifndef __APPLE2ENH__
-        .import         has_80cols_card
+        .import         iie_or_newer
         .import         uppercasemask
         .endif
 
@@ -26,7 +26,7 @@
 
 initconio:
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bmi     :+
         rts
 :
@@ -60,7 +60,7 @@ cputdirect:
         jsr     putchar
 
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     :+
         .endif
         bit     RD80VID         ; In 80 column mode?
@@ -87,7 +87,7 @@ left:
         .endif
 
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     done
         .endif
 
@@ -129,7 +129,7 @@ putchardirect:
         sec                     ; Assume main memory
 
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     put
         .endif
 

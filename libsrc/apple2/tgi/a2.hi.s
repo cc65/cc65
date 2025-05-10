@@ -124,7 +124,7 @@ pages:  .byte   2               ; Number of screens available
         .bss
 
 .ifndef __APPLE2ENH__
-has_80cols_card: .res 1
+iie_or_newer: .res 1
 .endif
 
 ; Absolute variables used in the code
@@ -160,7 +160,7 @@ INSTALL:
         stx     ptr1+1
         ldy     #$0
         lda     (ptr1),y
-        sta     has_80cols_card
+        sta     iie_or_newer
         bpl     :+
         .endif
         ; No page switching if 80 column store is enabled
@@ -193,7 +193,7 @@ INIT:
         bit     HIRES
 
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     clr_txt
         .endif
 
@@ -223,7 +223,7 @@ DONE:
         bit     LOWSCR
 
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     reset_wndtop
         .endif
         ; Limit SET80COL-HISCR to text

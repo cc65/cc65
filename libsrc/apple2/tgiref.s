@@ -7,9 +7,9 @@
 
 .ifndef __APPLE2ENH__
 
-        .import         has_80cols_card
+        .import         iie_or_newer
 
-tgi_libref      := has_80cols_card
+tgi_libref      := iie_or_newer
 
 .else
 

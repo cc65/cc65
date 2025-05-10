@@ -5,7 +5,7 @@
 ;
 
         .constructor    initostype, 9
-        .export         _get_ostype, ostype
+        .export         _get_ostype, ostype, iie_or_newer
 
 ; Identify machine according to:
 ; Apple II Miscellaneous TechNote #7, Apple II Family Identification
@@ -19,6 +19,9 @@ initostype:
         tya
         ora     #$80
 done:   sta     ostype
+        cmp     #$30          ; Apple //e?
+        ror                   ; Carry to high bit
+        sta     iie_or_newer
         rts
 nogs:   ldx     #$FF
 next:   inx
@@ -67,4 +70,5 @@ _get_ostype:
 
         .segment        "INIT"
 
-ostype: .res    1
+ostype:         .res    1
+iie_or_newer:   .res    1

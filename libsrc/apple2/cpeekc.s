@@ -5,7 +5,7 @@
 ;
 
         .ifndef __APPLE2ENH__
-        .import         has_80cols_card
+        .import         iie_or_newer
         .endif
 
         .export         _cpeekc
@@ -18,7 +18,7 @@ _cpeekc:
         sec                     ; Assume main memory
 
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     peek
         .endif
 

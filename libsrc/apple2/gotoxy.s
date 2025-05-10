@@ -9,7 +9,7 @@
         .import         popa, VTABZ
 
         .ifndef __APPLE2ENH__
-        .import         has_80cols_card
+        .import         iie_or_newer
         .endif
 
         .include        "apple2.inc"
@@ -28,7 +28,7 @@ _gotox:
         sta     CH              ; Store X
 
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     :+
         .endif
 

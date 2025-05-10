@@ -5,10 +5,9 @@
 ;
         .export         _videomode
 
-        .import         ostype, has_80cols_card, returnFFFF
-
         .ifndef __APPLE2ENH__
-        .constructor    init_80cols, 8
+        .import         returnFFFF
+        .import         iie_or_newer
         .endif
 
         .include        "apple2.inc"
@@ -19,26 +18,11 @@ VIDEOMODE_40x24 = $15
 VIDEOMODE_80x24 = $00
 
 
-        .ifndef __APPLE2ENH__
-
-        .segment        "ONCE"
-
-; has_80cols_card >= $80 if a 80 column card is present
-.proc init_80cols
-        lda     ostype
-        cmp     #$30          ; Apple //e
-        ror                   ; Carry to high bit
-        sta     has_80cols_card
-        rts
-.endproc
-
-        .endif
-
         .segment        "LOWCODE"
 
 _videomode:
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bmi     set_mode
 
         ; No 80 column card, return error if requested mode is 80cols

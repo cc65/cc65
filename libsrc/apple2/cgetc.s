@@ -9,7 +9,7 @@
         .export         _cgetc
 
         .ifndef __APPLE2ENH__
-        .import         has_80cols_card
+        .import         iie_or_newer
         .endif
         .import         cursor, putchardirect
 
@@ -24,7 +24,7 @@ _cgetc:
         ; Show caret.
         .ifndef __APPLE2ENH__
         lda     #' ' | $40      ; Blank, flashing
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     put_caret
         .endif
 

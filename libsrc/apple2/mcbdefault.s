@@ -10,7 +10,7 @@
         .export         _mouse_def_callbacks
 
         .ifndef __APPLE2ENH__
-        .import         has_80cols_card
+        .import         iie_or_newer
         .endif
 
         .include        "apple2.inc"
@@ -47,7 +47,7 @@ cursor = '+' | $40              ; Flashing crosshair
 
 getcursor:
         .ifndef __APPLE2ENH__
-        bit     has_80cols_card
+        bit     iie_or_newer
         bpl     column
         .endif
         bit     RD80VID         ; In 80 column mode?

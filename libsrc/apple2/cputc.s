@@ -5,8 +5,7 @@
 ; void __fastcall__ cputc (char c);
 ;
 
-        ; Call constructor *after* the 80-columns card detection
-        ; in videomode.s
+        ; Call constructor *after* iie_or_newer init from get_ostype.
         .constructor    initconio, 7
         .export         _cputcxy, _cputc
         .export         cputdirect, newline, putchar, putchardirect

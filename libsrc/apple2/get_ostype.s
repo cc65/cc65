@@ -5,7 +5,12 @@
 ;
 
         .constructor    initostype, 9
-        .export         _get_ostype, ostype, iie_or_newer
+        .export         _get_ostype, ostype
+
+        .ifndef __APPLE2ENH__
+        .export         iie_or_newer
+        .export         uppercasemask
+        .endif
 
 ; Identify machine according to:
 ; Apple II Miscellaneous TechNote #7, Apple II Family Identification
@@ -19,9 +24,17 @@ initostype:
         tya
         ora     #$80
 done:   sta     ostype
+
+        .ifndef __APPLE2ENH__
         cmp     #$30          ; Apple //e?
         ror                   ; Carry to high bit
         sta     iie_or_newer
+
+        bpl     :+            ; Set uppercase mask
+        lda     #$FF
+        sta     uppercasemask
+:       .endif
+
         rts
 nogs:   ldx     #$FF
 next:   inx
@@ -72,3 +85,11 @@ _get_ostype:
 
 ostype:         .res    1
 iie_or_newer:   .res    1
+
+        .segment        "DATA"
+
+.ifndef __APPLE2ENH__
+
+uppercasemask:  .byte   $DF
+
+.endif

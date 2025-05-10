@@ -10,7 +10,6 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
         .include        "apple2.inc"
-        .include        "../mli.inc"
 
         .macpack        module
 
@@ -84,7 +83,10 @@ Y2      :=      ptr4
 
         .byte   $74, $67, $69   ; "tgi"
         .byte   TGI_API_VERSION ; TGI API version number
+
+libref:
         .addr   $0000           ; Library reference
+
         .word   280             ; X resolution
         .word   192             ; Y resolution
         .byte   8               ; Number of drawing colors
@@ -121,14 +123,14 @@ pages:  .byte   2               ; Number of screens available
 
         .bss
 
+.ifndef __APPLE2ENH__
+has_80cols_card: .res 1
+.endif
+
 ; Absolute variables used in the code
 
 ERROR:  .res    1               ; Error code
 
-.ifndef __APPLE2ENH__
-has_80cols_card:                ; Our own copy of the standard variable,
-        .res    1               ; as we don't have access to it from here.
-.endif
 ; ------------------------------------------------------------------------
 
         .rodata
@@ -152,11 +154,12 @@ FONT:
 ; Must set an error code: NO
 INSTALL:
         .ifndef __APPLE2ENH__
-        lda     MACHID
-        and     #$02
-        lsr                   ; Move to bit 7 for easy bit-based check
-        lsr
-        ror
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #$0
+        lda     (ptr1),y
         sta     has_80cols_card
         bpl     :+
         .endif

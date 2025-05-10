@@ -44,9 +44,6 @@ SET80COL:=      $C001   ; Enable 80 column store
 RD80COL :=      $C018   ; >127 if 80 column store enabled
 RD80VID :=      $C01F   ; >127 if 80 column video enabled
 
-VIDEOMODE_40x24 = $15
-VIDEOMODE_80x24 = $00
-
 ; Character set
 CLRALTCHAR :=   $C00E   ; Normal Apple II char set
 SETALTCHAR :=   $C00F   ; Norm/inv LC, no flash

@@ -5,27 +5,29 @@
 ;
         .export         _videomode
 
-        .import         has_80cols_card, returnFFFF
+        .import         ostype, has_80cols_card, returnFFFF
 
         .ifndef __APPLE2ENH__
-        .constructor    detect_80cols_card, 25
+        .constructor    init_80cols, 8
         .endif
 
         .include        "apple2.inc"
         .include        "mli.inc"
 
 
+VIDEOMODE_40x24 = $15
+VIDEOMODE_80x24 = $00
+
+
         .ifndef __APPLE2ENH__
 
         .segment        "ONCE"
 
-; has_80cols_card = $80 if a 80 column card is present, $00 otherwise
-.proc detect_80cols_card
-        lda     MACHID
-        and     #$02
-        lsr                   ; Move to bit 7 for easy bit-based check
-        lsr
-        ror
+; has_80cols_card >= $80 if a 80 column card is present
+.proc init_80cols
+        lda     ostype
+        cmp     #$30          ; Apple //e
+        ror                   ; Carry to high bit
         sta     has_80cols_card
         rts
 .endproc

@@ -95,7 +95,6 @@ function.
 
 <itemize>
 <item>_dos_type
-<item>allow_lowercase
 <item><ref id="beep" name="beep">
 <item><ref id="dir_entry_count" name="dir_entry_count">
 <item><ref id="get_tv" name="get_tv">

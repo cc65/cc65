@@ -256,16 +256,6 @@ typedef struct DIR DIR;
 unsigned int __fastcall__ dir_entry_count(DIR *dir);
 /* Returns the number of active files in a ProDOS directory */
 
-#if !defined(__APPLE2ENH__)
-unsigned char __fastcall__ allow_lowercase (unsigned char onoff);
-/* If onoff is 0, lowercase characters printed to the screen via STDIO and
-** CONIO are forced to uppercase. If onoff is 1, lowercase characters are
-** printed to the screen untouched.  By default lowercase characters are
-** forced to uppercase because a stock Apple ][+ doesn't support lowercase
-** display. The function returns the old lowercase setting.
-*/
-#endif
-
 
 
 /* End of apple2.h */

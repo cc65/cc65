@@ -158,7 +158,7 @@ INSTALL:
         ldx     libref+1
         sta     ptr1
         stx     ptr1+1
-        ldy     #$0
+        ldy     #$00
         lda     (ptr1),y
         sta     iie_or_newer
         bpl     :+

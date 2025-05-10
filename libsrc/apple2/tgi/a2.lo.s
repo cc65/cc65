@@ -53,7 +53,9 @@ Y2      :=      ptr4
 
         .byte   $74, $67, $69   ; "tgi"
         .byte   TGI_API_VERSION ; TGI API version number
+libref:
         .addr   $0000           ; Library reference
+
         .word   40              ; X resolution
         .word   48              ; Y resolution
         .byte   16              ; Number of drawing colors
@@ -90,8 +92,12 @@ Y2      :=      ptr4
 
         .bss
 
-ERROR:  .res    1               ; Error code
-MIX:    .res    1               ; 4 lines of text
+ERROR:          .res    1     ; Error code
+MIX:            .res    1     ; 4 lines of text
+
+.ifndef __APPLE2ENH__
+iie_or_newer:   .res    1
+.endif
 
 ; ------------------------------------------------------------------------
 
@@ -126,11 +132,21 @@ INIT:
         bit     $C082           ; Switch in ROM
         jsr     SETGR
         bit     MIXCLR
-        .ifdef  __APPLE2ENH__
+
+        .ifndef __APPLE2ENH__
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #$00
+        lda     (ptr1),y
+        sta     iie_or_newer
+        bpl     :+
+        .endif
+
         sta     IOUDISON
         bit     DHIRESOFF
-        .endif
-        bit     $C080           ; Switch in LC bank 2 for R/O
+:       bit     $C080           ; Switch in LC bank 2 for R/O
 
         ; Done, reset the error code
         lda     #TGI_ERR_OK

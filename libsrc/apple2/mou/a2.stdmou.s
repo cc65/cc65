@@ -7,6 +7,7 @@
         .include        "zeropage.inc"
         .include        "mouse-kernel.inc"
         .include        "apple2.inc"
+        .include        "get_tv.inc"
 
         .macpack        module
 
@@ -21,6 +22,7 @@ CLAMPMOUSE      = $17   ; Sets mouse bounds in a window
 HOMEMOUSE       = $18   ; Sets mouse to upper-left corner of clamp win
 INITMOUSE       = $19   ; Resets mouse clamps to default values and
                         ; sets mouse position to 0,0
+TIMEDATA        = $1C   ; Set mousecard's interrupt rate
 
 pos1_lo         := $0478
 pos1_hi         := $0578
@@ -41,6 +43,7 @@ status          := $0778
         .byte   MOUSE_API_VERSION       ; Mouse driver API version number
 
         ; Library reference
+libref:
         .addr   $0000
 
         ; Jump table
@@ -169,7 +172,31 @@ next:   inc     ptr1+1
         asl
         sta     yparam+1
 
-        ; The AppleMouse II Card needs the ROM switched in
+        ; Apple II technical notes "Varying VBL Interrupt Rate",
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+
+        .ifdef __APPLE2ENH__
+        lda     (ptr1)
+        .else
+        ldy     #$00
+        lda     (ptr1),y
+        .endif
+
+        cmp     #TV::OTHER
+        beq     :+
+
+        ; The TV values are aligned with the values the mousecard
+        ; expect: 0 for 60Hz, 1 for 50Hz.
+        .assert TV::NTSC = 0, error
+        .assert TV::PAL = 1, error
+
+        ldx     #TIMEDATA
+        jsr     firmware
+
+:       ; The AppleMouse II Card needs the ROM switched in
         ; to be able to detect an Apple //e and use RDVBL
         bit     $C082
 

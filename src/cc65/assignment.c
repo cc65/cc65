@@ -495,8 +495,8 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
         /* Read the expression on the right side of the '=' or 'op=' */
         MarkedExprWithCheck (hie1, &Expr2);
 
-        /* The rhs must be an integer (or a float, but we don't support that yet */
-        if (!IsClassInt (Expr2.Type)) {
+        /* The rhs must be an integer or a float */
+        if (!IsClassInt (Expr2.Type) && !IsClassFloat (Expr2.Type)) {
             Error ("Invalid right operand for binary operator '%s'", Op);
             /* Continue. Wrong code will be generated, but the compiler won't
             ** break, so this is the best error recovery.
@@ -529,9 +529,17 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
 
             /* Special handling for add and sub - some sort of a hack, but short code */
             if (Gen->Func == g_add) {
-                g_inc (Flags | CF_CONST, Expr2.IVal);
+                if (IsClassFloat (Expr2.Type)) {
+                    g_inc (Flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    g_inc (Flags | CF_CONST, Expr2.IVal);
+                }
             } else if (Gen->Func == g_sub) {
-                g_dec (Flags | CF_CONST, Expr2.IVal);
+                if (IsClassFloat (Expr2.Type)) {
+                    g_dec (Flags | CF_CONST, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    g_dec (Flags | CF_CONST, Expr2.IVal);
+                }
             } else {
                 if (!ED_IsUneval (Expr)) {
                     if (Expr2.IVal == 0 && !ED_IsUneval (Expr)) {
@@ -683,8 +691,8 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
         return;
     }
 
-    /* There must be an integer or pointer on the left side */
-    if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type)) {
+    /* There must be an integer, pointer or float on the left side */
+    if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type) && !IsTypeFloat (Expr->Type)) {
         Error ("Invalid left operand for binary operator '%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
@@ -712,11 +720,9 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     ED_Init (&Expr2);
     Expr2.Flags |= Expr->Flags & E_MASK_KEEP_SUBEXPR;
 
-    /* Evaluate the rhs. We expect an integer here, since float is not
-    ** supported
-    */
+    /* Evaluate the rhs. We expect an integer or float here */
     hie1 (&Expr2);
-    if (!IsClassInt (Expr2.Type)) {
+    if (!IsClassInt (Expr2.Type) && !IsClassFloat (Expr2.Type)) {
         Error ("Invalid right operand for binary operator '%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
@@ -762,19 +768,36 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
             ** static variable, register variable, pooled literal or code
             ** label location.
             */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+            if (IsClassFloat (Expr->Type)) {
+                /* FIXME: what about the case when expr2 is NOT float? */
+                if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                    g_addeqstatic (lflags, Expr->Name, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    g_subeqstatic (lflags, Expr->Name, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
             } else {
-                g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+                if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                    g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+                } else {
+                    g_subeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
+                }
             }
             break;
 
         case E_LOC_STACK:
             /* Value on the stack */
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqlocal (lflags, Expr->IVal, Expr2.IVal);
+            if (IsClassFloat (Expr->Type)) {
+                if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                    g_addeqlocal (lflags, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
+                } else {
+                    g_subeqlocal (lflags, Expr->IVal, FP_D_As32bitRaw(Expr2.V.FVal));
+                }
             } else {
-                g_subeqlocal (lflags, Expr->IVal, Expr2.IVal);
+                if (Gen->Tok == TOK_PLUS_ASSIGN) {
+                    g_addeqlocal (lflags, Expr->IVal, Expr2.IVal);
+                } else {
+                    g_subeqlocal (lflags, Expr->IVal, Expr2.IVal);
+                }
             }
             break;
 

@@ -521,6 +521,14 @@ see also <tt>testcode/lib/em-test.c</tt> and <tt>samples/multidemo.c</tt>.
 </itemize>
 
 
+<sect1><tt/lzsa.h/<label id="lzsa.h"><p>
+
+<itemize>
+<item><ref id="decompress_lzsa1" name="decompress_lzsa1">
+<item><ref id="decompress_lzsa2" name="decompress_lzsa2">
+</itemize>
+
+
 <sect1><tt/modload.h/<label id="modload.h"><p>
 
 <itemize>
@@ -891,6 +899,13 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <!-- </itemize> -->
 
 (incomplete)
+
+
+<sect1><tt/zx02.h/<label id="zx02.h"><p>
+
+<itemize>
+<item><ref id="decompress_zx02" name="decompress_zx02">
+</itemize>
 
 
 <sect>Alphabetical function reference<p>
@@ -3381,6 +3396,70 @@ used in presence of a prototype.
 <tag/Description/<tt/decompress_lz4/ uncompresses a LZ4-compressed buffer.
 <tag/Notes/<itemize>
 <item>Use LZ4_compress_HC with compression level 16 for best compression.
+<item>Your program will need to know the uncompressed size of the buffer as
+there is no end-of-stream marker.
+<item>LZ4 is the biggest and second-slowest decompressor shipped in cc65 runtime.
+It is also the least efficient compression algorithm.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>decompress_lzsa1<label id="decompress_lzsa1"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uncompress a LZSA buffer with format 1.
+<tag/Header/<tt/<ref id="lzsa.h" name="lzsa.h">/
+<tag/Declaration/<tt/void decompress_lzsa1 (const unsigned char* src, unsigned char* const dst);/
+<tag/Description/<tt/decompress_lz4/ uncompresses a LZSA buffer with format 1.
+<tag/Notes/<itemize>
+<item>Use <tt/lzsa -f 1 -r input.bin output.lzsa1/ to compress your input.
+<item>The project and compressor can be found at <url url="https://github.com/emmanuel-marty/lzsa">
+<item>LZSA1 is the fastest decompressor shipped in cc65 runtime, but data is less
+compressed than with LZSA2 and ZX02.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>decompress_lzsa2<label id="decompress_lzsa2"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uncompress a LZSA buffer with format 2.
+<tag/Header/<tt/<ref id="lzsa.h" name="lzsa.h">/
+<tag/Declaration/<tt/void decompress_lzsa2 (const unsigned char* src, unsigned char* const dst);/
+<tag/Description/<tt/decompress_lz4/ uncompresses a LZSA buffer with format 2.
+<tag/Notes/<itemize>
+<item>Use <tt/lzsa -f 2 -r input.bin output.lzsa2/ to compress your input.
+<item>The project and compressor can be found at <url url="https://github.com/emmanuel-marty/lzsa">
+<item>LZSA2 is the second fastest decompressor shipped in cc65 runtime, but data is less
+compressed than with ZX02.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>decompress_zx02<label id="decompress_zx02"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uncompress a ZX02 buffer.
+<tag/Header/<tt/<ref id="zx02.h" name="zx02.h">/
+<tag/Declaration/<tt/void decompress_zx02 (const unsigned char* src, unsigned char* const dst);/
+<tag/Description/<tt/decompress_zx02/ uncompresses a ZX02 buffer with format 2.
+<tag/Notes/<itemize>
+<item>Use <tt/zx02 input.bin output.zx02/ to compress your input.
+<item>The project and compressor can be found at <url url="https://github.com/dmsc/zx02">
+<item>ZX02 is the slowest decompressor shipped with cc65 runtime, but is also the
+smallest and has the best compression ratio.
 </itemize>
 <tag/Availability/cc65
 <tag/Example/None.

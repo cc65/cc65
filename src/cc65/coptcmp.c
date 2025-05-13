@@ -637,12 +637,12 @@ unsigned OptCmp8 (CodeSeg* S)
                     ** shared branch operation. This prevents the unsafe
                     ** removal of the compare for known problem cases.
                     */
-                    if (
+                    if (L &&
                         /* Jump to branch that relies on the comparison. */
-                        (L->Owner->Info & (OF_CBRA | OF_ZBRA)) ||
+                        ((L->Owner->Info & (OF_CBRA | OF_ZBRA)) ||
                         /* Jump to boolean transformer that relies on the comparison. */
                         (L->Owner->OPC == OP65_JSR &&
-                         (FindBoolCmpCond (L->Owner->Arg)) != CMP_INV)
+                         (FindBoolCmpCond (L->Owner->Arg)) != CMP_INV))
                        )
                     {
                         ++ProtectCompare;

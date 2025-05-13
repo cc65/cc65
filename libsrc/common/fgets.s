@@ -90,22 +90,7 @@ read_loop:
         bne     :+
         inc     ptr4+1
 
-        ; The next code line:
-        ;
-        ;     .byte $c9, "\n"
-        ;
-        ; corresponds to a CMP #imm with the target-specific newline value as its operand.
-        ; This works because (with the 'string_escapes' feature enabled), the "\n" string
-        ; assembles to the target-specific value for the newline character.
-        ;
-        ; It would be better if we could just write:
-        ;
-        ;     cmp #'\n'
-        ;
-        ; Unfortunately, ca65 doesn't currently handle escape characters in character
-        ; constants. In the longer term, fixing that would be the preferred solution.
-
-:       .byte   $c9, "\n"       ; cmp #'\n'
+:       cmp     #'\n'    ; #'\n' should get translated properly
         beq     done
         bne     read_loop
 

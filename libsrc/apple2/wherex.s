@@ -4,16 +4,23 @@
 ; unsigned char wherex (void);
 ;
 
+        .ifndef __APPLE2ENH__
+        .import         iie_or_newer
+        .endif
+
         .export         _wherex
 
         .include        "apple2.inc"
 
 _wherex:
         lda     CH
-        .ifdef  __APPLE2ENH__
+        .ifndef __APPLE2ENH__
+        bit     iie_or_newer
+        bpl     :+
+        .endif
         bit     RD80VID         ; In 80 column mode?
         bpl     :+
         lda     OURCH
-:       .endif
-        ldx     #>$0000
+
+:       ldx     #>$0000
         rts

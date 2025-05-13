@@ -169,6 +169,12 @@ struct datetime {
     }                 time;
 };
 
+/* Video modes */
+#define VIDEOMODE_40x24     0x15
+#define VIDEOMODE_80x24     0x00
+#define VIDEOMODE_40COL     VIDEOMODE_40x24
+#define VIDEOMODE_80COL     VIDEOMODE_80x24
+
 
 
 /*****************************************************************************/
@@ -201,6 +207,11 @@ extern void a2_lo_tgi[];
 /*****************************************************************************/
 
 
+
+signed char __fastcall__ videomode (unsigned mode);
+/* Set the video mode, return the old mode, or -1 if 80-column hardware is not
+** installed. Call with one of the VIDEOMODE_xx constants.
+*/
 
 void beep (void);
 /* Beep beep. */
@@ -244,16 +255,6 @@ typedef struct DIR DIR;
 
 unsigned int __fastcall__ dir_entry_count(DIR *dir);
 /* Returns the number of active files in a ProDOS directory */
-
-#if !defined(__APPLE2ENH__)
-unsigned char __fastcall__ allow_lowercase (unsigned char onoff);
-/* If onoff is 0, lowercase characters printed to the screen via STDIO and
-** CONIO are forced to uppercase. If onoff is 1, lowercase characters are
-** printed to the screen untouched.  By default lowercase characters are
-** forced to uppercase because a stock Apple ][+ doesn't support lowercase
-** display. The function returns the old lowercase setting.
-*/
-#endif
 
 
 

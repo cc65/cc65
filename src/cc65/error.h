@@ -159,9 +159,6 @@ void InitDiagnosticStrBufs (void);
 void DoneDiagnosticStrBufs (void);
 /* Done with tracked string buffers used for diagnostics */
 
-void ClearDiagnosticStrBufs (void);
-/* Free all tracked string buffers */
-
 struct StrBuf* NewDiagnosticStrBuf (void);
 /* Get a new tracked string buffer */
 

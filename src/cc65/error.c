@@ -507,22 +507,11 @@ void InitDiagnosticStrBufs (void)
 void DoneDiagnosticStrBufs (void)
 /* Done with tracked string buffers used for diagnostics */
 {
-    ClearDiagnosticStrBufs ();
-    DoneCollection (&DiagnosticStrBufs);
-}
-
-
-
-void ClearDiagnosticStrBufs (void)
-/* Free all tracked string buffers */
-{
     unsigned I;
-
     for (I = 0; I < CollCount (&DiagnosticStrBufs); ++I) {
         SB_Done (CollAtUnchecked (&DiagnosticStrBufs, I));
     }
-
-    CollDeleteAll (&DiagnosticStrBufs);
+    DoneCollection (&DiagnosticStrBufs);
 }
 
 

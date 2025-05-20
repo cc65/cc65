@@ -147,6 +147,7 @@ icbll_copy:
         sta     dataptr+1
         lda     ICBLL,x
         sta     copylen
+        beq     copied          ; length = 0 if EOF
         pha                     ; remember for return value
         ldy     #0
         ldx     index
@@ -159,7 +160,7 @@ copy:   lda     linebuf,x
         bne     copy
 
         pla                     ; length
-        pha                     ; save length to return at okdone
+copied: pha                     ; save length to return at okdone
 
         clc
         adc     index

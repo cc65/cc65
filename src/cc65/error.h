@@ -127,6 +127,11 @@ void LIWarning (errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((
 void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print a warning message. For use within the preprocessor */
 
+void UnreachableCodeWarning (void);
+/* Print a warning about unreachable code at the current location if these
+** warnings are enabled.
+*/
+
 IntStack* FindWarning (const char* Name);
 /* Search for a warning in the WarnMap table and return a pointer to the
 ** intstack that holds its state. Return NULL if there is no such warning.

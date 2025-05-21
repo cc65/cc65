@@ -9,6 +9,10 @@
  *
  */
 
+#if defined(__APPLE2__) && !defined(__APPLE2ENH__)
+/* Have the grid characters adapt to the availability of MouseText. */
+#define DYN_BOX_DRAW
+#endif
 
 #include <conio.h>
 #include <string.h>
@@ -24,6 +28,9 @@
 #define NUMCOLS          16
 #endif
 
+#if defined(__APPLE2__) && !defined(__APPLE2ENH__)
+static char grid[5][5];
+#else
 static char grid[5][5] = {
     {CH_ULCORNER, CH_HLINE, CH_TTEE,  CH_HLINE, CH_URCORNER},
     {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
@@ -31,6 +38,35 @@ static char grid[5][5] = {
     {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
     {CH_LLCORNER, CH_HLINE, CH_BTEE,  CH_HLINE, CH_LRCORNER}
 };
+#endif
+
+#if defined(__APPLE2__) && !defined(__APPLE2ENH__)
+static void init_grid(void)
+{
+        /* Programmatically fill the array with extern chars
+         * instead of constants. */
+        grid[0][0] = CH_ULCORNER;
+        grid[2][0] = CH_LTEE;
+        grid[4][0] = CH_LLCORNER;
+
+        grid[0][2] = CH_TTEE;
+        grid[2][2] = CH_CROSS;
+        grid[4][2] = CH_BTEE;
+
+        grid[0][4] = CH_URCORNER;
+        grid[2][4] = CH_RTEE;
+        grid[4][4] = CH_LRCORNER;
+
+        grid[1][1] = grid[1][3] =
+        grid[3][1] = grid[3][3] = ' ';
+
+        grid[1][0] = grid[1][2] = grid[1][4] =
+        grid[3][0] = grid[3][2] = grid[3][4] = CH_VLINE;
+        grid[0][1] = grid[0][3] =
+        grid[2][1] = grid[2][3] =
+        grid[4][1] = grid[4][3] = CH_HLINE;
+}
+#endif
 
 void main(void)
 {
@@ -41,6 +77,11 @@ void main(void)
 
         joy_install(joy_static_stddrv);
 #endif
+
+#if defined(__APPLE2__) && !defined(__APPLE2ENH__)
+        init_grid();
+#endif
+
         clrscr();
         screensize(&xsize, &ysize);
         cputs("cc65 conio test\n\r");

@@ -4,6 +4,8 @@
 ; unsigned char get_ostype (void)
 ;
 
+        ; Priority higher than the default one so that things depending
+        ; on ostype can get ostype set when called at normal priority
         .constructor    initostype, 9
         .export         _get_ostype, ostype
 

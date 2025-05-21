@@ -1,17 +1,40 @@
 ;
 ; Oliver Schmidt, 07.09.2009
 ;
-; unsigned __fastcall__ videomode (unsigned mode);
+; signed char __fastcall__ videomode (unsigned mode);
 ;
-        .ifdef  __APPLE2ENH__
-
         .export         _videomode
 
+        .ifndef __APPLE2ENH__
+        .import         machinetype
+        .endif
+
+        .import         returnFFFF
+
         .include        "apple2.inc"
+        .include        "mli.inc"
+
+
+VIDEOMODE_40x24 = $15
+VIDEOMODE_80x24 = $00
 
         .segment        "LOWCODE"
 
 _videomode:
+        ; Functionally equivalent to previous assumption that
+        ; __APPLE2ENH__ == 80 columns hardware present. Will be
+        ; correctly checked in the very near future.
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bvs     set_mode
+
+        ; No 80 column card, return error if requested mode is 80cols
+        cmp     #VIDEOMODE_40x24
+        beq     out
+        jmp     returnFFFF
+set_mode:
+        .endif
+
         ; Get and save current videomode flag
         bit     RD80VID
         php
@@ -31,10 +54,8 @@ _videomode:
 
         ; Return ctrl-char code for setting previous
         ; videomode using the saved videomode flag
-        lda     #$15            ; Ctrl-char code for 40 cols
+        lda     #VIDEOMODE_40x24
         plp
-        bpl     :+
-        lda     #$00            ; Ctrl-char code for 80 cols
-:       rts                     ; X was preserved all the way
-
-        .endif                  ; __APPLE2ENH__
+        bpl     out
+        lda     #VIDEOMODE_80x24
+out:    rts                     ; X was preserved all the way

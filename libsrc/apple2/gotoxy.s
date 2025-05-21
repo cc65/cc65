@@ -8,6 +8,10 @@
         .export         gotoxy, _gotoxy, _gotox
         .import         popa, VTABZ
 
+        .ifndef __APPLE2ENH__
+        .import         machinetype
+        .endif
+
         .include        "apple2.inc"
 
 gotoxy:
@@ -22,9 +26,13 @@ _gotoxy:
 
 _gotox:
         sta     CH              ; Store X
-        .ifdef  __APPLE2ENH__
+
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bpl     :+
+        .endif
+
         bit     RD80VID         ; In 80 column mode?
         bpl     :+
         sta     OURCH           ; Store X
-:       .endif
-        rts
+:       rts

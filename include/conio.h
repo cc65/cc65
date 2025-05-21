@@ -216,7 +216,18 @@ void __fastcall__ cputhex16 (unsigned val);
 #  define cpeekrevers()         _cpeekrevers()
 #endif
 
-
+#ifdef _chline
+#  define chline(len)      _chline(len)
+#endif
+#ifdef _cvline
+#  define cvline(len)      _cvline(len)
+#endif
+#ifdef _chlinexy
+#  define chlinexy(x, y, len)      _chlinexy(x, y, len)
+#endif
+#ifdef _cvlinexy
+#  define cvlinexy(x, y, len)      _cvlinexy(x, y, len)
+#endif
 
 /* End of conio.h */
 #endif

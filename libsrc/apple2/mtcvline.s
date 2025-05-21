@@ -5,23 +5,20 @@
 ; void __fastcall__ cvline (unsigned char length);
 ;
 
-        .export         _cvlinexy, _cvline
+.ifdef __APPLE2ENH__
+
+        .export         _mt_cvlinexy, _mt_cvline
         .import         gotoxy, putchar, newline
 
         .include        "zeropage.inc"
 
-_cvlinexy:
+_mt_cvlinexy:
         pha                     ; Save the length
         jsr     gotoxy          ; Call this one, will pop params
         pla                     ; Restore the length and run into _cvline
 
-_cvline:
-        .ifdef  __APPLE2ENH__
+_mt_cvline:
         ldx     #$5F            ; Left vertical line MouseText character
-        .else
-        ldx     #'!' | $80      ; Exclamation mark, screen code
-        .endif
-
         stx     tmp1
         cmp     #$00            ; Is the length zero?
         beq     done            ; Jump if done
@@ -32,3 +29,5 @@ _cvline:
         dec     tmp2
         bne     :-
 done:   rts
+
+.endif

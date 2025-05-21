@@ -385,7 +385,7 @@ void UnreachableCodeWarning (void)
 */
 {
     if (IS_Get (&WarnUnreachableCode)) {
-	Warning ("Unreachable code");
+        Warning ("Unreachable code");
     }
 }
 

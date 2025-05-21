@@ -9,6 +9,10 @@
 
         .export         _mouse_def_callbacks
 
+        .ifndef __APPLE2ENH__
+        .import         machinetype
+        .endif
+
         .include        "apple2.inc"
 
 ; ------------------------------------------------------------------------
@@ -42,11 +46,14 @@ cursor = '+' | $40              ; Flashing crosshair
         .endif
 
 getcursor:
-        .ifdef  __APPLE2ENH__
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bpl     column
+        .endif
         bit     RD80VID         ; In 80 column mode?
         bpl     column          ; No, skip bank switching
 switch: bit     LOWSCR          ; Patched at runtime
-        .endif
+
 column: ldx     #$00            ; Patched at runtime
 getscr: lda     $0400,x         ; Patched at runtime
         cmp     #cursor
@@ -55,9 +62,7 @@ getscr: lda     $0400,x         ; Patched at runtime
 setcursor:
         lda     #cursor
 setscr: sta     $0400,x         ; Patched at runtime
-        .ifdef  __APPLE2ENH__
         bit     LOWSCR          ; Doesn't hurt in 40 column mode
-        .endif
         rts
 
 ; ------------------------------------------------------------------------
@@ -65,9 +70,7 @@ setscr: sta     $0400,x         ; Patched at runtime
         .code
 
 done:
-        .ifdef  __APPLE2ENH__
         bit     LOWSCR          ; Doesn't hurt in 40 column mode
-        .endif
 return: rts
 
 ; Hide the mouse cursor.
@@ -108,14 +111,14 @@ movex:
         inx
         bcs     :-
         stx     column+1
-        .ifdef  __APPLE2ENH__
+
+        ; Patch switch anyway, it will just be skipped over if in 40-col mode
         adc     #7 / 2          ; Left or right half of 40-col column?
         ldx     #<LOWSCR        ; Columns 1,3,5..79
         bcs     :+
         .assert LOWSCR + 1 = HISCR, error
         inx                     ; Columns 0,2,4..78
 :       stx     switch+1
-        .endif
         rts
 
 ; Move the mouse cursor y position to the value in A/X.

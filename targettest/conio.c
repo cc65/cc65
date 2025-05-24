@@ -24,6 +24,12 @@
 #define NUMCOLS          16
 #endif
 
+#if defined(__ATMOS__)
+// FIXME: those should be defined elsewhere?
+#define CH_HLINE '-'
+#define CH_VLINE '!'
+#endif
+
 static char grid[5][5] = {
     {CH_ULCORNER, CH_HLINE, CH_TTEE,  CH_HLINE, CH_URCORNER},
     {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
@@ -71,6 +77,14 @@ void peektest(void)
     for (j = 0; j < NUMCOLS; ++j) {
         (void)textcolor(cbuf[j]);
         revers(rbuf[j]);
+        cputc(buf[j]);
+    }
+    gotoxy(0, LINE_PEEKTEST);
+    cpeeks(buf, NUMCOLS);
+    (void)textcolor(1);
+    revers(0);
+    gotoxy(20, LINE_PEEKTEST);
+    for (j = 0; j < NUMCOLS; ++j) {
         cputc(buf[j]);
     }
 }

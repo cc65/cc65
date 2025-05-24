@@ -8,7 +8,7 @@
         .import         _set_iigs_speed, _get_iigs_speed
         .import         ostype
 
-        .constructor    calibrate_tv, 2
+        .constructor    calibrate_tv, 8 ; After ostype
 
         .include    "accelerator.inc"
         .include    "apple2.inc"

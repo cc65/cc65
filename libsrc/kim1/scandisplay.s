@@ -15,7 +15,6 @@
         sta     $FA             ; Middle display data
         jsr     popa
         sta     $FB             ; Leftmost display data
-        jsr     SCANDS
-        rts
+        jmp     SCANDS
 
 .endproc

@@ -1,0 +1,2 @@
+x:13: Warning: ISO C99 requires whitespace after the macro name
+x:14: Error: Undeclared identifier 'foo'

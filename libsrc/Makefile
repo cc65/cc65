@@ -33,6 +33,7 @@ TARGETS = apple2       \
           none         \
           osic1p       \
           pce          \
+          rp6502       \
           sim6502      \
           sim65c02     \
           supervision  \
@@ -131,8 +132,8 @@ $(TARGETS): | ../lib
 
 else # TARGET
 
-CA65FLAGS =
-CC65FLAGS = -Or -W error
+CA65FLAGS = -g
+CC65FLAGS = -g -Or -W error
 
 EXTZP = cbm510 \
         cbm610 \

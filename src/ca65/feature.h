@@ -69,6 +69,7 @@ typedef enum {
     FEAT_BRACKET_AS_INDIRECT,
     FEAT_STRING_ESCAPES,
     FEAT_LONG_JSR_JMP_RTS,
+    FEAT_LINE_CONTINUATIONS,
 
     /* Special value: Number of features available */
     FEAT_COUNT

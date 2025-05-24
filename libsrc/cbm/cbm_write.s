@@ -32,7 +32,7 @@
 
         .export         _cbm_write
         .importzp       ptr1, ptr2, ptr3
-        .import         popax, popa
+        .import         popax, popa, returnFFFF
         .import         ___oserror
 
 
@@ -88,7 +88,4 @@ _cbm_write:
 ; Error entry, error code is in A
 
 @E2:    sta     ___oserror
-        lda     #$FF
-        tax
-        rts                     ; return -1
-
+        jmp     returnFFFF

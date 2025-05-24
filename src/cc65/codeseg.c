@@ -1471,7 +1471,7 @@ void CS_Output (CodeSeg* S)
             /* Add line debug info */
             if (DebugInfo) {
                 WriteOutput ("\t.dbg\tline, \"%s\", %u\n",
-                             GetInputName (LI), GetInputLine (LI));
+                             GetActualFileName (LI), GetActualLineNum (LI));
             }
         }
         /* Output the code */

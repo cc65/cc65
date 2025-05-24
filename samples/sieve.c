@@ -38,7 +38,7 @@ static unsigned char Sieve[COUNT];
 
 
 
-#pragma static-locals(1);
+#pragma static-locals(1)
 
 
 

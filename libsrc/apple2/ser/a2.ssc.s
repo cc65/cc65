@@ -26,6 +26,7 @@
         .include        "ser-error.inc"
 
         .macpack        module
+        .macpack        cpu
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -37,8 +38,8 @@
         .endif
 
         ; Driver signature
-        .byte   $73, $65, $72           ; "ser"
-        .byte   SER_API_VERSION         ; Serial API version number
+        .byte   $73, $65, $72   ; "ser"
+        .byte   SER_API_VERSION ; Serial API version number
 
         ; Library reference
         .addr   $0000
@@ -57,13 +58,19 @@
 ;----------------------------------------------------------------------------
 ; I/O definitions
 
+.if (.cpu .bitand CPU_ISET_65C02)
+ACIA           := $C088
+.else
 Offset          = $8F           ; Move 6502 false read out of I/O to page $BF
+ACIA           := $C088-Offset
+.endif
 
-ACIA            = $C088-Offset
-ACIA_DATA       = ACIA+0        ; Data register
-ACIA_STATUS     = ACIA+1        ; Status register
-ACIA_CMD        = ACIA+2        ; Command register
-ACIA_CTRL       = ACIA+3        ; Control register
+ACIA_DATA      := ACIA+0        ; Data register
+ACIA_STATUS    := ACIA+1        ; Status register
+ACIA_CMD       := ACIA+2        ; Command register
+ACIA_CTRL      := ACIA+3        ; Control register
+
+SLTROMSEL      := $C02D         ; For Apple IIgs slot verification
 
 ;----------------------------------------------------------------------------
 ; Global variables
@@ -72,16 +79,18 @@ ACIA_CTRL       = ACIA+3        ; Control register
 
 RecvHead:       .res    1       ; Head of receive buffer
 RecvTail:       .res    1       ; Tail of receive buffer
-RecvFreeCnt:    .res    1       ; Number of bytes in receive buffer
+RecvFreeCnt:    .res    1       ; Number of free bytes in receive buffer
 SendHead:       .res    1       ; Head of send buffer
 SendTail:       .res    1       ; Tail of send buffer
-SendFreeCnt:    .res    1       ; Number of bytes in send buffer
+SendFreeCnt:    .res    1       ; Number of free bytes in send buffer
 
 Stopped:        .res    1       ; Flow-stopped flag
-RtsOff:         .res    1       ;
+RtsOff:         .res    1       ; Cached value of command register with
+                                ; flow stopped
+HSType:         .res    1       ; Flow-control type
 
-RecvBuf:        .res    256     ; Receive buffers: 256 bytes
-SendBuf:        .res    256     ; Send buffers: 256 bytes
+RecvBuf:        .res    256     ; Receive buffer: 256 bytes
+SendBuf:        .res    256     ; Send buffer: 256 bytes
 
 Index:          .res    1       ; I/O register index
 
@@ -91,8 +100,9 @@ Slot:   .byte   $02             ; Default to SSC in slot 2
 
         .rodata
 
-        ; Tables used to translate RS232 params into register values
-BaudTable:                      ; bit7 = 1 means setting is invalid
+BaudTable:                      ; Table used to translate RS232 baudrate param
+                                ; into control register value
+                                ; bit7 = 1 means setting is invalid
         .byte   $FF             ; SER_BAUD_45_5
         .byte   $01             ; SER_BAUD_50
         .byte   $02             ; SER_BAUD_75
@@ -111,32 +121,44 @@ BaudTable:                      ; bit7 = 1 means setting is invalid
         .byte   $0F             ; SER_BAUD_19200
         .byte   $FF             ; SER_BAUD_38400
         .byte   $FF             ; SER_BAUD_57600
-        .byte   $FF             ; SER_BAUD_115200
+        .byte   $00             ; SER_BAUD_115200
         .byte   $FF             ; SER_BAUD_230400
-BitTable:
+
+BitTable:                       ; Table used to translate RS232 databits param
+                                ; into control register value
         .byte   $60             ; SER_BITS_5
         .byte   $40             ; SER_BITS_6
         .byte   $20             ; SER_BITS_7
         .byte   $00             ; SER_BITS_8
-StopTable:
+
+StopTable:                      ; Table used to translate RS232 stopbits param
+                                ; into control register value
         .byte   $00             ; SER_STOP_1
         .byte   $80             ; SER_STOP_2
-ParityTable:
+
+ParityTable:                    ; Table used to translate RS232 parity param
+                                ; into command register value
         .byte   $00             ; SER_PAR_NONE
         .byte   $20             ; SER_PAR_ODD
         .byte   $60             ; SER_PAR_EVEN
         .byte   $A0             ; SER_PAR_MARK
         .byte   $E0             ; SER_PAR_SPACE
-IdOfsTable:
+
+IdOfsTable:                     ; Table of bytes positions, used to check four
+                                ; specific bytes on the slot's firmware to make
+                                ; sure this is a serial card.
         .byte   $05             ; Pascal 1.0 ID byte
         .byte   $07             ; Pascal 1.0 ID byte
         .byte   $0B             ; Pascal 1.1 generic signature byte
         .byte   $0C             ; Device signature byte
-IdValTable:
-        .byte   $38             ; Fixed
-        .byte   $18             ; Fixed
-        .byte   $01             ; Fixed
-        .byte   $31             ; Serial or parallel I/O card type 1
+
+IdValTable:                     ; Table of expected values for the four checked
+                                ; bytes
+        .byte   $38             ; ID Byte 0 (from Pascal 1.0), fixed
+        .byte   $18             ; ID Byte 1 (from Pascal 1.0), fixed
+        .byte   $01             ; Generic signature for Pascal 1.1, fixed
+        .byte   $31             ; Device signature byte (serial or
+                                ; parallel I/O card type 1)
 
 IdTableLen      = * - IdValTable
 
@@ -163,12 +185,10 @@ SER_CLOSE:
         ldx     Index           ; Check for open port
         beq     :+
 
-        ; Deactivate DTR and disable 6551 interrupts
-        lda     #%00001010
+        lda     #%00001010      ; Deactivate DTR and disable 6551 interrupts
         sta     ACIA_CMD,x
 
-        ; Done, return an error code
-:       lda     #SER_ERR_OK
+:       lda     #SER_ERR_OK     ; Done, return an error code
         .assert SER_ERR_OK = 0, error
         tax
         stx     Index           ; Mark port as closed
@@ -177,104 +197,155 @@ SER_CLOSE:
 ;----------------------------------------------------------------------------
 ; SER_OPEN: A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
+; Note: Hardware checks are done in SER_OPEN instead of SER_INSTALL,
+; because they depend on the selected slot, and we can't select the slot
+; before SER_INSTALL.
 
 SER_OPEN:
-        ldx     #<$C000
+        ; Check if this is a IIgs (Apple II Miscellaneous TechNote #7,
+        ; Apple II Family Identification)
+        sec
+        bit     $C082
+        jsr     $FE1F
+        bit     $C080
+
+        bcs     NotIIgs
+
+        ; We're on a IIgs. For every slot N, either bit N of $C02D is
+        ; 0 for the internal ROM, or 1 for "Your Card". Let's make sure
+        ; that slot N's bit is set to 1, otherwise, that can't be an SSC.
+
+        ldy     Slot
+        lda     SLTROMSEL
+:       lsr
+        dey
+        bpl     :-              ; Shift until slot's bit ends in carry
+        bcc     NoDev
+
+NotIIgs:ldx     #<$C000
         stx     ptr2
         lda     #>$C000
         ora     Slot
         sta     ptr2+1
 
-        ; Check Pascal 1.1 Firmware Protocol ID bytes
-:       ldy     IdOfsTable,x
+:       ldy     IdOfsTable,x    ; Check Pascal 1.1 Firmware Protocol ID bytes
         lda     IdValTable,x
         cmp     (ptr2),y
-        bne     NoDevice
+        bne     NoDev
         inx
         cpx     #IdTableLen
         bcc     :-
 
-        ; Convert slot to I/O register index
-        lda     Slot
+        lda     Slot            ; Convert slot to I/O register index
         asl
         asl
         asl
         asl
-        adc     #Offset                 ; Assume carry to be clear
+.if .not (.cpu .bitand CPU_ISET_65C02)
+        adc     #Offset         ; Assume carry to be clear
+.endif
         tax
 
-        ; Check if the handshake setting is valid
-        ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
-        lda     (ptr1),y
-        cmp     #SER_HS_HW              ; This is all we support
-        bne     InvParam
+        ; Check that this works like an ACIA 6551 is expected to work
 
-        ; Initialize buffers
-        ldy     #$00
+        lda     ACIA_STATUS,x   ; Save current values in what we expect to be
+        sta     tmp1            ; the ACIA status register
+        lda     ACIA_CMD,x      ; and command register. So we can restore them
+        sta     tmp2            ; if this isn't a 6551.
+
+        ldy     #%00000010      ; Disable TX/RX, disable IRQ
+:       tya
+        sta     ACIA_CMD,x
+        cmp     ACIA_CMD,x      ; Verify what we stored is there
+        bne     NotAcia
+        iny                     ; Enable TX/RX, disable IRQ
+        cpy     #%00000100
+        bne     :-
+        sta     ACIA_STATUS,x   ; Reset ACIA
+        lda     ACIA_CMD,x      ; Check that RX/TX is disabled
+        lsr
+        bcc     AciaOK
+
+NotAcia:lda     tmp2            ; Restore original values
+        sta     ACIA_CMD,x
+        lda     tmp1
+        sta     ACIA_STATUS,x
+
+NoDev:  lda     #SER_ERR_NO_DEVICE
+        bne     Out
+
+        ; Check if the handshake setting is valid
+AciaOK: ldy     #SER_PARAMS::HANDSHAKE
+        lda     (ptr1),y
+        cmp     #SER_HS_SW      ; Not supported
+        bne     HandshakeOK
+
+        lda     #SER_ERR_INIT_FAILED
+        bne     Out
+
+HandshakeOK:
+        sta     HSType          ; Store flow control type
+
+        ldy     #$00            ; Initialize buffers
         sty     Stopped
         sty     RecvHead
         sty     RecvTail
         sty     SendHead
         sty     SendTail
-        dey                             ; Y = 255
+        dey                     ; Y = 255
         sty     RecvFreeCnt
         sty     SendFreeCnt
 
         ; Set the value for the control register, which contains stop bits,
         ; word length and the baud rate.
         ldy     #SER_PARAMS::BAUDRATE
-        lda     (ptr1),y                ; Baudrate index
+        lda     (ptr1),y        ; Baudrate index
         tay
-        lda     BaudTable,y             ; Get 6551 value
-        bmi     InvBaud                 ; Branch if rate not supported
-        sta     tmp1
+        lda     BaudTable,y     ; Get 6551 value
+        sta     tmp2            ; Backup for IRQ setting
+        bpl     BaudOK          ; Check that baudrate is supported
 
-        ldy     #SER_PARAMS::DATABITS   ; Databits
-        lda     (ptr1),y
+        lda     #SER_ERR_BAUD_UNAVAIL
+        bne     Out
+
+BaudOK: sta     tmp1
+        ldy     #SER_PARAMS::DATABITS
+        lda     (ptr1),y        ; Databits index
         tay
-        lda     BitTable,y
+        lda     BitTable,y      ; Get 6551 value
         ora     tmp1
         sta     tmp1
 
-        ldy     #SER_PARAMS::STOPBITS   ; Stopbits
-        lda     (ptr1),y
+        ldy     #SER_PARAMS::STOPBITS
+        lda     (ptr1),y        ; Stopbits index
         tay
-        lda     StopTable,y
+        lda     StopTable,y     ; Get 6551 value
         ora     tmp1
-        ora     #%00010000              ; Receiver clock source = baudrate
+        ora     #%00010000      ; Set receiver clock source = baudrate
         sta     ACIA_CTRL,x
 
         ; Set the value for the command register. We remember the base value
         ; in RtsOff, since we will have to manipulate ACIA_CMD often.
-        ldy     #SER_PARAMS::PARITY     ; Parity
-        lda     (ptr1),y
+        ldy     #SER_PARAMS::PARITY
+        lda     (ptr1),y        ; Parity index
         tay
-        lda     ParityTable,y
-        ora     #%00000001              ; DTR active
-        sta     RtsOff
-        ora     #%00001000              ; Enable receive interrupts
-        sta     ACIA_CMD,x
+        lda     ParityTable,y   ; Get 6551 value
+
+        ora     #%00000001      ; Set DTR active
+        sta     RtsOff          ; Store value to easily handle flow control later
+
+        ora     #%00001010      ; Disable interrupts and set RTS low
+
+        ldy     tmp2            ; Don't enable IRQs if 115200bps
+        beq     :+
+        and     #%11111101      ; Enable receive IRQs
+:       sta     ACIA_CMD,x
 
         ; Done
-        stx     Index                   ; Mark port as open
+        stx     Index           ; Mark port as open
         lda     #SER_ERR_OK
-        .assert SER_ERR_OK = 0, error
-        tax
-        rts
-
-        ; Device (hardware) not found
-NoDevice:lda    #SER_ERR_NO_DEVICE
-        ldx     #0 ; return value is char
-        rts
-
-        ; Invalid parameter
-InvParam:lda    #SER_ERR_INIT_FAILED
-        ldx     #0 ; return value is char
-        rts
-
-        ; Baud rate not available
-InvBaud:lda     #SER_ERR_BAUD_UNAVAIL
-        ldx     #0 ; return value is char
+Out:
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------
@@ -284,38 +355,38 @@ InvBaud:lda     #SER_ERR_BAUD_UNAVAIL
 
 SER_GET:
         ldx     Index
-        ldy     SendFreeCnt     ; Send data if necessary
-        iny                     ; Y == $FF?
-        beq     :+
-        lda     #$00            ; TryHard = false
-        jsr     TryToSend
 
-        ; Check for buffer empty
-:       lda     RecvFreeCnt     ; (25)
+        lda     RecvFreeCnt     ; Check for buffer empty
         cmp     #$FF
         bne     :+
         lda     #SER_ERR_NO_DATA
-        ldx     #0 ; return value is char
+        ldx     #>$0000
         rts
 
-        ; Check for flow stopped & enough free: release flow control
-:       ldy     Stopped         ; (34)
+:       ldy     Stopped         ; Check for flow stopped
         beq     :+
-        cmp     #63
+        cmp     #63             ; Enough free?
         bcc     :+
+.if (.cpu .bitand CPU_ISET_65C02)
+        stz     Stopped         ; Release flow control
+.else
         lda     #$00
         sta     Stopped
+.endif
         lda     RtsOff
         ora     #%00001000
         sta     ACIA_CMD,x
 
-        ; Get byte from buffer
-:       ldy     RecvHead        ; (41)
+:       ldy     RecvHead        ; Get byte from buffer
         lda     RecvBuf,y
         inc     RecvHead
         inc     RecvFreeCnt
-        ldx     #$00            ; (59)
+        ldx     #$00
+.if (.cpu .bitand CPU_ISET_65C02)
+        sta     (ptr1)          ; Store it for caller
+.else
         sta     (ptr1,x)
+.endif
         txa                     ; Return code = 0
         rts
 
@@ -326,28 +397,26 @@ SER_GET:
 SER_PUT:
         ldx     Index
 
-        ; Try to send
-        ldy     SendFreeCnt
-        iny                     ; Y = $FF?
+        ldy     SendFreeCnt     ; Anything to send first?
+        cpy     #$FF            ; No
         beq     :+
         pha
         lda     #$00            ; TryHard = false
-        jsr     TryToSend
+        jsr     TryToSend       ; Try to flush send buffer
         pla
 
-        ; Put byte into send buffer & send
-:       ldy     SendFreeCnt
+        ldy     SendFreeCnt     ; Reload SendFreeCnt after TryToSend
         bne     :+
         lda     #SER_ERR_OVERFLOW
-        ldx     #0 ; return value is char
+        ldx     #>$0000
         rts
 
-:       ldy     SendTail
+:       ldy     SendTail        ; Put byte into send buffer
         sta     SendBuf,y
         inc     SendTail
         dec     SendFreeCnt
         lda     #$FF            ; TryHard = true
-        jsr     TryToSend
+        jsr     TryToSend       ; Flush send buffer
         lda     #SER_ERR_OK
         .assert SER_ERR_OK = 0, error
         tax
@@ -369,26 +438,25 @@ SER_STATUS:
 ;----------------------------------------------------------------------------
 ; SER_IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
 ; specific data in ptr1, and the ioctl code in A.
+; The ioctl data is the slot number to open.
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_IOCTL:
-        ; Check data msb and code to be 0
-        ora     ptr1+1
+        ora     ptr1+1          ; Check data msb and code to be 0
         bne     :+
 
-        ; Check data lsb to be [1..7]
-        ldx     ptr1
+        ldx     ptr1            ; Check data lsb to be [1..7]
         beq     :+
         cpx     #7+1
         bcs     :+
 
-        stx     Slot
+        stx     Slot            ; Store slot
         .assert SER_ERR_OK = 0, error
         tax
         rts
 
 :       lda     #SER_ERR_INV_IOCTL
-        ldx     #0 ; return value is char
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------
@@ -404,22 +472,24 @@ SER_IRQ:
         and     #$08
         beq     Done            ; Jump if no ACIA interrupt
         lda     ACIA_DATA,x     ; Get byte from ACIA
-        ldy     RecvFreeCnt     ; Check if we have free space left
+        ldx     RecvFreeCnt     ; Check if we have free space left
         beq     Flow            ; Jump if no space in receive buffer
         ldy     RecvTail        ; Load buffer pointer
         sta     RecvBuf,y       ; Store received byte in buffer
         inc     RecvTail        ; Increment buffer pointer
         dec     RecvFreeCnt     ; Decrement free space counter
-        ldy     RecvFreeCnt     ; Check for buffer space low
-        cpy     #33
+        cpx     #33             ; Check for buffer space low
         bcc     Flow            ; Assert flow control if buffer space low
         rts                     ; Interrupt handled (carry already set)
 
-        ; Assert flow control if buffer space too low
-Flow:   lda     RtsOff
+Flow:   lda     HSType          ; Don't touch if no flow control
+        beq     IRQDone
+
+        ldx     Index           ; Assert flow control if buffer space too low
+        lda     RtsOff
         sta     ACIA_CMD,x
         sta     Stopped
-        sec                     ; Interrupt handled
+IRQDone:sec                     ; Interrupt handled
 Done:   rts
 
 ;----------------------------------------------------------------------------
@@ -427,26 +497,24 @@ Done:   rts
 
 TryToSend:
         sta     tmp1            ; Remember tryHard flag
-Again:  lda     SendFreeCnt
-        cmp     #$FF
-        beq     Quit            ; Bail out
+NextByte:
+        lda     SendFreeCnt     ; Is there anything to send? This can happen if
+        cmp     #$FF            ; we got interrupted by RX while sending, and
+        beq     Quit            ; flow control was asserted.
 
-        ; Check for flow stopped
-        lda     Stopped
-        bne     Quit            ; Bail out
+Again:  lda     Stopped         ; Is flow stopped?
+        bne     Quit            ; Yes, Bail out
 
-        ; Check that ACIA is ready to send
-        lda     ACIA_STATUS,x
+        lda     ACIA_STATUS,x   ; Check that ACIA is ready to send
         and     #$10
-        bne     Send
+        bne     Send            ; It is!
         bit     tmp1            ; Keep trying if must try hard
         bmi     Again
 Quit:   rts
 
-        ; Send byte and try again
-Send:   ldy     SendHead
+Send:   ldy     SendHead        ; Get first byte to send
         lda     SendBuf,y
-        sta     ACIA_DATA,x
+        sta     ACIA_DATA,x     ; Send it
         inc     SendHead
         inc     SendFreeCnt
-        jmp     Again
+        bne     NextByte        ; And try next one

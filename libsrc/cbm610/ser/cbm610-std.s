@@ -245,15 +245,10 @@ InvBaud:
 ;
 
 SER_GET:
-        ldx     SendFreeCnt             ; Send data if necessary
-        inx                             ; X == $FF?
-        beq     @L1
-        lda     #$00
-        jsr     TryToSend
 
 ; Check for buffer empty
 
-@L1:    lda     RecvFreeCnt
+        lda     RecvFreeCnt
         cmp     #$ff
         bne     @L2
         lda     #SER_ERR_NO_DATA
@@ -293,21 +288,23 @@ SER_PUT:
 ; Try to send
 
         ldx     SendFreeCnt
-        inx                             ; X = $ff?
+        cpx     #$ff                   ; Nothing to flush
         beq     @L2
         pha
         lda     #$00
         jsr     TryToSend
         pla
 
-; Put byte into send buffer & send
+; Reload SendFreeCnt after TryToSend
 
-@L2:    ldx     SendFreeCnt
-        bne     @L3
+        ldx     SendFreeCnt
+        bne     @L2
         lda     #SER_ERR_OVERFLOW      ; X is already zero
         rts
 
-@L3:    ldx     SendTail
+; Put byte into send buffer & send
+
+@L2:    ldx     SendTail
         sta     SendBuf,x
         inc     SendTail
         dec     SendFreeCnt
@@ -395,31 +392,31 @@ SER_IRQ:
         sta     IndReg          ; Switch to the system bank
 @L0:    lda     SendFreeCnt
         cmp     #$ff
-        beq     @L3             ; Bail out
+        beq     @L2             ; Bail out
 
 ; Check for flow stopped
 
 @L1:    lda     Stopped
-        bne     @L3             ; Bail out
+        bne     @L2             ; Bail out
 
 ; Check that swiftlink is ready to send
 
-@L2:    ldy     #ACIA::STATUS
+       ldy     #ACIA::STATUS
         lda     (acia),y
         and     #$10
-        bne     @L4
+        bne     @L3
         bit     tmp1            ; Keep trying if must try hard
-        bmi     @L0
+        bmi     @L1
 
 ; Switch back the bank and return
 
-@L3:    lda     ExecReg
+@L2:    lda     ExecReg
         sta     IndReg
         rts
 
 ; Send byte and try again
 
-@L4:    ldx     SendHead
+@L3:    ldx     SendHead
         lda     SendBuf,x
         ldy     #ACIA::DATA
         sta     (acia),y

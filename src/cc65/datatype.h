@@ -215,6 +215,8 @@ struct Type {
 extern const Type type_char[];
 extern const Type type_schar[];
 extern const Type type_uchar[];
+extern const Type type_short[];
+extern const Type type_ushort[];
 extern const Type type_int[];
 extern const Type type_uint[];
 extern const Type type_long[];
@@ -326,7 +328,7 @@ INLINE TypeCode GetQualifier (const Type* T)
 #  define GetQualifier(T)       ((T)->C & T_MASK_QUAL)
 #endif
 
-TypeCode GetUnqualTypeCode (const Type* Type);
+TypeCode GetUnderlyingTypeCode (const Type* Type);
 /* Get the type code of the unqualified underlying type of Type.
 ** Return GetUnqualRawTypeCode (Type) if Type is not scalar.
 */
@@ -357,30 +359,30 @@ INLINE TypeCode GetTypeClass (const Type* T)
 INLINE TypeCode GetTypeRank (const Type* T)
 /* Get the type rank of a type */
 {
-    return (GetUnqualTypeCode (T) & T_MASK_RANK);
+    return (GetUnderlyingTypeCode (T) & T_MASK_RANK);
 }
 #else
-#  define GetTypeRank(T)        (GetUnqualTypeCode (T) & T_MASK_RANK)
+#  define GetTypeRank(T)        (GetUnderlyingTypeCode (T) & T_MASK_RANK)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetSignedness (const Type* T)
 /* Get the signedness of a type */
 {
-    return (GetUnqualTypeCode (T) & T_MASK_SIGN);
+    return (GetUnderlyingTypeCode (T) & T_MASK_SIGN);
 }
 #else
-#  define GetSignedness(T)      (GetUnqualTypeCode (T) & T_MASK_SIGN)
+#  define GetSignedness(T)      (GetUnderlyingTypeCode (T) & T_MASK_SIGN)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetSizeModifier (const Type* T)
 /* Get the size modifier of a type */
 {
-    return (GetUnqualTypeCode (T) & T_MASK_SIZE);
+    return (GetUnderlyingTypeCode (T) & T_MASK_SIZE);
 }
 #else
-#  define GetSizeModifier(T)    (GetUnqualTypeCode (T) & T_MASK_SIZE)
+#  define GetSizeModifier(T)    (GetUnderlyingTypeCode (T) & T_MASK_SIZE)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -433,8 +435,8 @@ Type* NewPointerTo (const Type* T);
 */
 
 Type* NewBitFieldOf (const Type* T, unsigned BitOffs, unsigned BitWidth);
-/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
-** string is allocated on the heap and may be freed after use.
+/* Return a type string that is "unqualified T : BitWidth" aligned on BitOffs.
+** The type string is allocated on the heap and may be freed after use.
 */
 
 const Type* AddressOf (const Type* T);
@@ -481,6 +483,9 @@ const Type* GetUnderlyingType (const Type* Type);
 
 const Type* GetStructReplacementType (const Type* SType);
 /* Get a replacement type for passing a struct/union by value in the primary */
+
+const Type* GetBitFieldDeclType (const Type* Type);
+/* Get the original integer type used to declare the bit-field */
 
 const Type* GetBitFieldChunkType (const Type* Type);
 /* Get the type needed to operate on the byte chunk containing the bit-field */
@@ -691,6 +696,17 @@ INLINE int IsTypeFuncPtr (const Type* T)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int IsTypeFuncLike (const Type* T)
+/* Return true if this is a function or a function pointer */
+{
+    return IsTypeFunc (T) || IsTypeFuncPtr (T);
+}
+#else
+int IsTypeFuncLike (const Type* T);
+/* Return true if this is a function or a function pointer */
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int IsClassInt (const Type* T)
 /* Return true if this is an integer type */
 {
@@ -761,6 +777,9 @@ int IsDerivedType (const Type* T);
 int IsAggregateType (const Type* T);
 /* Return true if this is an array or struct type */
 
+int IsDerivedDeclaratorType (const Type* T);
+/* Return true if this is an array, function or pointer type */
+
 int IsRelationType (const Type* T);
 /* Return true if this is an arithmetic, array or pointer type */
 
@@ -772,6 +791,18 @@ int IsESUType (const Type* T);
 
 int IsIncompleteESUType (const Type* T);
 /* Return true if this is an incomplete ESU type */
+
+int IsAnonESUType (const Type* T);
+/* Return true if this is an anonymous ESU type */
+
+int IsAnonStructClass (const Type* T);
+/* Return true if this is an anonymous struct or union type */
+
+int IsPassByRefType (const Type* T);
+/* Return true if this is a large struct/union type that doesn't fit in the
+** primary. This returns false for the void value extension type since it is
+** not passable at all.
+*/
 
 int IsEmptiableObjectType (const Type* T);
 /* Return true if this is a struct/union/void type that can have zero size */
@@ -1024,7 +1055,7 @@ void SetESUTagSym (Type* T, struct SymEntry* S);
 
 const char* GetBasicTypeName (const Type* T);
 /* Return a const name string of the basic type.
-** Return "type" for unknown basic types.
+** Return "<type>" for unknown basic types.
 */
 
 const char* GetFullTypeName (const Type* T);

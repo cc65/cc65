@@ -13,6 +13,7 @@
         .import         _strlower, _strlen
 
         .macpack        generic
+        .macpack        cpu
 
 ; ----------------------------------------------------------------------------
 ; We will store variables into the register bank in the zeropage. Define
@@ -37,7 +38,11 @@ FCount          = ptr2
 
 GetFormatChar:
         ldy     #0
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (Format)
+        .else
         lda     (Format),y
+        .endif
 IncFormatPtr:
         inc     Format
         bne     @L1
@@ -110,7 +115,11 @@ GetIntArg:
         lda     (ArgList),y
         tax
         dey
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (ArgList)
+        .else
         lda     (ArgList),y
+        .endif
         rts
 
 ; ----------------------------------------------------------------------------
@@ -135,9 +144,9 @@ ReadInt:
         pha                             ; Save digit value
         lda     ptr1
         ldx     ptr1+1
-        asl     ptr1
+        asl     a
         rol     ptr1+1                  ; * 2
-        asl     ptr1
+        asl     a
         rol     ptr1+1                  ; * 4, assume carry clear
         adc     ptr1
         sta     ptr1
@@ -265,10 +274,16 @@ Save:   lda     regbank,y
 ; Initialize the output counter in the output descriptor to zero
 
         lda     #0
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        sta     (OutData)
+        ldy     #$01
+        sta     (OutData),y
+        .else
         tay
         sta     (OutData),y
         iny
         sta     (OutData),y
+        .endif
 
 ; Get the output function from the output descriptor and remember it
 
@@ -338,7 +353,11 @@ MainLoop:
         sta     (sp),y
         dey
         lda     FCount
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        sta     (sp)
+        .else
         sta     (sp),y
+        .endif
         jsr     CallOutFunc             ; Call the output function
 
 ; We're back from out(), or we didn't call it. Check for end of string.
@@ -551,10 +570,16 @@ CheckCount:
         jsr     GetIntArg
         sta     ptr1
         stx     ptr1+1                  ; Get user supplied pointer
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (OutData)             ; Low byte of OutData->ccount
+        sta     (ptr1)
+        ldy     #1
+        .else
         ldy     #0
         lda     (OutData),y             ; Low byte of OutData->ccount
         sta     (ptr1),y
         iny
+        .endif
         lda     (OutData),y             ; High byte of OutData->ccount
         sta     (ptr1),y
         jmp     MainLoop                ; Done

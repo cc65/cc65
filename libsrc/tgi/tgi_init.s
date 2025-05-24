@@ -63,7 +63,7 @@
         lda     #<$100
         ldx     #>$100
         jsr     pushax                  ; Width scale = 1.0
-        jsr     pushax                  ; Heigh scale = 1.0
+        jsr     pushax                  ; Height scale = 1.0
         jsr     pusha                   ; Text direction = TGI_TEXT_HORIZONTAL
         jmp     _tgi_settextstyle       ; A = Font = TGI_FONT_BITMAP
 

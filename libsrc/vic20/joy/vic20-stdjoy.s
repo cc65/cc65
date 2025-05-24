@@ -82,7 +82,7 @@ COUNT:
 
 ; ------------------------------------------------------------------------
 ; READ: Read a particular joystick passed in A.
-; The current implemenation will ignore the joystick number because we do only
+; The current implementation will ignore the joystick number because we do only
 ; have one joystick
 
 READ:   lda     #$7F            ; mask for VIA2 JOYBIT: sw3

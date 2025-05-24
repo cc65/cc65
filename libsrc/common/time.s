@@ -6,7 +6,7 @@
 
         .export         _time
 
-        .import         decsp1, ldeaxi
+        .import         pusha, ldeaxi
         .importzp       ptr1, sreg, tmp1, tmp2
 
         .include        "time.inc"
@@ -22,54 +22,50 @@
 
 ; Get the time (machine dependent)
 
-        jsr     decsp1
+        .assert timespec::tv_sec = 0, error
+        lda     #CLOCK_REALTIME
+        jsr     pusha
         lda     #<time
         ldx     #>time
         jsr     _clock_gettime
-        sta     tmp2
-        lda     #<time
-        ldx     #>time
-        .assert timespec::tv_sec = 0, error
-        jsr     ldeaxi
-        sta     tmp1            ; Save low byte of result
+
+; _clock_gettime returns 0 on success and -1 on error. Check that.
+
+        inx                     ; Did _clock_gettime return -1?
+        bne     @L2             ; Jump if not
+
+; We had an error so invalidate time. A contains $FF.
+
+        ldy     #3
+@L1:    sta     time,y
+        dey
+        bpl     @L1
 
 ; Restore timep and check if it is NULL
 
-        pla
+@L2:    pla
         sta     ptr1+1
         pla
         sta     ptr1            ; Restore timep
         ora     ptr1+1          ; timep == 0?
-        beq     @L1
+        beq     @L4
 
 ; timep is not NULL, store the result there
 
         ldy     #3
-        lda     sreg+1
+@L3:    lda     time,y
         sta     (ptr1),y
         dey
-        lda     sreg
-        sta     (ptr1),y
-        dey
-        txa
-        sta     (ptr1),y
-        dey
-        lda     tmp1
-        sta     (ptr1),y
+        bpl     @L3
 
-; If the result is != 0, return -1
+; Load the final result.
 
-@L1:    lda     tmp2
-        beq     @L2
-
-        tax
-        sta     sreg
+@L4:    lda     time+3
         sta     sreg+1
-        rts
-
-; Reload the low byte of the result and return
-
-@L2:    lda     tmp1
+        lda     time+2
+        sta     sreg
+        ldx     time+1
+        lda     time
         rts
 
 .endproc

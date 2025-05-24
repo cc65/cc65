@@ -40,6 +40,8 @@ The simulator is called as follows:
         Long options:
           --help                Help (this text)
           --cycles              Print amount of executed CPU cycles
+          --cpu <type>          Override CPU type (6502, 65C02, 6502X)
+          --trace               Enable CPU trace
           --verbose             Increase verbosity
           --version             Print the simulator version number
 </verb></tscreen>
@@ -49,7 +51,7 @@ which is limited to an 8-bit result 0-255.
 
 An error in sim65, like bad arguments or an internal problem will exit with <tt/1/.
 
-A timeout from <tt/-x/ will exist with <tt/2/.
+A timeout from <tt/-x/ will exit with <tt/2/.
 
 
 <sect1>Command line options in detail<p>
@@ -69,6 +71,17 @@ Here is a description of all the command line options:
   The cycles for the final "<tt>jmp exit</tt>" are not included in this
   count.
 
+
+  <tag><tt>--cpu &lt;type&gt;</tt></tag>
+
+  Specify the CPU type to use while executing the program. This CPU type
+  is normally determined from the program file header, but it can be useful
+  to override it.
+
+  <tag><tt>--trace</tt></tag>
+
+  Print a single line of information for each instruction or interrupt that
+  is executed by the CPU to stdout.
 
   <tag><tt>-v, --verbose</tt></tag>
 
@@ -115,37 +128,78 @@ PVExit ($01)
 
 <sect>Creating a Test in C<p>
 
-For a C test compiled and linked with <tt/--target sim6502/ the
+For a C test linked with <tt/--target sim6502/ and the <tt/sim6502.lib/ library,
 command line arguments to <tt/sim65/ will be passed to <tt/main/,
 and the return value from <tt/main/ will become sim65's exit code.
-The <tt/exit/ function may also be used to terminate with an exit code.
+The <tt/stdlib.h/ <tt/exit/ function may also be used to terminate with an exit code.
 
-Exit codes are limited to 8 bits.
+Exit codes are limited to an unsigned 8 bit value. (E.g. returning -1 will give an exit code of 255.)
 
 The standard C library high level file input and output is functional.
 A sim65 application can be written like a command line application,
-providing arguments to <tt/main/ and using the <tt/stdio.h/ interfaces.
+providing command line arguments to <tt/main/ and using the <tt/stdio.h/ interfaces
+to interact with the console or access files.
 
 Internally, file input and output is provided at a lower level by
-a set of built-in paravirtualization functions (<ref id="paravirt-internal" name="see below">).
+a set of built-in paravirtualization functions (see <ref id="paravirt-internal" name="below">).
 
+Example:
+
+<tscreen><verb>
+#include <stdio.h>
+int main()
+{
+    printf("Hello!\n");
+    return 5;
+}
+
+// Build and run:
+//   cl65 -t sim6502 -o example.prg example.c
+//   sim65 example.prg
+
+// Build and run, separate steps:
+//   cc65 -t sim6502 -o example.s example.c
+//   ca65 -t sim6502 -o example.o example.s
+//   ld65 -t sim6502 -o example.prg example.o sim6502.lib
+//   sim65 example.prg
+</verb></tscreen>
 
 <sect>Creating a Test in Assembly<p>
 
-Assembly tests may similarly be assembled and linked with
-<tt/--target sim6502/ or <tt/--target sim65c02/.
-Define and export <tt/_main/ as an entry point,
+Though a C test may also link with assembly code,
+a pure assembly test can also be created.
+
+Link with <tt/--target sim6502/ or <tt/--target sim65c02/ and the corresponding library,
+define and export <tt/_main/ as an entry point,
 and the sim65 library provides two ways to return an 8-bit exit code:
 
 <itemize>
 
 <item>Return from <tt/_main/ with the exit code in <tt/A/.
 
-<item><tt/jmp exit/ with the code in <tt/A/.
+<item><tt/jmp exit/ with the code in <tt/A/. (<tt/.import exit/ from the sim65 library.)
 
 </itemize>
 
-The binary file has a 12 byte header:
+Example:
+
+<tscreen><verb>
+.export _main
+_main:
+    lda #5
+    rts
+
+; Build and run:
+;   cl65 -t sim6502 -o example.prg example.s
+;   sim65 example.prg
+
+; Build and run, separate steps:
+;   ca65 -t sim6502 -o example.o example.s
+;   ld65 -t sim6502 -o example.prg example.o sim6502.lib
+;   sim65 example.prg
+</verb></tscreen>
+
+Internally, the binary program file has a 12 byte header provided by the library:
 
 <itemize>
 
@@ -182,8 +236,204 @@ These use cc65 calling conventions, and are intended for use with the sim65 targ
 <item><tt/IRQ/ and <tt/NMI/ events will not be generated, though <tt/BRK/
 can be used if the IRQ vector at <tt/$FFFE/ is manually prepared by the test code.
 
+<item>The <tt/sim6502/ or <tt/sim65c02/ targets provide a default configuration,
+but if customization is needed <tt/sim6502.cfg/ or <tt/sim65c02.cfg/ might be used as a template.
+
 </itemize>
 
+<sect>Counter peripheral
+
+<p>The sim65 simulator supports a memory-mapped counter peripheral that manages
+a number of 64-bit counters that are continuously updated as the simulator is
+running. For each counter, it also provides a 64 bit "latching" register.
+
+<p>The functionality of the counter peripheral is accessible through 3 registers:
+
+<itemize>
+<item><tt>PERIPHERALS_COUNTER_LATCH</tt> ($FFC0, write-only)
+<item><tt>PERIPHERALS_COUNTER_SELECT</tt> ($FFC1, read/write)
+<item><tt>PERIPHERALS_COUNTER_VALUE</tt> ($FFC2..$FFC9, read-only)
+</itemize>
+
+<p>These three registers are used as follows.
+
+<p>When a program explicitly requests a "counter latch" operation by writing any value
+to the <tt>PERIPHERALS_COUNTER_LATCH</tt> address ($FFC0), all live registers are simultaneously
+copied to the latch registers. They will keep their newly latched values until another latch
+operation is requested.
+
+<p>The <tt>PERIPHERALS_COUNTER_SELECT</tt> address ($FFC1) register holds an 8-bit value that
+specifies which 64-bit latch register is currently readable through the <tt>PERIPHERALS_COUNTER_VALUE</tt>
+address range. Six values are currently defined:
+
+<itemize>
+<item>$00: latched clock cycle counter selected.
+<item>$01: latched CPU instruction counter selected.
+<item>$02: latched IRQ interrupt counter selected.
+<item>$03: latched NMI interrupt counter selected.
+<item>$80: latched wallclock time (nanoseconds) selected.
+<item>$81: latched wallclock time (split: seconds, nanoseconds) selected.
+</itemize>
+
+<p>Values $00 to $03 provide access to the latched (frozen) value of their respective live
+counters at the time of the last write to <tt>PERIPHERALS_COUNTER_LATCH</tt>.
+
+<p>When <tt>PERIPHERALS_COUNTER_SELECT</tt> equals $80, the <tt>PERIPHERALS_COUNTER_VALUE</tt>
+will be a 64-bit value corresponding to the number of nanoseconds elapsed since the Unix epoch
+(Midnight, Jan 1st, 1970 UTC), at the time of the last latch operation.
+
+<p>When <tt>PERIPHERALS_COUNTER_SELECT</tt> equals $81, the high 32 bits of <tt>PERIPHERALS_COUNTER_VALUE</tt>
+will be a 32-bit value corresponding to the number of seconds elapsed since the Unix epoch (Midnight, Jan 1st,
+1970 UTC), at the time of the last latch operation. The low 32 bits of
+<tt>PERIPHERALS_COUNTER_VALUE</tt> will hold the nanoseconds since the start of that second.
+
+<p>The two different wallclock-time latch registers will always refer to precisely the same time instant.
+For some applications, the single 64-bit value measured in nanoseconds will be more convenient, while
+for other applications, the split 32/32 bits representation with separate second and nanosecond
+values will be more convenient.
+
+<p>Note that the time elapsed since the Unix epoch is an approximation, as the implementation depends on the
+way POSIX defines time-since-the-epoch. Unfortunately, POSIX incorrectly assumes that all days are precisely
+86400 seconds long, which is not true in case of leap seconds. The way this inconsistency is resolved is
+system dependent.
+
+<p>On reset, <tt>PERIPHERALS_COUNTER_SELECT</tt> is initialized to zero. If the <tt>PERIPHERALS_COUNTER_SELECT</tt>
+register holds a value other than one of the six values described above, all <tt>PERIPHERALS_COUNTER_VALUE</tt>
+bytes will read as zero.
+
+<p>The <tt>PERIPHERALS_COUNTER_VALUE</tt> addresses ($FFC2..$FFC9) are used to read to currently
+selected 64-bit latch register value. Address $FFC2 holds the least significant byte (LSB),
+while address $FFC9 holds the most significant byte (MSB).
+
+<p>On reset, all latch registers are reset to zero. Reading any of the <tt>PERIPHERALS_COUNTER_VALUE</tt>
+bytes before the first write to <tt>PERIPHERALS_COUNTER_LATCH</tt> will yield zero.
+
+Example:
+
+<tscreen><verb>
+/* This example uses the peripheral support in sim65.h */
+
+#include <stdio.h>
+#include <sim65.h>
+
+static void print_current_counters(void)
+{
+    peripherals.counter.latch = 0; /* latch values */
+
+    peripherals.counter.select = COUNTER_SELECT_CLOCKCYCLE_COUNTER;
+    printf("clock cycles ............... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_INSTRUCTION_COUNTER;
+    printf("instructions ............... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_WALLCLOCK_TIME;
+    printf("wallclock time ............. : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    peripherals.counter.select = COUNTER_SELECT_WALLCLOCK_TIME_SPLIT;
+    printf("wallclock time, split ...... : %08lx %08lx\n", peripherals.counter.value32[1], peripherals.counter.value32[0]);
+    printf("\n");
+}
+
+int main(void)
+{
+    print_current_counters();
+    print_current_counters();
+    return 0;
+}
+</verb></tscreen>
+
+<sect>SIM65 control peripheral
+
+<p>The sim65 simulator supports a memory-mapped peripheral that allows control
+of the simulator behavior itself.
+
+<p>The sim65 control peripheral interface consists of 2 registers:
+
+<itemize>
+<item><tt>PERIPHERALS_SIMCONTROL_CPUMODE</tt> ($FFCA, read/write)
+<item><tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> ($FFCB, read/write)
+</itemize>
+
+<p>Address <tt>PERIPHERALS_SIMCONTROL_CPUMODE</tt> allows access to the currently active CPU mode.
+
+<p>Possible values are CPU_6502 (0), CPU_65C02 (1), and CPU_6502X (2). For specialized applications,
+it may be useful to switch CPU models at runtime; this is supported by writing 0, 1, or 2 to this address.
+Writing any other value will be ignored.
+
+<p>Address <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> allows inspection and control of the currently active
+CPU tracing mode.
+
+<p>A value of 0 means tracing is disabled; a value of $7F fully enables tracing. The 7
+lower bits of the value actually provide control over which fields are printed; see below
+for an explanation of the seven fields.
+
+<p>Having the ability to enable/disable tracing on the fly can be a useful debugging aid. For example,
+it can be used to enable tracing for short fragments of code. Consider the following example:
+
+<tscreen><verb>
+/* This example uses the TRACE_ON and TRACE_OFF macros defined in sim65.h */
+
+#include <stdio.h>
+#include <sim65.h>
+
+unsigned x;
+
+int main(void)
+{
+    TRACE_ON();
+
+    x = 0x1234; /* We want to see what happens here. */
+
+    TRACE_OFF();
+
+    return 0;
+}
+</verb></tscreen>
+
+<p>This small test program, when compiled with optimizations enabled (-O), produces the output trace below:
+
+<tscreen><verb>
+70           232  022E  A2 12     ldx  #$12         A=7F X=00 Y=04 S=FD Flags=nvdizC    SP=FFBC
+71           234  0230  A9 34     lda  #$34         A=7F X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+72           236  0232  8D C8 02  sta  $02C8        A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+73           240  0235  8E C9 02  stx  $02C9        A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+74           244  0238  A9 00     lda  #$00         A=34 X=12 Y=04 S=FD Flags=nvdizC    SP=FFBC
+75           246  023A  8D CB FF  sta  $FFCB        A=00 X=12 Y=04 S=FD Flags=nvdiZC    SP=FFBC
+</verb></tscreen>
+
+<p>The example output shows the full trace format, consisting of the following seven fields:
+
+<itemize>
+<item>The first field is an instruction counter. We see here that the assignment '<tt>x = 0x1234;</tt>'
+starts at the 70th CPU instruction since the start of the simulator, and takes four 6502 instructions.
+The two instructions that follow correspond to the execution of the <tt>TRACE_OFF</tt>' macro
+that disables tracing.
+<item>The second field shows the clock cycles since the start of the program. Here we see that the
+first four instructions take 12 clock cycles in total (262 - 250 = 12).
+<item>The third field shows the program counter as a four-digit, i.e., the PC register. Its 16-bit
+      value is displayed as a 4-digit hecadecimal number.
+<item>The fourth field shows one to three hexadecimal byte values that make up the instruction.
+<item>The fifth field shows the instruction in human-readable assembly language.
+<item>The sixth field shows the CPU registers before execution of the instruction. The A, X, Y, and
+      S registers are each shown as a single byte value. The six status bits of the CPU are shown in
+      the order NVDIZC (Negative, Overflow, Decimal, Interrupt, Zero, Carry). They are displayed as
+      a capital letter if the flag is set, or a small letter if the flag is unset.
+<item>The seventh and last field shows the software stack pointer SP as used by CC65 programs that
+      conform to the CC65 conventions.
+</itemize>
+
+<p>Writing a specific value to <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> will control which of these
+seven fields are displayed. The following values are defined to denote the seven fields:
+
+<itemize>
+<item>TRACE_FIELD_INSTR_COUNTER   = 0x40
+<item>TRACE_FIELD_CLOCK_COUNTER   = 0x20
+<item>TRACE_FIELD_PC              = 0x10
+<item>TRACE_FIELD_INSTR_BYTES     = 0x08
+<item>TRACE_FIELD_INSTR_ASSEMBLY  = 0x04
+<item>TRACE_FIELD_CPU_REGISTERS   = 0x02
+<item>TRACE_FIELD_CC65_SP         = 0x01
+</itemize>
+
+<p>For example, writing the value $16 to <tt>PERIPHERALS_SIMCONTROL_TRACEMODE</tt> will only display
+the program counter, instruction assembly, and CPU registers fields.
 
 <sect>Copyright<p>
 

@@ -342,7 +342,7 @@ GETPIXEL:
         lda     #$03            ; 3 (white)
 :       bcc     :+
         adc     #$03            ; += 4 (black -> black2, white -> white2)
-:       ldx     #$00
+:       ldx     #>$0000
         bit     $C080           ; Switch in LC bank 2 for R/O
         rts
 

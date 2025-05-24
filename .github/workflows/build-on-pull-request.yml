@@ -19,7 +19,7 @@ jobs:
       - shell: bash
         run: git config --global core.autocrlf input
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Do some simple style checks
         shell: bash
@@ -35,7 +35,7 @@ jobs:
         run: make -j2 lib QUIET=1
       - name: Run the regression tests.
         shell: bash
-        run: make test QUIET=1
+        run: make -j2 test QUIET=1
       - name: Test that the samples can be built.
         run: make -C samples platforms
       - name: Test that the targettest programs can be built.
@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: make -j2 doc
       - name: Upload a documents snapshot.
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docs
           path: ./html
@@ -54,7 +54,7 @@ jobs:
           make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
 
   build_windows:
-    name: Build (Windows)
+    name: Build and Test (Windows)
     runs-on: windows-latest
 
     steps:
@@ -62,13 +62,31 @@ jobs:
         run: git config --global core.autocrlf input
 
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
-      - name: Build app (debug)
-        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug
+      - name: Build app (x86 debug)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug -property:Platform=Win32
 
-      - name: Build app (release)
-        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release
+      - name: Build app (x86 release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release -property:Platform=Win32
+
+      - name: Build app (x64 release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug -property:Platform=x64
+
+      - name: Build app (x64 release)
+        run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Release -property:Platform=x64
+
+      - name: Build utils (MinGW)
+        shell: cmd
+        run: make -j2 util SHELL=cmd
+
+      - name: Build the platform libraries (make lib)
+        shell: cmd
+        run: make -j2 lib QUIET=1 SHELL=cmd
+
+      - name: Run the regression tests (make test)
+        shell: cmd
+        run: make -j2 test QUIET=1 SHELL=cmd

@@ -30,5 +30,5 @@ next:   inx
         bne     next
 
 done:   txa
-        ldx     #$00
+        ldx     #>$0000
         rts

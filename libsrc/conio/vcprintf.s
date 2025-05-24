@@ -10,7 +10,7 @@
         .importzp       sp, ptr1, ptr2, ptr3, tmp1
 
         .macpack        generic
-
+        .macpack        cpu
 
 .data
 
@@ -74,20 +74,39 @@ out:    jsr     popax           ; count
 
 ; Loop outputting characters
 
+.if (.cpu .bitand CPU_ISET_65SC02)
+
 @L1:    dec     outdesc+6
         beq     @L4
-@L2:    ldy     tmp1
-        lda     (ptr1),y
-        iny
-        bne     @L3
-        inc     ptr1+1
-@L3:    sty     tmp1
-        jsr     _cputc
-        jmp     @L1
+@L2:    lda     (ptr1)          ; (5)
+        inc     ptr1            ; (10)
+        bne     @L3             ; (12)
+        inc     ptr1+1          ; (17)
+@L3:    jsr     _cputc          ; (23)
+        bra     @L1             ; (26)
 
 @L4:    dec     outdesc+7
         bne     @L2
         rts
+
+.else
+
+@L1:    dec     outdesc+6
+        beq     @L4
+@L2:    ldy     tmp1            ; (3)
+        lda     (ptr1),y        ; (8)
+        iny                     ; (10)
+        bne     @L3             ; (12)
+        inc     ptr1+1          ; (17)
+@L3:    sty     tmp1            ; (20)
+        jsr     _cputc          ; (26)
+        jmp     @L1             ; (32)
+
+@L4:    dec     outdesc+7
+        bne     @L2
+        rts
+
+.endif
 
 ; ----------------------------------------------------------------------------
 ; vcprintf - formatted console i/o

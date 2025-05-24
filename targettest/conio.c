@@ -32,6 +32,48 @@ static char grid[5][5] = {
     {CH_LLCORNER, CH_HLINE, CH_BTEE,  CH_HLINE, CH_LRCORNER}
 };
 
+void colortest(void)
+{
+    unsigned int i, j;
+    cputsxy(0, 2, "Colors:" );
+    for (i = 0; i < 3; ++i) {
+            gotoxy(i, 3 + i);
+            for (j = 0; j < NUMCOLS; ++j) {
+                    (void)textcolor(j);
+                    cputc('X');
+            }
+    }
+}
+
+#define LINE_PEEKTEST   11
+
+void peektest(void)
+{
+    int j;
+    char buf[NUMCOLS];
+    char cbuf[NUMCOLS];
+    char rbuf[NUMCOLS];
+
+    gotoxy(0, LINE_PEEKTEST);
+    for (j = 0; j < NUMCOLS; ++j) {
+        (void)textcolor(j);
+        revers((j >> 1)&1);
+        cputc('a' + j);
+    }
+    for (j = 0; j < NUMCOLS; ++j) {
+        gotoxy(j, LINE_PEEKTEST);
+        buf[j] = cpeekc();
+        cbuf[j] = cpeekcolor();
+        rbuf[j] = cpeekrevers();
+    }
+    gotoxy(0, (LINE_PEEKTEST+1));
+    for (j = 0; j < NUMCOLS; ++j) {
+        (void)textcolor(cbuf[j]);
+        revers(rbuf[j]);
+        cputc(buf[j]);
+    }
+}
+
 void main(void)
 {
         unsigned int i, j, n;
@@ -52,16 +94,13 @@ void main(void)
         (void)bordercolor(bcol);
         (void)bgcolor(bgcol);
 
-        cputsxy(0, 2, "Colors:" );
-        for (i = 0; i < 3; ++i) {
-                gotoxy(i, 3 + i);
-                for (j = 0; j < NUMCOLS; ++j) {
-                        (void)textcolor(j);
-                        cputc('X');
-                }
-        }
-        (void)textcolor(tcol);
+        colortest();
+        peektest();
 
+        (void)textcolor(tcol);
+        revers(0);
+
+        gotoxy(4,5);
         cprintf("\n\n\r Screensize: %ux%u", xsize, ysize);
 
         chlinexy(0, 6, xsize);

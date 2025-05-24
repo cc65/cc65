@@ -15,12 +15,16 @@
 #include <stdlib.h>
 #include <joystick.h>
 
-#if defined(__GAMATE__)
+#if defined(__GAMATE__) || defined(__OSIC1P__)
 /* there is not enough screen space to show all 256 characters at the bottom */
 #define NUMCHARS        128
-#define NUMCOLS           4
 #else
 #define NUMCHARS        256
+#endif
+
+#if defined(__GAMATE__)
+#define NUMCOLS           4
+#else
 #define NUMCOLS          16
 #endif
 
@@ -79,6 +83,7 @@ void peektest(void)
         revers(rbuf[j]);
         cputc(buf[j]);
     }
+#if !defined (__OSIC1P__)
     gotoxy(0, LINE_PEEKTEST);
     cpeeks(buf, NUMCOLS);
     (void)textcolor(1);
@@ -87,6 +92,7 @@ void peektest(void)
     for (j = 0; j < NUMCOLS; ++j) {
         cputc(buf[j]);
     }
+#endif
 }
 
 void main(void)
@@ -134,7 +140,8 @@ void main(void)
                 }
         }
 
-        gotoxy(0, ysize - 2 - ((NUMCHARS + xsize) / xsize));
+        gotoxy(0, ysize - 3 - ((NUMCHARS + xsize) / xsize));
+        // one line with 0123..pattern
         revers(1);
         for (i = 0; i < xsize; ++i) {
                 cputc('0' + i % 10);
@@ -147,9 +154,11 @@ void main(void)
                     cputc(' ');
             }
         }
+        // fill last line of the block with '#'
         while(wherex() > 0) {
                 cputc('#');
         }
+        // one more line with 0123..pattern
         revers(1);
         for (i = 0; i < xsize; ++i) {
                 cputc('0' + i % 10);

@@ -624,6 +624,7 @@ EXELIST_pce = \
 # stroserror-test strqtok-test uname-test
 EXELIST_osic1p = \
 	minimal \
+	conio \
 	cursor \
 	mul-test
 

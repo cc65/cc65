@@ -125,11 +125,6 @@ void OutputGlobalLiteralPool (void);
 Literal* AddLiteral (const char* S);
 /* Add a literal string to the literal pool. Return the literal. */
 
-Literal* AddLiteralBuf (const void* Buf, unsigned Len);
-/* Add a buffer containing a literal string to the literal pool. Return the
-** literal.
-*/
-
 Literal* AddLiteralStr (const StrBuf* S);
 /* Add a literal string to the literal pool. Return the literal. */
 

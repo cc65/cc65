@@ -2647,8 +2647,9 @@ static void DoDefine (void)
         ** "There shall be white-space between the identifier and the
         ** replacement list in the definition of an object-like macro."
         ** Note: C89 doesn't have this constraint.
+        ** Note: if there is no replacement list, a space is not required.
         */
-        if (Std == STD_C99 && !IsSpace (CurC)) {
+        if (Std == STD_C99 && !IsSpace (CurC) && CurC != 0) {
             PPWarning ("ISO C99 requires whitespace after the macro name");
         }
 

@@ -59,6 +59,7 @@ void peektest(void)
         (void)textcolor(j);
         revers((j >> 1)&1);
         cputc('a' + j);
+        rbuf[j] = (j >> 1)&1;
     }
     for (j = 0; j < NUMCOLS; ++j) {
         gotoxy(j, LINE_PEEKTEST);

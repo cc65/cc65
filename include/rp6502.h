@@ -47,7 +47,7 @@ struct __RP6502
     unsigned char step1;
     unsigned int addr1;
     unsigned char xstack;
-    unsigned int errno;
+    unsigned int errno_;
     unsigned char op;
     unsigned char irq;
     const unsigned char spin;

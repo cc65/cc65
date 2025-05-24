@@ -7,8 +7,8 @@ int __cdecl__ open (const char* name, int flags, ...)
 {
     size_t namelen = strlen (name);
     if (namelen > 255) {
-        RIA.errno = EINVAL;
-        return _mappederrno(RIA.errno);
+        RIA.errno_ = EINVAL;
+        return _mappederrno (RIA.errno_);
     }
     while (namelen) {
         ria_push_char (name[--namelen]);

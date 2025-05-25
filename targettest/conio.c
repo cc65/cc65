@@ -114,6 +114,35 @@ void peektest(void)
 #endif
 }
 
+void allchars(int xsize, int ysize)
+{
+    int i;
+        gotoxy(0, ysize - 2 - ((NUMCHARS + (xsize-1)) / xsize));
+        // one line with 0123..pattern
+        revers(1);
+        for (i = 0; i < xsize; ++i) {
+                cputc('0' + i % 10);
+        }
+        revers(0);
+        for (i = 0; i < NUMCHARS; ++i) {
+            if ((i != '\n') && (i != '\r')) {
+                    cputc(i);
+            } else {
+                    cputc(' ');
+            }
+        }
+        // fill last line of the block with '#'
+        while(wherex() > 0) {
+                cputc('#');
+        }
+        // one more line with 0123..pattern
+        revers(1);
+        for (i = 0; i < xsize; ++i) {
+                cputc('0' + i % 10);
+        }
+        revers(0);
+}
+
 void main(void)
 {
         unsigned int i, j, n;
@@ -159,30 +188,7 @@ void main(void)
                 }
         }
 
-        gotoxy(0, ysize - 3 - ((NUMCHARS + xsize) / xsize));
-        // one line with 0123..pattern
-        revers(1);
-        for (i = 0; i < xsize; ++i) {
-                cputc('0' + i % 10);
-        }
-        revers(0);
-        for (i = 0; i < NUMCHARS; ++i) {
-            if ((i != '\n') && (i != '\r')) {
-                    cputc(i);
-            } else {
-                    cputc(' ');
-            }
-        }
-        // fill last line of the block with '#'
-        while(wherex() > 0) {
-                cputc('#');
-        }
-        // one more line with 0123..pattern
-        revers(1);
-        for (i = 0; i < xsize; ++i) {
-                cputc('0' + i % 10);
-        }
-        revers(0);
+        allchars(xsize, ysize);
 
         cursor(1);
         for (;;) {

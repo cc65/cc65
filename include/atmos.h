@@ -169,6 +169,17 @@ void atmos_tock (void);
 void atmos_zap (void);
 /* Raygun sound effect */
 
+
+/* The following #defines will cause the matching function prototypes
+** in conio.h to be overlaid by macroes with the same names,
+** thereby saving the function call overhead.
+*/
+#define _textcolor(color)       COLOR_WHITE
+#define _bgcolor(color)         COLOR_BLACK
+#define _bordercolor(color)     COLOR_BLACK
+#define _cpeekcolor(color)      COLOR_WHITE
+
+
 void waitvsync (void);
 /* Wait for start of next frame */
 

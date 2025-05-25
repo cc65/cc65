@@ -42,20 +42,21 @@ static char grid[5][5] = {
     {CH_LLCORNER, CH_HLINE, CH_BTEE,  CH_HLINE, CH_LRCORNER}
 };
 
+#define LINE_COLORTEST  3
+#define LINE_PEEKTEST   11
+
 void colortest(void)
 {
     unsigned int i, j;
     cputsxy(0, 2, "Colors:" );
     for (i = 0; i < 3; ++i) {
-            gotoxy(i, 3 + i);
+            gotoxy(i, LINE_COLORTEST + i);
             for (j = 0; j < NUMCOLS; ++j) {
                     (void)textcolor(j);
                     cputc('X');
             }
     }
 }
-
-#define LINE_PEEKTEST   11
 
 void peektest(void)
 {
@@ -69,13 +70,24 @@ void peektest(void)
         (void)textcolor(j);
         revers((j >> 1)&1);
         cputc('a' + j);
-        rbuf[j] = (j >> 1)&1;
+        buf[j] ='#';
+        cbuf[j] = 1;
+        rbuf[j] = 0;
     }
     for (j = 0; j < NUMCOLS; ++j) {
         gotoxy(j, LINE_PEEKTEST);
+// TODO: cpeekc() implementation missing for those:
+#if !defined(__TELESTRAT__)
         buf[j] = cpeekc();
+#endif
+// TODO: cpeekcolor() implementation missing for those:
+#if !defined(__TELESTRAT__)
         cbuf[j] = cpeekcolor();
+#endif
+// TODO: cpeekrevers() implementation missing for those:
+#if !defined(__TELESTRAT__)
         rbuf[j] = cpeekrevers();
+#endif
     }
     gotoxy(0, (LINE_PEEKTEST+1));
     for (j = 0; j < NUMCOLS; ++j) {
@@ -83,7 +95,14 @@ void peektest(void)
         revers(rbuf[j]);
         cputc(buf[j]);
     }
-#if !defined (__OSIC1P__)
+// TODO: cpeeks() implementation missing for those:
+#if !defined(__APPLE2__) && \
+    !defined(__APPLE2ENH__) && \
+    !defined(__ATARI__) && \
+    !defined(__CX16__) && \
+    !defined(__NES__) && \
+    !defined(__TELESTRAT__) && \
+    !defined(__OSIC1P__)
     gotoxy(0, LINE_PEEKTEST);
     cpeeks(buf, NUMCOLS);
     (void)textcolor(1);

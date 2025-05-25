@@ -51,10 +51,14 @@ put_caret:
 
         ; At this time, the high bit of the key pressed is set.
 :       bit     KBDSTRB         ; Clear keyboard strobe
-        .ifdef __APPLE2ENH__
+
+        .ifndef __APPLE2ENH__
+        bit     machinetype     ; Apple //e or more recent?
+        bpl     clear
+        .endif
         bit     BUTN0           ; Check if OpenApple is down
         bmi     done
-        .endif
-        and     #$7F            ; If not down, then clear high bit
+
+clear:  and     #$7F            ; If not down, then clear high bit
 done:   ldx     #>$0000
         rts

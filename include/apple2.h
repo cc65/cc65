@@ -83,6 +83,26 @@
 #define CH_CURS_LEFT    0x08
 #define CH_CURS_RIGHT   0x15
 
+/* These characters are not available on the ][+, but
+ * are on the //e. */
+#if defined(__APPLE2ENH__) || defined(APPLE2_INCLUDE_IIE_CHARS)
+#define CH_DEL          0x7F
+#define CH_CURS_UP      0x0B
+#define CH_CURS_DOWN    0x0A
+
+/* These are defined to be OpenApple + NumberKey */
+#define CH_F1   0xB1
+#define CH_F2   0xB2
+#define CH_F3   0xB3
+#define CH_F4   0xB4
+#define CH_F5   0xB5
+#define CH_F6   0xB6
+#define CH_F7   0xB7
+#define CH_F8   0xB8
+#define CH_F9   0xB9
+#define CH_F10  0xB0
+#endif
+
 #if defined(__APPLE2ENH__)
 
 /* MouseText-based functions for boxes and lines drawing */

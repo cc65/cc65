@@ -7,12 +7,11 @@
         .export         READST
 
         .include        "plus4.inc"
-        .importzp       ST
 
 ; Read the status byte from the zero page instead of banking in the ROM
 
 .proc   READST
-        lda     ST                      ; Load status
+        lda     STATUS                  ; Load status
         rts                             ; Return to caller
 .endproc
 

@@ -129,6 +129,10 @@ int __fastcall__ read_xram (unsigned buf, unsigned count, int fildes);
 int __fastcall__ write_xstack (const void* buf, unsigned count, int fildes);
 int __fastcall__ write_xram (unsigned buf, unsigned count, int fildes);
 
+/* Time zone hack */
+
+void ria_tzset (unsigned long time);
+
 /* XREG location helpers */
 
 #define xreg_ria_keyboard(...) xreg(0, 0, 0, __VA_ARGS__)

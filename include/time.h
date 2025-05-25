@@ -134,7 +134,6 @@ extern struct _timezone {
 int __fastcall__ clock_getres (clockid_t clock_id, struct timespec *res);
 int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec *tp);
 int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);
-void tzset (void);
 
 #endif
 

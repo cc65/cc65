@@ -540,12 +540,13 @@ EXELIST_sym1 = \
 	strnlen \
 	strqtok-test
 
-# omitted: clock-test cpeek-test conio deb dir-test em-test exec-test1 exec-test2
+# omitted: clock-test cpeek-test deb dir-test em-test exec-test1 exec-test2
 # fileio-test ft mouse-test posixio-test rename-test seek ser-test
 EXELIST_atmos = \
 	minimal \
 	arg-test \
 	clock \
+	conio \
 	cprintf \
 	cursor \
 	div-test \
@@ -623,6 +624,7 @@ EXELIST_pce = \
 # stroserror-test strqtok-test uname-test
 EXELIST_osic1p = \
 	minimal \
+	conio \
 	cursor \
 	mul-test
 

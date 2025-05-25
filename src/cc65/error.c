@@ -379,6 +379,18 @@ void PPWarning (const char* Format, ...)
 
 
 
+void UnreachableCodeWarning (void)
+/* Print a warning about unreachable code at the current location if these
+** warnings are enabled.
+*/
+{
+    if (IS_Get (&WarnUnreachableCode)) {
+        Warning ("Unreachable code");
+    }
+}
+
+
+
 IntStack* FindWarning (const char* Name)
 /* Search for a warning in the WarnMap table and return a pointer to the
 ** intstack that holds its state. Return NULL if there is no such warning.
@@ -507,22 +519,11 @@ void InitDiagnosticStrBufs (void)
 void DoneDiagnosticStrBufs (void)
 /* Done with tracked string buffers used for diagnostics */
 {
-    ClearDiagnosticStrBufs ();
-    DoneCollection (&DiagnosticStrBufs);
-}
-
-
-
-void ClearDiagnosticStrBufs (void)
-/* Free all tracked string buffers */
-{
     unsigned I;
-
     for (I = 0; I < CollCount (&DiagnosticStrBufs); ++I) {
         SB_Done (CollAtUnchecked (&DiagnosticStrBufs, I));
     }
-
-    CollDeleteAll (&DiagnosticStrBufs);
+    DoneCollection (&DiagnosticStrBufs);
 }
 
 

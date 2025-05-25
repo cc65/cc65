@@ -636,7 +636,9 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* If this is the main function in a C99 environment returning an int,
         ** let it always return zero. Otherwise output a warning.
         */
-        if (IS_Get (&Standard) >= STD_C99 && GetUnqualRawTypeCode (ReturnType) == T_INT) {
+        if (F_IsMainFunc (CurrentFunc) &&
+            IS_Get (&Standard) >= STD_C99 &&
+            GetUnqualRawTypeCode (ReturnType) == T_INT) {
             g_getimmed (CF_INT | CF_CONST, 0, 0);
         } else if (IS_Get (&WarnReturnType)) {
             Warning ("Control reaches end of non-void function [-Wreturn-type]");

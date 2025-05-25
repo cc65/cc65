@@ -188,8 +188,8 @@ static int IfStatement (void)
         /* If the if expression was always true, the code in the else branch
         ** is never executed. Output a warning if this is the case.
         */
-        if (TestResult == TESTEXPR_TRUE && IS_Get (&WarnUnreachableCode)) {
-            Warning ("Unreachable code");
+        if (TestResult == TESTEXPR_TRUE) {
+            UnreachableCodeWarning ();
         }
 
         /* Define the target for the first test */

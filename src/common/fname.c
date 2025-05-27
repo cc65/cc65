@@ -134,12 +134,17 @@ char* MakeTmpFilename (const char* Ext)
     ** warning: the use of `tmpnam' is dangerous, better use `mkstemp'
     **
     ** however, mkstemp actually opens a file, which we do not want.
+    ** tmpfile() is unsuitable for the same reason.
+    **
     ** we could write our own version, but then we would have to struggle
-    ** with supporting multiple build environments.  tmpnam(3) is fine
-    ** here.
+    ** with supporting multiple build environments.
+    ** 
+    ** tmpnam(3) is safe here, because ca65 / cc65 / ld65 will simply clobber
+    ** an existing file, or exit if with an error if they are unable to.
+    **
+    ** gcc will also complain, if you don't use the return value from tmpnam(3)
     */
-    (void) tmpnam(Buffer);
-    strcat(Buffer, Ext);
+    strcat(tmpnam(Buffer), Ext);
 
     Out = xmalloc (strlen (Buffer) + 1);
     strcpy (Out, Buffer);

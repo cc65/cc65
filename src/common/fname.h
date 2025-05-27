@@ -59,6 +59,12 @@ char* MakeFilename (const char* Origin, const char* Ext);
 ** The function may be used to create "foo.o" from "foo.s".
 */
 
+char* MakeTmpFilename (const char* Origin, const char* Ext);
+/* Make a new temporary file name from Ext.  tmpnam(3) is called
+** and Ext is appended to generate the filename. Origin is ignored.
+** The result is placed in a malloc'ed buffer and returned.
+*/
+
 
 
 /* End of fname.h */

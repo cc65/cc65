@@ -620,6 +620,9 @@ static void Assemble (const char* File)
 static void Compile (const char* File)
 /* Compile the given file */
 {
+    /* A temporary file name passed to the assembler */
+    char *TmpFile = NULL;
+
     /* Remember the current compiler argument count */
     unsigned ArgCount = CC65.ArgCount;
 
@@ -657,6 +660,12 @@ static void Compile (const char* File)
     /* Add the file as argument for the compiler */
     CmdAddArg (&CC65, File);
 
+    if (DoAssemble && DoLink) {
+        /* set a temporary output file name */
+        TmpFile = MakeTmpFilename(File, ".s");
+        CmdSetOutput (&CC65, TmpFile);
+    }
+
     /* Add a NULL pointer to terminate the argument list */
     CmdAddArg (&CC65, 0);
 
@@ -671,7 +680,10 @@ static void Compile (const char* File)
     */
     if (DoAssemble) {
         /* Assemble the intermediate file and remove it */
-        AssembleIntermediate (File);
+        AssembleIntermediate (TmpFile ? TmpFile : File);
+        if (TmpFile) {
+            xfree(TmpFile);
+        }
     }
 }
 

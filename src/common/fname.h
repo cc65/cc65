@@ -61,7 +61,7 @@ char* MakeFilename (const char* Origin, const char* Ext);
 
 char* MakeTmpFilename (const char* Ext);
 /* Make a new temporary file name from Ext.  tmpnam(3) is called
-** and Ext is appended to generate the filename. Origin is ignored.
+** and Ext is appended to generate the filename.
 ** The result is placed in a malloc'ed buffer and returned.
 */
 

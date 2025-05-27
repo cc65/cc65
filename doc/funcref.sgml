@@ -104,6 +104,7 @@ function.
 <item><ref id="mktime_dt" name="mktime_dt">
 <item>rebootafterexit
 <item><ref id="videomode" name="videomode">
+<item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
 
@@ -119,6 +120,7 @@ function.
 <item><ref id="mktime_dt" name="mktime_dt">
 <item>rebootafterexit
 <item><ref id="videomode" name="videomode">
+<item><ref id="waitvsync" name="waitvsync">
 </itemize>
 
 
@@ -8516,14 +8518,20 @@ if the mode is not supported due to lack of hardware.
 <descrip>
 <tag/Function/Wait until the start of the next video frame.
 <tag/Header/<tt/
-<ref id="apple2enh.h" name="apple2enh.h">,
+<ref id="apple2.h" name="apple2.h">,
 <ref id="atmos.h" name="atmos.h">,
 <ref id="cbm.h" name="cbm.h">,
 <ref id="gamate.h" name="gamate.h">,
 <ref id="nes.h" name="nes.h">,
 <ref id="pce.h" name="pce.h">/
-<tag/Declaration/<tt/void waitvsync (void);/
+<tag/Declaration/
+<tt>void waitvsync (void);</tt><newline>
+<tt>signed char waitvsync (void); /* For Apple II */</tt><newline>
 <tag/Description/Wait for vertical sync, to reduce flickering.
+<tag/Notes/<itemize>
+<item>The function will return -1 when the feature is not supported,
+like on the Apple&nbsp;&rsqb;&lsqb;+.
+</itemize>
 <tag/Availability/Platforms served by the headers above
 (Atmos requires the VSync hack)
 <tag/Example/None.

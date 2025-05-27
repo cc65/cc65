@@ -361,6 +361,7 @@ usage.
 <item>rebootafterexit
 <item>ser_apple2_slot
 <item>tgi_apple2_mix
+<item>videomode
 </itemize>
 
 
@@ -405,6 +406,10 @@ The names in the parentheses denote the symbols to be used for static linking of
   hires pages. Note that programs using this driver will have to be linked
   with <tt/-S $4000/ to reserve the first hires page or with <tt/-S $6000/
   to reserve both hires pages.
+
+  Note that the second hires page is only available if the text display is not in
+  80 column mode. This can be asserted by calling <tt/videomode (VIDEOMODE_40COL);/
+  before installing the driver.
 
   The function <tt/tgi_apple2_mix()/ allows to activate 4 lines of text. The
   function doesn't clear the corresponding area at the bottom of the screen.

@@ -103,6 +103,7 @@ function.
 <item><ref id="gmtime_dt" name="gmtime_dt">
 <item><ref id="mktime_dt" name="mktime_dt">
 <item>rebootafterexit
+<item><ref id="videomode" name="videomode">
 </itemize>
 
 
@@ -8477,24 +8478,27 @@ used in presence of a prototype.
 <tag/Function/Switch to either 40- or 80-column text mode, or a standard
 graphics mode.
 <tag/Header/<tt/
+<ref id="apple2.h" name="apple2.h">,
 <ref id="apple2enh.h" name="apple2enh.h">,
 <ref id="c128.h" name="c128.h">,
 <ref id="cx16.h" name="cx16.h">/
 <tag/Declaration/
-<tt>unsigned __fastcall__ videomode (unsigned Mode); /* for apple2enh and c128 */</tt><newline>
-<tt>signed char __fastcall__ videomode (signed char Mode); /* for cx16 */</tt>
+<tt>unsigned __fastcall__ videomode (unsigned Mode); /* for c128 */</tt><newline>
+<tt>signed char __fastcall__ videomode (signed char Mode); /* for apple2 and cx16 */</tt>
 <tag/Description/Switch to a 40- or 80-column text or graphics mode, depending
 on the argument. If the requested mode is already active, nothing happens. The
 old mode is returned from the call.
 <tag/Notes/<itemize>
-<item>The function is specific to the Commodore 128, the enhanced Apple //e,
+<item>The function is specific to the Commodore 128, the Apple II,
 and the Commander X16.
 <item>This function replaces <ref id="toggle_videomode"
 name="toggle_videomode">.
 <item>The function is available as only a fastcall function, so it may be used
 only in the presence of a prototype.
+<item>On Apple II, this functions returns the previously active video mode, or -1
+if the mode is not supported due to lack of hardware.
 </itemize>
-<tag/Availability/C128, enhanced Apple //e, and CX16
+<tag/Availability/C128, Apple II, and CX16
 <tag/See also/
 <ref id="fast" name="fast">,
 <ref id="isfast" name="isfast">,

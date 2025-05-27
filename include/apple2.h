@@ -83,7 +83,57 @@
 #define CH_CURS_LEFT    0x08
 #define CH_CURS_RIGHT   0x15
 
-#if !defined(__APPLE2ENH__)
+#if defined(__APPLE2ENH__)
+
+/* MouseText-based functions for boxes and lines drawing */
+void mt_chline (unsigned char length);
+void mt_cvline (unsigned char length);
+void mt_chlinexy (unsigned char x, unsigned char y, unsigned char length);
+void mt_cvlinexy (unsigned char x, unsigned char y, unsigned char length);
+
+#define CH_HLINE        0x5F
+#define CH_VLINE        0xDF
+#define CH_ULCORNER     0x5F
+#define CH_URCORNER     0x20
+#define CH_LLCORNER     0xD4
+#define CH_LRCORNER     0xDF
+#define CH_TTEE         0x5F
+#define CH_BTEE         0xD4
+#define CH_LTEE         0xD4
+#define CH_RTEE         0xDF
+#define CH_CROSS        0xD4
+
+#define _chline(length)       mt_chline(length)
+#define _chlinexy(x,y,length) mt_chlinexy(x,y,length)
+#define _cvline(length)       mt_cvline(length)
+#define _cvlinexy(x,y,length) mt_cvlinexy(x,y,length)
+
+#else
+
+/* Functions that don't depend on MouseText to draw boxes and lines */
+void dyn_chline (unsigned char h, unsigned char length);
+void dyn_cvline (unsigned char v, unsigned char length);
+void dyn_chlinexy (unsigned char h, unsigned char x, unsigned char y, unsigned char length);
+void dyn_cvlinexy (unsigned char v, unsigned char x, unsigned char y, unsigned char length);
+
+#if defined(DYN_BOX_DRAW)
+/* When the user defines DYN_BOX_DRAW, we'll adapt to the machine
+** we run on.
+ */
+extern char CH_HLINE;
+extern char CH_VLINE;
+extern char CH_ULCORNER;
+extern char CH_URCORNER;
+extern char CH_LLCORNER;
+extern char CH_LRCORNER;
+extern char CH_TTEE;
+extern char CH_BTEE;
+extern char CH_LTEE;
+extern char CH_RTEE;
+extern char CH_CROSS;
+
+#else
+/* Otherwise, fallback to safety and don't use MouseText at all. */
 #define CH_HLINE        '-'
 #define CH_VLINE        '!'
 #define CH_ULCORNER     '+'
@@ -95,7 +145,14 @@
 #define CH_LTEE         '+'
 #define CH_RTEE         '+'
 #define CH_CROSS        '+'
-#endif
+#endif /* DYN_BOX_DRAW */
+
+#define _chline(length)         dyn_chline(CH_HLINE, length)
+#define _chlinexy(x, y, length) dyn_chlinexy(CH_HLINE, x ,y, length)
+#define _cvline(length)         dyn_cvline(CH_VLINE, length)
+#define _cvlinexy(x, y, length) dyn_cvlinexy(CH_VLINE, x, y, length)
+
+#endif /* __APPLE2ENH__ */
 
 /* Masks for joy_read */
 #define JOY_UP_MASK     0x10
@@ -126,6 +183,12 @@
 #define TV_NTSC  0
 #define TV_PAL   1
 #define TV_OTHER 2
+
+/* Video modes */
+#define VIDEOMODE_40x24     0x15
+#define VIDEOMODE_80x24     0x00
+#define VIDEOMODE_40COL     VIDEOMODE_40x24
+#define VIDEOMODE_80COL     VIDEOMODE_80x24
 
 extern unsigned char _dos_type;
 /* Valid _dos_type values:
@@ -254,6 +317,11 @@ unsigned char __fastcall__ allow_lowercase (unsigned char onoff);
 ** display. The function returns the old lowercase setting.
 */
 #endif
+
+signed char __fastcall__ videomode (unsigned mode);
+/* Set the video mode, return the old mode, or -1 if 80-column hardware is not
+** installed. Call with one of the VIDEOMODE_xx constants.
+*/
 
 
 

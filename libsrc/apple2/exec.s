@@ -6,6 +6,7 @@
 
         .export         _exec
         .import         mli_file_info_direct
+        .import         aux80col
         .import         pushname, popname, popax, done, _exit
 
         .include        "zeropage.inc"
@@ -115,7 +116,8 @@ setbuf: lda     #$00            ; Low byte
         sta     io_buffer
         stx     io_buffer+1
 
-        .ifdef  __APPLE2ENH__
+        bit     aux80col
+        bpl     :+
         ; Calling the 80 column firmware needs the ROM switched
         ; in, otherwise it copies the F8 ROM to the LC (@ $CEF4)
         bit     $C082
@@ -128,9 +130,8 @@ setbuf: lda     #$00            ; Low byte
 
         ; Switch in LC bank 2 for R/O
         bit     $C080
-        .endif
 
-        ; Reset stack as we already passed
+:       ; Reset stack as we already passed
         ; the point of no return anyway
         ldx     #$FF
         txs

@@ -5,14 +5,10 @@
 ;
         .export         _videomode
 
-        .ifndef __APPLE2ENH__
-        .import         machinetype
-        .endif
-
+        .import         aux80col
         .import         returnFFFF
 
         .include        "apple2.inc"
-        .include        "mli.inc"
 
 
 VIDEOMODE_40x24 = $15
@@ -21,19 +17,14 @@ VIDEOMODE_80x24 = $00
         .segment        "LOWCODE"
 
 _videomode:
-        ; Functionally equivalent to previous assumption that
-        ; __APPLE2ENH__ == 80 columns hardware present. Will be
-        ; correctly checked in the very near future.
-        .ifndef __APPLE2ENH__
-        bit     machinetype
-        bvs     set_mode
+        bit     aux80col
+        bmi     set_mode
 
         ; No 80 column card, return error if requested mode is 80cols
         cmp     #VIDEOMODE_40x24
         beq     out
         jmp     returnFFFF
 set_mode:
-        .endif
 
         ; Get and save current videomode flag
         bit     RD80VID

@@ -673,7 +673,7 @@ static void Compile (const char* File)
 
     if (DoAssemble) {
         /* set a temporary output file name */
-        TmpFile = MakeTmpFilename(File, ".s");
+        TmpFile = MakeTmpFilename(".s");
         CmdSetOutput (&CC65, TmpFile);
     }
 

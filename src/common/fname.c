@@ -119,16 +119,26 @@ char* MakeFilename (const char* Origin, const char* Ext)
 
 
 
-char* MakeTmpFilename (const char* Origin, const char* Ext)
+char* MakeTmpFilename (const char* Ext)
 /* Make a new temporary file name from Ext.  tmpnam(3) is called
-** and Ext is appended to generate the filename. Origin is ignored.
+** and Ext is appended to generate the filename.
 ** The result is placed in a malloc'ed buffer and returned.
 */
 {
     char* Out;
     char Buffer[L_tmpnam * 2]; /* a lazy way to ensure we have space for Ext */
 
-    tmpnam(Buffer);
+    /*
+    ** gcc emits the following warning here:
+    **
+    ** warning: the use of `tmpnam' is dangerous, better use `mkstemp'
+    **
+    ** however, mkstemp actually opens a file, which we do not want.
+    ** we could write our own version, but then we would have to struggle
+    ** with supporting multiple build environments.  tmpnam(3) is fine
+    ** here.
+    */
+    (void) tmpnam(Buffer);
     strcat(Buffer, Ext);
 
     Out = xmalloc (strlen (Buffer) + 1);

@@ -138,7 +138,7 @@ char* MakeTmpFilename (const char* Ext)
     **
     ** we could write our own version, but then we would have to struggle
     ** with supporting multiple build environments.
-    ** 
+    **
     ** tmpnam(3) is safe here, because ca65 / cc65 / ld65 will simply clobber
     ** an existing file, or exit if with an error if they are unable to.
     **

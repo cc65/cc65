@@ -7,6 +7,10 @@
 ;
 
         .export         _cgetc
+
+        .ifndef __APPLE2ENH__
+        .import         machinetype
+        .endif
         .import         cursor, putchardirect
 
         .include        "zeropage.inc"
@@ -18,11 +22,14 @@ _cgetc:
         beq     :+
 
         ; Show caret.
-        .ifdef  __APPLE2ENH__
-        lda     #$7F | $80      ; Checkerboard, screen code
-        .else
+        .ifndef __APPLE2ENH__
         lda     #' ' | $40      ; Blank, flashing
+        bit     machinetype
+        bpl     put_caret
         .endif
+
+        lda     #$7F | $80      ; Checkerboard, screen code
+put_caret:
         jsr     putchardirect   ; Saves old character in tmp3
 
         ; Wait for keyboard strobe.

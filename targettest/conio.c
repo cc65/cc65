@@ -9,6 +9,15 @@
  *
  */
 
+/* Box drawing characters are usually constant expressions. However, there
+ * are scenarios where this is not the case. To ensure compatibility with
+ * code that assumes they are constant expressions, the scenarios in question
+ * must be explicitly enabled by defining DYN_BOX_DRAW. Currently, the only
+ * such scenario is the apple2 target. There, DYN_BOX_DRAW can be used to
+ * enable the use of MouseText characters on exactly those machines that
+ * support them.
+ */
+#define DYN_BOX_DRAW
 
 #include <conio.h>
 #include <string.h>
@@ -34,6 +43,10 @@
 #define CH_VLINE '!'
 #endif
 
+#if defined(DYN_BOX_DRAW)
+static char grid[5][5];
+#else
+
 static char grid[5][5] = {
     {CH_ULCORNER, CH_HLINE, CH_TTEE,  CH_HLINE, CH_URCORNER},
     {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
@@ -41,6 +54,35 @@ static char grid[5][5] = {
     {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
     {CH_LLCORNER, CH_HLINE, CH_BTEE,  CH_HLINE, CH_LRCORNER}
 };
+#endif
+
+#if defined(DYN_BOX_DRAW)
+static void init_grid(void)
+{
+        /* Programmatically fill the array with extern chars
+         * instead of constants. */
+        grid[0][0] = CH_ULCORNER;
+        grid[2][0] = CH_LTEE;
+        grid[4][0] = CH_LLCORNER;
+
+        grid[0][2] = CH_TTEE;
+        grid[2][2] = CH_CROSS;
+        grid[4][2] = CH_BTEE;
+
+        grid[0][4] = CH_URCORNER;
+        grid[2][4] = CH_RTEE;
+        grid[4][4] = CH_LRCORNER;
+
+        grid[1][1] = grid[1][3] =
+        grid[3][1] = grid[3][3] = ' ';
+
+        grid[1][0] = grid[1][2] = grid[1][4] =
+        grid[3][0] = grid[3][2] = grid[3][4] = CH_VLINE;
+        grid[0][1] = grid[0][3] =
+        grid[2][1] = grid[2][3] =
+        grid[4][1] = grid[4][3] = CH_HLINE;
+}
+#endif
 
 #define LINE_COLORTEST  3
 #define LINE_PEEKTEST   11
@@ -152,6 +194,11 @@ void main(void)
 
         joy_install(joy_static_stddrv);
 #endif
+
+#if defined(DYN_BOX_DRAW)
+        init_grid();
+#endif
+
         clrscr();
         screensize(&xsize, &ysize);
         cputs("cc65 conio test\n\r");

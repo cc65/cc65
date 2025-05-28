@@ -19,25 +19,21 @@ _waitvsync:
 
         .ifndef  __APPLE2ENH__
         bit     machinetype     ; IIe/enh?
-        bmi     :+
-
-        lda     #$FF            ; ][+ Unsupported
-        tax
-        rts
+        bpl     out             ; No, silently fail
         .endif
 
 :       bit     RDVBLBAR
         bpl     :-              ; Blanking
 :       bit     RDVBLBAR
         bmi     :-              ; Drawing
-        bpl     out
+        rts
 
         ; Apple IIgs TechNote #40, VBL Signal
 iigs:   bit     RDVBLBAR
         bmi     iigs            ; Blanking
 :       bit     RDVBLBAR
         bpl     :-              ; Drawing
-        bmi     out
+        rts
 
         ; Apple IIc TechNote #9, Detecting VBL
 iic:    php
@@ -53,6 +49,4 @@ iic:    php
         bit     DISVBL
 :       sta     IOUDISON        ; IIc Tech Ref Man: The firmware normally leaves IOUDIS on.
         plp
-out:    lda     #$00
-        tax
-        rts
+out:    rts

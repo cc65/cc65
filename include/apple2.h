@@ -343,6 +343,9 @@ signed char __fastcall__ videomode (unsigned mode);
 ** installed. Call with one of the VIDEOMODE_xx constants.
 */
 
+void waitvsync (void);
+/* Wait for start of next frame */
+
 
 
 /* End of apple2.h */

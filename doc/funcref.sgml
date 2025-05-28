@@ -8526,11 +8526,10 @@ if the mode is not supported due to lack of hardware.
 <ref id="pce.h" name="pce.h">/
 <tag/Declaration/
 <tt>void waitvsync (void);</tt><newline>
-<tt>signed char waitvsync (void); /* For Apple II */</tt><newline>
 <tag/Description/Wait for vertical sync, to reduce flickering.
 <tag/Notes/<itemize>
-<item>The function will return -1 when the feature is not supported,
-like on the Apple&nbsp;&rsqb;&lsqb;+.
+<item>The function will silently fail when the feature is not
+supported, like on the Apple&nbsp;&rsqb;&lsqb;+.
 </itemize>
 <tag/Availability/Platforms served by the headers above
 (Atmos requires the VSync hack)

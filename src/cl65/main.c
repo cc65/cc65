@@ -552,7 +552,12 @@ static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCou
         ** to the file list of the linker. The name of the output
         ** file is that of the input file with ".s" replaced by ".o".
         */
-        ObjName = MakeFilename (TmpFile ? TmpFile : File, ".o");
+        if (TmpFile) {
+            ObjName = MakeFilename (TmpFile, ".o");
+        }
+        else {
+            ObjName = MakeTmpFilename (".o");
+        }
         CmdSetOutput (&CA65, ObjName);
         CmdAddFile (&LD65, ObjName);
         /* This is just a temporary file, schedule it for removal */

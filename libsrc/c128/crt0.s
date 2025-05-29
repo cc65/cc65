@@ -9,7 +9,6 @@
         .import         push0, callmain
         .import         RESTOR, BSOUT, CLRCH
         .import         __MAIN_START__, __MAIN_SIZE__, __STACKSIZE__
-        .importzp       ST
 
         .include        "zeropage.inc"
         .include        "c128.inc"
@@ -92,7 +91,7 @@ L2:     lda     zpsave,x
 ; Place the program return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Reset the stack and the memory configuration.
 

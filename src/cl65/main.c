@@ -378,6 +378,14 @@ static void CmdSetOutput (CmdDesc* Cmd, const char* File)
 
 
 
+static void CmdSetAsmOutput (CmdDesc* Cmd, const char* File)
+/* Set the output asm file in a command desc for grc65 */
+{
+    CmdAddArg2 (Cmd, "-s", File);
+}
+
+
+
 static void CmdSetTarget (CmdDesc* Cmd, target_t Target)
 /* Set the output file in a command desc */
 {
@@ -703,6 +711,9 @@ static void Compile (const char* File)
 static void CompileRes (const char* File)
 /* Compile the given geos resource file */
 {
+    /* tmp Asm file name, if needed */
+    char* AsmName = NULL;
+
     /* Remember the current assembler argument count */
     unsigned ArgCount = GRC.ArgCount;
 
@@ -710,6 +721,14 @@ static void CompileRes (const char* File)
     ** is checked within grc65.
     */
     CmdSetTarget (&GRC, Target);
+
+    /* Changes to output file name must come
+    ** BEFORE adding the file
+    */
+    if (DoAssemble && DoLink) {
+        AsmName = MakeTmpFilename(".s");
+        CmdSetAsmOutput(&GRC, AsmName);
+    }
 
     /* Add the file as argument for the resource compiler */
     CmdAddArg (&GRC, File);
@@ -728,7 +747,10 @@ static void CompileRes (const char* File)
     */
     if (DoAssemble) {
         /* Assemble the intermediate file and remove it */
-        AssembleIntermediate (File, NULL);
+        AssembleIntermediate (File, AsmName);
+        if (AsmName) {
+            xfree(AsmName);
+        }
     }
 }
 

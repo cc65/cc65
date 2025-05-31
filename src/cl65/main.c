@@ -554,8 +554,7 @@ static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCou
         */
         if (TmpFile) {
             ObjName = MakeFilename (TmpFile, ".o");
-        }
-        else {
+        } else {
             ObjName = MakeTmpFilename (".o");
         }
         CmdSetOutput (&CA65, ObjName);
@@ -567,8 +566,7 @@ static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCou
         /* This is the final step. If an output name is given, set it */
         if (OutputName) {
             CmdSetOutput (&CA65, OutputName);
-        }
-        else {
+        } else {
             ObjName = MakeFilename (File, ".o");
             CmdSetOutput (&CA65, ObjName);
             xfree (ObjName);

@@ -39,7 +39,7 @@ IdTableLen      = * - IdValTable
 
 detect80cols:
         .ifndef __APPLE2ENH__
-        lda     machinetype     ; Check we're on a //e at least, otherwise we
+        bit     machinetype     ; Check we're on a //e at least, otherwise we
         bpl     NoDev           ; handle no 80cols hardware (like Videx)
         .endif
 

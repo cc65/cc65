@@ -4,8 +4,11 @@
 ; unsigned char __fastcall__ allow_lowercase (unsigned char onoff);
 ;
 
+.ifndef __APPLE2ENH__
+
         .export         _allow_lowercase
-        .import         uppercasemask, return0, return1
+        .import         return0
+        .import         uppercasemask, return1
 
 _allow_lowercase:
         tax
@@ -21,3 +24,5 @@ _allow_lowercase:
 
 values: .byte   $DF         ; Force uppercase
         .byte   $FF         ; Keep lowercase
+
+.endif

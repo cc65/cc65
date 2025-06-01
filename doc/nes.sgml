@@ -67,8 +67,8 @@ Programs containing NES specific code may use the <tt/nes.h/ header file.
 <sect1>NES specific functions<p>
 
 <itemize>
-<item>waitvsync - wait until the start of the next frame</item>
 <item>get_tv</item>
+<item>waitvsync - wait until the start of the next frame</item>
 </itemize>
 
 

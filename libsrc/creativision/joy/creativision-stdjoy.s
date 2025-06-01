@@ -1,11 +1,11 @@
 ;
 ; Standard joystick driver for the Creativision.
 ;
-; Christian Groessler, 2017-03-08
+; 2017-03-08, Christian Groessler
+; 2021-06-01, Greg King
 ;
 
                 .include        "zeropage.inc"
-
                 .include        "joy-kernel.inc"
                 .include        "joy-error.inc"
                 .include        "creativision.inc"
@@ -13,10 +13,12 @@
                 .macpack        module
 
 
+buttons         :=      tmp2
+
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-               module_header   _creativisionstd_joy
+                module_header   _creativisionstd_joy
 
 ; Driver signature
 
@@ -39,15 +41,13 @@
 
 JOY_COUNT       =       2                       ; Number of joysticks we support
 
-; Symbolic names for joystick masks (similar names like the defines in joystick.h, but not related to them)
+; Symbolic names for joystick masks (similar names to the macros in joystick.h,
+; with the same values as the masks in creativision.h)
 
 JOY_UP          =       $10
 JOY_DOWN        =       $04
 JOY_LEFT        =       $20
 JOY_RIGHT       =       $08
-
-; ------------------------------------------------------------------------
-; Code
 
                 .code
 
@@ -59,7 +59,8 @@ JOY_RIGHT       =       $08
 ;
 
 INSTALL:        lda     #JOY_ERR_OK
-                ldx     #0
+                .assert JOY_ERR_OK = 0, error
+                tax
 ;               rts                             ; Fall through
 
 ; ------------------------------------------------------------------------
@@ -82,14 +83,14 @@ COUNT:          lda     #<JOY_COUNT
 ; READ: Read a particular joystick passed in A.
 ;
 
-READJOY:        and     #1                      ; fix joystick number
-                bne     READJOY_1               ; read right joystick
+READJOY:        lsr     a                       ; Get joystick number
+                bcs     READJOY_1               ; Read right joystick
 
 ; Read left joystick
 
                 ldx     ZP_JOY0_DIR
                 lda     ZP_JOY0_BUTTONS
-                jmp     convert                 ; convert joystick state to cc65 values
+                bcc     convert                 ; Convert joystick state to cc65 values
 
 ; Read right joystick
 
@@ -97,11 +98,11 @@ READJOY_1:      ldx     ZP_JOY1_DIR
                 lda     ZP_JOY1_BUTTONS
                 lsr     a
                 lsr     a
-                ;jmp    convert                 ; convert joystick state to cc65 values
-                                                ; fall thru...
+                ;jmp    convert                 ; Convert joystick state to cc65 values
+                                                ; Fall thru...
 
 ; ------------------------------------------------------------------------
-; convert: make runtime lib compatible values
+; convert: make runtime lib-compatible values
 ;       inputs:
 ;               A - buttons
 ;               X - direction
@@ -111,24 +112,24 @@ convert:
 
 ; ------
 ; buttons:
-; Port values are for the left hand joystick (right hand joystick
+; Port values are for the left-hand joystick (right-hand joystick
 ; values were shifted to the right to be identical).
 ; Why are there two bits indicating a pressed trigger?
 ; According to the "Second book of programs for the Dick Smith Wizard"
-; (pg. 88ff), the left hand button gives the value of
-; %00010001 and the right hand button gives %00100010
+; (pg. 88ff), the left-hand button gives the value of
+; %00010001 and the right-hand button gives %00100010
 ; Why two bits? Can there be cases that just one of those bits is set?
-; Until these questions have been answered, we only use the lower two
-; bits and ignore the upper ones...
+; Until those questions have been answered, we only use the lower two
+; bits, and ignore the upper ones.
 
-                and     #%00000011              ; button status came in in A, strip high bits
-                sta     retval                  ; initialize 'retval' with button status
+                and     #%00000011              ; Button status came in A, strip high bits
+                sta     buttons
 
 ; ------
 ; direction:
-; CV has a 16-direction joystick
+; CV has a 16-direction joystick.
 ;
-; port values: (compass points)
+; Port values: (compass points)
 ; N      -  $49 - %01001001
 ; NNE    -  $48 - %01001000
 ; NE     -  $47 - %01000111
@@ -147,55 +148,51 @@ convert:
 ; NNW    -  $4A - %01001010
 ; center -  $00 - %00000000
 ;
-; mapping to cc65 definitions (4-direction joystick with 8 possible directions thru combinations)
+; Mapping to cc65 definitions (4-direction joystick with 8 possible directions thru combinations):
 ; N, E, S, W            ->      JOY_UP, JOY_RIGHT, JOY_DOWN, JOY_LEFT
 ; NE, SE, SW, NW        ->      (JOY_UP | JOY_RIGHT), (JOY_DOWN | JOY_RIGHT), (JOY_DOWN | JOY_LEFT), (JOY_UP | JOY_LEFT)
 ; NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW:
-;  toggle between straight and diagonal direction for every call, e.g.
+;  toggle between the straight and diagonal directions for each call, e.g.,
 ;  NNE:
 ;    call to READJOY:   return JOY_UP | JOY_RIGHT
 ;    call to READJOY:   return JOY_UP
 ;    call to READJOY:   return JOY_UP | JOY_RIGHT
 ;    call to READJOY:   return JOY_UP
 ;    call to READJOY:   return JOY_UP | JOY_RIGHT
-;    etc...
+;    etc.
 
-                txa                             ; move direction status into A
-                beq     done                    ; center position (no bits are set), nothing to do
+                txa                             ; Move direction status into A
+                beq     done                    ; Center position (no bits are set), nothing to do
 
-                and     #$0F                    ; get rid of the "$40" bit
-                bit     bit0                    ; is it a "three letter" direction (NNE, ENE, etc.)?
-                beq     special                 ; yes (bit #0 is zero)
+                and     #$0F                    ; Get rid of the "$40" bit
+                lsr     a                       ; Is it "three-letter" direction (NNE, ENE, etc.)?
+                tax                             ; Create index into table
+                bcc     special                 ; Yes (bit #0 was zero)
 
-                lsr     a                       ; create index into table
-                tax
                 lda     dirtable,x
-done:           ora     retval                  ; include "button" bits
-                ldx     #0
+done:           ora     buttons                 ; Include button bits
+                ldx     #>$0000
                 rts
 
 ; NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW
 
-special:        lsr     a
-                tax
-
-                lda     toggler                 ; toggle the toggler
+special:        lda     toggle                  ; Toggle the flag
                 eor     #$01
-                sta     toggler
-                bne     spec_1                  ; toggler is 1, use spectable_1 entry
+                sta     toggle
+                bne     spec_1                  ; Flag is 1, use spectable_1 entry
 
-                lda     spectable_0,x           ; toggler is 0, use spectable_0 entry
-                bne     done                    ; jump always
+                lda     spectable_0,x
+                bne     done                    ; Jump always
 
 spec_1:         lda     spectable_1,x
-                bne     done                    ; jump always
+                bne     done                    ; Jump always
 
 ; ------------------------------------------------------------------------
 ;
                 .rodata
 
-                ; a mapping table of "port values" to "cc65 values"
-                ; port value had been shifted one bit to the right (range 0..7)
+                ; A mapping table of "port values" to "cc65 values"
+                ; Port value had been shifted one bit to the right (range 0..7)
 dirtable:       .byte   JOY_DOWN                ; S
                 .byte   JOY_DOWN | JOY_RIGHT    ; SE
                 .byte   JOY_RIGHT               ; E
@@ -205,12 +202,12 @@ dirtable:       .byte   JOY_DOWN                ; S
                 .byte   JOY_LEFT                ; W
                 .byte   JOY_DOWN | JOY_LEFT     ; SW
 
-                ; two "special" mapping tables for three-letter directions (NNE, etc.)
+                ; Two "special" mapping tables for three-letter directions (NNE, etc.)
 spectable_0:    .byte   JOY_DOWN                ; SSW
                 .byte   JOY_DOWN                ; SSE
                 .byte   JOY_RIGHT               ; ESE
                 .byte   JOY_RIGHT               ; ENE
-                .byte   JOY_RIGHT               ; NNE
+                .byte   JOY_UP                  ; NNE
                 .byte   JOY_UP                  ; NNW
                 .byte   JOY_LEFT                ; WNW
                 .byte   JOY_LEFT                ; WSW
@@ -226,12 +223,8 @@ spectable_1:    .byte   JOY_DOWN | JOY_LEFT     ; SSW
 
 ; ------------------------------------------------------------------------
 ;
-bit0:           .byte   $01
-
-; ------------------------------------------------------------------------
-;
                 .bss
-toggler:        .res    1
-retval:         .res    1
+
+toggle:         .res    1
 
                 .end

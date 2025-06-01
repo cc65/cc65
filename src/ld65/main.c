@@ -136,6 +136,7 @@ static void Usage (void)
             "  --end-group\t\t\tEnd a library group\n"
             "  --force-import sym\t\tForce an import of symbol 'sym'\n"
             "  --help\t\t\tHelp (this text)\n"
+            "  --large-alignment\t\tDon't warn about large alignments\n"
             "  --lib file\t\t\tLink this library\n"
             "  --lib-path path\t\tSpecify a library search path\n"
             "  --mapfile name\t\tCreate a map file\n"
@@ -188,7 +189,7 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
     /* If we don't know the file type, determine it from the extension */
     if (Type == FILETYPE_UNKNOWN) {
-        Type = GetFileType (Name);
+        Type = GetTypeOfFile (Name);
     }
 
     /* For known file types, search the file in the directory list */
@@ -406,6 +407,14 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
+static void OptLargeAlignment (const char* Opt attribute ((unused)),
+                               const char* Arg attribute ((unused)))
+/* Don't warn about large alignments */
+{
+    LargeAlignment = 1;
+}
+
+
 static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
 /* Link a library */
 {
@@ -550,6 +559,15 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
+                                 const char* Arg attribute ((unused)))
+/* Generate an error if any warnings occur */
+{
+    WarningsAsErrors = 1;
+}
+
+
+
 static void OptMultDef (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Set flag to allow multiple definitions of a global symbol */
@@ -617,6 +635,7 @@ static void ParseCommandLine(void)
         { "--end-group",                 0,      CmdlOptEndGroup         },
         { "--force-import",              1,      OptForceImport          },
         { "--help",                      0,      OptHelp                 },
+        { "--large-alignment",           0,      OptLargeAlignment       },
         { "--lib",                       1,      OptLib                  },
         { "--lib-path",                  1,      OptLibPath              },
         { "--mapfile",                   1,      OptMapFile              },
@@ -627,6 +646,7 @@ static void ParseCommandLine(void)
         { "--start-group",               0,      CmdlOptStartGroup       },
         { "--target",                    1,      CmdlOptTarget           },
         { "--version",                   0,      OptVersion              },
+        { "--warnings-as-errors",        0,      OptWarningsAsErrors     },
     };
 
     unsigned I;
@@ -833,6 +853,10 @@ int main (int argc, char* argv [])
         }
         Error ("Cannot generate most of the files due to memory area overflow%c",
                (MemoryAreaOverflows > 1) ? 's' : ' ');
+    }
+
+    if (WarningCount > 0 && WarningsAsErrors) {
+        Error("Warnings as errors");
     }
 
     /* Create the output file */

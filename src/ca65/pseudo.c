@@ -566,8 +566,8 @@ static void DoBss (void)
 
 
 
-static void DoByte (void)
-/* Define bytes */
+static void DoByteBase (int EnableTranslation)
+/* Define bytes or literals */
 {
     /* Element type for the generated array */
     static const char EType[1] = { GT_BYTE };
@@ -579,8 +579,12 @@ static void DoByte (void)
     /* Parse arguments */
     while (1) {
         if (CurTok.Tok == TOK_STRCON) {
-            /* A string, translate into target charset and emit */
-            TgtTranslateStrBuf (&CurTok.SVal);
+            /* A string, translate into target charset
+               if appropriate */
+            if (EnableTranslation) {
+                TgtTranslateStrBuf (&CurTok.SVal);
+            }
+            /* Emit */
             EmitStrBuf (&CurTok.SVal);
             NextTok ();
         } else {
@@ -609,6 +613,14 @@ static void DoByte (void)
 
     /* Free the type string */
     SB_Done (&Type);
+}
+
+
+
+static void DoByte (void)
+/* Define bytes with translation */
+{
+    DoByteBase (1);
 }
 
 
@@ -821,8 +833,17 @@ static void DoDebugInfo (void)
 
 
 static void DoDefine (void)
-/* Define a one line macro */
+/* Define a one-line macro */
 {
+    /* The function is called with the .DEFINE token in place, because we need
+    ** to disable .define macro expansions before reading the next token.
+    ** Otherwise, the name of the macro might be expanded; therefore,
+    ** we never would see it.
+    */
+    DisableDefineStyleMacros ();
+    NextTok ();
+    EnableDefineStyleMacros ();
+
     MacDef (MAC_STYLE_DEFINE);
 }
 
@@ -1002,7 +1023,10 @@ static void DoFatal (void)
 static void DoFeature (void)
 /* Switch the Feature option */
 {
-    /* Allow a list of comma separated keywords */
+    feature_t Feature;
+    unsigned char On;
+
+    /* Allow a list of comma separated feature keywords with optional +/- or ON/OFF */
     while (1) {
 
         /* We expect an identifier */
@@ -1013,18 +1037,29 @@ static void DoFeature (void)
 
         /* Make the string attribute lower case */
         LocaseSVal ();
-
-        /* Set the feature and check for errors */
-        if (SetFeature (&CurTok.SVal) == FEAT_UNKNOWN) {
+        Feature = FindFeature(&CurTok.SVal);
+        if (Feature == FEAT_UNKNOWN) {
             /* Not found */
             ErrorSkip ("Invalid feature: '%m%p'", &CurTok.SVal);
             return;
-        } else {
-            /* Skip the keyword */
-            NextTok ();
         }
 
-        /* Allow more than one keyword */
+        if (Feature == FEAT_ADDRSIZE) {
+            Warning (1, "Deprecated feature: '.feature addrsize'. Pseudo function .addrsize is always available.");
+        }
+
+        NextTok ();
+
+        /* Optional +/- or ON/OFF */
+        On = 1;
+        if (CurTok.Tok != TOK_COMMA && !TokIsSep (CurTok.Tok)) {
+            SetBoolOption(&On);
+        }
+
+        /* Apply feature setting. */
+        SetFeature (Feature, On);
+
+        /* Allow more than one feature separated by commas. */
         if (CurTok.Tok == TOK_COMMA) {
             NextTok ();
         } else {
@@ -1406,6 +1441,14 @@ static void DoList (void)
 
 
 
+static void DoLiteral (void)
+/* Define bytes without translation */
+{
+    DoByteBase (0);
+}
+
+
+
 static void DoLoBytes (void)
 /* Define bytes, extracting the lo byte from each expression in the list */
 {
@@ -1543,10 +1586,31 @@ static void DoP4510 (void)
 
 
 
+static void DoPDTV (void)
+/* Switch to C64DTV CPU */
+{
+    SetCPU (CPU_6502DTV);
+}
+
+
+
 static void DoPageLength (void)
 /* Set the page length for the listing */
 {
     PageLength = IntArg (MIN_PAGE_LEN, MAX_PAGE_LEN);
+}
+
+
+
+static void DoPopCharmap (void)
+/* Restore a charmap */
+{
+    if (TgtTranslateStackIsEmpty ()) {
+        ErrorSkip ("Charmap stack is empty");
+        return;
+    }
+
+    TgtTranslatePop ();
 }
 
 
@@ -1640,6 +1704,16 @@ static void DoPSC02 (void)
 
 
 
+static void DoPushCharmap (void)
+/* Save the current charmap */
+{
+    if (!TgtTranslatePush ()) {
+        ErrorSkip ("Charmap stack overflow");
+    }
+}
+
+
+
 static void DoPushCPU (void)
 /* Push the current CPU setting onto the CPU stack */
 {
@@ -1666,6 +1740,17 @@ static void DoPushSeg (void)
 
     /* Get the current segment and push it */
     CollAppend (&SegStack, DupSegDef (GetCurrentSegDef ()));
+}
+
+
+
+static void DoReferTo (void)
+/* Mark given symbol as referenced */
+{
+    SymEntry* Sym = ParseAnySymName (SYM_ALLOC_NEW);
+    if (Sym) {
+        SymRef (Sym);
+    }
 }
 
 
@@ -1871,12 +1956,12 @@ static void DoTag (void)
 
 
 static void DoUnDef (void)
-/* Undefine a define style macro */
+/* Undefine a define-style macro */
 {
     /* The function is called with the .UNDEF token in place, because we need
     ** to disable .define macro expansions before reading the next token.
-    ** Otherwise the name of the macro would be expanded, so we would never
-    ** see it.
+    ** Otherwise, the name of the macro would be expanded; therefore,
+    ** we never would see it.
     */
     DisableDefineStyleMacros ();
     NextTok ();
@@ -1962,7 +2047,7 @@ static void DoZeropage (void)
 /* Control commands flags */
 enum {
     ccNone      = 0x0000,               /* No special flags */
-    ccKeepToken = 0x0001                /* Do not skip the current token */
+    ccKeepToken = 0x0001                /* Do not skip the control token */
 };
 
 /* Control command table */
@@ -2001,7 +2086,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoDbg,          },
     { ccNone,           DoDByt          },
     { ccNone,           DoDebugInfo     },
-    { ccNone,           DoDefine        },
+    { ccKeepToken,      DoDefine        },
     { ccNone,           DoUnexpected    },      /* .DEFINED */
     { ccNone,           DoUnexpected    },      /* .DEFINEDMACRO */
     { ccNone,           DoDelMac        },
@@ -2049,6 +2134,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },
@@ -2062,6 +2148,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoLineCont      },
     { ccNone,           DoList          },
     { ccNone,           DoListBytes     },
+    { ccNone,           DoLiteral       },
     { ccNone,           DoUnexpected    },      /* .LOBYTE */
     { ccNone,           DoLoBytes       },
     { ccNone,           DoUnexpected    },      /* .LOCAL */
@@ -2082,13 +2169,17 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoPageLength    },
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
     { ccNone,           DoPC02          },
+    { ccNone,           DoPDTV          },
+    { ccNone,           DoPopCharmap    },
     { ccNone,           DoPopCPU        },
     { ccNone,           DoPopSeg        },
     { ccNone,           DoProc          },
     { ccNone,           DoPSC02         },
+    { ccNone,           DoPushCharmap   },
     { ccNone,           DoPushCPU       },
     { ccNone,           DoPushSeg       },
     { ccNone,           DoUnexpected    },      /* .REFERENCED */
+    { ccNone,           DoReferTo       },      /* .REFERTO */
     { ccNone,           DoReloc         },
     { ccNone,           DoRepeat        },
     { ccNone,           DoRes           },
@@ -2163,5 +2254,8 @@ void CheckPseudo (void)
     }
     if (!IS_IsEmpty (&CPUStack)) {
         Warning (1, "CPU stack is not empty");
+    }
+    if (!TgtTranslateStackIsEmpty ()) {
+        Warning (1, "Charmap stack is not empty");
     }
 }

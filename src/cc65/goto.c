@@ -43,6 +43,7 @@
 #include "expr.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "standard.h"
 #include "symtab.h"
 #include "goto.h"
@@ -80,6 +81,8 @@ void GotoStatement (void)
         CodeEntry *E;
         unsigned char val;
 
+        ED_Init (&desc);
+
         NextToken ();
 
         /* arr[foo], we only support simple foo for now */
@@ -89,7 +92,7 @@ void GotoStatement (void)
 
             /* Find array size */
             if (!IsTypeArray (arr->Type) || SizeOf (arr->Type) == 0 ||
-                !(arr->Flags & SC_STATIC) ||
+                (arr->Flags & SC_STORAGEMASK) != SC_STATIC ||
                 SizeOf (GetElementType(arr->Type)) != 2) {
                 Error ("Expected a static array");
             } else if (GetElementCount (arr->Type) > 127) {
@@ -102,6 +105,9 @@ void GotoStatement (void)
             if (CurTok.Tok == TOK_ICONST) {
                 val = (unsigned char)CurTok.IVal;
                 NextToken ();
+
+                /* Append deferred inc/dec at sequence point */
+                DoDeferred (SQP_KEEP_NONE, &desc);
 
                 if (CPUIsets[CPU] & CPU_ISET_65SC02) {
                     AddCodeLine ("ldx #$%02X", val * 2);
@@ -116,6 +122,10 @@ void GotoStatement (void)
                        (idx = FindSym (CurTok.Ident))) {
                 hie10 (&desc);
                 LoadExpr (CF_NONE, &desc);
+
+                /* Append deferred inc/dec at sequence point */
+                DoDeferred (SQP_KEEP_EAX, &desc);
+
                 AddCodeLine ("asl a");
 
                 if (CPUIsets[CPU] & CPU_ISET_65SC02) {

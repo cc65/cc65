@@ -159,7 +159,7 @@ tgi_clip_sign:  .res    1
 
 
 ;----------------------------------------------------------------------------
-; Multiplicate value in y/a by dy, then divide by dx.
+; Multiply value in y/a by dy, then divide by dx.
 ;
 
 .code
@@ -176,7 +176,7 @@ tgi_clip_sign:  .res    1
 
         lda     tgi_clip_dy
         ldx     tgi_clip_dy+1           ; rhs
-        jsr     umul16x16r32            ; Multiplicate
+        jsr     umul16x16r32            ; Multiply
 
 ; Move the result of the multiplication into ptr1:ptr2
 
@@ -188,7 +188,7 @@ tgi_clip_sign:  .res    1
         ldx     tgi_clip_dx+1
         jsr     udiv32by16r16
 
-; Check the sign of the final result and negate it if nessary
+; Check the sign of the final result and negate it if necessary
 
 done:   bit     tmp1
         jmi     negax
@@ -199,7 +199,7 @@ done:   bit     tmp1
 
 
 ;----------------------------------------------------------------------------
-; Multiplicate value in y/a by dx, then divide by dy.
+; Multiply value in y/a by dx, then divide by dy.
 ;
 
 .code
@@ -216,7 +216,7 @@ done:   bit     tmp1
 
         lda     tgi_clip_dx
         ldx     tgi_clip_dx+1           ; rhs
-        jsr     umul16x16r32            ; Multiplicate
+        jsr     umul16x16r32            ; Multiply
 
 ; Move the result of the multiplication into ptr1:ptr2
 
@@ -228,7 +228,7 @@ done:   bit     tmp1
         ldx     tgi_clip_dy+1
         jsr     udiv32by16r16
 
-; Check the sign of the final result and negate it if nessary
+; Check the sign of the final result and negate it if necessary
 
         jmp     muldiv_dydx::done
 
@@ -279,7 +279,7 @@ L1:     lda     tgi_clip_o1
 
 ; We must clip. If we haven't already done so, calculate dx/dy.
 
-L2:     lda     tgi_clip_d              ; Deltas alreay calculated?
+L2:     lda     tgi_clip_d              ; Deltas already calculated?
         bne     HaveDeltas              ; Jump if yes
         inc     tgi_clip_d
         jsr     calcdeltas

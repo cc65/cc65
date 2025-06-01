@@ -120,11 +120,12 @@ Long options:
   --list-bytes n                Maximum number of bytes per listing line
   --memory-model model          Set the memory model
   --pagelength n                Set the page length for the listing
-  --relax-checks                Relax some checks (see docs)
+  --relax-checks                Disables some error checks
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity
   --version                     Print the assembler version
+  --warnings-as-errors          Treat warnings as errors
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -151,7 +152,7 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
-        6502, 6502X, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510
+        6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510
 
 
   <label id="option-create-dep">
@@ -183,7 +184,7 @@ Here is a description of all the command line options:
 
   Enable an emulation feature. This is identical as using <tt/.FEATURE/
   in the source with two exceptions: Feature names must be lower case, and
-  each feature must be specified by using an extra <tt/--feature/ option,
+  each feature must be specified by using a separate <tt/--feature/ option,
   comma separated lists are not allowed.
 
   See the discussion of the <tt><ref id=".FEATURE" name=".FEATURE"></tt>
@@ -226,7 +227,7 @@ Here is a description of all the command line options:
   <tag><tt>--large-alignment</tt></tag>
 
   Disable warnings about a large combined alignment. See the discussion of the
-  <tt><ref id=".ALIGN" name=".ALIGN"></tt> directive for futher information.
+  <tt><ref id=".ALIGN" name=".ALIGN"></tt> directive for further information.
 
 
   <label id="option--list-bytes">
@@ -264,14 +265,17 @@ Here is a description of all the command line options:
   <label id="option--relax-checks">
   <tag><tt>--relax-checks</tt></tag>
 
-  Relax some checks done by the assembler. This will allow code that is an
+  Disables some error checks done by the assembler. This will allow code that is an
   error in most cases and flagged as such by the assembler, but can be valid
   in special situations.
 
-  Examples are:
+  Disabled checks are:
 <itemize>
-<item>Short branches between two different segments.
-<item>Byte sized address loads where the address is not a zeropage address.
+<item>Address vs. fragment size: a byte sized load from an non-zeropage
+  address is truncated instead of producing an error.
+<item>Indirect jump on page boundary: <tt>jmp (label)</tt> on a label that
+  resides on a page boundary (<tt>$xxFF</tt>) fetches the second byte from the
+  wrong address on 6502 CPUs, now allowed instead of producing an error.
 </itemize>
 
 
@@ -301,7 +305,7 @@ Here is a description of all the command line options:
   compiler, see there for a list.
 
   Depending on the target, the default CPU type is also set. This can be
-  overriden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
+  overridden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
 
 
   <label id="option-v">
@@ -358,6 +362,13 @@ Here is a description of all the command line options:
   even warn about such things like unused imported symbols. The default
   warning level is 1, and it would probably be silly to set it to
   something lower.
+
+
+  <label id="option--warnings-as-errors">
+  <tag><tt>--warnings-as-errors</tt></tag>
+
+  An error will be generated if any warnings were produced.
+
 
 </descrip>
 <p>
@@ -419,6 +430,8 @@ The assembler accepts
       <tt><ref id=".P02" name=".P02"></tt> command was given).
 <item>all valid 6502 mnemonics plus a set of illegal instructions when in
       <ref id="6502X-mode" name="6502X mode">.
+<item>all valid 6502DTV mnemonics when in 6502DTV mode (after the
+      <tt><ref id=".PDTV" name=".PDTV"></tt> command was given).
 <item>all valid 65SC02 mnemonics when in 65SC02 mode (after the
       <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
 <item>all valid 65C02 mnemonics when in 65C02 mode (after the
@@ -428,6 +441,15 @@ The assembler accepts
 <item>all valid 4510 mnemonics when in 4510 mode (after the
       <tt><ref id=".P4510" name=".P4510"></tt> command was given).
 </itemize>
+
+On 6502-derived platforms the <tt/BRK/ instruction has an optional signature
+byte. If omitted, the assembler will only produce only 1 byte.
+
+<tscreen><verb>
+                brk                     ; 1-byte:  $00
+                brk     $34             ; 2-bytes: $00 $34
+                brk     #$34            ; 2-bytes: $00 $34
+</verb></tscreen>
 
 
 <sect1>65816 mode<p>
@@ -445,6 +467,17 @@ mnemonics:
 <item><tt>TDA</tt> is an alias for <tt>TDC</tt>
 <item><tt>TSA</tt> is an alias for <tt>TSC</tt>
 </itemize>
+
+The <tt/MVN/ and <tt/MVP/ instructions accept two different argument forms.
+Either two bank bytes may be given with a <tt/#/ prefix,
+or two far addresses whose high byte will be used.
+
+<tscreen><verb>
+                mvn     #^src, #^dst       ; bank of src to bank of dst
+                mvn     src, dst           ; bank of src to bank of dst
+                mvp     #$12, #$78         ; bank $12 to $78
+                mvp     $123456, $789ABC   ; bank $12 to $78
+</verb></tscreen>
 
 
 <sect1>6502X mode<label id="6502X-mode"><p>
@@ -622,7 +655,7 @@ problem in most cases.
 <tabular ca="clc">
 <bf/Operator/| <bf/Description/| <bf/Precedence/@<hline>
 | Built-in string functions| 0@
-||~@
+~|~|~@
 | Built-in pseudo-variables| 1@
 | Built-in pseudo-functions| 1@
 +| Unary positive| 1@
@@ -635,7 +668,7 @@ problem in most cases.
 .HIBYTE| Unary high-byte operator| 1@
 ^<newline>
 .BANKBYTE| Unary bank-byte operator| 1@
-||~@
+~|~|~@
 *| Multiplication| 2@
 /| Division| 2@
 .MOD| Modulo operator| 2@
@@ -647,28 +680,28 @@ problem in most cases.
 .SHL| Shift-left operator| 2@
 &gt;&gt;<newline>
 .SHR| Shift-right operator| 2@
-||~@
+~|~|~@
 +| Binary addition| 3@
 -| Binary subtraction| 3@
 &verbar;<newline>
 .BITOR| Bitwise or| 3@
-||~@
+~|~|~@
 = | Compare operator (equal)| 4@
 &lt;&gt;| Compare operator (not equal)| 4@
 &lt;| Compare operator (less)| 4@
 &gt;| Compare operator (greater)| 4@
 &lt;=| Compare operator (less or equal)| 4@
 &gt;=| Compare operator (greater or equal)| 4@
-||~@
+~|~|~@
 &amp;&amp;<newline>
 .AND| Boolean and| 5@
 .XOR| Boolean xor| 5@
-||~@
+~|~|~@
 &verbar;&verbar;<newline>
 .OR| Boolean or| 6@
-||~@
+~|~|~@
 !<newline>
-.NOT| Boolean not| 7@<hline>
+.NOT| Boolean not| 7
 </tabular>
 <caption>Available operators, sorted by precedence
 </table>
@@ -796,47 +829,38 @@ names like "Loop". Here is an example:
                 bne    @Loop            ; ERROR: Unknown identifier!
 </verb></tscreen>
 
+
 <sect1>Unnamed labels<p>
 
-If you really want to write messy code, there are also unnamed labels. These
-labels do not have a name (you guessed that already, didn't you?). A colon is
-used to mark the absence of the name.
+If you really want to write messy code, there are also unnamed labels. To define
+an unnamed label, use sole <tt>:</tt>.
 
-Unnamed labels may be accessed by using the colon plus several minus or plus
-characters as a label designator. Using the '-' characters will create a back
-reference (use the n'th label backwards), using '+' will create a forward
-reference (use the n'th label in forward direction). An example will help to
-understand this:
+To reference an unnamed label, use <tt>:</tt> with several <tt>-</tt> or <tt>+</tt> characters.
+The <tt>-</tt> characters will create a back reference (n'th label backwards),
+the <tt>+</tt> will create a forward reference (n'th label in forward direction).
+As an alternative, angle brackets <tt>&lt;</tt> and <tt>&gt;</tt> may be used
+instead of <tt>-</tt> and <tt>+</tt> with the same meaning.
+
+Example:
 
 <tscreen><verb>
-        :       lda     (ptr1),y        ; #1
-                cmp     (ptr2),y
-                bne     :+              ; -> #2
-                tax
-                beq     :+++            ; -> #4
-                iny
-                bne     :-              ; -> #1
-                inc     ptr1+1
-                inc     ptr2+1
-                bne     :-              ; -> #1
-
-        :       bcs     :+              ; #2 -> #3
-                ldx     #$FF
-                rts
-
-        :       ldx     #$01            ; #3
-        :       rts                     ; #4
+        cpy #0
+        beq :++
+    :
+        sta $2007
+        dey
+        bne :-
+    :
+        rts
 </verb></tscreen>
 
-As you can see from the example, unnamed labels will make even short
-sections of code hard to understand, because you have to count labels
-to find branch targets (this is the reason why I for my part do
-prefer the "cheap" local labels). Nevertheless, unnamed labels are
-convenient in some situations, so it's your decision.
+Unnamed labels may make even short sections of code hard to understand, because
+you have to count labels to find branch targets. It's better to prefer the
+"cheap" local labels. Nevertheless, unnamed labels are convenient in some
+situations, so it's up to your discretion.
 
 <em/Note:/ <ref id="scopes" name="Scopes"> organize named symbols, not
 unnamed ones, so scopes don't have an effect on unnamed labels.
-
 
 
 <sect1>Using macros to define labels and constants<p>
@@ -1033,7 +1057,7 @@ The namespace token (<tt/::/) is used to access other scopes:
         .endscope
 
                 ...
-                lda     foo::bar        ; Access foo in scope bar
+                lda     #foo::bar        ; Access bar in scope foo
 </verb></tscreen>
 
 The only way to deny access to a scope from the outside is to declare a scope
@@ -1337,29 +1361,34 @@ writable.
   Reading this pseudo variable will give the assembler version according to
   the following formula:
 
-        VER_MAJOR*$100 + VER_MINOR*$10
+        <tt>(VER_MAJOR * 0x100) + VER_MINOR</tt>
 
-  It may be used to encode the assembler version or check the assembler for
-  special features not available with older versions.
+  The upper 8 bits are the major-, the lower 8 bits are the  minor version.
 
   Example:
 
-  Version 2.14 of the assembler will return $2E0 as numerical constant when
-  reading the pseudo variable <tt/.VERSION/.
+  For example, version 47.11 of the assembler would have this macro defined as
+  <tt/0x2f0b/.
 
-
+  Note: until 2.19 this pseudo variable was defined as <tt>(VER_MAJOR * 0x100) + VER_MINOR * 0x10</tt> -
+  which resulted in broken values starting at version 2.16 of the assembler. For
+  this reason the value of this pseudo variable is considered purely informal - you should
+  not use it to check for a specific assembler version and use different code
+  according to the detected version - please update your code to work with the
+  recent version of the assembler instead (There is very little reason to not use
+  the most recent version - and even less to support older versions in your code).
 
 <sect>Pseudo functions<label id="pseudo-functions"><p>
 
-Pseudo functions expect their arguments in parenthesis, and they have a result,
-either a string or an expression.
+Pseudo functions expect their arguments in parentheses, and they have a result,
+either a string or an expression value.
 
 
 <sect1><tt>.ADDRSIZE</tt><label id=".ADDRSIZE"><p>
 
-  The <tt/.ADDRSIZE/ function is used to return the interal address size
+  The <tt/.ADDRSIZE/ function is used to return the internal address size
   associated with a symbol. This can be helpful in macros when knowing the address
-  size of symbol can help with custom instructions.
+  size of a symbol can help with custom instructions.
 
   Example:
 
@@ -1379,15 +1408,11 @@ either a string or an expression.
         .endmacro
   </verb></tscreen>
 
-  This command is new and must be enabled with the <tt/.FEATURE addrsize/ command.
-
-  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
-
 
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
 
   The <tt/.BANK/ function is used to support systems with banked memory. The
-  argument is an expression with exactly one segment reference - usually a
+  argument is an expression with exactly one segment reference -- usually a
   label. The function result is the value of the <tt/bank/ attribute assigned
   to the run memory area of the segment. Please see the linker documentation
   for more information about memory areas and their attributes.
@@ -1395,13 +1420,13 @@ either a string or an expression.
   The value of <tt/.BANK/ can be used to switch memory so that a memory bank
   containing specific data is available.
 
-  The <tt/bank/ attribute is a 32 bit integer and so is the result of the
+  The <tt/bank/ attribute is a 32-bit integer, and so is the result of the
   <tt/.BANK/ function. You will have to use <tt><ref id=".LOBYTE"
   name=".LOBYTE"></tt> or similar functions to address just part of it.
 
-  Please note that <tt/.BANK/ will always get evaluated in the link stage, so
-  an expression containing <tt/.BANK/ can never be used where a constant known
-  result is expected (for example with <tt/.RES/).
+  Please note that <tt/.BANK/ always will get evaluated in the link stage, so
+  an expression containing <tt/.BANK/ never can be used where a constant, known
+  result is expected (for example, with <tt/.RES/).
 
   Example:
 
@@ -1438,7 +1463,7 @@ either a string or an expression.
 
 <sect1><tt>.BLANK</tt><label id=".BLANK"><p>
 
-  Builtin function. The function evaluates its argument in braces and yields
+  Builtin function. The function evaluates its argument in parentheses and yields
   "false" if the argument is non blank (there is an argument), and "true" if
   there is no argument.  The token list that makes up the function argument
   may optionally be enclosed in curly braces. This allows the inclusion of
@@ -1477,13 +1502,48 @@ either a string or an expression.
 
 <sect1><tt>.CONST</tt><label id=".CONST"><p>
 
-  Builtin function. The function evaluates its argument in braces and
+  Builtin function. The function evaluates its argument in parentheses and
   yields "true" if the argument is a constant expression (that is, an
   expression that yields a constant value at assembly time) and "false"
   otherwise. As an example, the .IFCONST statement may be replaced by
 
   <tscreen><verb>
         .if     .const(a + 3)
+  </verb></tscreen>
+
+
+<sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is a symbol that already is defined somewhere in the source file up to the
+  current position. Otherwise, the function yields false. As an example, the
+  <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
+
+  <tscreen><verb>
+        .if     .defined(a)
+  </verb></tscreen>
+
+
+<sect1><tt>.DEFINEDMACRO</tt><label id=".DEFINEDMACRO"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  already has been defined as the name of a macro. Otherwise, the function yields
+  false. Example:
+
+  <tscreen><verb>
+        .macro add foo
+                clc
+                adc foo
+        .endmacro
+
+        .if     .definedmacro(add)
+                add #$01
+        .else
+                clc
+                adc #$01
+        .endif
   </verb></tscreen>
 
 
@@ -1520,6 +1580,23 @@ either a string or an expression.
                 makelabel       "foo", "bar"
 
                 .word           foobar          ; Valid label
+  </verb></tscreen>
+
+
+<sect1><tt>.ISMNEM, .ISMNEMONIC</tt><label id=".ISMNEMONIC"><p>
+
+  Builtin function. The function expects an identifier as argument in parentheses.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is defined as an instruction mnemonic that is recognized by the assembler.
+  Example:
+
+  <tscreen><verb>
+        .if     .not .ismnemonic(ina)
+                .macro ina
+                        clc
+                        adc #$01
+                .endmacro
+        .endif
   </verb></tscreen>
 
 
@@ -1717,7 +1794,7 @@ either a string or an expression.
 
 <sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>
 
-  Builtin function. The function expects an identifier as argument in braces.
+  Builtin function. The function expects an identifier as argument in parentheses.
   The argument is evaluated, and the function yields "true" if the identifier
   is a symbol that has already been referenced somewhere in the source file up
   to the current position. Otherwise the function yields false. As an example,
@@ -1824,24 +1901,6 @@ either a string or an expression.
   </descrip>
 
 
-<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
-
-  Builtin function. The function accepts a string and an index as
-  arguments and returns the value of the character at the given position
-  as an integer value. The index is zero based.
-
-  Example:
-
-  <tscreen><verb>
-        .macro  M       Arg
-                ; Check if the argument string starts with '#'
-                .if (.strat (Arg, 0) = '#')
-                ...
-                .endif
-        .endmacro
-  </verb></tscreen>
-
-
 <sect1><tt>.SPRINTF</tt><label id=".SPRINTF"><p>
 
   Builtin function. It expects a format string as first argument. The number
@@ -1861,9 +1920,27 @@ either a string or an expression.
   </verb></tscreen>
 
 
+<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
+
+  Builtin function. The function accepts a string and an index as
+  arguments and returns the value of the character at the given position
+  as an integer value. The index is zero based.
+
+  Example:
+
+  <tscreen><verb>
+        .macro  M       Arg
+                ; Check if the argument string starts with '#'
+                .if (.strat (Arg, 0) = '#')
+                ...
+                .endif
+        .endmacro
+  </verb></tscreen>
+
+
 <sect1><tt>.STRING</tt><label id=".STRING"><p>
 
-  Builtin function. The function accepts an argument in braces and converts
+  Builtin function. The function accepts an argument in parentheses and converts
   this argument into a string constant. The argument may be an identifier, or
   a constant numeric value.
 
@@ -1882,7 +1959,7 @@ either a string or an expression.
 
 <sect1><tt>.STRLEN</tt><label id=".STRLEN"><p>
 
-  Builtin function. The function accepts a string argument in braces and
+  Builtin function. The function accepts a string argument in parentheses and
   evaluates to the length of the string.
 
   Example:
@@ -1899,7 +1976,7 @@ either a string or an expression.
 
 <sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
 
-  Builtin function. The function accepts a token list in braces. The function
+  Builtin function. The function accepts a token list in parentheses. The function
   result is the number of tokens given as argument. The token list may
   optionally be enclosed into curly braces which are not considered part of
   the list and not counted. Enclosement in curly braces allows the inclusion
@@ -1965,7 +2042,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A16</tt><label id=".A16"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 16 bit.
+  Valid only in 65816 mode. Assume the accumulator is 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate accumulator addressing mode.
@@ -1975,7 +2052,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A8</tt><label id=".A8"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 8 bit.
+  Valid only in 65816 mode. Assume the accumulator is 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate accu addressing mode.
@@ -2058,15 +2135,15 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   the assembler will force a segment alignment to the least common multiple of
-  15, 18 and 251 - which is 22590. To protect the user against errors, the
-  assembler will issue a warning when the combined alignment exceeds 256. The
-  command line option <tt><ref id="option--large-alignment"
-  name="--large-alignment"></tt> will disable this warning.
+  15, 18 and 251 - which is 22590. To protect the user against errors, when the
+  combined alignment is larger than the explicitly requested alignments,
+  the assembler will issue a warning if it also exceeds 256. The command line
+  option <tt><ref id="option--large-alignment" name="--large-alignment"></tt>
+  will disable this warning.
 
-  Please note that with alignments that are a power of two (which were the
-  only alignments possible in older versions of the assembler), the problem is
-  less severe, because the least common multiple of powers to the same base is
-  always the larger one.
+  Please note that with only alignments that are a power of two, a warning will
+  never occur, because the least common multiple of powers to the same base is
+  always simply the larger one.
 
 
 
@@ -2082,7 +2159,11 @@ Here's a list of all control commands and a description, what they do:
 
   This will put the string "Hello world" followed by a binary zero into
   the current segment. There may be more strings separated by commas, but
-  the binary zero is only appended once (after the last one).
+  the binary zero is only appended once (after the last one). Strings will
+  be translated using the current character mapping definition.
+
+See: <tt><ref id=".BYTE" name=".BYTE"></tt>,<tt><ref id=".CHARMAP" name=".CHARMAP"></tt>,
+     <tt><ref id=".LITERAL" name=".LITERAL"></tt>
 
 
 <sect1><tt>.ASSERT</tt><label id=".ASSERT"><p>
@@ -2178,7 +2259,8 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.BYT, .BYTE</tt><label id=".BYTE"><p>
 
   Define byte sized data. Must be followed by a sequence of (byte ranged)
-  expressions or strings.
+  expressions or strings. Strings will be translated using the current
+  character mapping definition.
 
   Example:
 
@@ -2187,13 +2269,16 @@ Here's a list of all control commands and a description, what they do:
         .byt    "world", $0D, $00
   </verb></tscreen>
 
+See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CHARMAP"></tt>
+     <tt><ref id=".LITERAL" name=".LITERAL"></tt>
+
 
 <sect1><tt>.CASE</tt><label id=".CASE"><p>
 
   Switch on or off case sensitivity on identifiers. The default is off
   (that is, identifiers are case sensitive), but may be changed by the
   -i switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -2205,8 +2290,10 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.CHARMAP</tt><label id=".CHARMAP"><p>
 
-  Apply a custom mapping for characters. The command is followed by two
-  numbers. The first one is the index of the source character (range 0..255);
+  Apply a custom mapping for characters for the commands <tt><ref id=".ASCIIZ"
+  name=".ASCIIZ"></tt> and <tt><ref id=".BYTE" name=".BYTE"></tt>. The command
+  is followed by two numbers. The first one is the index of the source character
+  (range 0..255);
   the second one is the mapping (range 0..255). The mapping applies to all
   character and string constants <em/when/ they generate output; and, overrides
   a mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
@@ -2340,7 +2427,7 @@ Here's a list of all control commands and a description, what they do:
   Switch on or off debug info generation. The default is off (that is,
   the object file will not contain debug infos), but may be changed by the
   -g switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -2354,7 +2441,7 @@ Here's a list of all control commands and a description, what they do:
 
   Start a define style macro definition. The command is followed by an
   identifier (the macro name) and optionally by a list of formal arguments
-  in braces.
+  in parentheses.
 
   Please note that <tt/.DEFINE/ shares most disadvantages with its C
   counterpart, so the general advice is, <bf/NOT/ do use <tt/.DEFINE/ if you
@@ -2376,41 +2463,6 @@ Here's a list of all control commands and a description, what they do:
        <tt><ref id=".MACRO" name=".MACRO"></tt>
 
   See also section <ref id="macros" name="Macros">.
-
-
-<sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  is a symbol that is already defined somewhere in the source file up to the
-  current position. Otherwise the function yields false. As an example, the
-  <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
-
-  <tscreen><verb>
-        .if     .defined(a)
-  </verb></tscreen>
-
-
-<sect1><tt>.DEFINEDMACRO</tt><label id=".DEFINEDMACRO"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  has already been defined as the name of a macro. Otherwise the function yields
-  false. Example:
-
-  <tscreen><verb>
-        .macro add foo
-                clc
-                adc foo
-        .endmacro
-
-        .if     .definedmacro(add)
-                add #$01
-        .else
-                clc
-                adc #$01
-        .endif
-  </verb></tscreen>
 
 
 <sect1><tt>.DESTRUCTOR</tt><label id=".DESTRUCTOR"><p>
@@ -2485,7 +2537,19 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.ENDMAC, .ENDMACRO</tt><label id=".ENDMACRO"><p>
 
-  Marks the end of a macro definition.
+  Marks the end of a macro definition. Note, <tt>.ENDMACRO</tt> should be on
+  its own line to successfully end the macro definition. It is possible to use
+  <tt><ref id=".DEFINE" name=".DEFINE"></tt> to create a symbol that references
+  <tt>.ENDMACRO</tt> without ending the macro definition.
+
+  Example:
+
+  <tscreen><verb>
+        .macro  new_mac
+                .define startmac .macro
+                .define endmac .endmacro
+        .endmacro
+  </verb></tscreen>
 
   See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
        <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>,
@@ -2709,24 +2773,22 @@ Here's a list of all control commands and a description, what they do:
   This directive may be used to enable one or more compatibility features
   of the assembler. While the use of <tt/.FEATURE/ should be avoided when
   possible, it may be useful when porting sources written for other
-  assemblers. There is no way to switch a feature off, once you have
-  enabled it, so using
+  assemblers. After the feature name an optional '+' or '-' may specify whether
+  to enable or disable the feature (enable if omitted). Multiple features may be
+  enabled, separated by commas. Examples:
 
   <tscreen><verb>
-        .FEATURE        xxx
+        ; enable c_comments
+        .feature   c_comments
+        .feature   c_comments +
+        ; enable force_range, disable underline_in_numbers, enable labels_without_colons
+        .feature   force_range, underline_in_numbers -, labels_without_colons +
+        .feature   force_range +, underline_in_numbers off, labels_without_colons on
   </verb></tscreen>
-
-  will enable the feature until end of assembly is reached.
 
   The following features are available:
 
   <descrip>
-
-  <tag><tt>addrsize</tt><label id="addrsize"></tag>
-
-    Enables the .ADDRSIZE pseudo function. This function is experimental and not enabled by default.
-
-    See also: <tt><ref id=".ADDRSIZE" name=".ADDRSIZE"></tt>
 
   <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 
@@ -2795,6 +2857,43 @@ Here's a list of all control commands and a description, what they do:
     reserved keywords built into the assembler, that starts with a dot, may be
     overridden. When using this feature, you may also get into trouble if
     later versions of the assembler define new keywords starting with a dot.
+
+  <tag><tt>line_continuations</tt><label id="line_continuations"></tag>
+
+    Switch on or off line continuations using the backslash character
+    before a newline. The option is off by default.
+    Note: Line continuations do not work in a comment. A backslash at the
+    end of a comment is treated as part of the comment and does not trigger
+    line continuation.
+
+  Example:
+
+    <tscreen><verb>
+          .feature line_continuations +   ; Allow line continuations
+
+          lda     \
+                  #$20                    ; This is legal now
+    </verb></tscreen>
+
+    For backward compatibility reasons, the <tt>.LINECONT +</tt> control command
+    is also supported and enables the same feature.
+
+  <tag><tt>long_jsr_jmp_rts</tt><label id="long_jsr_jmp_rts"></tag>
+
+    Affects 65816 mode only.
+
+    Allows <tt>jsr</tt> and <tt>jmp</tt> to produce long jumps if the target
+    address has been previously declared in a <tt>far</tt> segment,
+    or imported as <tt>far</tt>.
+    Otherwise <tt>jsl</tt> and <tt>jml</tt> must be used instead.
+
+    Also allows <tt><ref id=".SMART" name=".SMART"></tt> to convert <tt>rts</tt>
+    to a long return <tt>rtl</tt> when the enclosing scope or memory model
+    indicates returning from a <tt>far</tt> procedure.
+
+    This permits compatibility with the old behavior of this assembler, or other
+    assemblers which similarly allowed <tt>jsr</tt> and <tt>jmp</tt> to be used
+    this way.
 
   <tag><tt>loose_char_term</tt><label id="loose_char_term"></tag>
 
@@ -3007,7 +3106,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.I16</tt><label id=".I16"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 16 bit.
+  Valid only in 65816 mode. Assume the index registers are 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate operands.
@@ -3018,7 +3117,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.I8</tt><label id=".I8"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 8 bit.
+  Valid only in 65816 mode. Assume the index registers are 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate operands.
@@ -3079,7 +3178,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.IFDEF</tt><label id=".IFDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is already
+  a symbol name. The condition is true if the given symbol is already
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3114,7 +3213,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.IFNDEF</tt><label id=".IFNDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is not
+  a symbol name. The condition is true if the given symbol is not
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3123,7 +3222,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.IFNREF</tt><label id=".IFNREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   not referenced before, and false otherwise.
 
   See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
@@ -3153,6 +3252,12 @@ Here's a list of all control commands and a description, what they do:
   (see <tt><ref id=".PC02" name=".PC02"></tt> command).
 
 
+<sect1><tt>.IFPDTV</tt><label id=".IFPDTV"><p>
+
+  Conditional assembly: Check if the assembler is currently in 6502DTV mode
+  (see <tt><ref id=".PDTV" name=".PDTV"></tt> command).
+
+
 <sect1><tt>.IFPSC02</tt><label id=".IFPSC02"><p>
 
   Conditional assembly: Check if the assembler is currently in 65SC02 mode
@@ -3162,7 +3267,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.IFREF</tt><label id=".IFREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   referenced before, and false otherwise.
 
   This command may be used to build subroutine libraries in include files
@@ -3178,7 +3283,8 @@ Here's a list of all control commands and a description, what they do:
         .endif
   </verb></tscreen>
 
-  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
+  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>, and
+  <tt><ref id=".REFERTO" name=".REFERTO"></tt>
 
 
 <sect1><tt>.IMPORT</tt><label id=".IMPORT"><p>
@@ -3276,46 +3382,9 @@ Here's a list of all control commands and a description, what they do:
   the feature in more detail.
 
 
-<sect1><tt>.ISMNEM, .ISMNEMONIC</tt><label id=".ISMNEMONIC"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  is defined as an instruction mnemonic that is recognized by the assembler.
-  Example:
-
-  <tscreen><verb>
-        .if     .not .ismnemonic(ina)
-                .macro ina
-                        clc
-                        adc #$01
-                .endmacro
-        .endif
-  </verb></tscreen>
-
-
-<sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
-
-  Switch on or off line continuations using the backslash character
-  before a newline. The option is off by default.
-  Note: Line continuations do not work in a comment. A backslash at the
-  end of a comment is treated as part of the comment and does not trigger
-  line continuation.
-  The command must be followed by a '+' or '-' character to switch the
-  option on or off respectively.
-
-  Example:
-
-  <tscreen><verb>
-        .linecont       +               ; Allow line continuations
-
-        lda     \
-                #$20                    ; This is legal now
-  </verb></tscreen>
-
-
 <sect1><tt>.LIST</tt><label id=".LIST"><p>
 
-  Enable output to the listing. The command must be followed by a boolean
+  Enable output to the listing. The command can be followed by a boolean
   switch ("on", "off", "+" or "-") and will enable or disable listing
   output.
   The option has no effect if the listing is not enabled by the command line
@@ -3346,6 +3415,22 @@ Here's a list of all control commands and a description, what they do:
         .listbytes      12              ; List the first 12 bytes
         .incbin         "data.bin"      ; Include large binary file
   </verb></tscreen>
+
+
+<sect1><tt>.LITERAL</tt><label id=".LITERAL"><p>
+
+  Define byte sized data. Must be followed by a sequence of (byte ranged)
+  expressions or strings. Strings will disregard the current character
+  mapping definition and will be interpreted literally.
+
+  Example:
+
+  <tscreen><verb>
+        .literal    "Hello "
+        .literal    "world", $0D, $00
+  </verb></tscreen>
+
+See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"></tt>
 
 
 <sect1><tt>.LOBYTES</tt><label id=".LOBYTES"><p>
@@ -3585,6 +3670,29 @@ Here's a list of all control commands and a description, what they do:
   <tt><ref id=".P4510" name=".P4510"></tt>
 
 
+<sect1><tt>.PDTV</tt><label id=".PDTV"><p>
+
+  Enable the 6502DTV instruction set. This is a superset of the 6502
+  instruction set.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>
+
+
+<sect1><tt>.POPCHARMAP</tt><label id=".POPCHARMAP"><p>
+
+  Pop the last character mapping from the stack, and activate it.
+
+  This command will switch back to the character mapping that was last pushed onto the
+  character mapping stack using the <tt><ref id=".PUSHCHARMAP" name=".PUSHCHARMAP"></tt>
+  command, and remove this entry from the stack.
+
+  The assembler will print an error message if the mappting stack is empty when
+  this command is issued.
+
+  See: <tt><ref id=".CHARMAP" name=".CHARMAP"></tt>, <tt><ref id=".PUSHCHARMAP"
+  name=".PUSHCHARMAP"></tt>
+
+
 <sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>
 
   Pop the last CPU setting from the stack, and activate it.
@@ -3659,6 +3767,22 @@ Here's a list of all control commands and a description, what they do:
   <tt><ref id=".P4510" name=".P4510"></tt>
 
 
+<sect1><tt>.PUSHCHARMAP</tt><label id=".PUSHCHARMAP"><p>
+
+  Push the currently active character mapping onto a stack. The stack has a size of 16
+  entries.
+
+  <tt/.PUSHCHARMAP/ allows together with <tt><ref id=".POPCHARMAP"
+  name=".POPCHARMAP"></tt> to switch to another character mapping and to restore the old
+  character mapping later, without knowledge of the current mapping.
+
+  The assembler will print an error message if the character mapping stack is already full,
+  when this command is issued.
+
+  See: <tt><ref id=".CHARMAP" name=".CHARMAP"></tt>, <tt><ref id=".POPCHARMAP"
+  name=".POPCHARMAP"></tt>
+
+
 <sect1><tt>.PUSHCPU</tt><label id=".PUSHCPU"><p>
 
   Push the currently active CPU onto a stack. The stack has a size of 8
@@ -3689,6 +3813,46 @@ Here's a list of all control commands and a description, what they do:
   full, when this command is issued.
 
   See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
+
+
+<sect1><tt>.REFERTO, .REFTO</tt><label id=".REFERTO"><p>
+
+  Mark a symbol as referenced.
+
+  It is useful in combination with the <tt><ref id=".IFREF" name=".IFREF"></tt>
+  command. A subroutine with two entry points can be created. When the first
+  entry point is called, it sets some default value as an argument, and falls
+  through into the second entry point. <tt>.REFERTO</tt> helps to ensure that
+  the second part is included into binary when only the first entry point is
+  actually used from the code.
+
+  Example:
+
+  <tscreen><verb>
+        .ifref NegateValue              ; If this subroutine is used
+        NegateValue:                    ; Define it
+                lda     #0
+                sec
+                sbc     Value
+            .ifref ResetValue           ; If the ResetValue is also used
+                jmp     SetValue        ; Jump over it
+            .else
+                .refto  SetValue        ; Ensure that SetValue will be included
+            .endif
+        .endif
+
+        .ifref ResetValue               ; If this subroutine is used
+        ResetValue:                     ; Define it
+                lda     #0              ; Set a default value
+                .refto  SetValue        ; Ensure that SetValue will be included
+        .endif
+
+        .ifref SetValue                 ; If this or previous subroutine is used
+        SetValue:
+                sta     Value
+                rts
+        .endif
+  </verb></tscreen>
 
 
 <sect1><tt>.RELOC</tt><label id=".RELOC"><p>
@@ -3731,7 +3895,7 @@ Here's a list of all control commands and a description, what they do:
 
   Reserve storage. The command is followed by one or two constant
   expressions. The first one is mandatory and defines, how many bytes of
-  storage should be defined. The second, optional expression must by a
+  storage should be defined. The second, optional expression must be a
   constant byte value that will be used as value of the data. If there
   is no fill value given, the linker will use the value defined in the
   linker configuration file (default: zero).
@@ -3848,10 +4012,11 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 65SC02, 65C02, 65816, 4510 and HuC6280.
+  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510 and HuC6280.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
+       <tt><ref id=".IFPDTV" name=".IFPDTV"></tt>,
        <tt><ref id=".IFP816" name=".IFP816"></tt>,
        <tt><ref id=".IFPC02" name=".IFPC02"></tt>,
        <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
@@ -3864,7 +4029,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.SMART</tt><label id=".SMART"><p>
 
-  Switch on or off smart mode. The command must be followed by a '+' or '-'
+  Switch on or off smart mode. The command can be followed by a '+' or '-'
   character to switch the option on or off respectively. The default is off
   (that is, the assembler doesn't try to be smart), but this default may be
   changed by the -s switch on the command line.
@@ -3879,7 +4044,9 @@ Here's a list of all control commands and a description, what they do:
         the assembler cannot trace the execution flow this may lead to false
         results in some cases. If in doubt, use the <tt/.Inn/ and <tt/.Ann/
         instructions to tell the assembler about the current settings.
-  <item>In 65816 mode, replace a <tt/RTS/ instruction by <tt/RTL/ if it is
+  <item>In 65816 mode, if the <tt><ref id="long_jsr_jmp_rts"
+        name="long_jsr_jmp_rts"></tt> feature is enabled,
+        smart mode will replace a <tt/RTS/ instruction by <tt/RTL/ if it is
         used within a procedure declared as <tt/far/, or if the procedure has
         no explicit address specification, but it is <tt/far/ because of the
         memory model used.
@@ -3910,7 +4077,9 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.TAG</tt><label id=".TAG"><p>
 
-  Allocate space for a struct or union.
+  Allocate space for a struct or union. This is equivalent to
+  <tt><ref id=".RES" name=".RES"></tt> with the
+  <tt><ref id=".SIZEOF" name=".SIZEOF"></tt> of a struct.
 
   Example:
 
@@ -3924,6 +4093,7 @@ Here's a list of all control commands and a description, what they do:
                 .tag    Point           ; Allocate 4 bytes
   </verb></tscreen>
 
+  See: <ref id="structs" name="&quot;Structs and unions&quot;">
 
 <sect1><tt>.UNDEF, .UNDEFINE</tt><label id=".UNDEFINE"><p>
 
@@ -4084,8 +4254,13 @@ macro actually takes in the definition. You may also leave intermediate
 parameters empty. Empty parameters are replaced by empty space (that is,
 they are removed when the macro is expanded). If you have a look at our
 macro definition above, you will see, that replacing the "addr" parameter
-by nothing will lead to wrong code in most lines. To help you, writing
-macros with a variable parameter list, there are some control commands:
+by nothing will lead to wrong code in most lines.
+
+The names "a", "x" and "y" should be avoided for macro parameters, as these
+will usually conflict with the 6502 registers.
+
+For writing macros with a variable parameter list, control commands are
+available:
 
 <tt><ref id=".IFBLANK" name=".IFBLANK"></tt> tests the rest of the line and
 returns true, if there are any tokens on the remainder of the line. Since
@@ -4096,15 +4271,15 @@ opposite.
 Look at this example:
 
 <tscreen><verb>
-.macro  ldaxy   a, x, y
-.ifnblank       a
-        lda     #a
+.macro  ldaxy   i, j, k
+.ifnblank       i
+        lda     #i
 .endif
-.ifnblank       x
-        ldx     #x
+.ifnblank       j
+        ldx     #j
 .endif
-.ifnblank       y
-        ldy     #y
+.ifnblank       k
+        ldy     #k
 .endif
 .endmacro
 </verb></tscreen>
@@ -4308,9 +4483,9 @@ different:
 
 <item>  Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> may not
         span more than a line. You may use line continuation (see <tt><ref
-        id=".LINECONT" name=".LINECONT"></tt>) to spread the definition over
-        more than one line for increased readability, but the macro itself
-        may not contain an end-of-line token.
+        id="line_continuations" name="line_continuations"></tt>) to spread the
+        definition over more than one line for increased readability, but the
+        macro itself may not contain an end-of-line token.
 
 <item>  Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> share
         the name space with classic macros, but they are detected and replaced
@@ -4325,8 +4500,8 @@ different:
         For this macro type, the number of actual parameters must match
         exactly the number of formal parameters.
 
-        To make this possible, formal parameters are enclosed in braces when
-        defining the macro. If there are no parameters, the empty braces may
+        To make this possible, formal parameters are enclosed in parentheses when
+        defining the macro. If there are no parameters, the empty parentheses may
         be omitted.
 
 <item>  Since <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may not
@@ -4376,8 +4551,8 @@ Macros with parameters may also be useful:
 
 Note that, while formal parameters have to be placed in parentheses,
 the actual argument used when invoking the macro should not be.
-The invoked arguments are separated by commas only, if parentheses are
-used by accident they will become part of the replaced token.
+The invoked arguments are separated by commas only; if parentheses are
+used by accident, they will become part of the replaced token.
 
 If you wish to have an expression follow the macro invocation, the
 last parameter can be enclosed in curly braces {} to indicate the end of that
@@ -4586,6 +4761,7 @@ each supported CPU a constant similar to
     CPU_SWEET16
     CPU_HUC6280
     CPU_4510
+    CPU_6502DTV
 </verb></tscreen>
 
 is defined. These constants may be used to determine the exact type of the
@@ -4600,6 +4776,7 @@ another constant is defined:
     CPU_ISET_SWEET16
     CPU_ISET_HUC6280
     CPU_ISET_4510
+    CPU_ISET_6502DTV
 </verb></tscreen>
 
 The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
@@ -4646,6 +4823,7 @@ compiler, depending on the target system selected:
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
 <item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
 <item><tt/__ATARI5200__/ - Target system is <tt/atari5200/
+<item><tt/__ATARI7800__/ - Target system is <tt/atari7800/
 <item><tt/__ATARI__/ - Target system is <tt/atari/ or <tt/atarixl/
 <item><tt/__ATARIXL__/ - Target system is <tt/atarixl/
 <item><tt/__ATMOS__/ - Target system is <tt/atmos/
@@ -4669,6 +4847,7 @@ compiler, depending on the target system selected:
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/
 <item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
 <item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
+<item><tt/__SYM1__/ - Target system is <tt/sym1/
 <item><tt/__VIC20__/ - Target system is <tt/vic20/
 </itemize>
 
@@ -4680,10 +4859,15 @@ compiler, depending on the target system selected:
 
 Structs and unions are special forms of <ref id="scopes" name="scopes">.  They
 are, to some degree, comparable to their C counterparts. Both have a list of
-members. Each member allocates storage, and optionally may have a name whose
-value, in the case of a struct, usually is the storage offset from the
-beginning, and in the case of a union, doesn't change, and usually is zero.
+members. Each member allocates storage, and optionally may have a name.
 
+Each named member has a constant value equal to the storage offset from the
+beginning of the structure. In the case of a union, all members are placed at
+the same offset, typically 0.
+
+Each named member also has a storage size which can be accessed with the
+<tt><ref id=".SIZEOF" name=".SIZEOF"></tt> operator. The struct or union itself
+also has a <tt/.SIZEOF/ indicating its total storage size.
 
 <sect1>Declaration<p>
 
@@ -4710,8 +4894,9 @@ A struct or union may not necessarily have a name. If it is anonymous, no
 local scope is opened; the identifiers used to name the members are placed
 into the current scope instead.
 
-A struct may contain unnamed members and definitions of local structs/unions.
-The storage allocators may contain a multiplier, as in the example below:
+Storage allocators may contain a multiplier. A struct may also contain members
+and definitions of local structs/unions. Example:
+
 <tscreen><verb>
       .struct Circle
               .struct Point
@@ -4720,7 +4905,8 @@ The storage allocators may contain a multiplier, as in the example below:
               Radius  .word
       .endstruct
 </verb></tscreen>
-The size of the Circle struct is 6 (three words).
+
+In this example the size of the Circle struct is 6 (three words).
 
 
 <sect1>The storage allocator keywords<p>
@@ -4730,7 +4916,7 @@ The size of the Circle struct is 6 (three words).
   <tag/.BYTE, .RES/
     Allocates multiples of 1 byte.  <tt/.RES/ requires an operand.
 
-  <tag/.DBYTE, .WORD, .ADDR/
+  <tag/.DBYT, .WORD, .ADDR/
     Allocates multiples of 2 bytes.
 
   <tag/.FARADDR/
@@ -4738,6 +4924,15 @@ The size of the Circle struct is 6 (three words).
 
   <tag/.DWORD/
     Allocates multiples of 4 bytes.
+
+  <tag/.TAG/
+    Allocates a previously defined struct.
+
+  <tag/.STRUCT, .UNION/
+    Begins a nested .struct or .union definition, and allocates it.
+    Note that its member offset values will begin at 0, unless this nested
+    structure is anonymous, in which case they will instead become members of
+    the enclosing scope.
 
   </descrip>
 
@@ -4783,13 +4978,54 @@ name=".TAG"> directive.
 C:      .tag    Circle
 </verb></tscreen>
 
-Currently, members are just offsets from the start of the struct or union. To
+Members are just offsets from the start of the struct or union. To
 access a field of a struct, the member offset must be added to the address of
 the struct variable itself:
 <tscreen><verb>
-        lda     C+Circle::Radius        ; Load circle radius into A
+        lda    C + Circle::Radius                    ; Load circle radius
+        lda    C + Circle::Origin + Point::ycoord    ; Load circle origin.ycoord
 </verb></tscreen>
-That may change in a future version of the assembler.
+
+Nested structures or unions are treated differently depending on whether they
+are anonymous. If named, a new structure definition is created within the
+enclosing scope, with its offsets beginning at 0. If anonymous, the members of
+the new structure are added to the enclosing scope instead, with offsets
+continuing through that scope. Example:
+
+<tscreen><verb>
+      .struct Object
+              id .byte                ; Object::id = 0
+              target .struct Point    ; Object::target = 1
+                      xcoord  .word   ; Object::Point::xcoord = 0
+                      ycoord  .word   ; Object::Point::ycoord = 2
+              .endstruct
+               cost .struct           ; Object::cost = 5
+                      price  .word    ; Object::price = 5
+                      tax  .word      ; Object::tax = 7
+              .endstruct
+              .struct
+                      radius  .word   ; Object::radius = 9
+              .endstruct
+      .endstruct
+
+O:    .tag   Object
+      lda    O + Object::target + Object::Point::ycoord  ; Named struct
+      lda    O + Object::tax                             ; Anonymous
+      lda    O + Object::radius                          ; Anonymous
+
+      ; Be careful not to use a named nested structure without also adding the
+      ; offset to the nested structure itself.
+      lda    O + Object::Point::ycoord                   ; Incorrect!
+      lda    O + Object::target + Object::Point::ycoord  ; Correct
+</verb></tscreen>
+
+In this example, the first nested structure is named "Point", and its member
+offsets begin at 0. On the other hand, the two anonymous structures simply
+continue to add members to the enclosing "Object" structure.
+
+Note that an anonymous structure does not need a member name, since all of its
+members become part of the enclosing structure. The "cost" member in the
+example is redundantly the same offset as its first member "price".
 
 
 <sect1>Limitations<p>

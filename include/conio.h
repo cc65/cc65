@@ -201,19 +201,33 @@ void __fastcall__ cputhex16 (unsigned val);
 */
 
 #ifdef _textcolor
-#  define textcolor(x)          _textcolor(x)
+#  define textcolor(color)      _textcolor(color)
 #endif
 #ifdef _bgcolor
-#  define bgcolor(x)            _bgcolor(x)
+#  define bgcolor(color)        _bgcolor(color)
 #endif
 #ifdef _bordercolor
-#  define bordercolor(x)        _bordercolor(x)
+#  define bordercolor(color)    _bordercolor(color)
 #endif
 #ifdef _cpeekcolor
-#  define cpeekcolor(x)         _cpeekcolor(x)
+#  define cpeekcolor()          _cpeekcolor()
+#endif
+#ifdef _cpeekrevers
+#  define cpeekrevers()         _cpeekrevers()
 #endif
 
-
+#ifdef _chline
+#  define chline(len)      _chline(len)
+#endif
+#ifdef _cvline
+#  define cvline(len)      _cvline(len)
+#endif
+#ifdef _chlinexy
+#  define chlinexy(x, y, len)      _chlinexy(x, y, len)
+#endif
+#ifdef _cvlinexy
+#  define cvlinexy(x, y, len)      _cvlinexy(x, y, len)
+#endif
 
 /* End of conio.h */
 #endif

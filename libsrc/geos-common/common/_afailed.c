@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <geos.h>
 
-void _afailed (char* file, unsigned line)
+void __afailed (char* file, unsigned line)
 {
     ExitTurbo();
 
@@ -28,5 +28,5 @@ void _afailed (char* file, unsigned line)
 
     DlgBoxOk(CBOLDON "ASSERTION FAILED", "PROGRAM TERMINATED" CPLAINTEXT);
 
-    exit (2);
+    exit (EXIT_ASSERT);
 }

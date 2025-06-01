@@ -6,7 +6,7 @@
 ; int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size)
 ; /* Reads up to "size" bytes from a file to "buffer".
 ; ** Returns the number of actually read bytes, 0 if there are no bytes left
-; ** (EOF) or -1 in case of an error. _oserror contains an errorcode then (see
+; ** (EOF) or -1 in case of an error. __oserror contains an errorcode then (see
 ; ** table below).
 ; */
 ; {
@@ -14,7 +14,7 @@
 ;     static unsigned char tmp;
 ;
 ;     /* if we can't change to the inputchannel #lfn then return an error */
-;     if (_oserror = cbm_k_chkin(lfn)) return -1;
+;     if (__oserror = cbm_k_chkin(lfn)) return -1;
 ;
 ;     bytesread = 0;
 ;
@@ -24,7 +24,7 @@
 ;         /* the kernal routine BASIN sets ST to EOF if the end of file
 ;         ** is reached the first time, then we have store tmp.
 ;         ** every subsequent call returns EOF and READ ERROR in ST, then
-;         ** we have to exit the loop here immediatly.
+;         ** we have to exit the loop here immediately.
 ;         */
 ;         if (cbm_k_readst() & 0xBF) break;
 ;
@@ -40,16 +40,16 @@
 
         .export         _cbm_read
         .importzp       ptr1, ptr2, ptr3, tmp1
-        .import         popax, popa
-        .import         __oserror
+        .import         popax, popa, returnFFFF
+        .import         ___oserror
 
 
 _cbm_read:
-        eor     #$FF
-        sta     ptr1
-        txa
-        eor     #$FF
-        sta     ptr1+1          ; Save -size-1
+        inx
+        stx     ptr1+1
+        tax
+        inx
+        stx     ptr1            ; Save size with both bytes incremented separately.
 
         jsr     popax
         sta     ptr2
@@ -92,9 +92,9 @@ _cbm_read:
         bne     @L3
         inc     ptr3+1          ; ++bytesread;
 
-@L3:    inc     ptr1
+@L3:    dec     ptr1
         bne     @L1
-        inc     ptr1+1
+        dec     ptr1+1
         bne     @L1
 
 @L4:    jsr     CLRCH
@@ -106,8 +106,5 @@ _cbm_read:
 
 ; CHKIN failed
 
-@E1:    sta     __oserror
-        lda     #$FF
-        tax
-        rts                     ; return -1
-
+@E1:    sta     ___oserror
+        jmp     returnFFFF

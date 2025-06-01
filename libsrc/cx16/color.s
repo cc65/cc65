@@ -36,7 +36,7 @@ _bgcolor:
         ora     tmp1
         sta     CHARCOLOR       ; set new values
         txa
-        lsr     a               ; get screen color
+        lsr     a               ; get old background color
         lsr     a
         lsr     a
         lsr     a

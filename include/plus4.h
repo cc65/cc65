@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2006, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -56,9 +56,8 @@
 
 /* The addresses of the static drivers */
 extern void plus4_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
-extern void plus4_stdser_ser[];
+extern void plus4_stdser_ser[];   /* Referred to by ser_static_stddrv[] */
 extern void ted_hi_tgi[];
-
 
 /* End of plus4.h */
 #endif

@@ -38,6 +38,7 @@
 #include "opc4510.h"
 #include "opc6502.h"
 #include "opc6502x.h"
+#include "opc6502dtv.h"
 #include "opc65816.h"
 #include "opc65c02.h"
 #include "opc65sc02.h"
@@ -70,8 +71,10 @@ void SetOpcTable (cpu_t CPU)
     switch (CPU) {
         case CPU_6502:    OpcTable = OpcTable_6502;     break;
         case CPU_6502X:   OpcTable = OpcTable_6502X;    break;
+        case CPU_6502DTV: OpcTable = OpcTable_6502DTV;  break;
         case CPU_65SC02:  OpcTable = OpcTable_65SC02;   break;
         case CPU_65C02:   OpcTable = OpcTable_65C02;    break;
+        case CPU_65816:   OpcTable = OpcTable_65816;    break;
         case CPU_HUC6280: OpcTable = OpcTable_HuC6280;  break;
         case CPU_M740:    OpcTable = OpcTable_M740;     break;
         case CPU_4510:    OpcTable = OpcTable_4510;     break;

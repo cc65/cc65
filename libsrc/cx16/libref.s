@@ -1,6 +1,6 @@
 ;
 ; 2013-05-31, Oliver Schmidt
-; 2019-09-22, Greg King
+; 2020-01-06, Greg King
 ;
 
         .export         em_libref

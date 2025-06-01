@@ -1,5 +1,5 @@
 ;
-; 2019-09-23, Greg King
+; 2020-05-02, Greg King
 ;
 ; unsigned char __fastcall__ bordercolor (unsigned char color);
 ; /* Set the color for the border. The old color setting is returned. */
@@ -11,17 +11,7 @@
 
 _bordercolor:
         tax
-
-        ; Point to the border color register.
-
-        stz     VERA::CTRL              ; Use port 0
-        lda     #<VERA::COMPOSER::FRAME
-        sta     VERA::ADDR
-        lda     #>VERA::COMPOSER::FRAME
-        sta     VERA::ADDR+1
-        ldy     #^VERA::COMPOSER::FRAME | VERA::INC0
-        sty     VERA::ADDR+2
-
-        lda     VERA::DATA0             ; get old value
-        stx     VERA::DATA0             ; set new value
+        stz     VERA::CTRL              ; Use display register bank 0
+        lda     VERA::DISP::FRAME       ; get old value
+        stx     VERA::DISP::FRAME       ; set new value
         rts

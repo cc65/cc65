@@ -126,6 +126,7 @@ declaration and usage.
 <item>cbm_save
 <item>cbm_write
 <item>get_tv
+<item>waitvsync
 </itemize>
 
 
@@ -230,10 +231,10 @@ The default drivers, <tt/mouse_stddrv (mouse_static_stddrv)/, point to <tt/cbm51
 
   <tag><tt/cbm510-std.ser (cbm510_std_ser)/</tag>
   Driver for the 6551 ACIA chip built into the Commodore 510. Supports up to
-  19200 BPS, hardware flow control (RTS/CTS), and interrupt-driven receives.
-  Note that, because of the peculiarities of the 6551 chip, transmits are not
-  interrupt driven; and, the transceiver blocks if the receiver asserts flow
-  control because of a full buffer.
+  19200 baud, requires hardware flow control (RTS/CTS) and does interrupt driven
+  receives. Note that, because of the peculiarities of the 6551 chip, transmits
+  are not interrupt driven; and, the transceiver blocks if the receiver asserts
+  flow control because of a full buffer.
 
 </descrip><p>
 

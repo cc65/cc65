@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -79,8 +79,7 @@
 #define BCOLOR_WHITE            0x01
 #define BCOLOR_RED              0x02
 #define BCOLOR_CYAN             0x03
-#define BCOLOR_VIOLET           0x04
-#define BCOLOR_PURPLE           BCOLOR_VIOLET
+#define BCOLOR_PURPLE           0x04
 #define BCOLOR_GREEN            0x05
 #define BCOLOR_BLUE             0x06
 #define BCOLOR_YELLOW           0x07
@@ -98,8 +97,7 @@
 #define COLOR_WHITE             (BCOLOR_WHITE | CATTR_LUMA7)
 #define COLOR_RED               (BCOLOR_RED | CATTR_LUMA4)
 #define COLOR_CYAN              (BCOLOR_CYAN | CATTR_LUMA7)
-#define COLOR_VIOLET            (BCOLOR_VIOLET | CATTR_LUMA7)
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            (BCOLOR_LIGHTVIOLET | CATTR_LUMA7)
 #define COLOR_GREEN             (BCOLOR_GREEN | CATTR_LUMA7)
 #define COLOR_BLUE              (BCOLOR_BLUE | CATTR_LUMA7)
 #define COLOR_YELLOW            (BCOLOR_YELLOW | CATTR_LUMA7)

@@ -37,24 +37,8 @@ void testlimits(int i) {
 }
 
 void testdefault1(unsigned char i) {
-/* we want a signed char */
-#ifdef REFCC
 
-#ifdef REFCC_UNSIGNED_CHARS
-signed char k;
-#else
-char k;
-#endif
-        
-#else
-        
-#ifdef UNSIGNED_CHARS
-signed char k;
-#else
-char k;
-#endif
-
-#endif
+        signed char k;
 
         for(;i<254;) {
                 k = i;
@@ -142,24 +126,8 @@ char k;
 }
 
 void testdefault2(unsigned char i) {
-/* we want a unsigned char */
-#ifdef REFCC
 
-#ifdef REFCC_UNSIGNED_CHARS
-char k;
-#else
-unsigned char k;
-#endif
-        
-#else
-        
-#ifdef UNSIGNED_CHARS
-char k;
-#else
-unsigned char k;
-#endif
-
-#endif
+        unsigned char k;
 
         for(;i<254;) {
                 k = i;
@@ -201,7 +169,7 @@ unsigned char k;
 
                 case 170:
                         break;
-                
+
                 case 18:
                         break;
                 case 19:
@@ -247,12 +215,12 @@ int main(void) {
         testlimits(32767);
         testlimits(-32768);
         testlimits(-1);
-        
+
         testdefault1(1);
         testdefault1(2);
         testdefault1(3);
         testdefault1(4);
-        
+
         testdefault2(1);
         testdefault2(2);
         testdefault2(3);

@@ -14,10 +14,11 @@
 ; ProDOS 8 1.6   - $16
 ; ProDOS 8 1.7   - $17
 ; ProDOS 8 1.8   - $18
-; ProDOS 8 1.9   - $18
+; ProDOS 8 1.9   - $18 (!)
 ; ProDOS 8 2.0.1 - $21
 ; ProDOS 8 2.0.2 - $22
 ; ProDOS 8 2.0.3 - $23
+; ProDOS 8 2.4.x - $24
 ;
 
         .constructor    initdostype, 25

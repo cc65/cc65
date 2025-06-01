@@ -33,7 +33,7 @@ sound_bip_keyboard:
     rts
 .endproc
 
-.proc _zap 
+.proc _zap
     BRK_TELEMON XZAP
     rts
 .endproc

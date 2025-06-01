@@ -57,6 +57,7 @@ extern unsigned char    DebugInfo;              /* Add debug info to the obj */
 extern unsigned char    PreprocessOnly;         /* Just preprocess the input */
 extern unsigned char    DebugOptOutput;         /* Output debug stuff */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
+extern unsigned         AllowNewComments;       /* Allow new style comments in C89 mode */
 
 /* Stackable options */
 extern IntStack         WritableStrings;        /* Literal strings are r/w */
@@ -67,7 +68,7 @@ extern IntStack         EnableRegVars;          /* Enable register variables */
 extern IntStack         AllowRegVarAddr;        /* Allow taking addresses of register vars */
 extern IntStack         RegVarsToCallStack;     /* Save reg variables on call stack */
 extern IntStack         StaticLocals;           /* Make local variables static */
-extern IntStack         SignedChars;            /* Make characters signed by default */
+extern IntStack         SignedChars;            /* Use 'signed char' as the underlying type of 'char' */
 extern IntStack         CheckStack;             /* Generate stack overflow checks */
 extern IntStack         Optimize;               /* Optimize flag */
 extern IntStack         CodeSizeFactor;         /* Size factor for generated code */
@@ -77,6 +78,7 @@ extern IntStack         DataAlignment;          /* Alignment for data */
 extern StrBuf           DepName;                /* Name of dependencies file */
 extern StrBuf           FullDepName;            /* Name of full dependencies file */
 extern StrBuf           DepTarget;              /* Name of dependency target */
+extern StrBuf           DebugTableName;         /* Name of debug table dump file */
 
 
 

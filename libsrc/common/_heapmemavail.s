@@ -8,7 +8,7 @@
 ;
 
         .importzp       ptr1, ptr2
-        .export         __heapmemavail
+        .export         ___heapmemavail
 
         .include        "_heap.inc"
 
@@ -17,7 +17,7 @@
 ;-----------------------------------------------------------------------------
 ; Code
 
-__heapmemavail:
+___heapmemavail:
 
 ; size_t Size = 0;
 
@@ -27,9 +27,9 @@ __heapmemavail:
 
 ; struct freeblock* F = _heapfirst;
 
-        lda     __heapfirst
+        lda     ___heapfirst
         sta     ptr1
-        lda     __heapfirst+1
+        lda     ___heapfirst+1
 @L1:    sta     ptr1+1
 
 ; while (F) {
@@ -61,17 +61,17 @@ __heapmemavail:
 ; return Size + (_heapend - _heapptr) * sizeof (*_heapend);
 
 @L2:    lda     ptr2
-        add     __heapend
+        add     ___heapend
         sta     ptr2
         lda     ptr2+1
-        adc     __heapend+1
+        adc     ___heapend+1
         tax
 
         lda     ptr2
-        sub     __heapptr
+        sub     ___heapptr
         sta     ptr2
         txa
-        sbc     __heapptr+1
+        sbc     ___heapptr+1
         tax
         lda     ptr2
 

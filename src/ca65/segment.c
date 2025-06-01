@@ -306,7 +306,7 @@ void SegAlign (unsigned long Alignment, int FillVal)
         ActiveSeg->Align = CombinedAlignment;
 
         /* Output a warning for larger alignments if not suppressed */
-        if (CombinedAlignment > LARGE_ALIGNMENT && !LargeAlignment) {
+        if (CombinedAlignment >= LARGE_ALIGNMENT && CombinedAlignment > ActiveSeg->Align && CombinedAlignment > Alignment && !LargeAlignment) {
             Warning (0, "Combined alignment is suspiciously large (%lu)",
                      CombinedAlignment);
         }
@@ -411,13 +411,13 @@ void SegDone (void)
 
                     /* We cannot evaluate the expression now, leave the job for
                     ** the linker. However, we can check if the address size
-                    ** matches the fragment size. Mismatches are errors in 
+                    ** matches the fragment size. Mismatches are errors in
                     ** most situations.
                     */
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
-                        LIError (&F->LI, "Range error");
+                        LIError (&F->LI, "Range error (Address size %u does not match fragment size %u)", ED.AddrSize, F->Len);
                     }
                 }
 

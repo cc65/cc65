@@ -7,7 +7,7 @@
 
             .import HLineRegs
             .export _RecoverLine
-            
+
             .include "jumptab.inc"
 
 _RecoverLine:

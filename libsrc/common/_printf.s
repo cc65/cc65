@@ -3,7 +3,7 @@
 ;
 ; Ullrich von Bassewitz, 2000-10-21
 ;
-                                   
+
         .include        "zeropage.inc"
 
         .export         __printf
@@ -13,6 +13,7 @@
         .import         _strlower, _strlen
 
         .macpack        generic
+        .macpack        cpu
 
 ; ----------------------------------------------------------------------------
 ; We will store variables into the register bank in the zeropage. Define
@@ -32,12 +33,16 @@ FCount          = ptr2
 .code
 
 ; ----------------------------------------------------------------------------
-; Get one character from the format string and increment the pointer. Will
-; return zero in Y.
+; Get one character from the format string, and increment the pointer. Will
+; return zero in .Y.
 
 GetFormatChar:
         ldy     #0
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (Format)
+        .else
         lda     (Format),y
+        .endif
 IncFormatPtr:
         inc     Format
         bne     @L1
@@ -51,7 +56,7 @@ OutputPadChar:
         lda     PadChar
 
 ; ----------------------------------------------------------------------------
-; Call the output function with one character in A
+; Call the output function with one character in .A
 
 Output1:
         sta     CharArg
@@ -92,7 +97,7 @@ GetSignedArg:
         jmp     axlong                  ; Convert to long
 
 ; ----------------------------------------------------------------------------
-; Get a long argument from the argument list. Returns 0 in Y.
+; Get a long argument from the argument list. Returns 0 in .Y.
 
 GetLongArg:
         jsr     GetIntArg               ; Get high word
@@ -102,7 +107,7 @@ GetLongArg:
 ; Run into GetIntArg fetching the low word
 
 ; ----------------------------------------------------------------------------
-; Get an integer argument from the argument list. Returns 0 in Y.
+; Get an integer argument from the argument list. Returns 0 in .Y.
 
 GetIntArg:
         jsr     DecArgList2
@@ -110,11 +115,15 @@ GetIntArg:
         lda     (ArgList),y
         tax
         dey
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (ArgList)
+        .else
         lda     (ArgList),y
+        .endif
         rts
 
 ; ----------------------------------------------------------------------------
-; Read an integer from the format string. Will return zero in Y.
+; Read an integer from the format string. Will return zero in .Y.
 
 ReadInt:
         ldy     #0
@@ -135,9 +144,9 @@ ReadInt:
         pha                             ; Save digit value
         lda     ptr1
         ldx     ptr1+1
-        asl     ptr1
+        asl     a
         rol     ptr1+1                  ; * 2
-        asl     ptr1
+        asl     a
         rol     ptr1+1                  ; * 4, assume carry clear
         adc     ptr1
         sta     ptr1
@@ -247,10 +256,10 @@ Save:   lda     regbank,y
         sta     RegSave,y
         dey
         bpl     Save
+        pla                             ; Restore low byte of ap
 
 ; Get the parameters from the stack
 
-        pla                             ; Restore low byte of ap
         sta     ArgList                 ; Argument list pointer
         stx     ArgList+1
 
@@ -265,10 +274,16 @@ Save:   lda     regbank,y
 ; Initialize the output counter in the output descriptor to zero
 
         lda     #0
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        sta     (OutData)
+        ldy     #$01
+        sta     (OutData),y
+        .else
         tay
         sta     (OutData),y
         iny
         sta     (OutData),y
+        .endif
 
 ; Get the output function from the output descriptor and remember it
 
@@ -307,7 +322,7 @@ MainLoop:
         inc     Format+1
 
 ; Calculate, how many characters must be output. Beware: This number may
-; be zero. A still contains the low byte of the pointer.
+; be zero. .A still contains the low byte of the pointer.
 
 @L3:    sub     FSave
         sta     FCount
@@ -338,12 +353,16 @@ MainLoop:
         sta     (sp),y
         dey
         lda     FCount
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        sta     (sp)
+        .else
         sta     (sp),y
+        .endif
         jsr     CallOutFunc             ; Call the output function
 
 ; We're back from out(), or we didn't call it. Check for end of string.
 
-@L4:    jsr     GetFormatChar           ; Get one char, zero in Y
+@L4:    jsr     GetFormatChar           ; Get one char, zero in .Y
         tax                             ; End of format string reached?
         bne     NotDone                 ; End not reached
 
@@ -357,7 +376,7 @@ Rest:   lda     RegSave,x
         rts
 
 ; Still a valid format character. Check for '%' and a '%%' sequence. Output
-; anything that is not a format specifier. On intro, Y is zero.
+; anything that is not a format specifier. On intro, .Y is zero.
 
 NotDone:
         cmp     #'%'
@@ -371,7 +390,7 @@ NotDone:
 
 ; We have a real format specifier
 ; Format is: %[flags][width][.precision][mod]type
-; Y is zero on entry.
+; .Y is zero on entry.
 
 FormatSpec:
 
@@ -383,7 +402,7 @@ FormatSpec:
         dex
         bpl     @L1
 
-; Start with reading the flags if there are any. X is $FF which is used
+; Start with reading the flags if there are any. .X is $FF which is used
 ; for "true"
 
 ReadFlags:
@@ -410,7 +429,7 @@ ReadFlags:
 @L4:    jsr     IncFormatPtr
         jmp     ReadFlags               ; ...and start over
 
-; Done with flags, read the pad char. Y is still zero if we come here.
+; Done with flags, read the pad char. .Y is still zero if we come here.
 
 ReadPadding:
         ldx     #' '                    ; PadChar
@@ -421,8 +440,8 @@ ReadPadding:
         lda     (Format),y              ; Read current for later
 @L1:    stx     PadChar
 
-; Read the width. Even here, Y is still zero. A contains the current character
-; from the format string
+; Read the width. Even here, .Y is still zero. .A contains the current character
+; from the format string.
 
 ReadWidth:
         cmp     #'*'
@@ -435,7 +454,7 @@ ReadWidth:
 @L2:    sta     Width
         stx     Width+1                 ; ...and remember in Width
 
-; Read the precision. Even here, Y is still zero.
+; Read the precision. Even here, .Y is still zero.
 
         sty     Prec                    ; Assume Precision is zero
         sty     Prec+1
@@ -456,7 +475,7 @@ ReadPrec:
 @L2:    sta     Prec
         stx     Prec+1
 
-; Read the modifiers. Y is still zero.
+; Read the modifiers. .Y is still zero.
 
 ReadMod:
         lda     (Format),y
@@ -479,9 +498,9 @@ ReadMod:
 
 ; Initialize the argument buffer pointers. We use a static buffer (ArgBuf) to
 ; assemble strings. A zero page index (BufIdx) is used to keep the current
-; write position. A pointer to the buffer (Str) is used to point to the the
-; argument in case we will not use the buffer but a user supplied string.
-; Y is zero when we come here.
+; write position. A pointer to the buffer (Str) is used to point to the
+; argument in case we will not use the buffer but a user-supplied string.
+; .Y is zero when we come here.
 
 DoFormat:
         sty     BufIdx                  ; Clear BufIdx
@@ -490,7 +509,7 @@ DoFormat:
         ldx     #>Buf
         stx     Str+1
 
-; Skip the current format character, then check it (current char in A)
+; Skip the current format character, then check it (current char in .A)
 
         jsr     IncFormatPtr
 
@@ -502,10 +521,10 @@ DoFormat:
 ; It is a character
 
         jsr     GetIntArg               ; Get the argument (promoted to int)
-        sta     Buf                     ; Place it as zero terminated string...
-        lda     #0
-        sta     Buf+1                   ; ...into the buffer
-        jmp     HaveArg                 ; Done
+        sta     Buf                     ; Place it into the buffer
+        ldx     #0
+        lda     #1                      ; Buffer length is 1
+        jmp     HaveArg1
 
 ; Is it an integer?
 
@@ -551,10 +570,16 @@ CheckCount:
         jsr     GetIntArg
         sta     ptr1
         stx     ptr1+1                  ; Get user supplied pointer
+        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        lda     (OutData)             ; Low byte of OutData->ccount
+        sta     (ptr1)
+        ldy     #1
+        .else
         ldy     #0
         lda     (OutData),y             ; Low byte of OutData->ccount
         sta     (ptr1),y
         iny
+        .endif
         lda     (OutData),y             ; High byte of OutData->ccount
         sta     (ptr1),y
         jmp     MainLoop                ; Done
@@ -671,6 +696,7 @@ HaveArg:
         lda     Str
         ldx     Str+1
         jsr     _strlen                 ; Get length of argument
+HaveArg1:                               ; Jumped into here from %c handling
         sta     ArgLen
         stx     ArgLen+1
 
@@ -777,8 +803,5 @@ ArgLen:         .res    2
 
 .data
 
-; Stuff from OutData. Is used as a vector and must be aligned
+; Stuff from OutData. Is used as a vector
 CallOutFunc:    jmp     $0000
-
-
-

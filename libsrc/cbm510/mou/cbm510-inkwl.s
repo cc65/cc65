@@ -175,6 +175,7 @@ INSTALL:
 ; Done, return zero.
 
         lda     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         tax
         rts
 
@@ -331,8 +332,8 @@ INFO:   jsr     POS
 ; Must return an error code in .XA.
 ;
 
-IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
-        ldx     #>MOUSE_ERR_INV_IOCTL
+IOCTL:  lda     #MOUSE_ERR_INV_IOCTL     ; We don't support ioctls, for now
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------

@@ -19,8 +19,9 @@
         NOTE:   This is not a thorough validation test of the facilities.
 */
 
+#define STANDARD_CC65
+#define NO_WCHAR
 #define NO_INTERNAL_WCHAR
-/*#define STANDALONE*/
 
 #include        <errno.h>
 #include        <limits.h>              /* for CHAR_BIT */
@@ -37,7 +38,7 @@
 
 #ifdef NO_WCHAR
 
-#warn "this test checks C99 features, but NO_WCHAR is defined so the test will most definetly fails."
+#warning "this test checks C99 features, but NO_WCHAR is defined so the test will most definitely fail."
 
 #endif
 
@@ -50,16 +51,6 @@
 #endif
 
 #include        <inttypes.h>            /* test idempotency */
-
-#ifdef STANDALONE
-
-FILE *outfile=NULL;
-#define opentest(x) outfile=stdout;
-#define closetest(x)
-
-#else
-
-#endif
 
 #if     __STDC_VERSION__ >= 199901
 #ifndef __Q8_QT
@@ -115,7 +106,7 @@ int
 main()  {
         int     status = 0;             /* exit status to be returned */
 
-        
+
         /* <stdint.h> features: */
 
         printf("CHAR_BIT=%u\n", (unsigned)CHAR_BIT );
@@ -535,12 +526,12 @@ main()  {
                                 else    /* for trailing semicolon */
 
 #else
-                                                                 
+
 #define SCAN(buf,fs,var,exp)
 #define PRINT(fs,var,exp)
 
 #endif
-                                                                 
+
 #ifdef  SCNo32
 
         SCAN(in_dn, SCNo32, int32, 9);
@@ -595,7 +586,7 @@ main()  {
 #endif
 
 #if 0
-  
+
 #ifdef  INT16_MAX
          {      INT16_MAX,              INT16_MAX,  },
          {      -INT16_MAX,             INT16_MAX,  },
@@ -839,7 +830,7 @@ main()  {
                         }
 #endif
         }
-        
+
         {
         char            *endptr;
         wchar_t         *wendptr;

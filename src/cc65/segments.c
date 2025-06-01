@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "chartype.h"
 #include "check.h"
 #include "coll.h"
@@ -61,27 +62,116 @@
 
 
 
-/* Pointer to the current segment list. Output goes here. */
-Segments* CS = 0;
+/* Table struct for address sizes of segments */
+typedef struct {
+    StrBuf Name;
+    unsigned char AddrSize;
+} SegAddrSize_t;
 
-/* Pointer to the global segment list */
-Segments* GS = 0;
+
+/* Pointer to the current segment context. Output goes here. */
+SegContext* CS = 0;
+
+/* Pointer to the global segment context */
+SegContext* GS = 0;
 
 /* Actual names for the segments */
 static StrStack SegmentNames[SEG_COUNT];
+
+/* Address size for the segments */
+static Collection SegmentAddrSizes;
 
 /* We're using a collection for the stack instead of a linked list. Since
 ** functions may not be nested (at least in the current implementation), the
 ** maximum stack depth is 2, so there is not really a need for a better
 ** implementation.
 */
-static Collection SegmentStack = STATIC_COLLECTION_INITIALIZER;
+static Collection SegContextStack = STATIC_COLLECTION_INITIALIZER;
 
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*                       Segment name and address size                       */
 /*****************************************************************************/
+
+
+
+void InitSegAddrSizes (void)
+/* Initialize the segment address sizes */
+{
+    InitCollection (&SegmentAddrSizes);
+}
+
+
+
+void DoneSegAddrSizes (void)
+/* Free the segment address sizes */
+{
+    SegAddrSize_t* A;
+    int I;
+    for (I = 0; I < (int)CollCount (&SegmentAddrSizes); ++I) {
+        A = CollAtUnchecked (&SegmentAddrSizes, I);
+        SB_Done (&A->Name);
+        xfree (A);
+    }
+    DoneCollection (&SegmentAddrSizes);
+}
+
+
+
+static SegAddrSize_t* FindSegAddrSize (const char* Name)
+/* Find already specified address size for a segment by name.
+** Return the found struct or 0 if not found.
+*/
+{
+    SegAddrSize_t* A;
+    int I;
+    for (I = 0; I < (int)CollCount (&SegmentAddrSizes); ++I) {
+        A = CollAtUnchecked (&SegmentAddrSizes, I);
+        if (A && strcmp (SB_GetConstBuf (&A->Name), Name) == 0) {
+            return A;
+        }
+    }
+    return 0;
+}
+
+
+
+void SetSegAddrSize (const char* Name, unsigned char AddrSize)
+/* Set the address size for a segment */
+{
+    SegAddrSize_t* A = FindSegAddrSize (Name);
+    if (!A) {
+        /* New one */
+        A = xmalloc (sizeof (SegAddrSize_t));
+        SB_Init (&A->Name);
+        SB_CopyStr (&A->Name, Name);
+        SB_Terminate (&A->Name);
+        CollAppend (&SegmentAddrSizes, A);
+    } else {
+        /* Check for mismatching address sizes */
+        if (A->AddrSize != AddrSize) {
+            Warning ("Segment address size changed from last time!");
+        }
+    }
+
+    /* Set the address size anyway */
+    A->AddrSize = AddrSize;
+}
+
+
+
+unsigned char GetSegAddrSize (const char* Name)
+/* Get the address size of the given segment.
+** Return ADDR_SIZE_INVALID if not found.
+*/
+{
+    SegAddrSize_t* A = FindSegAddrSize (Name);
+    if (A) {
+        return A->AddrSize;
+    }
+    return ADDR_SIZE_INVALID;
+}
 
 
 
@@ -136,19 +226,27 @@ const char* GetSegName (segment_t Seg)
 
 
 
-static Segments* NewSegments (SymEntry* Func)
-/* Initialize a Segments structure (set all fields to NULL) */
+/*****************************************************************************/
+/*                              Segment context                              */
+/*****************************************************************************/
+
+
+
+static SegContext* NewSegContext (SymEntry* Func)
+/* Initialize a SegContext structure (set all fields to NULL) */
 {
     /* Allocate memory */
-    Segments* S = xmalloc (sizeof (Segments));
+    SegContext* S = xmalloc (sizeof (SegContext));
 
     /* Initialize the fields */
-    S->Text     = NewTextSeg (Func);
-    S->Code     = NewCodeSeg (GetSegName (SEG_CODE), Func);
-    S->Data     = NewDataSeg (GetSegName (SEG_DATA), Func);
-    S->ROData   = NewDataSeg (GetSegName (SEG_RODATA), Func);
-    S->BSS      = NewDataSeg (GetSegName (SEG_BSS), Func);
-    S->CurDSeg  = SEG_DATA;
+    S->Text    = NewTextSeg (Func);
+    S->Code    = NewCodeSeg (GetSegName (SEG_CODE), Func);
+    S->Data    = NewDataSeg (GetSegName (SEG_DATA), Func);
+    S->ROData  = NewDataSeg (GetSegName (SEG_RODATA), Func);
+    S->BSS     = NewDataSeg (GetSegName (SEG_BSS), Func);
+    S->CurDSeg = SEG_DATA;
+    S->NextLabel     = 0;
+    S->NextDataLabel = 0;
 
     /* Return the new struct */
     return S;
@@ -156,14 +254,14 @@ static Segments* NewSegments (SymEntry* Func)
 
 
 
-Segments* PushSegments (SymEntry* Func)
-/* Make the new segment list current but remember the old one */
+SegContext* PushSegContext (SymEntry* Func)
+/* Make the new segment context current but remember the old one */
 {
     /* Push the current pointer onto the stack */
-    CollAppend (&SegmentStack, CS);
+    CollAppend (&SegContextStack, CS);
 
-    /* Create a new Segments structure */
-    CS = NewSegments (Func);
+    /* Create a new SegContext structure */
+    CS = NewSegContext (Func);
 
     /* Return the new struct */
     return CS;
@@ -171,14 +269,14 @@ Segments* PushSegments (SymEntry* Func)
 
 
 
-void PopSegments (void)
-/* Pop the old segment list (make it current) */
+void PopSegContext (void)
+/* Pop the old segment context (make it current) */
 {
     /* Must have something on the stack */
-    PRECONDITION (CollCount (&SegmentStack) > 0);
+    PRECONDITION (CollCount (&SegContextStack) > 0);
 
     /* Pop the last segment and set it as current */
-    CS = CollPop (&SegmentStack);
+    CS = CollPop (&SegContextStack);
 }
 
 
@@ -186,13 +284,13 @@ void PopSegments (void)
 void CreateGlobalSegments (void)
 /* Create the global segments and remember them in GS */
 {
-    GS = PushSegments (0);
+    GS = PushSegContext (0);
 }
 
 
 
 void UseDataSeg (segment_t DSeg)
-/* For the current segment list, use the data segment DSeg */
+/* For the current segment context, use the data segment DSeg */
 {
     /* Check the input */
     PRECONDITION (CS && DSeg != SEG_CODE);
@@ -280,7 +378,7 @@ void RemoveGlobalCode (void)
 
 
 
-void OutputSegments (const Segments* S)
+void OutputSegments (const SegContext* S)
 /* Output the given segments to the output file */
 {
     /* Output the function prologue if the segments came from a function */
@@ -289,13 +387,13 @@ void OutputSegments (const Segments* S)
     /* Output the text segment */
     TS_Output (S->Text);
 
+    /* Output the code segment */
+    CS_Output (S->Code);
+
     /* Output the three data segments */
     DS_Output (S->Data);
     DS_Output (S->ROData);
     DS_Output (S->BSS);
-
-    /* Output the code segment */
-    CS_Output (S->Code);
 
     /* Output the code segment epiloque */
     CS_OutputEpilogue (S->Code);

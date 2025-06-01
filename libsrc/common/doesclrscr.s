@@ -7,6 +7,6 @@
 ;
 
         .export _doesclrscrafterexit
-        .import return0 
+        .import return0
 
 _doesclrscrafterexit = return0

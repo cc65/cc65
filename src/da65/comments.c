@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2006      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -36,7 +36,7 @@
 /* common */
 #include "xmalloc.h"
 
-/* da65 */        
+/* da65 */
 #include "attrtab.h"
 #include "comments.h"
 #include "error.h"
@@ -52,11 +52,29 @@
 /* Comment table */
 static const char* CommentTab[0x10000];
 
+#define MAX_LONG_COMMENTS 256
+static const char* LongCommentVal[MAX_LONG_COMMENTS];
+static unsigned LongCommentAddr[MAX_LONG_COMMENTS];
+static unsigned LongCommentsUsed;
+
 
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+static unsigned FindLongIndex (unsigned Addr)
+{
+    unsigned i;
+    for (i = 0; i < LongCommentsUsed; i++) {
+        if (LongCommentAddr[i] == Addr) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 
 
@@ -66,11 +84,24 @@ void SetComment (unsigned Addr, const char* Comment)
     /* Check the given address */
     AddrCheck (Addr);
 
-    /* If we do already have a comment, warn and ignore the new one */
-    if (CommentTab[Addr]) {
-        Warning ("Duplicate comment for address $%04X", Addr);
+    if (IsLongAddr (Addr)) {
+        if (FindLongIndex (Addr)) {
+            Warning ("Duplicate comment for address $%06X", Addr);
+        } else {
+            if (LongCommentsUsed >= MAX_LONG_COMMENTS) {
+                Error("Too many long-address comments");
+            }
+            LongCommentVal[LongCommentsUsed] = xstrdup (Comment);
+            LongCommentAddr[LongCommentsUsed] = Addr;
+            LongCommentsUsed++;
+        }
     } else {
-        CommentTab[Addr] = xstrdup (Comment);
+        /* If we do already have a comment, warn and ignore the new one */
+        if (CommentTab[Addr]) {
+            Warning ("Duplicate comment for address $%04X", Addr);
+        } else {
+            CommentTab[Addr] = xstrdup (Comment);
+        }
     }
 }
 
@@ -81,6 +112,14 @@ const char* GetComment (unsigned Addr)
 {
     /* Check the given address */
     AddrCheck (Addr);
+
+    if (IsLongAddr (Addr)) {
+        const unsigned i = FindLongIndex (Addr);
+        if (i < LongCommentsUsed) {
+            return LongCommentVal[i];
+        }
+        return NULL;
+    }
 
     /* Return the label if any */
     return CommentTab[Addr];

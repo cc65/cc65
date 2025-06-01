@@ -7,7 +7,7 @@
         .export         toseqeax
         .import         toslcmp, booleq
 
-toseqeax:                       
+toseqeax:
         jsr     toslcmp         ; Set flags
         jmp     booleq          ; Convert to boolean
 

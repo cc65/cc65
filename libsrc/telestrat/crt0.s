@@ -12,7 +12,6 @@
         .import         __MAIN_START__, __MAIN_SIZE__
 
         .include        "zeropage.inc"
-        .include        "telestrat.inc"
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.

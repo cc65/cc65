@@ -13,7 +13,6 @@
         .importzp       ST
 
         .include        "zeropage.inc"
-        .include        "vic20.inc"
 
 ; ------------------------------------------------------------------------
 ; Startup code

@@ -212,6 +212,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__ATARI5200__", 1);
             break;
 
+        case TGT_ATARI7800:
+            NewSymbol ("__ATARI7800__", 1);
+            break;
+
         case TGT_ATARI:
             NewSymbol ("__ATARI__", 1);
             break;
@@ -332,6 +336,18 @@ static void SetSys (const char* Sys)
 
         case TGT_CX16:
             CBMSystem ("__CX16__");
+            break;
+
+        case TGT_SYM1:
+            NewSymbol ("__SYM1__", 1);
+            break;
+
+        case TGT_KIM1:
+            NewSymbol ("__KIM1__", 1);
+            break;
+
+        case TGT_RP6502:
+            NewSymbol ("__RP6502__", 1);
             break;
 
         default:
@@ -477,12 +493,15 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 /* Set an emulation feature */
 {
-    /* Make a string buffer from Arg */
-    StrBuf Feature;
+    /* Make a string buffer from Arg and use it to find the feature. */
+    StrBuf StrFeature;
+    feature_t Feature = FindFeature (SB_InitFromString (&StrFeature, Arg));
 
-    /* Set the feature, check for errors */
-    if (SetFeature (SB_InitFromString (&Feature, Arg)) == FEAT_UNKNOWN) {
+    /* Enable the feature, check for errors */
+    if (Feature == FEAT_UNKNOWN) {
         AbEnd ("Illegal emulation feature: '%s'", Arg);
+    } else {
+        SetFeature (Feature, 1);
     }
 }
 
@@ -644,6 +663,15 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
+                                 const char* Arg attribute ((unused)))
+/* Generate an error if any warnings occur */
+{
+    WarningsAsErrors = 1;
+}
+
+
+
 static void DoPCAssign (void)
 /* Start absolute code */
 {
@@ -677,6 +705,24 @@ static void OneLine (void)
     if (CurTok.Tok == TOK_COLON) {
         ULabDef ();
         NextTok ();
+    }
+
+    /* Handle @-style unnamed labels */
+    if (CurTok.Tok == TOK_ULABEL) {
+        if (CurTok.IVal != 0) {
+            Error ("Invalid unnamed label definition");
+        }
+        ULabDef ();
+        NextTok ();
+
+        /* Skip the colon. If NoColonLabels is enabled, allow labels without
+        ** a colon if there is no whitespace before the identifier.
+        */
+        if (CurTok.Tok == TOK_COLON) {
+            NextTok ();
+        } else if (CurTok.WS || !NoColonLabels) {
+            Error ("':' expected");
+        }
     }
 
     /* If the first token on the line is an identifier, check for a macro or
@@ -834,7 +880,12 @@ static void OneLine (void)
             /* The line has switched the segment */
             Size = 0;
         }
-        DefSizeOfSymbol (Sym, Size);
+        /* Suppress .size Symbol if this Symbol already has a multiply-defined error,
+        ** as it will only create its own additional unnecessary error.
+        */
+        if ((Sym->Flags & SF_MULTDEF) == 0) {
+            DefSizeOfSymbol (Sym, Size);
+        }
     }
 
     /* Line separator must come here */
@@ -907,27 +958,28 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--auto-import",      0,      OptAutoImport           },
-        { "--bin-include-dir",  1,      OptBinIncludeDir        },
-        { "--cpu",              1,      OptCPU                  },
-        { "--create-dep",       1,      OptCreateDep            },
-        { "--create-full-dep",  1,      OptCreateFullDep        },
-        { "--debug",            0,      OptDebug                },
-        { "--debug-info",       0,      OptDebugInfo            },
-        { "--feature",          1,      OptFeature              },
-        { "--help",             0,      OptHelp                 },
-        { "--ignore-case",      0,      OptIgnoreCase           },
-        { "--include-dir",      1,      OptIncludeDir           },
-        { "--large-alignment",  0,      OptLargeAlignment       },
-        { "--list-bytes",       1,      OptListBytes            },
-        { "--listing",          1,      OptListing              },
-        { "--memory-model",     1,      OptMemoryModel          },
-        { "--pagelength",       1,      OptPageLength           },
-        { "--relax-checks",     0,      OptRelaxChecks          },
-        { "--smart",            0,      OptSmart                },
-        { "--target",           1,      OptTarget               },
-        { "--verbose",          0,      OptVerbose              },
-        { "--version",          0,      OptVersion              },
+        { "--auto-import",         0,      OptAutoImport           },
+        { "--bin-include-dir",     1,      OptBinIncludeDir        },
+        { "--cpu",                 1,      OptCPU                  },
+        { "--create-dep",          1,      OptCreateDep            },
+        { "--create-full-dep",     1,      OptCreateFullDep        },
+        { "--debug",               0,      OptDebug                },
+        { "--debug-info",          0,      OptDebugInfo            },
+        { "--feature",             1,      OptFeature              },
+        { "--help",                0,      OptHelp                 },
+        { "--ignore-case",         0,      OptIgnoreCase           },
+        { "--include-dir",         1,      OptIncludeDir           },
+        { "--large-alignment",     0,      OptLargeAlignment       },
+        { "--list-bytes",          1,      OptListBytes            },
+        { "--listing",             1,      OptListing              },
+        { "--memory-model",        1,      OptMemoryModel          },
+        { "--pagelength",          1,      OptPageLength           },
+        { "--relax-checks",        0,      OptRelaxChecks          },
+        { "--smart",               0,      OptSmart                },
+        { "--target",              1,      OptTarget               },
+        { "--verbose",             0,      OptVerbose              },
+        { "--version",             0,      OptVersion              },
+        { "--warnings-as-errors",  0,      OptWarningsAsErrors     },
     };
 
     /* Name of the global name space */
@@ -1130,6 +1182,10 @@ int main (int argc, char* argv [])
     if (Verbosity >= 2) {
         SymDump (stdout);
         SegDump ();
+    }
+
+    if (WarningCount > 0 && WarningsAsErrors) {
+        Error("Warnings as errors");
     }
 
     /* If we didn't have an errors, finish off the line infos */

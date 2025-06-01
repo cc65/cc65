@@ -230,7 +230,7 @@ Section* ReadSection (FILE* F, ObjData* O)
                    "%lu. Last module requiring alignment was '%s'.",
                    GetString (Name), Alignment, MAX_ALIGNMENT,
                    GetObjFileName (O));
-        } else if (Alignment >= LARGE_ALIGNMENT) {
+        } else if (Alignment >= LARGE_ALIGNMENT && Alignment > S->Alignment && Alignment > Sec->Alignment && !LargeAlignment) {
             Warning ("Combined alignment for segment '%s' is suspiciously "
                      "large (%lu). Last module requiring alignment was '%s'.",
                      GetString (Name), Alignment, GetObjFileName (O));
@@ -637,6 +637,13 @@ void PrintDbgSegments (FILE* F)
         if (S->OutputName) {
             fprintf (F, ",oname=\"%s\",ooffs=%lu",
                      S->OutputName, S->OutputOffs);
+        }
+        if (S->MemArea) {
+            if (S->MemArea->BankExpr) {
+                if (IsConstExpr (S->MemArea->BankExpr)) {
+                    fprintf (F, ",bank=%lu", GetExprVal(S->MemArea->BankExpr));
+                }
+            }
         }
         fputc ('\n', F);
     }

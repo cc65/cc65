@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -39,10 +39,10 @@
 
 
 
-void __fastcall__ _poserror (const char* msg)
+void __fastcall__ __poserror (const char* msg)
 {
     /* Fetch the message that corresponds to _oserror */
-    const char* errormsg = _stroserror (_oserror);
+    const char* errormsg = __stroserror (_oserror);
 
     /* Different output depending on msg */
     if (msg) {

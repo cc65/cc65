@@ -66,8 +66,7 @@
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
-#define COLOR_VIOLET            0x04
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            0x04
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
@@ -85,7 +84,6 @@
 #define TGI_COLOR_WHITE         COLOR_WHITE
 #define TGI_COLOR_RED           COLOR_RED
 #define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
 #define TGI_COLOR_PURPLE        COLOR_PURPLE
 #define TGI_COLOR_GREEN         COLOR_GREEN
 #define TGI_COLOR_BLUE          COLOR_BLUE
@@ -142,10 +140,12 @@ extern void c64_c256k_emd[];
 extern void c64_dqbb_emd[];
 extern void c64_georam_emd[];
 extern void c64_isepic_emd[];
+extern void c64_kerberos_emd[];
 extern void c64_ram_emd[];
 extern void c64_ramcart_emd[];
 extern void c64_reu_emd[];
 extern void c64_vdc_emd[];
+extern void c64_rrr_emd[];
 extern void dtv_himem_emd[];
 extern void c64_hitjoy_joy[];
 extern void c64_numpad_joy[];
@@ -155,7 +155,7 @@ extern void c64_1351_mou[];             /* Referred to by mouse_static_stddrv[] 
 extern void c64_joy_mou[];
 extern void c64_inkwell_mou[];
 extern void c64_pot_mou[];
-extern void c64_swlink_ser[];
+extern void c64_swlink_ser[];           /* Referred to by ser_static_stddrv[] */
 extern void c64_hi_tgi[];               /* Referred to by tgi_static_stddrv[] */
 
 

@@ -82,14 +82,3 @@ _strstr:
         lda     #$00            ; return NULL
         tax
         rts
-
-
-
-
-
-
-
-
-
-
-

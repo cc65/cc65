@@ -53,7 +53,7 @@ Y2      :=      ptr4
 
         .byte   $74, $67, $69   ; "tgi"
         .byte   TGI_API_VERSION ; TGI API version number
-        .addr   $0000           ; Library reference
+libref: .addr   $0000           ; Library reference
         .word   40              ; X resolution
         .word   48              ; Y resolution
         .byte   16              ; Number of drawing colors
@@ -93,6 +93,10 @@ Y2      :=      ptr4
 ERROR:  .res    1               ; Error code
 MIX:    .res    1               ; 4 lines of text
 
+.ifndef __APPLE2ENH__
+machinetype: .res 1
+.endif
+
 ; ------------------------------------------------------------------------
 
         .rodata
@@ -126,7 +130,15 @@ INIT:
         bit     $C082           ; Switch in ROM
         jsr     SETGR
         bit     MIXCLR
-        bit     $C080           ; Switch in LC bank 2 for R/O
+
+        .ifndef  __APPLE2ENH__
+        bit     machinetype
+        bpl     lc_in
+        .endif
+
+        sta     IOUDISON
+        bit     DHIRESOFF
+lc_in:  bit     $C080           ; Switch in LC bank 2 for R/O
 
         ; Done, reset the error code
         lda     #TGI_ERR_OK
@@ -140,6 +152,16 @@ INIT:
 ; most of the time.
 ; Must set an error code: NO
 INSTALL:
+        .ifndef __APPLE2ENH__
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #$0
+        lda     (ptr1),y
+        sta     machinetype
+        bpl     :+
+        .endif
         ; Fall through
 
 ; UNINSTALL routine. Is called before the driver is removed from memory. May
@@ -317,7 +339,7 @@ GETPIXEL:
         jsr     SCRN
         tax
         lda     COL2TGI,x
-        ldx     #$00
+        ldx     #>$0000
         bit     $C080           ; Switch in LC bank 2 for R/O
         rts
 

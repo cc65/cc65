@@ -92,14 +92,14 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
 
   # For this one, see https://www.horus.com/~hias/atari/
   DIR2ATR ?= dir2atr
-
-  DISK_c64       = samples.d64
-  DISK_plus4     = samples.d64
-  DISK_apple2    = samples.dsk
-  DISK_apple2enh = samples.dsk
-  DISK_atari     = samples.atr
-  DISK_atarixl   = samples.atr
 endif
+
+DISK_c64       = samples.d64
+DISK_apple2    = samples.dsk
+DISK_apple2enh = samples.dsk
+DISK_atari     = samples.atr
+DISK_atarixl   = samples.atr
+DISK_plus4     = samples.d64
 
 # --------------------------------------------------------------------------
 # System-dependent settings
@@ -133,7 +133,7 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 # --------------------------------------------------------------------------
 # Generic rules
 
-.PHONY: all mostlyclean clean install zip samples disk
+.PHONY: samples all mostlyclean clean install zip disk platforms
 
 %: %.c
 %: %.s
@@ -155,35 +155,17 @@ else
 endif
 
 # --------------------------------------------------------------------------
+# Lists of subdirectories
+
+# disasm depends on cpp
+DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 kim1 cbm
+
+# --------------------------------------------------------------------------
 # Lists of executables
-
-EXELIST_c64 =      \
-        ascii      \
-        enumdevdir \
-        fire       \
-        gunzip65   \
-        hello      \
-        mandelbrot \
-        mousedemo  \
-        multdemo   \
-        nachtm     \
-        ovrldemo   \
-        plasma     \
-        sieve      \
-        tgidemo
-
-EXELIST_plus4 =    \
-        ascii      \
-        enumdevdir \
-        gunzip65   \
-        hello      \
-        mandelbrot \
-        plasma     \
-        sieve      \
-        tgidemo
 
 EXELIST_apple2 =   \
         ascii      \
+        checkversion \
         diodemo    \
         enumdevdir \
         gunzip65   \
@@ -193,12 +175,15 @@ EXELIST_apple2 =   \
         multdemo   \
         ovrldemo   \
         sieve      \
+        terminal   \
+        tinyshell  \
         tgidemo
 
 EXELIST_apple2enh = $(EXELIST_apple2)
 
 EXELIST_atari =    \
         ascii      \
+        checkversion \
         gunzip65   \
         hello      \
         mandelbrot \
@@ -206,15 +191,178 @@ EXELIST_atari =    \
         multdemo   \
         ovrldemo   \
         sieve      \
+        terminal   \
+        tinyshell  \
         tgidemo
 
 EXELIST_atarixl = $(EXELIST_atari)
 
 EXELIST_atari2600 = \
-        atari2600hello
-        
+        notavailable
+
+EXELIST_atari5200 = \
+        notavailable
+
+EXELIST_atmos =    \
+        ascii      \
+        checkversion \
+        hello      \
+        mandelbrot \
+        sieve      \
+        terminal   \
+        tgidemo
+
+EXELIST_bbc = \
+        notavailable
+
+EXELIST_c64 =      \
+        ascii      \
+        checkversion \
+        enumdevdir \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousedemo  \
+        multdemo   \
+        ovrldemo   \
+        sieve      \
+        terminal   \
+        tinyshell  \
+        tgidemo
+
+EXELIST_c128 =     \
+        ascii      \
+        checkversion \
+        enumdevdir \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousedemo  \
+        sieve      \
+        terminal   \
+        tinyshell  \
+        tgidemo
+
+EXELIST_c16 =      \
+        ascii      \
+        checkversion \
+        enumdevdir \
+        tinyshell  \
+        hello
+
+EXELIST_cbm510 =   \
+        ascii      \
+        checkversion \
+        gunzip65   \
+        hello      \
+        mousedemo  \
+        terminal   \
+        tinyshell  \
+        sieve
+
+EXELIST_cbm610 =   \
+        ascii      \
+        checkversion \
+        gunzip65   \
+        hello      \
+        terminal   \
+        tinyshell  \
+        sieve
+
+EXELIST_creativision = \
+        ascii          \
+        hello
+
+EXELIST_cx16 =     \
+        ascii      \
+        checkversion \
+        enumdevdir \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        mousedemo  \
+        sieve      \
+        tinyshell  \
+        tgidemo
+
+EXELIST_gamate =   \
+        hello
+
+EXELIST_geos-cbm = \
+        ascii      \
+        checkversion \
+        diodemo
+
+EXELIST_geos-apple = \
+        ascii
+
+EXELIST_lunix = \
+        notavailable
+
+EXELIST_lynx = \
+        notavailable
+
+EXELIST_nes = \
+        hello
+
+EXELIST_osic1p = \
+        notavailable
+
+EXELIST_pce = \
+        hello
+
+EXELIST_pet =      \
+        ascii      \
+        checkversion \
+        enumdevdir \
+        hello      \
+        tinyshell  \
+        sieve
+
+EXELIST_plus4 =    \
+        ascii      \
+        checkversion \
+        enumdevdir \
+        gunzip65   \
+        hello      \
+        mandelbrot \
+        terminal   \
+        tinyshell  \
+        sieve      \
+        tgidemo
+
+EXELIST_sim6502 =  \
+        checkversion \
+        gunzip65
+
+EXELIST_sim65c02 = $(EXELIST_sim6502)
+
 EXELIST_supervision = \
-        supervisionhello
+        notavailable
+
+EXELIST_sym1 =     \
+        notavailable
+
+EXELIST_kim1 =     \
+        notavailable
+
+EXELIST_telestrat = \
+        ascii       \
+        checkversion \
+        gunzip65    \
+        hello       \
+        mandelbrot  \
+        sieve       \
+        tgidemo
+
+EXELIST_vic20 =    \
+        ascii      \
+        checkversion \
+        enumdevdir \
+        hello      \
+        mandelbrot \
+        sieve      \
+        tgidemo
 
 # Unlisted targets will try to build everything.
 # That lets us learn what they cannot build, and what settings
@@ -223,14 +371,75 @@ ifndef EXELIST_$(SYS)
 EXELIST_$(SYS) := ${patsubst %.c,%,$(wildcard *.c)}
 endif
 
+define SUBDIR_recipe
+
+@+$(MAKE) -C $(dir) --no-print-directory $@
+
+endef # SUBDIR_recipe
+
 # --------------------------------------------------------------------------
 # Rules to make the binaries and the disk
 
 samples: $(EXELIST_$(SYS))
+	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
+
+# empty target used to skip systems that will not work with any program in this dir
+notavailable:
+ifeq ($(MAKELEVEL),0)
+	@echo "info: generic samples not available for" $(SYS)
+endif
 
 disk: $(DISK_$(SYS))
 
 all:
+
+# --------------------------------------------------------------------------
+# List of every supported platform
+TARGETS :=     \
+  apple2       \
+  apple2enh    \
+  atari        \
+  atarixl      \
+  atari2600    \
+  atari5200    \
+  atmos        \
+  bbc          \
+  c128         \
+  c16          \
+  c64          \
+  cbm510       \
+  cbm610       \
+  creativision \
+  cx16         \
+  gamate       \
+  kim1         \
+  lunix        \
+  lynx         \
+  nes          \
+  osic1p       \
+  pce          \
+  pet          \
+  plus4        \
+  sim6502      \
+  sim65c02     \
+  supervision  \
+  sym1         \
+  telestrat    \
+  vic20
+
+# --------------------------------------------------------------------------
+# Rule to make the binaries for every platform
+
+define TARGET_recipe
+
+@echo making samples for: $(T)
+@$(MAKE) -j2 SYS:=$(T)
+@$(MAKE) --no-print-directory clean SYS:=$(T)
+
+endef # TARGET_recipe
+
+platforms:
+	$(foreach T,$(TARGETS),$(TARGET_recipe))
 
 # --------------------------------------------------------------------------
 # Overlay rules. Overlays need special ld65 configuration files.  Also, the
@@ -253,20 +462,57 @@ OVERLAYLIST += $(foreach I,1 2 3,multdemo.$I)
 endif
 
 # --------------------------------------------------------------------------
+# TGI programs on the VIC-20 need a special ld65 configuration file.
+
+ifeq ($(SYS),vic20)
+mandelbrot.o: override CFLAGS += -D DYN_DRV=0
+mandelbrot: mandelbrot.o
+	$(LD) $(LDFLAGS) -o $@ -C vic20-tgi.cfg -m $@.map $^ $(SYS).lib
+
+# tgidemo needs at least 16K of RAM expansion.
+tgidemo.o: override CFLAGS += -D DYN_DRV=0
+tgidemo: tgidemo.o
+	$(LD) -D __HIMEM__=0x6000 $(LDFLAGS) -o $@ -C vic20-tgi.cfg -m $@.map $^ $(SYS).lib
+endif
+
+# --------------------------------------------------------------------------
+# some programs link against getsp.o
+
+getsp.o: getsp.s
+	$(AS) $(ASFLAGS) -t $(SYS) $<
+
+ifneq ($(SYS),vic20)
+tinyshell: tinyshell.o getsp.o
+	$(LD) $(LDFLAGS) -t $(SYS) -o $@ $^ $(SYS).lib
+endif
+
+# some programs need more memory on the vic20
+ifeq ($(SYS),vic20)
+tinyshell:  tinyshell.o getsp.o
+	$(LD) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
+endif
+
+# --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
 # with the VICE emulator.
 
-define D64_WRITE_recipe
+define D64_WRITE_PRG_recipe
 
-$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)) >$(NULLDEV)
+$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)),p >$(NULLDEV)
 
-endef # D64_WRITE_recipe
+endef # D64_WRITE_PRG_recipe
+
+define D64_WRITE_SEQ_recipe
+
+$(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)),s >$(NULLDEV)
+
+endef # D64_WRITE_SEQ_recipe
 
 samples.d64: samples
-	@$(C1541) -format samples,AA d64 $@ >$(NULLDEV)
-	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_recipe))
-	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_recipe))
-	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_recipe))
+	@$(C1541) -format "samples,00" d64 $@ >$(NULLDEV)
+	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
 
 # --------------------------------------------------------------------------
 # Rule to make an Apple II disk with all samples. Needs the AppleCommander
@@ -321,15 +567,36 @@ INSTALL = install
 samplesdir = $(PREFIX)/share/cc65/samples
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/tutorial
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/atari2600
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/atari5200
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/apple2
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/cbm
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/gamate
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/supervision
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/disasm
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/lynx
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sim65
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sym1
 	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
-	$(INSTALL) -m0644 README $(DESTDIR)$(samplesdir)
+	$(INSTALL) -m0644 readme.txt $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 geos/*.* $(DESTDIR)$(samplesdir)/geos
 	$(INSTALL) -m0644 tutorial/*.* $(DESTDIR)$(samplesdir)/tutorial
+	$(INSTALL) -m0644 atari2600/*.* $(DESTDIR)$(samplesdir)/atari2600
+	$(INSTALL) -m0644 atari5200/*.* $(DESTDIR)$(samplesdir)/atari5200
+	$(INSTALL) -m0644 apple2/*.* $(DESTDIR)$(samplesdir)/apple2
+	$(INSTALL) -m0644 cbm/*.* $(DESTDIR)$(samplesdir)/cbm
+	$(INSTALL) -m0644 gamate/*.* $(DESTDIR)$(samplesdir)/gamate
+	$(INSTALL) -m0644 supervision/*.* $(DESTDIR)$(samplesdir)/supervision
+	$(INSTALL) -m0644 disasm/*.* $(DESTDIR)$(samplesdir)/disasm
+	$(INSTALL) -m0644 kim1/*.* $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -m0644 lynx/*.* $(DESTDIR)$(samplesdir)/lynx
+	$(INSTALL) -m0644 sim65/*.* $(DESTDIR)$(samplesdir)/sim65
+	$(INSTALL) -m0644 sym1/*.* $(DESTDIR)$(samplesdir)/sym1
 
 # --------------------------------------------------------------------------
 # Packaging rules
@@ -341,8 +608,11 @@ zip:
 # Clean-up rules
 
 mostlyclean:
-	@$(DEL) *.lbl *.map *.o *.s 2>$(NULLDEV)
+	@$(DEL) *.lbl *.map *.o 2>$(NULLDEV)
+# we cant use .s since we have asm files in the directory that we want to keep
+	@$(DEL) ${patsubst %.c,%.s,$(wildcard *.c)} 2>$(NULLDEV)
 
 clean: mostlyclean
 	@$(DEL) $(EXELIST_$(SYS)) $(DISK_$(SYS)) 2>$(NULLDEV)
 	@$(DEL) multdemo.? ovrldemo.? 2>$(NULLDEV)
+	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))

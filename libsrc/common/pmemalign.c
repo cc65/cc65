@@ -50,7 +50,6 @@
 */
 
 
-
 int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
 /* Allocate a block of memory with the given "size", which is aligned to a
 ** memory address that is a multiple of "alignment".  "alignment" MUST NOT be
@@ -64,20 +63,27 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     size_t rawsize;
     size_t uppersize;
     size_t lowersize;
+    char err;
     register struct usedblock* b;       /* points to raw Block */
     register struct usedblock* u;       /* points to User block */
     register struct usedblock* p;       /* Points to upper block */
 
     /* Handle requests for zero-sized blocks */
     if (size == 0) {
+err_einval:
+        err = EINVAL;
+err_out:
         *memptr = NULL;
-        return EINVAL;
+        return err;
     }
 
-    /* Test alignment: is it a power of two? There must be only one bit set. */
-    if (alignment == 0 || (alignment & --alignment) != 0) {
-        *memptr = NULL;
-        return EINVAL;
+    /* Test alignment: is it a power of two? There must be one and only one bit set. */
+    if (alignment == 0) {
+        goto err_einval;
+    }
+
+    if (alignment & (alignment - 1)) {
+        goto err_einval;
     }
 
     /* Augment the block size up to the alignment, and allocate memory.
@@ -86,12 +92,12 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
     ** overhead added one time; and, the worst thing that might happen is that
     ** we cannot free the upper and lower blocks.
     */
-    b = malloc (size + alignment);
+    b = malloc (--alignment + size);
 
     /* Handle out-of-memory */
     if (b == NULL) {
-        *memptr = NULL;
-        return ENOMEM;
+        err = ENOMEM;
+        goto err_out;
     }
 
     /* Create (and return) a new pointer that points to the user-visible
@@ -169,6 +175,3 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size)
 
     return EOK;
 }
-
-
-

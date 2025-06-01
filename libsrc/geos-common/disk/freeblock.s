@@ -11,7 +11,7 @@
             .include "jumptab.inc"
             .include "diskdrv.inc"
             .include "geossym.inc"
-        
+
 _FreeBlock:
         jsr gettrse
         sta r6L

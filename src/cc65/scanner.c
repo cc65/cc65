@@ -39,6 +39,8 @@
 #include <errno.h>
 #include <ctype.h>
 #include <math.h>
+#include <inttypes.h>
+#include <limits.h>
 
 /* common */
 #include "chartype.h"
@@ -54,6 +56,7 @@
 #include "ident.h"
 #include "input.h"
 #include "litpool.h"
+#include "pragma.h"
 #include "preproc.h"
 #include "scanner.h"
 #include "standard.h"
@@ -67,8 +70,12 @@
 
 
 
-Token CurTok;           /* The current token */
-Token NextTok;          /* The next token */
+static Token SavedTok;          /* Saved token */
+Token       CurTok;             /* The current token */
+Token       NextTok;            /* The next token */
+int         PPParserRunning;    /* Is tokenizer used by the preprocessor */
+int         NoCharMap;          /* Disable literal translation */
+unsigned    InPragmaParser;     /* Depth of pragma parser calling */
 
 
 
@@ -86,6 +93,7 @@ static const struct Keyword {
     unsigned char   Std;        /* Token supported in which standards? */
 } Keywords [] = {
     { "_Pragma",        TOK_PRAGMA,     TT_C89 | TT_C99 | TT_CC65  },   /* !! */
+    { "_Static_assert", TOK_STATIC_ASSERT,                TT_CC65  },   /* C11 */
     { "__AX__",         TOK_AX,         TT_C89 | TT_C99 | TT_CC65  },
     { "__A__",          TOK_A,          TT_C89 | TT_C99 | TT_CC65  },
     { "__EAX__",        TOK_EAX,        TT_C89 | TT_C99 | TT_CC65  },
@@ -149,6 +157,17 @@ static const struct Keyword {
 #define IT_ULONG        0x08
 
 
+/* Internal type for numeric constant scanning.
+** Size must be explicit for cross-platform uniformity.
+*/
+typedef uint32_t scan_t;
+
+
+/* ParseChar return values */
+typedef struct {
+    int Val;
+    int Cooked;
+} parsedchar_t;
 
 /*****************************************************************************/
 /*                                   code                                    */
@@ -187,10 +206,12 @@ static int SkipWhite (void)
 {
     while (1) {
         while (CurC == '\0') {
-            if (NextLine () == 0) {
+            /* If reading next line fails or is disabled with directives, bail
+            ** out.
+            */
+            if (PPParserRunning || PreprocessNextLine () == 0) {
                 return 0;
             }
-            Preprocess ();
         }
         if (IsSpace (CurC)) {
             NextChar ();
@@ -231,14 +252,63 @@ void SymName (char* S)
 
 
 
+int IsWideQuoted (char First, char Second)
+/* Return 1 if the two successive characters indicate a wide string literal or
+** a wide char constant, otherwise return 0.
+*/
+{
+    return First == 'L' && IsQuote(Second);
+}
+
+
+
 int IsSym (char* S)
 /* If a symbol follows, read it and return 1, otherwise return 0 */
 {
-    if (IsIdent (CurC)) {
+    if (IsIdent (CurC) && !IsWideQuoted (CurC, NextC)) {
         SymName (S);
         return 1;
     } else {
         return 0;
+    }
+}
+
+
+
+int IsPPNumber (int Cur, int Next)
+/* Return 1 if the two successive characters indicate a pp-number, otherwise
+** return 0.
+*/
+{
+    return Cur != '.' ? IsDigit (Cur) : IsDigit (Next);
+}
+
+
+
+void CopyPPNumber (StrBuf* Target)
+/* Copy a pp-number from the input to Target */
+{
+    int Std;
+
+    if (!IsPPNumber (CurC, NextC)) {
+        return;
+    }
+
+    /* P-exp is only valid in C99 and later */
+    Std = IS_Get (&Standard);
+    while (IsIdent (CurC) || IsDigit (CurC) || CurC == '.') {
+        SB_AppendChar (Target, CurC);
+        if (NextC == '+' || NextC == '-') {
+            if (CurC == 'e' || CurC == 'E' ||
+                (Std >= STD_C99 && (CurC == 'p' || CurC == 'P'))) {
+                SB_AppendChar (Target, NextC);
+                NextChar ();
+            } else {
+                NextChar ();
+                break;
+            }
+        }
+        NextChar ();
     }
 }
 
@@ -262,12 +332,15 @@ static void SetTok (int tok)
 
 
 
-static int ParseChar (void)
-/* Parse a character. Converts escape chars into character codes. */
+static parsedchar_t ParseChar (void)
+/* Parse a character token. Converts escape chars into character codes. */
 {
+    parsedchar_t Result;
     int C;
     int HadError;
     int Count;
+
+    Result.Cooked = 1;
 
     /* Check for escape chars */
     if (CurC == '\\') {
@@ -281,6 +354,14 @@ static int ParseChar (void)
                 break;
             case 'b':
                 C = '\b';
+                break;
+            case 'e':
+                if (IS_Get(&Standard) != STD_CC65) {
+                    goto IllegalEscape;
+                }
+                /* we'd like to use \e here, but */
+                /* not all build systems support it */
+                C = '\x1B';
                 break;
             case 'f':
                 C = '\f';
@@ -309,6 +390,7 @@ static int ParseChar (void)
             case 'x':
             case 'X':
                 /* Hex character constant */
+                Result.Cooked = 0;
                 if (!IsXDigit (NextC)) {
                     Error ("\\x used with no following hex digits");
                     C = ' ';
@@ -337,6 +419,7 @@ static int ParseChar (void)
             case '6':
             case '7':
                 /* Octal constant */
+                Result.Cooked = 0;
                 Count = 1;
                 C = HexVal (CurC);
                 while (IsODigit (NextC) && Count++ < 3) {
@@ -347,6 +430,7 @@ static int ParseChar (void)
                     Error ("Octal character constant out of range");
                 break;
             default:
+IllegalEscape:
                 C = CurC;
                 Error ("Illegal escaped character: 0x%02X", CurC);
                 break;
@@ -359,15 +443,29 @@ static int ParseChar (void)
     NextChar ();
 
     /* Do correct sign extension */
-    return SignExtendChar (C);
+    Result.Val = SignExtendChar(C);
+    if (Result.Cooked) {
+        Result.Cooked = Result.Val;
+    }
+
+    return Result;
 }
 
 
 
 static void CharConst (void)
-/* Parse a character constant. */
+/* Parse a character constant token */
 {
-    int C;
+    parsedchar_t C;
+
+    if (CurC == 'L') {
+        /* Wide character constant */
+        NextTok.Tok = TOK_WCCONST;
+        NextChar ();
+    } else {
+        /* Narrow character constant */
+        NextTok.Tok = TOK_CCONST;
+    }
 
     /* Skip the quote */
     NextChar ();
@@ -383,11 +481,9 @@ static void CharConst (void)
         NextChar ();
     }
 
-    /* Setup values and attributes */
-    NextTok.Tok  = TOK_CCONST;
-
     /* Translate into target charset */
-    NextTok.IVal = SignExtendChar (TgtTranslateChar (C));
+    NextTok.IVal = SignExtendChar (C.Val);
+    NextTok.Cooked = C.Cooked;
 
     /* Character constants have type int */
     NextTok.Type = type_int;
@@ -396,50 +492,45 @@ static void CharConst (void)
 
 
 static void StringConst (void)
-/* Parse a quoted string */
+/* Parse a quoted string token */
 {
+    /* result from ParseChar */
+    parsedchar_t ParsedChar;
+
     /* String buffer */
     StrBuf S = AUTO_STRBUF_INITIALIZER;
 
     /* Assume next token is a string constant */
     NextTok.Tok  = TOK_SCONST;
 
-    /* Concatenate strings. If at least one of the concenated strings is a wide
-    ** character literal, the whole string is a wide char literal, otherwise
-    ** it's a normal string literal.
-    */
-    while (1) {
+    /* Check if this is a normal or a wide char string */
+    if (CurC == 'L' && NextC == '\"') {
+        /* Wide character literal */
+        NextTok.Tok = TOK_WCSCONST;
+        NextChar ();
+        NextChar ();
+    } else if (CurC == '\"') {
+        /* Skip the quote char */
+        NextChar ();
+    } else {
+        /* No string */
+        goto ExitPoint;
+    }
 
-        /* Check if this is a normal or a wide char string */
-        if (CurC == 'L' && NextC == '\"') {
-            /* Wide character literal */
-            NextTok.Tok = TOK_WCSCONST;
-            NextChar ();
-            NextChar ();
-        } else if (CurC == '\"') {
-            /* Skip the quote char */
-            NextChar ();
-        } else {
-            /* No string */
+    /* Read until end of string */
+    while (CurC != '\"') {
+        if (CurC == '\0') {
+            Error ("Unexpected newline");
             break;
         }
-
-        /* Read until end of string */
-        while (CurC != '\"') {
-            if (CurC == '\0') {
-                Error ("Unexpected newline");
-                break;
-            }
-            SB_AppendChar (&S, ParseChar ());
-        }
-
-        /* Skip closing quote char if there was one */
-        NextChar ();
-
-        /* Skip white space, read new input */
-        SkipWhite ();
-
+        ParsedChar = ParseChar ();
+        SB_AppendCharCooked(&S, ParsedChar.Val, ParsedChar.Cooked);
     }
+
+    /* Skip closing quote char if there was one */
+    NextChar ();
+
+ExitPoint:
 
     /* Terminate the string */
     SB_AppendChar (&S, '\0');
@@ -454,111 +545,130 @@ static void StringConst (void)
 
 
 static void NumericConst (void)
-/* Parse a numeric constant */
+/* Parse a numeric constant token */
 {
-    unsigned Base;              /* Temporary number base */
-    unsigned Prefix;            /* Base according to prefix */
-    StrBuf   S = STATIC_STRBUF_INITIALIZER;
+    unsigned Base;              /* Temporary number base according to prefix */
+    unsigned Index;
+    StrBuf   Src = AUTO_STRBUF_INITIALIZER;
     int      IsFloat;
     char     C;
     unsigned DigitVal;
-    unsigned long IVal;         /* Value */
+    scan_t   IVal;              /* Scanned value. */
+    int      Overflow;
+
+    /* Get the pp-number first, then parse on it */
+    CopyPPNumber (&Src);
+    SB_Terminate (&Src);
+    SB_Reset (&Src);
 
     /* Check for a leading hex, octal or binary prefix and determine the
     ** possible integer types.
     */
-    if (CurC == '0') {
+    if (SB_Peek (&Src) == '0') {
         /* Gobble 0 and examine next char */
-        NextChar ();
-        if (toupper (CurC) == 'X') {
-            Base = Prefix = 16;
-            NextChar ();        /* gobble "x" */
-        } else if (toupper (CurC) == 'B' && IS_Get (&Standard) >= STD_CC65) {
-            Base = Prefix = 2;
-            NextChar ();        /* gobble 'b' */
+        SB_Skip (&Src);
+        if (toupper (SB_Peek (&Src)) == 'X' &&
+            IsXDigit (SB_LookAt (&Src, SB_GetIndex (&Src) + 1))) {
+            Base = 16;
+            SB_Skip (&Src);     /* gobble "x" */
+        } else if (toupper (SB_Peek (&Src)) == 'B'  &&
+                   IS_Get (&Standard) >= STD_CC65   &&
+                   IsDigit (SB_LookAt (&Src, SB_GetIndex (&Src) + 1))) {
+            Base = 2;
+            SB_Skip (&Src);     /* gobble 'b' */
         } else {
             Base = 10;          /* Assume 10 for now - see below */
-            Prefix = 8;         /* Actual prefix says octal */
         }
     } else {
-        Base  = Prefix = 10;
+        Base = 10;
     }
 
-    /* Because floating point numbers don't have octal prefixes (a number
-    ** with a leading zero is decimal), we first have to read the number
-    ** before converting it, so we can determine if it's a float or an
-    ** integer.
+    /* Because floating point numbers don't have octal prefixes (a number with
+    ** a leading zero is decimal), we first have to read the number before
+    ** converting it, so we can determine if it's a float or an integer.
     */
-    while (IsXDigit (CurC) && HexVal (CurC) < Base) {
-        SB_AppendChar (&S, CurC);
-        NextChar ();
+    Index = SB_GetIndex (&Src);
+    while ((C = SB_Peek (&Src)) != '\0' && (Base <= 10 ? IsDigit (C) : IsXDigit (C))) {
+        SB_Skip (&Src);
     }
-    SB_Terminate (&S);
 
     /* The following character tells us if we have an integer or floating
     ** point constant. Note: Hexadecimal floating point constants aren't
     ** supported in C89.
     */
-    IsFloat = (CurC == '.' ||
-               (Base == 10 && toupper (CurC) == 'E') ||
-               (Base == 16 && toupper (CurC) == 'P' && IS_Get (&Standard) >= STD_C99));
+    IsFloat = (C == '.' ||
+               (Base == 10 && toupper (C) == 'E') ||
+               (Base == 16 && toupper (C) == 'P' && IS_Get (&Standard) >= STD_C99));
 
-    /* If we don't have a floating point type, an octal prefix results in an
-    ** octal base.
-    */
-    if (!IsFloat && Prefix == 8) {
+    /* An octal prefix for an integer type results in an octal base */
+    if (!IsFloat && Base == 10 && SB_LookAt (&Src, 0) == '0') {
         Base = 8;
     }
 
-    /* Since we do now know the correct base, convert the remembered input
-    ** into a number.
-    */
-    SB_Reset (&S);
+    /* Since we now know the correct base, convert the input into a number */
+    SB_SetIndex (&Src, Index);
     IVal = 0;
-    while ((C = SB_Get (&S)) != '\0') {
+    Overflow = 0;
+    while ((C = SB_Peek (&Src)) != '\0' && (Base <= 10 ? IsDigit (C) : IsXDigit (C))) {
         DigitVal = HexVal (C);
         if (DigitVal >= Base) {
-            Error ("Numeric constant contains digits beyond the radix");
+            Error ("Invalid digit \"%c\" beyond radix %u constant", C, Base);
+            SB_Clear (&Src);
+            break;
         }
-        IVal = (IVal * Base) + DigitVal;
+        /* Test result of adding digit for overflow. */
+        if (((scan_t)(IVal * Base + DigitVal) / Base) != IVal) {
+            Overflow = 1;
+        }
+        IVal = IVal * Base + DigitVal;
+        SB_Skip (&Src);
     }
-
-    /* We don't need the string buffer any longer */
-    SB_Done (&S);
+    if (Overflow) {
+        Error ("Numerical constant \"%s\" too large for internal %d-bit representation",
+               SB_GetConstBuf (&Src), (int)(sizeof(IVal)*CHAR_BIT));
+    }
 
     /* Distinguish between integer and floating point constants */
     if (!IsFloat) {
 
         unsigned Types;
-        int      HaveSuffix;
+        unsigned WarnTypes = 0;
 
-        /* Check for a suffix and determine the possible types */
-        HaveSuffix = 1;
-        if (toupper (CurC) == 'U') {
+        /* Check for a suffix and determine the possible types. It is always
+        ** possible to convert the data to unsigned long even if the IT_ULONG
+        ** flag were not set, but we are not doing that.
+        */
+        if (toupper (SB_Peek (&Src)) == 'U') {
             /* Unsigned type */
-            NextChar ();
-            if (toupper (CurC) != 'L') {
+            SB_Skip (&Src);
+            if (toupper (SB_Peek (&Src)) != 'L') {
                 Types = IT_UINT | IT_ULONG;
             } else {
-                NextChar ();
+                SB_Skip (&Src);
                 Types = IT_ULONG;
             }
-        } else if (toupper (CurC) == 'L') {
+        } else if (toupper (SB_Peek (&Src)) == 'L') {
             /* Long type */
-            NextChar ();
-            if (toupper (CurC) != 'U') {
+            SB_Skip (&Src);
+            if (toupper (SB_Peek (&Src)) != 'U') {
                 Types = IT_LONG | IT_ULONG;
+                WarnTypes = IT_ULONG;
             } else {
-                NextChar ();
+                SB_Skip (&Src);
                 Types = IT_ULONG;
             }
         } else {
-            HaveSuffix = 0;
-            if (Prefix == 10) {
+            if (SB_Peek (&Src) != '\0') {
+                Error ("Invalid suffix \"%s\" on integer constant",
+                       SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
+            }
+
+            if (Base == 10) {
                 /* Decimal constants are of any type but uint */
                 Types = IT_INT | IT_LONG | IT_ULONG;
+                WarnTypes = IT_LONG | IT_ULONG;
             } else {
-                /* Octal or hex constants are of any type */
+                /* Binary, octal and hex constants can be of any type */
                 Types = IT_INT | IT_UINT | IT_LONG | IT_ULONG;
             }
         }
@@ -568,11 +678,14 @@ static void NumericConst (void)
             /* Out of range for int */
             Types &= ~IT_INT;
             /* If the value is in the range 0x8000..0xFFFF, unsigned int is not
-            ** allowed, and we don't have a type specifying suffix, emit a
-            ** warning, because the constant is of type long.
+            ** allowed, and we don't have a long type specifying suffix, emit a
+            ** warning, because the constant is of type long while the user
+            ** might expect an unsigned int.
             */
-            if (IVal <= 0xFFFF && (Types & IT_UINT) == 0 && !HaveSuffix) {
-                Warning ("Constant is long");
+            if (IVal <= 0xFFFF              &&
+                (Types & IT_UINT) == 0      &&
+                (WarnTypes & IT_LONG) != 0) {
+                Warning ("Integer constant implies signed long");
             }
         }
         if (IVal > 0xFFFF) {
@@ -582,6 +695,15 @@ static void NumericConst (void)
         if (IVal > 0x7FFFFFFF) {
             /* Out of range for long int */
             Types &= ~IT_LONG;
+            /* If the value is in the range 0x80000000..0xFFFFFFFF, decimal,
+            ** and we have no unsigned type specifying suffix, emit a warning,
+            ** because the constant is of type unsigned long while the user
+            ** might expect a signed integer constant, especially if there is
+            ** a preceding unary op or when it is used in constant calculation.
+            */
+            if (WarnTypes & IT_ULONG) {
+                Warning ("Integer constant implies unsigned long");
+            }
         }
 
         /* Now set the type string to the smallest type in types */
@@ -597,6 +719,7 @@ static void NumericConst (void)
 
         /* Set the value and the token */
         NextTok.IVal = IVal;
+        NextTok.Cooked = 0;
         NextTok.Tok  = TOK_ICONST;
 
     } else {
@@ -605,42 +728,46 @@ static void NumericConst (void)
         Double FVal = FP_D_FromInt (IVal);      /* Convert to double */
 
         /* Check for a fractional part and read it */
-        if (CurC == '.') {
+        if (SB_Peek (&Src) == '.') {
 
-            Double Scale;
+            Double Scale, ScaleDigit;
 
             /* Skip the dot */
-            NextChar ();
+            SB_Skip (&Src);
 
             /* Read fractional digits */
-            Scale  = FP_D_Make (1.0);
-            while (IsXDigit (CurC) && (DigitVal = HexVal (CurC)) < Base) {
+            ScaleDigit = FP_D_Div (FP_D_Make (1.0), FP_D_FromInt (Base));
+            Scale = ScaleDigit;
+            while (IsXDigit (SB_Peek (&Src)) && (DigitVal = HexVal (SB_Peek (&Src))) < Base) {
                 /* Get the value of this digit */
-                Double FracVal = FP_D_Div (FP_D_FromInt (DigitVal * Base), Scale);
+                Double FracVal = FP_D_Mul (FP_D_FromInt (DigitVal), Scale);
                 /* Add it to the float value */
                 FVal = FP_D_Add (FVal, FracVal);
-                /* Scale base */
-                Scale = FP_D_Mul (Scale, FP_D_FromInt (DigitVal));
+                /* Adjust Scale for next digit */
+                Scale = FP_D_Mul (Scale, ScaleDigit);
                 /* Skip the digit */
-                NextChar ();
+                SB_Skip (&Src);
             }
         }
 
         /* Check for an exponent and read it */
-        if ((Base == 16 && toupper (CurC) == 'F') ||
-            (Base == 10 && toupper (CurC) == 'E')) {
+        if ((Base == 16 && toupper (SB_Peek (&Src)) == 'P') ||
+            (Base == 10 && toupper (SB_Peek (&Src)) == 'E')) {
 
             unsigned Digits;
             unsigned Exp;
+            int Sign;
 
             /* Skip the exponent notifier */
-            NextChar ();
+            SB_Skip (&Src);
 
             /* Read an optional sign */
-            if (CurC == '-') {
-                NextChar ();
-            } else if (CurC == '+') {
-                NextChar ();
+            Sign = 0;
+            if (SB_Peek (&Src) == '-') {
+                Sign = 1;
+                SB_Skip (&Src);
+            } else if (SB_Peek (&Src) == '+') {
+                SB_Skip (&Src);
             }
 
             /* Read exponent digits. Since we support only 32 bit floats
@@ -651,11 +778,11 @@ static void NumericConst (void)
             */
             Digits = 0;
             Exp    = 0;
-            while (IsDigit (CurC)) {
+            while (IsDigit (SB_Peek (&Src))) {
                 if (++Digits <= 3) {
-                    Exp = Exp * 10 + HexVal (CurC);
+                    Exp = Exp * 10 + HexVal (SB_Peek (&Src));
                 }
-                NextChar ();
+                SB_Skip (&Src);
             }
 
             /* Check for errors: We must have exponent digits, and not more
@@ -667,17 +794,23 @@ static void NumericConst (void)
                 Warning ("Floating constant exponent is too large");
             }
 
-            /* Scale the exponent and adjust the value accordingly */
+            /* Scale the exponent and adjust the value accordingly.
+            ** Decimal exponents are base 10, hexadecimal exponents are base 2 (C99).
+            */
             if (Exp) {
-                FVal = FP_D_Mul (FVal, FP_D_Make (pow (10, Exp)));
+                FVal = FP_D_Mul (FVal, FP_D_Make (pow ((Base == 16) ? 2.0 : 10.0, (Sign ? -1.0 : 1.0) * Exp)));
             }
         }
 
         /* Check for a suffix and determine the type of the constant */
-        if (toupper (CurC) == 'F') {
-            NextChar ();
+        if (toupper (SB_Peek (&Src)) == 'F') {
+            SB_Skip (&Src);
             NextTok.Type = type_float;
         } else {
+            if (SB_Peek (&Src) != '\0') {
+                Error ("Invalid suffix \"%s\" on floating constant",
+                       SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
+            }
             NextTok.Type = type_double;
         }
 
@@ -686,80 +819,98 @@ static void NumericConst (void)
         NextTok.Tok  = TOK_FCONST;
 
     }
+
+    /* We don't need the string buffer any longer */
+    SB_Done (&Src);
 }
 
 
 
-void NextToken (void)
+static void GetNextInputToken (void)
 /* Get next token from input stream */
 {
     ident token;
 
-    /* We have to skip white space here before shifting tokens, since the
-    ** tokens and the current line info is invalid at startup and will get
-    ** initialized by reading the first time from the file. Remember if
-    ** we were at end of input and handle that later.
-    */
-    int GotEOF = (SkipWhite() == 0);
+    if (!NoCharMap && !InPragmaParser) {
+        /* Translate string and character literals into target charset */
+        if (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST) {
+            TranslateLiteral (NextTok.SVal);
+        } else if (NextTok.Tok == TOK_CCONST || NextTok.Tok == TOK_WCCONST) {
+            if (NextTok.Cooked) {
+                NextTok.IVal = SignExtendChar (TgtTranslateChar (NextTok.IVal));
+            }
+            else {
+                NextTok.IVal = SignExtendChar (NextTok.IVal);
+            }
+        }
+    }
 
     /* Current token is the lookahead token */
     if (CurTok.LI) {
         ReleaseLineInfo (CurTok.LI);
     }
+
+    /* Get the current token */
     CurTok = NextTok;
 
-    /* When reading the first time from the file, the line info in NextTok,
-    ** which was copied to CurTok is invalid. Since the information from
-    ** the token is used for error messages, we must make it valid.
-    */
-    if (CurTok.LI == 0) {
-        CurTok.LI = UseLineInfo (GetCurLineInfo ());
-    }
+    if (SavedTok.Tok == TOK_INVALID) {
+        /* We have to skip white space here before shifting tokens, since the
+        ** tokens and the current line info is invalid at startup and will get
+        ** initialized by reading the first time from the file. Remember if we
+        ** were at end of input and handle that later.
+        */
+        int GotEOF = (SkipWhite () == 0);
 
-    /* Remember the starting position of the next token */
-    NextTok.LI = UseLineInfo (GetCurLineInfo ());
+        /* Remember the starting position of the next token */
+        NextTok.LI = UseLineInfo (GetCurLineInfo ());
 
-    /* Now handle end of input. */
-    if (GotEOF) {
-        /* End of file reached */
-        NextTok.Tok = TOK_CEOF;
+        /* Now handle end of input */
+        if (GotEOF) {
+            /* End of file reached */
+            NextTok.Tok = TOK_CEOF;
+            return;
+        }
+    } else {
+        /* Just use the saved token */
+        NextTok = SavedTok;
+        SavedTok.Tok = TOK_INVALID;
         return;
     }
 
     /* Determine the next token from the lookahead */
-    if (IsDigit (CurC) || (CurC == '.' && IsDigit (NextC))) {
+    if (IsPPNumber (CurC, NextC)) {
         /* A number */
         NumericConst ();
         return;
     }
 
-    /* Check for wide character literals */
-    if (CurC == 'L' && NextC == '\"') {
-        StringConst ();
-        return;
+    /* Check for wide character constants and literals */
+    if (CurC == 'L') {
+        if (NextC == '\"') {
+            StringConst ();
+            return;
+        } else if (NextC == '\'') {
+            CharConst ();
+            return;
+        }
     }
 
     /* Check for keywords and identifiers */
     if (IsSym (token)) {
 
-        /* Check for a keyword */
-        if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
-            /* Reserved word found */
-            return;
+        if (!PPParserRunning) {
+            /* Check for a keyword */
+            NextTok.Tok = FindKey (token);
+            if (NextTok.Tok != TOK_IDENT) {
+                /* Reserved word found */
+                return;
+            }
         }
+
         /* No reserved word, check for special symbols */
         if (token[0] == '_' && token[1] == '_') {
             /* Special symbols */
-            if (strcmp (token+2, "FILE__") == 0) {
-                NextTok.SVal = AddLiteral (GetCurrentFile());
-                NextTok.Tok  = TOK_SCONST;
-                return;
-            } else if (strcmp (token+2, "LINE__") == 0) {
-                NextTok.Tok  = TOK_ICONST;
-                NextTok.IVal = GetCurrentLine();
-                NextTok.Type = type_int;
-                return;
-            } else if (strcmp (token+2, "func__") == 0) {
+            if (strcmp (token+2, "func__") == 0) {
                 /* __func__ is only defined in functions */
                 if (CurrentFunc) {
                     NextTok.SVal = AddLiteral (F_GetFuncName (CurrentFunc));
@@ -995,11 +1146,103 @@ void NextToken (void)
             SetTok (TOK_COMP);
             break;
 
+        case '#':
+            NextChar ();
+            if (CurC == '#') {
+                SetTok (TOK_DOUBLE_HASH);
+            } else {
+                NextTok.Tok = TOK_HASH;
+            }
+            break;
+
         default:
             UnknownChar (CurC);
 
     }
+}
 
+
+
+void NextToken (void)
+/* Get next non-pragma token from input stream consuming any pragmas
+** encountered. Adjacent string literal tokens will be concatenated.
+*/
+{
+    /* Used for string literal concatenation */
+    Token PrevTok;
+
+    /* When reading the first time from the file, the line info in NextTok,
+    ** which will be copied to CurTok is invalid. Since the information from
+    ** the token is used for error messages, we must make it valid.
+    */
+    if (NextTok.LI == 0) {
+        NextTok.LI = UseLineInfo (GetCurLineInfo ());
+    }
+
+    PrevTok.Tok = TOK_INVALID;
+    while (1) {
+        /* Read the next token from the file */
+        GetNextInputToken ();
+
+        /* Consume all pragmas at hand, including those nested in a _Pragma() */
+        if (CurTok.Tok == TOK_PRAGMA) {
+            /* Repeated and/or nested _Pragma()'s will be handled recursively */
+            ConsumePragma ();
+        }
+
+        /* Check for string concatenation */
+        if (CurTok.Tok == TOK_SCONST || CurTok.Tok == TOK_WCSCONST) {
+            if (PrevTok.Tok == TOK_SCONST || PrevTok.Tok == TOK_WCSCONST) {
+                /* Warn on non-ISO behavior */
+                if (InPragmaParser) {
+                    Warning ("Concatenated string literals in _Pragma operation");
+                }
+
+                /* Concatenate strings */
+                ConcatLiteral (PrevTok.SVal, CurTok.SVal);
+
+                /* If at least one of the concatenated strings is a wide
+                ** character literal, the whole string is a wide char
+                ** literal, otherwise it is a normal string literal.
+                */
+                if (CurTok.Tok == TOK_WCSCONST) {
+                    PrevTok.Tok = TOK_WCSCONST;
+                    PrevTok.Type = CurTok.Type;
+                }
+            }
+
+            if (NextTok.Tok == TOK_SCONST ||
+                NextTok.Tok == TOK_WCSCONST ||
+                NextTok.Tok == TOK_PRAGMA) {
+                /* Remember current string literal token */
+                if (PrevTok.Tok == TOK_INVALID) {
+                    PrevTok = CurTok;
+                    PrevTok.LI = UseLineInfo (PrevTok.LI);
+                }
+
+                /* Keep looping */
+                continue;
+            }
+        }
+
+        break;
+    }
+
+    /* Use the concatenated string literal token if there is one */
+    if (PrevTok.Tok == TOK_SCONST || PrevTok.Tok == TOK_WCSCONST) {
+        if (CurTok.Tok != TOK_SCONST && CurTok.Tok != TOK_WCSCONST) {
+            /* Push back the incoming tokens */
+            SavedTok = NextTok;
+            NextTok  = CurTok;
+        } else {
+            /* The last string literal token can be just replaced */
+            if (CurTok.LI) {
+                ReleaseLineInfo (CurTok.LI);
+            }
+        }
+        /* Replace the current token with the concatenated string literal */
+        CurTok = PrevTok;
+    }
 }
 
 
@@ -1024,6 +1267,212 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
         NextToken ();
 
     }
+}
+
+
+
+static void OpenBrace (Collection* C, token_t Tok)
+/* Consume an opening parenthesis/bracket/curly brace and remember that */
+{
+    switch (Tok) {
+        case TOK_LPAREN: Tok = TOK_RPAREN; break;
+        case TOK_LBRACK: Tok = TOK_RBRACK; break;
+        case TOK_LCURLY: Tok = TOK_RCURLY; break;
+        default:         Internal ("Unexpected opening token: %02X", (unsigned)Tok);
+    }
+    CollAppend (C, (void*)Tok);
+    NextToken ();
+}
+
+
+
+static void PopBrace (Collection* C)
+/* Close the latest open parenthesis/bracket/curly brace */
+{
+    if (CollCount (C) > 0) {
+        CollPop (C);
+    }
+}
+
+
+
+static int CloseBrace (Collection* C, token_t Tok)
+/* Consume a closing parenthesis/bracket/curly brace if it is matched with an
+** opening one to close and return 0, or bail out and return -1 if it is not
+** matched.
+*/
+{
+    if (CollCount (C) > 0) {
+        token_t LastTok = (token_t)(intptr_t)CollLast (C);
+        if (LastTok == Tok) {
+            CollPop (C);
+            NextToken ();
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+
+
+int SmartErrorSkip (int TillEnd)
+/* Try some smart error recovery.
+**
+** - If TillEnd == 0:
+**   Skip tokens until a comma or closing curly brace that is not enclosed in
+**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+**   unpaired right parenthesis/bracket/curly brace is reached. The closing
+**   curly brace is consumed in the former case.
+**
+** - If TillEnd != 0:
+**   Skip tokens until a right curly brace or semicolon is reached and consumed
+**   while there are no open parentheses/brackets/curly braces, or until an EOF
+**   is reached anytime. Any open parenthesis/bracket/curly brace is considered
+**   to be closed by consuming a right parenthesis/bracket/curly brace even if
+**   they didn't match.
+**
+** - Return -1:
+**   If this exits at a semicolon or unpaired right parenthesis/bracket/curly
+**   brace while there are still open parentheses/brackets/curly braces.
+**
+** - Return 0:
+**   If this exits as soon as it reaches an EOF;
+**   Or if this exits right after consuming a semicolon or right curly brace
+**   while there are no open parentheses/brackets/curly braces.
+**
+** - Return 1:
+**   If this exits at a non-EOF without consuming it.
+*/
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI,
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!TillEnd) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    PopBrace (&C);
+                    NextToken ();
+                }
+                break;
+
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!TillEnd) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    PopBrace (&C);
+                    NextToken ();
+                }
+                if (CollCount (&C) == 0) {
+                    /* We consider this as a terminator as well */
+                    Res = 0;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_COMMA:
+                if (CollCount (&C) == 0 && !TillEnd) {
+                    Res = 1;
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_SEMI:
+                if (CollCount (&C) == 0) {
+                    if (TillEnd) {
+                        NextToken ();
+                        Res = 0;
+                    } else {
+                        Res = 1;
+                    }
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_CEOF:
+                /* We cannot consume this */
+                Res = 0;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
+}
+
+
+
+int SimpleErrorSkip (void)
+/* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
+** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
+*/
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = {
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    /* Found a terminator */
+                    Res = -1;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_CEOF:
+                /* We cannot go any farther */
+                Res = 0;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
 }
 
 

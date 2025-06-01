@@ -59,7 +59,7 @@ slower than the same code for unsigned types.
 
 <sect>Use chars instead of ints if possible<p>
 
-While in arithmetic operations, chars are immidiately promoted to ints, they
+While in arithmetic operations, chars are immediately promoted to ints, they
 are passed as chars in parameter lists and are accessed as chars in variables.
 The code generated is usually not much smaller, but it is faster, since
 accessing chars is faster. For several operations, the generated code may be
@@ -251,7 +251,7 @@ Register variables may give faster and shorter code, but they do also have an
 overhead. Register variables are actually zero page locations, so using them
 saves roughly one cycle per access. The calling routine may also use register
 variables, so the old values have to be saved on function entry and restored
-on exit. Saving an d restoring has an overhead of about 70 cycles per 2 byte
+on exit. Saving and restoring has an overhead of about 70 cycles per 2 byte
 variable. It is easy to see, that - apart from the additional code that is
 needed to save and restore the values - you need to make heavy use of a
 variable to justify the overhead.

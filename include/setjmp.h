@@ -42,8 +42,8 @@ typedef char jmp_buf [5];
 
 
 
-int __fastcall__ _setjmp (jmp_buf buf);
-#define setjmp  _setjmp         /* ISO insists on a macro */
+int __fastcall__ __setjmp (jmp_buf buf);
+#define setjmp  __setjmp         /* ISO insists on a macro */
 void __fastcall__ longjmp (jmp_buf buf, int retval) __attribute__((noreturn));
 
 

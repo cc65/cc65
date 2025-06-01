@@ -44,12 +44,12 @@
 
 
 
-extern const char Func__bzero[];        /* Asm name of "_bzero" */
-extern const char Func_memcpy[];        /* Asm name of "memcpy" */
-extern const char Func_memset[];        /* Asm name of "memset" */
-extern const char Func_strcmp[];        /* Asm name of "strcmp" */
-extern const char Func_strcpy[];        /* Asm name of "strcpy" */
-extern const char Func_strlen[];        /* Asm name of "strlen" */
+extern const char Func___bzero[];       /* C name of "__bzero" */
+extern const char Func_memcpy[];        /* C name of "memcpy" */
+extern const char Func_memset[];        /* C name of "memset" */
+extern const char Func_strcmp[];        /* C name of "strcmp" */
+extern const char Func_strcpy[];        /* C name of "strcpy" */
+extern const char Func_strlen[];        /* C name of "strlen" */
 
 
 

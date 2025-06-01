@@ -95,7 +95,7 @@ struct __gtia_write {
 
 #define PMG_SIZE_NORMAL 0x0 /* one color clock per pixel */
 #define PMG_SIZE_DOUBLE 0x1 /* two color clocks per pixel */
-#define PMG_SIZE_QUAD   0x2 /* four color clocks per pixel */
+#define PMG_SIZE_QUAD   0x3 /* four color clocks per pixel */
 
 
 /* COLPM0-COLPM3, COLPF0-COLPF3, COLBK color registers */

@@ -2,7 +2,7 @@
 
 <article>
 <title>PC-Engine (TurboGrafx 16) System-specific information for cc65
-<author><url url="mailto:groepaz@gmx.net" name="Groepaz/Hitmen">,<newline>
+<author><url url="mailto:groepaz@gmx.net" name="Groepaz">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
 
 <abstract>
@@ -114,8 +114,8 @@ Programs containing PCE-specific code may use the <tt/pce.h/ header file.
 <sect1>PCE-specific functions<p>
 
 <itemize>
-<item>waitvsync</item>
 <item>get_tv (since all PCE systems are NTSC, this always returns TV_NTSC)</item>
+<item>waitvsync</item>
 </itemize>
 
 
@@ -205,11 +205,6 @@ following functions (and a few others):
 
 
 <sect>Other hints<p>
-
-<itemize>
-<item><url url="https://mednafen.github.io/" name= "Mednafen"> is a good
-emulator to use for the PC-Engine.
-</itemize>
 
 Some useful resources on PCE coding:
 

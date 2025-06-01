@@ -62,7 +62,7 @@ int main(int argc,char **argv)
         #ifdef USECMDLINE
         if (argc < 2) {
                 printf("Usage: %s [duration] [disks]\n", argv[0]);
-                exit(1);
+                exit(EXIT_FAILURE);
         }
         else
         {

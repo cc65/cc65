@@ -33,6 +33,7 @@
 
 
 
+#include <stdio.h>
 #include <string.h>
 
 #include "xmalloc.h"
@@ -113,5 +114,40 @@ char* MakeFilename (const char* Origin, const char* Ext)
         memcpy (Out, Origin, P - Origin);
         strcpy (Out + (P - Origin), Ext);
     }
+    return Out;
+}
+
+
+
+char* MakeTmpFilename (const char* Ext)
+/* Make a new temporary file name from Ext.  tmpnam(3) is called
+** and Ext is appended to generate the filename.
+** The result is placed in a malloc'ed buffer and returned.
+*/
+{
+    char* Out;
+    char Buffer[L_tmpnam * 2]; /* a lazy way to ensure we have space for Ext */
+
+    /*
+    ** gcc emits the following warning here:
+    **
+    ** warning: the use of `tmpnam' is dangerous, better use `mkstemp'
+    **
+    ** however, mkstemp actually opens a file, which we do not want.
+    ** tmpfile() is unsuitable for the same reason.
+    **
+    ** we could write our own version, but then we would have to struggle
+    ** with supporting multiple build environments.
+    **
+    ** tmpnam(3) is safe here, because ca65 / cc65 / ld65 will simply clobber
+    ** an existing file, or exit if with an error if they are unable to.
+    **
+    ** gcc will also complain, if you don't use the return value from tmpnam(3)
+    */
+    strcat(tmpnam(Buffer), Ext);
+
+    Out = xmalloc (strlen (Buffer) + 1);
+    strcpy (Out, Buffer);
+
     return Out;
 }

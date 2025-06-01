@@ -2,21 +2,19 @@
 ** _afailed.c
 **
 ** 1998-06-06, Ullrich von Bassewitz
-** 2015-03-13, Greg King
+** 2019-11-10, Greg King
 */
 
 
 
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 
-
-void __fastcall__ _afailed (char* file, unsigned line)
+void __fastcall__ __afailed (char* file, unsigned line)
 {
-    fprintf (stderr, "ASSERTION FAILED IN %s(%u)\n", file, line);
-    exit (2);
+    raise (SIGABRT);
+    fprintf (stderr, "ASSERTION FAILED IN %s:%u\n", file, line);
+    exit (EXIT_ASSERT);
 }
-
-
-

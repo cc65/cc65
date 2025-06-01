@@ -3,13 +3,13 @@
 ; This file is part of
 ; cc65 - a freeware C compiler for 6502 based systems
 ;
-; https://github.com/cc65/cc65
+; https://cc65.github.io
 ;
 ; See "LICENSE" file for legal information.
 ;
 ;
 ; unsigned int __fastcall__ mul20(unsigned char value);
-; 
+;
 ; REMARKS: Function is defined to return with carry-flag cleared
 
 
@@ -34,7 +34,7 @@ mul5:   adc     tmp4            ; * 5
         inx                     ; yes, correct...
 
 mul10:  stx     tmp4            ; continue with classic shifting...
-        
+
         asl     a               ; * 10
         rol     tmp4
 

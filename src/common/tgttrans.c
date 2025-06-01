@@ -39,6 +39,8 @@
 #include "check.h"
 #include "target.h"
 #include "tgttrans.h"
+#include "coll.h"
+#include "xmalloc.h"
 
 
 
@@ -67,6 +69,9 @@ static unsigned char Tab[256] = {
     0xE0,0xE1,0xE2,0xE3,0xE4,0xE5,0xE6,0xE7,0xE8,0xE9,0xEA,0xEB,0xEC,0xED,0xEE,0xEF,
     0xF0,0xF1,0xF2,0xF3,0xF4,0xF5,0xF6,0xF7,0xF8,0xF9,0xFA,0xFB,0xFC,0xFD,0xFE,0xFF,
 };
+
+#define MAX_CHARMAP_STACK   16
+static Collection CharmapStack = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -116,7 +121,19 @@ void TgtTranslateStrBuf (StrBuf* Buf)
 ** system character set.
 */
 {
-    TgtTranslateBuf (SB_GetBuf (Buf), SB_GetLen (Buf));
+    unsigned char* B = (unsigned char*)SB_GetBuf(Buf);
+    unsigned char* Cooked = (unsigned char*)SB_GetCooked(Buf);
+    unsigned Len = SB_GetLen(Buf);
+
+    /* Translate */
+    while (Len--) {
+        if (*Cooked) {
+            *B = Tab[*B];
+        }
+        /* else { *B = *B; } */
+        ++B;
+        ++Cooked;
+    }
 }
 
 
@@ -124,6 +141,55 @@ void TgtTranslateStrBuf (StrBuf* Buf)
 void TgtTranslateSet (unsigned Index, unsigned char C)
 /* Set the translation code for the given character */
 {
-    CHECK (Index < sizeof (Tab));
+    CHECK (Index < (sizeof (Tab) / sizeof(Tab[0])));
     Tab[Index] = C;
+}
+
+
+
+int TgtTranslatePush (void)
+/* Pushes the current translation table to the internal stack
+** Returns 1 on success, 0 on stack full
+*/
+{
+    unsigned char* TempTab;
+
+    if (CollCount (&CharmapStack) >= MAX_CHARMAP_STACK) {
+        return 0;
+    }
+
+    TempTab = xmalloc (sizeof (Tab));
+    memcpy (TempTab, Tab, sizeof (Tab));
+
+    CollAppend (&CharmapStack, TempTab);
+    return 1;
+}
+
+
+
+int TgtTranslatePop (void)
+/* Pops a translation table from the internal stack into the current table
+** Returns 1 on success, 0 on stack empty
+*/
+{
+    unsigned char* TempTab;
+
+    if (CollCount (&CharmapStack) == 0) {
+        return 0;
+    }
+
+    TempTab = CollPop (&CharmapStack);
+
+    memcpy (Tab, TempTab, sizeof (Tab));
+
+    xfree (TempTab);
+    return 1;
+}
+
+
+
+int TgtTranslateStackIsEmpty (void)
+/* Returns 1 if the internal stack is empty */
+{
+    return CollCount (&CharmapStack) == 0;
 }

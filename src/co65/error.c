@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -81,7 +81,7 @@ void Error (const char* Format, ...)
 void Internal (const char* Format, ...)
 /* Print an internal error message and die */
 {
-    va_list ap;     
+    va_list ap;
     va_start (ap, Format);
     fprintf (stderr, "%s: Internal error: ", ProgName);
     vfprintf (stderr, Format, ap);

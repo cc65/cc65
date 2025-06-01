@@ -17,10 +17,10 @@ tosumul0ax:
         stz     sreg
         stz     sreg+1
 .else
-        ldy     #$00    
+        ldy     #$00
         sty     sreg
         sty     sreg+1
-.endif        
+.endif
 
 tosmuleax:
 tosumuleax:
@@ -29,7 +29,7 @@ mul32:  sta     ptr1
 .if (.cpu .bitand ::CPU_ISET_65SC02)
         lda     (sp)
         ldy     #1
-.else        
+.else
         ldy     #0
         lda     (sp),y
         iny
@@ -63,7 +63,7 @@ L0:     lsr     tmp4
         bcc     L1
         clc
         adc     ptr3
-        pha
+        tax
         lda     ptr3+1
         adc     tmp2
         sta     tmp2
@@ -73,7 +73,7 @@ L0:     lsr     tmp4
         lda     ptr4+1
         adc     tmp4
         sta     tmp4
-        pla
+        txa
 L1:     dey
         bpl     L0
         lda     ptr1            ; Load the low result word

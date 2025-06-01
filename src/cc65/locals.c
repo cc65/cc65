@@ -46,10 +46,13 @@
 #include "expr.h"
 #include "function.h"
 #include "global.h"
+#include "initdata.h"
 #include "loadexpr.h"
 #include "locals.h"
+#include "seqpoint.h"
 #include "stackptr.h"
 #include "standard.h"
+#include "staticassert.h"
 #include "symtab.h"
 #include "typeconv.h"
 #include "input.h"
@@ -63,31 +66,31 @@
 
 
 static unsigned AllocLabel (void (*UseSeg) ())
-/* Switch to a segment, define a local label and return it */
+/* Switch to a segment, define a local data label and return it */
 {
-    unsigned Label;
+    unsigned DataLabel;
 
     /* Switch to the segment */
     UseSeg ();
 
     /* Define the variable label */
-    Label = GetLocalLabel ();
-    g_defdatalabel (Label);
+    DataLabel = GetLocalDataLabel ();
+    g_defdatalabel (DataLabel);
 
     /* Return the label */
-    return Label;
+    return DataLabel;
 }
 
 
 
-static void AllocStorage (unsigned Label, void (*UseSeg) (), unsigned Size)
-/* Reserve Size bytes of BSS storage prefixed by a local label. */
+static void AllocStorage (unsigned DataLabel, void (*UseSeg) (), unsigned Size)
+/* Reserve Size bytes of BSS storage prefixed by a local data label. */
 {
     /* Switch to the segment */
     UseSeg ();
 
     /* Define the variable label */
-    g_defdatalabel (Label);
+    g_defdatalabel (DataLabel);
 
     /* Reserve space for the data */
     g_res (Size);
@@ -95,8 +98,8 @@ static void AllocStorage (unsigned Label, void (*UseSeg) (), unsigned Size)
 
 
 
-static void ParseRegisterDecl (Declaration* Decl, int Reg)
-/* Parse the declaration of a register variable. Reg is the offset of the
+static void ParseRegisterDecl (Declarator* Decl, int Reg)
+/* Parse the declarator of a register variable. Reg is the offset of the
 ** variable in the register bank.
 */
 {
@@ -108,23 +111,37 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
     /* Get the size of the variable */
     unsigned Size = SizeOf (Decl->Type);
 
-    /* Save the current contents of the register variable on stack */
-    F_AllocLocalSpace (CurrentFunc);
-    g_save_regvars (Reg, Size);
-
-    /* Add the symbol to the symbol table. We do that now, because for register
-    ** variables the current stack pointer is implicitly used as location for
-    ** the save area.
+    /* Check if this is the main function and we are in cc65 mode. If so, we
+    ** won't save the old contents of the register variables since in cc65
+    ** mode main() may not be called recursively.
     */
-    Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
+    int SaveRegVars = (IS_Get (&Standard) != STD_CC65) ||
+                      !F_IsMainFunc (CurrentFunc);
 
     /* Check for an optional initialization */
     if (CurTok.Tok == TOK_ASSIGN) {
 
-        ExprDesc Expr;
-
         /* Skip the '=' */
         NextToken ();
+
+        /* If the register variable is initialized, the initialization code may
+        ** access other already declared variables. This means that we have to
+        ** allocate them now.
+        */
+        F_AllocLocalSpace (CurrentFunc);
+
+        /* Save the current contents of the register variable on stack. This is
+        ** not necessary for the main function.
+        */
+        if (SaveRegVars) {
+            g_save_regvars (Reg, Size);
+        }
+
+        /* Add the symbol to the symbol table. We do that now, because for
+        ** register variables the current stack pointer is implicitly used
+        ** as location for the save area (maybe unused in case of main()).
+        */
+        Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
 
         /* Special handling for compound types */
         if (IsCompound) {
@@ -151,6 +168,9 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
 
         } else {
 
+            ExprDesc Expr;
+            ED_Init (&Expr);
+
             /* Parse the expression */
             hie1 (&Expr);
 
@@ -161,24 +181,45 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
             LoadExpr (CF_NONE, &Expr);
 
             /* Store the value into the variable */
-            g_putstatic (CF_REGVAR | TypeOf (Sym->Type), Reg, 0);
+            g_putstatic (CF_REGVAR | CG_TypeOf (Sym->Type), Reg, 0);
 
+            /* This has to be done at sequence point */
+            DoDeferred (SQP_KEEP_NONE, &Expr);
         }
 
         /* Mark the variable as referenced */
         Sym->Flags |= SC_REF;
+    } else {
+
+        /* Save the current contents of the register variable on stack. This is
+        ** not necessary for the main function.
+        */
+        if (SaveRegVars) {
+            F_AllocLocalSpace (CurrentFunc);
+            g_save_regvars (Reg, Size);
+        }
+
+        /* Add the symbol to the symbol table. We do that now, because for
+        ** register variables the current stack pointer is implicitly used
+        ** as location for the save area (maybe unused in case of main()).
+        */
+        Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, Reg);
     }
 
-    /* Cannot allocate a variable of zero size */
-    if (Size == 0) {
-        Error ("Variable '%s' has unknown size", Decl->Ident);
+    /* Cannot allocate a variable of unknown size */
+    if (HasUnknownSize (Sym->Type)) {
+        if (IsTypeArray (Decl->Type)) {
+            Error ("Array '%s' has unknown size", Decl->Ident);
+        } else {
+            Error ("Variable '%s' has unknown size", Decl->Ident);
+        }
     }
 }
 
 
 
-static void ParseAutoDecl (Declaration* Decl)
-/* Parse the declaration of an auto variable. */
+static void ParseAutoDecl (Declarator* Decl)
+/* Parse the declarator of an auto variable. */
 {
     unsigned  Flags;
     SymEntry* Sym;
@@ -201,8 +242,6 @@ static void ParseAutoDecl (Declaration* Decl)
 
         /* Check for an optional initialization */
         if (CurTok.Tok == TOK_ASSIGN) {
-
-            ExprDesc Expr;
 
             /* Skip the '=' */
             NextToken ();
@@ -241,6 +280,9 @@ static void ParseAutoDecl (Declaration* Decl)
 
             } else {
 
+                ExprDesc Expr;
+                ED_Init (&Expr);
+
                 /* Allocate previously reserved local space */
                 F_AllocLocalSpace (CurrentFunc);
 
@@ -260,12 +302,14 @@ static void ParseAutoDecl (Declaration* Decl)
                     Flags |= CF_CONST;
                 } else {
                     LoadExpr (CF_NONE, &Expr);
-                    ED_MakeRVal (&Expr);
+                    ED_MarkExprAsRVal (&Expr);
                 }
 
                 /* Push the value */
-                g_push (Flags | TypeOf (Sym->Type), Expr.IVal);
+                g_push (Flags | CG_TypeOf (Sym->Type), Expr.IVal);
 
+                /* This has to be done at sequence point */
+                DoDeferred (SQP_KEEP_NONE, &Expr);
             }
 
             /* Mark the variable as referenced */
@@ -275,7 +319,7 @@ static void ParseAutoDecl (Declaration* Decl)
             ** We abuse the Collection somewhat by using it to store line
             ** numbers.
             */
-            CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(long)GetCurrentLine (),
+            CollReplace (&CurrentFunc->LocalsBlockStack, (void *)(size_t)GetCurrentLineNum (),
                 CollCount (&CurrentFunc->LocalsBlockStack) - 1);
 
         } else {
@@ -291,18 +335,16 @@ static void ParseAutoDecl (Declaration* Decl)
 
 
         /* Static local variables. */
-        Decl->StorageClass = (Decl->StorageClass & ~SC_AUTO) | SC_STATIC;
+        Decl->StorageClass = (Decl->StorageClass & ~SC_STORAGEMASK) | SC_STATIC;
 
         /* Generate a label, but don't define it */
-        DataLabel = GetLocalLabel ();
+        DataLabel = GetLocalDataLabel ();
 
         /* Add the symbol to the symbol table. */
         Sym = AddLocalSym (Decl->Ident, Decl->Type, Decl->StorageClass, DataLabel);
 
         /* Allow assignments */
         if (CurTok.Tok == TOK_ASSIGN) {
-
-            ExprDesc Expr;
 
             /* Skip the '=' */
             NextToken ();
@@ -327,6 +369,9 @@ static void ParseAutoDecl (Declaration* Decl)
 
             } else {
 
+                ExprDesc Expr;
+                ED_Init (&Expr);
+
                 /* Allocate space for the variable */
                 AllocStorage (DataLabel, g_usebss, Size);
 
@@ -340,7 +385,10 @@ static void ParseAutoDecl (Declaration* Decl)
                 LoadExpr (CF_NONE, &Expr);
 
                 /* Store the value into the variable */
-                g_putstatic (TypeOf (Sym->Type), DataLabel, 0);
+                g_putstatic (CF_STATIC | CG_TypeOf (Sym->Type), DataLabel, 0);
+
+                /* This has to be done at sequence point */
+                DoDeferred (SQP_KEEP_NONE, &Expr);
             }
 
             /* Mark the variable as referenced */
@@ -354,21 +402,25 @@ static void ParseAutoDecl (Declaration* Decl)
         }
     }
 
-    /* Cannot allocate a variable of zero size */
-    if (Size == 0) {
-        Error ("Variable '%s' has unknown size", Decl->Ident);
+    /* Cannot allocate an incomplete variable */
+    if (HasUnknownSize (Sym->Type)) {
+        if (IsTypeArray (Decl->Type)) {
+            Error ("Array '%s' has unknown size", Decl->Ident);
+        } else {
+            Error ("Variable '%s' has unknown size", Decl->Ident);
+        }
     }
 }
 
 
 
-static void ParseStaticDecl (Declaration* Decl)
-/* Parse the declaration of a static variable. */
+static void ParseStaticDecl (Declarator* Decl)
+/* Parse the declarator of a static variable. */
 {
     unsigned Size;
 
     /* Generate a label, but don't define it */
-    unsigned DataLabel = GetLocalLabel ();
+    unsigned DataLabel = GetLocalDataLabel ();
 
     /* Add the symbol to the symbol table. */
     SymEntry* Sym = AddLocalSym (Decl->Ident, Decl->Type,
@@ -408,30 +460,49 @@ static void ParseStaticDecl (Declaration* Decl)
 
     }
 
-    /* Cannot allocate a variable of zero size */
-    if (Size == 0) {
-        Error ("Variable '%s' has unknown size", Decl->Ident);
+    /* Cannot allocate an incomplete variable */
+    if (HasUnknownSize (Sym->Type)) {
+        if (IsTypeArray (Decl->Type)) {
+            Error ("Array '%s' has unknown size", Decl->Ident);
+        } else {
+            Error ("Variable '%s' has unknown size", Decl->Ident);
+        }
     }
 }
 
 
 
-static void ParseOneDecl (const DeclSpec* Spec)
-/* Parse one variable declaration */
+static int ParseOneDecl (DeclSpec* Spec)
+/* Parse one variable declarator. */
 {
-    Declaration Decl;           /* Declaration data structure */
+    Declarator  Decl;           /* Declarator data structure */
+    int         NeedClean;
 
 
-    /* Read the declaration */
-    ParseDecl (Spec, &Decl, DM_NEED_IDENT);
+    /* Read the declarator */
+    NeedClean = ParseDecl (Spec, &Decl, DM_IDENT_OR_EMPTY);
 
-    /* Set the correct storage class for functions */
-    if ((Decl.StorageClass & SC_FUNC) == SC_FUNC) {
-        /* Function prototypes are always external */
-        if ((Decl.StorageClass & SC_EXTERN) == 0) {
-            Warning ("Function must be extern");
+    /* Check if there are explicitly specified non-external storage classes
+    ** for function declarations.
+    */
+    if ((Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
+        /* Function can only be declared inside functions with the 'extern'
+        ** storage class specifier or no storage class specifier at all.
+        ** Note: this declaration is always checked for compatibility with
+        ** other declarations of the same symbol, but does not necessarily
+        ** make the symbol globally visible. This is tricky.
+        */
+        if ((Spec->Flags & DS_DEF_STORAGE) != DS_DEF_STORAGE    &&
+            (Decl.StorageClass & SC_STORAGEMASK) != SC_EXTERN   &&
+            (Decl.StorageClass & SC_STORAGEMASK) != 0) {
+            Error ("Illegal storage class on function");
         }
-        Decl.StorageClass |= SC_EXTERN;
+
+        /* The default storage class could be wrong. Just clear them */
+        Decl.StorageClass &= ~SC_STORAGEMASK;
+    } else if ((Decl.StorageClass & SC_STORAGEMASK) != SC_EXTERN) {
+        /* If the symbol is not marked as external, it will be defined now */
+        Decl.StorageClass |= SC_DEF;
     }
 
     /* If we don't have a name, this was flagged as an error earlier.
@@ -441,40 +512,28 @@ static void ParseOneDecl (const DeclSpec* Spec)
         AnonName (Decl.Ident, "param");
     }
 
-    /* If the symbol is not marked as external, it will be defined now */
-    if ((Decl.StorageClass & SC_EXTERN) == 0) {
-        Decl.StorageClass |= SC_DEF;
-    }
-
     /* Handle anything that needs storage (no functions, no typdefs) */
-    if ((Decl.StorageClass & SC_FUNC) != SC_FUNC &&
-         (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
+    if ((Decl.StorageClass & SC_DEF) == SC_DEF &&
+        (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
 
         /* If we have a register variable, try to allocate a register and
         ** convert the declaration to "auto" if this is not possible.
         */
         int Reg = 0;    /* Initialize to avoid gcc complains */
-        if ((Decl.StorageClass & SC_REGISTER) != 0 &&
+        if ((Decl.StorageClass & SC_STORAGEMASK) == SC_REGISTER &&
             (Reg = F_AllocRegVar (CurrentFunc, Decl.Type)) < 0) {
             /* No space for this register variable, convert to auto */
-            Decl.StorageClass = (Decl.StorageClass & ~SC_REGISTER) | SC_AUTO;
+            Decl.StorageClass = (Decl.StorageClass & ~SC_STORAGEMASK) | SC_AUTO;
         }
 
         /* Check the variable type */
-        if ((Decl.StorageClass & SC_REGISTER) == SC_REGISTER) {
+        if ((Decl.StorageClass & SC_STORAGEMASK) == SC_REGISTER) {
             /* Register variable */
             ParseRegisterDecl (&Decl, Reg);
-        } else if ((Decl.StorageClass & SC_AUTO) == SC_AUTO) {
+        } else if ((Decl.StorageClass & SC_STORAGEMASK) == SC_AUTO) {
             /* Auto variable */
             ParseAutoDecl (&Decl);
-        } else if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN) {
-            /* External identifier - may not get initialized */
-            if (CurTok.Tok == TOK_ASSIGN) {
-                Error ("Cannot initialize externals");
-            }
-            /* Add the external symbol to the symbol table */
-            AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, 0);
-        } else if ((Decl.StorageClass & SC_STATIC) == SC_STATIC) {
+        } else if ((Decl.StorageClass & SC_STORAGEMASK) == SC_STATIC) {
             /* Static variable */
             ParseStaticDecl (&Decl);
         } else {
@@ -483,10 +542,33 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
     } else {
 
-        /* Add the symbol to the symbol table */
-        AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, 0);
+        if ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN) {
+            /* External identifier - may not get initialized */
+            if (CurTok.Tok == TOK_ASSIGN) {
+                Error ("Cannot initialize extern variable '%s'", Decl.Ident);
+                /* Avoid excess errors */
+                NextToken ();
+                ParseInit (Decl.Type);
+            }
+        }
+
+        if ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN ||
+            (Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
+            /* Add the global symbol to both of the global and local symbol
+            ** tables.
+            */
+            AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
+        } else {
+            /* Add the local symbol to the local symbol table */
+            AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, 0);
+        }
 
     }
+
+    /* Make sure we aren't missing some work */
+    CheckDeferredOpAllDone ();
+
+    return NeedClean;
 }
 
 
@@ -500,21 +582,31 @@ void DeclareLocals (void)
     /* A place to store info about potential initializations of auto variables */
     CollAppend (&CurrentFunc->LocalsBlockStack, 0);
 
-    /* Loop until we don't find any more variables */
+    /* Loop until we don't find any more variables. EOF is handled in the loop
+    ** as well.
+    */
     while (1) {
-
-        /* Check variable declarations. We need to distinguish between a
-        ** default int type and the end of variable declarations. So we
-        ** will do the following: If there is no explicit storage class
-        ** specifier *and* no explicit type given, *and* no type qualifiers
-        ** have been read, it is assumed that we have reached the end of
-        ** declarations.
-        */
         DeclSpec Spec;
-        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
-        if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
-            (Spec.Flags & DS_DEF_TYPE) != 0    &&       /* No type given */
-            GetQualifier (Spec.Type) == T_QUAL_NONE) {  /* No type qualifier */
+        int      NeedClean;
+
+        /* Check for a _Static_assert */
+        if (CurTok.Tok == TOK_STATIC_ASSERT) {
+            ParseStaticAssert ();
+            continue;
+        }
+
+        /* Read the declaration specifier */
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT | TS_FUNCTION_SPEC, SC_AUTO);
+
+        /* Check variable declarations. We need distinguish between a default
+        ** int type and the end of variable declarations. So we will do the
+        ** following: If there is no explicit storage class specifier *and* no
+        ** explicit type given, *and* no type qualifiers have been read, it is
+        ** assumed that we have reached the end of declarations.
+        */
+        if ((Spec.Flags & DS_DEF_STORAGE) != 0          &&  /* No storage spec */
+            (Spec.Flags & DS_TYPE_MASK) == DS_DEF_TYPE  &&  /* No type given */
+            GetQualifier (Spec.Type) == T_QUAL_NONE) {      /* No type qualifier */
             break;
         }
 
@@ -526,11 +618,24 @@ void DeclareLocals (void)
             continue;
         }
 
+        /* If we haven't got a type specifier yet, something must be wrong */
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
+        }
+
         /* Parse a comma separated variable list */
         while (1) {
 
-            /* Parse one declaration */
-            ParseOneDecl (&Spec);
+            /* Parse one declarator */
+            NeedClean = ParseOneDecl (&Spec);
+            if (NeedClean <= 0) {
+                break;
+            }
 
             /* Check if there is more */
             if (CurTok.Tok == TOK_COMMA) {
@@ -542,8 +647,20 @@ void DeclareLocals (void)
             }
         }
 
-        /* A semicolon must follow */
-        ConsumeSemi ();
+        if (NeedClean > 0) {
+            /* Must be followed by a semicolon */
+            if (ConsumeSemi ()) {
+                NeedClean = 0;
+            } else {
+                NeedClean = -1;
+            }
+        }
+
+EndOfDecl:
+        /* Try some smart error recovery */
+        if (NeedClean < 0) {
+            SmartErrorSkip (1);
+        }
     }
 
     /* Be sure to allocate any reserved space for locals */

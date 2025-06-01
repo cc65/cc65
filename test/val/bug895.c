@@ -21,7 +21,7 @@ unsigned int  uia, uib;
 unsigned long ula, ulb;
 
 #define OPTCMP8TEST_SINGLE(num,cmpop,asmprefix,vara,varb,b0,b1,a0,a1,typename,name) \
-    typename name ## _ ## num ## (void) { \
+    typename name ## _ ## num(void) { \
         varb = b0; \
         asm( asmprefix ); \
         vara = a0; \
@@ -30,7 +30,7 @@ unsigned long ula, ulb;
     }
 
 #define OPTCMP8TEST_VERIFY(num,b,desc,printterm,name) \
-    ASSERT_AreEqual(name ## _ ## num ##(),b,printterm,"Incorrect optimization of const comparison (" #name "_" #num ": " desc ").");
+    ASSERT_AreEqual(name ## _ ## num(),b,printterm,"Incorrect optimization of const comparison (" #name "_" #num ": " desc ").");
 
 /* Generates a set of comparison tests for one type and set of test values.
 **     name = a name for this test (no spaces)

@@ -91,7 +91,7 @@ static void Usage (void)
             "  -Os\t\t\t\tInline some standard functions\n"
             "  -T\t\t\t\tInclude source as comment\n"
             "  -V\t\t\t\tPrint the compiler version number\n"
-            "  -W warning[,...]\t\tSuppress warnings\n"
+            "  -W [-+]warning[,...]\t\tControl warnings ('-' disables, '+' enables)\n"
             "  -d\t\t\t\tDebug mode\n"
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"
@@ -114,8 +114,10 @@ static void Usage (void)
             "  --create-full-dep name\tCreate a full make dependency file\n"
             "  --data-name seg\t\tSet the name of the DATA segment\n"
             "  --debug\t\t\tDebug mode\n"
+            "  --debug-tables name\t\tWrite symbol table debug info to a file\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --debug-opt name\t\tDebug optimization steps\n"
+            "  --debug-opt-output\t\tDebug output of each optimization step\n"
             "  --dep-target target\t\tUse this dependency target\n"
             "  --disable-opt name\t\tDisable an optimization step\n"
             "  --eagerly-inline-funcs\tEagerly inline some known functions\n"
@@ -169,6 +171,10 @@ static void SetSys (const char* Sys)
 
         case TGT_ATARI5200:
             DefineNumericMacro ("__ATARI5200__", 1);
+            break;
+
+        case TGT_ATARI7800:
+            DefineNumericMacro ("__ATARI7800__", 1);
             break;
 
         case TGT_ATARI:
@@ -289,8 +295,20 @@ static void SetSys (const char* Sys)
             cbmsys ("__CX16__");
             break;
 
+        case TGT_SYM1:
+            DefineNumericMacro ("__SYM1__", 1);
+            break;
+
+        case TGT_KIM1:
+            DefineNumericMacro ("__KIM1__", 1);
+            break;
+
+        case TGT_RP6502:
+            DefineNumericMacro ("__RP6502__", 1);
+            break;
+
         default:
-            AbEnd ("Unknown target system type %d", Target);
+            AbEnd ("Unknown target system '%s'", Sys);
     }
 
     /* Initialize the translation tables for the target system */
@@ -462,7 +480,8 @@ static void OptCPU (const char* Opt, const char* Arg)
     /* Find the CPU from the given name */
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
-        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280) {
+        CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280 &&
+        CPU != CPU_6502DTV) {
         AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
     }
 }
@@ -488,7 +507,11 @@ static void OptDebug (const char* Opt attribute ((unused)),
     ++Debug;
 }
 
-
+static void OptDebugTables (const char* Opt, const char* Arg)
+/* Dump tables to file */
+{
+    FileNameOption (Opt, Arg, &DebugTableName);
+}
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
@@ -730,7 +753,7 @@ static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg
 
 static void OptSignedChars (const char* Opt attribute ((unused)),
                             const char* Arg attribute ((unused)))
-/* Make default characters signed */
+/* Use 'signed char' as the underlying type of 'char' */
 {
     IS_Set (&SignedChars, 1);
 }
@@ -859,6 +882,7 @@ int main (int argc, char* argv[])
         { "--create-full-dep",      1,      OptCreateFullDep        },
         { "--data-name",            1,      OptDataName             },
         { "--debug",                0,      OptDebug                },
+        { "--debug-tables",         1,      OptDebugTables          },
         { "--debug-info",           0,      OptDebugInfo            },
         { "--debug-opt",            1,      OptDebugOpt             },
         { "--debug-opt-output",     0,      OptDebugOptOutput       },
@@ -895,6 +919,9 @@ int main (int argc, char* argv[])
 
     /* Initialize the default segment names */
     InitSegNames ();
+
+    /* Initialize the segment address sizes table */
+    InitSegAddrSizes ();
 
     /* Initialize the include search paths */
     InitIncludePaths ();
@@ -944,10 +971,6 @@ int main (int argc, char* argv[])
 
                 case 't':
                     OptTarget (Arg, GetArg (&I, 2));
-                    break;
-
-                case 'u':
-                    OptCreateDep (Arg, 0);
                     break;
 
                 case 'v':
@@ -1059,13 +1082,16 @@ int main (int argc, char* argv[])
         IS_Set (&Standard, STD_DEFAULT);
     }
 
+    /* Track string buffer allocation */
+    InitDiagnosticStrBufs ();
+
     /* Go! */
     Compile (InputFile);
 
     /* Create the output file if we didn't had any errors */
-    if (PreprocessOnly == 0 && (ErrorCount == 0 || Debug)) {
+    if (PreprocessOnly == 0 && (GetTotalErrors () == 0 || Debug)) {
 
-        /* Emit literals, externals, do cleanup and optimizations */
+        /* Emit literals, do cleanup and optimizations */
         FinishCompile ();
 
         /* Open the file */
@@ -1082,6 +1108,12 @@ int main (int argc, char* argv[])
         CreateDependencies ();
     }
 
+    /* Done with tracked string buffer allocation */
+    DoneDiagnosticStrBufs ();
+
+    /* Free up the segment address sizes table */
+    DoneSegAddrSizes ();
+
     /* Return an apropriate exit code */
-    return (ErrorCount > 0)? EXIT_FAILURE : EXIT_SUCCESS;
+    return (GetTotalErrors () > 0)? EXIT_FAILURE : EXIT_SUCCESS;
 }

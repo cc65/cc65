@@ -3,7 +3,7 @@
 ;
 ; 2009-09-26, Ullrich von Bassewitz
 ; 2014-04-26, Christian Groessler
-; 2014-05-01, Greg King
+; 2020-07-14, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -195,9 +195,10 @@ INSTALL:
         sta     (ptr3),y
         cli
 
-; Done, return zero (= MOUSE_ERR_OK)
+; Done
 
-        ldx     #$00
+        ldx     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         txa
         rts
 
@@ -379,7 +380,7 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioctls for now
 IRQ:    jsr     CPREP
         lda     KEY_COUNT
         sta     old_key_count
-        lda     #$7F
+        lda     #$FF
         sta     CIA1_PRA
         lda     CIA1_PRB                ; Read joystick #0
         and     #$1F

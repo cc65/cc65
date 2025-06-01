@@ -2,7 +2,7 @@
 ; 2000-05-17, Ullrich von Bassewitz
 ; 2014-05-28, Greg King
 ;
-; int __fastcall__ _osmaperrno (unsigned char oserror);
+; int __fastcall__ __osmaperrno (unsigned char oserror);
 ; /* Map a system-specific error into a system-independent code. */
 ;
 
@@ -10,7 +10,7 @@
 
 .code
 
-__osmaperrno:
+___osmaperrno:
         ldx     #ErrTabSize
 @L1:    cmp     ErrTab-2,x      ; Search for the error code
         beq     @L2             ; Jump if found

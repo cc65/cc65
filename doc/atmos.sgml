@@ -1,15 +1,15 @@
 <!doctype linuxdoc system>
 
 <article>
-<title>Oric Atmos-specific information for cc65
+<title>Tangerine Oric Atmos-specific information for cc65
 <author>
 <url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
-<url url="mailto:polluks@sdf.lonestar.org" name="Stefan A. Haubenthal">,<newline>
+<url url="mailto:polluks@sdf.org" name="Stefan A. Haubenthal">,<newline>
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
 
 <abstract>
-An overview over the Atmos runtime system as it is implemented for the cc65 C
-compiler.
+An overview over the Oric Atmos runtime system as it is implemented for the cc65
+C compiler. This target is not Oric-1 compatible.
 </abstract>
 
 <!-- Table of contents -->
@@ -176,10 +176,11 @@ No mouse drivers are currently available for the Atmos.
 
   <tag><tt/atmos-acia.ser (atmos_acia_ser)/</tag>
   Driver for the Telestrat integrated serial controller and the Atmos with a
-  serial add-on.
-  Note that, because of the peculiarities of the 6551 chip, together with the
-  use of the NMI, transmits are not interrupt driven; and, the transceiver
-  blocks if the receiver asserts flow control because of a full buffer.
+  serial add-on. Supports up to 19200 baud, requires hardware flow control
+  (RTS/CTS) and does interrupt driven receives. Note that, because of the
+  peculiarities of the 6551 chip, together with the use of the NMI, transmits
+  are not interrupt driven; and, the transceiver blocks if the receiver
+  asserts flow control because of a full buffer.
 
 </descrip><p>
 

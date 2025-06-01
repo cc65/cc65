@@ -99,7 +99,9 @@ static const char* GetAbsOverride (unsigned Flags, unsigned Addr)
 ** string, otherwise return the empty string.
 */
 {
-    if ((Flags & flAbsOverride) != 0 && Addr < 0x100) {
+    if ((Flags & flFarOverride) != 0 && Addr < 0x10000) {
+        return "f:";
+    } else if ((Flags & flAbsOverride) != 0 && Addr < 0x100) {
         return "a:";
     } else {
         return "";
@@ -121,8 +123,10 @@ static const char* GetAddrArg (unsigned Flags, unsigned Addr)
         static char Buf [32];
         if (Addr < 0x100) {
             xsprintf (Buf, sizeof (Buf), "$%02X", Addr);
-        } else {
+        } else if (Addr < 0x10000) {
             xsprintf (Buf, sizeof (Buf), "$%04X", Addr);
+        } else {
+            xsprintf (Buf, sizeof (Buf), "$%06X", Addr);
         }
         return Buf;
     }
@@ -229,6 +233,28 @@ void OH_Immediate (const OpcDesc* D)
 
 
 
+void OH_Immediate65816M (const OpcDesc* D)
+{
+    if (GetAttr (PC) & atMem16) {
+        OneLine (D, "#$%04X", GetCodeWord (PC+1));
+    } else {
+        OneLine (D, "#$%02X", GetCodeByte (PC+1));
+    }
+}
+
+
+
+void OH_Immediate65816X (const OpcDesc* D)
+{
+    if (GetAttr (PC) & atIdx16) {
+        OneLine (D, "#$%04X", GetCodeWord (PC+1));
+    } else {
+        OneLine (D, "#$%02X", GetCodeByte (PC+1));
+    }
+}
+
+
+
 void OH_ImmediateWord (const OpcDesc* D)
 {
     OneLine (D, "#$%04X", GetCodeWord (PC+1));
@@ -322,14 +348,28 @@ void OH_AbsoluteY (const OpcDesc* D)
 
 void OH_AbsoluteLong (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeLongAddr (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s%s", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
 
 
 void OH_AbsoluteLongX (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeLongAddr (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s%s,x", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -346,14 +386,29 @@ void OH_Relative (const OpcDesc* D)
     GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
+    if (HaveLabel(Addr)) {
+        OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
+    } else {
+        /* No label -- make a relative address expression */
+        OneLine (D, "* + (%d)", (int) Offs + 2);
+    }
 }
 
 
 
 void OH_RelativeLong (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    signed short Offs = GetCodeWord (PC+1);
+
+    /* Calculate the target address */
+    unsigned Addr = (((int) PC+3) + Offs) & 0xFFFF;
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -536,14 +591,15 @@ void OH_ImmediateAbsoluteX (const OpcDesc* D)
 
 void OH_StackRelative (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Output the line */
+    OneLine (D, "$%02X,s", GetCodeByte (PC+1));
 }
 
 
 
 void OH_DirectIndirectLongX (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    Error ("Not implemented %s", __FUNCTION__);
 }
 
 
@@ -566,14 +622,28 @@ void OH_StackRelativeIndirectY4510 (const OpcDesc* D attribute ((unused)))
 
 void OH_DirectIndirectLong (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "[%s]", GetAddrArg (D->Flags, Addr));
 }
 
 
 
 void OH_DirectIndirectLongY (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "[%s],y", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -604,6 +674,19 @@ void OH_BlockMove (const OpcDesc* D)
              GetCodeWord (PC+5));
 
     xfree (DstLabel);
+}
+
+
+
+void OH_BlockMove65816 (const OpcDesc* D)
+{
+    /* Get source operand */
+    unsigned Src = GetCodeByte (PC+2);
+    /* Get destination operand */
+    unsigned Dst = GetCodeByte (PC+1);
+
+    /* Output the line */
+    OneLine (D, "#$%02X, #$%02X", Src, Dst);
 }
 
 

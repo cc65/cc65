@@ -62,7 +62,7 @@ struct StrBuf;
 struct Macro;
 typedef struct Macro Macro;
 
-                                
+
 
 /*****************************************************************************/
 /*                                   Code                                    */

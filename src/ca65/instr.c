@@ -92,7 +92,7 @@ static void PutSEP (const InsDesc* Ins);
 /* Emit a SEP instruction (65816), track register sizes */
 
 static void PutTAMn (const InsDesc* Ins);
-/* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TAMn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
 ** second operand byte. The TAM instruction is the more generic form, it takes
 ** an immediate argument.
@@ -104,9 +104,9 @@ static void PutTMA (const InsDesc* Ins);
 */
 
 static void PutTMAn (const InsDesc* Ins);
-/* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TMAn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
-** second operand byte. The TAM instruction is the more generic form, it takes
+** second operand byte. The TMA instruction is the more generic form, it takes
 ** an immediate argument.
 */
 
@@ -120,9 +120,21 @@ static void PutJMP (const InsDesc* Ins);
 ** to check for this case and is otherwise identical to PutAll.
 */
 
+static void PutJMP816 (const InsDesc* Ins);
+/* Handle the JMP instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
+** Note that JMP [abs] and JML [abs] are always both permitted for instruction $DC,
+** because the [] notation for long indirection makes the generated instruction unambiguous.
+*/
+
+static void PutJSR816 (const InsDesc* Ins);
+/* Handle the JSR instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
+*/
+
 static void PutRTS (const InsDesc* Ins attribute ((unused)));
 /* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
-** the enclosing scope is FAR.
+** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
 */
 
 static void PutAll (const InsDesc* Ins);
@@ -169,7 +181,7 @@ static const struct {
         { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -240,7 +252,7 @@ static const struct {
         { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -303,6 +315,91 @@ static const struct {
     }
 };
 
+/* Instruction table for the 6502 with DTV extra opcodes (DTV) and
+** those illegal instructions (X) which are supported by DTV.
+** Note: illegals opcodes which contain more subinstructions
+** (ASO, DCM, LSE, LXA, SBX and SHS) are not enlisted.
+*/
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[71];
+} InsTab6502DTV = {
+    sizeof (InsTab6502DTV.Ins) / sizeof (InsTab6502DTV.Ins[0]),
+    {
+        { "ADC",  0x080A26C, 0x60, 0, PutAll },
+        { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
+        { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
+        { "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ANE",  0x0800000, 0x8B, 0, PutAll },         /* X */
+        { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X */
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x000000C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x12, 0, PutPCRel8 },      /* DTV */
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A26C, 0xc0, 0, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DEC",  0x000006C, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A26C, 0x40, 0, PutAll },
+        { "INC",  0x000006c, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "JMP",  0x0000808, 0x4c, 6, PutJMP },
+        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X */
+        { "LAX",  0x080A30C, 0xA3, 11, PutAll },        /* X */
+        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x080006D, 0x00, 10, PutAll },        /* X */
+        { "ORA",  0x080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "RLA",  0x000A26C, 0x23, 0, PutAll },         /* X */
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RRA",  0x000A26C, 0x63, 0, PutAll },         /* X */
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SAC",  0x0800000, 0x32, 1, PutAll },         /* DTV */
+        { "SBC",  0x080A26C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SHA",  0x0002200, 0x93, 1, PutAll },         /* X */
+        { "SHX",  0x0000200, 0x9e, 1, PutAll },         /* X */
+        { "SHY",  0x0000040, 0x9c, 1, PutAll },         /* X */
+        { "SIR",  0x0800000, 0x42, 1, PutAll },         /* DTV */
+        { "STA",  0x000A26C, 0x80, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
+    }
+};
+
 /* Instruction table for the 65SC02 */
 static const struct {
     unsigned Count;
@@ -321,7 +418,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -413,7 +510,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -525,7 +622,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BSR",  0x0040000, 0x63, 0, PutPCRel4510 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -650,7 +747,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000005, 0x00, 6, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BRL",  0x0040000, 0x82, 0, PutPCRel16 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -659,7 +756,7 @@ static const struct {
         { "CLI",  0x0000001, 0x58, 0, PutAll },
         { "CLV",  0x0000001, 0xb8, 0, PutAll },
         { "CMP",  0x0b8f6fc, 0xc0, 0, PutAll },
-        { "COP",  0x0000004, 0x02, 6, PutAll },
+        { "COP",  0x0800005, 0x02, 6, PutAll },
         { "CPA",  0x0b8f6fc, 0xc0, 0, PutAll },   /* == CMP */
         { "CPX",  0x0c0000c, 0xe0, 1, PutAll },
         { "CPY",  0x0c0000c, 0xc0, 1, PutAll },
@@ -673,9 +770,9 @@ static const struct {
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JML",  0x4000010, 0x5c, 1, PutAll },
-        { "JMP",  0x4010818, 0x4c, 6, PutAll },
+        { "JMP",  0x4010818, 0x4c, 6, PutJMP816 },
         { "JSL",  0x0000010, 0x20, 7, PutAll },
-        { "JSR",  0x0010018, 0x20, 7, PutAll },
+        { "JSR",  0x0010018, 0x20, 7, PutJSR816 },
         { "LDA",  0x0b8f6fc, 0xa0, 0, PutAll },
         { "LDX",  0x0c0030c, 0xa2, 1, PutAll },
         { "LDY",  0x0c0006c, 0xa0, 1, PutAll },
@@ -736,7 +833,7 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "TYX",  0x0000001, 0xbb, 0, PutAll },
         { "WAI",  0x0000001, 0xcb, 0, PutAll },
-        { "WDM",  0x0000004, 0x42, 6, PutAll },
+        { "WDM",  0x0800004, 0x42, 6, PutAll },
         { "XBA",  0x0000001, 0xeb, 0, PutAll },
         { "XCE",  0x0000001, 0xfb, 0, PutAll }
     }
@@ -812,7 +909,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BSR",  0x0020000, 0x44, 0, PutPCRel8 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -930,6 +1027,7 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTabNone,
     (const InsTable*) &InsTab6502,
     (const InsTable*) &InsTab6502X,
+    (const InsTable*) &InsTab6502DTV,
     (const InsTable*) &InsTab65SC02,
     (const InsTable*) &InsTab65C02,
     (const InsTable*) &InsTab65816,
@@ -1093,7 +1191,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
     A->AddrModeSet &= Ins->AddrMode;
 
     /* If we have an expression, check it and remove any addressing modes that
-    ** are too small for the expression size. Since we have to study the
+    ** are too small for the expression size. Because we have to study the
     ** expression anyway, do also replace it by a simpler one if possible.
     */
     if (A->Expr) {
@@ -1121,9 +1219,9 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
             } else {
                 ED.AddrSize = DataAddrSize;
                 /* If the default address size of the data segment is unequal
-                ** to zero page addressing, but zero page addressing is 
-                ** allowed by the instruction, mark all symbols in the 
-                ** expression tree. This mark will be checked at end of 
+                ** to zero page addressing, but zero page addressing is
+                ** allowed by the instruction, mark all symbols in the
+                ** expression tree. This mark will be checked at end of
                 ** assembly, and a warning is issued, if a zero page symbol
                 ** was guessed wrong here.
                 */
@@ -1171,7 +1269,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         ExprNode* Left = A->Expr->Left;
         if ((A->Expr->Op == EXPR_BYTE0 || A->Expr->Op == EXPR_BYTE1) &&
             Left->Op == EXPR_SYMBOL                                  &&
-            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP) {
+            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP             &&
+            !(A->Flags & EFFADDR_OVERRIDE_ZP)) {
 
             /* Output a warning */
             Warning (1, "Suspicious address expression");
@@ -1212,7 +1311,7 @@ static void EmitCode (EffAddr* A)
             break;
 
         case 2:
-            if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y))) {
+            if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y | AM65_ABS_X_IND))) {
                 /* This is a 16 bit mode that uses an address. If in 65816,
                 ** mode, force this address into 16 bit range to allow
                 ** addressing inside a 64K segment.
@@ -1414,7 +1513,7 @@ static void PutSEP (const InsDesc* Ins)
 
 
 static void PutTAMn (const InsDesc* Ins)
-/* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TAMn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
 ** second operand byte. The TAM instruction is the more generic form, it takes
 ** an immediate argument.
@@ -1444,7 +1543,7 @@ static void PutTMA (const InsDesc* Ins)
     } else {
         /* Make sure just one bit is set */
         if ((Val & (Val - 1)) != 0) {
-            Error ("Argument to TAM must be a power of two");
+            Error ("Argument of TMA must be a power of two");
         }
     }
 }
@@ -1452,9 +1551,9 @@ static void PutTMA (const InsDesc* Ins)
 
 
 static void PutTMAn (const InsDesc* Ins)
-/* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
+/* Emit a TMAn instruction (HuC6280). Because this is a two-byte instruction with
 ** implicit addressing mode, the opcode byte in the table is actually the
-** second operand byte. The TAM instruction is the more generic form, it takes
+** second operand byte. The TMA instruction is the more generic form, it takes
 ** an immediate argument.
 */
 {
@@ -1519,11 +1618,12 @@ static void PutJMP (const InsDesc* Ins)
     if (EvalEA (Ins, &A)) {
 
         /* Check for indirect addressing */
-        if (A.AddrModeBit & AM65_ABS_IND) {
+        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02) && (RelaxChecks == 0)) {
 
             /* Compare the low byte of the expression to 0xFF to check for
             ** a page cross. Be sure to use a copy of the expression otherwise
-            ** things will go weird later.
+            ** things will go weird later. This only affects the 6502 CPU,
+            ** and was corrected in 65C02 and later CPUs in this family.
             */
             ExprNode* E = GenNE (GenByteExpr (CloneExpr (A.Expr)), 0xFF);
 
@@ -1531,7 +1631,7 @@ static void PutJMP (const InsDesc* Ins)
             unsigned Msg = GetStringId ("\"jmp (abs)\" across page border");
 
             /* Generate the assertion */
-            AddAssertion (E, ASSERT_ACT_WARN, Msg);
+            AddAssertion (E, ASSERT_ACT_ERROR, Msg);
         }
 
         /* No error, output code */
@@ -1541,12 +1641,46 @@ static void PutJMP (const InsDesc* Ins)
 
 
 
-static void PutRTS (const InsDesc* Ins attribute ((unused)))
-/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
-** the enclosing scope is FAR.
+static void PutJMP816 (const InsDesc* Ins)
+/* Handle the JMP instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
+** Note that JMP [abs] and JML [abs] are always both permitted for instruction $DC,
+** because the [] notation for long indirection makes the generated instruction unambiguous.
 */
 {
-    if (SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
+    if (LongJsrJmpRts) {
+        PutJMP (Ins);
+    } else {
+        InsDesc InsAbs = *Ins;
+        InsAbs.AddrMode &= ~(AM65_ABS_LONG);
+        PutJMP (&InsAbs);
+    }
+}
+
+
+
+static void PutJSR816 (const InsDesc* Ins)
+/* Handle the JSR instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
+*/
+{
+    if (LongJsrJmpRts) {
+        PutAll (Ins);
+    } else {
+        InsDesc InsAbs = *Ins;
+        InsAbs.AddrMode &= ~(AM65_ABS_LONG);
+        PutJMP (&InsAbs);
+    }
+}
+
+
+
+static void PutRTS (const InsDesc* Ins attribute ((unused)))
+/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
+** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
+*/
+{
+    if (LongJsrJmpRts && SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
         Emit0 (0x6B);       /* RTL */
     } else {
         Emit0 (0x60);       /* RTS */

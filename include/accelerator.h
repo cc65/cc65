@@ -180,7 +180,7 @@ unsigned char detect_c128 (void);
 unsigned char __fastcall__ set_chameleon_speed (unsigned char speed);
 
 /* Set the speed of the C64 Chameleon cartridge, the following inputs
- * are accepted: 
+ * are accepted:
  * SPEED_SLOW : 1 Mhz mode
  * SPEED_1X   : 1 Mhz mode
  * SPEED_2X   : 2 Mhz mode
@@ -304,6 +304,36 @@ unsigned char detect_turbomaster (void);
  * 0x01  : C64 Turbo Master cartridge present
  */
 
+unsigned char __fastcall__ set_iigs_speed (unsigned char speed);
+
+/* Set the speed of the Apple IIgs CPU.
+ *
+ * Possible values:
+ * SPEED_SLOW  : 1 Mhz mode
+ * SPEED_FAST  : Fast mode (2.8MHz or more, depending on the presence of
+ *               an accelerator)
+ *
+ * Any other value will be interpreted as SPEED_FAST.
+ */
+
+unsigned char get_iigs_speed (void);
+
+/* Get the speed of the Apple IIgs CPU.
+ *
+ * Possible return values:
+ * SPEED_SLOW  : 1 Mhz mode
+ * SPEED_FAST  : Fast mode (2.8MHz or more, depending on the presence of
+ *               an accelerator)
+ */
+
+unsigned char detect_iigs (void);
+
+/* Check whether we are running on an Apple IIgs.
+ *
+ * Possible return values:
+ * 0x00  : No
+ * 0x01  : Yes
+ */
+
 /* End of accelerator.h */
 #endif
-

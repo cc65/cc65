@@ -83,7 +83,10 @@ Y2      :=      ptr4
 
         .byte   $74, $67, $69   ; "tgi"
         .byte   TGI_API_VERSION ; TGI API version number
+
+libref:
         .addr   $0000           ; Library reference
+
         .word   280             ; X resolution
         .word   192             ; Y resolution
         .byte   8               ; Number of drawing colors
@@ -120,6 +123,10 @@ pages:  .byte   2               ; Number of screens available
 
         .bss
 
+.ifndef __APPLE2ENH__
+machinetype: .res 1
+.endif
+
 ; Absolute variables used in the code
 
 ERROR:  .res    1               ; Error code
@@ -146,13 +153,22 @@ FONT:
 ; most of the time.
 ; Must set an error code: NO
 INSTALL:
-        .ifdef  __APPLE2ENH__
+        .ifndef __APPLE2ENH__
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #$0
+        lda     (ptr1),y
+        sta     machinetype
+        bpl     :+
+        .endif
         ; No page switching if 80 column store is enabled
         bit     RD80COL
         bpl     :+
         lda     #$01
         sta     pages
-:       .endif
+:
 
         ; Fall through
 
@@ -175,6 +191,16 @@ INIT:
         ; Switch into graphics mode
         bit     MIXCLR
         bit     HIRES
+
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bpl     clr_txt
+        .endif
+
+        sta     IOUDISON
+        bit     DHIRESOFF
+
+clr_txt:
         bit     TXTCLR
 
         ; Beagle Bros Shape Mechanic fonts don't
@@ -196,11 +222,14 @@ DONE:
         bit     TXTSET
         bit     LOWSCR
 
-        .ifdef  __APPLE2ENH__
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bpl     reset_wndtop
+        .endif
         ; Limit SET80COL-HISCR to text
         bit     LORES
-        .endif
 
+reset_wndtop:
         ; Reset the text window top
         lda     #$00
         sta     WNDTOP
@@ -338,7 +367,7 @@ GETPIXEL:
         lda     #$03            ; 3 (white)
 :       bcc     :+
         adc     #$03            ; += 4 (black -> black2, white -> white2)
-:       ldx     #$00
+:       ldx     #>$0000
         bit     $C080           ; Switch in LC bank 2 for R/O
         rts
 

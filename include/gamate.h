@@ -145,6 +145,8 @@
 
 /* constants for the conio implementation */
 #define COLOR_BLACK     0x03
+#define COLOR_GRAY2     0x02
+#define COLOR_GRAY1     0x01
 #define COLOR_WHITE     0x00
 
 #define CH_HLINE        1
@@ -169,6 +171,8 @@
 
 /* No support for dynamically loadable drivers */
 #define DYN_DRV         0
+
+#define JOY_DATA        0x4400  /* hw register to read the pad bits from */
 
 /* Masks for joy_read */
 #define JOY_UP_MASK     0x01

@@ -1,10 +1,11 @@
 ;
 ; Ullrich von Bassewitz, 22.11.2002
 ;
-; BASIN replacement function
+; BASIN/CHRIN replacement function
 ;
-             
+
         .export         BASIN
+        .export         CHRIN
 
         .include        "plus4.inc"
 
@@ -17,4 +18,4 @@
         rts                             ; Return to caller
 .endproc
 
-
+CHRIN   :=      BASIN

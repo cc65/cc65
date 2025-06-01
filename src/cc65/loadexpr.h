@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -55,7 +55,10 @@ struct ExprDesc;
 
 
 void LoadExpr (unsigned Flags, struct ExprDesc* Expr);
-/* Load an expression into the primary register if it is not already there. */
+/* Load an expression into the primary register if it is not already there.
+** If Flags contains any CF_TYPEMASK bits, it then overrides the codegen type
+** info that would be otherwise taken from the expression type.
+*/
 
 
 

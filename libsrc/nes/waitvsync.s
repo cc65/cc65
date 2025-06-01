@@ -11,7 +11,7 @@
 
 .proc   _waitvsync
 
-wait:   lda     PPU_STATUS
+wait:   bit     PPU_STATUS
         bpl     wait
         rts
 

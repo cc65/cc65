@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -32,13 +32,14 @@
 /*****************************************************************************/
 
 
-                     
+
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
 #include "expr.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "testexpr.h"
 
 
@@ -58,20 +59,38 @@ unsigned Test (unsigned Label, int Invert)
     ExprDesc Expr;
     unsigned Result;
 
+    ED_Init (&Expr);
+
     /* Read a boolean expression */
     BoolExpr (hie0, &Expr);
 
-    /* Check for a constant expression */
+    /* Check for a constant numeric expression */
     if (ED_IsConstAbs (&Expr)) {
 
+        /* Append deferred inc/dec at sequence point */
+        DoDeferred (SQP_KEEP_NONE, &Expr);
+
         /* Result is constant, so we know the outcome */
-        Result = (Expr.IVal != 0);
+        Result = (Expr.IVal != 0) ? TESTEXPR_TRUE : TESTEXPR_FALSE;
 
         /* Constant rvalue */
         if (!Invert && Expr.IVal == 0) {
             g_jump (Label);
-            Warning ("Unreachable code");
+            UnreachableCodeWarning ();
         } else if (Invert && Expr.IVal != 0) {
+            g_jump (Label);
+        }
+
+    } else if (ED_IsAddrExpr (&Expr)) {
+
+        /* Append deferred inc/dec at sequence point */
+        DoDeferred (SQP_KEEP_NONE, &Expr);
+
+        /* Object addresses are non-NULL */
+        Result = TESTEXPR_TRUE;
+
+        /* Condition is always true */
+        if (Invert) {
             g_jump (Label);
         }
 
@@ -80,13 +99,14 @@ unsigned Test (unsigned Label, int Invert)
         /* Result is unknown */
         Result = TESTEXPR_UNKNOWN;
 
-        /* If the expr hasn't set condition codes, set the force-test flag */
-        if (!ED_IsTested (&Expr)) {
-            ED_MarkForTest (&Expr);
-        }
+        /* Set the test flag */
+        ED_RequireTest (&Expr);
 
         /* Load the value into the primary register */
         LoadExpr (CF_FORCECHAR, &Expr);
+
+        /* Append deferred inc/dec at sequence point */
+        DoDeferred (SQP_KEEP_TEST, &Expr);
 
         /* Generate the jump */
         if (Invert) {

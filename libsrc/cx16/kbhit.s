@@ -1,5 +1,5 @@
 ;
-; 2019-09-20, Greg King
+; 2022-03-28, Greg King
 ;
 ; unsigned char kbhit (void);
 ; /* Returns non-zero (true) if a typed character is waiting. */
@@ -7,11 +7,11 @@
 
         .export         _kbhit
 
-        .include        "cx16.inc"
+        .import         KBDBUF_PEEK
 
 
 .proc   _kbhit
-        ldx     #>$0000         ; High byte of return
-        lda     KEY_COUNT       ; Get number of characters
-        rts
+        jsr     KBDBUF_PEEK
+        txa                     ; Low byte of return (only its zero/nonzero ...
+        rts                     ; ... state matters)
 .endproc

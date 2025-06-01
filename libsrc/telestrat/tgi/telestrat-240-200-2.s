@@ -124,7 +124,7 @@ INIT:
 ; Switch into graphics mode
 
         BRK_TELEMON(XHIRES)
-      
+
 ; Done, reset the error code
 
         lda     #TGI_ERR_OK
@@ -247,17 +247,17 @@ GETDEFPALETTE:
 ;
 
 SETPIXEL:
-        lda #$80       ; curset on 
-SETPIXELSETMODE:        
+        lda #$80       ; curset on
+SETPIXELSETMODE:
         sta HRSFB
-        
+
         lda X1
         sta HRS1
         lda Y1
         sta HRS2
-        
-        
-        
+
+
+
         BRK_TELEMON(XCURSE)
 
         rts
@@ -289,18 +289,31 @@ LINE:
         sta   HRS3
         lda   Y2
         sta   HRS4
-        
-        lda   #$ff
+
+
+        lda   X1+1
+        sta   HRS1+1
+
+        lda   Y1+1
+        sta   HRS2+1
+
+        lda   X2+1
+        sta   HRS3+1
+
+        lda   Y2+1
+        sta   HRS4+1
+
+        lda   #$FF
         sta   HRSPAT
 
         BRK_TELEMON(XDRAWA)
 
         rts
-        
-CIRCLE:    
+
+CIRCLE:
         ; not done yet
-        rts      
-      
+        rts
+
 ; ------------------------------------------------------------------------
 ; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
 ; X1/Y1 = ptr1/ptr2 and X2/Y2 = ptr3/ptr4 using the current drawing color.
@@ -344,11 +357,11 @@ OUTTEXT:
         ; put hires cursor in X & Y
         lda   #$00
         jsr   SETPIXELSETMODE
-        
-        
+
+
         ; count the length of the string
         ldy   #$00
-loop:        
+loop:
         lda   (ptr3),y
         beq   out
         iny
@@ -356,10 +369,10 @@ loop:
 out:
         ; XSCHAR routine from telemon needs to have the length of the string in X register
         ; copy Y register to X register. It could be optimized in 65C02 with TYX
-        tya 
+        tya
         tax
-    
-        lda   ptr3     ; XSCHAR needs in A and Y the adress of the string        
-        ldy   ptr3+1    
+
+        lda   ptr3     ; XSCHAR needs in A and Y the address of the string
+        ldy   ptr3+1
         BRK_TELEMON(XSCHAR)
         rts

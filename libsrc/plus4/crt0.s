@@ -197,7 +197,7 @@ nohandler:
 ; IRQ stub installed at $314, called by our handler above if RAM is banked in,
 ; or the Kernal IRQ handler if ROM is banked in.
 
-; If we have handlers, call them. We will use a flag here instead of loading 
+; If we have handlers, call them. We will use a flag here instead of loading
 ; __INTERRUPTOR_COUNT__ directly, since the condes function is not reentrant.
 ; The irqcount flag will be set/reset from the main code, to avoid races.
 IRQStub:

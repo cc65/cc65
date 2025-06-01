@@ -218,7 +218,7 @@ INIT:
 DONE:   lda     $FF12
         ora     #%00000100      ; Fetch from ROM
         sta     $FF12
-        
+
 .if LBASE <> CHRBASE
         lda     #>CHRBASE       ; Reset character/color matrix address
         sta     $FF14
@@ -366,7 +366,7 @@ SETPALETTE:
         sta     LBASE+$02e8,y
         iny
         bne     @L2
- 
+
 
 ; Get chroma values from the low nybble of the palette entries
         lda     PALETTE+1       ; Foreground chroma
@@ -455,7 +455,7 @@ GETPIXEL:
         beq     @L1
         iny
 
-@L1:    
+@L1:
         tya                     ; Get color value into A
         ldx     #$00            ; Clear high byte
         rts

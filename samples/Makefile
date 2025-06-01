@@ -451,7 +451,7 @@ multdemo: multidemo.o
 ovrldemo: overlaydemo.o
 	$(LD) $(LDFLAGS) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
-OVERLAYLIST := 
+OVERLAYLIST :=
 
 ifneq ($(filter ovrldemo,$(EXELIST_$(SYS))),)
 OVERLAYLIST += $(foreach I,1 2 3,ovrldemo.$I)

@@ -1550,7 +1550,6 @@ CharAgain:
                 ** string later.
                 */
                 ReadStringConst ('\'');
-                TgtTranslateStrBuf(&CurTok.SVal);
                 if (SB_GetLen (&CurTok.SVal) == 1) {
                     CurTok.IVal = SB_AtUnchecked (&CurTok.SVal, 0);
                     CurTok.Tok = TOK_CHARCON;
@@ -1562,7 +1561,6 @@ CharAgain:
                 ** Hack: Pass 0 to ReadStringConst for special handling.
                 */
                 ReadStringConst(0);
-                TgtTranslateStrBuf(&CurTok.SVal);
                 if (SB_GetLen(&CurTok.SVal) != 1) {
                     Error ("Illegal character constant");
                     goto CharAgain;

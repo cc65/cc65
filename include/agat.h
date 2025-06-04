@@ -24,10 +24,14 @@
 #define COLOR_WHITE	0x07
 
 /* Characters codes */
-#define CH_ENTER        0x0D
-#define CH_ESC          0x1B
-#define CH_CURS_LEFT    0x08
-#define CH_CURS_RIGHT   0x15
+#define CH_CTRL_C	0x03
+#define CH_ENTER	0x0D
+#define CH_ESC		0x1B
+#define CH_CURS_LEFT	0x08
+#define CH_CURS_RIGHT	0x15
+#define CH_CURS_UP	0x19
+#define CH_CURS_DOWN	0x1A
+#define CH_ESC		0x1B
 
 
 /* Masks for joy_read */

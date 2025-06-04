@@ -22,6 +22,7 @@ HIMEM   :=      $73     ; Highest available memory address+1
 ;-----------------------------------------------------------------------------
 ; Vectors
 
+DOSWARM :=      $03D0   ; DOS warmstart vector
 BRKVec  :=      $03F0   ; Break vector
 SOFTEV  :=      $03F2   ; Vector for warm start
 PWREDUP :=      $03F4   ; This must be = EOR #$A5 of SOFTEV+1

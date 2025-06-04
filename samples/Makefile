@@ -163,12 +163,13 @@ DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 
 # --------------------------------------------------------------------------
 # Lists of executables
 
+#        gunzip65   \
+
 EXELIST_apple2 =   \
         ascii      \
         checkversion \
         diodemo    \
         enumdevdir \
-        gunzip65   \
         hello      \
         mandelbrot \
         mousedemo  \

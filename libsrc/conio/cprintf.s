@@ -6,7 +6,7 @@
 
         .export         _cprintf
         .import         pushax, addysp, _vcprintf
-        .importzp       spc, ptr1
+        .importzp       c_sp, ptr1
 
         .macpack        generic
 
@@ -31,9 +31,9 @@ _cprintf:
         dey
         dey                             ; Sub size of Format
         tya
-        add     spc
+        add     c_sp
         sta     ptr1
-        ldx     spc+1
+        ldx     c_sp+1
         bcc     @L1
         inx
 @L1:    stx     ptr1+1

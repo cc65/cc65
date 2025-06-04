@@ -6,7 +6,7 @@
 
         .include "atari.inc"
         .include "fd.inc"
-        .importzp tmp1,tmp2,tmp3,ptr4,spc
+        .importzp tmp1,tmp2,tmp3,ptr4,c_sp
         .import fd_table,fd_index
         .import fdt_to_fdi
         .export clriocb
@@ -229,7 +229,7 @@ freefnd:txa
         beq     l2
 
 l1:     ldy     #0
-        lda     (spc),y                  ; get device
+        lda     (c_sp),y                  ; get device
 l2:     sta     fd_table+ft_dev,x       ; set device
         lda     #1
         sta     fd_table+ft_usa,x       ; set usage counter

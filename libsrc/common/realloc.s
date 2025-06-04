@@ -4,7 +4,7 @@
 ; void* __fastcall__ realloc (void* block, register size_t size)
 ;
 
-        .importzp       ptr1, ptr2, ptr3, ptr4, tmp1, tmp2, tmp3, tmp4, spc
+        .importzp       ptr1, ptr2, ptr3, ptr4, tmp1, tmp2, tmp3, tmp4, c_sp
         .import         _malloc, _memcpy, _free
         .import         pushax, popptr1, return0
         .import          incsp2, decsp2

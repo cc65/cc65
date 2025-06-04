@@ -8,7 +8,7 @@
         .constructor    initstdout
 
         .import         rwcommon
-        .importzp       spc, ptr1, ptr2, ptr3
+        .importzp       c_sp, ptr1, ptr2, ptr3
 
         .include        "cbm.inc"
         .include        "errno.inc"

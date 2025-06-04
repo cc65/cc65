@@ -6,7 +6,7 @@
 
         .export         tosint
         .import         incsp2
-        .importzp       spc
+        .importzp       c_sp
 
         .macpack        cpu
 
@@ -16,17 +16,17 @@
 
         pha
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (spc)
+        lda     (c_sp)
 .else
         ldy     #0
-        lda     (spc),y          ; spc+1
+        lda     (c_sp),y          ; c_sp+1
 .endif
         ldy     #2
-        sta     (spc),y
+        sta     (c_sp),y
         dey
-        lda     (spc),y
+        lda     (c_sp),y
         ldy     #3
-        sta     (spc),y
+        sta     (c_sp),y
         pla
         jmp     incsp2          ; Drop 16 bit
 

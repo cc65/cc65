@@ -8,7 +8,7 @@
         .export         ___setjmp
 
         .import         return0
-        .importzp       spc, ptr1
+        .importzp       c_sp, ptr1
 
 ___setjmp:
         sta     ptr1            ; Save buf
@@ -17,10 +17,10 @@ ___setjmp:
 
 ; The parameter stack is now empty, put it into buf
 
-        lda     spc
+        lda     c_sp
         sta     (ptr1),y
         iny
-        lda     spc+1
+        lda     c_sp+1
         sta     (ptr1),y
         iny
 

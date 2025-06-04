@@ -9,20 +9,20 @@
 
 
         .export         ldeax0sp, ldeaxysp
-        .importzp       sreg, spc
+        .importzp       sreg, c_sp
 
 ldeax0sp:
         ldy     #3
 ldeaxysp:
-        lda     (spc),y
+        lda     (c_sp),y
         sta     sreg+1
         dey
-        lda     (spc),y
+        lda     (c_sp),y
         sta     sreg
         dey
-        lda     (spc),y
+        lda     (c_sp),y
         tax
         dey
-        lda     (spc),y
+        lda     (c_sp),y
         rts
 

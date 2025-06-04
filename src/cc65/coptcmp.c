@@ -431,22 +431,22 @@ unsigned OptCmp5 (CodeSeg* S)
 
                 /* The value is zero, we may use the simple code version:
                 **      ldy     #o-1
-                **      lda     (spc),y
+                **      lda     (c_sp),y
                 **      ldy     #o
-                **      ora     (spc),y
+                **      ora     (c_sp),y
                 **      jne/jeq ...
                 */
                 sprintf (Buf, "$%02X", (int)(L[0]->Num-1));
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
 
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "spc", 0, L[1]->LI);
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+2);
 
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                X = NewCodeEntry (OP65_ORA, AM65_ZP_INDY, "spc", 0, L[1]->LI);
+                X = NewCodeEntry (OP65_ORA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+4);
 
                 CS_DelEntries (S, I+5, 3);   /* cpx/bne/cmp */
@@ -461,18 +461,18 @@ unsigned OptCmp5 (CodeSeg* S)
                 ** of the low byte after the first branch if possible:
                 **
                 **      ldy     #o
-                **      lda     (spc),y
+                **      lda     (c_sp),y
                 **      cmp     #a
                 **      bne     L1
                 **      ldy     #o-1
-                **      lda     (spc),y
+                **      lda     (c_sp),y
                 **      cmp     #b
                 **      jne/jeq ...
                 */
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "spc", 0, L[1]->LI);
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+4);
 
                 X = NewCodeEntry (OP65_CMP, L[2]->AM, L[2]->Arg, 0, L[2]->LI);
@@ -482,7 +482,7 @@ unsigned OptCmp5 (CodeSeg* S)
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+7);
 
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "spc", 0, L[1]->LI);
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+8);
 
                 CS_DelEntries (S, I, 3);          /* ldy/jsr/cpx */

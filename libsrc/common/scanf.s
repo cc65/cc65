@@ -8,7 +8,7 @@
         .export         _scanf
 
         .import         _stdin, pushax, addysp, _vfscanf
-        .import         spc:zp, ptr1:zp
+        .import         c_sp:zp, ptr1:zp
 
         .macpack        generic
 
@@ -34,8 +34,8 @@ _scanf:
 
 ; Now, calculate the va_list pointer, which does point to Format.
 
-        lda     spc
-        ldx     spc+1
+        lda     c_sp
+        ldx     c_sp+1
         add     ArgSize
         bcc     @L1
         inx

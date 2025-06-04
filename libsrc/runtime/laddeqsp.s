@@ -5,29 +5,29 @@
 ;
 
         .export         laddeq0sp, laddeqysp
-        .importzp       spc, sreg
+        .importzp       c_sp, sreg
 
 laddeq0sp:
         ldy     #0
 laddeqysp:
         clc
-        adc     (spc),y
-        sta     (spc),y
+        adc     (c_sp),y
+        sta     (c_sp),y
         pha
         iny
         txa
-        adc     (spc),y
-        sta     (spc),y
+        adc     (c_sp),y
+        sta     (c_sp),y
         tax
         iny
         lda     sreg
-        adc     (spc),y
-        sta     (spc),y
+        adc     (c_sp),y
+        sta     (c_sp),y
         sta     sreg
         iny
         lda     sreg+1
-        adc     (spc),y
-        sta     (spc),y
+        adc     (c_sp),y
+        sta     (c_sp),y
         sta     sreg+1
         pla
         rts

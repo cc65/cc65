@@ -34,8 +34,8 @@ _init:    ldx     #$FF          ; Initialize stack pointer to $01FF
 
           lda     #<(__MAIN_START__ + __MAIN_SIZE__  + __STACKSIZE__)
           ldx     #>(__MAIN_START__ + __MAIN_SIZE__  + __STACKSIZE__)
-          sta     spc
-          stx     spc+1
+          sta     c_sp
+          stx     c_sp+1
 
 ; ---------------------------------------------------------------------------
 ; Initialize memory storage

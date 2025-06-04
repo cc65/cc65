@@ -27,7 +27,7 @@
         .constructor    mono_init_cursor
         .interruptor    mono_blink_cursor
 
-        .importzp       spc
+        .importzp       c_sp
         .import         _zonecounter
         .import         _mono_zones
         .import         cursor

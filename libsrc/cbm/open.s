@@ -12,7 +12,7 @@
         .import         opencmdchannel, closecmdchannel, readdiskerror
         .import         fnunit, fnisfile
         .import         _close
-        .importzp       spc, tmp2, tmp3
+        .importzp       c_sp, tmp2, tmp3
 
         .include        "errno.inc"
         .include        "fcntl.inc"

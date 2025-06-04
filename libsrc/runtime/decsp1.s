@@ -5,14 +5,14 @@
 ;
 
         .export         decsp1
-        .importzp       spc
+        .importzp       c_sp
 
 .proc   decsp1
 
-        ldy     spc
+        ldy     c_sp
         bne     @L1
-        dec     spc+1
-@L1:    dec     spc
+        dec     c_sp+1
+@L1:    dec     c_sp
         rts
 
 .endproc

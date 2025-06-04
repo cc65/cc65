@@ -338,25 +338,25 @@ MainLoop:
         jsr     decsp6                  ; 3 args
         ldy     #5
         lda     OutData+1
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     OutData
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     FSave+1
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     FSave
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     FCount+1
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     FCount
         .if (.cpu .bitand ::CPU_ISET_65SC02)
-        sta     (spc)
+        sta     (c_sp)
         .else
-        sta     (spc),y
+        sta     (c_sp),y
         .endif
         jsr     CallOutFunc             ; Call the output function
 

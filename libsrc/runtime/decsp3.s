@@ -5,18 +5,18 @@
 ;
 
         .export         decsp3
-        .importzp       spc
+        .importzp       c_sp
 
 .proc   decsp3
 
-        lda     spc
+        lda     c_sp
         sec
         sbc     #3
-        sta     spc
+        sta     c_sp
         bcc     @L1
         rts
 
-@L1:    dec     spc+1
+@L1:    dec     c_sp+1
         rts
 
 .endproc

@@ -5,16 +5,16 @@
 ;
 
         .export         leaaxsp, leaa0sp
-        .importzp       spc
+        .importzp       c_sp
 
 leaa0sp:
         ldx     #$00
 leaaxsp:
         clc
-        adc     spc
+        adc     c_sp
         pha
         txa
-        adc     spc+1
+        adc     c_sp+1
         tax
         pla
         rts

@@ -230,7 +230,7 @@ static unsigned char ReadProgramFile (void)
         }
     }
 
-    /* Get the address of spc from the file header */
+    /* Get the address of c_sp from the file header */
     if ((Val = fgetc(F)) != EOF) {
         SPAddr = Val;
     }

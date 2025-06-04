@@ -333,14 +333,14 @@ static int Affected (LoadRegInfo* LRI, const CodeEntry* E)
             */
             if (E->AM == AM65_ABS       ||
                 E->AM == AM65_ZP        ||
-                (E->AM == AM65_ZP_INDY && strcmp (E->ArgBase, "spc") == 0)
+                (E->AM == AM65_ZP_INDY && strcmp (E->ArgBase, "c_sp") == 0)
                 ) {
                 if ((LRI->Flags & LI_CHECK_ARG) != 0) {
                     if (AE == 0                             ||
                         (AE->AM != AM65_ABS &&
                          AE->AM != AM65_ZP  &&
                          (AE->AM != AM65_ZP_INDY ||
-                          strcmp (AE->ArgBase, "spc") != 0)) ||
+                          strcmp (AE->ArgBase, "c_sp") != 0)) ||
                          (AE->ArgOff == E->ArgOff &&
                           strcmp (AE->ArgBase, E->ArgBase) == 0)) {
 
@@ -445,7 +445,7 @@ void PrepairLoadRegInfoForArgCheck (CodeSeg* S, LoadRegInfo* LRI, CodeEntry* E)
         /* These insns are replaceable only if they are not modified later */
         LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
     } else if ((E->AM == AM65_ZP_INDY) &&
-                strcmp (E->Arg, "spc") == 0) {
+                strcmp (E->Arg, "c_sp") == 0) {
         /* A load from the stack with known offset is also ok, but in this
         ** case we must reload the index register later. Please note that
         ** a load indirect via other zero page locations is not ok, since
@@ -556,7 +556,7 @@ unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
             /* These insns are replaceable only if they are not modified later */
             LRI->Flags |= LI_CHECK_ARG | LI_CHECK_Y;
         } else if (E->AM == AM65_ZP_INDY &&
-                   strcmp (E->Arg, "spc") == 0) {
+                   strcmp (E->Arg, "c_sp") == 0) {
             /* A load from the stack with known offset is also ok, but in this
             ** case we must reload the index register later. Please note that
             ** a load indirect via other zero page locations is not ok, since
@@ -839,7 +839,7 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
             if (E->OPC != OP65_JSR) {
                 /* Check against some things that should not happen */
                 CHECK (E->AM == AM65_ZP_INDY && E->RI->In.RegY >= (short) Offs);
-                CHECK (strcmp (E->Arg, "spc") == 0);
+                CHECK (strcmp (E->Arg, "c_sp") == 0);
 
                 /* We need to correct this one */
                 Correction = 2;
@@ -1056,8 +1056,8 @@ void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
             InsertEntry (D, X, D->IP++);
 
             if (LI->A.LoadEntry->OPC == OP65_JSR) {
-                /* opc (spc),y */
-                X = NewCodeEntry (OPC, AM65_ZP_INDY, "spc", 0, D->OpEntry->LI);
+                /* opc (c_sp),y */
+                X = NewCodeEntry (OPC, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
             } else {
                 /* opc src,y */
                 X = NewCodeEntry (OPC, LI->A.LoadEntry->AM, LI->A.LoadEntry->Arg, 0, D->OpEntry->LI);
@@ -1119,8 +1119,8 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
             InsertEntry (D, X, D->IP++);
 
             if (LI->X.LoadEntry->OPC == OP65_JSR) {
-                /* opc (spc),y */
-                X = NewCodeEntry (OPC, AM65_ZP_INDY, "spc", 0, D->OpEntry->LI);
+                /* opc (c_sp),y */
+                X = NewCodeEntry (OPC, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
             } else {
                 /* opc src,y */
                 X = NewCodeEntry (OPC, LI->X.LoadEntry->AM, LI->X.LoadEntry->Arg, 0, D->OpEntry->LI);
@@ -1310,10 +1310,10 @@ const char* GetZPName (unsigned ZPLoc)
         return "save+1";
     }
     if ((ZPLoc & REG_SP_LO) != 0) {
-        return "spc";
+        return "c_sp";
     }
     if ((ZPLoc & REG_SP_HI) != 0) {
-        return "spc+1";
+        return "c_sp+1";
     }
 
     return 0;

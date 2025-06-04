@@ -7,7 +7,7 @@
 
         .export         _longjmp
         .import         popptr1
-        .importzp       spc, ptr1, ptr2
+        .importzp       c_sp, ptr1, ptr2
 
 _longjmp:
         sta     ptr2            ; Save retval
@@ -23,10 +23,10 @@ _longjmp:
 
         lda     (ptr1),y
         iny
-        sta     spc
+        sta     c_sp
         lda     (ptr1),y
         iny
-        sta     spc+1
+        sta     c_sp+1
 
 ; Get the old stack pointer
 

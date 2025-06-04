@@ -23,8 +23,8 @@ __sysmkdir:
         bne     oserr
 
         ; Set pushed name
-        lda     spc
-        ldx     spc+1
+        lda     c_sp
+        ldx     c_sp+1
         sta     mliparam + MLI::CREATE::PATHNAME
         stx     mliparam + MLI::CREATE::PATHNAME+1
 

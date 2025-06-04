@@ -7,23 +7,23 @@
 
         .export         pushlysp
         .import         pusheax
-        .importzp       sreg, spc
+        .importzp       sreg, c_sp
 
 .proc   pushlysp
 
         iny
         iny
-        lda     (spc),y
+        lda     (c_sp),y
         iny
         sta     sreg
-        lda     (spc),y
+        lda     (c_sp),y
         sta     sreg+1
         dey
         dey
-        lda     (spc),y
+        lda     (c_sp),y
         dey
         tax
-        lda     (spc),y
+        lda     (c_sp),y
         jmp     pusheax
 
 .endproc

@@ -209,7 +209,7 @@ Internally, the binary program file has a 12 byte header provided by the library
 
 <item>1 byte <bf/CPU type/: <tt/0/ = 6502, <tt/1/ = 65C02
 
-<item>1 byte <bf/spc address/: the zero page address of the C parameter stack pointer <tt/spc/ used by the paravirtualization functions
+<item>1 byte <bf/c_sp address/: the zero page address of the C parameter stack pointer <tt/c_sp/ used by the paravirtualization functions
 
 <item>1 word <bf/load address/: where to load the data from the file into memory (default: <tt/$0200/)
 

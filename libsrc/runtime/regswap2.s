@@ -5,7 +5,7 @@
 ;
 
         .export         regswap2
-        .importzp       spc, regbank
+        .importzp       c_sp, regbank
 
 .proc   regswap2
 
@@ -13,20 +13,20 @@
 
         lda     regbank,x               ; Get old value
         pha                             ; Save it
-        lda     (spc),y                  ; Get stack loc
+        lda     (c_sp),y                  ; Get stack loc
         sta     regbank,x               ; Store new value
         pla
-        sta     (spc),y                  ; Store old value
+        sta     (c_sp),y                  ; Store old value
 
 ; Second byte
 
         iny
         lda     regbank+1,x             ; Get old value
         pha                             ; Save it
-        lda     (spc),y                  ; Get stack loc
+        lda     (c_sp),y                  ; Get stack loc
         sta     regbank+1,x             ; Store new value
         pla
-        sta     (spc),y                  ; Store old value
+        sta     (c_sp),y                  ; Store old value
 
         rts
 

@@ -7,7 +7,7 @@
         .export         _vprintf
         .import         _vfprintf, _stdout
         .import         decsp2
-        .importzp       spc
+        .importzp       c_sp
 
 
 .proc   _vprintf
@@ -23,20 +23,20 @@
 ; Move the format parameter down and store stdout in it's place
 
         ldy     #2
-        lda     (spc),y
+        lda     (c_sp),y
         ldy     #0
-        sta     (spc),y
+        sta     (c_sp),y
         ldy     #3
-        lda     (spc),y
+        lda     (c_sp),y
         ldy     #1
-        sta     (spc),y
+        sta     (c_sp),y
 
         iny
         lda     _stdout
-        sta     (spc),y
+        sta     (c_sp),y
         iny
         lda     _stdout+1
-        sta     (spc),y
+        sta     (c_sp),y
 
 ; Restore A
 

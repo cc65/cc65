@@ -16,8 +16,8 @@ __sysremove:
         bne     oserr
 
         ; Set pushed name
-        lda     spc
-        ldx     spc+1
+        lda     c_sp
+        ldx     c_sp+1
         sta     mliparam + MLI::DESTROY::PATHNAME
         stx     mliparam + MLI::DESTROY::PATHNAME+1
 

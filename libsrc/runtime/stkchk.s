@@ -17,7 +17,7 @@
         .constructor    initstkchk, 25
         .import         __STACKSIZE__                   ; Linker defined
         .import         pusha0, _exit
-        .importzp       spc
+        .importzp       c_sp
 
         ; Use macros for better readability
         .macpack        generic
@@ -32,11 +32,11 @@
 
 .proc   initstkchk
 
-        lda     spc
+        lda     c_sp
         sta     initialsp
         sub     #<__STACKSIZE__
         sta     lowwater
-        lda     spc+1
+        lda     c_sp+1
         sta     initialsp+1
         sbc     #>__STACKSIZE__
 .if (.cpu .bitand ::CPU_ISET_65SC02)
@@ -70,7 +70,7 @@ cstkchk:
 ; Check the high byte of the software stack
 
 @L0:    lda     lowwater+1
-        cmp     spc+1
+        cmp     c_sp+1
         bcs     @L1
         rts
 
@@ -78,7 +78,7 @@ cstkchk:
 
 @L1:    bne     CStackOverflow
         lda     lowwater
-        cmp     spc
+        cmp     c_sp
         bcs     CStackOverflow
 Done:   rts
 
@@ -87,9 +87,9 @@ Done:   rts
 
 CStackOverflow:
         lda     initialsp
-        sta     spc
+        sta     c_sp
         lda     initialsp+1
-        sta     spc+1
+        sta     c_sp+1
 
 ; Generic abort entry. We should output a diagnostic here, but this is
 ; difficult, since we're operating at a lower level here.

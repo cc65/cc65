@@ -1,26 +1,26 @@
 ;
 ; Ullrich von Bassewitz, 31.08.1998
 ;
-; CC65 runtime: Store eax at (spc),y
+; CC65 runtime: Store eax at (c_sp),y
 ;
 
         .export         steaxysp, steax0sp
-        .importzp       spc, sreg
+        .importzp       c_sp, sreg
 
 steax0sp:
         ldy     #0
 steaxysp:
-        sta     (spc),y
+        sta     (c_sp),y
         iny
         pha
         txa
-        sta     (spc),y
+        sta     (c_sp),y
         iny
         lda     sreg
-        sta     (spc),y
+        sta     (c_sp),y
         iny
         lda     sreg+1
-        sta     (spc),y
+        sta     (c_sp),y
         pla
         rts
 

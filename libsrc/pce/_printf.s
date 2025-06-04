@@ -329,22 +329,22 @@ MainLoop:
         jsr     decsp6                  ; 3 args
         ldy     #5
         lda     OutData+1
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     OutData
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     FSave+1
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     FSave
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     FCount+1
-        sta     (spc),y
+        sta     (c_sp),y
         dey
         lda     FCount
-        sta     (spc),y
+        sta     (c_sp),y
         jsr     CallOutFunc             ; Call the output function
 
 ; We're back from out(), or we didn't call it. Check for end of string.

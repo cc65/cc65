@@ -6,7 +6,7 @@
 ;
 
         .export         swapstk
-        .importzp       spc, ptr4
+        .importzp       c_sp, ptr4
 
         .macpack        cpu
 
@@ -14,22 +14,22 @@ swapstk:
         sta     ptr4
         stx     ptr4+1
         ldy     #1              ; index
-        lda     (spc),y
+        lda     (c_sp),y
         tax
         lda     ptr4+1
-        sta     (spc),y
+        sta     (c_sp),y
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (spc)
+        lda     (c_sp)
         tay
         lda     ptr4
-        sta     (spc)
+        sta     (c_sp)
         tya
 .else
         dey
-        lda     (spc),y
+        lda     (c_sp),y
         pha
         lda     ptr4
-        sta     (spc),y
+        sta     (c_sp),y
         pla
 .endif
         rts                     ; whew!

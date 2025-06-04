@@ -6,7 +6,7 @@
 
         .include "atari.inc"
         .import findfreeiocb
-        .importzp tmp4, spc, ptr2, ptr3
+        .importzp tmp4, c_sp, ptr2, ptr3
         .import incsp2, subysp, addysp, popax
 .ifdef  UCASE_FILENAME
         .importzp tmp3
@@ -118,19 +118,19 @@ L1:     jsr     subysp          ; make room on the stack
 ; copy old name
         ldy     #0
 con:    lda     (ptr3),y
-        sta     (spc),y
+        sta     (c_sp),y
         beq     copyend
         iny
         bne     con
 
 copyend:lda     #$20            ; space
-        sta     (spc),y
+        sta     (c_sp),y
         iny
         tya                     ; get current offset (beyond old name)
         clc
-        adc     spc
+        adc     c_sp
         sta     ptr3
-        lda     spc+1
+        lda     c_sp+1
         adc     #0
         sta     ptr3+1          ; ptr3 now contains pointer to space for new filename
 
@@ -143,9 +143,9 @@ cnn:    lda     (ptr2),y
         bne     cnn
 
 copend2:ldx     tmp4
-        lda     spc
+        lda     c_sp
         sta     ICBAL,x
-        lda     spc+1
+        lda     c_sp+1
         sta     ICBAH,x
         lda     #RENAME
         sta     ICCOM,x
@@ -160,13 +160,13 @@ copend2:ldx     tmp4
 
 ; clean up stack
 
-        lda     spc
+        lda     c_sp
         clc
         adc     sspc
-        sta     spc
-        lda     spc+1
+        sta     c_sp
+        lda     c_sp+1
         adc     sspc+1
-        sta     spc+1
+        sta     c_sp+1
 
 ; handle status
 

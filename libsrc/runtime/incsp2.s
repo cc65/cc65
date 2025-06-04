@@ -5,7 +5,7 @@
 ;               this module also contains the popax function.
 
         .export         popax, incsp2
-        .importzp       spc
+        .importzp       c_sp
 
         .macpack        cpu
 
@@ -14,13 +14,13 @@
 .proc   popax
 
         ldy     #1
-        lda     (spc),y          ; get hi byte
+        lda     (c_sp),y          ; get hi byte
         tax                     ; into x
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (spc)            ; get lo byte
+        lda     (c_sp)            ; get lo byte
 .else
         dey
-        lda     (spc),y          ; get lo byte
+        lda     (c_sp),y          ; get lo byte
 .endif
 
 .endproc
@@ -29,14 +29,14 @@
 
 .proc   incsp2
 
-        inc     spc              ; 5
+        inc     c_sp              ; 5
         beq     @L1             ; 2
-        inc     spc              ; 5
+        inc     c_sp              ; 5
         beq     @L2             ; 2
         rts
 
-@L1:    inc     spc              ; 5
-@L2:    inc     spc+1            ; 5
+@L1:    inc     c_sp              ; 5
+@L2:    inc     c_sp+1            ; 5
         rts
 
 .endproc

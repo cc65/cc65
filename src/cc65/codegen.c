@@ -218,7 +218,10 @@ void g_preamble (void)
     AddTextLine ("\t.debuginfo\t%s", (DebugInfo != 0)? "on" : "off");
 
     /* Import zero page variables */
-    AddTextLine ("\t.importzp\tspc, sreg, regsave, regbank");
+    AddTextLine ("\t.importzp\t" "c_sp, sreg, regsave, regbank");
+    /* The space above is intentional, to ease replacement of the name of
+    ** the stack pointer.  Don't worry, the preprocessor will concatenate them.
+    */
     AddTextLine ("\t.importzp\ttmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4");
 
     /* Define long branch macros */
@@ -569,11 +572,11 @@ void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes)
             AddCodeLine ("ldx #$%02X", RegOffs & 0xFF);
             AddCodeLine ("jsr regswap1");
         } else {
-            AddCodeLine ("lda (spc),y");
+            AddCodeLine ("lda (c_sp),y");
             AddCodeLine ("ldx regbank%+d", RegOffs);
             AddCodeLine ("sta regbank%+d", RegOffs);
             AddCodeLine ("txa");
-            AddCodeLine ("sta (spc),y");
+            AddCodeLine ("sta (c_sp),y");
         }
 
     } else if (Bytes == 2) {
@@ -615,7 +618,7 @@ void g_save_regvars (int RegOffs, unsigned Bytes)
         AddCodeLine ("ldx #$%02X", (unsigned char) Bytes);
         g_defcodelabel (Label);
         AddCodeLine ("lda regbank%+d,x", RegOffs-1);
-        AddCodeLine ("sta (spc),y");
+        AddCodeLine ("sta (c_sp),y");
         AddCodeLine ("dey");
         AddCodeLine ("dex");
         AddCodeLine ("bne %s", LocalLabelName (Label));
@@ -639,28 +642,28 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
     if (Bytes == 1) {
 
         AddCodeLine ("ldy #$%02X", StackOffs);
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d", RegOffs);
 
     } else if (Bytes == 2) {
 
         AddCodeLine ("ldy #$%02X", StackOffs);
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d", RegOffs);
         AddCodeLine ("iny");
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d", RegOffs+1);
 
     } else if (Bytes == 3 && IS_Get (&CodeSizeFactor) >= 133) {
 
         AddCodeLine ("ldy #$%02X", StackOffs);
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d", RegOffs);
         AddCodeLine ("iny");
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d", RegOffs+1);
         AddCodeLine ("iny");
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d", RegOffs+2);
 
     } else if (StackOffs <= RegOffs) {
@@ -672,7 +675,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
         unsigned Label = GetLocalLabel ();
         AddCodeLine ("ldy #$%02X", StackOffs);
         g_defcodelabel (Label);
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d,y", RegOffs - StackOffs);
         AddCodeLine ("iny");
         AddCodeLine ("cpy #$%02X", StackOffs + Bytes);
@@ -688,7 +691,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
         AddCodeLine ("ldy #$%02X", (unsigned char) (StackOffs + Bytes - 1));
         AddCodeLine ("ldx #$%02X", (unsigned char) (Bytes - 1));
         g_defcodelabel (Label);
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta regbank%+d,x", RegOffs);
         AddCodeLine ("dey");
         AddCodeLine ("dex");
@@ -834,11 +837,11 @@ void g_getlocal (unsigned Flags, int Offs)
             CheckLocalOffs (Offs);
             if ((Flags & CF_FORCECHAR) || (Flags & CF_TEST)) {
                 AddCodeLine ("ldy #$%02X", Offs);
-                AddCodeLine ("lda (spc),y");
+                AddCodeLine ("lda (c_sp),y");
             } else {
                 AddCodeLine ("ldy #$%02X", Offs);
                 AddCodeLine ("ldx #$00");
-                AddCodeLine ("lda (spc),y");
+                AddCodeLine ("lda (c_sp),y");
                 if ((Flags & CF_UNSIGNED) == 0) {
                     unsigned L = GetLocalLabel();
                     AddCodeLine ("bpl %s", LocalLabelName (L));
@@ -852,9 +855,9 @@ void g_getlocal (unsigned Flags, int Offs)
             CheckLocalOffs (Offs + 1);
             AddCodeLine ("ldy #$%02X", (unsigned char) (Offs+1));
             if (Flags & CF_TEST) {
-                AddCodeLine ("lda (spc),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("dey");
-                AddCodeLine ("ora (spc),y");
+                AddCodeLine ("ora (c_sp),y");
             } else {
                 AddCodeLine ("jsr ldaxysp");
             }
@@ -935,7 +938,7 @@ void g_leasp (int Offs)
 {
     unsigned char Lo, Hi;
 
-    /* Calculate the offset relative to spc */
+    /* Calculate the offset relative to c_sp */
     Offs -= StackPtr;
 
     /* Get low and high byte */
@@ -945,17 +948,17 @@ void g_leasp (int Offs)
     /* Generate code */
     if (Lo == 0) {
         if (Hi <= 3) {
-            AddCodeLine ("lda spc");
-            AddCodeLine ("ldx spc+1");
+            AddCodeLine ("lda c_sp");
+            AddCodeLine ("ldx c_sp+1");
             while (Hi--) {
                 AddCodeLine ("inx");
             }
         } else {
-            AddCodeLine ("lda spc+1");
+            AddCodeLine ("lda c_sp+1");
             AddCodeLine ("clc");
             AddCodeLine ("adc #$%02X", Hi);
             AddCodeLine ("tax");
-            AddCodeLine ("lda spc");
+            AddCodeLine ("lda c_sp");
         }
     } else if (Hi == 0) {
         /* 8 bit offset */
@@ -966,8 +969,8 @@ void g_leasp (int Offs)
         } else {
             /* 8 bit offset inlined */
             unsigned L = GetLocalLabel ();
-            AddCodeLine ("lda spc");
-            AddCodeLine ("ldx spc+1");
+            AddCodeLine ("lda c_sp");
+            AddCodeLine ("ldx c_sp+1");
             AddCodeLine ("clc");
             AddCodeLine ("adc #$%02X", Lo);
             AddCodeLine ("bcc %s", LocalLabelName (L));
@@ -981,11 +984,11 @@ void g_leasp (int Offs)
         AddCodeLine ("jsr leaaxsp");
     } else {
         /* Full 16 bit offset inlined */
-        AddCodeLine ("lda spc");
+        AddCodeLine ("lda c_sp");
         AddCodeLine ("clc");
         AddCodeLine ("adc #$%02X", Lo);
         AddCodeLine ("pha");
-        AddCodeLine ("lda spc+1");
+        AddCodeLine ("lda c_sp+1");
         AddCodeLine ("adc #$%02X", Hi);
         AddCodeLine ("tax");
         AddCodeLine ("pla");
@@ -1001,10 +1004,10 @@ void g_leavariadic (int Offs)
 {
     unsigned ArgSizeOffs;
 
-    /* Calculate the offset relative to spc */
+    /* Calculate the offset relative to c_sp */
     Offs -= StackPtr;
 
-    /* Get the offset of the parameter which is stored at spc+0 on function
+    /* Get the offset of the parameter which is stored at c_sp+0 on function
     ** entry and check if this offset is reachable with a byte offset.
     */
     CHECK (StackPtr <= 0);
@@ -1013,14 +1016,14 @@ void g_leavariadic (int Offs)
 
     /* Get the size of all parameters. */
     AddCodeLine ("ldy #$%02X", ArgSizeOffs);
-    AddCodeLine ("lda (spc),y");
+    AddCodeLine ("lda (c_sp),y");
 
     /* Add the value of the stackpointer */
     if (IS_Get (&CodeSizeFactor) > 250) {
         unsigned L = GetLocalLabel();
-        AddCodeLine ("ldx spc+1");
+        AddCodeLine ("ldx c_sp+1");
         AddCodeLine ("clc");
-        AddCodeLine ("adc spc");
+        AddCodeLine ("adc c_sp");
         AddCodeLine ("bcc %s", LocalLabelName (L));
         AddCodeLine ("inx");
         g_defcodelabel (L);
@@ -1092,14 +1095,14 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
                 AddCodeLine ("lda #$%02X", (unsigned char) Val);
             }
             AddCodeLine ("ldy #$%02X", Offs);
-            AddCodeLine ("sta (spc),y");
+            AddCodeLine ("sta (c_sp),y");
             break;
 
         case CF_INT:
             if (Flags & CF_CONST) {
                 AddCodeLine ("ldy #$%02X", Offs+1);
                 AddCodeLine ("lda #$%02X", (unsigned char) (Val >> 8));
-                AddCodeLine ("sta (spc),y");
+                AddCodeLine ("sta (c_sp),y");
                 if ((Flags & CF_NOKEEP) == 0) {
                     /* Place high byte into X */
                     AddCodeLine ("tax");
@@ -1112,16 +1115,16 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
                     AddCodeLine ("dey");
                     AddCodeLine ("lda #$%02X", (unsigned char) Val);
                 }
-                AddCodeLine ("sta (spc),y");
+                AddCodeLine ("sta (c_sp),y");
             } else {
                 AddCodeLine ("ldy #$%02X", Offs);
                 if ((Flags & CF_NOKEEP) == 0 || IS_Get (&CodeSizeFactor) < 160) {
                     AddCodeLine ("jsr staxysp");
                 } else {
-                    AddCodeLine ("sta (spc),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("iny");
                     AddCodeLine ("txa");
-                    AddCodeLine ("sta (spc),y");
+                    AddCodeLine ("sta (c_sp),y");
                 }
             }
             break;
@@ -1161,12 +1164,12 @@ void g_putind (unsigned Flags, unsigned Offs)
             AddCodeLine ("pha");
         }
         AddCodeLine ("lda #$%02X", Offs & 0xFF);
-        AddCodeLine ("adc (spc),y");
-        AddCodeLine ("sta (spc),y");
+        AddCodeLine ("adc (c_sp),y");
+        AddCodeLine ("sta (c_sp),y");
         AddCodeLine ("iny");
         AddCodeLine ("lda #$%02X", (Offs >> 8) & 0xFF);
-        AddCodeLine ("adc (spc),y");
-        AddCodeLine ("sta (spc),y");
+        AddCodeLine ("adc (c_sp),y");
+        AddCodeLine ("sta (c_sp),y");
         if ((Flags & CF_NOKEEP) == 0) {
             AddCodeLine ("pla");
         }
@@ -1183,8 +1186,8 @@ void g_putind (unsigned Flags, unsigned Offs)
             AddCodeLine ("pha");
         }
         AddCodeLine ("lda #$%02X", (Offs >> 8) & 0xFF);
-        AddCodeLine ("adc (spc),y");
-        AddCodeLine ("sta (spc),y");
+        AddCodeLine ("adc (c_sp),y");
+        AddCodeLine ("sta (c_sp),y");
         if ((Flags & CF_NOKEEP) == 0) {
             AddCodeLine ("pla");
         }
@@ -1618,7 +1621,7 @@ void g_addlocal (unsigned flags, int offs)
             L = GetLocalLabel();
             AddCodeLine ("ldy #$%02X", NewOff & 0xFF);
             AddCodeLine ("clc");
-            AddCodeLine ("adc (spc),y");
+            AddCodeLine ("adc (c_sp),y");
             AddCodeLine ("bcc %s", LocalLabelName (L));
             AddCodeLine ("inx");
             g_defcodelabel (L);
@@ -1627,11 +1630,11 @@ void g_addlocal (unsigned flags, int offs)
         case CF_INT:
             AddCodeLine ("ldy #$%02X", NewOff & 0xFF);
             AddCodeLine ("clc");
-            AddCodeLine ("adc (spc),y");
+            AddCodeLine ("adc (c_sp),y");
             AddCodeLine ("pha");
             AddCodeLine ("txa");
             AddCodeLine ("iny");
-            AddCodeLine ("adc (spc),y");
+            AddCodeLine ("adc (c_sp),y");
             AddCodeLine ("tax");
             AddCodeLine ("pla");
             break;
@@ -1839,12 +1842,12 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
                 if (flags & CF_CONST) {
                     AddCodeLine ("clc");
                     AddCodeLine ("lda #$%02X", (int)(val & 0xFF));
-                    AddCodeLine ("adc (spc),y");
-                    AddCodeLine ("sta (spc),y");
+                    AddCodeLine ("adc (c_sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                 } else {
                     AddCodeLine ("clc");
-                    AddCodeLine ("adc (spc),y");
-                    AddCodeLine ("sta (spc),y");
+                    AddCodeLine ("adc (c_sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                 }
                 if ((flags & CF_UNSIGNED) == 0) {
                     unsigned L = GetLocalLabel();
@@ -1862,16 +1865,16 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
                 if (IS_Get (&CodeSizeFactor) >= 400) {
                     AddCodeLine ("clc");
                     AddCodeLine ("lda #$%02X", (int)(val & 0xFF));
-                    AddCodeLine ("adc (spc),y");
-                    AddCodeLine ("sta (spc),y");
+                    AddCodeLine ("adc (c_sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("iny");
                     AddCodeLine ("lda #$%02X", (int) ((val >> 8) & 0xFF));
-                    AddCodeLine ("adc (spc),y");
-                    AddCodeLine ("sta (spc),y");
+                    AddCodeLine ("adc (c_sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     if ((flags & CF_NOKEEP) == 0) {
                         AddCodeLine ("tax");
                         AddCodeLine ("dey");
-                        AddCodeLine ("lda (spc),y");
+                        AddCodeLine ("lda (c_sp),y");
                     }
                 } else {
                     g_getimmed (flags, val, 0);
@@ -1923,7 +1926,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
         case CF_INT:
         case CF_LONG:
             AddCodeLine ("jsr pushax");         /* Push the address */
-            push (CF_PTR);                      /* Correct the internal spc */
+            push (CF_PTR);                      /* Correct the internal c_sp */
             g_getind (flags, offs);             /* Fetch the value */
             g_inc (flags, val);                 /* Increment value in primary */
             g_putind (flags, offs);             /* Store the value back */
@@ -2089,15 +2092,15 @@ void g_subeqlocal (unsigned flags, int Offs, unsigned long val)
                 AddCodeLine ("ldy #$%02X", Offs);
                 AddCodeLine ("ldx #$00");
                 if (flags & CF_CONST) {
-                    AddCodeLine ("lda (spc),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sec");
                     AddCodeLine ("sbc #$%02X", (unsigned char)val);
                 } else {
                     AddCodeLine ("eor #$FF");
                     AddCodeLine ("sec");
-                    AddCodeLine ("adc (spc),y");
+                    AddCodeLine ("adc (c_sp),y");
                 }
-                AddCodeLine ("sta (spc),y");
+                AddCodeLine ("sta (c_sp),y");
                 if ((flags & CF_UNSIGNED) == 0) {
                     unsigned L = GetLocalLabel();
                     AddCodeLine ("bpl %s", LocalLabelName (L));
@@ -2157,7 +2160,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
         case CF_INT:
         case CF_LONG:
             AddCodeLine ("jsr pushax");         /* Push the address */
-            push (CF_PTR);                      /* Correct the internal spc */
+            push (CF_PTR);                      /* Correct the internal c_sp */
             g_getind (flags, offs);             /* Fetch the value */
             g_dec (flags, val);                 /* Increment value in primary */
             g_putind (flags, offs);             /* Store the value back */
@@ -2208,10 +2211,10 @@ void g_addaddr_local (unsigned flags attribute ((unused)), int offs)
             /* Label was used above */
             g_defcodelabel (L);
         }
-        AddCodeLine ("adc spc");
+        AddCodeLine ("adc c_sp");
         AddCodeLine ("tay");
         AddCodeLine ("txa");
-        AddCodeLine ("adc spc+1");
+        AddCodeLine ("adc c_sp+1");
         AddCodeLine ("tax");
         AddCodeLine ("tya");
     }
@@ -2512,10 +2515,10 @@ void g_callind (unsigned Flags, unsigned ArgSize, int Offs)
         CheckLocalOffs (Offs);
         AddCodeLine ("pha");
         AddCodeLine ("ldy #$%02X", Offs);
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta jmpvec+1");
         AddCodeLine ("iny");
-        AddCodeLine ("lda (spc),y");
+        AddCodeLine ("lda (c_sp),y");
         AddCodeLine ("sta jmpvec+2");
         AddCodeLine ("pla");
         AddCodeLine ("jsr jmpvec");
@@ -2573,11 +2576,11 @@ void g_lateadjustSP (unsigned label)
     AddCodeLine ("pha");
     AddCodeLine ("lda %s", LocalDataLabelName (label));
     AddCodeLine ("clc");
-    AddCodeLine ("adc spc");
-    AddCodeLine ("sta spc");
+    AddCodeLine ("adc c_sp");
+    AddCodeLine ("sta c_sp");
     AddCodeLine ("lda %s+1", LocalDataLabelName (label));
-    AddCodeLine ("adc spc+1");
-    AddCodeLine ("sta spc+1");
+    AddCodeLine ("adc c_sp+1");
+    AddCodeLine ("sta c_sp+1");
     AddCodeLine ("pla");
 }
 
@@ -2591,11 +2594,11 @@ void g_drop (unsigned Space)
         AddCodeLine ("pha");
         AddCodeLine ("lda #$%02X", (unsigned char) Space);
         AddCodeLine ("clc");
-        AddCodeLine ("adc spc");
-        AddCodeLine ("sta spc");
+        AddCodeLine ("adc c_sp");
+        AddCodeLine ("sta c_sp");
         AddCodeLine ("lda #$%02X", (unsigned char) (Space >> 8));
-        AddCodeLine ("adc spc+1");
-        AddCodeLine ("sta spc+1");
+        AddCodeLine ("adc c_sp+1");
+        AddCodeLine ("sta c_sp+1");
         AddCodeLine ("pla");
     } else if (Space > 8) {
         AddCodeLine ("ldy #$%02X", Space);
@@ -2618,13 +2621,13 @@ void g_space (int Space)
         ** overhead.
         */
         AddCodeLine ("pha");
-        AddCodeLine ("lda spc");
+        AddCodeLine ("lda c_sp");
         AddCodeLine ("sec");
         AddCodeLine ("sbc #$%02X", (unsigned char) Space);
-        AddCodeLine ("sta spc");
-        AddCodeLine ("lda spc+1");
+        AddCodeLine ("sta c_sp");
+        AddCodeLine ("lda c_sp+1");
         AddCodeLine ("sbc #$%02X", (unsigned char) (Space >> 8));
-        AddCodeLine ("sta spc+1");
+        AddCodeLine ("sta c_sp+1");
         AddCodeLine ("pla");
     } else if (Space > 8) {
         AddCodeLine ("ldy #$%02X", Space);
@@ -4584,14 +4587,14 @@ void g_initauto (unsigned Label, unsigned Size)
         AddCodeLine ("ldy #$%02X", Size-1);
         g_defcodelabel (CodeLabel);
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, Label, 0));
-        AddCodeLine ("sta (spc),y");
+        AddCodeLine ("sta (c_sp),y");
         AddCodeLine ("dey");
         AddCodeLine ("bpl %s", LocalLabelName (CodeLabel));
     } else if (Size <= 256) {
         AddCodeLine ("ldy #$00");
         g_defcodelabel (CodeLabel);
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, Label, 0));
-        AddCodeLine ("sta (spc),y");
+        AddCodeLine ("sta (c_sp),y");
         AddCodeLine ("iny");
         AddCmpCodeIfSizeNot256 ("cpy #$%02X", Size);
         AddCodeLine ("bne %s", LocalLabelName (CodeLabel));

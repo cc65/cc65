@@ -11,7 +11,7 @@
 .export _ria_call_int, _ria_call_long
 .export _ria_call_int_errno, _ria_call_long_errno
 
-.importzp spc, sreg
+.importzp c_sp, sreg
 .import ___mappederrno, incsp1
 
 .code

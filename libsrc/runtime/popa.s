@@ -5,23 +5,23 @@
 ;
 
         .export         popa
-        .importzp       spc
+        .importzp       c_sp
 
         .macpack        cpu
 
 .proc   popa
 
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (spc)
+        lda     (c_sp)
 .else
         ldy     #0              ; (2)
-        lda     (spc),y          ; (7) Read byte
+        lda     (c_sp),y          ; (7) Read byte
 .endif
-        inc     spc              ; (12)
+        inc     c_sp              ; (12)
         beq     @L1             ; (14)
         rts                     ; (20)
 
-@L1:    inc     spc+1
+@L1:    inc     c_sp+1
         rts
 
 .endproc

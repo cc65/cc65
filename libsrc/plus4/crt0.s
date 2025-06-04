@@ -34,7 +34,7 @@ Start:
         sei                     ; No interrupts since we're banking out the ROM
         sta     ENABLE_RAM
         ldx     #zpspace-1
-L1:     lda     spc,x
+L1:     lda     c_sp,x
         sta     zpsave,x
         dex
         bpl     L1
@@ -54,8 +54,8 @@ L1:     lda     spc,x
 
         lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        sta     spc
-        stx     spc+1
+        sta     c_sp
+        stx     c_sp+1
 
 ; Set up the IRQ vector in the banked RAM; and, switch off the ROM.
 
@@ -99,7 +99,7 @@ _exit:  pha                     ; Save the return code
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
-        sta     spc,x
+        sta     c_sp,x
         dex
         bpl     L2
 

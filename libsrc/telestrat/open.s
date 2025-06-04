@@ -2,7 +2,7 @@
 
     .import    addysp,popax
 
-    .importzp  spc,tmp2,tmp3,tmp1
+    .importzp  c_sp,tmp2,tmp3,tmp1
 
 
     .include   "telestrat.inc"

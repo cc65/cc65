@@ -1,11 +1,11 @@
 
         .export _getsp
-        .importzp       spc
+        .importzp       c_sp
 
 .proc   _getsp
 
-        ldx     spc+1
-        lda     spc
+        ldx     c_sp+1
+        lda     c_sp
         rts
 
 .endproc

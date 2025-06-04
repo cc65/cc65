@@ -22,8 +22,8 @@ __sysrename:
         bne     oserr1
 
         ; Save pushed oldname
-        lda     spc
-        ldx     spc+1
+        lda     c_sp
+        ldx     c_sp+1
         sta     ptr3
         stx     ptr3+1
 
@@ -40,8 +40,8 @@ __sysrename:
         stx     mliparam + MLI::RENAME::PATHNAME+1
 
         ; Set pushed newname
-        lda     spc
-        ldx     spc+1
+        lda     c_sp
+        ldx     c_sp+1
         sta     mliparam + MLI::RENAME::NEW_PATHNAME
         stx     mliparam + MLI::RENAME::NEW_PATHNAME+1
 

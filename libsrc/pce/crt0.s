@@ -13,7 +13,7 @@
         .import         initlib, donelib
         .import         push0, _main
         .import         IRQStub, __nmi
-        .importzp       spc
+        .importzp       c_sp
 
         ; Linker-generated
         .import         __CARTSIZE__
@@ -86,8 +86,8 @@ start:  sei
         ; Set up the stack
         lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        sta     spc
-        stx     spc+1
+        sta     c_sp
+        stx     c_sp+1
 
         ; Call the module constructors.
         jsr     initlib

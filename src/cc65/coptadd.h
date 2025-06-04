@@ -55,14 +55,14 @@ unsigned OptAdd1 (CodeSeg* S);
 **      jsr     pushax
 **      ldy     xxx
 **      ldx     #$00
-**      lda     (spc),y
+**      lda     (c_sp),y
 **      jsr     tosaddax
 **
 ** and replace it by:
 **
 **      ldy     xxx-2
 **      clc
-**      adc     (spc),y
+**      adc     (c_sp),y
 **      bcc     L
 **      inx
 ** L:
@@ -72,26 +72,26 @@ unsigned OptAdd2 (CodeSeg* S);
 /* Search for the sequence
 **
 **      ldy     #xx
-**      lda     (spc),y
+**      lda     (c_sp),y
 **      tax
 **      dey
-**      lda     (spc),y
+**      lda     (c_sp),y
 **      ldy     #$yy
 **      jsr     addeqysp
 **
 ** and replace it by:
 **
 **      ldy     #xx-1
-**      lda     (spc),y
+**      lda     (c_sp),y
 **      ldy     #yy
 **      clc
-**      adc     (spc),y
-**      sta     (spc),y
+**      adc     (c_sp),y
+**      sta     (c_sp),y
 **      ldy     #xx
-**      lda     (spc),y
+**      lda     (c_sp),y
 **      ldy     #yy+1
-**      adc     (spc),y
-**      sta     (spc),y
+**      adc     (c_sp),y
+**      sta     (c_sp),y
 **
 ** provided that a/x is not used later.
 */

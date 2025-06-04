@@ -11,8 +11,8 @@
         ; Returns with carry set on error, and sets errno
 mli_file_info_direct:
         ; Set pushed name
-        lda     spc
-        ldx     spc+1
+        lda     c_sp
+        ldx     c_sp+1
         sta     mliparam + MLI::INFO::PATHNAME
         stx     mliparam + MLI::INFO::PATHNAME+1
 

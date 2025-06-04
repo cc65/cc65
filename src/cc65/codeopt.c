@@ -810,7 +810,7 @@ static unsigned RunOptGroup5 (CodeSeg* S)
 
 
 static unsigned RunOptGroup6 (CodeSeg* S)
-/* This one is quite special. It tries to replace "lda (spc),y" by "lda (spc,x)".
+/* This one is quite special. It tries to replace "lda (c_sp),y" by "lda (c_sp,x)".
 ** The latter is ony cycle slower, but if we're able to remove the necessary
 ** load of the Y register, because X is zero anyway, we gain 1 cycle and
 ** shorten the code by one (transfer) or two bytes (load). So what we do is

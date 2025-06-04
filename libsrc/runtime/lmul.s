@@ -7,7 +7,7 @@
 
         .export         tosumul0ax, tosumuleax, tosmul0ax, tosmuleax
         .import         addysp1
-        .importzp       spc, sreg, tmp1, tmp2, tmp3, tmp4, ptr1, ptr3, ptr4
+        .importzp       c_sp, sreg, tmp1, tmp2, tmp3, tmp4, ptr1, ptr3, ptr4
 
         .macpack        cpu
 
@@ -27,21 +27,21 @@ tosumuleax:
 mul32:  sta     ptr1
         stx     ptr1+1          ; op2 now in ptr1/sreg
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (spc)
+        lda     (c_sp)
         ldy     #1
 .else
         ldy     #0
-        lda     (spc),y
+        lda     (c_sp),y
         iny
 .endif
         sta     ptr3
-        lda     (spc),y
+        lda     (c_sp),y
         sta     ptr3+1
         iny
-        lda     (spc),y
+        lda     (c_sp),y
         sta     ptr4
         iny
-        lda     (spc),y
+        lda     (c_sp),y
         sta     ptr4+1          ; op1 in pre3/ptr4
         jsr     addysp1         ; Drop TOS
 

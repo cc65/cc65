@@ -6,12 +6,12 @@
 ;
 
         .export         checkst
-        .importzp       ST
 
+        .include        "pet.inc"
 
 .proc   checkst
 
-        lda     ST
+        lda     STATUS
         beq     @L1
         lda     #5              ; ### Device not present
         sec

@@ -269,7 +269,7 @@ static void ParseAutoDecl (Declarator* Decl)
                 Sym->V.Offs = F_ReserveLocalSpace (CurrentFunc, Size);
 
                 /* Next, allocate the space on the stack. This means that the
-                ** variable is now located at offset 0 from the current sp.
+                ** variable is now located at offset 0 from the current spc.
                 */
                 F_AllocLocalSpace (CurrentFunc);
 

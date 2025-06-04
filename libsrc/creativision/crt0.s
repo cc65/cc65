@@ -40,8 +40,8 @@ entry:
         ; Setup the argument stack ptr
         lda     #<(__ZP_LAST__ + __STACKSIZE__)
         ldx     #>(__ZP_LAST__ + __STACKSIZE__)
-        sta     sp
-        stx     sp+1
+        sta     spc
+        stx     spc+1
 
         ; Call module constructors
         jsr     initlib

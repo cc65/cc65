@@ -7,24 +7,24 @@
 
         .export         popeax
         .import         incsp4
-        .importzp       sp, sreg
+        .importzp       spc, sreg
 
         .macpack        cpu
 
 popeax: ldy     #3
-        lda     (sp),y
+        lda     (spc),y
         sta     sreg+1
         dey
-        lda     (sp),y
+        lda     (spc),y
         sta     sreg
         dey
-        lda     (sp),y
+        lda     (spc),y
         tax
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (sp)
+        lda     (spc)
 .else
         dey
-        lda     (sp),y
+        lda     (spc),y
 .endif
         jmp     incsp4
 

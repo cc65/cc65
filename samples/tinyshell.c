@@ -112,17 +112,17 @@ static void get_command(void)
 #ifdef CHECK_SP
     static char firstcall = 1;
     static unsigned int good_sp;
-    unsigned int sp;
+    unsigned int spc;
     if (firstcall)
-        sp = good_sp = getsp();
+        spc = good_sp = getsp();
     else
-        sp = getsp();
+        spc = getsp();
 
-    if (sp != good_sp) {
-        printf("SP: 0x%04X  ***MISMATCH*** 0x%04X\n", sp, good_sp);
+    if (spc != good_sp) {
+        printf("SP: 0x%04X  ***MISMATCH*** 0x%04X\n", spc, good_sp);
     }
     else if (verbose)
-        printf("SP: 0x%04X\n", sp);
+        printf("SP: 0x%04X\n", spc);
 #endif
 
     arg1 = arg2 = arg3 = NULL;

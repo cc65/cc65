@@ -14,7 +14,7 @@
         .import         pushwysp
         .import         tosumulax, tosudivax
 
-        .importzp       ptr1, sp
+        .importzp       ptr1, spc
 
         .include        "errno.inc"
         .include        "_file.inc"
@@ -136,23 +136,23 @@
 ; to read() by one, so read() starts to store data at buf+1.
 
         .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (sp)
+        lda     (spc)
         sta     ptr1
         add     #1
-        sta     (sp)
+        sta     (spc)
         ldy     #1
         .else
         ldy     #0
-        lda     (sp),y
+        lda     (spc),y
         sta     ptr1
         add     #1
-        sta     (sp),y
+        sta     (spc),y
         iny
         .endif
-        lda     (sp),y
+        lda     (spc),y
         sta     ptr1+1
         adc     #0
-        sta     (sp),y                  ; ptr1 = buf++;
+        sta     (spc),y                  ; ptr1 = buf++;
 
 ; Get the buffered character and place it as first character into the read
 ; buffer.

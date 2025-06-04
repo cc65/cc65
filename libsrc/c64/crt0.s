@@ -55,7 +55,7 @@ _exit:  pha                     ; Save the return code on stack
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
-        sta     sp,x
+        sta     spc,x
         dex
         bpl     L2
 
@@ -85,7 +85,7 @@ init:
 ; Save the zero-page locations that we need.
 
         ldx     #zpspace-1
-L1:     lda     sp,x
+L1:     lda     spc,x
         sta     zpsave,x
         dex
         bpl     L1
@@ -94,8 +94,8 @@ L1:     lda     sp,x
 
         lda     #<(__MAIN_START__ + __MAIN_SIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__)
-        sta     sp
-        stx     sp+1            ; Set argument stack ptr
+        sta     spc
+        stx     spc+1            ; Set argument stack ptr
 
 ; Switch to the second charset.
 

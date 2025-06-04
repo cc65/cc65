@@ -101,8 +101,8 @@ found:  tya
         bne     oserr1
 
         ; Set pushed name
-        lda     sp
-        ldx     sp+1
+        lda     spc
+        ldx     spc+1
         sta     mliparam + MLI::OPEN::PATHNAME
         stx     mliparam + MLI::OPEN::PATHNAME+1
 

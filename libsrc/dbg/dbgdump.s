@@ -7,23 +7,23 @@
         .export         _DbgMemDump
         .import         addysp1
         .import         __hextab
-        .importzp       sp, tmp2, tmp3, tmp4, ptr3, ptr4
+        .importzp       spc, tmp2, tmp3, tmp4, ptr3, ptr4
 
 _DbgMemDump:
         ldy     #0
-        lda     (sp),y          ; Get length
+        lda     (spc),y          ; Get length
         sta     tmp4
         iny
-        lda     (sp),y          ; Get the string buffer
+        lda     (spc),y          ; Get the string buffer
         sta     ptr3
         iny
-        lda     (sp),y
+        lda     (spc),y
         sta     ptr3+1
         iny
-        lda     (sp),y          ; Get the address
+        lda     (spc),y          ; Get the address
         sta     ptr4
         iny
-        lda     (sp),y
+        lda     (spc),y
         sta     ptr4+1
         jsr     addysp1         ; Drop the parameters
 

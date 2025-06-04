@@ -30,9 +30,9 @@ start:
 
         ; Set up parameter stack
         lda     #<(__RAM3_START__ + __RAM3_SIZE__)
-        sta     sp
+        sta     spc
         lda     #>(__RAM3_START__ + __RAM3_SIZE__)
-        sta     sp+1
+        sta     spc+1
 
         jsr     copydata
         jsr     zerobss

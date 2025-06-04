@@ -59,8 +59,8 @@ start:
 
         lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        sta     sp
-        stx     sp+1
+        sta     spc
+        stx     spc+1
 
 .else
 
@@ -75,11 +75,11 @@ start:
         lda     MEMTOP
         sbc     #<__RESERVED_MEMORY__
         sta     APPMHI                  ; initialize our APPMHI value
-        sta     sp                      ; set up runtime stack part 1
+        sta     spc                      ; set up runtime stack part 1
         lda     MEMTOP+1
         sbc     #>__RESERVED_MEMORY__
         sta     APPMHI+1
-        sta     sp+1                    ; set up runtime stack part 2
+        sta     spc+1                    ; set up runtime stack part 2
 
 .endif
 

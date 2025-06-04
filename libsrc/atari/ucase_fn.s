@@ -24,7 +24,7 @@
         .importzp tmp2
         .import __defdev
 .endif
-        .importzp tmp3,ptr4,sp
+        .importzp tmp3,ptr4,spc
         .import subysp,addysp
         .export ucase_fn
 
@@ -63,13 +63,13 @@ hasdev:
         ldy     #0
 
 loop2:  lda     (ptr4),y
-        sta     (sp),y
+        sta     (spc),y
         beq     copy_end
         bmi     L1              ; Not lowercase (also, invalid, should reject)
         cmp     #'a'
         bcc     L1              ; Not lowercase
         and     #$DF            ; make upper case char, assume ASCII chars
-        sta     (sp),y          ; store back
+        sta     (spc),y          ; store back
 L1:
         iny
         bpl     loop2           ; bpl: this way we only support a max. length of 127
@@ -93,15 +93,15 @@ copy_end:
         jsr     subysp          ; adjust stack pointer
         dey
 cpdev:  lda     __defdev,y
-        sta     (sp),y          ; insert device name, number and ':'
+        sta     (spc),y          ; insert device name, number and ':'
         dey
         bpl     cpdev
 hasdev2:
 .endif
 
         ; leave A and X pointing to the modified filename
-        lda     sp
-        ldx     sp+1
+        lda     spc
+        ldx     spc+1
         clc                     ; indicate success
         rts
 

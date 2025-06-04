@@ -5,7 +5,7 @@
 ;
 
         .export         pusha0sp, pushaysp, pusha
-        .importzp       sp
+        .importzp       spc
 
         .macpack        cpu
 
@@ -14,16 +14,16 @@
 pusha0sp:
         ldy     #$00
 pushaysp:
-        lda     (sp),y
-pusha:  ldy     sp              ; (3)
+        lda     (spc),y
+pusha:  ldy     spc              ; (3)
         beq     @L1             ; (6)
-        dec     sp              ; (11)
+        dec     spc              ; (11)
         ldy     #0              ; (13)
-        sta     (sp),y          ; (19)
+        sta     (spc),y          ; (19)
         rts                     ; (25)
 
-@L1:    dec     sp+1            ; (11)
-        dec     sp              ; (16)
-        sta     (sp),y          ; (22)
+@L1:    dec     spc+1            ; (11)
+        dec     spc              ; (16)
+        sta     (spc),y          ; (22)
         rts                     ; (28)
 

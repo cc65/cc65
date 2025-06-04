@@ -5,14 +5,14 @@
 ;
 
         .export         enter
-        .importzp       sp
+        .importzp       spc
 
 enter:  tya                     ; get arg size
-        ldy     sp
+        ldy     spc
         bne     L1
-        dec     sp+1
-L1:     dec     sp
+        dec     spc+1
+L1:     dec     spc
         ldy     #0
-        sta     (sp),y          ; Store the arg count
+        sta     (spc),y          ; Store the arg count
         rts
 

@@ -61,16 +61,16 @@ _vfscanf:
 ; Swap f against &d on the stack, placing f into d.data
 
         ldy     #2              ; Offset of f on the stack
-        lda     (sp),y
+        lda     (spc),y
         sta     d + SCANFDATA::DATA
         lda     #<d
-        sta     (sp),y
+        sta     (spc),y
 
         iny                     ; High byte
-        lda     (sp),y
+        lda     (spc),y
         sta     d + SCANFDATA::DATA + 1
         lda     #>d
-        sta     (sp),y
+        sta     (spc),y
 
 ; Restore the low byte of ap, and call the _scanf function
 

@@ -5,31 +5,31 @@
 ;
 
         .export         lsubeq0sp, lsubeqysp
-        .importzp       sp, sreg
+        .importzp       spc, sreg
 
 lsubeq0sp:
         ldy     #0
 lsubeqysp:
         sec
         eor     #$FF
-        adc     (sp),y
-        sta     (sp),y
+        adc     (spc),y
+        sta     (spc),y
         pha                     ; Save low byte
         iny
         txa
         eor     #$FF
-        adc     (sp),y
-        sta     (sp),y
+        adc     (spc),y
+        sta     (spc),y
         tax
         iny
-        lda     (sp),y
+        lda     (spc),y
         sbc     sreg
-        sta     (sp),y
+        sta     (spc),y
         sta     sreg
         iny
-        lda     (sp),y
+        lda     (spc),y
         sbc     sreg+1
-        sta     (sp),y
+        sta     (spc),y
         sta     sreg+1
         pla
         rts

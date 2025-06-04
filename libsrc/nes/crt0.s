@@ -107,8 +107,8 @@ start:
 
         lda     #<(__SRAM_START__ + __SRAM_SIZE__)
         ldx     #>(__SRAM_START__ + __SRAM_SIZE__)
-        sta     sp
-        stx     sp+1            ; Set argument stack ptr
+        sta     spc
+        stx     spc+1            ; Set argument stack ptr
 
 ; Call the module constructors.
 

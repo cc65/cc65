@@ -743,9 +743,9 @@ unsigned OptBNegAX2 (CodeSeg* S)
 ** and replace it by
 **
 **      ldy     #xx
-**      lda     (sp),y
+**      lda     (spc),y
 **      dey
-**      ora     (sp),y
+**      ora     (spc),y
 **      jeq/jne ...
 */
 {
@@ -772,16 +772,16 @@ unsigned OptBNegAX2 (CodeSeg* S)
 
             CodeEntry* X;
 
-            /* lda (sp),y */
-            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+            /* lda (spc),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "spc", 0, L[1]->LI);
             CS_InsertEntry (S, X, I+1);
 
             /* dey */
             X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[1]->LI);
             CS_InsertEntry (S, X, I+2);
 
-            /* ora (sp),y */
-            X = NewCodeEntry (OP65_ORA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+            /* ora (spc),y */
+            X = NewCodeEntry (OP65_ORA, AM65_ZP_INDY, "spc", 0, L[1]->LI);
             CS_InsertEntry (S, X, I+3);
 
             /* Invert the branch */

@@ -34,8 +34,8 @@ pushname:
         sta     mliparam + MLI::ON_LINE::UNIT_NUM
 
         ; Use allocated pathname buffer
-        lda     sp
-        ldx     sp+1
+        lda     spc
+        ldx     spc+1
         sta     mliparam + MLI::ON_LINE::DATA_BUFFER
         stx     mliparam + MLI::ON_LINE::DATA_BUFFER+1
 
@@ -46,16 +46,16 @@ pushname:
         bcs     addsp65
 
         ; Get volume name length
-        lda     (sp),y
+        lda     (spc),y
         and     #15             ; Max volume name length
 
         ; Bracket volume name with slashes to form prefix
         sta     tmp1
         lda     #'/'
-        sta     (sp),y
+        sta     (spc),y
         ldy     tmp1
         iny                     ; Leading slash
-        sta     (sp),y
+        sta     (spc),y
         iny                     ; Trailing slash
 
         ; Adjust source pointer for copy
@@ -69,7 +69,7 @@ pushname:
 
         ; Copy source to allocated pathname buffer
 copy:   lda     (ptr1),y
-        sta     (sp),y
+        sta     (spc),y
         beq     setlen
         iny
         cpy     #FILENAME_MAX
@@ -86,7 +86,7 @@ addsp65:ldy     #FILENAME_MAX
 setlen: tya
         jsr     decsp1          ; Preserves A
         ldy     #$00
-        sta     (sp),y
+        sta     (spc),y
 
         ; Return success
         tya

@@ -10,9 +10,9 @@ before:
         jsr     pusha
         ldy     #$01
         ldx     #$00
-        lda     (sp),y
+        lda     (spc),y
         beq     L0005
-        lda     (sp,x)
+        lda     (spc,x)
         beq     L0005
         txa
         jmp     incsp2          ; <--
@@ -24,9 +24,9 @@ after:
         jsr     pusha
         ldy     #$01
         ldx     #$00
-        lda     (sp),y
+        lda     (spc),y
         beq     L0004
-        lda     (sp,x)
+        lda     (spc,x)
         beq     L0004
         txa
         jmp     L0001            ; <--

@@ -6,12 +6,12 @@
 
         .export         pushbsp, pushbysp
         .import         pusha0
-        .importzp       sp
+        .importzp       spc
 
 pushbsp:
         ldy     #0
 pushbysp:
-        lda     (sp),y          ; get lo byte
+        lda     (spc),y          ; get lo byte
         jmp     pusha0          ; promote to unsigned and push
 
 

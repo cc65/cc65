@@ -193,9 +193,9 @@ _init:    LDX     #$FF                 ; Initialize stack pointer to $01FF
 ; Set cc65 argument stack pointer
 
           LDA     #&lt;(__RAM_START__ + __RAM_SIZE__)
-          STA     sp
+          STA     spc
           LDA     #&gt;(__RAM_START__ + __RAM_SIZE__)
-          STA     sp+1
+          STA     spc+1
 
 ; ---------------------------------------------------------------------------
 ; Initialize memory storage

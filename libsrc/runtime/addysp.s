@@ -5,17 +5,17 @@
 ;
 
         .export         addysp1, addysp
-        .importzp       sp
+        .importzp       spc
 
 addysp1:
         iny
 addysp: pha                     ; Save A
         clc
         tya                     ; Get the value
-        adc     sp              ; Add low byte
-        sta     sp              ; Put it back
+        adc     spc              ; Add low byte
+        sta     spc              ; Put it back
         bcc     @L1             ; If no carry, we're done
-        inc     sp+1            ; Inc high byte
+        inc     spc+1            ; Inc high byte
 @L1:    pla                     ; Restore A
         rts
 

@@ -9,7 +9,7 @@
 
         .import         _open
         .import         pushax, incsp4, return0
-        .importzp       sp, ptr1
+        .importzp       spc, ptr1
 
 
         .include        "errno.inc"
@@ -28,10 +28,10 @@
 ; Get a pointer to the mode string
 
         ldy     #1
-        lda     (sp),y
+        lda     (spc),y
         sta     ptr1+1
         dey
-        lda     (sp),y
+        lda     (spc),y
         sta     ptr1
 
 ; Look at the first character in mode
@@ -78,10 +78,10 @@ invmode:
 
 modeok: ldy     #$00
         txa                     ; Mode -> A
-        sta     (sp),y
+        sta     (spc),y
         tya
         iny
-        sta     (sp),y
+        sta     (spc),y
         ldy     #4              ; Size of arguments in bytes
         jsr     _open           ; Will cleanup the stack
 

@@ -36,9 +36,9 @@ DbgBreak:
 
         jsr     DbgSwapZP       ; Swap stuff
         lda     #<DbgStack      ; Set new stack
-        sta     sp
+        sta     spc
         lda     #>DbgStack
-        sta     sp+1
+        sta     spc+1
         jsr     ResetDbgBreaks  ; Reset temporary breakpoints
         jsr     _DbgEntry       ; Call C code
         jsr     SetDbgBreaks    ; Set temporary breakpoints
@@ -61,7 +61,7 @@ DbgStack:
 ; Swap space for the C temporaries
 
 CTemp:
-_DbgCS: .res    2               ; sp
+_DbgCS: .res    2               ; spc
 _DbgHI: .res    2               ; sreg
         .res    (zpsavespace-4) ; Other stuff
 
@@ -78,7 +78,7 @@ Swap1:  ldx     CTemp,y
         lda     <__ZP_START__,y
         sta     CTemp,y
         txa
-        sta     sp,y
+        sta     spc,y
         dey
         bpl     Swap1
         rts

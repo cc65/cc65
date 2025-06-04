@@ -10,7 +10,7 @@
 ;
         .export         pushl0, push0ax, pusheax
         .import         decsp4
-        .importzp       sp, sreg
+        .importzp       spc, sreg
 
         .macpack        cpu
 
@@ -31,19 +31,19 @@ pusheax:
         jsr     decsp4
         ldy     #3
         lda     sreg+1
-        sta     (sp),y
+        sta     (spc),y
         dey
         lda     sreg
-        sta     (sp),y
+        sta     (spc),y
         dey
         txa
-        sta     (sp),y
+        sta     (spc),y
         pla
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        sta     (sp)
+        sta     (spc)
 .else
         dey
-        sta     (sp),y
+        sta     (spc),y
 .endif
         rts
 

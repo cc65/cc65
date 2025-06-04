@@ -10,8 +10,8 @@
 
        lda #<__STACKSTART__
        ldx #>__STACKSTART__
-       sta sp
-       stx sp+1
+       sta spc
+       stx spc+1
        jsr zerobss
        jsr initlib
        jsr _main

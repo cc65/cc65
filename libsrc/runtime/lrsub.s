@@ -10,7 +10,7 @@
 ;
         .export         tosrsub0ax, tosrsubeax
         .import         addysp1
-        .importzp       sp, sreg, tmp1
+        .importzp       spc, sreg, tmp1
 
         .macpack        cpu
 
@@ -27,24 +27,24 @@ tosrsub0ax:
 tosrsubeax:
         sec
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        sbc     (sp)
+        sbc     (spc)
         ldy     #1
 .else
         ldy     #0
-        sbc     (sp),y          ; byte 0
+        sbc     (spc),y          ; byte 0
         iny
 .endif
         sta     tmp1            ; use as temp storage
         txa
-        sbc     (sp),y          ; byte 1
+        sbc     (spc),y          ; byte 1
         tax
         iny
         lda     sreg
-        sbc     (sp),y          ; byte 2
+        sbc     (spc),y          ; byte 2
         sta     sreg
         iny
         lda     sreg+1
-        sbc     (sp),y          ; byte 3
+        sbc     (spc),y          ; byte 3
         sta     sreg+1
         lda     tmp1
         jmp     addysp1         ; drop TOS

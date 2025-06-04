@@ -13,7 +13,7 @@
             .export _mouse_move, _mouse_buttons
 
             .import popsreg, addysp1
-            .importzp sp, sreg, ptr1
+            .importzp spc, sreg, ptr1
 
             .include "const.inc"
             .include "jumptab.inc"
@@ -87,22 +87,22 @@ _mouse_box:
 
         sta mouseBottom
 
-        lda (sp),y
+        lda (spc),y
         sta mouseRight
         iny
-        lda (sp),y
+        lda (spc),y
         sta mouseRight+1        ; maxx
 
         iny
-        lda (sp),y
+        lda (spc),y
         sta mouseTop
         iny                     ; Skip high byte
 
         iny
-        lda (sp),y
+        lda (spc),y
         sta mouseLeft
         iny
-        lda (sp),y
+        lda (spc),y
         sta mouseLeft+1         ; minx
 
         jmp addysp1             ; Drop params, return

@@ -6,7 +6,7 @@
 
         .constructor    initheap, 24
         .import         __BSS_RUN__, __BSS_SIZE__, __STACKSIZE__
-        .importzp       sp
+        .importzp       spc
 
         .include        "_heap.inc"
 
@@ -31,10 +31,10 @@ ___heaplast:
 
 initheap:
         sec
-        lda     sp
+        lda     spc
         sbc     #<__STACKSIZE__
         sta     ___heapend
-        lda     sp+1
+        lda     spc+1
         sbc     #>__STACKSIZE__
         sta     ___heapend+1
         rts

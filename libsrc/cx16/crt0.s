@@ -80,8 +80,8 @@ init:
 
         lda     #<(__MAIN_START__ + __MAIN_SIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__)
-        sta     sp
-        stx     sp+1            ; Set argument stack ptr
+        sta     spc
+        stx     spc+1            ; Set argument stack ptr
 
 ; Switch to the lower/UPPER PetSCII charset.
 

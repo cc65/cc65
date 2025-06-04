@@ -24,7 +24,7 @@ Start:
 ; Save the zero-page locations that we need.
 
         ldx     #zpspace-1
-L1:     lda     sp,x
+L1:     lda     spc,x
         sta     zpsave,x
         dex
         bpl     L1
@@ -49,8 +49,8 @@ L1:     lda     sp,x
         bcc     MemOk
         ldy     #$80
         ldx     #$00
-MemOk:  stx     sp
-        sty     sp+1            ; set argument stack ptr
+MemOk:  stx     spc
+        sty     spc+1            ; set argument stack ptr
 
 ; Call the module constructors.
 
@@ -69,7 +69,7 @@ _exit:  pha                     ; Save the return code on stack
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
-        sta     sp,x
+        sta     spc,x
         dex
         bpl     L2
 

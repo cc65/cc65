@@ -8,7 +8,7 @@
 ; by the compiler, ready for usage in asm code.
 
 
-        .globalzp       sp, sreg, regsave
+        .globalzp       spc, sreg, regsave
         .globalzp       ptr1, ptr2, ptr3, ptr4
         .globalzp       tmp1, tmp2, tmp3, tmp4
         .globalzp       regbank

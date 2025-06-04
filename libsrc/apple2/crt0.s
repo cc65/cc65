@@ -43,7 +43,7 @@
 
         ; Save the zero-page locations that we need.
 init:   ldx     #zpspace-1
-:       lda     sp,x
+:       lda     spc,x
         sta     zpsave,x
         dex
         bpl     :-
@@ -81,8 +81,8 @@ basic:  lda     HIMEM
         ldx     HIMEM+1
 
         ; Set up the C stack.
-:       sta     sp
-        stx     sp+1
+:       sta     spc
+        stx     spc+1
 
         ; ProDOS TechRefMan, chapter 5.3.5:
         ; "Your system program should place in the RESET vector the

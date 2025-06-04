@@ -4788,17 +4788,17 @@ bit. Using
 
 <tscreen><verb>
         .if (.cpu .bitand CPU_ISET_65SC02)
-                lda     (sp)
+                lda     (spc)
         .else
                 ldy     #$00
-                lda     (sp),y
+                lda     (spc),y
         .endif
 </verb></tscreen>
 
 it is possible to determine if the
 
 <tscreen><verb>
-                lda     (sp)
+                lda     (spc)
 </verb></tscreen>
 
 instruction is supported, which is the case for the 65SC02, 65C02 and 65816

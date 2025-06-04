@@ -8,7 +8,7 @@
         .export         _vfprintf
         .import         push1, pushwysp, incsp6
         .import         _fwrite, __printf
-        .importzp       sp, ptr1
+        .importzp       spc, ptr1
 
         .macpack        generic
 
@@ -121,15 +121,15 @@ _vfprintf:
 ; exactly as _printf expects it. Parameters will get dropped by _printf.
 
         ldy     #2
-        lda     (sp),y          ; Low byte of f
+        lda     (spc),y          ; Low byte of f
         sta     ptr
         lda     #<outdesc
-        sta     (sp),y
+        sta     (spc),y
         iny
-        lda     (sp),y          ; High byte of f
+        lda     (spc),y          ; High byte of f
         sta     ptr+1
         lda     #>outdesc
-        sta     (sp),y
+        sta     (spc),y
 
 ; Restore low byte of ap and call _printf
 

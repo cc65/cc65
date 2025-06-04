@@ -105,7 +105,7 @@ unsigned OptPtrStore2 (CodeSeg* S);
 ** L:   jsr     pushax
 **      ldy     yyy
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (spc),y
 **      ldy     #$00
 **      jsr     staspidx
 **
@@ -115,7 +115,7 @@ unsigned OptPtrStore2 (CodeSeg* S);
 **      stx     ptr1+1
 **      ldy     yyy-2
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (spc),y
 **      ldy     xxx
 **      sta     (ptr1),y
 **
@@ -123,7 +123,7 @@ unsigned OptPtrStore2 (CodeSeg* S);
 **
 **      ldy     yyy-2
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (spc),y
 **      ldy     xxx
 **      sta     (zp),y
 **
@@ -131,7 +131,7 @@ unsigned OptPtrStore2 (CodeSeg* S);
 **
 **      ldy     yyy-2
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (spc),y
 **      ldy     xxx
 **      sta     label,y
 **
@@ -139,7 +139,7 @@ unsigned OptPtrStore2 (CodeSeg* S);
 **
 **      ldy     yyy-2
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (spc),y
 **      ldy     xxx
 **      sta     $xxxx,y
 **

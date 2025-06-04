@@ -6,7 +6,7 @@
 
         .export         toseq00, toseqa0, toseqax
         .import         tosicmp, booleq
-        .importzp       sp, tmp1
+        .importzp       spc, tmp1
 
 toseq00:
         lda     #$00

@@ -12,7 +12,7 @@
 
         .export         _memcpy, memcpy_upwards, memcpy_getparams
         .import         popax, popptr1
-        .importzp       sp, ptr1, ptr2, ptr3
+        .importzp       spc, ptr1, ptr2, ptr3
 
 ; ----------------------------------------------------------------------
 _memcpy:
@@ -70,10 +70,10 @@ memcpy_getparams:               ; IMPORTANT! Function has to leave with Y=0!
         iny                     ; Y=0 guaranteed by popptr1, we need '1' here...
                                 ; (direct stack access is three cycles faster
                                 ; (total cycle count with return))
-        lda     (sp),y
+        lda     (spc),y
         tax
         stx     ptr2+1          ; save high byte of ptr2
         dey                     ; Y = 0
-        lda     (sp),y          ; Get ptr2 low
+        lda     (spc),y          ; Get ptr2 low
         sta     ptr2
         rts

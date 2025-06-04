@@ -6,7 +6,7 @@
 ;
 
         .export         tosicmp, tosicmp0
-        .importzp       sp, sreg
+        .importzp       spc, sreg
 
 
 tosicmp0:
@@ -17,16 +17,16 @@ tosicmp:
         stx     sreg+1          ; Save ax
 
         ldy     #$00
-        lda     (sp),y          ; Get low byte
+        lda     (spc),y          ; Get low byte
         tax
-        inc     sp              ; 5
+        inc     spc              ; 5
         bne     @L1             ; 3
-        inc     sp+1            ; (5)
+        inc     spc+1            ; (5)
 @L1:
-        lda     (sp),y          ; Get high byte
-        inc     sp              ; 5
+        lda     (spc),y          ; Get high byte
+        inc     spc              ; 5
         bne     @L2             ; 3
-        inc     sp+1            ; (5)
+        inc     spc+1            ; (5)
 
 ; Do the compare.
 

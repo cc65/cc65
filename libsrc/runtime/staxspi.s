@@ -7,7 +7,7 @@
 
         .export         staxspidx
         .import         incsp2
-        .importzp       sp, tmp1, ptr1
+        .importzp       spc, tmp1, ptr1
 
         .macpack        cpu
 
@@ -16,13 +16,13 @@
         sty     tmp1            ; Save Y
         pha                     ; Save A
         ldy     #1
-        lda     (sp),y
+        lda     (spc),y
         sta     ptr1+1
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (sp)
+        lda     (spc)
 .else
         dey
-        lda     (sp),y
+        lda     (spc),y
 .endif
         sta     ptr1            ; Address now in ptr1
         ldy     tmp1            ; Restore Y

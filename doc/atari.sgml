@@ -1121,7 +1121,7 @@ If BSS and/or the stack shouldn't stay at the end of the program,
 some parts of the cc65 runtime lib need to be replaced/modified.
 
 common/_heap.s defines the location of the heap and atari/crt0.s
-defines the location of the stack by initializing sp.
+defines the location of the stack by initializing spc.
 
 
 <sect1>Upgrading from an older cc65 version<p>

@@ -31,22 +31,22 @@ _vscanf:
 ; Move the format down
 
         ldy     #2
-        lda     (sp),y          ; Load byte of format
+        lda     (spc),y          ; Load byte of format
         ldy     #0
-        sta     (sp),y
+        sta     (spc),y
         ldy     #3
-        lda     (sp),y
+        lda     (spc),y
         ldy     #1
-        sta     (sp),y
+        sta     (spc),y
 
 ; Store stdin into the stack frame
 
         iny
         lda     _stdin
-        sta     (sp),y
+        sta     (spc),y
         iny
         lda     _stdin+1
-        sta     (sp),y
+        sta     (spc),y
 
 ; Restore the low byte of ap and jump to vfscanf, which will cleanup the stack
 

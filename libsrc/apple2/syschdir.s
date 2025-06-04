@@ -17,8 +17,8 @@ __syschdir:
         bne     oserr
 
         ; Set pushed name
-        lda     sp
-        ldx     sp+1
+        lda     spc
+        ldx     spc+1
         sta     mliparam + MLI::PREFIX::PATHNAME
         stx     mliparam + MLI::PREFIX::PATHNAME+1
 

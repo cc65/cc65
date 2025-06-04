@@ -5,7 +5,7 @@
 ; int __cdecl__ xreg(char device, char channel, unsigned char address, ...);
 
 .export _xreg
-.importzp sp
+.importzp spc
 .import addysp, _ria_call_int_errno
 
 .include "rp6502.inc"
@@ -20,12 +20,12 @@
 
 @copy: ; copy stack
     dey
-    lda (sp),y
+    lda (spc),y
     sta RIA_XSTACK
     tya
     bne @copy
 
-    ; recover variadic size and move sp
+    ; recover variadic size and move spc
     txa
     tay
     jsr addysp

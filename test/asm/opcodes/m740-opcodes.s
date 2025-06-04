@@ -36,7 +36,7 @@
    bbr1    $12,*+122   ; clb 0,zp
    jsr     $3456
    and     ($12,x)
-   .byte   $22,$00,$00 ; jsr sp
+   .byte   $22,$00,$00 ; jsr spc
    .byte   $23,$00,$00 ; bbs 1,a
    bit     $12
    and     $12

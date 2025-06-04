@@ -5,7 +5,7 @@
 ;
 
         .export         __EXEHDR__ : absolute = 1       ; Linker referenced
-        .importzp       sp
+        .importzp       spc
         .import         __MAIN_START__
         .import         startup
 
@@ -24,6 +24,6 @@
 .else
         .error Unknown CPU type.
 .endif
-        .byte   sp                             ; sp address
+        .byte   spc                             ; spc address
         .addr   __MAIN_START__                 ; load address
         .addr   startup                        ; reset address

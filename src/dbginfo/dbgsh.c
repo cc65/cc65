@@ -458,7 +458,7 @@ static unsigned FindIdType (const char* TypeName)
         {   "segment",  SegmentId       },
         {   "source",   SourceId        },
         {   "src",      SourceId        },
-        {   "sp",       SpanId          },
+        {   "spc",       SpanId          },
         {   "span",     SpanId          },
         {   "sym",      SymbolId        },
         {   "symbol",   SymbolId        },

@@ -16,7 +16,7 @@
         .export         sectsizetab
         .import         ___oserror, __sio_call, _dio_read
         .import         pushax, addysp, subysp
-        .importzp       ptr2, sp
+        .importzp       ptr2, spc
         .include        "atari.inc"
 
 
@@ -78,10 +78,10 @@ _dio_open:
         ldy     #128
         jsr     subysp          ; allocate buffer on the stack
 
-        lda     sp
+        lda     spc
         pha
-        lda     sp+1
-        pha                     ; save sp (buffer address) on processor stack
+        lda     spc+1
+        pha                     ; save spc (buffer address) on processor stack
 
         lda     ptr2
         ldx     ptr2+1

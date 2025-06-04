@@ -6,17 +6,17 @@
 ;
 
         .export         subysp
-        .importzp       sp
+        .importzp       spc
 
 .proc   subysp
 
         tya
         eor     #$ff
         sec
-        adc     sp
-        sta     sp
+        adc     spc
+        sta     spc
         bcs     @L1
-        dec     sp+1
+        dec     spc+1
 @L1:    rts
 
 .endproc

@@ -7,7 +7,7 @@
 
         .export         toslcmp
         .import         incsp4
-        .importzp       sp, sreg, ptr1
+        .importzp       spc, sreg, ptr1
 
 
 toslcmp:
@@ -15,23 +15,23 @@ toslcmp:
         stx     ptr1+1          ; EAX now in sreg:ptr1
 
         ldy     #$03
-        lda     (sp),y
+        lda     (spc),y
         sec
         sbc     sreg+1
         bne     L4
 
         dey
-        lda     (sp),y
+        lda     (spc),y
         cmp     sreg
         bne     L1
 
         dey
-        lda     (sp),y
+        lda     (spc),y
         cmp     ptr1+1
         bne     L1
 
         dey
-        lda     (sp),y
+        lda     (spc),y
         cmp     ptr1
 
 L1:     php                     ; Save flags

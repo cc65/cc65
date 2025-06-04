@@ -27,7 +27,7 @@
         .constructor    init_cursor
         .interruptor    blink_cursor
 
-        .importzp       sp
+        .importzp       spc
         .import         _zonecounter
         .import         _zones
         .import         cursor

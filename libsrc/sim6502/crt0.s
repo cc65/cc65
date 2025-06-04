@@ -22,8 +22,8 @@ startup:cld
         txs
         lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        sta     sp
-        stx     sp+1
+        sta     spc
+        stx     spc+1
         jsr     zerobss
         jsr     initlib
         jsr     callmain

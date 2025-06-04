@@ -9,7 +9,7 @@
         .export         _vsscanf
 
         .import         popax, __scanf
-        .importzp       sp, ptr1, ptr2
+        .importzp       spc, ptr1, ptr2
 
         .macpack        generic
 
@@ -165,15 +165,15 @@ d:      .addr   get
 ; to d
 
         ldy     #2                      ; Stack offset of str
-        lda     (sp),y
+        lda     (spc),y
         sta     sd + SSCANFDATA::STR
         lda     #<d
-        sta     (sp),y
+        sta     (spc),y
         iny
-        lda     (sp),y
+        lda     (spc),y
         sta     sd + SSCANFDATA::STR+1
         lda     #>d
-        sta     (sp),y
+        sta     (spc),y
 
         lda     #$00
         sta     sd + SSCANFDATA::INDEX

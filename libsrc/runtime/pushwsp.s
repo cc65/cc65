@@ -5,27 +5,27 @@
 ;
 
         .export         pushwysp, pushw0sp
-        .importzp       sp
+        .importzp       spc
 
         .macpack        generic
 
 pushw0sp:
         ldy     #3
 pushwysp:
-        lda     sp              ; 3
+        lda     spc              ; 3
         sub     #2              ; 4
-        sta     sp              ; 3
+        sta     spc              ; 3
         bcs     @L1             ; 3(+1)
-        dec     sp+1            ; (5)
-@L1:    lda     (sp),y          ; 5 =16
+        dec     spc+1            ; (5)
+@L1:    lda     (spc),y          ; 5 =16
         tax                     ; 2
         dey                     ; 2
-        lda     (sp),y          ; 5
+        lda     (spc),y          ; 5
         ldy     #$00            ; 2
-        sta     (sp),y          ; 5
+        sta     (spc),y          ; 5
         iny                     ; 2
         txa                     ; 2
-        sta     (sp),y          ; 5
+        sta     (spc),y          ; 5
         rts
 
 

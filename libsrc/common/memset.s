@@ -17,7 +17,7 @@
 
         .export         _memset, _bzero, ___bzero
         .import         popax
-        .importzp       sp, ptr1, ptr2, ptr3
+        .importzp       spc, ptr1, ptr2, ptr3
 
 _bzero:
 ___bzero:
@@ -36,10 +36,10 @@ _memset:
 
 common:                         ; Fill value is in X!
         ldy     #1
-        lda     (sp),y
+        lda     (spc),y
         sta     ptr1+1          ; save high byte of ptr
         dey                     ; Y = 0
-        lda     (sp),y          ; Get ptr
+        lda     (spc),y          ; Get ptr
         sta     ptr1
 
         lsr     ptr3+1          ; divide number of

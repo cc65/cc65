@@ -8,7 +8,7 @@
 ;
 
         .include        "atari.inc"
-        .importzp       sp
+        .importzp       spc
         .export         _mouse_pm_callbacks
         .constructor    pm_init, 27
         .destructor     pm_down
@@ -193,22 +193,22 @@ pm_init:
 
 .else
 
-; use top of memory and lower sp accordingly
-        sta     sp
+; use top of memory and lower spc accordingly
+        sta     spc
         sta     MOUSE_PM_BASE
-        lda     sp+1
+        lda     spc+1
         and     #7                      ; offset within 2K
         cmp     #3 + MOUSE_PM_RAW + 1   ; can we use it?
         bcc     @decr                   ; no
 
-        lda     sp+1
+        lda     spc+1
         and     #$F8
 @set:   adc     #3 + MOUSE_PM_RAW - 1   ; CF is set, so adding MOUSE_PM_RAW + 3
         sta     MOUSE_PM_BASE+1
-        sta     sp+1
+        sta     spc+1
         bne     @cont                   ; jump always
 
-@decr:  lda     sp+1
+@decr:  lda     spc+1
         and     #$F8
         sbc     #8 - 1                  ; CF is clear, subtracts 8
         bcs     @set                    ; jump always

@@ -5,18 +5,18 @@
 ;
 
         .export         decsp8
-        .importzp       sp
+        .importzp       spc
 
 .proc   decsp8
 
-        lda     sp
+        lda     spc
         sec
         sbc     #8
-        sta     sp
+        sta     spc
         bcc     @L1
         rts
 
-@L1:    dec     sp+1
+@L1:    dec     spc+1
         rts
 
 .endproc

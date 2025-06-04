@@ -12,7 +12,7 @@
         .export         _inflatemem
 
         .import         incsp2
-        .importzp       sp, sreg, ptr1, ptr2, ptr3, ptr4
+        .importzp       spc, sreg, ptr1, ptr2, ptr3, ptr4
 
 ; --------------------------------------------------------------------------
 ;
@@ -79,10 +79,10 @@ _inflatemem:
         stx     inputPointer+1
 ; outputPointer = dest
         ldy     #1
-        lda     (sp),y
+        lda     (spc),y
         sta     outputPointer+1
         dey
-        lda     (sp),y
+        lda     (spc),y
         sta     outputPointer
 
 ;       ldy     #0
@@ -129,11 +129,11 @@ inflate_nextBlock:
         lda     outputPointer
 ;       ldy     #0
 ;       sec
-        sbc     (sp),y
+        sbc     (spc),y
         iny
         pha
         lda     outputPointer+1
-        sbc     (sp),y
+        sbc     (spc),y
         tax
         pla
 ; pop dest

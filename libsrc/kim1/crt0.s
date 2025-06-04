@@ -26,9 +26,9 @@ _init:    cld                          ; Clear decimal mode
 ; Set cc65 argument stack pointer
 
           lda     #<(__RAM_START__ + __RAM_SIZE__)
-          sta     sp
+          sta     spc
           lda     #>(__RAM_START__ + __RAM_SIZE__)
-          sta     sp+1
+          sta     spc+1
 
 ; Initialize memory storage
 

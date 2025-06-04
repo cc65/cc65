@@ -3,7 +3,7 @@
 ;
     .export    _wherex
 
-    .importzp  sp
+    .importzp  spc
 
     .include   "telestrat.inc"
 

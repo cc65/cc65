@@ -225,11 +225,11 @@ MOVE:   sei                             ; No interrupts
         jsr     MoveY                   ; Set new y position
 
         ldy     #1
-        lda     (sp),y
+        lda     (spc),y
         sta     XPos+1
         tax
         dey
-        lda     (sp),y
+        lda     (spc),y
         jsr     MoveX                   ; Move the pointer
 
         cli                             ; Allow interrupts

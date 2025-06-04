@@ -1,3 +1,13 @@
+# ---- Display info during parsing phase ----
+$(info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~)
+$(info ~~~ Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))))
+ifeq ($(MAKECMDGOALS),)
+  $(info ~~~ Invoked target: (default))
+else
+  $(info ~~~ Invoked target: $(MAKECMDGOALS))
+endif
+$(info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~)
+
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
 SYS ?= c64

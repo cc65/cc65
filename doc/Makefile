@@ -1,3 +1,13 @@
+# ---- Display info during parsing phase ----
+$(info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~)
+$(info ~~~ Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))))
+ifeq ($(MAKECMDGOALS),)
+  $(info ~~~ Invoked target: (default))
+else
+  $(info ~~~ Invoked target: $(MAKECMDGOALS))
+endif
+$(info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~)
+
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif

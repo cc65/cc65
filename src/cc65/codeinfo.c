@@ -90,6 +90,7 @@ struct FuncInfo {
 ** routines are marked to use only the A register. The remainder is ignored
 ** anyway.
 */
+/* MUST BE SORTED BY NAME !!! */
 static const FuncInfo FuncInfoTable[] = {
     { "addeq0sp",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_AXY                        },
     { "addeqysp",   SLV_IND | REG_AXY,  PSTATE_ALL | REG_AXY                        },

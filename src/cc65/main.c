@@ -306,6 +306,10 @@ static void SetSys (const char* Sys)
         case TGT_RP6502:
             DefineNumericMacro ("__RP6502__", 1);
             break;
+        
+        case TGT_AGAT:
+            DefineNumericMacro ("__AGAT__", 1);
+            break;
 
         default:
             AbEnd ("Unknown target system '%s'", Sys);

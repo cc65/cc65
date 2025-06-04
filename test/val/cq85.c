@@ -62,7 +62,7 @@ int s85(struct defs *pd0){
      struct tnode *right;
    };
 
-   struct tnode s1, s2, *sp;
+   struct tnode s1, s2, *c_sp;
 
    struct{
      char cdummy;

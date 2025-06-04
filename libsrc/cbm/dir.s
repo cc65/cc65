@@ -44,10 +44,10 @@ __dirread:
 ; Replace dir by dir->fd
 
         ldy     #2
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1+1
         ldy     #DIR::fd+1
         lda     (ptr1),y
@@ -55,10 +55,10 @@ __dirread:
         dey
         lda     (ptr1),y
         ldy     #2
-        sta     (sp),y
+        sta     (c_sp),y
         pla
         iny
-        sta     (sp),y
+        sta     (c_sp),y
 
 ; Get count, save it again, clear the high byte and call read(). By the
 ; previous actions, the stack frame is as read() needs it, and read() will

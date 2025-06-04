@@ -5,16 +5,16 @@
 ;
 
         .export         regswap1
-        .importzp       sp, regbank
+        .importzp       c_sp, regbank
 
 .proc   regswap1
 
         lda     regbank,x               ; Get old value
         pha                             ; Save it
-        lda     (sp),y                  ; Get stack loc
+        lda     (c_sp),y                  ; Get stack loc
         sta     regbank,x               ; Store new value
         pla
-        sta     (sp),y                  ; Store old value
+        sta     (c_sp),y                  ; Store old value
         rts
 
 .endproc

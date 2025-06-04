@@ -131,7 +131,7 @@ All other parameters will be pushed to the C-stack from left to right.
 The rightmost parameter will have the lowest address on the stack,
 and multi-byte parameters will have their least significant byte at the lower address.
 
-The <tt/sp/ pseudo-register is a zeropage pointer to the base of the C-stack.
+The <tt/c_sp/ pseudo-register is a zeropage pointer to the base of the C-stack.
 If the function is variadic, the <tt/Y/ register will contain the number of
 bytes pushed to the stack for this function.
 
@@ -153,10 +153,10 @@ void cdecl foo(unsigned bar, unsigned char baz);
 ; Example code for accessing bar. The variable is in A/X after this code snippet:
 ;
     ldy     #2      ; Offset of high byte of bar
-    lda     (sp),y  ; High byte now in A
+    lda     (c_sp),y  ; High byte now in A
     tax             ; High byte now in X
     dey             ; Offset of low byte of bar
-    lda     (sp),y  ; Low byte now in A
+    lda     (c_sp),y  ; Low byte now in A
 </verb></tscreen>
 
 <sect1>Epilogue, after the function call<p>
@@ -175,12 +175,12 @@ used if the return type is 32-bit.
 If the function has a void return type, the compiler will not depend on the result
 of <tt>A/X/sreg</tt>, so these may be clobbered by the function.
 
-The C-stack pointer <tt/sp/ must be restored by the function to its value before the
+The C-stack pointer <tt/c_sp/ must be restored by the function to its value before the
 function call prologue. It may pop all of its parameters from the C-stack
 (e.g. using the <tt/runtime/ function <tt/popa/),
-or it could adjust <tt/sp/ directly.
+or it could adjust <tt/c_sp/ directly.
 If the function is variadic, the <tt/Y/ register contains the number of bytes
-pushed to the stack on entry, which may be added to <tt/sp/ to restore its
+pushed to the stack on entry, which may be added to <tt/c_sp/ to restore its
 original state.
 
 The internal pseudo-register <tt/regbank/ must not be changed by the function.

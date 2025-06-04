@@ -90,6 +90,7 @@ struct FuncInfo {
 ** routines are marked to use only the A register. The remainder is ignored
 ** anyway.
 */
+/* MUST BE SORTED BY NAME !!! */
 static const FuncInfo FuncInfoTable[] = {
     { "addeq0sp",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_AXY                        },
     { "addeqysp",   SLV_IND | REG_AXY,  PSTATE_ALL | REG_AXY                        },
@@ -380,7 +381,10 @@ static const FuncInfo FuncInfoTable[] = {
 #define FuncInfoCount   (sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
 /* Table with names of zero page locations used by the compiler */
+/* MUST BE SORTED BY NAME !!! */
 static const ZPInfo ZPInfoTable[] = {
+    {   0, "c_sp",      2,  REG_SP_LO,      REG_SP      },
+    {   0, "c_sp+1",    1,  REG_SP_HI,      REG_SP      },
     {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
     {   0, "ptr1+1",    1,  REG_PTR1_HI,    REG_PTR1    },
     {   0, "ptr2",      2,  REG_PTR2_LO,    REG_PTR2    },
@@ -390,8 +394,6 @@ static const ZPInfo ZPInfoTable[] = {
     {   7, "regbank",   6,  REG_NONE,       REG_NONE    },
     {   0, "regsave",   4,  REG_SAVE_LO,    REG_SAVE    },
     {   0, "regsave+1", 3,  REG_SAVE_HI,    REG_SAVE    },
-    {   0, "sp",        2,  REG_SP_LO,      REG_SP      },
-    {   0, "sp+1",      1,  REG_SP_HI,      REG_SP      },
     {   0, "sreg",      2,  REG_SREG_LO,    REG_SREG    },
     {   0, "sreg+1",    1,  REG_SREG_HI,    REG_SREG    },
     {   0, "tmp1",      1,  REG_TMP1,       REG_TMP1    },

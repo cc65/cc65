@@ -10,7 +10,7 @@
 ** got one from argv). I then opens the file,
 ** reads the first 16 bytes and displays them
 ** (as hex values).
-** The values of sp (cc65 runtime stack pointer)
+** The values of c_sp (cc65 runtime stack pointer)
 ** are displayed at some places. The displayed
 ** value should always be the same.
 */
@@ -64,16 +64,16 @@ int main(int argc,char **argv)
     }
     printf("using filename \"%s\"\n",filename);
     csp = getsp();
-    printf("now opening file... sp = %d\n",csp);
+    printf("now opening file... c_sp = %d\n",csp);
     fd = open(filename,O_RDONLY);
     csp = getsp();
     if (fd == -1) {
         char x1 = _oserror;
-        printf("open failed: os: %d,\n\terrno: %d, sp = %d\n",x1,errno,csp);
+        printf("open failed: os: %d,\n\terrno: %d, c_sp = %d\n",x1,errno,csp);
         cgetc();
         return(0);
     }
-    printf("open success -- handle = $%x, sp = %d\n",fd,csp);
+    printf("open success -- handle = $%x, c_sp = %d\n",fd,csp);
 #ifdef __ATARI__
     printf("fd_index:\n ");
     for (i=0; i<12; i++) printf("%02X ",__fd_index[i]);
@@ -88,7 +88,7 @@ int main(int argc,char **argv)
     lr = read(fd,buf,16);  /* read first 16 bytes */
     csp = getsp();
     if (lr == -1) {
-        printf("read failed: %d (sp = %d)\n",errno,csp);
+        printf("read failed: %d (c_sp = %d)\n",errno,csp);
         cgetc();
         return(0);
     }
@@ -99,7 +99,7 @@ int main(int argc,char **argv)
         return(0);
     }
     csp = getsp();
-    printf("\n\nThe data read: (%d bytes, sp = %d)\n",lr,csp);
+    printf("\n\nThe data read: (%d bytes, c_sp = %d)\n",lr,csp);
     for (i=0; i<lr; i++) {
         printf("%02X ",buf[i]);
         if (!((i+1) & 7)) printf("\n");

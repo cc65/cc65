@@ -127,7 +127,7 @@ unsigned OptPtrLoad4 (CodeSeg* S);
 **      ldx     #>(label+0)
 **      ldy     #$xx
 **      clc
-**      adc     (sp),y
+**      adc     (c_sp),y
 **      bcc     L
 **      inx
 ** L:   ldy     #$00
@@ -136,7 +136,7 @@ unsigned OptPtrLoad4 (CodeSeg* S);
 ** and replace it by:
 **
 **      ldy     #$xx
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      tay
 **      ldx     #$00
 **      lda     label,y
@@ -166,7 +166,7 @@ unsigned OptPtrLoad6 (CodeSeg* S);
 **      jsr     pushax
 **      ldy     xxx
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      jsr     tosaddax
 **      ldy     #$00
 **      jsr     ldauidx
@@ -176,7 +176,7 @@ unsigned OptPtrLoad6 (CodeSeg* S);
 **      sta     ptr1
 **      stx     ptr1+1
 **      ldy     xxx
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      tay
 **      lda     (ptr1),y
 */

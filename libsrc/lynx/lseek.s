@@ -11,7 +11,7 @@
 ;
 ; off_t __fastcall__ lseek(int fd, off_t offset, int whence);
 
-        .importzp       sp, sreg, regsave, regbank, tmp1, ptr1, ptr2
+        .importzp       c_sp, sreg, regsave, regbank, tmp1, ptr1, ptr2
         .macpack        longbranch
         .export         _lseek
         .import         addysp, stax0sp, tosand0ax, pusheax, asreax2

@@ -5,16 +5,16 @@
 ;
 
         .export         ldax0sp, ldaxysp
-        .importzp       sp
+        .importzp       c_sp
 
 ; Beware: The optimizer knows about the value in Y after return!
 
 ldax0sp:
         ldy     #1
 ldaxysp:
-        lda     (sp),y          ; get high byte
+        lda     (c_sp),y          ; get high byte
         tax                     ; and save it
         dey                     ; point to lo byte
-        lda     (sp),y          ; load low byte
+        lda     (c_sp),y          ; load low byte
         rts
 

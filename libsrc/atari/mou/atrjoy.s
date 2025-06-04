@@ -241,11 +241,11 @@ MOVE:   php
         jsr     CMOVEY                  ; Set it
 
         ldy     #$01
-        lda     (sp),y
+        lda     (c_sp),y
         sta     XPos+1
         tax
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         sta     XPos                    ; New X position
         jsr     CMOVEX                  ; Move the cursor
 

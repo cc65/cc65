@@ -11,7 +11,7 @@
             .import initlib, donelib
             .import callmain
             .import zerobss
-            .importzp sp
+            .importzp c_sp
 
             .include "jumptab.inc"
             .include "geossym.inc"
@@ -48,8 +48,8 @@
 
         lda #<(__STACKADDR__ + __STACKSIZE__)
         ldx #>(__STACKADDR__ + __STACKSIZE__)
-        sta sp
-        stx sp+1
+        sta c_sp
+        stx c_sp+1
 
 ; Call the module constructors.
 

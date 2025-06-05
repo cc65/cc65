@@ -112,9 +112,6 @@ LDFLAGS_mandelbrot_apple2enh = --start-addr 0x4000
 LDFLAGS_tgidemo_apple2       = --start-addr 0x4000
 LDFLAGS_tgidemo_apple2enh    = --start-addr 0x4000
 
-LDFLAGS_mandelbrot_plus4     = -C plus4-hires.cfg
-LDFLAGS_tgidemo_plus4        = -C plus4-hires.cfg
-
 # The Apple ][ needs the start address adjusted for the mousedemo
 LDFLAGS_mousedemo_apple2 = --start-addr 0x4000
 
@@ -150,6 +147,8 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 .o:
 ifeq ($(SYS),vic20)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
+else ifeq ($(SYS),plus4)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C plus4-hires.cfg -m $@.map $^ $(SYS).lib
 else
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 endif

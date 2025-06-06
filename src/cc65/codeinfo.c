@@ -190,12 +190,12 @@ static const FuncInfo FuncInfoTable[] = {
     { "ldeaxysp",   SLV_IND | REG_Y,        PSTATE_ALL | REG_EAXY                   },
     { "leaa0sp",    REG_SP | REG_A,         PSTATE_ALL | REG_AX                     },
     { "leaaxsp",    REG_SP | REG_AX,        PSTATE_ALL | REG_AX                     },
-    { "leave00",    REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
-    { "leave0",     REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
     { "leave",      REG_SP,                 PSTATE_ALL | REG_SP | REG_Y             },
-    { "leavey00",   REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
-    { "leavey0",    REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leave0",     REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leave00",    REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
     { "leavey",     REG_SP | REG_Y,         PSTATE_ALL | REG_SP | REG_Y             },
+    { "leavey0",    REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leavey00",   REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
     { "lsubeq",     REG_EAXY | REG_PTR1_LO, PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
     { "lsubeq0sp",  SLV_TOP | REG_EAX,      PSTATE_ALL | REG_EAXY                   },
     { "lsubeq1",    REG_Y | REG_PTR1_LO,    PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
@@ -379,6 +379,28 @@ static const FuncInfo FuncInfoTable[] = {
 };
 #define FuncInfoCount   (sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
+#if defined(__GNUC__) || defined(__clang__)
+/*
+** This will run at startup and verify that FuncInfoTable is sorted.
+*/
+__attribute__((constructor))
+static void CheckFuncInfoTableSorted(void) {
+    size_t I;
+    for (I= 1; I < FuncInfoCount; ++I) {
+        if (strcmp(FuncInfoTable[I-1].Name, FuncInfoTable[I].Name) >= 0) {
+            fprintf(stderr,
+                "%s :: FuncInfoTable not sorted at index %zu\n", __FILE__, I);
+            fprintf(stderr,
+                "    %s < %s\n",
+                FuncInfoTable[I-1].Name, FuncInfoTable[I].Name);
+            abort();
+        }
+    }
+}
+#endif
+
+
+
 /* Table with names of zero page locations used by the compiler */
 static const ZPInfo ZPInfoTable[] = {
     {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
@@ -400,6 +422,26 @@ static const ZPInfo ZPInfoTable[] = {
     {   0, "tmp4",      1,  REG_NONE,       REG_NONE    },
 };
 #define ZPInfoCount     (sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
+
+#if defined(__GNUC__) || defined(__clang__)
+/*
+** This will run at startup and verify that FuncInfoTable is sorted.
+*/
+__attribute__((constructor))
+static void CheckZPInfoTableSorted(void) {
+    size_t I;
+    for (I= 1; I < ZPInfoCount; ++I) {
+        if (strcmp(ZPInfoTable[I-1].Name, ZPInfoTable[I].Name) >= 0) {
+            fprintf(stderr,
+                "%s :: ZPInfoTable not sorted at index %zu\n", __FILE__, I);
+            fprintf(stderr,
+                "    %s < %s\n",
+                ZPInfoTable[I-1].Name, ZPInfoTable[I].Name);
+            abort();
+        }
+    }
+}
+#endif
 
 
 

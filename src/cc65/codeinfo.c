@@ -425,7 +425,7 @@ static const ZPInfo ZPInfoTable[] = {
 
 #if defined(__GNUC__) || defined(__clang__)
 /*
-** This will run at startup and verify that FuncInfoTable is sorted.
+** This will run at startup and verify that ZPInfoTable is sorted.
 */
 __attribute__((constructor))
 static void CheckZPInfoTableSorted(void) {

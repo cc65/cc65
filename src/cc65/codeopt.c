@@ -46,6 +46,7 @@
 #include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -268,6 +269,7 @@ static OptFunc* OptFuncs[] = {
     &DOptLoad1,
     &DOptLoad2,
     &DOptLoad3,
+    &DOptLoadStoreLoad,
     &DOptLongAssign,
     &DOptLongCopy,
     &DOptNegAX1,
@@ -318,7 +320,6 @@ static OptFunc* OptFuncs[] = {
     &DOptStore4,
     &DOptStore5,
     &DOptStoreLoad,
-    &DOptLoadStoreLoad,
     &DOptSub1,
     &DOptSub2,
     &DOptSub3,
@@ -333,6 +334,7 @@ static OptFunc* OptFuncs[] = {
 };
 #define OPTFUNC_COUNT  (sizeof(OptFuncs) / sizeof(OptFuncs[0]))
 
+BSEARCH_CHECK(OptFuncs, OPTFUNC_COUNT, OptFuncs, ->Name);
 
 
 static int CmpOptStep (const void* Key, const void* Func)

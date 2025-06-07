@@ -44,6 +44,7 @@
 #include "inline.h"
 #include "print.h"
 #include "xmalloc.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "codegen.h"
@@ -238,6 +239,7 @@ static const struct PPDType {
 /* Number of preprocessor directive types */
 #define PPDTOKEN_COUNT  (sizeof(PPDTypes) / sizeof(PPDTypes[0]))
 
+BSEARCH_CHECK(PPDTypes, PPDTOKEN_COUNT, PPDTypes, .Tok);
 
 
 static int CmpToken (const void* Key, const void* Elem)

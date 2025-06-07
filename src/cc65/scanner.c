@@ -46,6 +46,7 @@
 #include "chartype.h"
 #include "fp.h"
 #include "tgttrans.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "datatype.h"
@@ -148,6 +149,7 @@ static const struct Keyword {
 };
 #define KEY_COUNT       (sizeof (Keywords) / sizeof (Keywords [0]))
 
+BSEARCH_CHECK(Keywords, KEY_COUNT, Keywords, .Key);
 
 
 /* Stuff for determining the type of an integer constant */

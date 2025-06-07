@@ -31,11 +31,13 @@
 
 
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 /* common */
 #include "check.h"
 #include "xmalloc.h"
+#include "bsearchcheck.h"
 
 /* sp65 */
 #include "attr.h"
@@ -61,6 +63,7 @@ static const PaletteMapEntry PaletteMap[] = {
     {   "lynx-palette",         GenLynxPalette  },
 };
 
+BSEARCH_CHECK(PaletteMap, sizeof(PaletteMap) / sizeof(PaletteMap[0]), PaletteMap, .Format);
 
 
 /*****************************************************************************/

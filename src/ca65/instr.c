@@ -43,6 +43,7 @@
 #include "bitops.h"
 #include "check.h"
 #include "mmodel.h"
+#include "bsearchcheck.h"
 
 /* ca65 */
 #include "asserts.h"
@@ -230,6 +231,8 @@ static const struct {
     }
 };
 
+BSEARCH_CHECK(InsTab6502, InsTab6502.Count, InsTab6502.Ins, .Mnemonic);
+
 /* Instruction table for the 6502 with illegal instructions */
 static const struct {
     unsigned Count;
@@ -314,6 +317,8 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll }
     }
 };
+
+BSEARCH_CHECK(InsTab6502X, InsTab6502X.Count, InsTab6502X.Ins, .Mnemonic);
 
 /* Instruction table for the 6502 with DTV extra opcodes (DTV) and
 ** those illegal instructions (X) which are supported by DTV.
@@ -400,6 +405,8 @@ static const struct {
     }
 };
 
+BSEARCH_CHECK(InsTab6502DTV, InsTab6502DTV.Count, InsTab6502DTV.Ins, .Mnemonic);
+
 /* Instruction table for the 65SC02 */
 static const struct {
     unsigned Count;
@@ -475,6 +482,8 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll }
     }
 };
+
+BSEARCH_CHECK(InsTab65SC02, InsTab65SC02.Count, InsTab65SC02.Ins, .Mnemonic);
 
 /* Instruction table for the 65C02 */
 static const struct {
@@ -585,6 +594,8 @@ static const struct {
         { "WAI",  0x0000001, 0xcb, 0, PutAll }
     }
 };
+
+BSEARCH_CHECK(InsTab65C02, InsTab65C02.Count, InsTab65C02.Ins, .Mnemonic);
 
 /* Instruction table for the 4510 */
 static const struct {
@@ -729,6 +740,8 @@ static const struct {
     }
 };
 
+BSEARCH_CHECK(InsTab4510, InsTab4510.Count, InsTab4510.Ins, .Mnemonic);
+
 /* Instruction table for the 65816 */
 static const struct {
     unsigned Count;
@@ -839,6 +852,8 @@ static const struct {
     }
 };
 
+BSEARCH_CHECK(InsTab65816, InsTab65816.Count, InsTab65816.Ins, .Mnemonic);
+
 /* Instruction table for the SWEET16 pseudo CPU */
 static const struct {
     unsigned Count;
@@ -874,6 +889,8 @@ static const struct {
         { "SUB",  AMSW16_REG,              0xB0, 0, PutSweet16 },
     }
 };
+
+BSEARCH_CHECK(InsTabSweet16, InsTabSweet16.Count, InsTabSweet16.Ins, .Mnemonic);
 
 /* Instruction table for the HuC6280 (the CPU used in the PC engine) */
 static const struct {
@@ -1020,7 +1037,7 @@ static const struct {
     }
 };
 
-
+BSEARCH_CHECK(InsTabHuC6280, InsTabHuC6280.Count, InsTabHuC6280.Ins, .Mnemonic);
 
 /* An array with instruction tables */
 static const InsTable* InsTabs[CPU_COUNT] = {

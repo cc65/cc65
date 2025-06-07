@@ -48,6 +48,7 @@
 #include "fname.h"
 #include "tgttrans.h"
 #include "xmalloc.h"
+#include "bsearchcheck.h"
 
 /* ca65 */
 #include "condasm.h"
@@ -308,6 +309,7 @@ struct DotKeyword {
     { ".ZEROPAGE",      TOK_ZEROPAGE            },
 };
 
+BSEARCH_CHECK(DotKeywords, sizeof(DotKeywords) / sizeof(DotKeywords[0]), DotKeywords, .Key);
 
 
 /*****************************************************************************/

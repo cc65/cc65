@@ -33,6 +33,7 @@
 
 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,6 +41,7 @@
 #include "chartype.h"
 #include "check.h"
 #include "target.h"
+#include "bsearchcheck.h"
 
 
 
@@ -182,6 +184,8 @@ static const TargetEntry TargetMap[] = {
     {   "vic20",        TGT_VIC20        },
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
+
+BSEARCH_CHECK(TargetMap, MAP_ENTRY_COUNT, TargetMap, .Name);
 
 
 /* Table with target properties by target ID */

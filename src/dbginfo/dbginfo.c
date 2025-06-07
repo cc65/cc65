@@ -2523,64 +2523,65 @@ static void NextChar (InputData* D)
 
 
 
+static const struct KeywordEntry  {
+    const char      Keyword[12];
+    Token           Tok;
+} KeywordTable[] = {
+    { "abs",        TOK_ABSOLUTE    },
+    { "addrsize",   TOK_ADDRSIZE    },
+    { "auto",       TOK_AUTO        },
+    { "bank",       TOK_BANK        },
+    { "count",      TOK_COUNT       },
+    { "csym",       TOK_CSYM        },
+    { "def",        TOK_DEF         },
+    { "enum",       TOK_ENUM        },
+    { "equ",        TOK_EQUATE      },
+    { "exp",        TOK_EXPORT      },
+    { "ext",        TOK_EXTERN      },
+    { "file",       TOK_FILE        },
+    { "func",       TOK_FUNC        },
+    { "global",     TOK_GLOBAL      },
+    { "id",         TOK_ID          },
+    { "imp",        TOK_IMPORT      },
+    { "info",       TOK_INFO        },
+    { "lab",        TOK_LABEL       },
+    { "lib",        TOK_LIBRARY     },
+    { "line",       TOK_LINE        },
+    { "long",       TOK_LONG        },
+    { "major",      TOK_MAJOR       },
+    { "minor",      TOK_MINOR       },
+    { "mod",        TOK_MODULE      },
+    { "mtime",      TOK_MTIME       },
+    { "name",       TOK_NAME        },
+    { "offs",       TOK_OFFS        },
+    { "oname",      TOK_OUTPUTNAME  },
+    { "ooffs",      TOK_OUTPUTOFFS  },
+    { "parent",     TOK_PARENT      },
+    { "ref",        TOK_REF         },
+    { "reg",        TOK_REGISTER    },
+    { "ro",         TOK_RO          },
+    { "rw",         TOK_RW          },
+    { "sc",         TOK_SC          },
+    { "scope",      TOK_SCOPE       },
+    { "seg",        TOK_SEGMENT     },
+    { "size",       TOK_SIZE        },
+    { "span",       TOK_SPAN        },
+    { "start",      TOK_START       },
+    { "static",     TOK_STATIC      },
+    { "struct",     TOK_STRUCT      },
+    { "sym",        TOK_SYM         },
+    { "type",       TOK_TYPE        },
+    { "val",        TOK_VALUE       },
+    { "var",        TOK_VAR         },
+    { "version",    TOK_VERSION     },
+    { "zp",         TOK_ZEROPAGE    },
+};
+
+BSEARCH_CHECK(KeywordTable, sizeof(KeywordTable) / sizeof(KeywordTable[0]), KeywordTable, .Keyword);
+
 static void NextToken (InputData* D)
 /* Read the next token from the input stream */
 {
-    static const struct KeywordEntry  {
-        const char      Keyword[12];
-        Token           Tok;
-    } KeywordTable[] = {
-        { "abs",        TOK_ABSOLUTE    },
-        { "addrsize",   TOK_ADDRSIZE    },
-        { "auto",       TOK_AUTO        },
-        { "bank",       TOK_BANK        },
-        { "count",      TOK_COUNT       },
-        { "csym",       TOK_CSYM        },
-        { "def",        TOK_DEF         },
-        { "enum",       TOK_ENUM        },
-        { "equ",        TOK_EQUATE      },
-        { "exp",        TOK_EXPORT      },
-        { "ext",        TOK_EXTERN      },
-        { "file",       TOK_FILE        },
-        { "func",       TOK_FUNC        },
-        { "global",     TOK_GLOBAL      },
-        { "id",         TOK_ID          },
-        { "imp",        TOK_IMPORT      },
-        { "info",       TOK_INFO        },
-        { "lab",        TOK_LABEL       },
-        { "lib",        TOK_LIBRARY     },
-        { "line",       TOK_LINE        },
-        { "long",       TOK_LONG        },
-        { "major",      TOK_MAJOR       },
-        { "minor",      TOK_MINOR       },
-        { "mod",        TOK_MODULE      },
-        { "mtime",      TOK_MTIME       },
-        { "name",       TOK_NAME        },
-        { "offs",       TOK_OFFS        },
-        { "oname",      TOK_OUTPUTNAME  },
-        { "ooffs",      TOK_OUTPUTOFFS  },
-        { "parent",     TOK_PARENT      },
-        { "ref",        TOK_REF         },
-        { "reg",        TOK_REGISTER    },
-        { "ro",         TOK_RO          },
-        { "rw",         TOK_RW          },
-        { "sc",         TOK_SC          },
-        { "scope",      TOK_SCOPE       },
-        { "seg",        TOK_SEGMENT     },
-        { "size",       TOK_SIZE        },
-        { "span",       TOK_SPAN        },
-        { "start",      TOK_START       },
-        { "static",     TOK_STATIC      },
-        { "struct",     TOK_STRUCT      },
-        { "sym",        TOK_SYM         },
-        { "type",       TOK_TYPE        },
-        { "val",        TOK_VALUE       },
-        { "var",        TOK_VAR         },
-        { "version",    TOK_VERSION     },
-        { "zp",         TOK_ZEROPAGE    },
-    };
-
-
     /* Skip whitespace */
     while (D->C == ' ' || D->C == '\t' || D->C == '\r') {
         NextChar (D);

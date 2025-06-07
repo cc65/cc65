@@ -33,11 +33,13 @@
 
 
 
+#include <stdio.h>
 #include <stdlib.h>
 
 /* common */
 #include "chartype.h"
 #include "xmalloc.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "codeinfo.h"
@@ -1226,6 +1228,16 @@ static int CmpHarmless (const void* Key, const void* Entry)
 
 
 
+/* there is absolutely no reason to bsearch a table with
+** one entry.  whoever did this should be taken out back
+** behind the wood shed.
+*/
+static const char* const Tab[] = {
+    "_abs",
+};
+
+BSEARCH_CHECK(Tab, sizeof(Tab) / sizeof(Tab[0]), Tab, );
+
 int HarmlessCall (const CodeEntry* E, int PushedBytes)
 /* Check if this is a call to a harmless subroutine that will not interrupt
 ** the pushax/op sequence when encountered.
@@ -1252,16 +1264,12 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes)
         }
         return 1;
     } else {
-        static const char* const Tab[] = {
-            "_abs",
-        };
-
         void* R = bsearch (E->Arg,
                             Tab,
                             sizeof (Tab) / sizeof (Tab[0]),
                             sizeof (Tab[0]),
                             CmpHarmless);
-        return (R != 0);
+        return (R != NULL); 
     }
 }
 

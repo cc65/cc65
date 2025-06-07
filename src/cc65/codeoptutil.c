@@ -1269,7 +1269,7 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes)
                             sizeof (Tab) / sizeof (Tab[0]),
                             sizeof (Tab[0]),
                             CmpHarmless);
-        return (R != NULL); 
+        return (R != NULL);
     }
 }
 

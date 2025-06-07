@@ -668,14 +668,23 @@ const Type* ArithmeticConvert (const Type* lhst, const Type* rhst)
     ** of the result. This pattern is called the usual arithmetic conversions.
     */
 
+    if (IsTypeFloat (lhst) && IsTypeFloat (rhst)) {
+        /* FIXME: float - this needs much more special handling */
+        return type_float;
+    }
+    if (IsTypeFloat (lhst)) {
+        /* FIXME: float - this needs much more special handling */
+        return type_float;
+    }
+    if (IsTypeFloat (rhst)) {
+        /* FIXME: float - this needs much more special handling */
+        return type_float;
+    }
+
     /* There are additional rules for floating point types that we don't bother with, since
     ** floating point types are not (yet) supported.
     ** The integral promotions are performed on both operands.
     */
-    if (IsClassFloat(lhst) || IsClassFloat(rhst)) {
-        Error ("Floating point arithmetic not supported.");
-        return type_long;
-    }
     lhst = IntPromotion (lhst);
     rhst = IntPromotion (rhst);
 

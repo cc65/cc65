@@ -5,17 +5,16 @@
 ;
 
 
-	.export		_textcolor
-	.include	"agat.inc"
+    .export     _textcolor
+    .include    "agat.inc"
 
 
 _textcolor:
-	ldx	TATTR
-	eor	TATTR
-	and	#$07
-	eor	TATTR
-	sta	TATTR
-	txa
-	and	#$0F
-	rts
-
+    ldx    TATTR
+    eor    TATTR
+    and    #$07
+    eor    TATTR
+    sta    TATTR
+    txa
+    and    #$0F
+    rts

@@ -5,14 +5,12 @@
 ; void __fastcall__ gotoy (unsigned char y);
 ;
 
-	.import		VTABZ
-	.export		_gotoy
-	.include	"agat.inc"
+    .import     VTABZ
+    .export     _gotoy
+    .include    "agat.inc"
 
 _gotoy:
-	clc
-	adc	WNDTOP
-	sta	CV
-	jmp	VTABZ
-
-
+    clc
+    adc    WNDTOP
+    sta    CV
+    jmp    VTABZ

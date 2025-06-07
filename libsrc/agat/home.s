@@ -10,6 +10,6 @@
         .include        "agat.inc"
 
 HOME:
-	lda	#$8C
-	jsr	COUT
-	rts
+    lda    #$8C
+    jsr    COUT
+    rts

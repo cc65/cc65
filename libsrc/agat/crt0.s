@@ -14,61 +14,61 @@
 
 ; ------------------------------------------------------------------------
 
-	.segment        "STARTUP"
-	jsr	init
-	jsr	zerobss
-	jsr	callmain
-_exit:	ldx	#<exit
-	lda	#>exit
-	jsr	reset
-	jsr	donelib
-exit:	ldx	#$02
-:	lda	rvsave,x
-	sta	SOFTEV,x
-	dex
-	bpl	:-
-	ldx	#zpspace-1
-:	lda	zpsave,x
-	sta	sp,x
-	dex
-	bpl	:-
-	ldx	#$FF
-	txs
-	jmp	DOSWARM
+    .segment        "STARTUP"
+    jsr    init
+    jsr    zerobss
+    jsr    callmain
+_exit:    ldx    #<exit
+    lda    #>exit
+    jsr    reset
+    jsr    donelib
+exit:    ldx    #$02
+:   lda    rvsave,x
+    sta    SOFTEV,x
+    dex
+    bpl    :-
+    ldx    #zpspace-1
+:   lda    zpsave,x
+    sta    sp,x
+    dex
+    bpl    :-
+    ldx    #$FF
+    txs
+    jmp    DOSWARM
 
 
 
-	.segment	"ONCE"
+    .segment    "ONCE"
 
-init:	ldx	#zpspace-1
-:	lda	sp,x
-	sta	zpsave,x
-	dex
-	bpl	:-
+init:    ldx    #zpspace-1
+:   lda    sp,x
+    sta    zpsave,x
+    dex
+    bpl    :-
 
-	ldx	#$02
-:	lda	SOFTEV,x
-	sta	rvsave,x
-	dex
-	bpl	:-
+    ldx    #$02
+:   lda    SOFTEV,x
+    sta    rvsave,x
+    dex
+    bpl    :-
 
-	lda	HIMEM
-	ldx	HIMEM+1
-	sta	sp
-	stx	sp+1
-	ldx	#<_exit
-	lda	#>_exit
-	jsr	reset
-	jmp	initlib
+    lda    HIMEM
+    ldx    HIMEM+1
+    sta    sp
+    stx    sp+1
+    ldx    #<_exit
+    lda    #>_exit
+    jsr    reset
+    jmp    initlib
 
-	.code
+    .code
 
-reset:	stx	SOFTEV
-	sta	SOFTEV+1
-	eor	#$A5
-	sta	PWREDUP
-	rts
+reset:    stx    SOFTEV
+    sta    SOFTEV+1
+    eor    #$A5
+    sta    PWREDUP
+    rts
 
-	.segment	"INIT"
-zpsave:	.res	zpspace
-rvsave:	.res	3
+    .segment    "INIT"
+zpsave:    .res    zpspace
+rvsave:    .res    3

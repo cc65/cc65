@@ -40,6 +40,7 @@
 /* common */
 #include "check.h"
 #include "cpu.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "codeinfo.h"
@@ -588,6 +589,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
     },
 };
 
+BSEARCH_CHECK(OPCTable, sizeof(OPCTable) / sizeof(OPCTable[0]), OPCTable, .Mnemo);
 
 
 /*****************************************************************************/

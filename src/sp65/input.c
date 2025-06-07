@@ -33,10 +33,12 @@
 
 
 
+#include <stdio.h>
 #include <stdlib.h>
 
 /* common */
 #include "fileid.h"
+#include "bsearchcheck.h"
 
 /* sp65 */
 #include "attr.h"
@@ -77,6 +79,7 @@ static const FileId FormatTable[] = {
     {   "pcx",  ifPCX           },
 };
 
+BSEARCH_CHECK(FormatTable, sizeof(FormatTable) / sizeof(FormatTable[0]), FormatTable, .Ext);
 
 
 /*****************************************************************************/

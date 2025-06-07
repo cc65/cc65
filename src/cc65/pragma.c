@@ -42,6 +42,7 @@
 #include "segnames.h"
 #include "tgttrans.h"
 #include "xmalloc.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "codegen.h"
@@ -129,6 +130,8 @@ static const struct Pragma {
     { "zpsym",                  PRAGMA_ZPSYM              },
 };
 #define PRAGMA_COUNT    (sizeof (Pragmas) / sizeof (Pragmas[0]))
+
+BSEARCH_CHECK(Pragmas, PRAGMA_COUNT, Pragmas, .Key);
 
 /* Result of ParsePushPop */
 typedef enum {

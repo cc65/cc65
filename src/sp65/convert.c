@@ -33,7 +33,11 @@
 
 
 
+#include <stdio.h>
 #include <stdlib.h>
+
+/* common */
+#include "bsearchcheck.h"
 
 /* sp65 */
 #include "attr.h"
@@ -71,6 +75,7 @@ static const ConverterMapEntry ConverterMap[] = {
     {   "vic2-sprite",          GenVic2Sprite   },
 };
 
+BSEARCH_CHECK(ConverterMap, sizeof(ConverterMap) / sizeof(ConverterMap[0]), ConverterMap, .Format);
 
 
 /*****************************************************************************/

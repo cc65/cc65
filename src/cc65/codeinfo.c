@@ -40,6 +40,7 @@
 #include "chartype.h"
 #include "coll.h"
 #include "debugflag.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -190,12 +191,12 @@ static const FuncInfo FuncInfoTable[] = {
     { "ldeaxysp",   SLV_IND | REG_Y,        PSTATE_ALL | REG_EAXY                   },
     { "leaa0sp",    REG_SP | REG_A,         PSTATE_ALL | REG_AX                     },
     { "leaaxsp",    REG_SP | REG_AX,        PSTATE_ALL | REG_AX                     },
-    { "leave00",    REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
-    { "leave0",     REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
     { "leave",      REG_SP,                 PSTATE_ALL | REG_SP | REG_Y             },
-    { "leavey00",   REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
-    { "leavey0",    REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leave0",     REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leave00",    REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
     { "leavey",     REG_SP | REG_Y,         PSTATE_ALL | REG_SP | REG_Y             },
+    { "leavey0",    REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leavey00",   REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
     { "lsubeq",     REG_EAXY | REG_PTR1_LO, PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
     { "lsubeq0sp",  SLV_TOP | REG_EAX,      PSTATE_ALL | REG_EAXY                   },
     { "lsubeq1",    REG_Y | REG_PTR1_LO,    PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
@@ -379,6 +380,8 @@ static const FuncInfo FuncInfoTable[] = {
 };
 #define FuncInfoCount   (sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
+BSEARCH_CHECK(FuncInfoTable, FuncInfoCount, FuncInfoTable, .Name);
+
 /* Table with names of zero page locations used by the compiler */
 static const ZPInfo ZPInfoTable[] = {
     {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
@@ -401,7 +404,7 @@ static const ZPInfo ZPInfoTable[] = {
 };
 #define ZPInfoCount     (sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 
-
+BSEARCH_CHECK(ZPInfoTable, ZPInfoCount, ZPInfoTable, .Name);
 
 /*****************************************************************************/
 /*                                   Code                                    */

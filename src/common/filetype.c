@@ -33,12 +33,14 @@
 
 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 /* common */
 #include "fileid.h"
 #include "filetype.h"
+#include "bsearchcheck.h"
 
 
 
@@ -85,6 +87,7 @@ static const FileId TypeTable[] = {
 
 #define FILETYPE_COUNT (sizeof (TypeTable) / sizeof (TypeTable[0]))
 
+BSEARCH_CHECK(TypeTable, FILETYPE_COUNT, TypeTable, .Ext);
 
 
 /*****************************************************************************/

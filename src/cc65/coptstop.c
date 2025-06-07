@@ -37,6 +37,7 @@
 
 /* common */
 #include "chartype.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -1461,6 +1462,7 @@ static unsigned Opt_a_tosxor (StackOpData* D)
 /*****************************************************************************/
 
 
+#define FUNC_COUNT(Table) (sizeof(Table) / sizeof(Table[0]))
 
 /* The first column of these two tables must be sorted in lexical order */
 
@@ -1487,6 +1489,8 @@ static const OptFuncDesc FuncTable[] = {
     { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                                   },
 };
 
+BSEARCH_CHECK(FuncTable, FUNC_COUNT(FuncTable), FuncTable, .Name);
+
 static const OptFuncDesc FuncRegATable[] = {
     { "tosandax",   Opt_a_tosand,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "toseqax",    Opt_a_toseq,   REG_NONE, OP_NONE                                   },
@@ -1505,8 +1509,7 @@ static const OptFuncDesc FuncRegATable[] = {
     { "tosxorax",   Opt_a_tosxor,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
 };
 
-#define FUNC_COUNT(Table) (sizeof(Table) / sizeof(Table[0]))
-
+BSEARCH_CHECK(FuncRegATable, FUNC_COUNT(FuncRegATable), FuncRegATable, .Name);
 
 
 static int CmpFunc (const void* Key, const void* Func)

@@ -39,6 +39,7 @@
 /* common */
 #include "attrib.h"
 #include "check.h"
+#include "bsearchcheck.h"
 
 /* cc65 */
 #include "asmcode.h"
@@ -93,6 +94,8 @@ static struct StdFuncDesc {
 
 };
 #define FUNC_COUNT      (sizeof (StdFuncs) / sizeof (StdFuncs[0]))
+
+BSEARCH_CHECK(StdFuncs, FUNC_COUNT, StdFuncs, .Name);
 
 typedef struct ArgDesc ArgDesc;
 struct ArgDesc {

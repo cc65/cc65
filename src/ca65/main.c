@@ -353,7 +353,7 @@ static void SetSys (const char* Sys)
         case TGT_AGAT:
             NewSymbol ("__AGAT__", 1);
             break;
-            
+
         default:
             AbEnd ("Invalid target name: '%s'", Sys);
 

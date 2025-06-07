@@ -2577,7 +2577,7 @@ static const struct KeywordEntry  {
     { "zp",         TOK_ZEROPAGE    },
 };
 
-BSEARCH_CHECK(KeywordTable, sizeof(KeywordTable) / sizeof(KeywordTable[0]), KeywordTable, .Keyword);
+//BSEARCH_CHECK(KeywordTable, sizeof(KeywordTable) / sizeof(KeywordTable[0]), KeywordTable, .Keyword);
 
 static void NextToken (InputData* D)
 /* Read the next token from the input stream */

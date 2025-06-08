@@ -9,7 +9,7 @@
         .export         __randomize
         .import         _srand
 
-        .include        "apple2.inc"
+        .include        "agat.inc"
 
 __randomize:
         ldx     RNDH            ; Use random value supplied by ROM

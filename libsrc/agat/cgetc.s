@@ -13,7 +13,8 @@ _cgetc:
     bit    cursor
     bne    hascur
     lda    #$00
-hascur:    sta    CURSOR
+hascur:
+    sta    CURSOR
     jsr    j1
     cmp    #$A0
     bpl    :+

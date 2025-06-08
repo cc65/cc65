@@ -11,7 +11,8 @@
 _cclear:
     sta    ptr1
     lda    #$A0
-next:    jsr COUT
+next:
+    jsr    COUT
     dec    ptr1
     bne    next
     rts

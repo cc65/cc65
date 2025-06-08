@@ -18,11 +18,13 @@
     jsr    init
     jsr    zerobss
     jsr    callmain
-_exit:    ldx    #<exit
+_exit:
+    ldx    #<exit
     lda    #>exit
     jsr    reset
     jsr    donelib
-exit:    ldx    #$02
+exit:
+    ldx    #$02
 :   lda    rvsave,x
     sta    SOFTEV,x
     dex
@@ -40,7 +42,8 @@ exit:    ldx    #$02
 
     .segment    "ONCE"
 
-init:    ldx    #zpspace-1
+init:
+    ldx    #zpspace-1
 :   lda    sp,x
     sta    zpsave,x
     dex
@@ -63,7 +66,8 @@ init:    ldx    #zpspace-1
 
     .code
 
-reset:    stx    SOFTEV
+reset:
+    stx    SOFTEV
     sta    SOFTEV+1
     eor    #$A5
     sta    PWREDUP

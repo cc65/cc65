@@ -20,7 +20,8 @@ _cputc:
     ldy    #$00
     sty    CH
     rts
-notleft:cmp    #$0A
+notleft:
+    cmp    #$0A
     beq    newline
 putchar:
     ldy    CH
@@ -30,16 +31,19 @@ putchar:
     bmi    wch
     sta    (BASL),Y
     iny
-wch:sty    CH
+wch:
+    sty    CH
     cpy    WNDWDTH
     bcc    noend
     ldy    #$00
     sty    CH
-newline:inc    CV
+newline:
+    inc    CV
     lda    CV
     cmp    WNDBTM
     bcc    :+
     lda    WNDTOP
     sta    CV
 :   jmp    VTABZ
-noend:    rts
+noend:
+    rts

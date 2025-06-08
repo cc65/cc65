@@ -15,6 +15,7 @@ PROGS = ar65     \
         cl65     \
         co65     \
         da65     \
+        dbginfo  \
         grc65    \
         ld65     \
         od65     \

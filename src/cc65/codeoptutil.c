@@ -1232,14 +1232,6 @@ static const char* const Tab[] = {
     "_abs",
 };
 
-/* there is absolutely no reason to bsearch a table with
-** one entry.  whoever did this should be taken out back
-** behind the wood shed.
-*/
-static const char* const Tab[] = {
-    "_abs",
-};
-
 BSEARCH_CHECK(Tab, sizeof(Tab) / sizeof(Tab[0]), Tab, );
 
 int HarmlessCall (const CodeEntry* E, int PushedBytes)

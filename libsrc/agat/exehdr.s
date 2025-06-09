@@ -4,6 +4,9 @@
 ; This module supplies an AppleSingle version 2 file header + entry with
 ; ID 11 according to https://tools.ietf.org/rfc/rfc1740.txt Appendix A.
 ;
+; Agat target uses this header only for compatibility with Apple Commander
+; because Agat's 140K disk filesystem is identical to Apple II DOS 3.3 and
+; "ac.jar -as" option can be used to import binaries into disk images.
 
         .export         __EXEHDR__ : absolute = 1       ; Linker referenced
         .import         __FILETYPE__                    ; Linker generated

@@ -2523,6 +2523,7 @@ static void NextChar (InputData* D)
 
 
 
+/* CAUTION: table must be sorted for bsearch */
 static const struct KeywordEntry  {
     const char      Keyword[12];
     Token           Tok;

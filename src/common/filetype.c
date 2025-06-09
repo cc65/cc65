@@ -50,6 +50,7 @@
 
 
 
+/* CAUTION: table must be sorted for bsearch */
 static const FileId TypeTable[] = {
     /* Upper case stuff for obsolete operating systems */
     {   "A",    FILETYPE_LIB    },

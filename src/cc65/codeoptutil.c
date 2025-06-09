@@ -1227,11 +1227,7 @@ static int CmpHarmless (const void* Key, const void* Entry)
 }
 
 
-
-/* there is absolutely no reason to bsearch a table with
-** one entry.  whoever did this should be taken out back
-** behind the wood shed.
-*/
+/* CAUTION: table must be sorted for bsearch */
 static const char* const Tab[] = {
     "_abs",
 };

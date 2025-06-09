@@ -5,14 +5,18 @@ endif
 
 ifdef CMD_EXE
 
-.PHONY: checkstyle
+.PHONY: checkstyle sorted
 
 checkstyle:
 	$(info INFO: style checks require bash.)
+sorted:
+	$(info INFO: table checks require bash.)
 
 else
 
-.PHONY: checkstyle lineendings tabs lastline spaces noexec
+.PHONY: checkstyle lineendings tabs lastline spaces noexec sorted
+
+all: checkstyle sorted
 
 checkstyle: lineendings tabs lastline spaces noexec
 
@@ -30,5 +34,9 @@ spaces: spaces.sh
 
 noexec: noexec.sh
 	@./noexec.sh
+
+sorted: sorted.sh sorted_codeopt.sh
+	@./sorted.sh
+	@./sorted_codeopt.sh
 
 endif

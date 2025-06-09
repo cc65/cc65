@@ -82,19 +82,20 @@ static OutputFormatDesc OutputFormatTable[ofCount] = {
 /* CAUTION: table must be alphabetically sorted for bsearch */
 static const FileId FormatTable[] = {
     /* Upper case stuff for obsolete operating systems */
+/* BEGIN SORTED.SH */
     {   "A",    ofAsm           },
     {   "ASM",  ofAsm           },
     {   "BIN",  ofBin           },
     {   "C",    ofC             },
     {   "INC",  ofAsm           },
     {   "S",    ofAsm           },
-
     {   "a",    ofAsm           },
     {   "asm",  ofAsm           },
     {   "bin",  ofBin           },
     {   "c",    ofC             },
     {   "inc",  ofAsm           },
     {   "s",    ofAsm           },
+/* END SORTED.SH */
 };
 
 

@@ -1227,7 +1227,9 @@ static int CmpHarmless (const void* Key, const void* Entry)
 
 /* CAUTION: table must be sorted for bsearch */
 static const char* const Tab[] = {
+/* BEGIN SORTED.SH */
     "_abs",
+/* END SORTED.SH */
 };
 
 int HarmlessCall (const CodeEntry* E, int PushedBytes)

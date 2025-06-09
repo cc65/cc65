@@ -35,8 +35,9 @@ spaces: spaces.sh
 noexec: noexec.sh
 	@./noexec.sh
 
-sorted: sorted.sh sorted_codeopt.sh
+sorted: sorted.sh sorted_codeopt.sh sorted_opcodes.sh
 	@./sorted.sh
 	@./sorted_codeopt.sh
+	@./sorted_opcodes.sh
 
 endif

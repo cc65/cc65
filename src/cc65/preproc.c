@@ -221,6 +221,7 @@ static const struct PPDType {
     const char*     Tok;        /* Token */
     ppdirective_t   Type;       /* Type */
 } PPDTypes[] = {
+/* BEGIN SORTED.SH */
     {   "define",       PPD_DEFINE      },
     {   "elif",         PPD_ELIF        },
     {   "else",         PPD_ELSE        },
@@ -234,6 +235,7 @@ static const struct PPDType {
     {   "pragma",       PPD_PRAGMA      },
     {   "undef",        PPD_UNDEF       },
     {   "warning",      PPD_WARNING     },
+/* END SORTED.SH */
 };
 
 /* Number of preprocessor directive types */

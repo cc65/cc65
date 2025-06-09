@@ -143,6 +143,7 @@ struct TargetEntry {
 ** CAUTION: must be alphabetically for bsearch().
 */
 static const TargetEntry TargetMap[] = {
+/* BEGIN SORTED.SH */
     {   "apple2",       TGT_APPLE2       },
     {   "apple2enh",    TGT_APPLE2ENH    },
     {   "atari",        TGT_ATARI        },
@@ -181,6 +182,7 @@ static const TargetEntry TargetMap[] = {
     {   "sym1",         TGT_SYM1         },
     {   "telestrat",    TGT_TELESTRAT    },
     {   "vic20",        TGT_VIC20        },
+/* END SORTED.SH */
 };
 #define MAP_ENTRY_COUNT         (sizeof (TargetMap) / sizeof (TargetMap[0]))
 

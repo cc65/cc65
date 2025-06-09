@@ -87,6 +87,7 @@ enum {
 };
 
 /* Token table */
+/* CAUTION: table must be sorted for bsearch */
 static const struct Keyword {
     char*           Key;        /* Keyword name */
     unsigned char   Tok;        /* The token */

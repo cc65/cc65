@@ -4,8 +4,9 @@ SCRIPT_PATH=`dirname $0`
 
 CHECK_DIR=../../src
 
-SORT_OPT=-u
+SORT_OPT="-u -c"
 
+# $1: filename
 function checkarray_quoted_name
 {
     CHECK_FILE="$1"
@@ -23,17 +24,14 @@ function checkarray_quoted_name
         exit -1
     fi
 
-    LC_COLLATE=C sort $SORT_OPT .a.tmp > .b.tmp
-
-    if cmp --silent -- .a.tmp .b.tmp; then
+    if `LC_COLLATE=C sort $SORT_OPT .a.tmp`; then
         echo ""$1" tables OK"
     else
         echo "error: "$1" tables are not sorted."
-        diff -y .a.tmp .b.tmp
-        rm -rf .a.tmp .b.tmp
+        rm -rf .a.tmp
         exit -1
     fi
-    rm -rf .a.tmp .b.tmp
+    rm -rf .a.tmp
 }
 
 for N in `grep -rl "BEGIN SORTED_OPCODES.SH" "$CHECK_DIR"`; do

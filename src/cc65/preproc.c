@@ -216,6 +216,7 @@ typedef enum {
 
 
 /* Preprocessor directive tokens mapping table */
+/* CAUTION: table must be sorted for bsearch */
 static const struct PPDType {
     const char*     Tok;        /* Token */
     ppdirective_t   Type;       /* Type */

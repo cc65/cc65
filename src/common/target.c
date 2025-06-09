@@ -140,8 +140,9 @@ struct TargetEntry {
     target_t    Id;                     /* Target ID */
 };
 
-/* Table that maps target names to IDs. Sorted alphabetically for bsearch().
+/* Table that maps target names to IDs.
 ** Allows multiple entries for one target ID (target name aliases).
+** CAUTION: must be alphabetically for bsearch().
 */
 static const TargetEntry TargetMap[] = {
     {   "apple2",       TGT_APPLE2       },

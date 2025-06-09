@@ -91,6 +91,7 @@ struct FuncInfo {
 ** routines are marked to use only the A register. The remainder is ignored
 ** anyway.
 */
+/* CAUTION: table must be sorted for bsearch */
 static const FuncInfo FuncInfoTable[] = {
     { "addeq0sp",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_AXY                        },
     { "addeqysp",   SLV_IND | REG_AXY,  PSTATE_ALL | REG_AXY                        },
@@ -383,6 +384,7 @@ static const FuncInfo FuncInfoTable[] = {
 BSEARCH_CHECK(FuncInfoTable, FuncInfoCount, FuncInfoTable, .Name);
 
 /* Table with names of zero page locations used by the compiler */
+/* CAUTION: table must be sorted for bsearch */
 static const ZPInfo ZPInfoTable[] = {
     {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
     {   0, "ptr1+1",    1,  REG_PTR1_HI,    REG_PTR1    },

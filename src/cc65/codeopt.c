@@ -103,6 +103,7 @@ struct OptFunc {
 
 
 /* A list of all the function descriptions */
+/* CAUTION: should be sorted by "name" */
 static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Ind     = { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Stores  = { Opt65C02Stores,  "Opt65C02Stores",  100, 0, 0, 0, 0, 0 };
@@ -153,18 +154,13 @@ static OptFunc DOptJumpTarget3  = { OptJumpTarget3,  "OptJumpTarget3",  100, 0, 
 static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad2        = { OptLoad2,        "OptLoad2",        200, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad3        = { OptLoad3,        "OptLoad3",          0, 0, 0, 0, 0, 0 };
+static OptFunc DOptLoadStoreLoad= { OptLoadStoreLoad,"OptLoadStoreLoad",  0, 0, 0, 0, 0, 0 };
 static OptFunc DOptLongAssign   = { OptLongAssign,   "OptLongAssign",   100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLongCopy     = { OptLongCopy,     "OptLongCopy",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX1       = { OptNegAX1,       "OptNegAX1",       165, 0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX2       = { OptNegAX2,       "OptNegAX2",       200, 0, 0, 0, 0, 0 };
 static OptFunc DOptPrecalc      = { OptPrecalc,      "OptPrecalc",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad1     = { OptPtrLoad1,     "OptPtrLoad1",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad2     = { OptPtrLoad2,     "OptPtrLoad2",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad3     = { OptPtrLoad3,     "OptPtrLoad3",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad4     = { OptPtrLoad4,     "OptPtrLoad4",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad5     = { OptPtrLoad5,     "OptPtrLoad5",      50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad6     = { OptPtrLoad6,     "OptPtrLoad6",      60, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad7     = { OptPtrLoad7,     "OptPtrLoad7",     140, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad11    = { OptPtrLoad11,    "OptPtrLoad11",     92, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad12    = { OptPtrLoad12,    "OptPtrLoad12",     50, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad13    = { OptPtrLoad13,    "OptPtrLoad13",     65, 0, 0, 0, 0, 0 };
@@ -174,6 +170,12 @@ static OptFunc DOptPtrLoad16    = { OptPtrLoad16,    "OptPtrLoad16",    100, 0, 
 static OptFunc DOptPtrLoad17    = { OptPtrLoad17,    "OptPtrLoad17",    190, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad18    = { OptPtrLoad18,    "OptPtrLoad18",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad19    = { OptPtrLoad19,    "OptPtrLoad19",     65, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad2     = { OptPtrLoad2,     "OptPtrLoad2",     100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad3     = { OptPtrLoad3,     "OptPtrLoad3",     100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad4     = { OptPtrLoad4,     "OptPtrLoad4",     100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad5     = { OptPtrLoad5,     "OptPtrLoad5",      50, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad6     = { OptPtrLoad6,     "OptPtrLoad6",      60, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad7     = { OptPtrLoad7,     "OptPtrLoad7",     140, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1    = { OptPtrStore1,    "OptPtrStore1",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2    = { OptPtrStore2,    "OptPtrStore2",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore3    = { OptPtrStore3,    "OptPtrStore3",    100, 0, 0, 0, 0, 0 };
@@ -203,7 +205,6 @@ static OptFunc DOptStore3       = { OptStore3,       "OptStore3",       120, 0, 
 static OptFunc DOptStore4       = { OptStore4,       "OptStore4",        50, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore5       = { OptStore5,       "OptStore5",       100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStoreLoad    = { OptStoreLoad,    "OptStoreLoad",      0, 0, 0, 0, 0, 0 };
-static OptFunc DOptLoadStoreLoad= { OptLoadStoreLoad,"OptLoadStoreLoad",  0, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub1         = { OptSub1,         "OptSub1",         100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub2         = { OptSub2,         "OptSub2",         100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub3         = { OptSub3,         "OptSub3",         100, 0, 0, 0, 0, 0 };
@@ -218,6 +219,7 @@ static OptFunc DOptUnusedStores = { OptUnusedStores, "OptUnusedStores",   0, 0, 
 
 
 /* Table containing all the steps in alphabetical order */
+/* CAUTION: table must be sorted for bsearch */
 static OptFunc* OptFuncs[] = {
     &DOpt65C02BitOps,
     &DOpt65C02Ind,

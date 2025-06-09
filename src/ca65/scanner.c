@@ -132,6 +132,7 @@ static int         C            = 0;    /* Current input character */
 int               ForcedEnd     = 0;
 
 /* List of dot keywords with the corresponding tokens */
+/* CAUTION: table must be sorted for bsearch */
 struct DotKeyword {
     const char* Key;                    /* MUST be first field */
     token_t     Tok;

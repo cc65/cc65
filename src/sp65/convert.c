@@ -65,7 +65,8 @@ struct ConverterMapEntry {
     StrBuf*             (*ConvertFunc) (const Bitmap*, const Collection*);
 };
 
-/* Converter table, alphabetically sorted */
+/* Converter table */
+/* CAUTION: table must be alphabetically sorted for bsearch */
 static const ConverterMapEntry ConverterMap[] = {
     {   "geos-bitmap",          GenGeosBitmap   },
     {   "geos-icon",            GenGeosIcon     },

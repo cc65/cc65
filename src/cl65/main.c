@@ -122,6 +122,11 @@ static int DoAssemble   = 1;
 /* The name of the output file, NULL if none given */
 static const char* OutputName = 0;
 
+/* The path part of the output file, NULL if none given
+** or the OutputName is just a filename with no path
+** information. */
+static char *OutputDirectory = 0;
+
 /* The name of the linker configuration file if given */
 static const char* LinkerConfig = 0;
 
@@ -555,7 +560,7 @@ static void AssembleFile (const char* File, const char* TmpFile, unsigned ArgCou
         if (TmpFile) {
             ObjName = MakeFilename (TmpFile, ".o");
         } else {
-            ObjName = MakeTmpFilename (".o");
+            ObjName = MakeTmpFilename (OutputDirectory, File, ".o");
         }
         CmdSetOutput (&CA65, ObjName);
         CmdAddFile (&LD65, ObjName);
@@ -684,7 +689,7 @@ static void Compile (const char* File)
 
     if (DoAssemble) {
         /* set a temporary output file name */
-        TmpFile = MakeTmpFilename(".s");
+        TmpFile = MakeTmpFilename(OutputDirectory, File, ".s");
         CmdSetOutput (&CC65, TmpFile);
     }
 
@@ -729,7 +734,7 @@ static void CompileRes (const char* File)
     ** BEFORE adding the file
     */
     if (DoAssemble && DoLink) {
-        AsmName = MakeTmpFilename(".s");
+        AsmName = MakeTmpFilename(OutputDirectory, File, ".s");
         CmdSetAsmOutput(&GRC, AsmName);
     }
 
@@ -1623,6 +1628,7 @@ int main (int argc, char* argv [])
                 case 'o':
                     /* Name the output file */
                     OutputName = GetArg (&I, 2);
+                    OutputDirectory = GetFileDirectory(OutputName);
                     break;
 
                 case 'r':
@@ -1713,6 +1719,9 @@ int main (int argc, char* argv [])
     }
 
     RemoveTempFiles ();
+    if (OutputDirectory != NULL) {
+      xfree(OutputDirectory);
+    }
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

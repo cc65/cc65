@@ -129,8 +129,8 @@ void AddMacroParam (Macro* M, const char* Param);
 int MacroCmp (const Macro* M1, const Macro* M2);
 /* Compare two macros and return zero if both are identical. */
 
-void PrintMacroStats (FILE* F);
-/* Print macro statistics to the given text file. */
+void PrintMacroDetails (FILE* F);
+/* Print macro details to the given text file. */
 
 
 

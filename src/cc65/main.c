@@ -317,6 +317,64 @@ static void SetSys (const char* Sys)
 
 
 
+static void SetCpuMacros (void)
+/* Defines for CPU */
+{
+    switch (CPU) {
+
+        case CPU_NONE:
+            DefineNumericMacro ("__CPU_NONE__", 1);
+            break;
+
+        case CPU_6502:
+            DefineNumericMacro ("__CPU_6502__", 1);
+            break;
+
+        case CPU_6502X:
+            DefineNumericMacro ("__CPU_6502X__", 1);
+            break;
+
+        case CPU_6502DTV:
+            DefineNumericMacro ("__CPU_6502DTV__", 1);
+            break;
+
+        case CPU_65SC02:
+            DefineNumericMacro ("__CPU_65SC02__", 1);
+            break;
+
+        case CPU_65C02:
+            DefineNumericMacro ("__CPU_65C02__", 1);
+            break;
+
+        case CPU_65816:
+            DefineNumericMacro ("__CPU_65816__", 1);
+            break;
+
+        case CPU_SWEET16:
+            DefineNumericMacro ("__CPU_SWEET16__", 1);
+            break;
+
+        case CPU_HUC6280:
+            DefineNumericMacro ("__CPU_HUC6280__", 1);
+            break;
+
+        case CPU_M740:
+            DefineNumericMacro ("__CPU_M740__", 1);
+            break;
+
+        case CPU_4510:
+            DefineNumericMacro ("__CPU_4510__", 1);
+            break;
+
+        case CPU_UNKNOWN:
+        default:
+            DefineNumericMacro ("__CPU_UNKNOWN__", 1);
+            break;
+    }
+}
+
+
+
 static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 /* Handle an option that remembers a file name for later */
 {
@@ -1071,6 +1129,8 @@ int main (int argc, char* argv[])
             CPU = CPU_6502;
         }
     }
+
+    SetCpuMacros();
 
     /* If no memory model was given, use the default */
     if (MemoryModel == MMODEL_UNKNOWN) {

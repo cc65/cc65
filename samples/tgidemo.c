@@ -81,13 +81,21 @@ static void DoPalette (int n)
 {
     static const unsigned char Palette[4][2] = {
 /* FIXME: add some ifdefs with proper values for targets that need it */
+#if !defined(__APPLE2__)
         { COLOR_BLACK, COLOR_BLUE },
         { COLOR_WHITE, COLOR_BLACK },
         { COLOR_RED, COLOR_BLACK },
         { COLOR_BLACK, COLOR_BLACK }
+#else
+        { COLOR_WHITE, COLOR_BLACK },
+        { COLOR_BLACK, COLOR_BLACK },
+        { COLOR_WHITE, COLOR_BLACK },
+        { COLOR_BLACK, COLOR_BLACK }
+#endif
     };
     tgi_setpalette (Palette[n]);
 }
+
 
 
 static void DoCircles (void)

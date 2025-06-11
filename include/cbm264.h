@@ -110,24 +110,25 @@
 #define COLOR_LIGHTBLUE         (BCOLOR_LIGHTBLUE | CATTR_LUMA7)
 #define COLOR_GRAY3             (BCOLOR_WHITE | CATTR_LUMA5)
 
-/* TGI color defines */
-#define TGI_COLOR_BLACK         COLOR_BLACK
-#define TGI_COLOR_WHITE         COLOR_WHITE
-#define TGI_COLOR_RED           COLOR_RED
-#define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
-#define TGI_COLOR_PURPLE        COLOR_PURPLE
-#define TGI_COLOR_GREEN         COLOR_GREEN
-#define TGI_COLOR_BLUE          COLOR_BLUE
-#define TGI_COLOR_YELLOW        COLOR_YELLOW
-#define TGI_COLOR_ORANGE        COLOR_ORANGE
-#define TGI_COLOR_BROWN         COLOR_BROWN
-#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED
-#define TGI_COLOR_GRAY1         COLOR_GRAY1
-#define TGI_COLOR_GRAY2         COLOR_GRAY2
-#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
-#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
-#define TGI_COLOR_GRAY3         COLOR_GRAY3
+/* TGI color defines (these are indices into the default palette) */
+#define TGI_COLOR_BLACK         0
+#define TGI_COLOR_WHITE         1
+/*
+#define TGI_COLOR_RED           2
+#define TGI_COLOR_CYAN          3
+#define TGI_COLOR_PURPLE        4
+#define TGI_COLOR_GREEN         5
+#define TGI_COLOR_BLUE          6
+#define TGI_COLOR_YELLOW        7
+#define TGI_COLOR_ORANGE        8
+#define TGI_COLOR_BROWN         9
+#define TGI_COLOR_LIGHTRED      10
+#define TGI_COLOR_GRAY1         11
+#define TGI_COLOR_GRAY2         12
+#define TGI_COLOR_LIGHTGREEN    13
+#define TGI_COLOR_LIGHTBLUE     14
+#define TGI_COLOR_GRAY3         15
+*/
 
 /* Masks for joy_read */
 #define JOY_UP_MASK             0x01

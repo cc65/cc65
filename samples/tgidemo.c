@@ -85,12 +85,12 @@ static void DoPalette (int n)
         { COLOR_BLACK, COLOR_BLUE },
         { COLOR_WHITE, COLOR_BLACK },
         { COLOR_RED, COLOR_BLACK },
-        { COLOR_BLACK, COLOR_BLACK }
+        { COLOR_BLACK, COLOR_WHITE }
 #else
         { COLOR_WHITE, COLOR_BLACK },
-        { COLOR_BLACK, COLOR_BLACK },
+        { COLOR_BLACK, COLOR_WHITE },
         { COLOR_WHITE, COLOR_BLACK },
-        { COLOR_BLACK, COLOR_BLACK }
+        { COLOR_BLACK, COLOR_WHITE }
 #endif
     };
     tgi_setpalette (Palette[n]);

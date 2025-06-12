@@ -18,6 +18,6 @@ _cgetc:
         tax
         lda #$00
         sta LASTCHAR
-        txa         
+        txa
         ldx #$00
         rts

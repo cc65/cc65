@@ -19,7 +19,7 @@
         .import findfreeiocb
         .import incsp4
         .import ldaxysp,addysp
-        .import __oserror
+        .import ___oserror, returnFFFF
 .ifdef  UCASE_FILENAME
         .import ucase_fn
 .endif
@@ -37,11 +37,9 @@ parmok: jsr     findfreeiocb
         beq     iocbok          ; we found one
 
         lda     #<EMFILE        ; "too many open files"
-seterr: jsr     __directerrno
+seterr: jsr     ___directerrno
         jsr     incsp4          ; clean up stack
-        lda     #$FF
-        tax
-        rts                     ; return -1
+        jmp     returnFFFF
 
         ; process the mode argument
 
@@ -150,11 +148,11 @@ finish: php
         jsr     CIOV            ; close IOCB again since open failed
         jsr     fddecusage      ; and decrement usage counter of fd
         lda     tmp3            ; put error code into A
-        jmp     __mappederrno
+        jmp     ___mappederrno
 
 ok:     lda     tmp2            ; get fd
         ldx     #0
-        stx     __oserror
+        stx     ___oserror
         rts
 
 .endproc

@@ -60,7 +60,7 @@ void c_char(void)
   if(char1 || !char0)
     failures++;
 
-  if((char0 >5 ) && (char0 < 10)) 
+  if((char0 >5 ) && (char0 < 10))
     failures++;
 
   char0 +=5; /* char0 = 6 now */
@@ -100,7 +100,7 @@ void c_int(void)
   if(int1 || !int0)
     failures++;
 
-  if((int0 >5 ) && (int0 < 10)) 
+  if((int0 >5 ) && (int0 < 10))
     failures++;
 
   int0 +=5; /* int0 = 6 now */
@@ -140,7 +140,7 @@ void c_long(void)
   if(long1 || !long0)
     failures++;
 
-  if((long0 >5 ) && (long0 < 10)) 
+  if((long0 >5 ) && (long0 < 10))
     failures++;
 
   long0 +=5; /* long0 = 6 now */

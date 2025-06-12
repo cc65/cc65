@@ -3,6 +3,9 @@
 # var. to build for another target system.
 SYS ?= geos-cbm
 
+# Comes with the VICE emulator, see http://vice-emu.sourceforge.net/
+C1541 ?= c1541
+
 # If SYS was given on the commandline, redirect "c64" to "geos-cbm" and
 # "apple2enh" to "geos-apple"
 ifeq ($(origin SYS),command line)
@@ -44,13 +47,13 @@ else
   CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
   SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
-endif 
+endif
 
 DIRLIST = grc
 
 define SUBDIR_recipe
 
-@$(MAKE) SYS=$(SYS) -C $(dir) --no-print-directory $@
+@+$(MAKE) SYS=$(SYS) -C $(dir) --no-print-directory $@
 
 endef # SUBDIR_recipe
 
@@ -80,6 +83,14 @@ EXELIST_geos-apple = \
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
 	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
+
+define samples-geos
+$(C1541) -attach $(0).d64 -geoswrite $(1);
+endef
+
+samples-geos: $(EXELIST_$(SYS))
+	$(C1541) -format "$@,01" d64 $@.d64
+	$(foreach tool,$(EXELIST_$(SYS)),$(call samples-geos,$(tool)))
 else
 samples:
   ifeq ($(MAKELEVEL),0)
@@ -94,39 +105,39 @@ bitmap.c: logo.pcx
 	$(SP) -r logo.pcx -c geos-bitmap -w bitmap.c,ident=bitmap
 
 bitmap-demo.cvt: bitmap.c bitmap-demores.grc bitmap-demo.c
-	$(CL) -t $(SYS) -O -o bitmap-demo.cvt -m bitmap-demo.map bitmap-demores.grc bitmap-demo.c
-	
+	$(CL) -t $(SYS) -O -o $@ -m bitmap-demo.map bitmap-demores.grc bitmap-demo.c
+
 filesel.cvt: fileselres.grc filesel.c
-	$(CL) -t $(SYS) -O -o filesel.cvt -m filesel.map fileselres.grc filesel.c
+	$(CL) -t $(SYS) -O -o $@ -m filesel.map fileselres.grc filesel.c
 
 geosconio.cvt: geosconiores.grc geosconio.c
-	$(CL) -t $(SYS) -O -o geosconio.cvt -m geosconio.map geosconiores.grc geosconio.c
+	$(CL) -t $(SYS) -O -o $@ -m geosconio.map geosconiores.grc geosconio.c
 
 geosver.cvt: geosverres.grc geosver.c
-	$(CL) -t $(SYS) -O -o geover.cvt -m geosver.map geosverres.grc geosver.c
+	$(CL) -t $(SYS) -O -o $@ -m geosver.map geosverres.grc geosver.c
 
 getid.cvt: getidres.grc getid.c
-	$(CL) -t $(SYS) -O -o getid.cvt -m getid.map getidres.grc getid.c
+	$(CL) -t $(SYS) -O -o $@ -m getid.map getidres.grc getid.c
 
 hello1.cvt: hello1res.grc hello1.c
-	$(CL) -t $(SYS) -O -o hello1.cvt -m hello1.map hello1res.grc hello1.c
+	$(CL) -t $(SYS) -O -o $@ -m hello1.map hello1res.grc hello1.c
 
 hello2.cvt: hello2res.grc hello2.c
-	$(CL) -t $(SYS) -O -o hello2.cvt -m hello2.map hello2res.grc hello2.c
+	$(CL) -t $(SYS) -O -o $@ -m hello2.map hello2res.grc hello2.c
 
 overlay-demo.cvt: overlay-demores.grc overlay-demo.c
-	$(CL) -t $(SYS) -O -o overlay-demo.cvt -m overlay-demo.map overlay-demores.grc overlay-demo.c
+	$(CL) -t $(SYS) -O -o $@ -m overlay-demo.map overlay-demores.grc overlay-demo.c
 
 rmvprot.cvt: rmvprotres.grc rmvprot.c
-	$(CL) -t $(SYS) -O -o rmvprot.cvt -m rmvprot.map rmvprotres.grc rmvprot.c
+	$(CL) -t $(SYS) -O -o $@ -m rmvprot.map rmvprotres.grc rmvprot.c
 
 vector-demo.cvt: vector-demores.grc vector-demo.c
-	$(CL) -t $(SYS) -O -o vector-demo.cvt -m vector-demo.map vector-demores.grc vector-demo.c
+	$(CL) -t $(SYS) -O -o $@ -m vector-demo.map vector-demores.grc vector-demo.c
 
 yesno.cvt: yesnores.grc yesno.c
-	$(CL) -t $(SYS) -O -o yesno.cvt -m yesno.map yesnores.grc yesno.c
+	$(CL) -t $(SYS) -O -o $@ -m yesno.map yesnores.grc yesno.c
 
-	
+
 clean:
 	@$(DEL) overlay-demores.h 2>$(NULLDEV)
 	@$(DEL) bitmap.c 2>$(NULLDEV)

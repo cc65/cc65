@@ -69,7 +69,8 @@ static InputFormatDesc InputFormatTable[ifCount] = {
     {   ReadPCXFile     },
 };
 
-/* Table that maps extensions to input formats. Must be sorted alphabetically */
+/* Table that maps extensions to input formats. */
+/* CAUTION: table must be alphabetically sorted for bsearch */
 static const FileId FormatTable[] = {
     /* Upper case stuff for obsolete operating systems */
     {   "PCX",  ifPCX           },

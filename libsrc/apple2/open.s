@@ -18,6 +18,7 @@
         .include        "fcntl.inc"
         .include        "mli.inc"
         .include        "filedes.inc"
+        .include        "time.inc"
 
         .segment        "ONCE"
 
@@ -64,7 +65,7 @@ _open:
 errno:  jsr     incsp4          ; Preserves A
 
         ; Set __errno
-        jmp     __directerrno
+        jmp     ___directerrno
 
         ; Save fdtab slot
 found:  tya
@@ -147,8 +148,8 @@ oserr1: ldy     tmp2            ; Restore fdtab slot
         jsr     freebuffer
         pla                     ; Restore oserror code
 
-        ; Set __oserror
-        jmp     __mappederrno
+        ; Set ___oserror
+        jmp     ___mappederrno
 
 open:   ldy     tmp2            ; Restore fdtab slot
 
@@ -208,8 +209,8 @@ done:   lda     tmp1            ; Restore fd
         jsr     popname         ; Preserves A
 
         ; Return success
-        ldx     #$00
-        stx     __oserror
+        ldx     #>$0000
+        stx     ___oserror
         rts
 
 freebuffer:

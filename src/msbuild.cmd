@@ -1,18 +1,23 @@
 @echo off
+setlocal
 
-if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\Tools\VsDevCmd.bat" goto vs2017
-if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" goto vs2019
+where msbuild.exe 1>nul 2>&1 && goto :ready
 
-echo Error: VsDevCmd.bat not found!
-goto:eof
+set VSWHERE_PATH=%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe
+if not exist "%VSWHERE_PATH%" set VSWHERE_PATH=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
+if not exist "%VSWHERE_PATH%" goto :error
+for /f "usebackq delims=#" %%a in (`"%VSWHERE_PATH%" -latest -property installationPath`) do set VSDEVCMD_PATH=%%a\Common7\Tools\VsDevCmd.bat
+if not exist "%VSDEVCMD_PATH%" goto :error
+set VSCMD_SKIP_SENDTELEMETRY=1
+call "%VSDEVCMD_PATH%" -no_logo -startdir=none
 
-:vs2017
-call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\Tools\VsDevCmd.bat"
-goto run
+where msbuild.exe 1>nul 2>&1 && goto :ready
 
-:vs2019
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
-goto run
+:error
 
-:run
+echo Error: Can't find MSBuild.
+exit /b 1
+
+:ready
+
 msbuild.exe %*

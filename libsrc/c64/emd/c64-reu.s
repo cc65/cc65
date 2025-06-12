@@ -73,7 +73,7 @@ reu_params:     .word   $0000           ; Host address, lo, hi
                 .byte   $00             ; Expansion  bank no.
                 .word   $0000           ; # bytes to move, lo, hi
                 .byte   $00             ; Interrupt mask reg.
-                .byte   $00             ; Adress control reg.
+                .byte   $00             ; Address control reg.
 
 .code
 
@@ -127,8 +127,9 @@ size_found:
 pagecount_ok:
         stx     pagecount
         sty     pagecount+1
-        lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
+        lda     #EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        tax
         rts
 
 ; common REU setup for size check
@@ -152,6 +153,7 @@ reu_size_check_common:
 
 nodevice:
         lda     #EM_ERR_NO_DEVICE
+        .assert EM_ERR_OK = 0, error
 ;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

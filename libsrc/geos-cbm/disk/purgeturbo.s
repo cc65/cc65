@@ -8,5 +8,5 @@
             .export _PurgeTurbo
 
             .include "jumptab.inc"
-        
+
 _PurgeTurbo     = PurgeTurbo

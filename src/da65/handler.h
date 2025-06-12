@@ -57,6 +57,8 @@ void OH_Illegal (const OpcDesc* D attribute ((unused)));
 void OH_Accumulator (const OpcDesc*);
 void OH_Implicit (const OpcDesc*);
 void OH_Immediate (const OpcDesc*);
+void OH_Immediate65816M (const OpcDesc*);
+void OH_Immediate65816X (const OpcDesc*);
 void OH_ImmediateWord (const OpcDesc*);
 void OH_Direct (const OpcDesc*);
 void OH_DirectX (const OpcDesc*);
@@ -90,6 +92,7 @@ void OH_StackRelativeIndirectY4510 (const OpcDesc*);
 void OH_DirectIndirectLong (const OpcDesc*);
 void OH_DirectIndirectLongY (const OpcDesc*);
 void OH_BlockMove (const OpcDesc*);
+void OH_BlockMove65816 (const OpcDesc*);
 void OH_AbsoluteXIndirect (const OpcDesc*);
 
 /* Mitsubishi 740 */

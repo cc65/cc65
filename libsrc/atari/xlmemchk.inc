@@ -7,7 +7,7 @@
 ; It calculates the value to put into RAMTOP for a subsequent
 ; "GRAPHICS 0" call, and the lowest address which will be used
 ; by the screen memory afterwards.
-; 
+;
 ; inputs:
 ;       __STARTADDRESS__        -       load address of the program
 ; outputs:

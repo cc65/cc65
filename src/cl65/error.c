@@ -39,7 +39,7 @@
 
 /* common */
 #include "cmdline.h"
-          
+
 /* cl65 */
 #include "global.h"
 #include "error.h"

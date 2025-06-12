@@ -22,14 +22,14 @@ unsigned int __fastcall__ cbm_load (const char* name, unsigned char device, void
     unsigned int size = 0;
 
     if (cbm_open (1, device, CBM_READ, name) != 0) {
-        /* Can't load from a file that can't be openned. */
+        /* Can't load from a file that can't be opened. */
         return 0;
     }
 
     /* Get the file's load address. */
     if (cbm_read (1, &load, sizeof load) != sizeof load) {
         /* Either the file wasn't found, or it was too short.  (Note:
-        ** the computer openned a file even if the drive couldn't open one.)
+        ** the computer opened a file even if the drive couldn't open one.)
         */
         cbm_close (1);
         return 0;

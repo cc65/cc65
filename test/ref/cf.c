@@ -67,7 +67,7 @@ char *argv[];
     }
 
     printf("input:\n\n");
-    
+
     nc = 0;
     while ((c = GETCHAR()) != -1)
     {

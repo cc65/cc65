@@ -125,11 +125,10 @@ uservec:        jmp     $FFFF           ; Patched at runtime
 
 .data
 
-; Old break vector preceeded by a jump opcode
+; Old break vector preceded by a jump opcode
 brk_old:
         jmp     $0000
 
-; Indirect vectors preceeded by a jump opcode
+; Indirect vectors preceded by a jump opcode
 brk_ind:
         jmp     $0000
-

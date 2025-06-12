@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 22.06.2002
+; 2002-06-22, Ullrich von Bassewitz
+; 2021-12-23, Greg King
 ;
 ; Original C code by Marc 'BlackJack' Rintsch, 18.03.2001
 ;
@@ -14,31 +15,22 @@
 ; {
 ;     cbm_k_setlfs(lfn, device, sec_addr);
 ;     cbm_k_setnam(name);
-;     return _oserror = cbm_k_open();
+;     return __oserror = cbm_k_open();
 ; }
 ;
 
         .export         _cbm_open
+
         .import         popa
         .import         _cbm_k_setlfs, _cbm_k_setnam, _cbm_k_open
-        .import         __oserror
+        .import         ___oserror
 
 _cbm_open:
-        pha
-        txa
-        pha                     ; Save name
+        jsr     _cbm_k_setnam
 
         jsr     popa            ; Get sec_addr
         jsr     _cbm_k_setlfs   ; Call SETLFS, pop all args
 
-        pla
-        tax
-        pla                     ; Get name
-        jsr     _cbm_k_setnam
-
         jsr     _cbm_k_open
-        sta     __oserror
-
+        sta     ___oserror
         rts
-
-

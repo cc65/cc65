@@ -59,7 +59,7 @@ void c_char_gte_lit1(unsigned char expected_result)
 
   if(char0 >= 0x7e)
     result |= 0x10;
-  
+
   if(char0 >= 0x7f)
     result |= 0x20;
 
@@ -138,10 +138,10 @@ void c_int_gte_lit1(unsigned char expected_result)
 
   if(int0 >= 0x0101)
     result |= 0x10;
-  
+
   if(int0 >= 0x01ff)
     result |= 0x20;
-  
+
   if(int0 >= 0x0200)
     result |= 0x40;
 
@@ -226,10 +226,10 @@ void c_int_gte_lit2(unsigned char expected_result)
 
   if(int0 >= -0x0101)
     result |= 0x10;
-  
+
   if(int0 >= -0x0100)
     result |= 0x20;
-  
+
   if(int0 >= -0xff)
     result |= 0x40;
 

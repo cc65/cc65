@@ -107,6 +107,7 @@
 // $90
 #define AM65_ALL_FAR    (AM65_ABS_LONG | AM65_ABS_LONG_X)
                             // $10          $80
+
 /* Bitmask for all immediate operations */
 // $8e00 000
 #define AM65_ALL_IMM    (AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT | AM65_IMM_IMPLICIT_WORD)

@@ -46,7 +46,7 @@ int main (void)
     sprintf (result, "%08lX - %s\n", t, buf);
     printf (result);
     if (strcmp(result, EXPECTSTR) != 0) { fails++; }
-    
+
     printf("fails: %d\n", fails);
 
     return fails;

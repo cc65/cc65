@@ -3,7 +3,7 @@
 ; 2002-10-22, Greg King
 ;
 ; This signed-division function returns both the quotient and the remainder,
-; in this structure:
+; in this structure: (quotient in sreg, remainder in AX)
 ;
 ; typedef struct {
 ;     int rem, quot;
@@ -18,10 +18,10 @@
         .importzp       sreg, ptr1, tmp1
 
 _div:   jsr     tosdivax        ; Division-operator does most of the work
-        
+
         ldy     sreg            ; low byte remainder from sreg
         sta     sreg            ; store low byte quotient to sreg
-        
+
         lda     sreg+1          ; high byte remainder from sreg
         stx     sreg+1          ; store high byte quotient to sreg
 

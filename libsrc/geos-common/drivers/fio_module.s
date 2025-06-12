@@ -14,7 +14,7 @@ FILEDES         = 3             ; first free to use file descriptor
 
             .importzp ptr1, ptr2, ptr3, tmp1
             .import addysp, popax, popptr1
-            .import __oserror
+            .import ___oserror
             .import _FindFile, _ReadByte
             .export _open, _close, _read
 
@@ -38,21 +38,21 @@ _open:
         jsr popax               ; Get flags
         sta tmp1
         jsr popptr1             ; Get name
-            
+
         lda filedesc            ; is there a file already open?
         bne @alreadyopen
-            
+
         lda tmp1                ; check open mode
         and #(O_RDWR | O_CREAT)
         cmp #O_RDONLY           ; only O_RDONLY is valid
         bne @badmode
-            
+
         lda ptr1
         ldx ptr1+1
         jsr _FindFile           ; try to find the file
         tax
         bne @oserror
-            
+
         lda dirEntryBuf + OFF_DE_TR_SC ; tr&se for ReadByte (r1)
         sta f_track
         lda dirEntryBuf + OFF_DE_TR_SC + 1
@@ -65,8 +65,8 @@ _open:
         stx f_offset
         stx f_offset+1
         lda #0                  ; clear errors
-        sta __oserror
-        jsr __seterrno
+        sta ___oserror
+        jsr ___seterrno
         lda #FILEDES            ; return fd
         sta filedesc
         rts
@@ -75,14 +75,14 @@ _open:
         .byte $2c               ; skip
 @alreadyopen:
         lda #EMFILE             ; too many opened files (there can be only one)
-        jmp __directerrno       ; set errno, clear oserror, return -1
+        jmp ___directerrno      ; set errno, clear oserror, return -1
 @oserror:
-        jmp __mappederrno       ; set platform error code, return -1
+        jmp ___mappederrno      ; set platform error code, return -1
 
 _close:
         lda #0
-        sta __oserror
-        jsr __seterrno          ; clear errors
+        sta ___oserror
+        jsr ___seterrno         ; clear errors
         lda #0                  ; clear fd
         sta filedesc
         tax
@@ -92,7 +92,7 @@ _read:
     ; a/x - number of bytes
     ; popax - buffer ptr
     ; popax - fd, must be == to the above one
-    ; return -1+__oserror or number of bytes read
+    ; return -1+___oserror or number of bytes read
 
         inx
         stx ptr1+1
@@ -111,14 +111,14 @@ _read:
 
 @filenotopen:
         lda #EBADF
-        jmp __directerrno       ; Sets _errno, clears _oserror, returns -1
+        jmp ___directerrno      ; Sets _errno, clears __oserror, returns -1
 
 @fileok:
         lda #0
         sta ptr3
         sta ptr3+1              ; put 0 into ptr3 (number of bytes read)
-        sta __oserror           ; clear error flags
-        jsr __seterrno
+        sta ___oserror          ; clear error flags
+        jsr ___seterrno
 
         lda f_track             ; restore stuff for ReadByte
         ldx f_sector
@@ -147,11 +147,11 @@ _read:
         bne @L2
         inc ptr3+1
 
-@L2:    lda __oserror           ; was there error ?
+@L2:    lda ___oserror          ; was there error ?
         beq @L3
         cmp #BFR_OVERFLOW       ; EOF?
         beq @done               ; yes, we're done
-        jmp __mappederrno       ; no, we're screwed
+        jmp ___mappederrno      ; no, we're screwed
 
 @L3:    dec ptr1                ; decrement the count
         bne @L0

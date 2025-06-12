@@ -63,6 +63,7 @@
 
 /* sim65 */
 #include "6502.h"
+#include "error.h"
 #include "memory.h"
 #include "paravirt.h"
 
@@ -105,7 +106,7 @@ static void SetAX (CPURegs* Regs, unsigned Val)
 
 static unsigned char Pop (CPURegs* Regs)
 {
-    return MemReadByte (0x0100 + ++Regs->SP);
+    return MemReadByte (0x0100 + (++Regs->SP & 0xFF));
 }
 
 
@@ -123,11 +124,7 @@ static unsigned PopParam (unsigned char Incr)
 static void PVExit (CPURegs* Regs)
 {
     Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
-    if (PrintCycles) {
-        Print (stdout, 0, "%lu cycles\n", GetCycles ());
-    }
-
-    exit (Regs->AC);
+    SimExit (Regs->AC); /* Error code in range 0-255. */
 }
 
 
@@ -162,11 +159,35 @@ static void PVArgs (CPURegs* Regs)
     SetAX (Regs, ArgC);
 }
 
+/* Match between standard POSIX whence and cc65 whence. */
+static unsigned SEEK_MODE_MATCH[3] = {
+  SEEK_CUR,
+  SEEK_END,
+  SEEK_SET
+};
+
+static void PVLseek (CPURegs* Regs)
+{
+    unsigned RetVal;
+
+    unsigned Whence = GetAX (Regs);
+    unsigned Offset = PopParam (4);
+    unsigned FD     = PopParam (2);
+
+    Print (stderr, 2, "PVLseek ($%04X, $%08X, $%04X (%d))\n",
+           FD, Offset, Whence, SEEK_MODE_MATCH[Whence]);
+
+    RetVal = lseek(FD, (off_t)Offset, SEEK_MODE_MATCH[Whence]);
+    Print (stderr, 2, "PVLseek returned %04X\n", RetVal);
+
+    SetAX (Regs, RetVal);
+}
+
 
 
 static void PVOpen (CPURegs* Regs)
 {
-    char Path[1024];
+    char Path[PV_PATH_SIZE];
     int OFlag = O_INITIAL;
     int OMode = 0;
     unsigned RetVal, I = 0;
@@ -183,9 +204,15 @@ static void PVOpen (CPURegs* Regs)
     }
 
     do {
-        Path[I] = MemReadByte (Name++);
+        if (!(Path[I] = MemReadByte ((Name + I) & 0xFFFF))) {
+            break;
+        }
+        ++I;
+        if (I >= PV_PATH_SIZE) {
+            Error("PVOpen path too long at address $%04X",Name);
+        }
     }
-    while (Path[I++]);
+    while (1);
 
     Print (stderr, 2, "PVOpen (\"%s\", $%04X)\n", Path, Flags);
 
@@ -235,7 +262,44 @@ static void PVClose (CPURegs* Regs)
 
     Print (stderr, 2, "PVClose ($%04X)\n", FD);
 
-    RetVal = close (FD);
+    if (FD != 0xFFFF) {
+        RetVal = close (FD);
+    } else {
+        /* test/val/constexpr.c "abuses" close, expecting close(-1) to return -1.
+        ** This behaviour is not the same on all target platforms.
+        ** MSVC's close treats it as a fatal error instead and terminates.
+        */
+        RetVal = 0xFFFF;
+    }
+
+    SetAX (Regs, RetVal);
+}
+
+
+
+static void PVSysRemove (CPURegs* Regs)
+{
+    char Path[PV_PATH_SIZE];
+    unsigned RetVal, I = 0;
+
+    unsigned Name  = GetAX (Regs);
+
+    Print (stderr, 2, "PVSysRemove ($%04X)\n", Name);
+
+    do {
+        if (!(Path[I] = MemReadByte ((Name + I) & 0xFFFF))) {
+            break;
+        }
+        ++I;
+        if (I >= PV_PATH_SIZE) {
+            Error("PVSysRemove path too long at address $%04X", Name);
+        }
+    }
+    while (1);
+
+    Print (stderr, 2, "PVSysRemove (\"%s\")\n", Path);
+
+    RetVal = remove (Path);
 
     SetAX (Regs, RetVal);
 }
@@ -294,7 +358,18 @@ static void PVWrite (CPURegs* Regs)
 
 
 
+static void PVOSMapErrno (CPURegs* Regs)
+{
+    unsigned err = GetAX(Regs);
+    SetAX (Regs, err != 0 ? -1 : 0);
+}
+
+
+
 static const PVFunc Hooks[] = {
+    PVLseek,
+    PVSysRemove,
+    PVOSMapErrno,
     PVOpen,
     PVClose,
     PVRead,
@@ -317,6 +392,8 @@ void ParaVirtInit (unsigned aArgStart, unsigned char aSPAddr)
 void ParaVirtHooks (CPURegs* Regs)
 /* Potentially execute paravirtualization hooks */
 {
+    unsigned lo;
+
     /* Check for paravirtualization address range */
     if (Regs->PC <  PARAVIRT_BASE ||
         Regs->PC >= PARAVIRT_BASE + sizeof (Hooks) / sizeof (Hooks[0])) {
@@ -327,5 +404,6 @@ void ParaVirtHooks (CPURegs* Regs)
     Hooks[Regs->PC - PARAVIRT_BASE] (Regs);
 
     /* Simulate RTS */
-    Regs->PC = Pop(Regs) + (Pop(Regs) << 8) + 1;
+    lo = Pop (Regs);
+    Regs->PC = lo + (Pop (Regs) << 8) + 1;
 }

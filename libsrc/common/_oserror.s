@@ -1,14 +1,14 @@
 ;
 ; Ullrich von Bassewitz, 16.05.2000
 ;
-; extern unsigned char _oserror;
+; extern unsigned char __oserror;
 ; /* Operating system specific errors from the low level functions */
 
 
-        .export         __oserror
+        .export         ___oserror
 
 .bss
 
-__oserror:
+___oserror:
         .res    1
 

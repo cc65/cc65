@@ -121,7 +121,19 @@ void TgtTranslateStrBuf (StrBuf* Buf)
 ** system character set.
 */
 {
-    TgtTranslateBuf (SB_GetBuf (Buf), SB_GetLen (Buf));
+    unsigned char* B = (unsigned char*)SB_GetBuf(Buf);
+    unsigned char* Cooked = (unsigned char*)SB_GetCooked(Buf);
+    unsigned Len = SB_GetLen(Buf);
+
+    /* Translate */
+    while (Len--) {
+        if (*Cooked) {
+            *B = Tab[*B];
+        }
+        /* else { *B = *B; } */
+        ++B;
+        ++Cooked;
+    }
 }
 
 
@@ -129,7 +141,7 @@ void TgtTranslateStrBuf (StrBuf* Buf)
 void TgtTranslateSet (unsigned Index, unsigned char C)
 /* Set the translation code for the given character */
 {
-    CHECK (Index < sizeof (Tab));
+    CHECK (Index < (sizeof (Tab) / sizeof(Tab[0])));
     Tab[Index] = C;
 }
 

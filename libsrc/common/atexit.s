@@ -38,7 +38,7 @@
 ; Error, no space left
 
 @Error: lda     #ENOSPC         ; No space left
-        jsr     __seterrno
+        jsr     ___seterrno
         ldx     #$FF            ; Return -1
         txa
         rts

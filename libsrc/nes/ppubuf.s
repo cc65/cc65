@@ -68,7 +68,7 @@
 
 ; ------------------------------------------------------------------------
 ; Flush PPU-Memory write buffer
-; called from vblank interupt
+; called from vblank interrupt
 
 .proc   ppubuf_flush
 
@@ -101,7 +101,7 @@
 @end:   stx     ringread
         sty     ringcount
 
-        rts     
+        rts
 
 .endproc
 

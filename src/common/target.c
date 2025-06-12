@@ -223,9 +223,9 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
     { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
     { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
-    { "mega65",         CPU_45GS02,     BINFMT_BINARY,      CTPET   }
+    { "mega65",         CPU_45GS02,     BINFMT_BINARY,      CTPET   },
     { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
-    { "rp6502",         CPU_65C02,      BINFMT_BINARY,      CTNone  },
+    { "rp6502",         CPU_65C02,      BINFMT_BINARY,      CTNone  }
 };
 
 /* Target system */

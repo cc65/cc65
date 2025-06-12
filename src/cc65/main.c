@@ -317,6 +317,81 @@ static void SetSys (const char* Sys)
 
 
 
+static void DefineCpuMacros (void)
+/* Define macros for the target CPU */
+{
+    const char* CPUName;
+
+    /* Note: The list of CPUs handled here must match the one checked in
+    ** OptCPU().
+    */
+    switch (CPU) {
+
+        /* The following ones are legal CPUs as far as the assembler is
+        ** concerned but are ruled out earlier in the compiler, so this
+        ** function should never see them.
+        */
+        case CPU_NONE:
+        case CPU_SWEET16:
+        case CPU_M740:
+        case CPU_4510:
+        case CPU_UNKNOWN:
+            CPUName = (CPU == CPU_UNKNOWN)? "unknown" : CPUNames[CPU];
+            Internal ("Invalid CPU \"%s\"", CPUName);
+            break;
+
+        case CPU_6502:
+            DefineNumericMacro ("__CPU_6502__", 1);
+            break;
+
+        case CPU_6502X:
+            DefineNumericMacro ("__CPU_6502X__", 1);
+            break;
+
+        case CPU_6502DTV:
+            DefineNumericMacro ("__CPU_6502DTV__", 1);
+            break;
+
+        case CPU_65SC02:
+            DefineNumericMacro ("__CPU_65SC02__", 1);
+            break;
+
+        case CPU_65C02:
+            DefineNumericMacro ("__CPU_65C02__", 1);
+            break;
+
+        case CPU_65816:
+            DefineNumericMacro ("__CPU_65816__", 1);
+            break;
+
+        case CPU_HUC6280:
+            DefineNumericMacro ("__CPU_HUC6280__", 1);
+            break;
+
+        default:
+            FAIL ("Unexpected value in switch");
+            break;
+    }
+
+    /* Define the macros for instruction sets. We only include the ones for
+    ** the available CPUs.
+    */
+    DefineNumericMacro ("__CPU_ISET_6502__", CPU_ISET_6502);
+    DefineNumericMacro ("__CPU_ISET_6502X__", CPU_ISET_6502X);
+    DefineNumericMacro ("__CPU_ISET_6502DTV__", CPU_ISET_6502DTV);
+    DefineNumericMacro ("__CPU_ISET_65SC02__", CPU_ISET_65SC02);
+    DefineNumericMacro ("__CPU_ISET_65C02__", CPU_ISET_65C02);
+    DefineNumericMacro ("__CPU_ISET_65816__", CPU_ISET_65816);
+    DefineNumericMacro ("__CPU_ISET_HUC6280__", CPU_ISET_HUC6280);
+
+    /* Now define the macro that contains the bit set with the available
+    ** cpu instructions.
+    */
+    DefineNumericMacro ("__CPU__", CPUIsets[CPU]);
+}
+
+
+
 static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 /* Handle an option that remembers a file name for later */
 {
@@ -477,7 +552,9 @@ static void OptCreateFullDep (const char* Opt attribute ((unused)),
 static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
-    /* Find the CPU from the given name */
+    /* Find the CPU from the given name. We do only accept a certain number
+    ** of CPUs. If the list is changed, be sure to adjust SetCpuMacros().
+    */
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
         CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280 &&
@@ -1063,7 +1140,9 @@ int main (int argc, char* argv[])
     /* Create the output file name if it was not explicitly given */
     MakeDefaultOutputName (InputFile);
 
-    /* If no CPU given, use the default CPU for the target */
+    /* If no CPU given, use the default CPU for the target. Define macros that
+    ** allow to query the CPU.
+    */
     if (CPU == CPU_UNKNOWN) {
         if (Target != TGT_UNKNOWN) {
             CPU = GetTargetProperties (Target)->DefaultCPU;
@@ -1071,6 +1150,7 @@ int main (int argc, char* argv[])
             CPU = CPU_6502;
         }
     }
+    DefineCpuMacros ();
 
     /* If no memory model was given, use the default */
     if (MemoryModel == MMODEL_UNKNOWN) {

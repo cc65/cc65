@@ -140,7 +140,7 @@ extern void c128_1351_mou[];    /* Referred to by mouse_static_stddrv[] */
 extern void c128_joy_mou[];
 extern void c128_inkwell_mou[];
 extern void c128_pot_mou[];
-extern void c128_swlink_ser[];
+extern void c128_swlink_ser[];  /* Referred to by ser_static_stddrv[] */
 extern void c128_hi_tgi[];
 extern void c128_vdc_tgi[];     /* Referred to by tgi_static_stddrv[] */
 extern void c128_vdc2_tgi[];

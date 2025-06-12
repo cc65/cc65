@@ -7,6 +7,7 @@
         .include        "zeropage.inc"
         .include        "mouse-kernel.inc"
         .include        "apple2.inc"
+        .include        "get_tv.inc"
 
         .macpack        module
 
@@ -21,6 +22,7 @@ CLAMPMOUSE      = $17   ; Sets mouse bounds in a window
 HOMEMOUSE       = $18   ; Sets mouse to upper-left corner of clamp win
 INITMOUSE       = $19   ; Resets mouse clamps to default values and
                         ; sets mouse position to 0,0
+TIMEDATA        = $1C   ; Set mousecard's interrupt rate
 
 pos1_lo         := $0478
 pos1_hi         := $0578
@@ -41,6 +43,7 @@ status          := $0778
         .byte   MOUSE_API_VERSION       ; Mouse driver API version number
 
         ; Library reference
+libref:
         .addr   $0000
 
         ; Jump table
@@ -133,8 +136,8 @@ next:   inc     ptr1+1
         bcc     :+
 
         ; Mouse firmware not found
-        lda     #<MOUSE_ERR_NO_DEVICE
-        ldx     #>MOUSE_ERR_NO_DEVICE
+        lda     #MOUSE_ERR_NO_DEVICE
+        ldx     #0 ; return value is char
         rts
 
         ; Check Pascal 1.1 Firmware Protocol ID bytes
@@ -155,6 +158,7 @@ next:   inc     ptr1+1
         ; Disable interrupts now because setting the slot number makes
         ; the IRQ handler (maybe called due to some non-mouse IRQ) try
         ; calling the firmware which isn't correctly set up yet
+        php
         sei
 
         ; Convert to and save slot number
@@ -168,7 +172,31 @@ next:   inc     ptr1+1
         asl
         sta     yparam+1
 
-        ; The AppleMouse II Card needs the ROM switched in
+        ; Apple II technical notes "Varying VBL Interrupt Rate",
+        lda     libref
+        ldx     libref+1
+        sta     ptr1
+        stx     ptr1+1
+
+        .ifdef __APPLE2ENH__
+        lda     (ptr1)
+        .else
+        ldy     #$00
+        lda     (ptr1),y
+        .endif
+
+        cmp     #TV::OTHER
+        beq     :+
+
+        ; The TV values are aligned with the values the mousecard
+        ; expect: 0 for 60Hz, 1 for 50Hz.
+        .assert TV::NTSC = 0, error
+        .assert TV::PAL = 1, error
+
+        ldx     #TIMEDATA
+        jsr     firmware
+
+:       ; The AppleMouse II Card needs the ROM switched in
         ; to be able to detect an Apple //e and use RDVBL
         bit     $C082
 
@@ -211,7 +239,7 @@ next:   inc     ptr1+1
 common: jsr     firmware
 
         ; Enable interrupts and return success
-        cli
+        plp
         lda     #<MOUSE_ERR_OK
         ldx     #>MOUSE_ERR_OK
         rts
@@ -220,6 +248,7 @@ common: jsr     firmware
 ; No return code required (the driver is removed from memory on return).
 UNINSTALL:
         ; Hide cursor
+        php
         sei
         jsr     CHIDE
 
@@ -249,7 +278,8 @@ SETBOX:
         ; Apple II Mouse TechNote #1, Interrupt Environment with the Mouse:
         ; "Disable interrupts before placing position information in the
         ;  screen holes."
-:       sei
+:       php
+        sei
 
         ; Set low clamp
         lda     (ptr1),y
@@ -298,6 +328,7 @@ GETBOX:
 ; the screen). No return code required.
 MOVE:
         ldy     slot
+        php
         sei
 
         ; Set y
@@ -328,9 +359,10 @@ MOVE:
 ; no special action is required besides hiding the mouse cursor.
 ; No return code required.
 HIDE:
+        php
         sei
         jsr     CHIDE
-        cli
+        plp
         rts
 
 ; SHOW: Is called to show the mouse cursor. The mouse kernel manages a
@@ -339,15 +371,16 @@ HIDE:
 ; no special action is required besides enabling the mouse cursor.
 ; No return code required.
 SHOW:
+        php
         sei
         jsr     CSHOW
-        cli
+        plp
         rts
 
 ; BUTTONS: Return the button mask in A/X.
 BUTTONS:
         lda     info + MOUSE_INFO::BUTTONS
-        ldx     #$00
+        ldx     #>$0000
         rts
 
 ; POS: Return the mouse position in the MOUSE_POS struct pointed to by ptr1.
@@ -360,12 +393,13 @@ POS:
 ; struct pointed to by ptr1. No return code required.
 INFO:
         ldy     #.sizeof(MOUSE_INFO)-1
-copy:   sei
+copy:   php
+        sei
 :       lda     info,y
         sta     (ptr1),y
         dey
         bpl     :-
-        cli
+        plp
         rts
 
 ; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl

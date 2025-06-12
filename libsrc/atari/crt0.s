@@ -204,6 +204,10 @@ APPMHI_save:    .res    2
 
 ; ------------------------------------------------------------------------
 
+.segment "INIT"       ; have at least one (empty) segment of INIT, exehdr.s needs its definition
+
+; ------------------------------------------------------------------------
+
 .segment "LOWCODE"       ; have at least one (empty) segment of LOWCODE, so that the next line works even if the program doesn't make use of this segment
 .assert (__LOWCODE_RUN__ + __LOWCODE_SIZE__ <= $4000 || __LOWCODE_RUN__ > $7FFF || __LOWCODE_SIZE__ = 0), warning, "'lowcode area' reaches into $4000..$7FFF bank memory window"
 ; check for LOWBSS_SIZE = 0 not needed since the only file which uses LOWBSS (irq.s) also uses LOWCODE

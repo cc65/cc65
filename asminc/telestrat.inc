@@ -257,8 +257,11 @@ XBINDX           = $28          ; Convert a number into hex and displays on chan
 XDECIM           = $29
 XHEXA            = $2A          ; Convert a number into hex
 
+XMAINARGS        = $2C          ; Only available for Orix
+
 XEDT             = $2D          ; Launch editor
 XINSER           = $2E
+XGETARGV         = $2E          ; Only available for Orix
 
 XSCELG           = $2F          ; Search a line in editor mode
 XOPEN            = $30          ; Only in Orix
@@ -276,6 +279,8 @@ XFWRITE          = $3B          ; Only in Orix write file
 XRECLK           = $3C          ; Reset clock
 XCLCL            = $3D          ; Close clock
 XWRCLK           = $3E          ; Displays clock in the address in A & Y registers
+
+XFSEEK           = $3F          ; Only in Orix
 
 ; Sound primitives
 XSONPS           = $40          ; Send data to PSG register (14 values)

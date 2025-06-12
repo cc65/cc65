@@ -108,6 +108,12 @@ void LineComment (unsigned PC, unsigned Count);
 void OutputSettings (void);
 /* Output CPU and other settings */
 
+void OutputMFlag (unsigned char enabled);
+/* Output the 65816 M-flag state */
+
+void OutputXFlag (unsigned char enabled);
+/* Output the 65816 X-flag state */
+
 
 
 /* End of output.h */

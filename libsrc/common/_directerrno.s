@@ -10,14 +10,14 @@
         .macpack        cpu
 
 ; ----------------------------------------------------------------------------
-; int __fastcall__ _directerrno (unsigned char code);
-; /* Set errno to a specific error code, clear _oserror, and return -1. Used
+; int __fastcall__ __directerrno (unsigned char code);
+; /* Set errno to a specific error code, clear __oserror, and return -1. Used
 ; ** by the library.
 ; */
 
-__directerrno:
-        jsr     __seterrno              ; Set errno (returns with .A = 0)
-        sta     __oserror               ; Clear __oserror
+___directerrno:
+        jsr     ___seterrno             ; Set errno (returns with .A = 0)
+        sta     ___oserror              ; Clear ___oserror
 .if (.cpu .bitand CPU_ISET_65SC02)
         dec     a
 .else

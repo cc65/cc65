@@ -9,20 +9,43 @@
  *
  */
 
+/* Box drawing characters are usually constant expressions. However, there
+ * are scenarios where this is not the case. To ensure compatibility with
+ * code that assumes they are constant expressions, the scenarios in question
+ * must be explicitly enabled by defining DYN_BOX_DRAW. Currently, the only
+ * such scenario is the apple2 target. There, DYN_BOX_DRAW can be used to
+ * enable the use of MouseText characters on exactly those machines that
+ * support them.
+ */
+#define DYN_BOX_DRAW
 
 #include <conio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <joystick.h>
 
-#if defined(__GAMATE__)
+#if defined(__GAMATE__) || defined(__OSIC1P__)
 /* there is not enough screen space to show all 256 characters at the bottom */
 #define NUMCHARS        128
-#define NUMCOLS           4
 #else
 #define NUMCHARS        256
+#endif
+
+#if defined(__GAMATE__)
+#define NUMCOLS           4
+#else
 #define NUMCOLS          16
 #endif
+
+#if defined(__ATMOS__)
+// FIXME: those should be defined elsewhere?
+#define CH_HLINE '-'
+#define CH_VLINE '!'
+#endif
+
+#if defined(DYN_BOX_DRAW)
+static char grid[5][5];
+#else
 
 static char grid[5][5] = {
     {CH_ULCORNER, CH_HLINE, CH_TTEE,  CH_HLINE, CH_URCORNER},
@@ -31,6 +54,136 @@ static char grid[5][5] = {
     {CH_VLINE,    ' ',      CH_VLINE, ' ',      CH_VLINE   },
     {CH_LLCORNER, CH_HLINE, CH_BTEE,  CH_HLINE, CH_LRCORNER}
 };
+#endif
+
+#if defined(DYN_BOX_DRAW)
+static void init_grid(void)
+{
+        /* Programmatically fill the array with extern chars
+         * instead of constants. */
+        grid[0][0] = CH_ULCORNER;
+        grid[2][0] = CH_LTEE;
+        grid[4][0] = CH_LLCORNER;
+
+        grid[0][2] = CH_TTEE;
+        grid[2][2] = CH_CROSS;
+        grid[4][2] = CH_BTEE;
+
+        grid[0][4] = CH_URCORNER;
+        grid[2][4] = CH_RTEE;
+        grid[4][4] = CH_LRCORNER;
+
+        grid[1][1] = grid[1][3] =
+        grid[3][1] = grid[3][3] = ' ';
+
+        grid[1][0] = grid[1][2] = grid[1][4] =
+        grid[3][0] = grid[3][2] = grid[3][4] = CH_VLINE;
+        grid[0][1] = grid[0][3] =
+        grid[2][1] = grid[2][3] =
+        grid[4][1] = grid[4][3] = CH_HLINE;
+}
+#endif
+
+#define LINE_COLORTEST  3
+#define LINE_PEEKTEST   11
+
+void colortest(void)
+{
+    unsigned int i, j;
+    cputsxy(0, 2, "Colors:" );
+    for (i = 0; i < 3; ++i) {
+            gotoxy(i, LINE_COLORTEST + i);
+            for (j = 0; j < NUMCOLS; ++j) {
+                    (void)textcolor(j);
+                    cputc('X');
+            }
+    }
+}
+
+void peektest(void)
+{
+    int j;
+    char buf[NUMCOLS];
+    char cbuf[NUMCOLS];
+    char rbuf[NUMCOLS];
+
+    gotoxy(0, LINE_PEEKTEST);
+    for (j = 0; j < NUMCOLS; ++j) {
+        (void)textcolor(j);
+        revers((j >> 1)&1);
+        cputc('a' + j);
+        buf[j] ='#';
+        cbuf[j] = 1;
+        rbuf[j] = 0;
+    }
+    for (j = 0; j < NUMCOLS; ++j) {
+        gotoxy(j, LINE_PEEKTEST);
+// TODO: cpeekc() implementation missing for those:
+#if !defined(__TELESTRAT__)
+        buf[j] = cpeekc();
+#endif
+// TODO: cpeekcolor() implementation missing for those:
+#if !defined(__TELESTRAT__)
+        cbuf[j] = cpeekcolor();
+#endif
+// TODO: cpeekrevers() implementation missing for those:
+#if !defined(__TELESTRAT__)
+        rbuf[j] = cpeekrevers();
+#endif
+    }
+    gotoxy(0, (LINE_PEEKTEST+1));
+    for (j = 0; j < NUMCOLS; ++j) {
+        (void)textcolor(cbuf[j]);
+        revers(rbuf[j]);
+        cputc(buf[j]);
+    }
+// TODO: cpeeks() implementation missing for those:
+#if !defined(__APPLE2__) && \
+    !defined(__APPLE2ENH__) && \
+    !defined(__ATARI__) && \
+    !defined(__CX16__) && \
+    !defined(__NES__) && \
+    !defined(__TELESTRAT__) && \
+    !defined(__OSIC1P__)
+    gotoxy(0, LINE_PEEKTEST);
+    cpeeks(buf, NUMCOLS);
+    (void)textcolor(1);
+    revers(0);
+    gotoxy(20, LINE_PEEKTEST);
+    for (j = 0; j < NUMCOLS; ++j) {
+        cputc(buf[j]);
+    }
+#endif
+}
+
+void allchars(int xsize, int ysize)
+{
+    int i;
+        gotoxy(0, ysize - 2 - ((NUMCHARS + (xsize-1)) / xsize));
+        // one line with 0123..pattern
+        revers(1);
+        for (i = 0; i < xsize; ++i) {
+                cputc('0' + i % 10);
+        }
+        revers(0);
+        for (i = 0; i < NUMCHARS; ++i) {
+            if ((i != '\n') && (i != '\r')) {
+                    cputc(i);
+            } else {
+                    cputc(' ');
+            }
+        }
+        // fill last line of the block with '#'
+        while(wherex() > 0) {
+                cputc('#');
+        }
+        // one more line with 0123..pattern
+        revers(1);
+        for (i = 0; i < xsize; ++i) {
+                cputc('0' + i % 10);
+        }
+        revers(0);
+}
 
 void main(void)
 {
@@ -41,6 +194,11 @@ void main(void)
 
         joy_install(joy_static_stddrv);
 #endif
+
+#if defined(DYN_BOX_DRAW)
+        init_grid();
+#endif
+
         clrscr();
         screensize(&xsize, &ysize);
         cputs("cc65 conio test\n\r");
@@ -52,16 +210,13 @@ void main(void)
         (void)bordercolor(bcol);
         (void)bgcolor(bgcol);
 
-        cputsxy(0, 2, "Colors:" );
-        for (i = 0; i < 3; ++i) {
-                gotoxy(i, 3 + i);
-                for (j = 0; j < NUMCOLS; ++j) {
-                        (void)textcolor(j);
-                        cputc('X');
-                }
-        }
-        (void)textcolor(tcol);
+        colortest();
+        peektest();
 
+        (void)textcolor(tcol);
+        revers(0);
+
+        gotoxy(4,5);
         cprintf("\n\n\r Screensize: %ux%u", xsize, ysize);
 
         chlinexy(0, 6, xsize);
@@ -80,27 +235,7 @@ void main(void)
                 }
         }
 
-        gotoxy(0, ysize - 2 - ((NUMCHARS + xsize) / xsize));
-        revers(1);
-        for (i = 0; i < xsize; ++i) {
-                cputc('0' + i % 10);
-        }
-        revers(0);
-        for (i = 0; i < NUMCHARS; ++i) {
-            if ((i != '\n') && (i != '\r')) {
-                    cputc(i);
-            } else {
-                    cputc(' ');
-            }
-        }
-        while(wherex() > 0) {
-                cputc('#');
-        }
-        revers(1);
-        for (i = 0; i < xsize; ++i) {
-                cputc('0' + i % 10);
-        }
-        revers(0);
+        allchars(xsize, ysize);
 
         cursor(1);
         for (;;) {
@@ -130,9 +265,11 @@ void main(void)
                     case CH_ENTER:
                         clrscr();
                         return;
+#ifdef CH_CURS_LEFT
                     case CH_CURS_LEFT:
                         inpos = (inpos - 1) % 8;
                         break;
+#endif
                     case '0': case '1': case '2': case '3': case '4':
                     case '5': case '6': case '7': case '8': case '9':
                         (void)textcolor(i - '0');
@@ -164,7 +301,9 @@ void main(void)
                     default:
                         cputc(i);
                         /* fallthrough */
+#ifdef CH_CURS_RIGHT
                     case CH_CURS_RIGHT:
+#endif
                         inpos = (inpos + 1) % 8;
                 }
 #endif

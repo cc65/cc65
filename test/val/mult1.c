@@ -26,14 +26,16 @@ void done()
 
 void m1(void)
 {
-  c1 = c1*5;       /* char = char * lit */
+  c1 = c1*5;        /* char = char * lit */
+  c2 = c1*c3;       /* char = char * char */
 
-  c2 = c1 *c3;     /* char = char * char */
-
-  uc1= uc1*5;      /* uchar = uchar * lit *
-  uc2=uc1*uc3;     /* uchar = uchar * uchar */
+  uc1 = uc1*3;      /* uchar = uchar * lit */
+  uc2 = uc1*uc3;    /* uchar = uchar * uchar */
 
   if(c2 != 25)
+    failures++;
+
+  if(uc2 != 36)
     failures++;
 }
 
@@ -53,6 +55,7 @@ void m3(unsigned char uc)
   /* testing literal multiply with same source and destination */
   vuc = uc;
   uc2 = 0;
+  uc1 = vuc; uc1 = uc1*0; if( uc1 != 0 )              failures++;
   uc1 = vuc; uc1 = uc1*1; if( uc1 != (uc2+=TESTLIT) ) failures++;
   uc1 = vuc; uc1 = uc1*2; if( uc1 != (uc2+=TESTLIT) ) failures++;
   uc1 = vuc; uc1 = uc1*3; if( uc1 != (uc2+=TESTLIT) ) failures++;
@@ -96,6 +99,9 @@ int  main(void)
   c1 = 1;
   c3 = 5;
 
+  uc1 = 2;
+  uc3 = 6;
+
   m1();
 
   uc1 = 0x10;
@@ -107,7 +113,7 @@ int  main(void)
 
   ui3 = ui1*ui2;   /* uint = uint * unit */
 
-  /*m3(TESTLIT);*/
+  m3(TESTLIT);
 
   success = failures;
   done();

@@ -352,8 +352,8 @@ static void StoreOffset (PrintfCtrl* P)
 /* Store the current output offset (%n format spec) */
 {
     switch (P->LengthMod) {
-        case lmChar:     *va_arg (P->ap, int*)       = P->BufFill; break;
-        case lmShort:    *va_arg (P->ap, int*)       = P->BufFill; break;
+        case lmChar:     *va_arg (P->ap, char*)      = (char)P->BufFill; break;
+        case lmShort:    *va_arg (P->ap, short*)     = (short)P->BufFill; break;
         case lmInt:      *va_arg (P->ap, int*)       = P->BufFill; break;
         case lmLong:     *va_arg (P->ap, long*)      = P->BufFill; break;
         case lmIntMax:   *va_arg (P->ap, intmax_t*)  = P->BufFill; break;
@@ -483,6 +483,18 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                     P.LengthMod = lmChar;
                 } else {
                     P.LengthMod = lmShort;
+                }
+                break;
+
+            /* support the MSVC specific I64 for long long */
+            case 'I':
+                F = *Format++;
+                if (F == '6') {
+                    F = *Format++;
+                    if (F == '4') {
+                        F = *Format++;
+                        P.LengthMod = lmLongLong;
+                    }
                 }
                 break;
 

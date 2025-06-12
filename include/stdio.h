@@ -38,9 +38,8 @@
 
 
 /* NULL pointer */
-#ifndef _HAVE_NULL
-#define NULL    0
-#define _HAVE_NULL
+#ifndef NULL
+#define NULL ((void *) 0)
 #endif
 
 /* size_t is needed */
@@ -87,6 +86,10 @@ extern FILE* stderr;
 #  define FILENAME_MAX      (80+1)
 #elif defined(__TELESTRAT__)
 #  define FILENAME_MAX      (50+1)
+#elif defined(__SIM6502__)
+#  define FILENAME_MAX      (1024+1)
+#elif defined(__SIM65C02__)
+#  define FILENAME_MAX      (1024+1)
 #else
 #  define FILENAME_MAX      (16+1)
 #endif
@@ -147,7 +150,11 @@ int __fastcall__ vfscanf (FILE* f, const char* format, __va_list ap);
 FILE* __fastcall__ fdopen (int fd, const char* mode);   /* Unix */
 int __fastcall__ fileno (FILE* f);                      /* Unix */
 #endif
-void __fastcall__ _poserror (const char* msg);          /* cc65 */
+void __fastcall__ __poserror (const char* msg);          /* cc65 */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _poserror __poserror
+#endif
 
 /* Masking macros for some functions */
 #define getc(f)         fgetc (f)               /* ANSI */

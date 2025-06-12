@@ -8,6 +8,7 @@
         .import         subysp, addysp, decsp1
 
         .include        "zeropage.inc"
+        .include        "apple2.inc"
         .include        "mli.inc"
 
 pushname:
@@ -15,7 +16,7 @@ pushname:
         stx     ptr1+1
 
         ; Alloc pathname buffer
-        ldy     #64+1           ; Max pathname length + zero
+        ldy     #FILENAME_MAX
         jsr     subysp
 
         ; Check for full pathname
@@ -71,14 +72,14 @@ copy:   lda     (ptr1),y
         sta     (sp),y
         beq     setlen
         iny
-        cpy     #64+1           ; Max pathname length + zero
+        cpy     #FILENAME_MAX
         bcc     copy
 
         ; Load oserror code
         lda     #$40            ; "Invalid pathname"
 
         ; Free pathname buffer
-addsp65:ldy     #64+1
+addsp65:ldy     #FILENAME_MAX
         bne     addsp           ; Branch always
 
         ; Alloc and set length byte
@@ -93,5 +94,5 @@ setlen: tya
 
 popname:
         ; Cleanup stack
-        ldy     #1 + 64+1       ; Length byte + max pathname length + zero
-addsp:  jmp     addysp          ; Preserves A
+        ldy     #1 + FILENAME_MAX
+addsp:  jmp     addysp          ; Preserves A and X

@@ -154,7 +154,7 @@ endif
 # Lists of subdirectories
 
 # disasm depends on cpp
-DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 cbm
+DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 kim1 cbm
 
 # --------------------------------------------------------------------------
 # Lists of executables
@@ -171,6 +171,7 @@ EXELIST_apple2 =   \
         multdemo   \
         ovrldemo   \
         sieve      \
+        terminal   \
         tinyshell  \
         tgidemo
 
@@ -186,6 +187,7 @@ EXELIST_atari =    \
         multdemo   \
         ovrldemo   \
         sieve      \
+        terminal   \
         tinyshell  \
         tgidemo
 
@@ -203,6 +205,7 @@ EXELIST_atmos =    \
         hello      \
         mandelbrot \
         sieve      \
+        terminal   \
         tgidemo
 
 EXELIST_bbc = \
@@ -219,6 +222,7 @@ EXELIST_c64 =      \
         multdemo   \
         ovrldemo   \
         sieve      \
+        terminal   \
         tinyshell  \
         tgidemo
 
@@ -231,6 +235,7 @@ EXELIST_c128 =     \
         mandelbrot \
         mousedemo  \
         sieve      \
+        terminal   \
         tinyshell  \
         tgidemo
 
@@ -247,6 +252,7 @@ EXELIST_cbm510 =   \
         gunzip65   \
         hello      \
         mousedemo  \
+        terminal   \
         tinyshell  \
         sieve
 
@@ -255,6 +261,7 @@ EXELIST_cbm610 =   \
         checkversion \
         gunzip65   \
         hello      \
+        terminal   \
         tinyshell  \
         sieve
 
@@ -314,6 +321,7 @@ EXELIST_plus4 =    \
         enumdevdir \
         gunzip65   \
         hello      \
+        terminal   \
         tinyshell  \
         sieve
 
@@ -327,6 +335,9 @@ EXELIST_supervision = \
         notavailable
 
 EXELIST_sym1 =     \
+        notavailable
+
+EXELIST_kim1 =     \
         notavailable
 
 EXELIST_telestrat = \
@@ -395,6 +406,7 @@ TARGETS :=     \
   creativision \
   cx16         \
   gamate       \
+  kim1         \
   lunix        \
   lynx         \
   nes          \
@@ -414,6 +426,7 @@ TARGETS :=     \
 
 define TARGET_recipe
 
+@echo making samples for: $(T)
 @$(MAKE) -j2 SYS:=$(T)
 @$(MAKE) --no-print-directory clean SYS:=$(T)
 
@@ -549,6 +562,11 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/cbm
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/gamate
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/supervision
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/disasm
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/lynx
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sim65
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sym1
 	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 readme.txt $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)
@@ -560,6 +578,11 @@ install:
 	$(INSTALL) -m0644 cbm/*.* $(DESTDIR)$(samplesdir)/cbm
 	$(INSTALL) -m0644 gamate/*.* $(DESTDIR)$(samplesdir)/gamate
 	$(INSTALL) -m0644 supervision/*.* $(DESTDIR)$(samplesdir)/supervision
+	$(INSTALL) -m0644 disasm/*.* $(DESTDIR)$(samplesdir)/disasm
+	$(INSTALL) -m0644 kim1/*.* $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -m0644 lynx/*.* $(DESTDIR)$(samplesdir)/lynx
+	$(INSTALL) -m0644 sim65/*.* $(DESTDIR)$(samplesdir)/sim65
+	$(INSTALL) -m0644 sym1/*.* $(DESTDIR)$(samplesdir)/sym1
 
 # --------------------------------------------------------------------------
 # Packaging rules

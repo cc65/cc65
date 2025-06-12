@@ -1,16 +1,16 @@
 ;
 ; Ullrich von Bassewitz, 07.11.2002
 ;
-; void _randomize (void);
+; void __randomize (void);
 ; /* Initialize the random number generator */
 ;
 
-        .export         __randomize
+        .export         ___randomize
         .import         _srand
 
         .include        "apple2.inc"
 
-__randomize:
+___randomize:
         ldx     RNDH            ; Use random value supplied by ROM
         lda     RNDL
         jmp     _srand          ; Initialize generator

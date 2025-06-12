@@ -36,6 +36,7 @@
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
+#include "expr.h"
 #include "exprdesc.h"
 #include "global.h"
 #include "loadexpr.h"
@@ -132,10 +133,10 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 AdjustBitField = 1;
 
                 /* Flags we need operate on the whole bit-field, without CF_FORCECHAR.  */
-                BitFieldFullWidthFlags = Flags | TypeOf (Expr->Type);
+                BitFieldFullWidthFlags = Flags | CG_TypeOf (Expr->Type);
 
                 /* Flags we need operate on the whole chunk containing the bit-field.  */
-                Flags |= TypeOf (GetBitFieldChunkType (Expr->Type));
+                Flags |= CG_TypeOf (GetBitFieldChunkType (Expr->Type));
 
                 /* If we're adjusting, then only load a char (not an int) and do only char ops;
                 ** We will clear the high byte in the adjustment.  CF_FORCECHAR does nothing if
@@ -150,7 +151,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 if (IsIncompleteESUType (Expr->Type)) {
                     return;
                 }
-                Flags |= TypeOf (Expr->Type);
+                Flags |= CG_TypeOf (Expr->Type);
             }
         }
 
@@ -174,7 +175,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
 
             case E_LOC_NONE:
                 /* Immediate number constant */
-                g_getimmed (Flags | CF_IMM | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+                g_getimmed (Flags | CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
                 break;
 
             case E_LOC_ABS:
@@ -277,4 +278,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         }
     }
 
+    if (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type)) {
+        /* Expression has had side effects */
+        Expr->Flags |= E_SIDE_EFFECTS;
+    }
 }

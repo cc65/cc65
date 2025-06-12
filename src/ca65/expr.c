@@ -496,7 +496,7 @@ static ExprNode* FuncIsMnemonic (void)
     /* Skip the name */
     NextTok ();
 
-    return GenLiteralExpr (Instr > 0);
+    return GenLiteralExpr (Instr >= 0);
 }
 
 

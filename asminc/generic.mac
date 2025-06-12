@@ -31,10 +31,8 @@
 
 ; bgt - jump if unsigned greater
 .macro  bgt     Arg
-        .local  L
-        beq     L
+        beq     *+4
         bcs     Arg
-L:
 .endmacro
 
 ; ble - jump if unsigned less or equal

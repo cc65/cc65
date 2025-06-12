@@ -73,4 +73,7 @@ endif
 	dd if=$< bs=8K count=${COUNT} >> $@
 
 clean:
-	@$(DEL) conio.o conio.??? 2>$(NULLDEV)
+	@$(DEL) conio.o 2>$(NULLDEV)
+	@$(DEL) conio.pce 2>$(NULLDEV)
+	@$(DEL) conio.bin 2>$(NULLDEV)
+	@$(DEL) conio.map 2>$(NULLDEV)

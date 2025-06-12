@@ -261,6 +261,9 @@ different options for different files on the command line. As an example.
 translates main.c with full optimization and module.c with less optimization
 and debug info enabled.
 
+Note that the target system (-t , --target) must be specified before any file
+unless using the default target of c64
+
 The type of an input file is derived from its extension:
 
 <itemize>

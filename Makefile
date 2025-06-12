@@ -21,7 +21,7 @@ mostlyclean clean:
 avail unavail bin:
 	@$(MAKE) -C src     --no-print-directory $@
 
-lib:
+lib libtest:
 	@$(MAKE) -C libsrc  --no-print-directory $@
 
 doc html info:
@@ -43,13 +43,14 @@ util:
 checkstyle:
 	@$(MAKE) -C .github/checks       --no-print-directory $@
 
-# simple "test" target, only run regression tests for c64 target
+# runs regression tests, requires libtest target libraries
 test:
 	@$(MAKE) -C test                 --no-print-directory $@
 
 # GNU "check" target, which runs all tests
 check:
 	@$(MAKE) -C .github/checks checkstyle --no-print-directory
+	@$(MAKE) -C src test                  --no-print-directory
 	@$(MAKE) test
 	@$(MAKE) -C targettest platforms      --no-print-directory
 	@$(MAKE) -C samples platforms         --no-print-directory

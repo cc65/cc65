@@ -72,7 +72,7 @@ typedef enum token_t {
     TOK_REG,            /* Sweet16 R.. register (in sweet16 mode) */
 
     TOK_ASSIGN,         /* := */
-    TOK_ULABEL,         /* :++ or :-- */
+    TOK_ULABEL,         /* An unnamed label */
 
     TOK_EQ,             /* = */
     TOK_NE,             /* <> */

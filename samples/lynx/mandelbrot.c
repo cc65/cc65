@@ -26,7 +26,7 @@
 #define divfp(_a,_b)    ((((signed long)_a)<<fpshift)/(_b))
 
 /* Use static local variables for speed */
-#pragma static-locals (1);
+#pragma static-locals (1)
 
 
 

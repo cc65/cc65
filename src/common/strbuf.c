@@ -82,6 +82,7 @@ StrBuf* SB_InitFromString (StrBuf* B, const char* S)
     B->Len       = strlen (S);
     B->Index     = 0;
     B->Buf       = (char*) S;
+    B->Cooked    = (char*) S;
     return B;
 }
 
@@ -92,6 +93,7 @@ void SB_Done (StrBuf* B)
 {
     if (B->Allocated) {
         xfree (B->Buf);
+        xfree (B->Cooked);
     }
 }
 
@@ -146,10 +148,12 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
     */
     if (B->Allocated) {
         /* Just reallocate the block */
-        B->Buf   = xrealloc (B->Buf, NewAllocated);
+        B->Buf    = xrealloc (B->Buf, NewAllocated);
+        B->Cooked = xrealloc (B->Cooked, NewAllocated);
     } else {
         /* Allocate a new block and copy */
-        B->Buf   = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
+        B->Buf    = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
+        B->Cooked = memcpy (xmalloc (NewAllocated), B->Cooked, B->Len);
     }
 
     /* Remember the new block size */
@@ -178,10 +182,12 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
     /* Free the old buffer if there is one */
     if (B->Allocated) {
         xfree (B->Buf);
+        xfree (B->Cooked);
     }
 
     /* Allocate a fresh block */
-    B->Buf = xmalloc (NewAllocated);
+    B->Buf    = xmalloc (NewAllocated);
+    B->Cooked = xmalloc (NewAllocated);
 
     /* Remember the new block size */
     B->Allocated = NewAllocated;
@@ -222,6 +228,7 @@ void SB_Terminate (StrBuf* B)
         SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = '\0';
+    B->Cooked[B->Len] = '\0';
 }
 
 
@@ -234,6 +241,22 @@ void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
             SB_CheapRealloc (Target, Size);
         }
         memcpy (Target->Buf, Buf, Size);
+        memcpy (Target->Cooked, Buf, Size); /* nothing raw */
+    }
+    Target->Len = Size;
+}
+
+
+
+void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char* Cooked, unsigned Size)
+/* Copy Buf and Cooked to Target, discarding the old contents of Target */
+{
+    if (Size) {
+        if (Target->Allocated < Size) {
+            SB_CheapRealloc (Target, Size);
+        }
+        memcpy (Target->Buf, Buf, Size);
+        memcpy (Target->Cooked, Cooked, Size);
     }
     Target->Len = Size;
 }
@@ -254,7 +277,7 @@ void SB_CopyStr (StrBuf* Target, const char* S)
 void SB_Copy (StrBuf* Target, const StrBuf* Source)
 /* Copy Source to Target, discarding the old contents of Target */
 {
-    SB_CopyBuf (Target, Source->Buf, Source->Len);
+    SB_CopyBufCooked (Target, Source->Buf, Source->Cooked, Source->Len);
     Target->Index = Source->Index;
 }
 #endif
@@ -269,6 +292,21 @@ void SB_AppendChar (StrBuf* B, int C)
         SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = (char) C;
+    B->Cooked[B->Len] = (char) C;
+    B->Len = NewLen;
+}
+
+
+
+void SB_AppendCharCooked (StrBuf* B, int C, int Cooked)
+/* Append a character to a string buffer */
+{
+    unsigned NewLen = B->Len + 1;
+    if (NewLen > B->Allocated) {
+        SB_Realloc (B, NewLen);
+    }
+    B->Buf[B->Len] = (char) C;
+    B->Cooked[B->Len] = (char) (Cooked ? C : 0);
     B->Len = NewLen;
 }
 
@@ -282,6 +320,7 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
         SB_Realloc (B, NewLen);
     }
     memcpy (B->Buf + B->Len, S, Size);
+    memcpy (B->Cooked + B->Len, S, Size);
     B->Len = NewLen;
 }
 
@@ -301,7 +340,13 @@ void SB_AppendStr (StrBuf* B, const char* S)
 void SB_Append (StrBuf* Target, const StrBuf* Source)
 /* Append the contents of Source to Target */
 {
-    SB_AppendBuf (Target, Source->Buf, Source->Len);
+    unsigned NewLen = Target->Len + Source->Len;
+    if (NewLen > Target->Allocated) {
+        SB_Realloc (Target, NewLen);
+    }
+    memcpy (Target->Buf + Target->Len, Source->Buf, Source->Len);
+    memcpy (Target->Cooked + Target->Len, Source->Cooked, Source->Len);
+    Target->Len = NewLen;
 }
 #endif
 

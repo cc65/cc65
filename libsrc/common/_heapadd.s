@@ -10,7 +10,7 @@
         .importzp       ptr1, ptr2
         .import         popax
         .import         heapadd
-        .export         __heapadd
+        .export         ___heapadd
 
         .include        "_heap.inc"
 
@@ -19,7 +19,7 @@
 ;-----------------------------------------------------------------------------
 ; Code
 
-__heapadd:
+___heapadd:
         sta     ptr1            ; Store size in ptr1
         stx     ptr1+1
         jsr     popax           ; Get the block pointer

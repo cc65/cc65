@@ -37,11 +37,15 @@
 #define _TIME_H
 
 
+/* Forward declaration for target.h */
+typedef unsigned long time_t;
+typedef unsigned long clock_t;
+
+
 
 /* NULL pointer */
-#ifndef _HAVE_NULL
-#define NULL    0
-#define _HAVE_NULL
+#ifndef NULL
+#define NULL ((void *) 0)
 #endif
 
 /* size_t is needed */
@@ -49,9 +53,6 @@
 #define _HAVE_size_t
 typedef unsigned size_t;
 #endif
-
-typedef unsigned long time_t;
-typedef unsigned long clock_t;
 
 /* Structure for broken down time */
 struct tm {
@@ -85,12 +86,14 @@ struct tm {
 #  define CLOCKS_PER_SEC        135   /* FIXME */
 #elif defined(__GEOS__)
 #  define CLOCKS_PER_SEC        1
+#elif defined (__RP6502__)
+#  define CLOCKS_PER_SEC        100
 #elif defined(__TELESTRAT__)
 #  define CLOCKS_PER_SEC        10
 #elif defined(__ATARI__) || defined (__LYNX__)
 /* Read the clock rate at runtime */
-clock_t _clocks_per_sec (void);
-#  define CLOCKS_PER_SEC        _clocks_per_sec()
+clock_t __clocks_per_sec (void);
+#  define CLOCKS_PER_SEC        __clocks_per_sec()
 #endif
 #define CLOCK_REALTIME          0
 

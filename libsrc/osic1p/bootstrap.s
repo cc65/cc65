@@ -34,8 +34,7 @@ ram_top         :=      __MAIN_START__ + __MAIN_SIZE__
 
 .ifdef ASM
 
-        .include        "osic1p.inc"
-        .macpack        generic
+        .include        "screen-c1p-24x24.s"
 
 load            :=      $08             ; private variables
 count           :=      $0A
@@ -45,7 +44,7 @@ GETCHAR         :=      $FFBF           ; gets one character from ACIA
 FIRSTVISC       =       $85             ; Offset of first visible character in video RAM
 LINEDIST        =       $20             ; Offset in video RAM between two lines
 
-        ldy     #<$0000
+        ldy     #$00
         lda     #<load_addr
         ldx     #>load_addr
         sta     load
@@ -57,9 +56,9 @@ LINEDIST        =       $20             ; Offset in video RAM between two lines
         stx     count+1                 ; save size with each byte incremented separately
 
 L1:     dec     count
-        bnz     L2
+        bne     L2
         dec     count+1
-        bze     L3
+        beq     L3
 L2:     jsr     GETCHAR                 ; (doesn't change .Y)
         sta     (load),y
 
@@ -70,12 +69,12 @@ L2:     jsr     GETCHAR                 ; (doesn't change .Y)
         lsr     a
         and     #8 - 1
         ora     #$10                    ; eight arrow characters
-        sta     SCRNBASE + FIRSTVISC + 2 * LINEDIST + 11
+        sta     C1P_SCR_BASE + FIRSTVISC + 2 * LINEDIST + 11
 
         iny
-        bnz     L1
+        bne     L1
         inc     load+1
-        bnz     L1                      ; branch always
+        bne     L1                      ; branch always
 
 L3:     jmp     load_addr
 
@@ -112,18 +111,15 @@ CR      =       $0D
         hex2    >load_addr
         .byte   CR, "85", CR, "08", CR
         .byte   "86", CR, "09", CR
-        .byte   "A9", CR
-        hex2    <load_size
-        .byte   CR, "49", CR, "FF", CR
-        .byte   "85", CR, "0A", CR
-        .byte   "A9", CR
-        hex2    >load_size
-        .byte   CR, "49", CR, "FF", CR
-        .byte   "85", CR, "0B", CR
-
-        .byte   "E6", CR, "0A", CR
+        .byte   "A2", CR
+        hex2    (<load_size) + 1
+        .byte   CR, "86", CR, "0A", CR
+        .byte   "A2", CR
+        hex2    (>load_size) + 1
+        .byte   CR, "86", CR, "0B", CR
+        .byte   "C6", CR, "0A", CR
         .byte   "D0", CR, "04", CR
-        .byte   "E6", CR, "0B", CR
+        .byte   "C6", CR, "0B", CR
         .byte   "F0", CR, "16", CR
         .byte   "20", CR, "BF", CR, "FF", CR
         .byte   "91", CR, "08", CR

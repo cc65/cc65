@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <limits.h>
 #if defined(_MSC_VER)
 /* Microsoft compiler */
@@ -521,11 +522,13 @@ static void RangeSection (void)
 /* Parse a range section */
 {
     static const IdentTok RangeDefs[] = {
-        {   "COMMENT",          INFOTOK_COMMENT },
-        {   "END",              INFOTOK_END     },
-        {   "NAME",             INFOTOK_NAME    },
-        {   "START",            INFOTOK_START   },
-        {   "TYPE",             INFOTOK_TYPE    },
+        {   "COMMENT",          INFOTOK_COMMENT  },
+        {   "END",              INFOTOK_END      },
+        {   "NAME",             INFOTOK_NAME     },
+        {   "START",            INFOTOK_START    },
+        {   "TYPE",             INFOTOK_TYPE     },
+        {   "ADDRMODE",         INFOTOK_ADDRMODE },
+        {   "UNIT",             INFOTOK_UNIT     },
     };
 
     static const IdentTok TypeDefs[] = {
@@ -543,12 +546,14 @@ static void RangeSection (void)
 
     /* Which values did we get? */
     enum {
-        tNone   = 0x00,
-        tStart  = 0x01,
-        tEnd    = 0x02,
-        tType   = 0x04,
-        tName   = 0x08,
-        tComment= 0x10,
+        tNone     = 0x00,
+        tStart    = 0x01,
+        tEnd      = 0x02,
+        tType     = 0x04,
+        tName     = 0x08,
+        tComment  = 0x10,
+        tAddrMode = 0x20,
+        tUnit     = 0x40,
         tNeeded = (tStart | tEnd | tType)
     };
     unsigned Attributes = tNone;
@@ -557,9 +562,11 @@ static void RangeSection (void)
     unsigned Start      = 0;
     unsigned End        = 0;
     unsigned char Type  = 0;
+    unsigned AddrMode   = 0;
     char* Name          = 0;
     char* Comment       = 0;
     unsigned MemberSize = 0;
+    unsigned Unit       = 0;
 
 
     /* Skip the token */
@@ -592,9 +599,19 @@ static void RangeSection (void)
             case INFOTOK_END:
                 AddAttr ("END", &Attributes, tEnd);
                 InfoNextTok ();
-                InfoAssureInt ();
-                InfoRangeCheck (0x0000, 0xFFFF);
-                End = InfoIVal;
+
+                if (InfoTok == INFOTOK_OFFSET_INTCON) {
+                    InfoRangeCheck (0x0000, 0xFFFF);
+                    if (!(Attributes & tStart))
+                        InfoError ("When using End with an offset, Start must be specified before");
+                    End = Start + InfoIVal - 1;
+                    if (End > 0xFFFF)
+                        InfoError ("Range error");
+                } else {
+                    InfoAssureInt ();
+                    InfoRangeCheck (0x0000, 0xFFFF);
+                    End = InfoIVal;
+                }
                 InfoNextTok ();
                 break;
 
@@ -637,6 +654,46 @@ static void RangeSection (void)
                 InfoNextTok ();
                 break;
 
+            case INFOTOK_ADDRMODE:
+                AddAttr ("ADDRMODE", &Attributes, tAddrMode);
+                InfoNextTok ();
+                InfoAssureStr ();
+                if (InfoSVal[0] == '\0') {
+                    InfoError ("AddrMode may not be empty");
+                }
+                if (InfoSVal[1] == '\0') {
+                    InfoError ("AddrMode must be two characters long");
+                }
+                if (tolower(InfoSVal[0]) == 'm') {
+                    if (InfoSVal[0] == 'm') {
+                        AddrMode = atMem16;
+                    } else {
+                        AddrMode = atMem8;
+                    }
+                } else {
+                    InfoError ("AddrMode syntax: mx");
+                }
+                if (tolower(InfoSVal[1]) == 'x') {
+                    if (InfoSVal[1] == 'x') {
+                        AddrMode |= atIdx16;
+                    } else {
+                        AddrMode |= atIdx8;
+                    }
+                } else {
+                    InfoError ("AddrMode syntax: mx");
+                }
+                InfoNextTok ();
+                break;
+
+            case INFOTOK_UNIT:
+                AddAttr ("UNIT", &Attributes, tUnit);
+                InfoNextTok ();
+                InfoAssureInt ();
+                InfoRangeCheck (0x0002, 0xFFFF);
+                Unit = InfoIVal;
+                InfoNextTok ();
+                break;
+
             default:
                 Internal ("Unexpected token: %u", InfoTok);
         }
@@ -651,6 +708,35 @@ static void RangeSection (void)
         InfoError ("Required values missing from this section");
     }
 
+    if (CPU == CPU_65816) {
+        if (Type == atCode && !(Attributes & tAddrMode)) {
+            InfoError ("65816 code sections require addressing mode");
+        }
+        if (Type != atCode && (Attributes & tAddrMode)) {
+            InfoError ("AddrMode is only valid for code sections");
+        }
+    }
+
+    /* Only tables support unit sizes */
+    if ((Attributes & tUnit) &&
+        Type != atAddrTab &&
+        Type != atByteTab &&
+        Type != atDByteTab &&
+        Type != atDWordTab &&
+        Type != atRtsTab &&
+        Type != atTextTab &&
+        Type != atWordTab) {
+        InfoError ("Only table types support unit size");
+    }
+
+    /* Mark each unit separator */
+    if (Attributes & tUnit) {
+        unsigned i;
+        for (i = Start; i < End; i += Unit) {
+            MarkAddr(i, atTableUnit);
+        }
+    }
+
     /* Start must be less than end */
     if (Start > End) {
         InfoError ("Start value must not be greater than end value");
@@ -662,7 +748,7 @@ static void RangeSection (void)
     }
 
     /* Set the range */
-    MarkRange (Start, End, Type);
+    MarkRange (Start, End, Type | AddrMode);
 
     /* Do we have a label? */
     if (Attributes & tName) {

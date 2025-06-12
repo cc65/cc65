@@ -521,7 +521,7 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
     /* If we have a function given, get the return type of the function.
     ** Assume ANY return type besides void will use the A and X registers.
     */
-    if (S->Func && !IsTypeVoid ((RetType = GetFuncReturn (Func->Type)))) {
+    if (S->Func && !IsTypeVoid ((RetType = GetFuncReturnType (Func->Type)))) {
         if (SizeOf (RetType) == SizeOf (type_long)) {
             S->ExitRegs = REG_EAX;
         } else {
@@ -1471,7 +1471,7 @@ void CS_Output (CodeSeg* S)
             /* Add line debug info */
             if (DebugInfo) {
                 WriteOutput ("\t.dbg\tline, \"%s\", %u\n",
-                             GetInputName (LI), GetInputLine (LI));
+                             GetActualFileName (LI), GetActualLineNum (LI));
             }
         }
         /* Output the code */

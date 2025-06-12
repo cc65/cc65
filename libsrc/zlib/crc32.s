@@ -1,6 +1,7 @@
 ;
 ; 2001-11-14, Piotr Fusik
 ; 2018-05-20, Christian Kruger
+; 2025-05-14, Piotr Fusik
 ;
 ; unsigned long __fastcall__ crc32 (unsigned long crc,
 ;                                   const unsigned char* buf,
@@ -9,7 +10,7 @@
 
         .export _crc32
 
-        .import         compleax, incsp2, incsp4, popptr1, popeax
+        .import         compleax, incsp4, popptr1, popeax
         .importzp       sreg, ptr1, ptr2, tmp1, tmp2
 
 POLYNOMIAL      =       $EDB88320
@@ -58,15 +59,12 @@ make_table:
         inx
         bne     @L1
         inc     table_initialised
-RET:
         rts
 
 _crc32:
-; ptr2 = (len & 0xff) == 0 ? len : len + 0x100;
-        tay
-        beq     @L1
+; ptr2 = len + 0x100
         inx
-@L1:    sta     ptr2
+        sta     ptr2
         stx     ptr2+1
 ; ptr1 = buf
         jsr     popptr1
@@ -78,20 +76,15 @@ _crc32:
         bne     @dont_make
         jsr     make_table
 @dont_make:
-; eax = crc
-        jsr     popeax
-; if (len == 0) return crc;
-        ldy     ptr2
-        bne     @L2
-        ldy     ptr2+1
-        beq     RET
-@L2:
 ; eax = ~crc
+        jsr     popeax
         jsr     compleax
         stx     tmp2
         ldy     #0
+@L1:    cpy     ptr2
+        beq     @low_end
 ; crc = (crc >> 8) ^ table[(crc & 0xff) ^ *p++];
-@L3:    eor     (ptr1),y
+@L2:    eor     (ptr1),y
         tax
         lda     table_0,x
         eor     tmp2
@@ -106,12 +99,12 @@ _crc32:
         sta     sreg+1
         lda     tmp1
         iny
-        bne     @L4
+        bne     @L1
         inc     ptr1+1
-@L4:    dec     ptr2
-        bne     @L3
+        jmp     @L1
+@low_end:
         dec     ptr2+1
-        bne     @L3
+        bne     @L2
         ldx     tmp2
         jmp     compleax
 

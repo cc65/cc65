@@ -55,6 +55,7 @@
 
 
 /* Opcode description table */
+/* CAUTION: table must be sorted by mnemonic for bsearch */
 const OPCDesc OPCTable[OP65_COUNT] = {
 
     /* 65XX opcodes */

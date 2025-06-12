@@ -7,7 +7,7 @@
         .include        "atari.inc"
         .export         _dio_query_sectsize
         .importzp       ptr1,tmp1
-        .import         popax, __oserror
+        .import         popax, ___oserror
 
 .proc   _dio_query_sectsize
 
@@ -15,7 +15,7 @@
         stx     ptr1+1
 
         lda     #0
-        sta     __oserror
+        sta     ___oserror
 
         ldy     #sst_sectsize+1
         lda     (ptr1),y

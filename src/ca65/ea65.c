@@ -72,11 +72,13 @@ void GetEA (EffAddr* A)
     /* Clear the output struct */
     A->AddrModeSet = 0;
     A->Expr = 0;
+    A->Flags = 0;
 
     /* Handle an addressing size override */
     switch (CurTok.Tok) {
         case TOK_OVERRIDE_ZP:
             Restrictions = AM65_DIR | AM65_DIR_X | AM65_DIR_Y;
+            A->Flags |= EFFADDR_OVERRIDE_ZP;
             NextTok ();
             break;
 

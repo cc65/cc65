@@ -332,6 +332,7 @@ See the <url url="funcref.html" name="function reference"> for declaration and u
 <item>_scroll
 <item>_setcolor
 <item>_setcolor_low
+<item>_sound
 <item>waitvsync
 </itemize>
 
@@ -411,8 +412,9 @@ Please mind that ANTIC has memory alignment requirements for "player
 missile graphics"-data, font data, display lists and screen memory. Creation
 of a special linker configuration with appropriate aligned segments and
 switching to that segment in the c-code is usually necessary. A more memory
-hungry solution consists in using the "<tt/posix_memalign()/" function in
-conjunction with copying your data to the allocated memory.
+hungry solution consists in using the <url url="funcref.html#posix_memalign"
+name="posix_memalign()"> function in conjunction with copying your data to the
+allocated memory.
 
 <sect1>Character mapping<p>
 
@@ -442,19 +444,7 @@ package delivers the same feature.</em>
 You can switch back to the ATASCII mapping by including
 "<tt/atari_atascii_charmap.h/".
 
-A final note: Since cc65 has currently some difficulties with string merging
-under different mappings, defining remapped strings works only flawlessly
-with static array initialization:
-
-<tscreen><verb>
-#include &lt;atari_screen_charmap.h&gt;
-char pcScreenMappingString[] = "Hello Atari!";
-
-#include &lt;atari_atascii_charmap.h&gt;
-char pcAtasciiMappingString[] = "Hello Atari!";
-</verb></tscreen>
-
-delivers correct results, while
+Example:
 
 <tscreen><verb>
 #include &lt;atari_screen_charmap.h&gt;
@@ -463,8 +453,6 @@ char* pcScreenMappingString = "Hello Atari!";
 #include &lt;atari_atascii_charmap.h&gt;
 char* pcAtasciiMappingString = "Hello Atari!";
 </verb></tscreen>
-
-does not.
 
 <sect1>Keyboard codes<p>
 

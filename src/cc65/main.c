@@ -306,7 +306,7 @@ static void SetSys (const char* Sys)
         case TGT_EBADGER:
             DefineNumericMacro ("__EBADGER__", 1);
             break;
-            
+
         case TGT_RP6502:
             DefineNumericMacro ("__RP6502__", 1);
             break;

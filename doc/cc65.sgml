@@ -200,13 +200,13 @@ Here is a description of all the command line options:
   <tag><tt>-d, --debug</tt></tag>
 
   Enables debug mode, for debugging the behavior of cc65.
-     
+
 
   <label id="option-dD">
   <tag><tt>-dD</tt></tag>
 
   Like <tt/<ref id="option-dM" name="-dM">/ but does not include the predefined
-  macros.	   
+  macros.
 
 
   <label id="option-dM">

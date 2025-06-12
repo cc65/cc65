@@ -4809,7 +4809,7 @@ unsigned long GetCycles (void)
 /* Return the total number of cycles executed */
 {
     /* Return the total number of cycles */
-    return Peripherals.Counter.ClockCycles;
+    return (unsigned long)Peripherals.Counter.ClockCycles;
 }
 
 

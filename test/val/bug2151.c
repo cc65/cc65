@@ -47,10 +47,11 @@ _Pragma _Pragma (
 #pragma bss-name("BSS")
 {
     extern int y;
-#pragma bss-name("BSS2")
+#pragma bss-name("BSS") // used to be BSS2, but fix for #2608 means
+                        // that now causes ld65 to fail, so we use BSS instead
     static
 #pragma zpsym ("y")
-    int x; // TODO: currently in "BSS", but supposed to be in "BSS2"?
+    int x;
     x = 0;
 
     if (memcmp(str, "aBC", 3))

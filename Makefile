@@ -55,6 +55,7 @@ test:
 check:
 	@$(MAKE) -C .github/checks checkstyle --no-print-directory
 	@$(MAKE) -C .github/checks sorted     --no-print-directory
+	@$(MAKE) -C src test                  --no-print-directory
 	@$(MAKE) test
 	@$(MAKE) -C targettest platforms      --no-print-directory
 	@$(MAKE) -C samples platforms         --no-print-directory

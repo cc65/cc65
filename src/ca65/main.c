@@ -719,6 +719,24 @@ static void OneLine (void)
         NextTok ();
     }
 
+    /* Handle @-style unnamed labels */
+    if (CurTok.Tok == TOK_ULABEL) {
+        if (CurTok.IVal != 0) {
+            Error ("Invalid unnamed label definition");
+        }
+        ULabDef ();
+        NextTok ();
+
+        /* Skip the colon. If NoColonLabels is enabled, allow labels without
+        ** a colon if there is no whitespace before the identifier.
+        */
+        if (CurTok.Tok == TOK_COLON) {
+            NextTok ();
+        } else if (CurTok.WS || !NoColonLabels) {
+            Error ("':' expected");
+        }
+    }
+
     /* If the first token on the line is an identifier, check for a macro or
     ** an instruction.
     */

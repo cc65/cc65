@@ -12,23 +12,25 @@ endif
 
 WORKDIR = ../testwrk/asm
 
-SUBDIRS = cpudetect opcodes listing val err misc
-
 .PHONY: all continue mostlyclean clean
 
 all: mostlyclean continue
 
-define CALL_template
+continue: mostlyclean
+	@$(MAKE) -C cpudetect all
+	@$(MAKE) -C opcodes all
+	@$(MAKE) -C listing all
+	@$(MAKE) -C val all
+	@$(MAKE) -C err all
+	@$(MAKE) -C misc all
 
-continue::
-	@$(MAKE) -C $1 all
-
-mostlyclean::
-	@$(MAKE) -C $1 clean
-
-endef
-
-$(foreach subdir,$(SUBDIRS),$(eval $(call CALL_template,$(subdir))))
+mostlyclean:
+	@$(MAKE) -C cpudetect clean
+	@$(MAKE) -C opcodes clean
+	@$(MAKE) -C listing clean
+	@$(MAKE) -C val clean
+	@$(MAKE) -C err clean
+	@$(MAKE) -C misc clean
 
 clean: mostlyclean
 	@$(call RMDIR,$(WORKDIR))

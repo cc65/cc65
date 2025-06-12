@@ -102,7 +102,7 @@ readadapter:
         lda     #%00010001
         sta     $dd0e           ; control register a
                                 ; timer: start
-                                ;        continous
+                                ;        continuous
                                 ;        forced load
                                 ; serial port: input
 
@@ -110,7 +110,7 @@ readadapter:
         lda     #%01010001
         sta     $dc0e           ; control register a
                                 ; timer: start
-                                ;        continous
+                                ;        continuous
                                 ;        forced load
                                 ; serial port: output
 

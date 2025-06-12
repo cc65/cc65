@@ -61,7 +61,7 @@ Short options:
   -Os                           Inline some standard functions
   -T                            Include source as comment
   -V                            Print the compiler version number
-  -W warning[,...]              Suppress warnings
+  -W [-+]warning[,...]          Control warnings ('-' disables, '+' enables)
   -d                            Debug mode
   -g                            Add debug info to object file
   -h                            Help (this text)
@@ -84,8 +84,9 @@ Long options:
   --create-full-dep name        Create a full make dependency file
   --data-name seg               Set the name of the DATA segment
   --debug                       Debug mode
+  --debug-tables name           Write symbol table debug info to a file
   --debug-info                  Add debug info to object file
-  --debug-opt name              Configure optimizations with a file
+  --debug-opt name              Debug optimization steps
   --debug-opt-output            Debug output of each optimization step
   --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step
@@ -823,6 +824,11 @@ and the one defined by the ISO standard:
         as it sounds, since the 6502 has so few registers that it isn't
         possible to keep values in registers anyway.
         <p>
+<item>  In <tt/cc65/ mode, <tt/main()/ cannot be called recursively. If this
+        is necessary, the program must be compiled in <tt/c89/ or <tt/c99/ mode
+        using the <tt><ref id="option--standard" name="--standard"></tt>
+        command line option.
+        <p>
 </itemize>
 
 There may be some more minor differences I'm currently not aware of. The
@@ -1047,6 +1053,16 @@ This cc65 version has some extensions to the ISO C standard.
         unsigned char foo = 0b101; // sets it to 5
         </verb></tscreen>
 
+<item>  The character escape '\e', a GCC C extension, is accepted.
+        In ASCII this is the escape character 0x1B, which may be
+        remapped in other character sets via a #pragma charmap.
+        It can be disabled with the <tt><ref id="option--standard"
+        name="--standard"></tt> option.
+
+        <tscreen><verb>
+        unsigned char foo = '\e'; // sets it to 0x1B or equivalent
+        </verb></tscreen>
+
 </itemize>
 <p>
 
@@ -1137,6 +1153,96 @@ The compiler defines several macros at startup:
   <item><tt/__CC65_STD_C99__/
   <item><tt/__CC65_STD_CC65__/
   </itemize>
+
+  <label id="macro-CPU">
+  <tag><tt>__CPU__</tt></tag>
+
+  This macro contains a bitset that allows to check if a specific instruction
+  set is supported. For example, the 65C02 CPU supports all instructions of the
+  65SC02. So testing for the instruction set of the 65SC02 using the following
+  check will succeed for both CPUs (and also for the 65816 and HUC6280).
+
+  <tscreen><verb>
+  #if (__CPU__ & __CPU_ISET_65SC02__)
+  </verb></tscreen>
+
+  This is much simpler and more future proof than checking for specific CPUs.
+
+  The compiler defines a set of constants named <tt/__CPU_ISET_xxx/ to do the
+  checks. The <tt/__CPU__/ variable is usually derived from the target system
+  given, but can be changed using the <tt/<ref id="option--cpu" name="--cpu">/
+  command line option.
+
+  <tag><tt>__CPU_6502__</tt></tag>
+
+  This macro is defined if the code is compiled for a 6502 CPU.
+
+  <tag><tt>__CPU_6502X__</tt></tag>
+
+  This macro is defined if the code is compiled for a 6502 CPU with invalid
+  opcodes.
+
+  <tag><tt>__CPU_6502DTV__</tt></tag>
+
+  This macro is defined if the code is compiled for a DTV CPU.
+
+  <tag><tt>__CPU_65SC02__</tt></tag>
+
+  This macro is defined if the code is compiled for a 65SC02 CPU.
+
+  <tag><tt>__CPU_65C02__</tt></tag>
+
+  This macro is defined if the code is compiled for a 65C02 CPU.
+
+  <tag><tt>__CPU_65816__</tt></tag>
+
+  This macro is defined if the code is compiled for a 65816 CPU.
+
+  <tag><tt>__CPU_HUC6280__</tt></tag>
+
+  This macro is defined if the code is compiled for a HUC6280 CPU.
+
+  <tag><tt>__CPU_ISET_6502__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the 6502 CPU.
+
+  <tag><tt>__CPU_ISET_6502X__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the 6502X CPU.
+
+  <tag><tt>__CPU_ISET_6502DTV__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the 6502DTV CPU.
+
+  <tag><tt>__CPU_ISET_65SC02__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the 65SC02 CPU.
+
+  <tag><tt>__CPU_ISET_65C02__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the 65C02 CPU.
+
+  <tag><tt>__CPU_ISET_65816__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the 65816 CPU.
+
+  <tag><tt>__CPU_ISET_HUC6280__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the HUC6280 CPU.
 
   <tag><tt>__CX16__</tt></tag>
 
@@ -1273,6 +1379,12 @@ If the first parameter is <tt/push/, the old value is saved onto a stack
 before changing it. The value may later be restored by using the <tt/pop/
 parameter with the <tt/#pragma/.
 
+For all pragma names that contain hyphens, the same name using underlines
+instead of the hyphens is available as an alternative. While the former
+resembles the corresponding command line option and is more orthogonal, the
+latter may be more compatible with external tools that rewrite the token
+sequences of the input.
+
 
 <sect1><tt>#pragma allow-eager-inline ([push,] on|off)</tt><label id="pragma-allow-eager-inline"><p>
 
@@ -1358,7 +1470,7 @@ parameter with the <tt/#pragma/.
   Example:
   <tscreen><verb>
   /* Use a space wherever an 'a' occurs in ISO-8859-1 source */
-  #pragma charmap (0x61, 0x20);
+  #pragma charmap (0x61, 0x20)
   </verb></tscreen>
 
 
@@ -1613,13 +1725,13 @@ parameter with the <tt/#pragma/.
 
   This pragma sets a wrapper for functions, often used for trampolines.
 
-  The name is a function returning <tt/void/, and taking no parameters.
+  The <tt/name/ is a wrapper function returning <tt/void/, and taking no parameters.
   It must preserve the CPU's <tt/A/ and <tt/X/ registers if it wraps any
   <tt/__fastcall__/ functions that have parameters.  It must preserve
   the <tt/Y/ register if it wraps any variadic functions (they have "<tt/.../"
   in their prototypes).
 
-  The identifier is an 8-bit number that's set into <tt/tmp4/. If the identifier
+  The <tt/identifier/ is an 8-bit number that's set into <tt/tmp4/. If the <tt/identifier/
   is "bank", then ca65's <tt><url url="ca65.html#.BANK" name=".bank"></tt> function will be used
   to determine the number from the bank attribute defined in the linker config,
   see <url url="ld65.html#MEMORY" name="Other MEMORY area attributes">. Note that
@@ -1628,6 +1740,11 @@ parameter with the <tt/#pragma/.
 
   The address of a wrapped function is passed in <tt/ptr4/.  The wrapper can
   call that function by using "<tt/jsr callptr4/".
+
+  All functions ever declared or defined when this pragma is in effect will be wrapped
+  when they are called explicitly by their names later in the same translation unit.
+  Invocation of these functions in any other ways, for example, that via a function
+  pointer or in inline assembly code, will not be wrapped.
 
   This feature is useful, for example, with banked memory, to switch banks
   automatically to where a wrapped function resides, and then to restore the

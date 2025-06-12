@@ -69,6 +69,7 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
         /* Get the symbol types */
         const Type* Type1 = Sym1->Type;
         const Type* Type2 = Sym2->Type;
+        typecmp_t   CmpResult;
 
         /* If either of both functions is old style, apply the default
         ** promotions to the parameter type.
@@ -84,9 +85,10 @@ static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
             }
         }
 
-        /* Compare this field */
-        if (TypeCmp (Type1, Type2).C < TC_EQUAL) {
-            /* Field types not equal */
+        /* Compare types of this parameter */
+        CmpResult = TypeCmp (Type1, Type2);
+        if (CmpResult.C < TC_EQUAL || (CmpResult.F & TCF_MASK_PARAM_DIFF) != 0) {
+            /* The types are not compatible */
             return 0;
         }
 
@@ -257,8 +259,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
         }
 
         /* Get the ranks of the left and right hands */
-        LeftRank  = (GetUnqualTypeCode (lhs) & T_MASK_RANK);
-        RightRank = (GetUnqualTypeCode (rhs) & T_MASK_RANK);
+        LeftRank  = (GetUnderlyingTypeCode (lhs) & T_MASK_RANK);
+        RightRank = (GetUnderlyingTypeCode (rhs) & T_MASK_RANK);
 
         /* Bit-fields are considered compatible if they have the same
         ** signedness, bit-offset and bit-width.
@@ -342,10 +344,10 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
             case T_RANK_PTR:
                 ++Result->Indirections;
                 if (Result->Indirections == 1) {
-                    if ((GetUnqualTypeCode (lhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
+                    if ((GetUnderlyingTypeCode (lhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
                         Result->F |= TCF_VOID_PTR_ON_LEFT;
                     }
-                    if ((GetUnqualTypeCode (rhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
+                    if ((GetUnderlyingTypeCode (rhs + 1) & T_MASK_RANK) == T_RANK_VOID) {
                         Result->F |= TCF_VOID_PTR_ON_RIGHT;
                     }
                 } else {

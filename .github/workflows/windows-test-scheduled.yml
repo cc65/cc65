@@ -30,7 +30,7 @@ jobs:
         run: mkdir ~/.cache-sha
 
       - name: Cache SHA
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: check-sha
         with:
           path: ~/.cache-sha
@@ -43,11 +43,11 @@ jobs:
 
       - name: Checkout source
         if: steps.check-sha.outputs.cache-hit != 'true'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Add msbuild to PATH
         if: steps.check-sha.outputs.cache-hit != 'true'
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build app (MSVC debug)
         if: steps.check-sha.outputs.cache-hit != 'true'
@@ -70,7 +70,7 @@ jobs:
       - name: Run the regression tests (make test)
         if: steps.check-sha.outputs.cache-hit != 'true'
         shell: cmd
-        run: make test QUIET=1 SHELL=cmd
+        run: make -j2 test QUIET=1 SHELL=cmd
 
       - name: Test that the samples can be built (make samples)
         if: steps.check-sha.outputs.cache-hit != 'true'

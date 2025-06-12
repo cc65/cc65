@@ -231,9 +231,11 @@ static int findToken (const char * const *tokenTbl, const char *token)
     /* takes as input table of tokens and token, returns position in table or -1 if not found */
     int i;
 
-    for (i = 0; tokenTbl[i][0]; i++) {
-        if (strcmp (tokenTbl[i], token) == 0) {
-            return i;
+    if (token != NULL) {
+        for (i = 0; tokenTbl[i][0]; i++) {
+            if (strcmp (tokenTbl[i], token) == 0) {
+                return i;
+            }
         }
     }
 

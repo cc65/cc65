@@ -97,7 +97,7 @@
 #define COLOR_WHITE             (BCOLOR_WHITE | CATTR_LUMA7)
 #define COLOR_RED               (BCOLOR_RED | CATTR_LUMA4)
 #define COLOR_CYAN              (BCOLOR_CYAN | CATTR_LUMA7)
-#define COLOR_PURPLE            (BCOLOR_VIOLET | CATTR_LUMA7)
+#define COLOR_PURPLE            (BCOLOR_LIGHTVIOLET | CATTR_LUMA7)
 #define COLOR_GREEN             (BCOLOR_GREEN | CATTR_LUMA7)
 #define COLOR_BLUE              (BCOLOR_BLUE | CATTR_LUMA7)
 #define COLOR_YELLOW            (BCOLOR_YELLOW | CATTR_LUMA7)

@@ -90,6 +90,7 @@ struct FuncInfo {
 ** routines are marked to use only the A register. The remainder is ignored
 ** anyway.
 */
+/* CAUTION: table must be sorted for bsearch */
 static const FuncInfo FuncInfoTable[] = {
     { "addeq0sp",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_AXY                        },
     { "addeqysp",   SLV_IND | REG_AXY,  PSTATE_ALL | REG_AXY                        },
@@ -99,6 +100,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "aslax2",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "aslax3",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "aslax4",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
+    { "aslax7",     REG_AX,             PSTATE_ALL | REG_AXY                        },
     { "aslaxy",     REG_AXY,            PSTATE_ALL | REG_AXY | REG_TMP1             },
     { "asleax1",    REG_EAX,            PSTATE_ALL | REG_EAX | REG_TMP1             },
     { "asleax2",    REG_EAX,            PSTATE_ALL | REG_EAX | REG_TMP1             },
@@ -108,6 +110,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "asrax2",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "asrax3",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "asrax4",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
+    { "asrax7",     REG_AX,             PSTATE_ALL | REG_AX                         },
     { "asraxy",     REG_AXY,            PSTATE_ALL | REG_AXY | REG_TMP1             },
     { "asreax1",    REG_EAX,            PSTATE_ALL | REG_EAX | REG_TMP1             },
     { "asreax2",    REG_EAX,            PSTATE_ALL | REG_EAX | REG_TMP1             },
@@ -188,12 +191,12 @@ static const FuncInfo FuncInfoTable[] = {
     { "ldeaxysp",   SLV_IND | REG_Y,        PSTATE_ALL | REG_EAXY                   },
     { "leaa0sp",    REG_SP | REG_A,         PSTATE_ALL | REG_AX                     },
     { "leaaxsp",    REG_SP | REG_AX,        PSTATE_ALL | REG_AX                     },
-    { "leave00",    REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
-    { "leave0",     REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
     { "leave",      REG_SP,                 PSTATE_ALL | REG_SP | REG_Y             },
-    { "leavey00",   REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
-    { "leavey0",    REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leave0",     REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leave00",    REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
     { "leavey",     REG_SP | REG_Y,         PSTATE_ALL | REG_SP | REG_Y             },
+    { "leavey0",    REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leavey00",   REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
     { "lsubeq",     REG_EAXY | REG_PTR1_LO, PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
     { "lsubeq0sp",  SLV_TOP | REG_EAX,      PSTATE_ALL | REG_EAXY                   },
     { "lsubeq1",    REG_Y | REG_PTR1_LO,    PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
@@ -245,6 +248,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "shlax2",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "shlax3",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "shlax4",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
+    { "shlax7",     REG_AX,             PSTATE_ALL | REG_AXY                        },
     { "shlaxy",     REG_AXY,            PSTATE_ALL | REG_AXY | REG_TMP1             },
     { "shleax1",    REG_EAX,            PSTATE_ALL | REG_EAX | REG_TMP1             },
     { "shleax2",    REG_EAX,            PSTATE_ALL | REG_EAX | REG_TMP1             },
@@ -254,6 +258,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "shrax2",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "shrax3",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
     { "shrax4",     REG_AX,             PSTATE_ALL | REG_AX | REG_TMP1              },
+    { "shrax7",     REG_AX,             PSTATE_ALL | REG_AX                         },
     { "shraxy",     REG_AXY,            PSTATE_ALL | REG_AXY | REG_TMP1             },
     { "shreax1",    REG_EAX,            PSTATE_ALL | REG_EAX | REG_TMP1             },
     { "shreax2",    REG_EAX,            PSTATE_ALL | REG_EAX | REG_TMP1             },
@@ -376,6 +381,7 @@ static const FuncInfo FuncInfoTable[] = {
 #define FuncInfoCount   (sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
 /* Table with names of zero page locations used by the compiler */
+/* CAUTION: table must be sorted for bsearch */
 static const ZPInfo ZPInfoTable[] = {
     {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
     {   0, "ptr1+1",    1,  REG_PTR1_HI,    REG_PTR1    },
@@ -556,11 +562,8 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
                 *Use = REG_NONE;
             }
 
-            /* Will destroy all registers */
-            *Chg = REG_ALL;
-
-            /* and will destroy all processor flags */
-            *Chg |= PSTATE_ALL;
+            /* Will destroy all registers and processor flags */
+            *Chg = (REG_ALL | PSTATE_ALL);
 
             /* Done */
             return FNCLS_GLOBAL;
@@ -573,8 +576,7 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
         ** are used mostly in inline assembly anyway.
         */
         *Use = REG_ALL;
-        *Chg = REG_ALL;
-        *Chg |= PSTATE_ALL;
+        *Chg = (REG_ALL | PSTATE_ALL);
         return FNCLS_NUMERIC;
 
     } else {
@@ -601,8 +603,7 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
                 fprintf (stderr, "No info about internal function '%s'\n", Name);
             }
             *Use = REG_ALL;
-            *Chg = REG_ALL;
-            *Chg |= PSTATE_ALL;
+            *Chg = (REG_ALL | PSTATE_ALL);
         }
         return FNCLS_BUILTIN;
     }
@@ -611,8 +612,7 @@ fncls_t GetFuncInfo (const char* Name, unsigned int* Use, unsigned int* Chg)
     ** registers and processor flags are changed
     */
     *Use = REG_EAXY;
-    *Chg = REG_ALL;
-    *Chg |= PSTATE_ALL;
+    *Chg = (REG_ALL | PSTATE_ALL);
 
     return FNCLS_UNKNOWN;
 }
@@ -891,6 +891,14 @@ int RegEAXUsed (struct CodeSeg* S, unsigned Index)
 /* Check if any of the four bytes in EAX are used. */
 {
     return (GetRegInfo (S, Index, REG_EAX) & REG_EAX) != 0;
+}
+
+
+
+int LoadFlagsUsed (struct CodeSeg* S, unsigned Index)
+/* Check if one of the flags set by a register load (Z and N) are used. */
+{
+    return (GetRegInfo (S, Index, PSTATE_ZN) & PSTATE_ZN) != 0;
 }
 
 

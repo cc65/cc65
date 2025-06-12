@@ -5,7 +5,7 @@ CHECK_PATH=.
 
 cd $SCRIPT_PATH/../../
 
-FILES=`find $CHECK_PATH -type f \( -name \*.inc -o -name Makefile -o -name \*.cfg -o -name \*.\[chs\] -o -name \*.mac -o -name \*.asm -o -name \*.sgml \) -print | grep -v "libwrk/" | grep -v "testwrk/" | xargs grep -l ' $'`
+FILES=`find $CHECK_PATH -type f \( -name \*.inc -o -name Makefile -o -name \*.cfg -o -name \*.\[chs\] -o -name \*.mac -o -name \*.asm -o -name \*.sgml \) -print | grep -v "test/" | grep -v "libwrk/" | grep -v "testwrk/" | xargs grep -l ' $'`
 
 cd $OLDCWD
 

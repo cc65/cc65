@@ -270,7 +270,7 @@ SER_CLOSE:
         lda     #%00001010
         sta     ACIA_CMD
 
-; Initalize buffers. Returns zero in a
+; Initialize buffers. Returns zero in a
 
         jsr     InitBuffers
 

@@ -16,7 +16,7 @@
         sta     ID               ; Tape record ID to P1L
         jsr     LOADT            ; Read data from tape
         bcs     error
-        jmp     return0          ; Return 0 if sucessful
+        jmp     return0          ; Return 0 if successful
 error:  jmp     return1          ; or 1 if not
 
 .endproc
@@ -33,7 +33,7 @@ error:  jmp     return1          ; or 1 if not
         ldx     #$00
         jsr     DUMPT            ; Write data to tape
         bcs     error
-        jmp     return0          ; Return 0 if sucessful
+        jmp     return0          ; Return 0 if successful
 error:  jmp     return1          ; or 1 if not
 
 .endproc

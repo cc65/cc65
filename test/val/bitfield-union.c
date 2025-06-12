@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 The cc65 Authors
+  Copyright 2020-2023 The cc65 Authors
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any damages
@@ -25,6 +25,7 @@
 #include <stdio.h>
 
 typedef union {
+     const unsigned int : 1;
      unsigned int bf;
 
      struct {
@@ -38,8 +39,12 @@ static unsigned char failures = 0;
 
 int main (void)
 {
-     bitfield_t bitfield = {0};
+     bitfield_t bitfield = { 42 };
 
+     printf ("Bitfield: %u\n", bitfield.bf);
+     if (bitfield.bf != 42) failures++;
+
+     bitfield.bf ^= 42;
      printf ("Bitfield: %u\n", bitfield.bf);
      if (bitfield.bf != 0) failures++;
 

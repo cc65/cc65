@@ -450,7 +450,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 /* Parse argument declarations and function body. */
 {
     int         ParamComplete;  /* If all paramemters have complete types */
-    int         C99MainFunc = 0;/* Flag for C99 main function returning int */
     SymEntry*   Param;
     const Type* RType;          /* Real type used for struct parameters */
     const Type* ReturnType;     /* Return type */
@@ -512,28 +511,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
         /* Mark this as the main function */
         CurrentFunc->Flags |= FF_IS_MAIN;
-
-        /* Main cannot be a fastcall function */
-        if (IsQualFastcall (Func->Type)) {
-            Error ("'main' cannot be declared as __fastcall__");
-        }
-
-        /* Check return type */
-        if (GetUnqualRawTypeCode (ReturnType) == T_INT) {
-            /* Determine if this is a main function in a C99 environment that
-            ** returns an int.
-            */
-            if (IS_Get (&Standard) >= STD_C99) {
-                C99MainFunc = 1;
-            }
-        } else {
-            /* If cc65 extensions aren't enabled, don't allow a main function
-            ** that doesn't return an int.
-            */
-            if (IS_Get (&Standard) != STD_CC65) {
-                Error ("'main' must always return an int");
-            }
-        }
 
         /* Add a forced import of a symbol that is contained in the startup
         ** code. This will force the startup code to be linked in.
@@ -659,7 +636,9 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
         /* If this is the main function in a C99 environment returning an int,
         ** let it always return zero. Otherwise output a warning.
         */
-        if (C99MainFunc) {
+        if (F_IsMainFunc (CurrentFunc) &&
+            IS_Get (&Standard) >= STD_C99 &&
+            GetUnqualRawTypeCode (ReturnType) == T_INT) {
             g_getimmed (CF_INT | CF_CONST, 0, 0);
         } else if (IS_Get (&WarnReturnType)) {
             Warning ("Control reaches end of non-void function [-Wreturn-type]");
@@ -669,11 +648,17 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Output the function exit code label */
     g_defcodelabel (F_GetRetLab (CurrentFunc));
 
-    /* Restore the register variables */
-    F_RestoreRegVars (CurrentFunc);
+    /* Restore the register variables (not necessary for the main function in
+    ** cc65 mode)
+    */
+    int CleanupOnExit = (IS_Get (&Standard) != STD_CC65) ||
+                        !F_IsMainFunc (CurrentFunc);
+    if (CleanupOnExit) {
+        F_RestoreRegVars (CurrentFunc);
+    }
 
     /* Generate the exit code */
-    g_leave ();
+    g_leave (CleanupOnExit);
 
     /* Emit references to imports/exports */
     EmitExternals ();
@@ -685,9 +670,6 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     /* Leave the lexical level */
     LeaveFunctionLevel ();
 
-    /* Eat the closing brace */
-    ConsumeRCurly ();
-
     /* Restore the old literal pool, remembering the one for the function */
     Func->V.F.LitPool = PopLiteralPool ();
 
@@ -698,6 +680,12 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
 
     /* Switch back to the old segments */
     PopSegContext ();
+
+    /* Eat the closing brace after we've done everything with the function
+    ** definition. This way we won't have troubles with pragmas right after
+    ** the closing brace.
+    */
+    ConsumeRCurly();
 
     /* Reset the current function pointer */
     FreeFunction (CurrentFunc);

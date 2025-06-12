@@ -104,10 +104,16 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 
     } else {
 
-        /* The rhs cannot happen to be loaded in the primary as it is too big */
+        /* Load the address of rhs into the primary */
         if (!ED_IsLocExpr (RExpr)) {
             ED_AddrExpr (RExpr);
             LoadExpr (CF_NONE, RExpr);
+        } else if (RExpr->IVal != 0) {
+            /* We have an expression in the primary plus a constant
+            ** offset. Adjust the value in the primary accordingly.
+            */
+            g_inc (CF_PTR | CF_CONST, RExpr->IVal);
+            RExpr->IVal = 0;
         }
 
         /* Push the address of the rhs as the source of memcpy */

@@ -3,6 +3,9 @@
 # var. to build for another target system.
 SYS ?= geos-cbm
 
+# Comes with the VICE emulator, see http://vice-emu.sourceforge.net/
+C1541 ?= c1541
+
 # If SYS was given on the commandline, redirect "c64" to "geos-cbm" and
 # "apple2enh" to "geos-apple"
 ifeq ($(origin SYS),command line)
@@ -82,11 +85,11 @@ samples: $(EXELIST_$(SYS))
 	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))
 
 define samples-geos
-c1541 -attach $(0).d64 -geoswrite $(1);
+$(C1541) -attach $(0).d64 -geoswrite $(1);
 endef
 
 samples-geos: $(EXELIST_$(SYS))
-	c1541 -format "$@,01" d64 $@.d64
+	$(C1541) -format "$@,01" d64 $@.d64
 	$(foreach tool,$(EXELIST_$(SYS)),$(call samples-geos,$(tool)))
 else
 samples:
@@ -103,7 +106,7 @@ bitmap.c: logo.pcx
 
 bitmap-demo.cvt: bitmap.c bitmap-demores.grc bitmap-demo.c
 	$(CL) -t $(SYS) -O -o $@ -m bitmap-demo.map bitmap-demores.grc bitmap-demo.c
-	
+
 filesel.cvt: fileselres.grc filesel.c
 	$(CL) -t $(SYS) -O -o $@ -m filesel.map fileselres.grc filesel.c
 
@@ -134,7 +137,7 @@ vector-demo.cvt: vector-demores.grc vector-demo.c
 yesno.cvt: yesnores.grc yesno.c
 	$(CL) -t $(SYS) -O -o $@ -m yesno.map yesnores.grc yesno.c
 
-	
+
 clean:
 	@$(DEL) overlay-demores.h 2>$(NULLDEV)
 	@$(DEL) bitmap.c 2>$(NULLDEV)

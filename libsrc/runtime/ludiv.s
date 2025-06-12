@@ -22,7 +22,7 @@ tosudiv0ax:
 .endif
 
 tosudiveax:
-        jsr     getlop          ; Get the paramameters
+        jsr     getlop          ; Get the parameters
         jsr     udiv32          ; Do the division
         lda     ptr1            ; Result is in ptr1:sreg
         ldx     ptr1+1

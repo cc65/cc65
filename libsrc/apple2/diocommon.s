@@ -31,5 +31,5 @@ diocommon:
 dioepilog:
         ; Return success or error
         sta     ___oserror
-        ldx     #$00
+        ldx     #>$0000
         rts

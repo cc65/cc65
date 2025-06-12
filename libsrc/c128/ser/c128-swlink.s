@@ -134,7 +134,7 @@ ParityTable:
 ; Interrupt stub that is copied into low RAM. The startup code uses a special
 ; memory configuration with just kernal and I/O enabled (anything else is RAM).
 ; The NMI handler in ROM will switch back to a configuration where just the
-; low 16K RAM are accessible. So we have to copy a smal piece of code into
+; low 16K RAM are accessible. So we have to copy a small piece of code into
 ; low RAM that enables the cc65 configuration and then jumps to the real NMI
 ; handler.
 
@@ -296,7 +296,7 @@ SER_CLOSE:
         lda     #%00001010
         sta     ACIA_CMD
 
-; Initalize buffers. Returns zero in a
+; Initialize buffers. Returns zero in a
 
         jsr     InitBuffers
 

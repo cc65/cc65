@@ -67,6 +67,7 @@ static const char* const FeatureKeys[FEAT_COUNT] = {
     "bracket_as_indirect",
     "string_escapes",
     "long_jsr_jmp_rts",
+    "line_continuations",
 };
 
 
@@ -121,6 +122,7 @@ void SetFeature (feature_t Feature, unsigned char On)
         case FEAT_BRACKET_AS_INDIRECT:        BracketAsIndirect = On;    break;
         case FEAT_STRING_ESCAPES:             StringEscapes     = On;    break;
         case FEAT_LONG_JSR_JMP_RTS:           LongJsrJmpRts     = On;    break;
+        case FEAT_LINE_CONTINUATIONS:         LineCont          = On;    break;
         default:                                                         break;
     }
 }

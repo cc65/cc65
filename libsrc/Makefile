@@ -139,7 +139,6 @@ CC65FLAGS = -g -Or -W error
 EXTZP = cbm510 \
         cbm610 \
         lynx
-        
 
 MKINC = $(GEOS) \
         atari   \

@@ -8,6 +8,6 @@
 
         .include        "ebadger.inc"
 
-_revers: 
+_revers:
         lda #$00
         rts

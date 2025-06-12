@@ -58,6 +58,7 @@ init:   ldx     #zpspace-1
         ; Check for ProDOS.
         ldy     $BF00           ; MLI call entry point
         cpy     #$4C            ; Is MLI present? (JMP opcode)
+        php                     ; Remember whether we're running ProDOS
         bne     basic
 
         ; Check the ProDOS system bit map.
@@ -99,7 +100,20 @@ basic:  lda     HIMEM
         bit     $C081
         bit     $C081
 
-        ; Set the source start address.
+        plp                     ; Are we running ProDOS?
+        beq     :+              ; Yes, no need to patch vectors
+
+        lda     #<reset_6502
+        ldx     #>reset_6502
+        sta     ROM_RST
+        stx     ROM_RST+1
+
+        lda     #<irq_6502
+        ldx     #>irq_6502
+        sta     ROM_IRQ
+        stx     ROM_IRQ+1
+
+:       ; Set the source start address.
         ; Aka __LC_LOAD__ iff segment LC exists.
         lda     #<(__ONCE_LOAD__ + __ONCE_SIZE__)
         ldy     #>(__ONCE_LOAD__ + __ONCE_SIZE__)
@@ -143,6 +157,14 @@ return: rts
 quit:   jsr     $BF00           ; MLI call entry point
         .byte   $65             ; Quit
         .word   q_param
+
+reset_6502:                     ; Used with DOS3.3 programs
+        bit     $C082           ; Switch in ROM
+        jmp     (ROM_RST)       ; Jump to ROM's RESET vector
+
+irq_6502:                       ; Used with DOS3.3 programs
+        bit     $C082           ; Switch in ROM
+        jmp     (ROM_IRQ)       ; Jump to ROM's IRQ/BRK vector
 
 ; ------------------------------------------------------------------------
 

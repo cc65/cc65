@@ -1075,7 +1075,7 @@ static const struct {
         { "CLC",  0x0000001, 0x18, 0, PutAll },    //OK
         { "CLD",  0x0000001, 0xd8, 0, PutAll },    //OK
         { "CLI",  0x0000001, 0x58, 0, PutAll },    //OK
-        { "CLT",  0x0000001, 0x12, 0, PutAll }, 
+        { "CLT",  0x0000001, 0x12, 0, PutAll },
         { "CLV",  0x0000001, 0xb8, 0, PutAll },    //OK
         { "CMP",  0x080A26C, 0xc0, 0, PutAll },    //OK
         { "COM",  0x0000004, 0x44, 1, PutAll },
@@ -1606,7 +1606,7 @@ static void PutBitBranchm740 (const InsDesc* Ins)
     //GetEA (&A);
     //fprintf (stderr, "%s%d\n", "BITBRANCH Instruction ",A.AddrMode );
 //HACK! THIS DOES NOT WORK ALL THE TIME!
-    A.AddrMode = 2; 
+    A.AddrMode = 2;
 //HARDCODED FOR ZP ADDRESSING MODE!!!
 
     A.Opcode = Ins->BaseCode | EATab[Ins->ExtCode][A.AddrMode];

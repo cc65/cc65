@@ -21,7 +21,7 @@ PROGS = ar65     \
         sim65    \
         sp65
 
-.PHONY: all mostlyclean clean install zip avail unavail bin $(PROGS) dbginfo
+.PHONY: all mostlyclean clean install zip avail unavail bin $(PROGS)
 
 .SUFFIXES:
 
@@ -168,7 +168,19 @@ $(eval $(call OBJS_template,common))
 
 $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
 
-dbginfo:
-$(eval $(call PROG_template,dbginfo))
+
+.PHONY: dbginfo dbgsh test
+
+test: dbginfo dbgsh
+
+$(eval $(call OBJS_template,dbginfo))
+
+dbginfo: $(dbginfo_OBJS)
+
+../wrk/dbgsh$(EXE_SUFFIX): $(dbginfo_OBJS) ../wrk/common/common.a
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+dbgsh: ../wrk/dbgsh$(EXE_SUFFIX)
+
 
 -include $(DEPS)

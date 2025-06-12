@@ -26,6 +26,7 @@ TARGETS = apple2       \
           creativision \
           $(CBMS)      \
           $(GEOS)      \
+          ebadger      \
           gamate       \
           kim1         \
           lynx         \

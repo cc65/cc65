@@ -53,7 +53,6 @@
 #include "segment.h"
 
 
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -111,6 +110,7 @@ void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth
         L->Depth        = Depth;
         L->Output       = (ListingEnabled > 0);
         L->ListBytes    = (unsigned char) ListBytes;
+
         memcpy (L->Line, SB_GetConstBuf (Line), Len);
         L->Line[Len] = '\0';
 
@@ -184,8 +184,8 @@ void InitListingLine (void)
                 L->PC            = GetPC ();
                 L->Reloc         = GetRelocMode ();
                 L->Output        = (ListingEnabled > 0);
-                L->ListBytes = (unsigned char) ListBytes;
-            } while (L->Next != LineLast);
+                L->ListBytes     = (unsigned char) ListBytes;
+              } while (L->Next != LineLast);
         }
         LineCur = LineLast;
 
@@ -299,6 +299,8 @@ void CreateListing (void)
     FILE* F;
     Fragment* Frag;
     ListLine* L;
+    char file = 0xFF;
+
     char HeaderBuf [LINE_HEADER_LEN+1];
 
     /* Open the real listing file */
@@ -330,6 +332,25 @@ void CreateListing (void)
         if (L->Output == 0) {
             L = L->Next;
             continue;
+        }
+
+        if (L->File != file)
+        {
+            file = L->File;
+            fprintf (F, "File=%02X\n", L->File);
+
+            /* Increment the current line */
+            ++PageLines;
+
+            /* Switch to a new page if needed. Do not switch, if the current line is
+            ** the last one, to avoid pages that consist of just the header.
+            */
+            if (PageLength > 0 && PageLines >= PageLength) {
+                /* Do a formfeed */
+                putc ('\f', F);
+                /* Print the header on the new page */
+                PrintPageHeader (F, L);
+            }
         }
 
         /* If we don't have a fragment list for this line, things are easy */

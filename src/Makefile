@@ -21,7 +21,7 @@ PROGS = ar65     \
         sim65    \
         sp65
 
-.PHONY: all mostlyclean clean install zip avail unavail bin $(PROGS)
+.PHONY: all mostlyclean clean install zip avail unavail bin $(PROGS) dbginfo
 
 .SUFFIXES:
 
@@ -167,5 +167,8 @@ $(eval $(call OBJS_template,common))
 	$(AR) r $@ $?
 
 $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
+
+dbginfo:
+$(eval $(call PROG_template,dbginfo))
 
 -include $(DEPS)

@@ -138,8 +138,9 @@ struct TargetEntry {
     target_t    Id;                     /* Target ID */
 };
 
-/* Table that maps target names to IDs. Sorted alphabetically for bsearch().
+/* Table that maps target names to IDs.
 ** Allows multiple entries for one target ID (target name aliases).
+** CAUTION: must be alphabetically for bsearch().
 */
 static const TargetEntry TargetMap[] = {
     {   "apple2",       TGT_APPLE2       },
@@ -174,6 +175,7 @@ static const TargetEntry TargetMap[] = {
     {   "pce",          TGT_PCENGINE     },
     {   "pet",          TGT_PET          },
     {   "plus4",        TGT_PLUS4        },
+    {   "rp6502",       TGT_RP6502       },
     {   "sim6502",      TGT_SIM6502      },
     {   "sim65c02",     TGT_SIM65C02     },
     {   "supervision",  TGT_SUPERVISION  },
@@ -223,6 +225,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "ebadger",        CPU_65C02,      BINFMT_BINARY,      CTNone  },
+    { "rp6502",         CPU_65C02,      BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

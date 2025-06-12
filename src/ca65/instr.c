@@ -169,6 +169,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[56];
 } InsTab6502 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502.Ins) / sizeof (InsTab6502.Ins[0]),
     {
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
@@ -235,6 +236,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[75];
 } InsTab6502X = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502X.Ins) / sizeof (InsTab6502X.Ins[0]),
     {
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
@@ -324,6 +326,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[71];
 } InsTab6502DTV = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502DTV.Ins) / sizeof (InsTab6502DTV.Ins[0]),
     {
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
@@ -405,6 +408,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[66];
 } InsTab65SC02 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65SC02.Ins) / sizeof (InsTab65SC02.Ins[0]),
     {
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
@@ -481,6 +485,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[100];
 } InsTab65C02 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65C02.Ins) / sizeof (InsTab65C02.Ins[0]),
     {
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
@@ -591,6 +596,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[133];
 } InsTab4510 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab4510.Ins) / sizeof (InsTab4510.Ins[0]),
     {
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
@@ -734,6 +740,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[100];
 } InsTab65816 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65816.Ins) / sizeof (InsTab65816.Ins[0]),
     {
         { "ADC",  0x0b8f6fc, 0x60, 0, PutAll },
@@ -844,6 +851,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[26];
 } InsTabSweet16 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTabSweet16.Ins) / sizeof (InsTabSweet16.Ins[0]),
     {
         { "ADD",  AMSW16_REG,              0xA0, 0, PutSweet16 },
@@ -880,6 +888,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[135];
 } InsTabHuC6280 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTabHuC6280.Ins) / sizeof (InsTabHuC6280.Ins[0]),
     {
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
@@ -1618,7 +1627,7 @@ static void PutJMP (const InsDesc* Ins)
     if (EvalEA (Ins, &A)) {
 
         /* Check for indirect addressing */
-        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02)) {
+        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02) && (RelaxChecks == 0)) {
 
             /* Compare the low byte of the expression to 0xFF to check for
             ** a page cross. Be sure to use a copy of the expression otherwise
@@ -1631,7 +1640,7 @@ static void PutJMP (const InsDesc* Ins)
             unsigned Msg = GetStringId ("\"jmp (abs)\" across page border");
 
             /* Generate the assertion */
-            AddAssertion (E, ASSERT_ACT_WARN, Msg);
+            AddAssertion (E, ASSERT_ACT_ERROR, Msg);
         }
 
         /* No error, output code */

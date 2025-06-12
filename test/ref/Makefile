@@ -39,8 +39,18 @@ OPTIONS = g O Os Osi Osir Osr Oi Oir Or
 
 ISEQUAL = ..$S..$Stestwrk$Sisequal$(EXE)
 
+# NOTE: the current test bench may include K&R style C, C89 style C, C99 - and
+#       even things from later standards. Technically C99 removed certain C89
+#       constructs - However, so far GCC would still compile them and issue a
+#       warning (instead of an error). Now, GCC 14 will be more strict about this,
+#       and by default make those things an error instead. We use -std=gnu17 here
+#       so we can still build the references with a modern compiler, and don't
+#       have to deal with special-casing individual tests that use constructs
+#       from those old standards. Should this become a problem in the future, we
+#       will have to change that, and create said special cases here.
+#       see discussion in https://github.com/cc65/cc65/issues/2277
 CC = gcc
-CFLAGS = -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow
+CFLAGS = -std=gnu17 -O2 -Wall -W -Wextra -funsigned-char -fwrapv -fno-strict-overflow -Wno-error=implicit-int -Wno-error=int-conversion
 
 .PHONY: all clean
 
@@ -53,7 +63,9 @@ CUSTOMSOURCES = \
 # exact error output is required
 ERRORSOURCES = \
 	custom-reference-error.c \
-	bug1889-missing-identifier.c
+	inline-error.c \
+	bug1889-missing-identifier.c \
+	bug2312-preprocessor-error.c
 
 SOURCES := $(filter-out $(CUSTOMSOURCES) $(ERRORSOURCES),$(wildcard *.c))
 

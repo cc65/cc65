@@ -1,5 +1,7 @@
-custom-reference-error.c:18: Error: Call to undeclared function 'printf'
-custom-reference-error.c:19: Error: Undefined symbol: 'n'
-custom-reference-error.c:21: Warning: Control reaches end of non-void function [-Wreturn-type]
-custom-reference-error.c:21: Warning: Parameter 'argc' is never used
-custom-reference-error.c:21: Warning: Parameter 'argv' is never used
+custom-reference-error.c:17: Error: #error: This is an error
+custom-reference-error.c:21: Error: Call to undeclared function 'printf'
+custom-reference-error.c:22: Error: Undeclared identifier 'n'
+custom-reference-error.c:24: Warning: Control reaches end of non-void function [-Wreturn-type]
+custom-reference-error.c:24: Warning: Parameter 'argc' is never used
+custom-reference-error.c:24: Warning: Parameter 'argv' is never used
+custom-reference-error.c:26: Error: Constant integer expression expected

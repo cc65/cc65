@@ -18,10 +18,10 @@ jobs:
         run: git config --global core.autocrlf input
 
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build app (debug)
         run: msbuild src\cc65.sln -t:rebuild -property:Configuration=Debug
@@ -44,7 +44,7 @@ jobs:
       - shell: bash
         run: git config --global core.autocrlf input
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Do some simple style checks
         shell: bash
@@ -59,7 +59,7 @@ jobs:
         run: make -j2 lib QUIET=1
       - name: Run the regression tests.
         shell: bash
-        run: make test QUIET=1
+        run: make -j2 test QUIET=1
       - name: Test that the samples can be built.
         shell: bash
         run: make -j2 samples
@@ -86,18 +86,18 @@ jobs:
           mv cc65.zip cc65-snapshot-win32.zip
 
       - name: Upload a 32-bit Snapshot Zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cc65-snapshot-win32
           path: cc65-snapshot-win32.zip
       - name: Upload a 64-bit Snapshot Zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cc65-snapshot-win64
           path: cc65-snapshot-win64.zip
 
       - name: Get the online documents repo.
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: cc65/doc
           # this token will expire, if it does, generate a new one as decribed in https://github.com/cc65/cc65/issues/2065
@@ -120,7 +120,7 @@ jobs:
       - name: Package offline documents.
         run: 7z a cc65-snapshot-docs.zip ./html/*.*
       - name: Upload a Documents Snapshot Zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cc65-snapshot-docs
           path: cc65-snapshot-docs.zip
@@ -130,6 +130,15 @@ jobs:
         uses: nogsantos/scp-deploy@master
         with:
           src: cc65-snapshot-win32.zip
+          host: ${{ secrets.SSH_HOST }}
+          remote: ${{ secrets.SSH_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+      - name: Upload 64-bit Windows snapshot to sourceforge
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: cc65-snapshot-win64.zip
           host: ${{ secrets.SSH_HOST }}
           remote: ${{ secrets.SSH_DIR }}
           port: ${{ secrets.SSH_PORT }}

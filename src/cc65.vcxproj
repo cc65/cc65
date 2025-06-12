@@ -5,9 +5,17 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -21,7 +29,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -30,6 +44,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -40,9 +55,27 @@
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -64,12 +97,13 @@
     <ClInclude Include="cc65\codeseg.h" />
     <ClInclude Include="cc65\compile.h" />
     <ClInclude Include="cc65\coptadd.h" />
+    <ClInclude Include="cc65\coptbool.h" />
     <ClInclude Include="cc65\coptc02.h" />
     <ClInclude Include="cc65\coptcmp.h" />
     <ClInclude Include="cc65\coptind.h" />
     <ClInclude Include="cc65\coptjmp.h" />
+    <ClInclude Include="cc65\coptlong.h" />
     <ClInclude Include="cc65\coptmisc.h" />
-    <ClInclude Include="cc65\coptneg.h" />
     <ClInclude Include="cc65\coptptrload.h" />
     <ClInclude Include="cc65\coptptrstore.h" />
     <ClInclude Include="cc65\coptpush.h" />
@@ -79,6 +113,7 @@
     <ClInclude Include="cc65\coptstore.h" />
     <ClInclude Include="cc65\coptsub.h" />
     <ClInclude Include="cc65\copttest.h" />
+    <ClInclude Include="cc65\coptunary.h" />
     <ClInclude Include="cc65\dataseg.h" />
     <ClInclude Include="cc65\datatype.h" />
     <ClInclude Include="cc65\declare.h" />
@@ -110,6 +145,7 @@
     <ClInclude Include="cc65\scanner.h" />
     <ClInclude Include="cc65\scanstrbuf.h" />
     <ClInclude Include="cc65\segments.h" />
+    <ClInclude Include="cc65\seqpoint.h" />
     <ClInclude Include="cc65\shiftexpr.h" />
     <ClInclude Include="cc65\stackptr.h" />
     <ClInclude Include="cc65\standard.h" />
@@ -143,12 +179,13 @@
     <ClCompile Include="cc65\codeseg.c" />
     <ClCompile Include="cc65\compile.c" />
     <ClCompile Include="cc65\coptadd.c" />
+    <ClCompile Include="cc65\coptbool.c" />
     <ClCompile Include="cc65\coptc02.c" />
     <ClCompile Include="cc65\coptcmp.c" />
     <ClCompile Include="cc65\coptind.c" />
     <ClCompile Include="cc65\coptjmp.c" />
+    <ClCompile Include="cc65\coptlong.c" />
     <ClCompile Include="cc65\coptmisc.c" />
-    <ClCompile Include="cc65\coptneg.c" />
     <ClCompile Include="cc65\coptptrload.c" />
     <ClCompile Include="cc65\coptptrstore.c" />
     <ClCompile Include="cc65\coptpush.c" />
@@ -158,6 +195,7 @@
     <ClCompile Include="cc65\coptstore.c" />
     <ClCompile Include="cc65\coptsub.c" />
     <ClCompile Include="cc65\copttest.c" />
+    <ClCompile Include="cc65\coptunary.c" />
     <ClCompile Include="cc65\dataseg.c" />
     <ClCompile Include="cc65\datatype.c" />
     <ClCompile Include="cc65\declare.c" />
@@ -190,6 +228,7 @@
     <ClCompile Include="cc65\scanner.c" />
     <ClCompile Include="cc65\scanstrbuf.c" />
     <ClCompile Include="cc65\segments.c" />
+    <ClCompile Include="cc65\seqpoint.c" />
     <ClCompile Include="cc65\shiftexpr.c" />
     <ClCompile Include="cc65\stackptr.c" />
     <ClCompile Include="cc65\standard.c" />

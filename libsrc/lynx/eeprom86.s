@@ -41,7 +41,7 @@ EE_C_WRITE      =    $14
 EE_C_READ       =    $18
 EE_C_ERASE      =    $1C
 EE_C_EWEN       =    $13
-EE_C_EWEN2      =    $FF   ;; C0 schould be enough
+EE_C_EWEN2      =    $FF   ;; C0 should be enough
 EE_C_EWDS       =    $10
 EE_C_EWDS2      =    $00
 

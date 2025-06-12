@@ -12,7 +12,7 @@
 ;
 ;   2. Reentrancy. The condes routines must use self modyfiying code, which
 ;      means it is not reentrant. An IRQ using condes, that interrupts
-;      another use of condes will cause unpredicatble behaviour. The current
+;      another use of condes will cause unpredictable behaviour. The current
 ;      code avoids this by using locking mechanisms, but it's complex and
 ;      has a size and performance penalty.
 ;

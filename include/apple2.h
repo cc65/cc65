@@ -41,6 +41,7 @@
 #  error This module may only be used when compiling for the Apple ][!
 #endif
 
+#include <time.h>
 #include <apple2_filetype.h>
 
 
@@ -82,7 +83,77 @@
 #define CH_CURS_LEFT    0x08
 #define CH_CURS_RIGHT   0x15
 
-#if !defined(__APPLE2ENH__)
+/* These characters are not available on the ][+, but
+ * are on the //e. */
+#if defined(__APPLE2ENH__) || defined(APPLE2_INCLUDE_IIE_CHARS)
+#define CH_DEL          0x7F
+#define CH_CURS_UP      0x0B
+#define CH_CURS_DOWN    0x0A
+
+/* These are defined to be OpenApple + NumberKey */
+#define CH_F1   0xB1
+#define CH_F2   0xB2
+#define CH_F3   0xB3
+#define CH_F4   0xB4
+#define CH_F5   0xB5
+#define CH_F6   0xB6
+#define CH_F7   0xB7
+#define CH_F8   0xB8
+#define CH_F9   0xB9
+#define CH_F10  0xB0
+#endif
+
+#if defined(__APPLE2ENH__)
+
+/* MouseText-based functions for boxes and lines drawing */
+void mt_chline (unsigned char length);
+void mt_cvline (unsigned char length);
+void mt_chlinexy (unsigned char x, unsigned char y, unsigned char length);
+void mt_cvlinexy (unsigned char x, unsigned char y, unsigned char length);
+
+#define CH_HLINE        0x5F
+#define CH_VLINE        0xDF
+#define CH_ULCORNER     0x5F
+#define CH_URCORNER     0x20
+#define CH_LLCORNER     0xD4
+#define CH_LRCORNER     0xDF
+#define CH_TTEE         0x5F
+#define CH_BTEE         0xD4
+#define CH_LTEE         0xD4
+#define CH_RTEE         0xDF
+#define CH_CROSS        0xD4
+
+#define _chline(length)       mt_chline(length)
+#define _chlinexy(x,y,length) mt_chlinexy(x,y,length)
+#define _cvline(length)       mt_cvline(length)
+#define _cvlinexy(x,y,length) mt_cvlinexy(x,y,length)
+
+#else
+
+/* Functions that don't depend on MouseText to draw boxes and lines */
+void dyn_chline (unsigned char h, unsigned char length);
+void dyn_cvline (unsigned char v, unsigned char length);
+void dyn_chlinexy (unsigned char h, unsigned char x, unsigned char y, unsigned char length);
+void dyn_cvlinexy (unsigned char v, unsigned char x, unsigned char y, unsigned char length);
+
+#if defined(DYN_BOX_DRAW)
+/* When the user defines DYN_BOX_DRAW, we'll adapt to the machine
+** we run on.
+ */
+extern char CH_HLINE;
+extern char CH_VLINE;
+extern char CH_ULCORNER;
+extern char CH_URCORNER;
+extern char CH_LLCORNER;
+extern char CH_LRCORNER;
+extern char CH_TTEE;
+extern char CH_BTEE;
+extern char CH_LTEE;
+extern char CH_RTEE;
+extern char CH_CROSS;
+
+#else
+/* Otherwise, fallback to safety and don't use MouseText at all. */
 #define CH_HLINE        '-'
 #define CH_VLINE        '!'
 #define CH_ULCORNER     '+'
@@ -94,7 +165,14 @@
 #define CH_LTEE         '+'
 #define CH_RTEE         '+'
 #define CH_CROSS        '+'
-#endif
+#endif /* DYN_BOX_DRAW */
+
+#define _chline(length)         dyn_chline(CH_HLINE, length)
+#define _chlinexy(x, y, length) dyn_chlinexy(CH_HLINE, x ,y, length)
+#define _cvline(length)         dyn_cvline(CH_VLINE, length)
+#define _cvlinexy(x, y, length) dyn_cvlinexy(CH_VLINE, x, y, length)
+
+#endif /* __APPLE2ENH__ */
 
 /* Masks for joy_read */
 #define JOY_UP_MASK     0x10
@@ -121,6 +199,17 @@
 #define APPLE_IIGS1     0x81  /* Apple IIgs (ROM 1)          */
 #define APPLE_IIGS3     0x83  /* Apple IIgs (ROM 3)          */
 
+/* Return codes for get_tv() */
+#define TV_NTSC  0
+#define TV_PAL   1
+#define TV_OTHER 2
+
+/* Video modes */
+#define VIDEOMODE_40x24     0x15
+#define VIDEOMODE_80x24     0x00
+#define VIDEOMODE_40COL     VIDEOMODE_40x24
+#define VIDEOMODE_80COL     VIDEOMODE_80x24
+
 extern unsigned char _dos_type;
 /* Valid _dos_type values:
 **
@@ -142,6 +231,27 @@ extern unsigned char _dos_type;
 ** ProDOS 8 2.4.x - 0x24
 */
 
+/* struct stat.st_mode values */
+#define S_IFDIR  0x01
+#define S_IFREG  0x02
+#define S_IFBLK  0xFF
+#define S_IFCHR  0xFF
+#define S_IFIFO  0xFF
+#define S_IFLNK  0xFF
+#define S_IFSOCK 0xFF
+
+struct datetime {
+    struct {
+        unsigned day  :5;
+        unsigned mon  :4;
+        unsigned year :7;
+    }                 date;
+    struct {
+        unsigned char min;
+        unsigned char hour;
+    }                 time;
+};
+
 
 
 /*****************************************************************************/
@@ -151,20 +261,10 @@ extern unsigned char _dos_type;
 
 
 /* The file stream implementation and the POSIX I/O functions will use the
-** following struct to set the date and time stamp on files. This specificially
+** following struct to set the date and time stamp on files. This specifically
 ** applies to the open and fopen functions.
 */
-extern struct {
-    struct {
-        unsigned day  :5;
-        unsigned mon  :4;
-        unsigned year :7;
-    }             createdate;    /* Current date: 0 */
-    struct {
-        unsigned char min;
-        unsigned char hour;
-    }             createtime;    /* Current time: 0 */
-} _datetime;
+extern struct datetime _datetime;
 
 /* The addresses of the static drivers */
 #if !defined(__APPLE2ENH__)
@@ -172,6 +272,7 @@ extern void a2_auxmem_emd[];
 extern void a2_stdjoy_joy[];     /* Referred to by joy_static_stddrv[]   */
 extern void a2_stdmou_mou[];     /* Referred to by mouse_static_stddrv[] */
 extern void a2_ssc_ser[];        /* Referred to by ser_static_stddrv[]   */
+extern void a2_gs_ser[];         /* IIgs serial driver                   */
 extern void a2_hi_tgi[];         /* Referred to by tgi_static_stddrv[]   */
 extern void a2_lo_tgi[];
 #endif
@@ -183,6 +284,12 @@ extern void a2_lo_tgi[];
 /*****************************************************************************/
 
 
+
+void beep (void);
+/* Beep beep. */
+
+unsigned char get_tv (void);
+/* Get the machine vblank frequency. Returns one of the TV_xxx codes. */
 
 unsigned char get_ostype (void);
 /* Get the machine type. Returns one of the APPLE_xxx codes. */
@@ -209,6 +316,35 @@ void rebootafterexit (void);
 #define _bordercolor(color)     COLOR_BLACK
 #define _cpeekcolor()           COLOR_WHITE
 #define _cpeekrevers()          0
+
+struct tm* __fastcall__ gmtime_dt (const struct datetime* dt);
+/* Converts a ProDOS date/time structure to a struct tm */
+
+time_t __fastcall__ mktime_dt (const struct datetime* dt);
+/* Converts a ProDOS date/time structure to a time_t UNIX timestamp */
+
+typedef struct DIR DIR;
+
+unsigned int __fastcall__ dir_entry_count(DIR *dir);
+/* Returns the number of active files in a ProDOS directory */
+
+#if !defined(__APPLE2ENH__)
+unsigned char __fastcall__ allow_lowercase (unsigned char onoff);
+/* If onoff is 0, lowercase characters printed to the screen via STDIO and
+** CONIO are forced to uppercase. If onoff is 1, lowercase characters are
+** printed to the screen untouched.  By default lowercase characters are
+** forced to uppercase because a stock Apple ][+ doesn't support lowercase
+** display. The function returns the old lowercase setting.
+*/
+#endif
+
+signed char __fastcall__ videomode (unsigned mode);
+/* Set the video mode, return the old mode, or -1 if 80-column hardware is not
+** installed. Call with one of the VIDEOMODE_xx constants.
+*/
+
+void waitvsync (void);
+/* Wait for start of next frame */
 
 
 

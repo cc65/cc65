@@ -56,7 +56,7 @@
 
 
 
-struct Segments;
+struct SegContext;
 struct LiteralPool;
 struct CodeEntry;
 
@@ -68,46 +68,92 @@ struct CodeEntry;
 
 
 
-/* Storage classes and flags */
+/* Symbol types and flags */
 #define SC_NONE         0x0000U         /* Nothing */
-#define SC_STRUCT       0x0001U         /* Struct */
-#define SC_UNION        0x0002U         /* Union */
-#define SC_ENUM         0x0003U         /* Enum */
-#define SC_TYPEDEF      0x0004U         /* Typedef */
-#define SC_ESUTYPEMASK  0x0007U         /* Mask for above types */
-#define SC_ENUMERATOR   0x0008U         /* An enumerator */
-#define SC_BITFIELD     0x0010U         /* A bit-field inside a struct or union */
-#define SC_TYPEMASK     0x001FU         /* Mask for above types */
 
-#define SC_FUNC         0x0020U         /* A function */
-#define SC_LABEL        0x0040U         /* A goto code label */
-#define SC_CONST        0x0080U         /* A numeric constant with a type */
-#define SC_PARAM        0x0100U         /* A function parameter */
-#define SC_DEFTYPE      0x0200U         /* Parameter has default type (=int, old style) */
-#define SC_STRUCTFIELD  0x0400U         /* Struct or union field */
+/* Types of symbols */
+#define SC_STRUCT       0x0001U         /* Struct tag */
+#define SC_UNION        0x0002U         /* Union tag */
+#define SC_ENUM         0x0003U         /* Enum tag */
+#define SC_LABEL        0x0004U         /* A goto code label */
+#define SC_BITFIELD     0x0005U         /* A bit-field inside a struct or union */
+#define SC_TYPEDEF      0x0006U         /* A typedef */
+#define SC_ENUMERATOR   0x0007U         /* An enumerator */
 
-#define SC_ZEROPAGE     0x0800U         /* Symbol marked as zeropage */
+/* Note: These symbol types might be checked as bit-flags occasionally.
+**       So don't share their unique bits with other symbol types.
+*/
+#define SC_FUNC         0x0008U         /* A function */
+#define SC_ARRAY        0x0010U         /* UNUSED: An array */
+#define SC_TYPEMASK     0x001FU         /* Mask for symbol types all above */
 
-#define SC_DEF          0x1000U         /* Symbol is defined */
-#define SC_REF          0x2000U         /* Symbol is referenced */
-#define SC_DECL         0x4000U         /* Symbol is declared in global scope */
-#define SC_STORAGE      0x8000U         /* Symbol with associated storage */
+/* Additional property of the symbols */
+#define SC_CONST        0x0020U         /* A numeric constant with a type */
+#define SC_STRUCTFIELD  0x0040U         /* A struct or union field */
+#define SC_PARAM        0x0080U         /* A function parameter */
+#define SC_DEFTYPE      0x0100U         /* An old-style parameter with default type (=int) */
 
-#define SC_AUTO         0x010000U       /* Auto variable */
-#define SC_REGISTER     0x020000U       /* Register variable */
-#define SC_STATIC       0x040000U       /* Static - not to be confused with other *_STATIC */
-#define SC_EXTERN       0x080000U       /* Extern linkage */
-#define SC_STORAGEMASK  0x0F0000U       /* Storage type mask */
+/* Address property of the symbol */
+#define SC_ZEROPAGE     0x0200U         /* Symbol marked as on zeropage */
 
-#define SC_HAVEATTR     0x100000U       /* Symbol has attributes */
+/* Additional attributes of the symbol */
+#define SC_HAVEALIGN    0x0400U         /* UNUSED: Symbol has special alignment */
+#define SC_HAVEATTR     0x0800U         /* Symbol has attributes */
 
-#define SC_GOTO         0x200000U
-#define SC_SPADJUSTMENT 0x400000U
-#define SC_GOTO_IND     0x800000U       /* Indirect goto */
+/* Special property of declaration */
+#define SC_TU_STORAGE   0x1000U         /* Symbol has allocated storage in the TU */
+#define SC_ASSIGN_INIT  0x2000U         /* Symbol is to be initialized with assignment code */
 
-#define SC_ALIAS        0x01000000U     /* Alias of global or anonymous field */
-#define SC_FICTITIOUS   0x02000000U     /* Symbol is fictitious (for error recovery) */
-#define SC_HAVEFAM      0x04000000U     /* Type has a Flexible Array Member */
+#define SC_ALIAS        0x4000U         /* Symbol is an alias */
+#define SC_FICTITIOUS   0x8000U         /* Symbol is fictitious (for error recovery) */
+#define SC_HAVEFAM      0x010000U       /* Struct/union has a Flexible Array Member */
+#define SC_HAVECONST    0x020000U       /* Struct/union has a const member */
+
+/* Status of the symbol */
+#define SC_DEF          0x040000U       /* Symbol is defined */
+#define SC_REF          0x080000U       /* Symbol is referenced */
+#define SC_GOTO         0x100000U       /* Symbol is destination of a goto */
+#define SC_GOTO_IND     0x200000U       /* Symbol is destination of an indirect goto */
+#define SC_LOCALSCOPE   0x400000U       /* Symbol is invisible in file scope */
+#define SC_NOINLINEDEF  0x800000U       /* Symbol may never have an inline definition */
+
+/* To figure out the linkage of an object or function symbol Sym:
+** - external linkage:
+**    SymIsGlobal (Sym) && (Sym->Flags & SC_STORAGEMASK) != SC_STATIC
+** - internal linkage:
+**    SymIsGlobal (Sym) && (Sym->Flags & SC_STORAGEMASK) == SC_STATIC
+** - no linkage:
+**    !SymIsGlobal (Sym)
+**
+** To figure out the storage class of a symbol by its SC_ flags:
+**
+** - no explicit storage class specifiers (in file scope):
+**    (flags & SC_STORAGEMASK) == SC_NONE
+** - no explicit storage class specifiers (in block scope):
+**    (flags & SC_STORAGEMASK) == SC_AUTO
+** - extern:
+**    (flags & SC_STORAGEMASK) == SC_EXTERN
+** - static:
+**    (flags & SC_STORAGEMASK) == SC_STATIC
+** - auto:
+**    (flags & SC_STORAGEMASK) == SC_AUTO
+** - register:
+**    (flags & SC_STORAGEMASK) == SC_REGISTER
+** - typedef (per ISO C):
+**    (flags & SC_TYPEMASK) == SC_TYPEDEF
+**
+** Note: SC_TYPEDEF can be also used as a flag.
+*/
+#define SC_AUTO         0x01000000U     /* Auto storage class */
+#define SC_REGISTER     0x02000000U     /* Register storage class */
+#define SC_STATIC       0x03000000U     /* Static storage class */
+#define SC_EXTERN       0x04000000U     /* Extern storage class */
+#define SC_THREAD       0x08000000U     /* UNSUPPORTED: Thread-local storage class */
+#define SC_STORAGEMASK  0x0F000000U     /* Storage type mask */
+
+/* Function specifiers */
+#define SC_INLINE       0x10000000U     /* Inline function */
+#define SC_NORETURN     0x20000000U     /* Noreturn function */
 
 
 
@@ -156,8 +202,10 @@ struct SymEntry {
 
         /* Data for functions */
         struct {
-            struct Segments*    Seg;      /* Segments for this function */
+            struct SegContext*  Seg;      /* SegContext for this function */
             struct LiteralPool* LitPool;  /* Literal pool for this function */
+            struct SymEntry*    WrappedCall;        /* Pointer to the WrappedCall */
+            unsigned int        WrappedCallData;    /* The WrappedCall's user data */
         } F;
 
         /* Label name for static symbols */
@@ -211,14 +259,37 @@ void FreeSymEntry (SymEntry* E);
 void DumpSymEntry (FILE* F, const SymEntry* E);
 /* Dump the given symbol table entry to the file in readable form */
 
+int SymIsOutputFunc (const SymEntry* Sym);
+/* Return true if this is a function that must be output */
+
+#if defined(HAVE_INLINE)
+INLINE int SymIsArray (const SymEntry* Sym)
+/* Return true if the given entry is an array entry */
+{
+    return ((Sym->Flags & SC_TYPEMASK) == SC_ARRAY);
+}
+#else
+#  define SymIsArray(Sym)       (((Sym)->Flags & SC_TYPEMASK) == SC_ARRAY)
+#endif
+
 #if defined(HAVE_INLINE)
 INLINE int SymIsBitField (const SymEntry* Sym)
 /* Return true if the given entry is a bit-field entry */
 {
-    return ((Sym->Flags & SC_BITFIELD) == SC_BITFIELD);
+    return ((Sym->Flags & SC_TYPEMASK) == SC_BITFIELD);
 }
 #else
-#  define SymIsBitField(Sym)    (((Sym)->Flags & SC_BITFIELD) == SC_BITFIELD)
+#  define SymIsBitField(Sym)    (((Sym)->Flags & SC_TYPEMASK) == SC_BITFIELD)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int SymIsLabel (const SymEntry* Sym)
+/* Return true if the given entry is a label entry */
+{
+    return ((Sym)->Flags & SC_TYPEMASK) == SC_LABEL;
+}
+#else
+#  define SymIsLabel(Sym)       (((Sym)->Flags & SC_TYPEMASK) == SC_LABEL)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -254,16 +325,12 @@ INLINE int SymIsRef (const SymEntry* Sym)
 #if defined(HAVE_INLINE)
 INLINE int SymIsRegVar (const SymEntry* Sym)
 /* Return true if the given entry is a register variable */
-/* ### HACK! Fix the ugly type flags! */
 {
-    return ((Sym->Flags & (SC_REGISTER | SC_TYPEMASK)) == SC_REGISTER);
+    return ((Sym->Flags & (SC_STORAGEMASK | SC_TYPEMASK)) == (SC_REGISTER | SC_NONE));
 }
 #else
-#  define SymIsRegVar(Sym)  (((Sym)->Flags & (SC_REGISTER | SC_TYPEMASK)) == SC_REGISTER)
+#  define SymIsRegVar(Sym)  (((Sym)->Flags & (SC_STORAGEMASK | SC_TYPEMASK)) == (SC_REGISTER | SC_NONE))
 #endif
-
-int SymIsOutputFunc (const SymEntry* Sym);
-/* Return true if this is a function that must be output */
 
 #if defined(HAVE_INLINE)
 INLINE int SymHasFlexibleArrayMember (const SymEntry* Sym)
@@ -276,13 +343,23 @@ INLINE int SymHasFlexibleArrayMember (const SymEntry* Sym)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int SymHasConstMember (const SymEntry* Sym)
+/* Return true if the given entry has a const member */
+{
+    return ((Sym->Flags & SC_HAVECONST) == SC_HAVECONST);
+}
+#else
+#  define SymHasConstMember(Sym)    (((Sym)->Flags & SC_HAVECONST) == SC_HAVECONST)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE const char* SymGetAsmName (const SymEntry* Sym)
 /* Return the assembler label name for the symbol (beware: may be NULL!) */
 {
     return Sym->AsmName;
 }
 #else
-#  define SymGetAsmName(Sym)      ((Sym)->AsmName)
+#  define SymGetAsmName(Sym)        ((Sym)->AsmName)
 #endif
 
 const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType);

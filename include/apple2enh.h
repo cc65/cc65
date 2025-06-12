@@ -47,49 +47,6 @@
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Characters codes */
-#define CH_DEL          0x7F
-#define CH_CURS_UP      0x0B
-#define CH_CURS_DOWN    0x0A
-
-#define CH_HLINE        0x5F
-#define CH_VLINE        0xDF
-#define CH_ULCORNER     0x5F
-#define CH_URCORNER     0x20
-#define CH_LLCORNER     0xD4
-#define CH_LRCORNER     0xDF
-#define CH_TTEE         0x5F
-#define CH_BTEE         0xD4
-#define CH_LTEE         0xD4
-#define CH_RTEE         0xDF
-#define CH_CROSS        0xD4
-
-/* These are defined to be OpenApple + NumberKey */
-#define CH_F1   0xB1
-#define CH_F2   0xB2
-#define CH_F3   0xB3
-#define CH_F4   0xB4
-#define CH_F5   0xB5
-#define CH_F6   0xB6
-#define CH_F7   0xB7
-#define CH_F8   0xB8
-#define CH_F9   0xB9
-#define CH_F10  0xB0
-
-/* Video modes */
-#define VIDEOMODE_40x24     0x0011
-#define VIDEOMODE_80x24     0x0012
-#define VIDEOMODE_40COL     VIDEOMODE_40x24
-#define VIDEOMODE_80COL     VIDEOMODE_80x24
-
-
-
-/*****************************************************************************/
 /*                                 Variables                                 */
 /*****************************************************************************/
 
@@ -100,24 +57,9 @@ extern void a2e_auxmem_emd[];
 extern void a2e_stdjoy_joy[];     /* Referred to by joy_static_stddrv[]   */
 extern void a2e_stdmou_mou[];     /* Referred to by mouse_static_stddrv[] */
 extern void a2e_ssc_ser[];        /* Referred to by ser_static_stddrv[]   */
+extern void a2e_gs_ser[];         /* IIgs serial driver                   */
 extern void a2e_hi_tgi[];         /* Referred to by tgi_static_stddrv[]   */
 extern void a2e_lo_tgi[];
-
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
-
-unsigned __fastcall__ videomode (unsigned mode);
-/* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
-** constants.
-*/
-
-void waitvsync (void);
-/* Wait for start of next frame */
 
 
 

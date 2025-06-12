@@ -23,7 +23,7 @@
 .proc   __sio_call
 
         sta     DCOMND          ; set command into DCB
-        stx     DSTATS          ; set data flow directon
+        stx     DSTATS          ; set data flow direction
         jsr     popax           ; get buffer address
         sta     DBUFLO          ; set buffer address into DCB
         stx     DBUFHI

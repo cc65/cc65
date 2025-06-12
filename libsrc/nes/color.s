@@ -9,11 +9,11 @@
 
 
         .export         _textcolor, _bgcolor, _bordercolor
-        .import         return0, ppubuf_put
+        .import         return0, return1, ppubuf_put
 
         .include        "nes.inc"
 
-_textcolor      = return0
+_textcolor      = return1
 _bordercolor    = return0
 
 .proc   _bgcolor

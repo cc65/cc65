@@ -65,6 +65,7 @@
 #include "preproc.h"
 #include "standard.h"
 #include "staticassert.h"
+#include "typecmp.h"
 #include "symtab.h"
 
 
@@ -78,7 +79,6 @@
 static void Parse (void)
 /* Top level parser routine. */
 {
-    int comma;
     SymEntry* Sym;
     FuncDesc* FuncDef = 0;
 
@@ -88,14 +88,18 @@ static void Parse (void)
     /* Fill up the next token with a bogus semicolon and start the tokenizer */
     NextTok.Tok = TOK_SEMI;
     NextToken ();
+    NextToken ();
 
     /* Parse until end of input */
     while (CurTok.Tok != TOK_CEOF) {
 
         DeclSpec        Spec;
+        int             Comma;
+        int             NeedClean = 0;
 
         /* Check for empty statements */
         if (CurTok.Tok == TOK_SEMI) {
+            /* TODO: warn on this if we have a pedantic mode */
             NextToken ();
             continue;
         }
@@ -110,28 +114,20 @@ static void Parse (void)
             continue;
         }
 
-        /* Check for a #pragma */
-        if (CurTok.Tok == TOK_PRAGMA) {
-            DoPragma ();
-            continue;
-        }
-
         /* Check for a _Static_assert */
         if (CurTok.Tok == TOK_STATIC_ASSERT) {
             ParseStaticAssert ();
             continue;
         }
 
-        /* Read variable defs and functions */
-        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT, SC_EXTERN | SC_STATIC);
+        /* Read the declaration specifier */
+        ParseDeclSpec (&Spec, TS_DEFAULT_TYPE_INT | TS_FUNCTION_SPEC, SC_NONE);
 
         /* Don't accept illegal storage classes */
-        if ((Spec.StorageClass & SC_TYPEMASK) == 0) {
-            if ((Spec.StorageClass & SC_AUTO) != 0 ||
-                (Spec.StorageClass & SC_REGISTER) != 0) {
-                Error ("Illegal storage class");
-                Spec.StorageClass = SC_EXTERN | SC_STATIC;
-            }
+        if ((Spec.StorageClass & SC_STORAGEMASK) == SC_AUTO ||
+            (Spec.StorageClass & SC_STORAGEMASK) == SC_REGISTER) {
+            Error ("Illegal storage class");
+            Spec.StorageClass &= ~SC_STORAGEMASK;
         }
 
         /* Check if this is only a type declaration */
@@ -141,44 +137,59 @@ static void Parse (void)
             continue;
         }
 
+        /* If we haven't got a type specifier yet, something must be wrong */
+        if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
+            /* Avoid extra errors if it was a failed type specifier */
+            if ((Spec.Flags & DS_EXTRA_TYPE) == 0) {
+                Error ("Declaration specifier expected");
+            }
+            NeedClean = -1;
+            goto EndOfDecl;
+        }
+
         /* Read declarations for this type */
-        Sym = 0;
-        comma = 0;
+        Comma = 0;
         while (1) {
 
             Declarator Decl;
 
-            /* Read the next declaration */
-            ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
+            Sym = 0;
 
-            /* Check if we must reserve storage for the variable. We do this,
-            **
-            **   - if it is not a typedef or function,
-            **   - if we don't had a storage class given ("int i")
-            **   - if the storage class is explicitly specified as static,
-            **   - or if there is an initialization.
-            **
-            ** This means that "extern int i;" will not get storage allocated.
-            */
-            if ((Decl.StorageClass & SC_FUNC) != SC_FUNC &&
+            /* Read the next declaration */
+            NeedClean = ParseDecl (&Spec, &Decl, DM_IDENT_OR_EMPTY);
+
+            /* Bail out if there are errors */
+            if (NeedClean <= 0) {
+                break;
+            }
+
+            /* The symbol is now visible in the file scope */
+            if ((Decl.StorageClass & SC_TYPEMASK) != SC_FUNC &&
                 (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-                if ((Spec.Flags & DS_DEF_STORAGE) != 0                       ||
-                    (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
-                    ((Decl.StorageClass & SC_EXTERN) != 0 &&
+                /* Check if we must reserve storage for the variable. We do this,
+                **
+                **   - if it is not a typedef or function,
+                **   - if we don't had a storage class given ("int i")
+                **   - if the storage class is explicitly specified as static,
+                **   - or if there is an initialization.
+                **
+                ** This means that "extern int i;" will not get storage allocated
+                ** in this translation unit.
+                */
+                if ((Decl.StorageClass & SC_STORAGEMASK) == SC_NONE     ||
+                    (Decl.StorageClass & SC_STORAGEMASK) == SC_STATIC   ||
+                    ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN &&
                      CurTok.Tok == TOK_ASSIGN)) {
-                    /* We will allocate storage */
-                    Decl.StorageClass |= SC_STORAGE;
-                } else {
-                    /* It's a declaration */
-                    Decl.StorageClass |= SC_DECL;
+                    /* We will allocate storage in this translation unit */
+                    Decl.StorageClass |= SC_TU_STORAGE;
                 }
             }
 
             /* If this is a function declarator that is not followed by a comma
             ** or semicolon, it must be followed by a function body.
             */
-            if ((Decl.StorageClass & SC_FUNC) != 0) {
-                if (CurTok.Tok != TOK_COMMA && CurTok.Tok != TOK_SEMI) {
+            if ((Decl.StorageClass & SC_TYPEMASK) == SC_FUNC) {
+                if (CurTok.Tok == TOK_LCURLY) {
                     /* A definition */
                     Decl.StorageClass |= SC_DEF;
 
@@ -191,7 +202,13 @@ static void Parse (void)
                     }
                 } else {
                     /* Just a declaration */
-                    Decl.StorageClass |= SC_DECL;
+                    FuncDef = GetFuncDesc (Decl.Type);
+                    if ((FuncDef->Flags & (FD_EMPTY | FD_OLDSTYLE)) == FD_OLDSTYLE) {
+                        /* A parameter list without types is only allowed in a
+                        ** function definition.
+                        */
+                        Error ("Parameter names without types in function declaration");
+                    }
                 }
             }
 
@@ -202,7 +219,7 @@ static void Parse (void)
             SymUseAttr (Sym, &Decl);
 
             /* Reserve storage for the variable if we need to */
-            if (Decl.StorageClass & SC_STORAGE) {
+            if (Decl.StorageClass & SC_TU_STORAGE) {
 
                 /* Get the size of the variable */
                 unsigned Size = SizeOf (Decl.Type);
@@ -252,17 +269,19 @@ static void Parse (void)
 
                     /* Parse the initialization */
                     ParseInit (Sym->Type);
+
                 } else {
 
                     /* This is a declaration */
                     if (IsTypeVoid (Decl.Type)) {
                         /* We cannot declare variables of type void */
                         Error ("Illegal type for variable '%s'", Decl.Ident);
-                        Sym->Flags &= ~(SC_STORAGE | SC_DEF);
+                        Sym->Flags |= SC_DEF;
                     } else if (Size == 0 && SymIsDef (Sym) && !IsEmptiableObjectType (Decl.Type)) {
                         /* Size is unknown. Is it an array? */
                         if (!IsTypeArray (Decl.Type)) {
                             Error ("Variable '%s' has unknown size", Decl.Ident);
+                            Sym->Flags |= SC_DEF;
                         }
                     } else {
                         /* Check for enum forward declaration.
@@ -286,11 +305,14 @@ static void Parse (void)
                         */
                         const char* bssName = GetSegName (SEG_BSS);
 
-                        if (Sym->V.BssName && strcmp (Sym->V.BssName, bssName) != 0) {
-                            Error ("Global variable '%s' already was defined in the '%s' segment.",
-                                   Sym->Name, Sym->V.BssName);
+                        if (Sym->V.BssName != 0) {
+                            if (strcmp (Sym->V.BssName, bssName) != 0) {
+                                Error ("Global variable '%s' already was defined in the '%s' segment",
+                                       Sym->Name, Sym->V.BssName);
+                            }
+                        } else {
+                            Sym->V.BssName = xstrdup (bssName);
                         }
-                        Sym->V.BssName = xstrdup (bssName);
 
                         /* This is to make the automatical zeropage setting of the symbol
                         ** work right.
@@ -300,45 +322,63 @@ static void Parse (void)
                 }
 
                 /* Make the symbol zeropage according to the segment address size */
-                if ((Sym->Flags & SC_STATIC) != 0) {
-                    if (GetSegAddrSize (GetSegName (CS->CurDSeg)) == ADDR_SIZE_ZP) {
-                        Sym->Flags |= SC_ZEROPAGE;
+                if ((Sym->Flags & SC_TYPEMASK) == SC_NONE) {
+                    if (SymIsGlobal (Sym) ||
+                        (Sym->Flags & SC_STORAGEMASK) == SC_STATIC ||
+                        (Sym->Flags & SC_STORAGEMASK) == SC_REGISTER) {
+                        if (GetSegAddrSize (GetSegName (CS->CurDSeg)) == ADDR_SIZE_ZP) {
+                            Sym->Flags |= SC_ZEROPAGE;
+                        }
                     }
                 }
 
             }
 
             /* Check for end of declaration list */
-            if (CurTok.Tok == TOK_COMMA) {
-                NextToken ();
-                comma = 1;
-            } else {
+            if (CurTok.Tok != TOK_COMMA) {
                 break;
+            }
+            Comma = 1;
+            Spec.Flags |= DS_NO_EMPTY_DECL;
+            NextToken ();
+        }
+
+        /* Finish the declaration */
+        if (Sym && IsTypeFunc (Sym->Type) && CurTok.Tok == TOK_LCURLY) {
+            /* A function definition is not terminated with a semicolon */
+            if (IsTypeFunc (Spec.Type) && TypeCmp (Sym->Type, Spec.Type).C >= TC_EQUAL) {
+                /* ISO C: The type category in a function definition cannot be
+                ** inherited from a typedef.
+                */
+                Error ("Function cannot be defined with a typedef");
+            } else if (Comma) {
+                /* ISO C: A function definition cannot shall its return type
+                ** specifier with other declarators.
+                */
+                Error ("';' expected after top level declarator");
+            }
+
+            /* Parse the function body anyways */
+            NeedClean = 0;
+            NewFunc (Sym, FuncDef);
+
+            /* Make sure we aren't omitting any work */
+            CheckDeferredOpAllDone ();
+        } else if (NeedClean > 0) {
+            /* Must be followed by a semicolon */
+            if (CurTok.Tok != TOK_SEMI) {
+                Error ("',' or ';' expected after top level declarator");
+                NeedClean = -1;
+            } else {
+                NextToken ();
+                NeedClean = 0;
             }
         }
 
-        /* Function declaration? */
-        if (Sym && IsTypeFunc (Sym->Type)) {
-
-            /* Function */
-            if (!comma) {
-                if (CurTok.Tok == TOK_SEMI) {
-                    /* Prototype only */
-                    NextToken ();
-                } else {
-                    /* Parse the function body */
-                    NewFunc (Sym, FuncDef);
-
-                    /* Make sure we aren't omitting any work */
-                    CheckDeferredOpAllDone ();
-                }
-            }
-
-        } else {
-
-            /* Must be followed by a semicolon */
-            ConsumeSemi ();
-
+EndOfDecl:
+        /* Try some smart error recovery */
+        if (NeedClean < 0) {
+            SmartErrorSkip (1);
         }
     }
 
@@ -476,7 +516,10 @@ void Compile (const char* FileName)
         ** global variables.
         */
         for (Entry = GetGlobalSymTab ()->SymHead; Entry; Entry = Entry->NextSym) {
-            if ((Entry->Flags & (SC_STORAGE | SC_DEF | SC_STATIC)) == (SC_STORAGE | SC_STATIC)) {
+            /* Is it a global (with or without static) tentative declaration of
+            ** an uninitialized variable?
+            */
+            if ((Entry->Flags & (SC_TU_STORAGE | SC_DEF)) == SC_TU_STORAGE) {
                 /* Assembly definition of uninitialized global variable */
                 SymEntry* TagSym = GetESUTagSym (Entry->Type);
                 unsigned Size = SizeOf (Entry->Type);
@@ -505,11 +548,21 @@ void Compile (const char* FileName)
 
                     /* Mark as defined; so that it will be exported, not imported */
                     Entry->Flags |= SC_DEF;
-                } else {
+                } else if (!IsTypeArray (Entry->Type)) {
                     /* Tentative declared variable is still of incomplete type */
-                    Error ("Definition of '%s' has type '%s' that is never completed",
+                    Error ("Definition of '%s' never has its type '%s' completed",
                            Entry->Name,
                            GetFullTypeName (Entry->Type));
+                }
+            } else if (!SymIsDef (Entry) && (Entry->Flags & SC_TYPEMASK) == SC_FUNC) {
+                /* Check for undefined functions */
+                if ((Entry->Flags & SC_STORAGEMASK) == SC_STATIC && SymIsRef (Entry)) {
+                    Warning ("Static function '%s' used but never defined",
+                             Entry->Name);
+                } else if ((Entry->Flags & SC_INLINE) != 0) {
+                    Warning ("Inline function '%s' %s but never defined",
+                             Entry->Name,
+                             SymIsRef (Entry) ? "used" : "declared");
                 }
             }
         }

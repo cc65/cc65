@@ -201,6 +201,9 @@ int RegAXUsed (struct CodeSeg* S, unsigned Index);
 int RegEAXUsed (struct CodeSeg* S, unsigned Index);
 /* Check if any of the four bytes in EAX are used. */
 
+int LoadFlagsUsed (struct CodeSeg* S, unsigned Index);
+/* Check if one of the flags set by a register load (Z and N) are used. */
+
 unsigned GetKnownReg (unsigned Use, const struct RegContents* RC);
 /* Return the register or zero page location from the set in Use, thats
 ** contents are known. If Use does not contain any register, or if the

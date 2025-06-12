@@ -127,6 +127,7 @@ typedef enum {
     TOK_ABSOLUTE = TOK_FIRST_KEYWORD,   /* ABSOLUTE keyword */
     TOK_ADDRSIZE,                       /* ADDRSIZE keyword */
     TOK_AUTO,                           /* AUTO keyword */
+    TOK_BANK,                           /* BANK keyword */
     TOK_COUNT,                          /* COUNT keyword */
     TOK_CSYM,                           /* CSYM keyword */
     TOK_DEF,                            /* DEF keyword */
@@ -347,6 +348,7 @@ struct SegInfo {
     cc65_size           Size;           /* Size of segment */
     char*               OutputName;     /* Name of output file */
     unsigned long       OutputOffs;     /* Offset in output file */
+    unsigned            Bank;           /* Bank number of memory area */
     char                Name[1];        /* Name of segment */
 };
 
@@ -1618,7 +1620,8 @@ static int CompareScopeInfoByName (const void* L, const void* R)
 
 static SegInfo* NewSegInfo (const StrBuf* Name, unsigned Id,
                             cc65_addr Start, cc65_addr Size,
-                            const StrBuf* OutputName, unsigned long OutputOffs)
+                            const StrBuf* OutputName, unsigned long OutputOffs,
+                            unsigned Bank)
 /* Create a new SegInfo struct and return it */
 {
     /* Allocate memory */
@@ -1628,6 +1631,7 @@ static SegInfo* NewSegInfo (const StrBuf* Name, unsigned Id,
     S->Id         = Id;
     S->Start      = Start;
     S->Size       = Size;
+    S->Bank       = Bank;
     if (SB_GetLen (OutputName) > 0) {
         /* Output file given */
         S->OutputName = SB_StrDup (OutputName);
@@ -1676,6 +1680,7 @@ static void CopySegInfo (cc65_segmentdata* D, const SegInfo* S)
     D->segment_size  = S->Size;
     D->output_name   = S->OutputName;
     D->output_offs   = S->OutputOffs;
+    D->segment_bank  = S->Bank;
 }
 
 
@@ -2518,6 +2523,7 @@ static void NextChar (InputData* D)
 
 
 
+/* CAUTION: table must be sorted for bsearch */
 static void NextToken (InputData* D)
 /* Read the next token from the input stream */
 {
@@ -2528,6 +2534,7 @@ static void NextToken (InputData* D)
         { "abs",        TOK_ABSOLUTE    },
         { "addrsize",   TOK_ADDRSIZE    },
         { "auto",       TOK_AUTO        },
+        { "bank",       TOK_BANK        },
         { "count",      TOK_COUNT       },
         { "csym",       TOK_CSYM        },
         { "def",        TOK_DEF         },
@@ -3838,6 +3845,7 @@ static void ParseSegment (InputData* D)
     StrBuf          Name = STRBUF_INITIALIZER;
     StrBuf          OutputName = STRBUF_INITIALIZER;
     unsigned long   OutputOffs = 0;
+    unsigned        Bank = 0;
     SegInfo*        S;
     enum {
         ibNone      = 0x000,
@@ -3850,6 +3858,7 @@ static void ParseSegment (InputData* D)
         ibSize      = 0x020,
         ibStart     = 0x040,
         ibType      = 0x080,
+        ibBank      = 0x100,
 
         ibRequired  = ibId | ibName | ibStart | ibSize | ibAddrSize | ibType,
     } InfoBits = ibNone;
@@ -3863,10 +3872,11 @@ static void ParseSegment (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_ID         &&
-            D->Tok != TOK_NAME          && D->Tok != TOK_OUTPUTNAME &&
-            D->Tok != TOK_OUTPUTOFFS    && D->Tok != TOK_SIZE       &&
-            D->Tok != TOK_START         && D->Tok != TOK_TYPE) {
+        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_BANK       &&
+            D->Tok != TOK_ID            && D->Tok != TOK_NAME       &&
+            D->Tok != TOK_OUTPUTNAME    && D->Tok != TOK_OUTPUTOFFS &&
+            D->Tok != TOK_SIZE          && D->Tok != TOK_START      &&
+            D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -3890,6 +3900,15 @@ static void ParseSegment (InputData* D)
             case TOK_ADDRSIZE:
                 NextToken (D);
                 InfoBits |= ibAddrSize;
+                break;
+
+            case TOK_BANK:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Bank = D->IVal;
+                InfoBits |= ibBank;
+                NextToken (D);
                 break;
 
             case TOK_ID:
@@ -3992,7 +4011,7 @@ static void ParseSegment (InputData* D)
     }
 
     /* Create the segment info and remember it */
-    S = NewSegInfo (&Name, Id, Start, Size, &OutputName, OutputOffs);
+    S = NewSegInfo (&Name, Id, Start, Size, &OutputName, OutputOffs, Bank);
     CollReplaceExpand (&D->Info->SegInfoById, S, Id);
     CollAppend (&D->Info->SegInfoByName, S);
 

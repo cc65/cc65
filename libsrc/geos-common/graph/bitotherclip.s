@@ -6,7 +6,7 @@
 ; void BitOtherClip     (void *proc1, void* proc2, char skipl, char skipr, int skipy,
 ;                               struct iconpic *myGfx);
 
-; both proc1, proc2 should be: char __fastcall something (void);
+; both proc1, proc2 should be: char foo (void);
 ;       proc1 is called before reading a byte (.A returns next data)
 ;       proc2 is called before reading each byte which is not pattern (code >219)
 

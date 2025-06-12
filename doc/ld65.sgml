@@ -1180,6 +1180,202 @@ The ZPSAVE segment contains the original values of the zeropage locations used
 by the ZEROPAGE segment. It is placed in its own segment because it must not be
 initialized.
 
+<sect>Debug Info<p>
+
+The debug info and the API mirrors closely the items available in the sources
+used to build an executable. To use the API efficiently, it is necessary to
+understand from which blocks the information is built.
+
+<itemize>
+<item>  Libraries
+<item>  Lines
+<item>  Modules
+<item>  Scopes
+<item>  Segments
+<item>  Source files
+<item>  Spans
+<item>  Symbols
+<item>  Types
+</itemize>
+
+Each item of each type has something like a primary index called an 'id'.
+The ids can be thought of as array indices, so looking up something by its
+id is fast. Invalid ids are marked with the special value CC65_INV_ID.
+Data passed back for an item may contain ids of other objects. A scope for
+example contains the id of the parent scope (or CC65_INV_ID if there is no
+parent scope). Most API functions use ids to lookup related objects.
+
+
+<sect1>Libraries<p>
+
+This information comes from the linker and is currently used in only one
+place:To mark the origin of a module. The information available for a library
+is its name including the path.
+
+<itemize>
+<item> Library id
+<item> Name and path of library
+</itemize>
+
+
+<sect1>Lines<p>
+
+A line is a location in a source file. It is module dependent, which means
+that if two modules use the same source file, each one has its own line
+information for this file. While the assembler has also column information,
+it is dropped early because it would generate much more data. A line may have
+one or more spans attached if code or data is generated.
+
+<itemize>
+<item> Line id
+<item> Id of the source file, the line is from
+<item> The line number in the file (starting with 1)
+<item> The type of the line: Assembler/C source or macro
+<item> A count for recursive macros if the line comes from a macro
+</itemize>
+
+
+<sect1>Modules<p>
+
+A module is actually an object file. It is generated from one or more source
+files and may come from a library. The assembler generates a main scope for
+symbols declared outside user generated scopes. The main scope has an empty name.
+
+<itemize>
+<item> Module id
+<item> The name of the module including the path
+<item> The id of the main source file (the one specified on the command line)
+<item> The id of the library the module comes from, or CC65_INV_ID
+<item> The id of the main scope for this module
+</itemize>
+
+
+<sect1>Scopes<p>
+
+Each module has a main scope where all symbols live, that are specified outside
+other scopes. Additional nested scopes may be specified in the sources. So scopes
+have a one to many relation: Each scope (with the exception of the main scope) has
+exactly one parent and may have several child scopes. Scopes may not cross modules.
+
+<itemize>
+<item> Scope id
+<item> The name of the scope (may be empty)
+<item> The type of the scope: Module, .SCOPE or .PROC, .STRUCT and .ENUM
+<item> The size of the scope (the size of the span for the active segment)
+<item> The id of the parent scope (CC65_INV_ID in case of the main scope)
+<item> The id of the attached symbol for .PROC scopes
+<item> The id of the module where the scope comes from
+</itemize>
+
+
+<sect1>Segment Info<p>
+
+<itemize>
+<item> Segment id
+<item> The name of the segment
+<item> The start address of the segment
+<item> The size of the segment
+<item> The name of the output file, this segment was written to (may be empty)
+<item> The offset of the segment in the output file (only if name not empty)
+<item> The bank number of the segment's memory area
+</itemize>
+
+It is also possible to retrieve the spans for sections (a section is the part of a
+segment that comes from one module). Since the main scope covers a whole module, and
+the main scope has spans assigned (if not empty), the spans for the main scope of a
+module are also the spans for the sections in the segments.
+
+
+<sect1>Source files<p>
+
+Modules are generated from source files. Since some source files are used several times
+when generating a list of modules (header files for example), the linker will merge
+duplicates to reduce redundant information. Source files are considered identical if the
+full name including the path is identical, and the size and time of last modification
+matches. Please note that there may be still duplicates if files are accessed using
+different paths.
+
+<itemize>
+<item> Source file id
+<item> The name of the source file including the path
+<item> The size of the file at the time when it was read
+<item> The time of last modification at the time when the file was read
+</itemize>
+
+
+<sect1>Spans<p>
+
+A span is a small part of a segment. It has a start address and a size. Spans are used
+to record sizes of other objects. Line infos and scopes may have spans attached, so it
+is possible to lookup which data was generated for these items.
+
+<itemize>
+<item> Span id
+<item> The start address of the span. This is an absolute address
+<item> The end address of the span. This is inclusive which means if start==end then => size==1
+<item> The id of the segment were the span is located
+<item> The type of the data in the span (optional, maybe NULL)
+<item> The number of line infos available for this span
+<item> The number of scope infos available for this span
+</itemize>
+
+The last two fields will save a call to cc65_line_byspan or cc65_scope_byspan by providing
+information about the number of items that can be retrieved by these calls.
+
+
+<sect1>Symbols<p>
+
+<itemize>
+<item> Symbol id
+<item> The name of the symbol
+<item> The type of the symbol, which may be label, equate or import
+<item> The size of the symbol (size of attached code or data). Only for labels. Zero if unknown
+<item> The value of the symbol. For an import, this is taken from the corresponding export
+<item> The id of the corresponding export. Only valid for imports, CC65_INV_ID for other symbols
+<item> The segment id if the symbol is segment based. For an import, taken from the export
+<item> The id of the scope this symbols was defined in
+<item> The id of the parent symbol. This is only set for cheap locals and CC65_INV_ID otherwise
+</itemize>
+
+Beware: Even for an import, the id of the corresponding export may be CC65_INV_ID.
+This happens if the module with the export has no debug information. So make sure
+that your application can handle it.
+
+
+<sect1>Types<p>
+
+A type is somewhat special. You cannot retrieve data about it in a similar way as with the other
+items. Instead you have to call a special routine that parses the type data and returns it
+in a set of data structures that can be processed by a C or C++ program.
+
+The type information is language independent and doesn't encode things like 'const' or
+'volatile'. Instead it defines a set of simple data types and a few ways to aggregate
+them (arrays, structs and unions).
+
+Type information is currently generated by the assembler for storage allocating commands
+like .BYTE or .WORD. For example, the assembler code
+
+<tscreen><verb>
+foo:    .byte $01, $02, $03
+</verb></tscreen>
+
+will assign the symbol foo a size of 3, but will also generate a span with a size of 3
+bytes and a type ARRAY[3] OF BYTE.
+Evaluating the type of a span allows a debugger to display the data in the same way as it
+was defined in the assembler source.
+
+<table>
+<tabular ca="clc">
+<bf/Assembler Command/| <bf/Generated Type Information/@<hline>
+.ADDR| ARRAY OF LITTLE ENDIAN POINTER WITH SIZE 2 TO VOID@
+.BYTE| ARRAY OF UNSIGNED WITH SIZE 1@
+.DBYT| ARRAY OF BIG ENDIAN UNSIGNED WITH SIZE 2@
+.DWORD| ARRAY OF LITTLE ENDIAN UNSIGNED WITH SIZE 4@
+.FARADDR| ARRAY OF LITTLE ENDIAN POINTER WITH SIZE 3 TO VOID@
+.WORD| ARRAY OF LITTLE ENDIAN UNSIGNED WITH SIZE 2
+</tabular>
+</table>
+
 
 
 <sect>Copyright<p>

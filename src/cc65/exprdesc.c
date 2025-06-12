@@ -167,6 +167,17 @@ int ED_IsLocQuasiConst (const ExprDesc* Expr)
 
 
 
+int ED_IsLocZP (const ExprDesc* Expr)
+/* Return true if the expression is in a location on a zeropage */
+{
+    return ED_IsLocRegister (Expr) ||
+           (ED_IsLocConst (Expr) &&
+            Expr->Sym != 0       &&
+            (Expr->Sym->Flags & SC_ZEROPAGE) != 0);
+}
+
+
+
 #if !defined(HAVE_INLINE)
 int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
 /* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
@@ -244,7 +255,7 @@ int ED_IsConstTrue (const ExprDesc* Expr)
 {
     /* Non-zero arithmetics and objects addresses are boolean true */
     return (ED_IsConstAbsInt (Expr) && Expr->IVal != 0) ||
-           (ED_IsAddrExpr (Expr));
+           ED_IsEntityAddr (Expr);
 }
 
 
@@ -302,13 +313,59 @@ int ED_IsQuasiConstAddr (const ExprDesc* Expr)
 
 
 
-int ED_IsNullPtr (const ExprDesc* Expr)
-/* Return true if the given expression is a NULL pointer constant */
+
+int ED_IsStackAddr (const ExprDesc* Expr)
+/* Return true if the expression denotes a fixed address on stack */
 {
-    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) ==
-                               (E_LOC_NONE|E_RTYPE_RVAL) &&
-           Expr->IVal == 0                               &&
-           IsClassInt (Expr->Type);
+    return ED_IsAddrExpr (Expr) && ED_IsLocStack (Expr);
+}
+
+
+
+int ED_IsZPInd (const ExprDesc* Expr)
+/* Return true if the expression is located on the zeropage */
+{
+    return ED_IsIndExpr (Expr) && ED_IsLocZP (Expr);
+}
+
+
+
+int ED_IsNullPtr (const ExprDesc* Expr)
+/* Return true if the given expression is a null pointer.
+** Note: A null pointer constant converted to a pointer type is a null pointer.
+*/
+{
+    return ED_IsConstAbs (Expr) &&
+           Expr->IVal == 0      &&
+           (IsClassInt (Expr->Type) || IsTypePtr (Expr->Type));
+}
+
+
+
+int ED_IsNullPtrConstant (const ExprDesc* Expr)
+/* Return true if the given expression is a null pointer constant.
+** Note: An integer constant expression with value 0, or such an
+** expression cast to void* is a null pointer constant. However, a
+** null pointer constant converted to a pointer type is just a null
+** pointer, not necessarily a constant in ISO C.
+*/
+{
+    return ED_IsConstAbs (Expr) &&
+           Expr->IVal == 0      &&
+           (IsClassInt (Expr->Type) ||
+            (IsTypePtr (Expr->Type) && IsTypeVoid (Expr->Type + 1) &&
+             GetQualifier (Expr->Type + 1) == T_QUAL_NONE));
+}
+
+
+
+int ED_IsEntityAddr (const ExprDesc* Expr)
+/* Return true if the expression denotes the address of an object or function.
+*/
+{
+    return ED_IsAddrExpr (Expr) &&
+           Expr->Sym != 0       &&
+           (IsClassPtr (Expr->Type) || IsTypeFunc (Expr->Type));
 }
 
 
@@ -390,7 +447,7 @@ ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr)
 
 
 
-ExprDesc* ED_AddrExpr (ExprDesc* Expr)
+void ED_AddrExpr (ExprDesc* Expr)
 /* Take address of Expr. The result is always an rvalue */
 {
     switch (Expr->Flags & E_MASK_LOC) {
@@ -419,12 +476,11 @@ ExprDesc* ED_AddrExpr (ExprDesc* Expr)
             }
             break;
     }
-    return Expr;
 }
 
 
 
-ExprDesc* ED_IndExpr (ExprDesc* Expr)
+void ED_IndExpr (ExprDesc* Expr)
 /* Dereference Expr */
 {
     switch (Expr->Flags & E_MASK_LOC) {
@@ -458,7 +514,6 @@ ExprDesc* ED_IndExpr (ExprDesc* Expr)
             }
             break;
     }
-    return Expr;
 }
 
 

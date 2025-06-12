@@ -54,18 +54,20 @@ iobuf_alloc:
         rts
 
         ; Mark table entry as used
-:       lda     #$FF
-        sta     table,x
+:       dec     table,x
 
         ; Convert table index to address hibyte
         txa
         asl
         asl
-        clc
+        ; Skip clearing carry, it can't be set as long as MAX_FDS*4 is
+        ; less than 64.
+        .assert MAX_FDS*4 < $40, error
         adc     #>$0800
 
         ; Store address in "memptr"
-        ldy     #$01
+        ; (Y still equals 0 from popptr1)
+        iny
         sta     (ptr1),y
         dey
         tya
@@ -82,8 +84,7 @@ iobuf_free:
 
         ; Mark table entry as free
         tax
-        lda     #$00
-        sta     table,x
+        inc     table,x
         rts
 
 ; ------------------------------------------------------------------------

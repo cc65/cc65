@@ -7,7 +7,7 @@
         .export         _gotoy
         .import         VTABZ
         .include "ebadger.inc"
-        
+
 _gotoy:
         clc
         adc     WNDTOP

@@ -346,6 +346,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__KIM1__", 1);
             break;
 
+        case TGT_RP6502:
+            NewSymbol ("__RP6502__", 1);
+            break;
+
         default:
             AbEnd ("Invalid target name: '%s'", Sys);
 
@@ -703,6 +707,24 @@ static void OneLine (void)
         NextTok ();
     }
 
+    /* Handle @-style unnamed labels */
+    if (CurTok.Tok == TOK_ULABEL) {
+        if (CurTok.IVal != 0) {
+            Error ("Invalid unnamed label definition");
+        }
+        ULabDef ();
+        NextTok ();
+
+        /* Skip the colon. If NoColonLabels is enabled, allow labels without
+        ** a colon if there is no whitespace before the identifier.
+        */
+        if (CurTok.Tok == TOK_COLON) {
+            NextTok ();
+        } else if (CurTok.WS || !NoColonLabels) {
+            Error ("':' expected");
+        }
+    }
+
     /* If the first token on the line is an identifier, check for a macro or
     ** an instruction.
     */
@@ -858,7 +880,12 @@ static void OneLine (void)
             /* The line has switched the segment */
             Size = 0;
         }
-        DefSizeOfSymbol (Sym, Size);
+        /* Suppress .size Symbol if this Symbol already has a multiply-defined error,
+        ** as it will only create its own additional unnecessary error.
+        */
+        if ((Sym->Flags & SF_MULTDEF) == 0) {
+            DefSizeOfSymbol (Sym, Size);
+        }
     }
 
     /* Line separator must come here */

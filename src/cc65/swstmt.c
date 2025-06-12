@@ -64,7 +64,7 @@
 typedef struct SwitchCtrl SwitchCtrl;
 struct SwitchCtrl {
     Collection* Nodes;          /* CaseNode tree */
-    TypeCode    ExprType;       /* Basic switch expression type */
+    const Type* ExprType;       /* Switch controlling expression type */
     unsigned    Depth;          /* Number of bytes the selector type has */
     unsigned    DefaultLabel;   /* Label for the default branch */
 
@@ -133,7 +133,7 @@ void SwitchStatement (void)
 
     /* Setup the control structure, save the old and activate the new one */
     SwitchData.Nodes        = NewCollection ();
-    SwitchData.ExprType     = GetUnqualTypeCode (&SwitchExpr.Type[0]);
+    SwitchData.ExprType     = SwitchExpr.Type;
     SwitchData.Depth        = SizeOf (SwitchExpr.Type);
     SwitchData.DefaultLabel = 0;
     OldSwitch = Switch;
@@ -152,7 +152,7 @@ void SwitchStatement (void)
 
     /* Check if we had any labels */
     if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
-        Warning ("No case labels");
+        Warning ("No reachable case labels for switch");
     }
 
     /* If the last statement did not have a break, we may have an open
@@ -209,62 +209,64 @@ void CaseLabel (void)
 /* Handle a case label */
 {
     ExprDesc CaseExpr;          /* Case label expression */
-    long     Val;               /* Case label value */
-    unsigned CodeLabel;         /* Code label for this case */
 
     /* Skip the "case" token */
     NextToken ();
 
     /* Read the selector expression */
     CaseExpr = NoCodeConstAbsIntExpr (hie1);
-    Val = CaseExpr.IVal;
 
     /* Now check if we're inside a switch statement */
     if (Switch != 0) {
 
         /* Check the range of the expression */
-        switch (Switch->ExprType) {
+        const Type* CaseT       = CaseExpr.Type;
+        long        CaseVal     = CaseExpr.IVal;
+        int         OutOfRange  = 0;
+        const char* DiagMsg     = 0;
 
-            case T_SCHAR:
-                /* Signed char */
-                if (Val < -128 || Val > 127) {
-                    Error ("Range error");
-                }
-                break;
+        CaseExpr.Type = IntPromotion (Switch->ExprType);
+        LimitExprValue (&CaseExpr, 1);
 
-            case T_UCHAR:
-                if (Val < 0 || Val > 255) {
-                    Error ("Range error");
-                }
-                break;
-
-            case T_SHORT:
-            case T_INT:
-                if (Val < -32768 || Val > 32767) {
-                    Error ("Range error");
-                }
-                break;
-
-            case T_USHORT:
-            case T_UINT:
-                if (Val < 0 || Val > 65535) {
-                    Error ("Range error");
-                }
-                break;
-
-            case T_LONG:
-            case T_ULONG:
-                break;
-
-            default:
-                Internal ("Invalid type: %06lX", Switch->ExprType);
+        if (CaseVal != CaseExpr.IVal ||
+            (IsSignSigned (CaseT) != IsSignSigned (CaseExpr.Type) &&
+            (IsSignSigned (CaseT) ? CaseVal < 0 : CaseExpr.IVal < 0))) {
+            Warning (IsSignSigned (CaseT) ?
+                     IsSignSigned (CaseExpr.Type) ?
+                     "Case value is implicitly converted (%ld to %ld)" :
+                     "Case value is implicitly converted (%ld to %lu)" :
+                     IsSignSigned (CaseExpr.Type) ?
+                     "Case value is implicitly converted (%lu to %ld)" :
+                     "Case value is implicitly converted (%lu to %lu)",
+                     CaseVal, CaseExpr.IVal);
         }
 
-        /* Insert the case selector into the selector table */
-        CodeLabel = InsertCaseValue (Switch->Nodes, Val, Switch->Depth);
+        /* Check the range of the expression */
+        if (IsSignSigned (CaseExpr.Type)) {
+            if (CaseExpr.IVal < GetIntegerTypeMin (Switch->ExprType)) {
+                DiagMsg = "Case value (%ld) out of range for switch condition type";
+                OutOfRange = 1;
+            } else if (IsSignSigned (Switch->ExprType) ?
+                       CaseExpr.IVal > (long)GetIntegerTypeMax (Switch->ExprType) :
+                       SizeOf (CaseExpr.Type) > SizeOf (Switch->ExprType) &&
+                       (unsigned long)CaseExpr.IVal > GetIntegerTypeMax (Switch->ExprType)) {
+                DiagMsg = "Case value (%ld) out of range for switch condition type";
+                OutOfRange = 1;
+            }
+        } else if ((unsigned long)CaseExpr.IVal > GetIntegerTypeMax (Switch->ExprType)) {
+            DiagMsg = "Case value (%lu) out of range for switch condition type";
+            OutOfRange = 1;
+        }
 
-        /* Define this label */
-        g_defcodelabel (CodeLabel);
+        if (OutOfRange == 0) {
+            /* Insert the case selector into the selector table */
+            unsigned CodeLabel = InsertCaseValue (Switch->Nodes, CaseExpr.IVal, Switch->Depth);
+
+            /* Define this label */
+            g_defcodelabel (CodeLabel);
+        } else {
+            Warning (DiagMsg, CaseExpr.IVal);
+        }
 
     } else {
 

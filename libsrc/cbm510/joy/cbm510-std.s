@@ -117,7 +117,7 @@ READ:   ldx     #$0F            ; Switch to the system bank
         lsr     tmp1
         lsr     tmp1
 
-; Mask the relavant bits, get the push button bit
+; Mask the relevant bits, get the push button bit
 
 @L2:    asl     a               ; push button bit into carry
         lda     tmp1

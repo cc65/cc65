@@ -374,7 +374,7 @@ IRQ:
 ; The touch pad is read thru the paddle potentiometers. The possible
 ; values are 1..228. Since the maximum value is less than the X
 ; dimension we have to "stretch" this value. In order to use only
-; divisions by powers of two, we use the following appoximation:
+; divisions by powers of two, we use the following approximation:
 ; 320/227 = 1.4096
 ; 1+1/2-1/8+1/32 = 1.4062
 ; For Y we subtract 1/8 of it to get in the YMax ballpark.
@@ -385,7 +385,7 @@ IRQ:
 
 ; X
 
-        ldx     PADDL0                  ; get X postion
+        ldx     PADDL0                  ; get X position
         dex                             ; decrement, since it's 1-based
         stx     XPos
         txa
@@ -445,7 +445,7 @@ IRQ:
 
 ; Y
 
-        ldx     PADDL1                  ; get Y postion
+        ldx     PADDL1                  ; get Y position
         dex                             ; decrement, since it's 1-based
         stx     YPos
         lda     #228

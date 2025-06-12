@@ -78,6 +78,7 @@ struct LexicalLevel {
 #define LEX_LEVEL_FUNCTION      2U
 #define LEX_LEVEL_BLOCK         3U
 #define LEX_LEVEL_STRUCT        4U
+#define LEX_LEVEL_PARAM_LIST    5U  /* HACK for error recovery */
 
 /* Forwards */
 struct FuncDesc;
@@ -141,7 +142,7 @@ void LeaveStructLevel (void);
 
 
 SymEntry* FindSym (const char* Name);
-/* Find the symbol with the given name */
+/* Find with the given name the symbol visible in the current scope */
 
 SymEntry* FindGlobalSym (const char* Name);
 /* Find the symbol with the given name in the global symbol table only */
@@ -150,7 +151,7 @@ SymEntry* FindLocalSym (const char* Name);
 /* Find the symbol with the given name in the current symbol table only */
 
 SymEntry* FindTagSym (const char* Name);
-/* Find the symbol with the given name in the tag table */
+/* Find with the given name the tag symbol visible in the current scope */
 
 SymEntry FindStructField (const Type* TypeArray, const char* Name);
 /* Find a struct/union field in the fields list.
@@ -210,8 +211,11 @@ SymTable* GetFieldSymTab (void);
 SymTable* GetLabelSymTab (void);
 /* Return the label symbol table */
 
-int SymIsLocal (SymEntry* Sym);
-/* Return true if the symbol is defined in the highest lexical level */
+int SymIsLocal (const SymEntry* Sym);
+/* Return true if the symbol is declared in the highest lexical level */
+
+int SymIsGlobal (const SymEntry* Sym);
+/* Return true if the symbol is declared in the file scope level */
 
 void MakeZPSym (const char* Name);
 /* Mark the given symbol as zero page symbol */

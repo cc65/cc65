@@ -69,11 +69,11 @@ typedef struct {
 } SegAddrSize_t;
 
 
-/* Pointer to the current segment list. Output goes here. */
-Segments* CS = 0;
+/* Pointer to the current segment context. Output goes here. */
+SegContext* CS = 0;
 
-/* Pointer to the global segment list */
-Segments* GS = 0;
+/* Pointer to the global segment context */
+SegContext* GS = 0;
 
 /* Actual names for the segments */
 static StrStack SegmentNames[SEG_COUNT];
@@ -86,12 +86,12 @@ static Collection SegmentAddrSizes;
 ** maximum stack depth is 2, so there is not really a need for a better
 ** implementation.
 */
-static Collection SegmentStack = STATIC_COLLECTION_INITIALIZER;
+static Collection SegContextStack = STATIC_COLLECTION_INITIALIZER;
 
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*                       Segment name and address size                       */
 /*****************************************************************************/
 
 
@@ -226,11 +226,17 @@ const char* GetSegName (segment_t Seg)
 
 
 
-static Segments* NewSegments (SymEntry* Func)
-/* Initialize a Segments structure (set all fields to NULL) */
+/*****************************************************************************/
+/*                              Segment context                              */
+/*****************************************************************************/
+
+
+
+static SegContext* NewSegContext (SymEntry* Func)
+/* Initialize a SegContext structure (set all fields to NULL) */
 {
     /* Allocate memory */
-    Segments* S = xmalloc (sizeof (Segments));
+    SegContext* S = xmalloc (sizeof (SegContext));
 
     /* Initialize the fields */
     S->Text    = NewTextSeg (Func);
@@ -248,14 +254,14 @@ static Segments* NewSegments (SymEntry* Func)
 
 
 
-Segments* PushSegments (SymEntry* Func)
-/* Make the new segment list current but remember the old one */
+SegContext* PushSegContext (SymEntry* Func)
+/* Make the new segment context current but remember the old one */
 {
     /* Push the current pointer onto the stack */
-    CollAppend (&SegmentStack, CS);
+    CollAppend (&SegContextStack, CS);
 
-    /* Create a new Segments structure */
-    CS = NewSegments (Func);
+    /* Create a new SegContext structure */
+    CS = NewSegContext (Func);
 
     /* Return the new struct */
     return CS;
@@ -263,14 +269,14 @@ Segments* PushSegments (SymEntry* Func)
 
 
 
-void PopSegments (void)
-/* Pop the old segment list (make it current) */
+void PopSegContext (void)
+/* Pop the old segment context (make it current) */
 {
     /* Must have something on the stack */
-    PRECONDITION (CollCount (&SegmentStack) > 0);
+    PRECONDITION (CollCount (&SegContextStack) > 0);
 
     /* Pop the last segment and set it as current */
-    CS = CollPop (&SegmentStack);
+    CS = CollPop (&SegContextStack);
 }
 
 
@@ -278,13 +284,13 @@ void PopSegments (void)
 void CreateGlobalSegments (void)
 /* Create the global segments and remember them in GS */
 {
-    GS = PushSegments (0);
+    GS = PushSegContext (0);
 }
 
 
 
 void UseDataSeg (segment_t DSeg)
-/* For the current segment list, use the data segment DSeg */
+/* For the current segment context, use the data segment DSeg */
 {
     /* Check the input */
     PRECONDITION (CS && DSeg != SEG_CODE);
@@ -372,7 +378,7 @@ void RemoveGlobalCode (void)
 
 
 
-void OutputSegments (const Segments* S)
+void OutputSegments (const SegContext* S)
 /* Output the given segments to the output file */
 {
     /* Output the function prologue if the segments came from a function */

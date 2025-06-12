@@ -37,6 +37,8 @@
 #define _6502_H
 
 
+#include <stdint.h>
+
 
 /*****************************************************************************/
 /*                                   Data                                    */
@@ -46,8 +48,9 @@
 
 /* Supported CPUs */
 typedef enum CPUType {
-    CPU_6502,
-    CPU_65C02
+    CPU_6502  = 0,
+    CPU_65C02 = 1,
+    CPU_6502X = 2
 } CPUType;
 
 /* Current CPU */
@@ -56,14 +59,16 @@ extern CPUType CPU;
 /* 6502 CPU registers */
 typedef struct CPURegs CPURegs;
 struct CPURegs {
-    unsigned    AC;             /* Accumulator */
-    unsigned    XR;             /* X register */
-    unsigned    YR;             /* Y register */
-    unsigned    ZR;             /* Z register */
-    unsigned    SR;             /* Status register */
-    unsigned    SP;             /* Stackpointer */
-    unsigned    PC;             /* Program counter */
+    uint8_t     AC;             /* Accumulator */
+    uint8_t     XR;             /* X register */
+    uint8_t     YR;             /* Y register */
+    uint8_t     SR;             /* Status register */
+    uint8_t     SP;             /* Stackpointer */
+    uint16_t    PC;             /* Program counter */
 };
+
+/* Current CPU registers */
+extern CPURegs Regs;
 
 /* Status register bits */
 #define CF      0x01            /* Carry flag */

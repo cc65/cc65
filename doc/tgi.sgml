@@ -477,10 +477,10 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Get number of horisontal pixels on the screen.
+<tag/Function/Get number of horizontal pixels on the screen.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned tgi_getxres (void);/
-<tag/Description/Get number of horisontal pixels on the screen.
+<tag/Description/Get number of horizontal pixels on the screen.
 This is same as tgi_maxx()+1.
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.

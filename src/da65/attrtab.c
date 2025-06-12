@@ -149,7 +149,7 @@ unsigned GetGranularity (attr_t Style)
 
         case atSkip:
         default:
-            Internal ("GetGraularity called for style = %d", Style);
+            Internal ("GetGranularity called for style = %d", Style);
             return 0;
     }
 }

@@ -35,6 +35,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <errno.h>
 
 /* common */
@@ -47,7 +48,9 @@
 #include "6502.h"
 #include "error.h"
 #include "memory.h"
+#include "peripherals.h"
 #include "paravirt.h"
+#include "trace.h"
 
 
 
@@ -60,8 +63,14 @@
 /* Name of program file */
 const char* ProgramFile;
 
-/* exit simulator after MaxCycles Cycles */
-unsigned long MaxCycles;
+/* Set to True if CPU mode override is in effect. If set, the CPU is not read from the program file. */
+static bool CPUOverrideActive = false;
+
+/* exit simulator after MaxCycles Cccles */
+unsigned long long MaxCycles = 0;
+
+/* countdown from MaxCycles */
+unsigned long long RemainCycles;
 
 /* Header signature 'sim65' */
 static const unsigned char HeaderSignature[] = {
@@ -70,7 +79,6 @@ static const unsigned char HeaderSignature[] = {
 #define HEADER_SIGNATURE_LENGTH (sizeof(HeaderSignature)/sizeof(HeaderSignature[0]))
 
 static const unsigned char HeaderVersion = 2;
-
 
 
 /*****************************************************************************/
@@ -93,7 +101,9 @@ static void Usage (void)
             "Long options:\n"
             "  --help\t\tHelp (this text)\n"
             "  --cycles\t\tPrint amount of executed CPU cycles\n"
+            "  --cpu <type>\t\tOverride CPU type (6502, 65C02, 6502X)\n"
             "  --profile <file>\tSave profiling information (appended)\n"
+            "  --trace\t\tEnable CPU trace\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
             ProgName);
@@ -107,6 +117,35 @@ static void OptHelp (const char* Opt attribute ((unused)),
 {
     Usage ();
     exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptCPU (const char* Opt, const char* Arg)
+/* Set CPU type */
+{
+    /* Don't use FindCPU here. Enum constants would clash. */
+    if (strcmp(Arg, "6502") == 0) {
+        CPU = CPU_6502;
+        CPUOverrideActive = true;
+    } else if (strcmp(Arg, "65C02") == 0 || strcmp(Arg, "65c02") == 0) {
+        CPU = CPU_65C02;
+        CPUOverrideActive = true;
+    } else if (strcmp(Arg, "6502X") == 0 || strcmp(Arg, "6502x") == 0) {
+        CPU = CPU_6502X;
+        CPUOverrideActive = true;
+    } else {
+        AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
+    }
+}
+
+
+
+static void OptTrace (const char* Opt attribute ((unused)),
+                      const char* Arg attribute ((unused)))
+/* Enable trace mode */
+{
+    TraceMode = TRACE_ENABLE_FULL; /* Enable full trace mode. */
 }
 
 
@@ -134,14 +173,16 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the simulator version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-    exit(EXIT_SUCCESS);
+    exit (EXIT_SUCCESS);
 }
 
+
+
 static void OptQuitXIns (const char* Opt attribute ((unused)),
-                        const char* Arg attribute ((unused)))
-/* quit after MaxCycles cycles */
+                        const char* Arg)
+/* Quit after MaxCycles cycles */
 {
-    MaxCycles = strtoul(Arg, NULL, 0);
+    MaxCycles = strtoull(Arg, NULL, 0);
 }
 
 static void OptProfile (const char* Opt attribute ((unused)),
@@ -179,12 +220,21 @@ static unsigned char ReadProgramFile (void)
         Error ("'%s': Invalid header version.", ProgramFile);
     }
 
-    /* Get the CPU type from the file header */
+    /* Get the CPU type from the file header.
+     * Use it to set the CPU type, unless CPUOverrideActive is set.
+     */
     if ((Val = fgetc(F)) != EOF) {
-        if (Val != CPU_6502 && Val != CPU_65C02) {
-            Error ("'%s': Invalid CPU type", ProgramFile);
+        if (!CPUOverrideActive) {
+            switch (Val) {
+            case CPU_6502:
+            case CPU_65C02:
+            case CPU_6502X:
+                CPU = Val;
+                break;
+            default:
+                Error ("'%s': Invalid CPU type", ProgramFile);
+            }
         }
-        CPU = Val;
     }
 
     /* Get the address of sp from the file header */
@@ -193,6 +243,7 @@ static unsigned char ReadProgramFile (void)
     }
 
     /* Get load address */
+    Val2 = 0; /* suppress uninitialized variable warning */
     if (((Val = fgetc(F)) == EOF) ||
         ((Val2 = fgetc(F)) == EOF)) {
         Error ("'%s': Header missing load address", ProgramFile);
@@ -237,15 +288,22 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--help",             0,      OptHelp                 },
-        { "--cycles",           0,      OptCycles               },
-        { "--profile",          1,      OptProfile              },
-        { "--verbose",          0,      OptVerbose              },
-        { "--version",          0,      OptVersion              },
+        { "--help",             0,      OptHelp      },
+        { "--cycles",           0,      OptCycles    },
+        { "--cpu",              1,      OptCPU       },
+        { "--profile",          1,      OptProfile   },
+        { "--trace",            0,      OptTrace     },
+        { "--verbose",          0,      OptVerbose   },
+        { "--version",          0,      OptVersion   },
     };
 
     unsigned I;
     unsigned char SPAddr;
+    unsigned int Cycles;
+
+    /* Set reasonable defaults. */
+    CPU = CPU_6502;
+    TraceMode = TRACE_DISABLED; /* Disabled by default */
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "sim65");
@@ -305,7 +363,7 @@ int main (int argc, char* argv[])
     }
 
     /* Do we have a program file? */
-    if (ProgramFile == 0) {
+    if (ProgramFile == NULL) {
         AbEnd ("No program file");
     }
 
@@ -313,21 +371,40 @@ int main (int argc, char* argv[])
         ProfileInit ();
     }
 
+    /* Reset memory */
     MemInit ();
 
+    /* Reset peripherals. */
+    PeripheralsInit ();
+
+    /* Read program file into memory.
+     * This also sets the CPU type, unless a CPU override is in effect.
+     */
     SPAddr = ReadProgramFile ();
 
+    /* Initialize the paravirtualization subsystem. It requires the stack pointer address, to be able to
+     * simulate 6502 subroutine calls.
+     */
+
+    TraceInit(SPAddr);
     ParaVirtInit (I, SPAddr);
 
+    /* Reset the CPU */
     Reset ();
 
+    RemainCycles = MaxCycles;
     while (1) {
-        ExecuteInsn ();
-        if (MaxCycles && (GetCycles () >= MaxCycles)) {
-            ErrorCode (SIM65_ERROR_TIMEOUT, "Maximum number of cycles reached.");
+        Cycles = ExecuteInsn ();
+        if (MaxCycles) {
+            if (Cycles > RemainCycles) {
+                ErrorCode (SIM65_ERROR_TIMEOUT, "Maximum number of cycles reached.");
+            }
+            RemainCycles -= Cycles;
         }
     }
 
-    /* Return an apropriate exit code */
-    return EXIT_SUCCESS;
+    /* Unreachable. sim65 program must exit through paravirtual PVExit
+    ** or timeout from MaxCycles producing an error.
+    */
+    return SIM65_ERROR;
 }

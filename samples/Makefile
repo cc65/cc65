@@ -562,6 +562,11 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/cbm
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/gamate
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/supervision
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/disasm
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/lynx
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sim65
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sym1
 	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 readme.txt $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)
@@ -573,6 +578,11 @@ install:
 	$(INSTALL) -m0644 cbm/*.* $(DESTDIR)$(samplesdir)/cbm
 	$(INSTALL) -m0644 gamate/*.* $(DESTDIR)$(samplesdir)/gamate
 	$(INSTALL) -m0644 supervision/*.* $(DESTDIR)$(samplesdir)/supervision
+	$(INSTALL) -m0644 disasm/*.* $(DESTDIR)$(samplesdir)/disasm
+	$(INSTALL) -m0644 kim1/*.* $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -m0644 lynx/*.* $(DESTDIR)$(samplesdir)/lynx
+	$(INSTALL) -m0644 sim65/*.* $(DESTDIR)$(samplesdir)/sim65
+	$(INSTALL) -m0644 sym1/*.* $(DESTDIR)$(samplesdir)/sym1
 
 # --------------------------------------------------------------------------
 # Packaging rules

@@ -21,7 +21,8 @@ as it comes with the cc65 C compiler. It describes the memory layout,
 enhanced&nbsp;Apple&nbsp;//e specific header files, available drivers, and any
 pitfalls specific to that platform.
 
-Please note that enhanced&nbsp;Apple&nbsp;//e specific functions are just mentioned
+Please note that this target requires a 65C02 or 65816 CPU,
+enhanced&nbsp;Apple&nbsp;//e specific functions are just mentioned
 here, they are described in detail in the separate <url url="funcref.html"
 name="function reference">. Even functions marked as "platform dependent" may
 be available on more than one platform. Please see the function reference for
@@ -62,7 +63,7 @@ Special locations:
 </descrip><p>
 
 While running <tt/main()/ the Language Card bank 2 is enabled for read access.
-However while running module constructors/destructors the Language Card is disabled.
+However while running module constructors the Language Card is disabled.
 
 Enabling the Language Card allows to use it as additional memory for cc65
 generated code. However code is never automatically placed there. Rather code
@@ -289,9 +290,9 @@ the memory from &dollar;800 to &dollar;1FFF can be added to the heap by calling
 
 ProDOS 8 requires for every open file a page-aligned 1 KB I/O buffer. By default
 these buffers are allocated by the cc65 runtime system on the heap using
-<tt/posix_memalign()/. While this is generally the best solution it means quite
-some overhead for (especially rather small) cc65 programs which do open files
-but don't make use of the heap otherwise.
+<url url="funcref.html#posix_memalign" name="posix_memalign()">. While this is
+generally the best solution it means quite some overhead for (especially rather
+small) cc65 programs which do open files but don't make use of the heap otherwise.
 
 The apple2enh package comes with the alternative ProDOS 8 I/O buffer allocation
 module <tt/apple2enh-iobuf-0800.o/ which uses the memory between &dollar;800 and
@@ -321,20 +322,40 @@ Programs containing enhanced&nbsp;Apple&nbsp;//e specific code may use the
 
 <sect1>Enhanced&nbsp;Apple&nbsp;//e specific functions<p>
 
-The functions listed below are special for the enhanced&nbsp;Apple&nbsp;//e. See
-the <url url="funcref.html" name="function reference"> for declaration and
+The functions and variables listed below are special for the Apple&nbsp;&rsqb;&lsqb;.
+See the <url url="funcref.html" name="function reference"> for declaration and
 usage.
 
 <itemize>
 <item>_auxtype
 <item>_dos_type
 <item>_filetype
+<item>_datetime
+<item>beep
+<item>dir_entry_count
+<item>get_tv
 <item>get_ostype
+<item>gmtime_dt
+<item>mktime_dt
 <item>rebootafterexit
 <item>ser_apple2_slot
 <item>tgi_apple2_mix
 <item>videomode
 <item>waitvsync
+</itemize>
+
+
+<sect1>Apple IIgs specific functions in accelerator.h<p>
+
+In addition to those, the <tt/accelerator.h/ header file contains three functions
+to help determine whether the program is running on a IIgs, and change the IIgs
+CPU speed. See the <url url="funcref.html" name="function reference"> for declaration and
+usage.
+
+<itemize>
+<item>detect_iigs
+<item>get_iigs_speed
+<item>set_iigs_speed
 </itemize>
 
 
@@ -427,16 +448,46 @@ The names in the parentheses denote the symbols to be used for static linking of
 <descrip>
 
   <tag><tt/a2e.ssc.ser (a2e_ssc_ser)/</tag>
-  Driver for the Apple&nbsp;II Super Serial Card. Supports up to 19200 baud,
-  requires hardware flow control (RTS/CTS) and does interrupt driven receives.
+  Driver for the Apple&nbsp;II Super Serial Card.
+  The SSC is an extension card for the II, II+, IIe; the Apple //c and //c+ have
+  the same hardware and firmware integrated.
+  It supports up to 9600 baud, supports no flow control and hardware flow control
+  (RTS/CTS) and does interrupt driven receives. Speeds faster than 9600 baud
+  aren't reachable because the ROM and ProDOS IRQ handlers are too slow.
+  Software flow control (XON/XOFF) is not supported.
+
   Note that because of the peculiarities of the 6551 chip transmits are not
   interrupt driven, and the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
+
+  Note that using the driver at SER_BAUD_115200 will disable IRQs. It will be up
+  to the users to use the serial port, either by re-enabling IRQs themselves,
+  or by directly poll-reading the ACIA DATA register without the help of ser_get().
 
   The driver defaults to slot 2. Call <tt/ser_apple2_slot()/ prior to
   <tt/ser_open()/ in order to select a different slot. <tt/ser_apple2_slot()/
   succeeds for all Apple&nbsp;II slots, but <tt/ser_open()/ fails with
   <tt/SER_ERR_NO_DEVICE/ if there's no SSC firmware found in the selected slot.
+
+  In the Apple //c and //c+, slot 1 is the printer port, and slot 2 is the modem
+  port.
+
+  Never call <tt/ser_apple2_slot()/ after <tt/ser_open()/.
+
+  <tag><tt/a2e.gs.ser (a2e_gs_ser)/</tag>
+  Driver for the Apple&nbsp;IIgs serial ports (printer and modem).
+  It supports up to 9600 baud, supports no flow control and hardware flow control
+  (RTS/CTS) and does interrupt driven receives. Speeds faster than 9600 baud
+  aren't reachable because the ROM and ProDOS IRQ handlers are too slow.
+  Software flow control (XON/XOFF) is not supported.
+  Note that transmits are not interrupt driven, and the transceiver blocks if
+  the receiver asserts flow control because of a full buffer.
+
+  The driver defaults to opening the modem port. Calling <tt/ser_apple2_slot()/
+  prior to <tt/ser_open()/ allows to select the printer port (1) or the modem
+  port (0).
+
+  Never call <tt/ser_apple2_slot()/ after <tt/ser_open()/.
 
 </descrip><p>
 
@@ -549,6 +600,28 @@ program. See the discussion of the <tt/.CONDES/ feature in the <url
 url="ca65.html" name="assembler manual">.
 
 
+<sect1>ProDOS date/time manipulation<p>
+
+<descrip>
+The readdir and stat function return ProDOS timestamps in their file
+creation/modification time attributes. You can convert them to more portable
+time representations using either:
+
+<tag/struct tm/
+<tt/struct tm* __fastcall__ gmtime_dt (const struct datetime* dt);/
+
+Converts a <tt/struct datetime/ into a <tt/struct tm/. Returns -1 in case
+of error and sets errno, 0 on success.
+
+<tag/time_t/
+<tt/time_t __fastcall__ mktime_dt (const struct datetime* dt);/
+
+Parses a <tt/struct datetime/ and returns a UNIX timestamp. Returns 0 on error and
+sets errno.
+
+</descrip>
+
+
 <sect1>DIO<p>
 
 <descrip>
@@ -593,7 +666,7 @@ url="ca65.html" name="assembler manual">.
   auxiliary type. Therefore, some additional mechanism for specifying
   the file types is needed.
 
-  <tag>Specifying the File Type and Auxiliary Type</tag>
+  <tag>Specifying the File Type, Auxiliary Type and creation date</tag>
 
   There are two global variables provided that allow the file type
   and auxiliary type to be specified before a call to <tt/fopen()/
@@ -609,6 +682,16 @@ url="ca65.html" name="assembler manual">.
   The header file <tt/apple2_filetype.h/ also defines many values
   that can be used to set these variables. It is included in
   <tt/apple2.h/, which is in turn included in <tt/apple2enh.h/.
+
+  The global variable <tt/_datetime/ allows the file creation date/time
+  to be set before a call to <tt/fopen()/
+  or <tt/open()/ that creates the file. It is defined in <tt/apple2.h/:
+
+  <tscreen>
+  <verb>
+  extern struct datetime _datetime;
+  </verb>
+  </tscreen>
 
   <tag>Example</tag>
 

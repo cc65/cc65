@@ -23,7 +23,7 @@
 
         .code
 
-; set new grapics mode
+; set new graphics mode
 ; gets new mode in A
 ; returns handle or -1 on error
 ; uses tmp1, tmp2, tmp3, tmp4 (in subroutines)

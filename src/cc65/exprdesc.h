@@ -98,7 +98,7 @@ enum {
     E_LOC_NONE          = 0x0000,       /* Pure rvalue with no storage */
     E_LOC_ABS           = 0x0001,       /* Absolute numeric addressed variable */
     E_LOC_GLOBAL        = 0x0002,       /* Global variable */
-    E_LOC_STATIC        = 0x0004,       /* Static variable */
+    E_LOC_STATIC        = 0x0004,       /* Local static variable */
     E_LOC_REGISTER      = 0x0008,       /* Register variable */
     E_LOC_STACK         = 0x0010,       /* Value on the stack */
     E_LOC_PRIMARY       = 0x0020,       /* Temporary in primary register */
@@ -369,6 +369,9 @@ int ED_IsLocQuasiConst (const ExprDesc* Expr);
 */
 #endif
 
+int ED_IsLocZP (const ExprDesc* Expr);
+/* Return true if the expression is in a location on a zeropage */
+
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
 /* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
@@ -572,8 +575,28 @@ int ED_IsQuasiConstAddr (const ExprDesc* Expr);
 ** This can be a constant address or a stack variable address.
 */
 
+int ED_IsStackAddr (const ExprDesc* Expr);
+/* Return true if the expression denotes a fixed address on stack */
+
+int ED_IsZPInd (const ExprDesc* Expr);
+/* Return true if the expression is located on the zeropage */
+
 int ED_IsNullPtr (const ExprDesc* Expr);
-/* Return true if the given expression is a NULL pointer constant */
+/* Return true if the given expression is a null pointer.
+** Note: A null pointer constant converted to a pointer type is a null pointer.
+*/
+
+int ED_IsNullPtrConstant (const ExprDesc* Expr);
+/* Return true if the given expression is a null pointer constant.
+** Note: An integer constant expression with value 0, or such an
+** expression cast to void* is a null pointer constant. However, a
+** null pointer constant converted to a pointer type is just a null
+** pointer, not necessarily a constant in ISO C.
+*/
+
+int ED_IsEntityAddr (const ExprDesc* Expr);
+/* Return true if the expression denotes the address of an object or function.
+*/
 
 int ED_IsBool (const ExprDesc* Expr);
 /* Return true if the expression can be treated as a boolean, that is, it can
@@ -628,10 +651,10 @@ INLINE void ED_MarkExprAsRVal (ExprDesc* Expr)
 #  define ED_MarkExprAsRVal(Expr)   do { (Expr)->Flags &= ~E_RTYPE_LVAL; } while (0)
 #endif
 
-ExprDesc* ED_AddrExpr (ExprDesc* Expr);
+void ED_AddrExpr (ExprDesc* Expr);
 /* Take address of Expr */
 
-ExprDesc* ED_IndExpr (ExprDesc* Expr);
+void ED_IndExpr (ExprDesc* Expr);
 /* Dereference Expr */
 
 #if defined(HAVE_INLINE)

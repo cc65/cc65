@@ -43,7 +43,7 @@ libref: .addr   $0000                   ; Library reference
 ; to an RTS for test versions (function not implemented). A future version may
 ; allow for emulation: In this case the vector will be zero. Emulation means
 ; that the graphics kernel will emulate the function by using lower level
-; primitives - for example ploting a line by using calls to SETPIXEL.
+; primitives - for example plotting a line by using calls to SETPIXEL.
 
         .addr   INSTALL
         .addr   UNINSTALL
@@ -258,7 +258,7 @@ GETERROR:
 ;
 ; The TGI lacks a way to draw sprites. As that functionality is vital to
 ; Lynx games we borrow this CONTROL function to implement the still
-; missing tgi_draw_sprite funtion. To use this in your C-program
+; missing tgi_draw_sprite function. To use this in your C-program
 ; do a #define tgi_draw_sprite(spr) tgi_ioctl(0, spr)
 ;
 ; To do a flip-screen call tgi_ioctl(1, 0)

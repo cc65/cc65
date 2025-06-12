@@ -85,5 +85,4 @@ unsigned char OrgPerSeg          = 0;   /* Make .org local to current seg */
 unsigned char CComments          = 0;   /* Allow C like comments */
 unsigned char ForceRange         = 0;   /* Force values into expected range */
 unsigned char UnderlineInNumbers = 0;   /* Allow underlines in numbers */
-unsigned char AddrSize           = 0;   /* Allow .ADDRSIZE function */
 unsigned char BracketAsIndirect  = 0;   /* Use '[]' not '()' for indirection */

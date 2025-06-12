@@ -33,11 +33,16 @@ TARGETS = apple2       \
           none         \
           osic1p       \
           pce          \
+          rp6502       \
           sim6502      \
           sim65c02     \
           supervision  \
           sym1         \
           telestrat
+
+TARGETTEST = none     \
+             sim6502  \
+             sim65c02
 
 DRVTYPES = emd \
            joy \
@@ -53,7 +58,7 @@ OUTPUTDIRS := lib                                                               
               $(subst ../,,$(wildcard ../target/*/drv/*))                                     \
               $(subst ../,,$(wildcard ../target/*/util))
 
-.PHONY: all mostlyclean clean install zip lib $(TARGETS)
+.PHONY: all mostlyclean clean install zip lib libtest $(TARGETS)
 
 .SUFFIXES:
 
@@ -80,6 +85,8 @@ ifndef TARGET
 datadir = $(PREFIX)/share/cc65
 
 all lib: $(TARGETS)
+
+libtest: $(TARGETTEST)
 
 mostlyclean:
 	$(call RMDIR,../libwrk)
@@ -116,13 +123,17 @@ endef # ZIP_recipe
 zip:
 	$(foreach dir,$(OUTPUTDIRS),$(ZIP_recipe))
 
-$(TARGETS):
+$(TARGETS): | ../lib
 	@$(MAKE) --no-print-directory $@
+
+# ../lib must be created globally before doing lib targets in parallel
+../lib:
+	@$(call MKDIR,$@)
 
 else # TARGET
 
-CA65FLAGS =
-CC65FLAGS = -Or -W error
+CA65FLAGS = -g
+CC65FLAGS = -g -Or -W error
 
 EXTZP = cbm510 \
         cbm610 \
@@ -287,10 +298,12 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
 	@echo $(TARGET) - $(<F)
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
+$(EXTRA_OBJS): | ../lib
+
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../target/$(TARGET)/util:
+../libwrk/$(TARGET) ../target/$(TARGET)/util:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

@@ -18,5 +18,5 @@ normal: dex                     ; $00->$FF, $40->$3F
         stx     INVFLG          ; Save new flag value
         bmi     :+              ; Jump if current value is $FF (normal)
         lda     #$01            ; Return "inverse"
-:       ldx     #$00
+:       ldx     #>$0000
         rts

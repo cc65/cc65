@@ -189,7 +189,7 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
     /* If we don't know the file type, determine it from the extension */
     if (Type == FILETYPE_UNKNOWN) {
-        Type = GetFileType (Name);
+        Type = GetTypeOfFile (Name);
     }
 
     /* For known file types, search the file in the directory list */

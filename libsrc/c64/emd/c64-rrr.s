@@ -212,8 +212,8 @@ MAP:
         cmp pagecount
         bcs return_null
         sta curpage
-        lda #<dummy        ; load .A/.X with adress of data for COPYFROM-call (which expects the
-        ldx #>dummy        ; adress in .A/.X)
+        lda #<dummy        ; load .A/.X with address of data for COPYFROM-call (which expects the
+        ldx #>dummy        ; address in .A/.X)
         jsr COPYFROM
         bcs return_win     ; function returns pointer to window (returns always with carry set!)
 
@@ -224,8 +224,8 @@ COMMIT:
         lda curpage
         cmp pagecount
         bcs return
-        lda #<dummy        ; load .A/.X with adress of data for COPYTO-call (which expects the
-        ldx #>dummy        ; adress in .A/.X)
+        lda #<dummy        ; load .A/.X with address of data for COPYTO-call (which expects the
+        ldx #>dummy        ; address in .A/.X)
 
 ;----------------------------------------------------------------------------------------
 ;void __fastcall__ em_copyto (struct em_copy *copy_data);
@@ -324,7 +324,7 @@ get_struct_data:
         ;read and process the values from the em_copy struct passed to as parameters rameter to the
         ;functions em_copyto and em_copyfrom
 
-        sta aux         ;store adress of struct (passed in .A/.X) into a zp pointer
+        sta aux         ;store address of struct (passed in .A/.X) into a zp pointer
         stx aux+1
         ldy #0          ;index 0
 
@@ -347,7 +347,7 @@ get_struct_data:
         lsr
         lsr             ;shift into bits 3 and 4
         ora #$23        ;set bit 5 (select ram) and 1+2 (game/exrom setting for ULTIMAX-mode)
-        tax             ;.X has now the value to write into $de00 to acess rr-ram at desired 16k-bank
+        tax             ;.X has now the value to write into $de00 to access rr-ram at desired 16k-bank
         iny
         iny             ;skip unused byte
         lda (aux),y     ;read length lo-byte
@@ -357,7 +357,7 @@ get_struct_data:
         iny
         lda (aux),y     ;length hi-byte
         adc c64_ram+1
-        sta len+1       ;tmp2: length, tmp3 contains end adress of transfer in c64-ram.
+        sta len+1       ;tmp2: length, tmp3 contains end address of transfer in c64-ram.
         rts
                         ;55 bytes
 

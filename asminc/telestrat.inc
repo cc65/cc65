@@ -257,8 +257,11 @@ XBINDX           = $28          ; Convert a number into hex and displays on chan
 XDECIM           = $29
 XHEXA            = $2A          ; Convert a number into hex
 
+XMAINARGS        = $2C          ; Only available for Orix
+
 XEDT             = $2D          ; Launch editor
 XINSER           = $2E
+XGETARGV         = $2E          ; Only available for Orix
 
 XSCELG           = $2F          ; Search a line in editor mode
 XOPEN            = $30          ; Only in Orix

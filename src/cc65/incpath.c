@@ -76,7 +76,7 @@ void FinishIncludePaths (void)
     AddSubSearchPathFromEnv (SysIncSearchPath, "CC65_HOME", "include");
 
     /* Add some compiled-in search paths if defined at compile time. */
-#if defined(CC65_INC) && !defined(_WIN32)
+#if defined(CC65_INC) && !defined(_WIN32) && !defined(_AMIGA)
     AddSearchPath (SysIncSearchPath, CC65_INC);
 #endif
 

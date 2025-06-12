@@ -1,4 +1,4 @@
-/*****************************************************************************/
+
 /*                                                                           */
 /*                                macrotab.h                                 */
 /*                                                                           */
@@ -42,6 +42,7 @@
 
 /* cc65 */
 #include "error.h"
+#include "output.h"
 #include "preproc.h"
 #include "macrotab.h"
 
@@ -60,6 +61,67 @@ static Macro* MacroTab[MACRO_TAB_SIZE];
 /* The undefined macros list head */
 static Macro* UndefinedMacrosListHead;
 
+/* Some defines for better readability when calling OutputMacros() */
+#define ALL_MACROS      0
+#define USER_MACROS     1
+#define NAME_ONLY       0
+#define FULL_DEFINITION 1
+
+
+
+/*****************************************************************************/
+/*                                  helpers                                  */
+/*****************************************************************************/
+
+
+
+static void OutputMacro (const Macro* M, int Full)
+/* Output one macro. If Full is true, the replacement is also output. */
+{
+    WriteOutput ("#define %s", M->Name);
+    int ParamCount = M->ParamCount;
+    if (M->ParamCount >= 0) {
+        int I;
+        if (M->Variadic) {
+            CHECK (ParamCount > 0);
+            --ParamCount;
+        }
+        WriteOutput ("(");
+        for (I = 0; I < ParamCount; ++I) {
+            const char* Name = CollConstAt (&M->Params, I);
+            WriteOutput ("%s%s", (I == 0)? "" : ",", Name);
+        }
+        if (M->Variadic) {
+            WriteOutput ("%s...", (ParamCount == 0)? "" : ",");
+        }
+        WriteOutput (")");
+    }
+    WriteOutput (" ");
+    if (Full) {
+        WriteOutput ("%.*s",
+                     SB_GetLen (&M->Replacement),
+                     SB_GetConstBuf (&M->Replacement));
+    }
+    WriteOutput ("\n");
+}
+
+
+
+static void OutputMacros (int UserOnly, int Full)
+/* Output macros to the output file depending on the flags given */
+{
+    unsigned I;
+    for (I = 0; I < MACRO_TAB_SIZE; ++I) {
+        const Macro* M = MacroTab [I];
+        while (M) {
+            if (!UserOnly || !M->Predefined) {
+                OutputMacro (M, Full);
+            }
+            M = M->Next;
+        }
+    }
+}
+
 
 
 /*****************************************************************************/
@@ -68,7 +130,7 @@ static Macro* UndefinedMacrosListHead;
 
 
 
-Macro* NewMacro (const char* Name)
+Macro* NewMacro (const char* Name, unsigned char Predefined)
 /* Allocate a macro structure with the given name. The structure is not
 ** inserted into the macro table.
 */
@@ -84,6 +146,7 @@ Macro* NewMacro (const char* Name)
     M->ParamCount   = -1;        /* Flag: Not a function-like macro */
     InitCollection (&M->Params);
     SB_Init (&M->Replacement);
+    M->Predefined   = Predefined;
     M->Variadic     = 0;
     memcpy (M->Name, Name, Len+1);
 
@@ -116,7 +179,7 @@ Macro* CloneMacro (const Macro* M)
 ** Use FreeMacro for that.
 */
 {
-    Macro* New = NewMacro (M->Name);
+    Macro* New = NewMacro (M->Name, M->Predefined);
     unsigned I;
 
     for (I = 0; I < CollCount (&M->Params); ++I) {
@@ -134,7 +197,7 @@ Macro* CloneMacro (const Macro* M)
 
 
 void DefineNumericMacro (const char* Name, long Val)
-/* Define a macro for a numeric constant */
+/* Define a predefined macro for a numeric constant */
 {
     char Buf[64];
 
@@ -148,10 +211,10 @@ void DefineNumericMacro (const char* Name, long Val)
 
 
 void DefineTextMacro (const char* Name, const char* Val)
-/* Define a macro for a textual constant */
+/* Define a predefined macro for a textual constant */
 {
     /* Create a new macro */
-    Macro* M = NewMacro (Name);
+    Macro* M = NewMacro (Name, 1);
 
     /* Set the value as replacement text */
     SB_CopyStr (&M->Replacement, Val);
@@ -349,4 +412,28 @@ void PrintMacroStats (FILE* F)
             fprintf (F, "empty\n");
         }
     }
+}
+
+
+
+void OutputAllMacrosFull (void)
+/* Output all macros to the output file */
+{
+    OutputMacros (ALL_MACROS, FULL_DEFINITION);
+}
+
+
+
+void OutputUserMacros (void)
+/* Output the names of all user defined macros to the output file */
+{
+    OutputMacros (USER_MACROS, NAME_ONLY);
+}
+
+
+
+void OutputUserMacrosFull (void)
+/* Output all user defined macros to the output file */
+{
+    OutputMacros (USER_MACROS, FULL_DEFINITION);
 }

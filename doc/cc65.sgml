@@ -63,6 +63,9 @@ Short options:
   -V                            Print the compiler version number
   -W [-+]warning[,...]          Control warnings ('-' disables, '+' enables)
   -d                            Debug mode
+  -dD                           Output all macro definitions (needs -E)
+  -dM                           Output user defined macros (needs -E)
+  -dN                           Output user defined macro names (needs -E)
   -g                            Add debug info to object file
   -h                            Help (this text)
   -j                            Default characters are signed
@@ -197,6 +200,26 @@ Here is a description of all the command line options:
   <tag><tt>-d, --debug</tt></tag>
 
   Enables debug mode, for debugging the behavior of cc65.
+
+
+  <label id="option-dD">
+  <tag><tt>-dD</tt></tag>
+
+  Like <tt/<ref id="option-dM" name="-dM">/ but does not include the predefined
+  macros.
+
+
+  <label id="option-dM">
+  <tag><tt>-dM</tt></tag>
+
+  When used with -E, will output <tt>#define</tt> directives for all the macros
+  defined during execution of the preprocessor, including predefined macros.
+
+
+  <tag><tt>-dN</tt></tag>
+
+  Like <tt/<ref id="option-dD" name="-dD">/ but will only output the macro names,
+  not their definitions.
 
 
   <tag><tt>--debug-tables name</tt></tag>

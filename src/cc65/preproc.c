@@ -2573,7 +2573,7 @@ static void DoDefine (void)
     CheckForBadIdent (Ident, Std, 0);
 
     /* Create a new macro definition */
-    M = NewMacro (Ident);
+    M = NewMacro (Ident, 0);
 
     /* Check if this is a function-like macro */
     if (CurC == '(') {

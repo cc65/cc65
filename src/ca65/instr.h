@@ -109,7 +109,7 @@
                             /* $10          $80 */
 
 /* Bitmask for all immediate operations */
-/* $8e00 000
+/* $8e00 000 */
 #define AM65_ALL_IMM    (AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT | AM65_IMM_IMPLICIT_WORD)
 /*                        $200000          $400000           $800000            $8000000 */
 /* Bit numbers and count */

@@ -89,6 +89,7 @@ typedef enum {
 } pragma_t;
 
 /* Pragma table */
+/* CAUTION: table must be sorted for bsearch */
 static const struct Pragma {
     const char* Key;            /* Keyword */
     pragma_t    Tok;            /* Token */

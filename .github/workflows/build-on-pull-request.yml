@@ -27,6 +27,9 @@ jobs:
       - name: Build the tools.
         shell: bash
         run: make -j2 bin USER_CFLAGS=-Werror
+      - name: Build the dbginfo example
+        shell: bash
+        run: make -j2 -C src test
       - name: Build the utilities.
         shell: bash
         run: make -j2 util

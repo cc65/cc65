@@ -1464,6 +1464,7 @@ static unsigned Opt_a_tosxor (StackOpData* D)
 
 /* The first column of these two tables must be sorted in lexical order */
 
+/* CAUTION: table must be sorted for bsearch */
 static const OptFuncDesc FuncTable[] = {
     { "___bzero",   Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
     { "staspidx",   Opt_staspidx,  REG_NONE, OP_NONE                                   },
@@ -1487,6 +1488,7 @@ static const OptFuncDesc FuncTable[] = {
     { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                                   },
 };
 
+/* CAUTION: table must be sorted for bsearch */
 static const OptFuncDesc FuncRegATable[] = {
     { "tosandax",   Opt_a_tosand,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "toseqax",    Opt_a_toseq,   REG_NONE, OP_NONE                                   },

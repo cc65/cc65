@@ -78,7 +78,8 @@ static OutputFormatDesc OutputFormatTable[ofCount] = {
     {   WriteCFile      },
 };
 
-/* Table that maps extensions to Output formats. Must be sorted alphabetically */
+/* Table that maps extensions to Output formats. */
+/* CAUTION: table must be alphabetically sorted for bsearch */
 static const FileId FormatTable[] = {
     /* Upper case stuff for obsolete operating systems */
     {   "A",    ofAsm           },

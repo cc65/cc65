@@ -52,6 +52,9 @@ const char* FindName (const char* Path);
 ** the file, the function returns Path as name.
 */
 
+char *GetFileDirectory (const char* File);
+/* Return a copy of the path part of a File, or NULL if there is none. */
+
 char* MakeFilename (const char* Origin, const char* Ext);
 /* Make a new file name from Origin and Ext. If Origin has an extension, it
 ** is removed and Ext is appended. If Origin has no extension, Ext is simply
@@ -59,9 +62,10 @@ char* MakeFilename (const char* Origin, const char* Ext);
 ** The function may be used to create "foo.o" from "foo.s".
 */
 
-char* MakeTmpFilename (const char* Ext);
-/* Make a new temporary file name from Ext.  tmpnam(3) is called
-** and Ext is appended to generate the filename.
+char* MakeTmpFilename (const char *Directory, const char *Origin, const char* Ext);
+/* Make a new temporary file name from Directory, Origin, and Ext.
+** A temporary path is generated from the Directory,
+** the Origin filename, the compiler's PID and the Extension.
 ** The result is placed in a malloc'ed buffer and returned.
 */
 

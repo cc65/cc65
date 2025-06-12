@@ -2523,6 +2523,7 @@ static void NextChar (InputData* D)
 
 
 
+/* CAUTION: table must be sorted for bsearch */
 static void NextToken (InputData* D)
 /* Read the next token from the input stream */
 {

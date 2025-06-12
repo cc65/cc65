@@ -8,7 +8,7 @@
         .export         gotoxy, _gotoxy, _gotox
         .import         popa, VTABZ
         .include "ebadger.inc"
-        
+
 gotoxy:
         jsr     popa            ; Get Y
 

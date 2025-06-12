@@ -58,60 +58,60 @@
 ** When assembling for the 6502 or 65C02, all addressing modes that are not
 ** available on these CPUs are removed before doing any checks.
 */
-#define AM65_IMPLICIT           0x00000003UL // IMP
-#define AM65_ACCU               0x00000002UL // A, BIT, A
-#define AM65_DIR                0x00000004UL // ZP, BIT, ZP
-#define AM65_ABS                0x00000008UL // ABS
-#define AM65_ABS_LONG           0x00000010UL // --
-#define AM65_DIR_X              0x00000020UL // ZP,X
-#define AM65_ABS_X              0x00000040UL // ABS, X
-#define AM65_ABS_LONG_X         0x00000080UL // --
-#define AM65_DIR_Y              0x00000100UL // ZP, Y
-#define AM65_ABS_Y              0x00000200UL // ABS, Y
-#define AM65_DIR_IND            0x00000400UL // ZP, IND
-#define AM65_ABS_IND            0x00000800UL // IND
-#define AM65_DIR_IND_LONG       0x00001000UL // --
-#define AM65_DIR_IND_Y          0x00002000UL // IND, Y
-#define AM65_DIR_IND_LONG_Y     0x00004000UL // --
-#define AM65_DIR_X_IND          0x00008000UL // IND, X
-#define AM65_ABS_X_IND          0x00010000UL // --
-#define AM65_REL                0x00020000UL // REL
-#define AM65_REL_LONG           0x00040000UL // --
-#define AM65_STACK_REL          0x00080000UL // SP ?
-#define AM65_STACK_REL_IND_Y    0x00100000UL // ?
-#define AM65_IMM_ACCU           0x00200000UL // 
-#define AM65_IMM_INDEX          0x00400000UL // 
-#define AM65_IMM_IMPLICIT       0x00800000UL // IMM
-#define AM65_BLOCKMOVE          0x01000000UL // --
-#define AM65_BLOCKXFER          0x02000000UL // --
-#define AM65_ABS_IND_LONG       0x04000000UL // --
+#define AM65_IMPLICIT           0x00000003UL /* IMP */
+#define AM65_ACCU               0x00000002UL /* A, BIT, A */
+#define AM65_DIR                0x00000004UL /* ZP, BIT, ZP */
+#define AM65_ABS                0x00000008UL /* ABS */
+#define AM65_ABS_LONG           0x00000010UL /* -- */
+#define AM65_DIR_X              0x00000020UL /* ZP,X */
+#define AM65_ABS_X              0x00000040UL /* ABS, X */
+#define AM65_ABS_LONG_X         0x00000080UL /* -- */
+#define AM65_DIR_Y              0x00000100UL /* ZP, Y */
+#define AM65_ABS_Y              0x00000200UL /* ABS, Y */
+#define AM65_DIR_IND            0x00000400UL /* ZP, IND */
+#define AM65_ABS_IND            0x00000800UL /* IND */
+#define AM65_DIR_IND_LONG       0x00001000UL /* -- */
+#define AM65_DIR_IND_Y          0x00002000UL /* IND, Y */
+#define AM65_DIR_IND_LONG_Y     0x00004000UL /* -- */
+#define AM65_DIR_X_IND          0x00008000UL /* IND, X */
+#define AM65_ABS_X_IND          0x00010000UL /* -- */
+#define AM65_REL                0x00020000UL /* REL */
+#define AM65_REL_LONG           0x00040000UL /* -- */
+#define AM65_STACK_REL          0x00080000UL /* SP ? */
+#define AM65_STACK_REL_IND_Y    0x00100000UL /* ? */
+#define AM65_IMM_ACCU           0x00200000UL
+#define AM65_IMM_INDEX          0x00400000UL
+#define AM65_IMM_IMPLICIT       0x00800000UL /* IMM */
+#define AM65_BLOCKMOVE          0x01000000UL /* -- */
+#define AM65_BLOCKXFER          0x02000000UL /* -- */
+#define AM65_ABS_IND_LONG       0x04000000UL /* -- */
 #define AM65_IMM_IMPLICIT_WORD  0x08000000UL /* PHW #$1234 (4510 only) */
 
 /* Bitmask for all ZP operations that have correspondent ABS ops */
-// $8524
+/* $8524 */
 #define AM65_SET_ZP     (AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
-                          //$4          $20          $100      $400           $8000
+                          /*$4          $20          $100      $400           $8000 */
 /* Bitmask for all ABS operations that have correspondent FAR ops */
-// $48
+/* $48 */
 #define AM65_SET_ABS    (AM65_ABS | AM65_ABS_X)
-//                         $8           $40
+/*                         $8           $40 */
 /* Bitmask for all ZP operations */
-// $8524
+/* $8524 */
 #define AM65_ALL_ZP     (AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
-                          //$4          $20           $100     $400           $8000
+                          /*$4          $20           $100     $400           $8000 */
 /* Bitmask for all ABS operations */
-// $10a48
+/* $10a48 */
 #define AM65_ALL_ABS    (AM65_ABS | AM65_ABS_X | AM65_ABS_Y | AM65_ABS_IND | AM65_ABS_X_IND)
-//                         $8           $40           $200      $800           $10000
+/*                         $8           $40           $200      $800           $10000 */
 /* Bitmask for all FAR operations */
-// $90
+/* $90 */
 #define AM65_ALL_FAR    (AM65_ABS_LONG | AM65_ABS_LONG_X)
-                            // $10          $80
+                            /* $10          $80 */
 
 /* Bitmask for all immediate operations */
-// $8e00 000
+/* $8e00 000
 #define AM65_ALL_IMM    (AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT | AM65_IMM_IMPLICIT_WORD)
-//                        $200000          $400000           $800000            $8000000
+/*                        $200000          $400000           $800000            $8000000 */
 /* Bit numbers and count */
 #define AM65I_IMM_ACCU          21
 #define AM65I_IMM_INDEX         22

@@ -32,7 +32,12 @@
 #define CH_CURS_UP     0x19
 #define CH_CURS_DOWN   0x1A
 #define CH_ESC         0x1B
-
+#define CH_HLINE       0x1B
+#define CH_VLINE       0x5C
+#define CH_ULCORNER    0x10
+#define CH_URCORNER    0x12
+#define CH_LLCORNER    0x1D
+#define CH_LRCORNER    0x1F
 
 /* Masks for joy_read */
 #define JOY_UP_MASK    0x10
@@ -68,4 +73,4 @@ void rebootafterexit (void);
 /* End of agat.h */
 
 
-#endif //_AGAT_H
+#endif

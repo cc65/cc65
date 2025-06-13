@@ -11,5 +11,5 @@
 
 HOME:
     lda    #$8C
-    jsr    COUT
+    jmp    COUT
     rts

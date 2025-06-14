@@ -156,15 +156,22 @@ char* MakeTmpFilename (const char *Directory, const char *Origin, const char* Ex
 {
     char* Out;
     size_t Len = 0;
+    static unsigned int Counter = 0;
 
-    /* Allocate template */
+    /* Allocate enough for the directory, ... */
     if (Directory != NULL) {
       Len = strlen (Directory);
     }
-    Len += strlen (Origin) + strlen (".2147483648") + strlen (Ext) + 1;
+
+    /* ... plus the the original name, the maximum length of the PID, the
+     * maximum length of the counter, the extension, and the terminator.
+     */
+    Len += strlen (Origin) + (strlen (".2147483648") * 2) + strlen (Ext) + 1;
     Out = xmalloc (Len);
 
-    snprintf (Out, Len, "%s%s.%u%s", (Directory != NULL ? Directory : ""),
-                                     FindName(Origin), getpid(), Ext);
+    snprintf (Out, Len, "%s%s.%u%u%s", (Directory != NULL ? Directory : ""),
+                                     FindName(Origin), getpid(), Counter, Ext);
+    Counter++;
+
     return Out;
 }

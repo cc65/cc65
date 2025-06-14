@@ -573,7 +573,7 @@ void Compile (const char* FileName)
     DonePreprocess ();
 
     if (Debug) {
-        PrintMacroStats (stdout);
+        PrintMacroDetails (stdout);
     }
 
     /* Print an error report */

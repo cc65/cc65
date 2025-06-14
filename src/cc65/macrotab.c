@@ -329,24 +329,42 @@ int MacroCmp (const Macro* M1, const Macro* M2)
 
 
 
-void PrintMacroStats (FILE* F)
-/* Print macro statistics to the given text file. */
+void PrintMacroDetails (FILE* F)
+/* Print macro details to the given text file. */
 {
     unsigned I;
+    int J;
     Macro* M;
 
-    fprintf (F, "\n\nMacro Hash Table Summary\n");
     for (I = 0; I < MACRO_TAB_SIZE; ++I) {
-        fprintf (F, "%3u : ", I);
         M = MacroTab [I];
         if (M) {
             while (M) {
-                fprintf (F, "%s ", M->Name);
+                if (M->ParamCount == -1) {
+                    fprintf (F, "#define %s", M->Name);
+                    if (M->Replacement.Len) {
+                        fprintf(F," %.*s", M->Replacement.Len, M->Replacement.Buf);
+                    }
+                    fprintf (F, "\n");
+                }
+                else {
+                    fprintf (F, "#define %s(", M->Name);
+                    for (J = 0; J < M->ParamCount; ++J) {
+                        if (J > 0) {
+                            fprintf(F, ",");
+                        }
+                        fprintf(F, "%s", (char *) CollAtUnchecked (&M->Params, J));
+                    }
+                    fprintf (F, ")");
+                    if (M->Replacement.Len) {
+                        fprintf(F," %.*s", M->Replacement.Len, M->Replacement.Buf);
+                    }
+                    fprintf (F, "\n");
+                }
+
                 M = M->Next;
             }
-            fprintf (F, "\n");
-        } else {
-            fprintf (F, "empty\n");
         }
     }
 }
+

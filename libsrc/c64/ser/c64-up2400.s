@@ -2,9 +2,9 @@
 ; userport of a C64.
 ;
 ; Johan Van den Brande, (c) 2014
-; 
+;
 ; Based on George Hug's 'Towards 2400' article in the Transactor Magazine volume 9 issue 3.
-; (https://archive.org/details/transactor-magazines-v9-i03) 
+; (https://archive.org/details/transactor-magazines-v9-i03)
 ;
 ; I used parts of this fix to get around the 0x0d problem when a 0x00 byte is received.
 ; (https://modelrail.otenko.com/electronics/commodore-64-fixing-rs-232-serial-limitations)
@@ -106,7 +106,7 @@ SER_INSTALL:
 
 SER_UNINSTALL:
         lda     #<SER_ERR_OK
-        tax 
+        tax
         rts
 
 ;----------------------------------------------------------------------------
@@ -157,19 +157,19 @@ SER_GET:
         sta (ptr1,x)
         jsr CLRCH
         lda #<SER_ERR_OK
-        tax 
+        tax
         rts
 
 SER_GET_NO_DATA:
         lda #<SER_ERR_NO_DATA
-        ldx #>SER_ERR_NO_DATA 
+        ldx #>SER_ERR_NO_DATA
         rts
 
 ;----------------------------------------------------------------------------
 ; OURBASIN: This is a minimised call to get the character from the buffer.
 ; The Kernal code does not allow zero bytes (0x00)... this does.
 ;
- 
+
 SER_OURBASIN:
         jsr $F14E
         bcc @exit
@@ -495,4 +495,4 @@ rshavedata:
         beq rsempty     ; no
         lda #1
 rsempty:
-        rts 
+        rts

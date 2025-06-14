@@ -496,6 +496,17 @@ void Compile (const char* FileName)
         while (PreprocessNextLine ())
         { /* Nothing */ }
 
+        /* Output macros if requested by the user */
+        if (DumpAllMacrosFull) {
+            OutputAllMacrosFull ();
+        }
+        if (DumpUserMacros) {
+            OutputUserMacros ();
+        }
+        if (DumpUserMacrosFull) {
+            OutputUserMacrosFull ();
+        }
+
         /* Close the output file */
         CloseOutputFile ();
 

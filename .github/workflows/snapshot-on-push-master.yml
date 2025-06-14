@@ -49,6 +49,9 @@ jobs:
       - name: Do some simple style checks
         shell: bash
         run: make -j2 checkstyle
+      - name: Check bsearch tables
+        shell: bash
+        run: make -j2 sorted
       - name: Build the tools.
         shell: bash
         run: |

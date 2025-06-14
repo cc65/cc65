@@ -94,6 +94,7 @@ static const struct Pragma {
     const char* Key;            /* Keyword */
     pragma_t    Tok;            /* Token */
 } Pragmas[] = {
+/* BEGIN SORTED.SH */
     { "align",                  PRAGMA_ALIGN              },
     { "allow-eager-inline",     PRAGMA_ALLOW_EAGER_INLINE },
     { "allow_eager_inline",     PRAGMA_ALLOW_EAGER_INLINE },
@@ -128,6 +129,7 @@ static const struct Pragma {
     { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
     { "writable_strings",       PRAGMA_WRITABLE_STRINGS   },
     { "zpsym",                  PRAGMA_ZPSYM              },
+/* END SORTED.SH */
 };
 #define PRAGMA_COUNT    (sizeof (Pragmas) / sizeof (Pragmas[0]))
 

@@ -64,12 +64,14 @@ struct ConverterMapEntry {
 /* Converter table */
 /* CAUTION: table must be alphabetically sorted for bsearch */
 static const ConverterMapEntry ConverterMap[] = {
+/* BEGIN SORTED.SH */
     {   "geos-bitmap",          GenGeosBitmap   },
     {   "geos-icon",            GenGeosIcon     },
     {   "koala",                GenKoala        },
     {   "lynx-sprite",          GenLynxSprite   },
     {   "raw",                  GenRaw          },
     {   "vic2-sprite",          GenVic2Sprite   },
+/* END SORTED.SH */
 };
 
 

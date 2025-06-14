@@ -172,6 +172,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502.Ins) / sizeof (InsTab6502.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "AND",  0x080A26C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -228,6 +229,7 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -239,6 +241,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502X.Ins) / sizeof (InsTab6502X.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
         { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
@@ -314,6 +317,7 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -329,6 +333,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502DTV.Ins) / sizeof (InsTab6502DTV.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
         { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
@@ -400,6 +405,7 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -411,6 +417,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65SC02.Ins) / sizeof (InsTab65SC02.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -477,6 +484,7 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -488,6 +496,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65C02.Ins) / sizeof (InsTab65C02.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -588,6 +597,7 @@ static const struct {
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "WAI",  0x0000001, 0xcb, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -599,6 +609,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab4510.Ins) / sizeof (InsTab4510.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -732,6 +743,7 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "TYS",  0x0000001, 0x2b, 0, PutAll },
         { "TZA",  0x0000001, 0x6b, 0, PutAll },
+/* END SORTED.SH */
     }
 };
 
@@ -743,6 +755,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65816.Ins) / sizeof (InsTab65816.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x0b8f6fc, 0x60, 0, PutAll },
         { "AND",  0x0b8f6fc, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -843,6 +856,7 @@ static const struct {
         { "WDM",  0x0800004, 0x42, 6, PutAll },
         { "XBA",  0x0000001, 0xeb, 0, PutAll },
         { "XCE",  0x0000001, 0xfb, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -854,6 +868,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTabSweet16.Ins) / sizeof (InsTabSweet16.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADD",  AMSW16_REG,              0xA0, 0, PutSweet16 },
         { "BC",   AMSW16_BRA,              0x03, 0, PutSweet16Branch },
         { "BK",   AMSW16_IMP,              0x0A, 0, PutSweet16 },
@@ -880,6 +895,7 @@ static const struct {
         { "STD",  AMSW16_IND,              0x70, 0, PutSweet16 },
         { "STP",  AMSW16_IND,              0x90, 0, PutSweet16 },
         { "SUB",  AMSW16_REG,              0xB0, 0, PutSweet16 },
+/* END SORTED.SH */
     }
 };
 
@@ -891,6 +907,7 @@ static const struct {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTabHuC6280.Ins) / sizeof (InsTabHuC6280.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -1026,6 +1043,7 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 

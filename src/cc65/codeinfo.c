@@ -92,6 +92,7 @@ struct FuncInfo {
 */
 /* CAUTION: table must be sorted for bsearch */
 static const FuncInfo FuncInfoTable[] = {
+/* BEGIN SORTED.SH */
     { "addeq0sp",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_AXY                        },
     { "addeqysp",   SLV_IND | REG_AXY,  PSTATE_ALL | REG_AXY                        },
     { "addysp",     REG_SP | REG_Y,     PSTATE_ALL | REG_SP                         },
@@ -377,12 +378,14 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosxoreax",  SLV_TOP | REG_EAX,  PSTATE_ALL | REG_SP | REG_EAXY | REG_TMP1   },
     { "tsteax",     REG_EAX,            PSTATE_ALL | REG_Y                          },
     { "utsteax",    REG_EAX,            PSTATE_ALL | REG_Y                          },
+/* END SORTED.SH */
 };
 #define FuncInfoCount   (sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
 /* Table with names of zero page locations used by the compiler */
 /* CAUTION: table must be sorted for bsearch */
 static const ZPInfo ZPInfoTable[] = {
+/* BEGIN SORTED.SH */
     {   0, "c_sp",      2,  REG_SP_LO,      REG_SP      },
     {   0, "c_sp+1",    1,  REG_SP_HI,      REG_SP      },
     {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
@@ -400,6 +403,7 @@ static const ZPInfo ZPInfoTable[] = {
     {   0, "tmp2",      1,  REG_NONE,       REG_NONE    },
     {   0, "tmp3",      1,  REG_NONE,       REG_NONE    },
     {   0, "tmp4",      1,  REG_NONE,       REG_NONE    },
+/* END SORTED.SH */
 };
 #define ZPInfoCount     (sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 

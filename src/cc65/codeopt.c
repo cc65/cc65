@@ -103,6 +103,7 @@ struct OptFunc {
 
 /* A list of all the function descriptions */
 /* CAUTION: should be sorted by "name" */
+/* BEGIN DECL SORTED_CODEOPT.SH */
 static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Ind     = { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Stores  = { Opt65C02Stores,  "Opt65C02Stores",  100, 0, 0, 0, 0, 0 };
@@ -215,11 +216,13 @@ static OptFunc DOptTransfers3   = { OptTransfers3,   "OptTransfers3",    65, 0, 
 static OptFunc DOptTransfers4   = { OptTransfers4,   "OptTransfers4",    65, 0, 0, 0, 0, 0 };
 static OptFunc DOptUnusedLoads  = { OptUnusedLoads,  "OptUnusedLoads",    0, 0, 0, 0, 0, 0 };
 static OptFunc DOptUnusedStores = { OptUnusedStores, "OptUnusedStores",   0, 0, 0, 0, 0, 0 };
+/* END DECL SORTED_CODEOPT.SH */
 
 
 /* Table containing all the steps in alphabetical order */
 /* CAUTION: table must be sorted for bsearch */
 static OptFunc* OptFuncs[] = {
+/* BEGIN SORTED_CODEOPT.SH */
     &DOpt65C02BitOps,
     &DOpt65C02Ind,
     &DOpt65C02Stores,
@@ -332,6 +335,7 @@ static OptFunc* OptFuncs[] = {
     &DOptTransfers4,
     &DOptUnusedLoads,
     &DOptUnusedStores,
+/* END SORTED_CODEOPT.SH */
 };
 #define OPTFUNC_COUNT  (sizeof(OptFuncs) / sizeof(OptFuncs[0]))
 

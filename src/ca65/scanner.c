@@ -136,6 +136,7 @@ struct DotKeyword {
     const char* Key;                    /* MUST be first field */
     token_t     Tok;
 } DotKeywords [] = {
+/* BEGIN SORTED.SH */
     { ".A16",           TOK_A16                 },
     { ".A8",            TOK_A8                  },
     { ".ADDR",          TOK_ADDR                },
@@ -307,6 +308,7 @@ struct DotKeyword {
     { ".XMATCH",        TOK_XMATCH              },
     { ".XOR",           TOK_BOOLXOR             },
     { ".ZEROPAGE",      TOK_ZEROPAGE            },
+/* END SORTED.SH */
 };
 
 

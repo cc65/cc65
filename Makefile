@@ -41,7 +41,11 @@ util:
 
 # check the code style
 checkstyle:
-	@$(MAKE) -C .github/checks       --no-print-directory $@
+	@$(MAKE) -C .github/checks --no-print-directory $@
+
+# check bsearch tables
+sorted:
+	@$(MAKE) -C .github/checks --no-print-directory $@
 
 # runs regression tests, requires libtest target libraries
 test:
@@ -50,6 +54,7 @@ test:
 # GNU "check" target, which runs all tests
 check:
 	@$(MAKE) -C .github/checks checkstyle --no-print-directory
+	@$(MAKE) -C .github/checks sorted     --no-print-directory
 	@$(MAKE) -C src test                  --no-print-directory
 	@$(MAKE) test
 	@$(MAKE) -C targettest platforms      --no-print-directory

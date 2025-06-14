@@ -38,6 +38,14 @@ KBDREPEAT       := $28a
 KBDREPEATRATE   := $28b
 KBDREPEATDELAY  := $28c
 
+; RS232 related locations
+RS232BAUD          := $0299 ; 16bit value, Full Bit time microseconds
+RS232INPUTIDX      := $029b ; Index to End of Input Buffer
+RS232INPUTBUFFER   := $029c ; High Byte of Address of Input Buffer
+RS232OUTPUTBUFFER  := $029d ; High Byte of Address of Output Buffer
+RS232OUTPUTIDX     := $029e ; Index to End of Output Buffer
+RS232ENABLES       := $02a1 ; RS232 Enables
+
 ; ---------------------------------------------------------------------------
 ; Vector and other locations
 

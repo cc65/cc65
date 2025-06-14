@@ -169,7 +169,7 @@ char* MakeTmpFilename (const char *Directory, const char *Origin, const char* Ex
     Len += strlen (Origin) + (strlen (".2147483648") * 2) + strlen (Ext) + 1;
     Out = xmalloc (Len);
 
-    snprintf (Out, Len, "%s%s.%u%u%s", (Directory != NULL ? Directory : ""),
+    snprintf (Out, Len, "%s%s.%u.%u%s", (Directory != NULL ? Directory : ""),
                                      FindName(Origin), getpid(), Counter, Ext);
     Counter++;
 

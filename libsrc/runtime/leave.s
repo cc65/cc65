@@ -12,7 +12,7 @@
         .export         leave00, leave0, leavey00, leavey0, leavey
         .export         leave
         .import         addysp
-        .importzp       sp
+        .importzp       c_sp
 
         .macpack        cpu
 
@@ -31,24 +31,24 @@ leavey:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
 
 leave:  tay                     ; save A a sec
-        lda     (sp)            ; that's the pushed arg size
+        lda     (c_sp)            ; that's the pushed arg size
         sec                     ; Count the byte, the count's stored in
-        adc     sp
-        sta     sp
+        adc     c_sp
+        sta     c_sp
         bcc     L1
-        inc     sp+1
+        inc     c_sp+1
 L1:     tya                     ; Get return value back
 
 .else
 
 leave:  pha                     ; save A a sec
         ldy     #0
-        lda     (sp),y          ; that's the pushed arg size
+        lda     (c_sp),y          ; that's the pushed arg size
         sec                     ; Count the byte, the count's stored in
-        adc     sp
-        sta     sp
+        adc     c_sp
+        sta     c_sp
         bcc     L1
-        inc     sp+1
+        inc     c_sp+1
 L1:     pla                     ; Get return value back
 
 .endif

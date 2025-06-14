@@ -117,7 +117,7 @@ entry:  php
         tya
         sec
         sbc     #7
-        sta     $1FF            ; Save new sp
+        sta     $1FF            ; Save new c_sp
         tay
 
         tsx
@@ -145,7 +145,7 @@ entry:  php
         iny
         sta     (sysp1),y
 
-        ldy     $1FF            ; Restore sp in bank 15
+        ldy     $1FF            ; Restore c_sp in bank 15
 
         lda     #.hibyte(expull-1)
         sta     (sysp1),y
@@ -245,7 +245,7 @@ L1:     lda     extzp,x
         dex
         bpl     L1
 
-; Save the old stack pointer from the system bank; and, set up our hw sp.
+; Save the old stack pointer from the system bank; and, set up our hw c_sp.
 
         tsx
         txa
@@ -279,9 +279,9 @@ L3:     lda     vectors,x
 ; Set up the C stack.
 
         lda     #.lobyte(callbank15::entry)
-        sta     sp
+        sta     c_sp
         lda     #.hibyte(callbank15::entry)
-        sta     sp+1
+        sta     c_sp+1
 
 ; Set up the subroutine and jump vector table that redirects Kernal calls to
 ; the system bank.
@@ -495,7 +495,7 @@ _exit:  pha                     ; Save the return code on stack
 ; Set up the welcome code at the stack bottom in the system bank.
 
         ldy     #$FF
-        lda     (sysp1),y       ; Load system bank sp
+        lda     (sysp1),y       ; Load system bank c_sp
         tax
         iny                     ; Y = 0
         lda     #$58            ; CLI opcode

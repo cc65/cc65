@@ -5,15 +5,15 @@
 ;
 
         .export         ldaui0sp, ldauiysp
-        .importzp       sp, ptr1
+        .importzp       c_sp, ptr1
 
 ldaui0sp:
         ldy     #1
 ldauiysp:
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1+1
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1
         txa
         tay

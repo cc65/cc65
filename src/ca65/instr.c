@@ -1042,9 +1042,10 @@ static const struct {
 } InsTabm740 = {
     sizeof (InsTabm740.Ins) / sizeof (InsTabm740.Ins[0]),
     {
-        { "ADC",  0x080A26C, 0x60, 0, PutAll },    //OK
-        { "AND",  0x080A26C, 0x20, 0, PutAll },    //OK
-        { "ASL",  0x000006e, 0x02, 1, PutAll },    //OK
+/* BEGIN SORTED.SH */
+        { "ADC",  0x080A26C, 0x60, 0, PutAll },
+        { "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
         { "BBR0", 0x0000006, 0x13, 10, PutBitBranchm740 },
         { "BBR1", 0x0000006, 0x33, 10, PutBitBranchm740 },
         { "BBR2", 0x0000006, 0x53, 10, PutBitBranchm740 },
@@ -1061,47 +1062,47 @@ static const struct {
         { "BBS5", 0x0000006, 0xa3, 10, PutBitBranchm740 },
         { "BBS6", 0x0000006, 0xc3, 10, PutBitBranchm740 },
         { "BBS7", 0x0000006, 0xe3, 10, PutBitBranchm740 },
-        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 }, //OK
-        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 }, //OK
-        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 }, //OK
-        { "BIT",  0x000000C, 0x00, 2, PutAll },    //OK
-        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 }, //OK
-        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 }, //OK
-        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 }, //OK
-        { "BRA",  0x0020000, 0x80, 0, PutPCRel8 }, //65c02
-        { "BRK",  0x0000001, 0x00, 0, PutAll },    //OK
-        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 }, //OK
-        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 }, //OK
-        { "CLC",  0x0000001, 0x18, 0, PutAll },    //OK
-        { "CLD",  0x0000001, 0xd8, 0, PutAll },    //OK
-        { "CLI",  0x0000001, 0x58, 0, PutAll },    //OK
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x000000C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
         { "CLT",  0x0000001, 0x12, 0, PutAll },
-        { "CLV",  0x0000001, 0xb8, 0, PutAll },    //OK
-        { "CMP",  0x080A26C, 0xc0, 0, PutAll },    //OK
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A26C, 0xc0, 0, PutAll },
         { "COM",  0x0000004, 0x44, 1, PutAll },
-        { "CPX",  0x080000C, 0xe0, 1, PutAll },    //OK
-        { "CPY",  0x080000C, 0xc0, 1, PutAll },    //OK
-        { "DEC",  0x000006F, 0x00, 3, PutAll },    //Ch. to 6F
-        { "DEX",  0x0000001, 0xca, 0, PutAll },    //OK
-        { "DEY",  0x0000001, 0x88, 0, PutAll },    //OK
-        { "EOR",  0x080A26C, 0x40, 0, PutAll },    //OK
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DEC",  0x000006F, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A26C, 0x40, 0, PutAll },
         { "FST",  0x0000001, 0xe2, 0, PutAll },
-        { "INC",  0x000006f, 0x00, 4, PutAll },    //Ch. to 6F
-        { "INX",  0x0000001, 0xe8, 0, PutAll },    //OK
-        { "INY",  0x0000001, 0xc8, 0, PutAll },    //OK
+        { "INC",  0x000006f, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JMP",  0x0000C08, 0x00, 12, PutAll },
         { "JSR",  0x0080808, 0x00, 13, PutAll },
-        { "LDA",  0x080A26C, 0xa0, 0, PutAll },    //OK
+        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
         { "LDM",  0x0000004, 0x3c, 6, PutLDMm740 },
-        { "LDX",  0x080030C, 0xa2, 1, PutAll },    //OK
-        { "LDY",  0x080006C, 0xa0, 1, PutAll },    //OK
-        { "LSR",  0x000006F, 0x42, 1, PutAll },    //OK
-        { "NOP",  0x0000001, 0xea, 0, PutAll },    //OK
-        { "ORA",  0x080A26C, 0x00, 0, PutAll },    //OK
-        { "PHA",  0x0000001, 0x48, 0, PutAll },    //OK
-        { "PHP",  0x0000001, 0x08, 0, PutAll },    //OK
-        { "PLA",  0x0000001, 0x68, 0, PutAll },    //OK
-        { "PLP",  0x0000001, 0x28, 0, PutAll },    //OK
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "ORA",  0x080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
         { "RMB0", 0x0000006, 0x1b, 10, PutAll },
         { "RMB1", 0x0000006, 0x3b, 10, PutAll },
         { "RMB2", 0x0000006, 0x5b, 10, PutAll },
@@ -1110,15 +1111,15 @@ static const struct {
         { "RMB5", 0x0000006, 0xbb, 10, PutAll },
         { "RMB6", 0x0000006, 0xdb, 10, PutAll },
         { "RMB7", 0x0000006, 0xfb, 10, PutAll },
-        { "ROL",  0x000006F, 0x22, 1, PutAll },    //OK
-        { "ROR",  0x000006F, 0x62, 1, PutAll },    //OK
-        { "RRF",  0x0000004, 0x82, 6, PutAll },    //OK
-        { "RTI",  0x0000001, 0x40, 0, PutAll },    //OK
-        { "RTS",  0x0000001, 0x60, 0, PutAll },    //OK
-        { "SBC",  0x080A26C, 0xe0, 0, PutAll },    //OKs
-        { "SEC",  0x0000001, 0x38, 0, PutAll },    //OK
-        { "SED",  0x0000001, 0xf8, 0, PutAll },    //OK
-        { "SEI",  0x0000001, 0x78, 0, PutAll },    //OK
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RRF",  0x0000004, 0x82, 6, PutAll },
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SBC",  0x080A26C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
         { "SET",  0x0000001, 0x32, 0, PutAll },
         { "SLW",  0x0000001, 0xC2, 0, PutAll },
         { "SMB0", 0x0000006, 0x0b, 10, PutAll },
@@ -1129,16 +1130,17 @@ static const struct {
         { "SMB5", 0x0000006, 0xab, 10, PutAll },
         { "SMB6", 0x0000006, 0xcb, 10, PutAll },
         { "SMB7", 0x0000006, 0xeb, 10, PutAll },
-        { "STA",  0x000A26C, 0x80, 0, PutAll },    //OK
-        { "STP",  0x0000001, 0x42, 0, PutAll },    //OK
-        { "STX",  0x000010c, 0x82, 1, PutAll },    //OK
-        { "STY",  0x000002c, 0x80, 1, PutAll },    //OK
-        { "TAX",  0x0000001, 0xaa, 0, PutAll },    //OK
-        { "TAY",  0x0000001, 0xa8, 0, PutAll },    //OK
-        { "TSX",  0x0000001, 0xba, 0, PutAll },    //OK
-        { "TXA",  0x0000001, 0x8a, 0, PutAll },    //OK
-        { "TXS",  0x0000001, 0x9a, 0, PutAll },    //OK
-        { "TYA",  0x0000001, 0x98, 0, PutAll }     //OK
+        { "STA",  0x000A26C, 0x80, 0, PutAll },
+        { "STP",  0x0000001, 0x42, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 

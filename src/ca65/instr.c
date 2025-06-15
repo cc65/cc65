@@ -85,6 +85,12 @@ static void PutBlockTransfer (const InsDesc* Ins);
 static void PutBitBranch (const InsDesc* Ins);
 /* Handle 65C02 branch on bit condition */
 
+static void PutBitBranchm740 (const InsDesc* Ins);
+/* Handle m740 branch on bit condition */
+
+static void PutLDMm740 (const InsDesc* Ins);
+/* Handle m740 LDM instruction */
+
 static void PutREP (const InsDesc* Ins);
 /* Emit a REP instruction, track register sizes */
 
@@ -1047,7 +1053,114 @@ static const struct {
     }
 };
 
-
+/* Instruction table for the m740 CPU */
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[97];
+} InsTabm740 = {
+    sizeof (InsTabm740.Ins) / sizeof (InsTabm740.Ins[0]),
+    {
+/* BEGIN SORTED.SH */
+        { "ADC",  0x080A26C, 0x60, 0, PutAll },
+        { "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "BBR0", 0x0000006, 0x13, 10, PutBitBranchm740 },
+        { "BBR1", 0x0000006, 0x33, 10, PutBitBranchm740 },
+        { "BBR2", 0x0000006, 0x53, 10, PutBitBranchm740 },
+        { "BBR3", 0x0000006, 0x73, 10, PutBitBranchm740 },
+        { "BBR4", 0x0000006, 0x93, 10, PutBitBranchm740 },
+        { "BBR5", 0x0000006, 0xb3, 10, PutBitBranchm740 },
+        { "BBR6", 0x0000006, 0xd3, 10, PutBitBranchm740 },
+        { "BBR7", 0x0000006, 0xf3, 10, PutBitBranchm740 },
+        { "BBS0", 0x0000006, 0x03, 10, PutBitBranchm740 },
+        { "BBS1", 0x0000006, 0x23, 10, PutBitBranchm740 },
+        { "BBS2", 0x0000006, 0x43, 10, PutBitBranchm740 },
+        { "BBS3", 0x0000006, 0x63, 10, PutBitBranchm740 },
+        { "BBS4", 0x0000006, 0x83, 10, PutBitBranchm740 },
+        { "BBS5", 0x0000006, 0xa3, 10, PutBitBranchm740 },
+        { "BBS6", 0x0000006, 0xc3, 10, PutBitBranchm740 },
+        { "BBS7", 0x0000006, 0xe3, 10, PutBitBranchm740 },
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x000000C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLT",  0x0000001, 0x12, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A26C, 0xc0, 0, PutAll },
+        { "COM",  0x0000004, 0x44, 1, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DEC",  0x000006F, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A26C, 0x40, 0, PutAll },
+        { "FST",  0x0000001, 0xe2, 0, PutAll },
+        { "INC",  0x000006f, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "JMP",  0x0000C08, 0x00, 12, PutAll },
+        { "JSR",  0x0080808, 0x00, 13, PutAll },
+        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
+        { "LDM",  0x0000004, 0x3c, 6, PutLDMm740 },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "ORA",  0x080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "RMB0", 0x0000006, 0x1b, 10, PutAll },
+        { "RMB1", 0x0000006, 0x3b, 10, PutAll },
+        { "RMB2", 0x0000006, 0x5b, 10, PutAll },
+        { "RMB3", 0x0000006, 0x7b, 10, PutAll },
+        { "RMB4", 0x0000006, 0x9b, 10, PutAll },
+        { "RMB5", 0x0000006, 0xbb, 10, PutAll },
+        { "RMB6", 0x0000006, 0xdb, 10, PutAll },
+        { "RMB7", 0x0000006, 0xfb, 10, PutAll },
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RRF",  0x0000004, 0x82, 6, PutAll },
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SBC",  0x080A26C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SET",  0x0000001, 0x32, 0, PutAll },
+        { "SLW",  0x0000001, 0xC2, 0, PutAll },
+        { "SMB0", 0x0000006, 0x0b, 10, PutAll },
+        { "SMB1", 0x0000006, 0x2b, 10, PutAll },
+        { "SMB2", 0x0000006, 0x4b, 10, PutAll },
+        { "SMB3", 0x0000006, 0x6b, 10, PutAll },
+        { "SMB4", 0x0000006, 0x8b, 10, PutAll },
+        { "SMB5", 0x0000006, 0xab, 10, PutAll },
+        { "SMB6", 0x0000006, 0xcb, 10, PutAll },
+        { "SMB7", 0x0000006, 0xeb, 10, PutAll },
+        { "STA",  0x000A26C, 0x80, 0, PutAll },
+        { "STP",  0x0000001, 0x42, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
+    }
+};
 
 /* An array with instruction tables */
 static const InsTable* InsTabs[CPU_COUNT] = {
@@ -1060,7 +1173,7 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTab65816,
     (const InsTable*) &InsTabSweet16,
     (const InsTable*) &InsTabHuC6280,
-    0,                                  /* Mitsubishi 740 */
+    (const InsTable*) &InsTabm740,           /* Mitsubishi 740 */
     (const InsTable*) &InsTab4510,
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
@@ -1068,7 +1181,7 @@ const InsTable* InsTab = (const InsTable*) &InsTab6502;
 /* Table to build the effective 65xx opcode from a base opcode and an
 ** addressing mode. (The value in the table is ORed with the base opcode)
 */
-static unsigned char EATab[12][AM65I_COUNT] = {
+static unsigned char EATab[14][AM65I_COUNT] = {
     {   /* Table 0 */
         0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
         0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
@@ -1140,6 +1253,18 @@ static unsigned char EATab[12][AM65I_COUNT] = {
         0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
         0x00, 0x00, 0x80, 0x00
+    },
+    {   /* Table 12 m740 JMP */
+        0x00, 0x00, 0x00, 0x4c, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0xb2, 0x6c, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00
+    },
+    {   /* Table 13 m740 JSR */
+        0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x22, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00
     },
 };
 
@@ -1361,6 +1486,12 @@ static void EmitCode (EffAddr* A)
 }
 
 
+static void PutLDMm740 (const InsDesc* Ins)
+{
+
+    Emit0 (Ins->BaseCode);
+    EmitWord (Expression ());
+}
 
 static long PutImmed8 (const InsDesc* Ins)
 /* Parse and emit an immediate 8 bit instruction. Return the value of the
@@ -1481,6 +1612,22 @@ static void PutBitBranch (const InsDesc* Ins)
     EmitSigned (GenBranchExpr (1), 1);
 }
 
+static void PutBitBranchm740 (const InsDesc* Ins)
+/* Handle 65C02 branch on bit condition */
+{
+    EffAddr A;
+
+    /* HACK: hardcoded for zp addressing mode, this doesn't work all the time */
+    A.AddrMode = 2;
+
+    A.Opcode = Ins->BaseCode | EATab[Ins->ExtCode][A.AddrMode];
+    /* Evaluate the addressing mode used */
+    /* No error, output code */
+    Emit0 (A.Opcode);
+    EmitByte (Expression ());
+    ConsumeComma ();
+    EmitSigned (GenBranchExpr (1), 1);
+}
 
 
 static void PutREP (const InsDesc* Ins)
@@ -1584,7 +1731,6 @@ static void PutTMAn (const InsDesc* Ins)
 ** an immediate argument.
 */
 {
-    /* Emit the TMA opcode itself */
     Emit0 (0x43);
 
     /* Emit the argument, which is the opcode from the table */
@@ -1640,10 +1786,8 @@ static void PutJMP (const InsDesc* Ins)
 */
 {
     EffAddr A;
-
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
-
         /* Check for indirect addressing */
         if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02) && (RelaxChecks == 0)) {
 

@@ -99,6 +99,7 @@ DISK_apple2    = samples.dsk
 DISK_apple2enh = samples.dsk
 DISK_atari     = samples.atr
 DISK_atarixl   = samples.atr
+DISK_plus4     = samples.d64
 
 # --------------------------------------------------------------------------
 # System-dependent settings
@@ -146,6 +147,8 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 .o:
 ifeq ($(SYS),vic20)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
+else ifeq ($(SYS),plus4)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C plus4-hires.cfg -m $@.map $^ $(SYS).lib
 else
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 endif
@@ -326,9 +329,11 @@ EXELIST_plus4 =    \
         enumdevdir \
         gunzip65   \
         hello      \
+        mandelbrot \
         terminal   \
         tinyshell  \
-        sieve
+        sieve      \
+        tgidemo
 
 EXELIST_sim6502 =  \
         checkversion \
@@ -451,7 +456,15 @@ multdemo: multidemo.o
 ovrldemo: overlaydemo.o
 	$(LD) $(LDFLAGS) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
-OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
+OVERLAYLIST :=
+
+ifneq ($(filter ovrldemo,$(EXELIST_$(SYS))),)
+OVERLAYLIST += $(foreach I,1 2 3,ovrldemo.$I)
+endif
+
+ifneq ($(filter multdemo,$(EXELIST_$(SYS))),)
+OVERLAYLIST += $(foreach I,1 2 3,multdemo.$I)
+endif
 
 # --------------------------------------------------------------------------
 # TGI programs on the VIC-20 need a special ld65 configuration file.

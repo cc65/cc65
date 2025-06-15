@@ -64,15 +64,15 @@ ACIA_STATUS     := ACIA+1       ; Status register
 ACIA_CMD        := ACIA+2       ; Command register
 ACIA_CTRL       := ACIA+3       ; Control register
 
+RecvHead        := $07D1        ; Head of receive buffer
+RecvTail        := $07D2        ; Tail of receive buffer
+RecvFreeCnt     := $07D3        ; Number of bytes in receive buffer
 ;----------------------------------------------------------------------------
 ;
 ; Global variables
 ;
 
 .bss
-RecvHead:       .res    1       ; Head of receive buffer
-RecvTail:       .res    1       ; Tail of receive buffer
-RecvFreeCnt:    .res    1       ; Number of bytes in receive buffer
 SendHead:       .res    1       ; Head of send buffer
 SendTail:       .res    1       ; Tail of send buffer
 SendFreeCnt:    .res    1       ; Number of bytes in send buffer
@@ -88,7 +88,7 @@ SendBuf:        .res    256
 
 ; Tables used to translate RS232 params into register values
 
-BaudTable:                      ; bit7 = 1 means setting is invalid
+BaudTable:                      ; Bit7 = 1 means setting is invalid
         .byte   $FF             ; SER_BAUD_45_5
         .byte   $01             ; SER_BAUD_50
         .byte   $02             ; SER_BAUD_75
@@ -354,26 +354,27 @@ SER_IOCTL:
 ;
 
 SER_IRQ:
-        lda     ACIA_STATUS     ; Check ACIA status for receive interrupt
-        and     #$08
-        beq     @L9             ; Jump if no ACIA interrupt (carry still clear)
-        lda     ACIA_DATA       ; Get byte from ACIA
-        ldx     RecvFreeCnt     ; Check if we have free space left
-        beq     @L1             ; Jump if no space in receive buffer
-        ldy     RecvTail        ; Load buffer pointer
-        sta     RecvBuf,y       ; Store received byte in buffer
-        inc     RecvTail        ; Increment buffer pointer
-        dec     RecvFreeCnt     ; Decrement free space counter
-        cpx     #33             ; Check for buffer space low
-        bcc     @L1             ; Assert flow control if buffer space low
+        lda     ACIA_STATUS     ; (4)  Check for byte received
+        and     #$08            ; (2)
+        beq     @L9             ; (2*)
+
+        lda     ACIA_DATA       ; (4)  Get byte and put into receive buffer
+        ldy     RecvTail        ; (4)
+        ldx     RecvFreeCnt     ; (4)
+        beq     @L3             ; (2*) Jump if no space in receive buffer
+        sta     RecvBuf,y       ; (5)
+        inc     RecvTail        ; (6)
+        dec     RecvFreeCnt     ; (6)
+        cpx     #33             ; (2)  Check for buffer space low
+        bcc     @L2             ; (2*)
         rts                     ; Return with carry set (interrupt handled)
 
 ; Assert flow control if buffer space too low
 
-@L1:    lda     RtsOff
-        sta     ACIA_CMD
-        sta     Stopped
-        sec                     ; Interrupt handled
+@L2:    lda     RtsOff          ; (3)
+        sta     ACIA_CMD        ; (4)
+        sta     Stopped         ; (3)
+@L3:    sec                     ; Interrupt handled
 @L9:    rts
 
 ;----------------------------------------------------------------------------

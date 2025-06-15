@@ -85,10 +85,10 @@ static void PutBlockTransfer (const InsDesc* Ins);
 static void PutBitBranch (const InsDesc* Ins);
 /* Handle 65C02 branch on bit condition */
 
-static void PutBitBranchm740 (const InsDesc* Ins);
+static void PutBitBranch_m740 (const InsDesc* Ins);
 /* Handle m740 branch on bit condition */
 
-static void PutLDMm740 (const InsDesc* Ins);
+static void PutLDM_m740 (const InsDesc* Ins);
 /* Handle m740 LDM instruction */
 
 static void PutREP (const InsDesc* Ins);
@@ -1056,41 +1056,49 @@ static const struct {
 /* Instruction table for the m740 CPU */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[97];
+    InsDesc  Ins[106];
 } InsTabm740 = {
     sizeof (InsTabm740.Ins) / sizeof (InsTabm740.Ins[0]),
     {
 /* BEGIN SORTED.SH */
-        { "ADC",  0x080A26C, 0x60, 0, PutAll },
-        { "AND",  0x080A26C, 0x20, 0, PutAll },
-        { "ASL",  0x000006e, 0x02, 1, PutAll },
-        { "BBR0", 0x0000006, 0x13, 10, PutBitBranchm740 },
-        { "BBR1", 0x0000006, 0x33, 10, PutBitBranchm740 },
-        { "BBR2", 0x0000006, 0x53, 10, PutBitBranchm740 },
-        { "BBR3", 0x0000006, 0x73, 10, PutBitBranchm740 },
-        { "BBR4", 0x0000006, 0x93, 10, PutBitBranchm740 },
-        { "BBR5", 0x0000006, 0xb3, 10, PutBitBranchm740 },
-        { "BBR6", 0x0000006, 0xd3, 10, PutBitBranchm740 },
-        { "BBR7", 0x0000006, 0xf3, 10, PutBitBranchm740 },
-        { "BBS0", 0x0000006, 0x03, 10, PutBitBranchm740 },
-        { "BBS1", 0x0000006, 0x23, 10, PutBitBranchm740 },
-        { "BBS2", 0x0000006, 0x43, 10, PutBitBranchm740 },
-        { "BBS3", 0x0000006, 0x63, 10, PutBitBranchm740 },
-        { "BBS4", 0x0000006, 0x83, 10, PutBitBranchm740 },
-        { "BBS5", 0x0000006, 0xa3, 10, PutBitBranchm740 },
-        { "BBS6", 0x0000006, 0xc3, 10, PutBitBranchm740 },
-        { "BBS7", 0x0000006, 0xe3, 10, PutBitBranchm740 },
-        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
-        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
-        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
-        { "BIT",  0x000000C, 0x00, 2, PutAll },
-        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
-        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
-        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-        { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
-        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
-        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "ADC",  0x0080A26C, 0x60, 0, PutAll },
+        { "AND",  0x0080A26C, 0x20, 0, PutAll },
+        { "ASL",  0x0000006e, 0x02, 1, PutAll },
+        { "BBC0", 0x10000002, 0x13, 10, PutBitBranch_m740 },
+        { "BBC1", 0x10000002, 0x33, 10, PutBitBranch_m740 },
+        { "BBC2", 0x10000002, 0x53, 10, PutBitBranch_m740 },
+        { "BBC3", 0x10000002, 0x73, 10, PutBitBranch_m740 },
+        { "BBC4", 0x10000002, 0x93, 10, PutBitBranch_m740 },
+        { "BBC5", 0x10000002, 0xb3, 10, PutBitBranch_m740 },
+        { "BBC6", 0x10000002, 0xd3, 10, PutBitBranch_m740 },
+        { "BBC7", 0x10000002, 0xf3, 10, PutBitBranch_m740 },
+        { "BBS0", 0x10000002, 0x03, 10, PutBitBranch_m740 },
+        { "BBS1", 0x10000002, 0x23, 10, PutBitBranch_m740 },
+        { "BBS2", 0x10000002, 0x43, 10, PutBitBranch_m740 },
+        { "BBS3", 0x10000002, 0x63, 10, PutBitBranch_m740 },
+        { "BBS4", 0x10000002, 0x83, 10, PutBitBranch_m740 },
+        { "BBS5", 0x10000002, 0xa3, 10, PutBitBranch_m740 },
+        { "BBS6", 0x10000002, 0xc3, 10, PutBitBranch_m740 },
+        { "BBS7", 0x10000002, 0xe3, 10, PutBitBranch_m740 },
+        { "BCC",  0x00020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x00020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x00020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x0000000C, 0x00, 2, PutAll },
+        { "BMI",  0x00020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x00020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x00020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x00020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x00000001, 0x00, 0, PutAll },
+        { "BVC",  0x00020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x00020000, 0x70, 0, PutPCRel8 },
+        { "CLB0", 0x0000006, 0x1b, 10, PutAll },
+        { "CLB1", 0x0000006, 0x3b, 10, PutAll },
+        { "CLB2", 0x0000006, 0x5b, 10, PutAll },
+        { "CLB3", 0x0000006, 0x7b, 10, PutAll },
+        { "CLB4", 0x0000006, 0x9b, 10, PutAll },
+        { "CLB5", 0x0000006, 0xbb, 10, PutAll },
+        { "CLB6", 0x0000006, 0xdb, 10, PutAll },
+        { "CLB7", 0x0000006, 0xfb, 10, PutAll },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
         { "CLD",  0x0000001, 0xd8, 0, PutAll },
         { "CLI",  0x0000001, 0x58, 0, PutAll },
@@ -1111,7 +1119,7 @@ static const struct {
         { "JMP",  0x0000C08, 0x00, 12, PutAll },
         { "JSR",  0x0080808, 0x00, 13, PutAll },
         { "LDA",  0x080A26C, 0xa0, 0, PutAll },
-        { "LDM",  0x0000004, 0x3c, 6, PutLDMm740 },
+        { "LDM",  0x10000000, 0x3c, 0, PutLDM_m740 },
         { "LDX",  0x080030C, 0xa2, 1, PutAll },
         { "LDY",  0x080006C, 0xa0, 1, PutAll },
         { "LSR",  0x000006F, 0x42, 1, PutAll },
@@ -1135,25 +1143,26 @@ static const struct {
         { "RTI",  0x0000001, 0x40, 0, PutAll },
         { "RTS",  0x0000001, 0x60, 0, PutAll },
         { "SBC",  0x080A26C, 0xe0, 0, PutAll },
+        { "SEB0", 0x0000006, 0x0b, 10, PutAll },
+        { "SEB1", 0x0000006, 0x2b, 10, PutAll },
+        { "SEB2", 0x0000006, 0x4b, 10, PutAll },
+        { "SEB3", 0x0000006, 0x6b, 10, PutAll },
+        { "SEB4", 0x0000006, 0x8b, 10, PutAll },
+        { "SEB5", 0x0000006, 0xab, 10, PutAll },
+        { "SEB6", 0x0000006, 0xcb, 10, PutAll },
+        { "SEB7", 0x0000006, 0xeb, 10, PutAll },
         { "SEC",  0x0000001, 0x38, 0, PutAll },
         { "SED",  0x0000001, 0xf8, 0, PutAll },
         { "SEI",  0x0000001, 0x78, 0, PutAll },
         { "SET",  0x0000001, 0x32, 0, PutAll },
         { "SLW",  0x0000001, 0xC2, 0, PutAll },
-        { "SMB0", 0x0000006, 0x0b, 10, PutAll },
-        { "SMB1", 0x0000006, 0x2b, 10, PutAll },
-        { "SMB2", 0x0000006, 0x4b, 10, PutAll },
-        { "SMB3", 0x0000006, 0x6b, 10, PutAll },
-        { "SMB4", 0x0000006, 0x8b, 10, PutAll },
-        { "SMB5", 0x0000006, 0xab, 10, PutAll },
-        { "SMB6", 0x0000006, 0xcb, 10, PutAll },
-        { "SMB7", 0x0000006, 0xeb, 10, PutAll },
         { "STA",  0x000A26C, 0x80, 0, PutAll },
         { "STP",  0x0000001, 0x42, 0, PutAll },
         { "STX",  0x000010c, 0x82, 1, PutAll },
         { "STY",  0x000002c, 0x80, 1, PutAll },
         { "TAX",  0x0000001, 0xaa, 0, PutAll },
         { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TST",  0x0000004, 0x64, 0, PutAll },
         { "TSX",  0x0000001, 0xba, 0, PutAll },
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
@@ -1486,12 +1495,20 @@ static void EmitCode (EffAddr* A)
 }
 
 
-static void PutLDMm740 (const InsDesc* Ins)
+static void PutLDM_m740 (const InsDesc* Ins)
 {
-
+    EffAddr A;
+    /* Evaluate the addressing mode */
+    if (EvalEA (Ins, &A) == 0) {
+        /* An error occurred */
+        return;
+    }
     Emit0 (Ins->BaseCode);
-    EmitWord (Expression ());
+    EmitByte (A.Expr);
+    Consume (TOK_HASH, "'#' expected");
+    EmitByte (Expression ());
 }
+
 
 static long PutImmed8 (const InsDesc* Ins)
 /* Parse and emit an immediate 8 bit instruction. Return the value of the
@@ -1612,21 +1629,29 @@ static void PutBitBranch (const InsDesc* Ins)
     EmitSigned (GenBranchExpr (1), 1);
 }
 
-static void PutBitBranchm740 (const InsDesc* Ins)
-/* Handle 65C02 branch on bit condition */
+static void PutBitBranch_m740 (const InsDesc* Ins)
+/* Handle m740 branch on bit condition */
 {
     EffAddr A;
 
-    /* HACK: hardcoded for zp addressing mode, this doesn't work all the time */
-    A.AddrMode = 2;
-
-    A.Opcode = Ins->BaseCode | EATab[Ins->ExtCode][A.AddrMode];
     /* Evaluate the addressing mode used */
-    /* No error, output code */
-    Emit0 (A.Opcode);
-    EmitByte (Expression ());
-    ConsumeComma ();
-    EmitSigned (GenBranchExpr (1), 1);
+    GetEA(&A);
+
+    A.AddrMode = 2; /* HACK */
+    A.Opcode = Ins->BaseCode;
+
+    if (A.AddrModeSet == 0x00000002) {
+        /* Accu */
+        Emit0 (A.Opcode);
+        ConsumeComma ();
+        EmitSigned (GenBranchExpr (1), 1);
+    } else if (A.AddrModeSet == 0x10000000) {
+        A.Opcode += 0x04;
+        /* Zeropage */
+        Emit0 (A.Opcode);
+        EmitByte (A.Expr);
+        EmitSigned (GenBranchExpr (1), 1);
+    }
 }
 
 

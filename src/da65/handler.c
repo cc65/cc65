@@ -92,6 +92,29 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
     LineFeed ();
 }
 
+static void OneLineNoIndent (const OpcDesc* D, const char* Arg, ...) attribute ((format(printf, 2, 3)));
+static void OneLineNoIndent (const OpcDesc* D, const char* Arg, ...)
+/* Output one line with the given mnemonic and argument */
+{
+    char Buf [256];
+    va_list ap;
+
+    /* Mnemonic */
+    Mnemonic (D->Mnemo);
+
+    /* Argument */
+    va_start (ap, Arg);
+    xvsprintf (Buf, sizeof (Buf), Arg, ap);
+    va_end (ap);
+
+    Output ("%s", Buf);
+
+    /* Add the code stuff as comment */
+    LineComment (PC, D->Size);
+
+    /* End the line */
+    LineFeed ();
+}
 
 
 static const char* GetAbsOverride (unsigned Flags, unsigned Addr)
@@ -531,7 +554,7 @@ void OH_BitBranch (const OpcDesc* D)
     xfree (BranchLabel);
 }
 
-void OH_BitBranchm740 (const OpcDesc* D)
+void OH_BitBranch_m740 (const OpcDesc* D)
 {
     unsigned Bit = GetCodeByte (PC) >> 5;
     unsigned Addr = GetCodeByte (PC+1);
@@ -545,7 +568,7 @@ void OH_BitBranchm740 (const OpcDesc* D)
     GenerateLabel (flLabel, BranchAddr);
 
     /* Output the line */
-    OneLine (D, "%01X,%s,%s", Bit, GetAddrArg (D->Flags, Addr), GetAddrArg (flLabel, BranchAddr));
+    OneLineNoIndent (D, "%01X %s,%s", Bit, GetAddrArg (D->Flags, Addr), GetAddrArg (flLabel, BranchAddr));
 }
 
 void OH_ImmediateDirect (const OpcDesc* D)
@@ -743,7 +766,7 @@ void OH_ZeroPageBit (const OpcDesc* D)
     GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%01X,%s", Bit, GetAddrArg (D->Flags, Addr));
+    OneLineNoIndent (D, "%01X %s", Bit, GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -753,7 +776,7 @@ void OH_AccumulatorBit (const OpcDesc* D)
     unsigned Bit = GetCodeByte (PC) >> 5;
 
     /* Output the line */
-    OneLine (D, "%01X,a", Bit);
+    OneLineNoIndent (D, "%01X a", Bit);
 }
 
 
@@ -770,7 +793,7 @@ void OH_AccumulatorBitBranch (const OpcDesc* D)
     GenerateLabel (flLabel, BranchAddr);
 
     /* Output the line */
-    OneLine (D, "%01X,a,%s", Bit, GetAddrArg (flLabel, BranchAddr));
+    OneLineNoIndent (D, "%01X a, %s", Bit, GetAddrArg (flLabel, BranchAddr));
 }
 
 

@@ -86,6 +86,9 @@
 #define AM65_BLOCKXFER          0x02000000UL /* -- */
 #define AM65_ABS_IND_LONG       0x04000000UL /* -- */
 #define AM65_IMM_IMPLICIT_WORD  0x08000000UL /* PHW #$1234 (4510 only) */
+#define AM65_ZP_REL             0x10000000UL /* ZP, REL (m740) */
+
+
 
 /* Bitmask for all ZP operations that have correspondent ABS ops */
 /* $8524 */

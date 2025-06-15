@@ -214,7 +214,9 @@ void GetEA (EffAddr* A)
                     break;
 
                 default:
-                    Error ("Syntax error");
+                    /* FIXME: syntax error if not zp, ind */
+                    A->AddrModeSet = AM65_ZP_REL;
+                    break;
 
             }
 

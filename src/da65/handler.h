@@ -78,7 +78,7 @@ void OH_DirectXIndirect (const OpcDesc*);
 void OH_AbsoluteIndirect (const OpcDesc*);
 
 void OH_BitBranch (const OpcDesc*);
-void OH_BitBranchm740 (const OpcDesc*);
+void OH_BitBranch_m740 (const OpcDesc*);
 
 void OH_ImmediateDirect (const OpcDesc*);
 void OH_ImmediateDirectX (const OpcDesc*);

@@ -93,6 +93,7 @@ static const struct Keyword {
     unsigned char   Tok;        /* The token */
     unsigned char   Std;        /* Token supported in which standards? */
 } Keywords [] = {
+/* BEGIN SORTED.SH */
     { "_Pragma",        TOK_PRAGMA,     TT_C89 | TT_C99 | TT_CC65  },   /* !! */
     { "_Static_assert", TOK_STATIC_ASSERT,                TT_CC65  },   /* C11 */
     { "__AX__",         TOK_AX,         TT_C89 | TT_C99 | TT_CC65  },
@@ -146,6 +147,7 @@ static const struct Keyword {
     { "void",           TOK_VOID,       TT_C89 | TT_C99 | TT_CC65  },
     { "volatile",       TOK_VOLATILE,   TT_C89 | TT_C99 | TT_CC65  },
     { "while",          TOK_WHILE,      TT_C89 | TT_C99 | TT_CC65  },
+/* END SORTED.SH */
 };
 #define KEY_COUNT       (sizeof (Keywords) / sizeof (Keywords [0]))
 

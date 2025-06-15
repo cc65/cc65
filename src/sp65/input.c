@@ -73,9 +73,10 @@ static InputFormatDesc InputFormatTable[ifCount] = {
 /* CAUTION: table must be alphabetically sorted for bsearch */
 static const FileId FormatTable[] = {
     /* Upper case stuff for obsolete operating systems */
+/* BEGIN SORTED.SH */
     {   "PCX",  ifPCX           },
-
     {   "pcx",  ifPCX           },
+/* END SORTED.SH */
 };
 
 

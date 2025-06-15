@@ -59,7 +59,9 @@ struct PaletteMapEntry {
 /* Converter table */
 /* CAUTION: table must be alphabetically sorted for bsearch */
 static const PaletteMapEntry PaletteMap[] = {
+/* BEGIN SORTED.SH */
     {   "lynx-palette",         GenLynxPalette  },
+/* END SORTED.SH */
 };
 
 

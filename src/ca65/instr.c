@@ -1438,12 +1438,10 @@ static void EmitCode (EffAddr* A)
 
         case 0:
             Emit0 (A->Opcode);
-            //fprintf (stderr, "%s %x\n", "Instruction1",A->Opcode );
             break;
 
         case 1:
             Emit1 (A->Opcode, A->Expr);
-            //fprintf (stderr, "%s %x %x\n", "Instruction2",A->Opcode, A->Expr );
             break;
 
         case 2:
@@ -1461,7 +1459,6 @@ static void EmitCode (EffAddr* A)
         case 3:
             /* Far argument */
             Emit3 (A->Opcode, A->Expr);
-            //fprintf (stderr, "%s %x %x\n", "Instruction3",A->Opcode, A->Expr );
             break;
 
         default:
@@ -1475,10 +1472,6 @@ static void PutLDMm740 (const InsDesc* Ins)
 {
 
     Emit0 (Ins->BaseCode);
-    fprintf (stderr, "%s\n", "Basecode out ");
-    //EmitByte (Expression ());
- //   ConsumeComma ();
-    //EmitByte (Expression ());
     EmitWord (Expression ());
 }
 
@@ -1605,22 +1598,17 @@ static void PutBitBranchm740 (const InsDesc* Ins)
 /* Handle 65C02 branch on bit condition */
 {
     EffAddr A;
-    //GetEA (&A);
-    //fprintf (stderr, "%s%d\n", "BITBRANCH Instruction ",A.AddrMode );
-//HACK! THIS DOES NOT WORK ALL THE TIME!
+
+    /* HACK: hardcoded for zp addressing mode, this doesn't work all the time */
     A.AddrMode = 2;
-//HARDCODED FOR ZP ADDRESSING MODE!!!
 
     A.Opcode = Ins->BaseCode | EATab[Ins->ExtCode][A.AddrMode];
     /* Evaluate the addressing mode used */
-    //if (EvalEA (Ins, &A)) {
-        /* No error, output code */
-        //EmitCode (&A);
-        Emit0 (A.Opcode);
-        EmitByte (Expression ());
-        ConsumeComma ();
-        EmitSigned (GenBranchExpr (1), 1);
-    //}
+    /* No error, output code */
+    Emit0 (A.Opcode);
+    EmitByte (Expression ());
+    ConsumeComma ();
+    EmitSigned (GenBranchExpr (1), 1);
 }
 
 
@@ -1862,7 +1850,6 @@ static void PutAll (const InsDesc* Ins)
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
         /* No error, output code */
-        //fprintf (stderr, "%s%d\n", "JMP Instruction ",A.AddrModeBit );
         EmitCode (&A);
     }
 }
@@ -2001,8 +1988,7 @@ void SetCPU (cpu_t NewCPU)
     if (NewCPU != CPU_UNKNOWN && InsTabs[NewCPU]) {
         CPU = NewCPU;
         InsTab = InsTabs[CPU];
-        //fprintf (stderr, "%s%d\n", "FoundTabEntry ",CPU );
-        } else {
+    } else {
         Error ("CPU not supported");
     }
 }
@@ -2056,7 +2042,6 @@ int FindInstruction (const StrBuf* Ident)
         return -1;
     } else {
         /* Found, return the entry */
-        //fprintf (stderr, "%s%s\n", "FoundID ",ID );
         return ID - InsTab->Ins;
     }
 }

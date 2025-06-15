@@ -545,7 +545,6 @@ void OH_BitBranchm740 (const OpcDesc* D)
     GenerateLabel (flLabel, BranchAddr);
 
     /* Output the line */
-    //OneLine (D, "%01X,%s", Bit, GetAddrArg (D->Flags, Addr));
     OneLine (D, "%01X,%s,%s", Bit, GetAddrArg (D->Flags, Addr), GetAddrArg (flLabel, BranchAddr));
 }
 

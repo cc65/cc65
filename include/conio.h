@@ -110,6 +110,24 @@ char cgetc (void);
 ** 1 (see below), a blinking cursor is displayed while waiting.
 */
 
+char *cgets (char *buffer);
+/* Get a string of characters directly from the console. The standard interface
+** is quirky:
+**
+**   - set buffer[0] to the size of the buffer - 2, must be > 0
+**   - call cgets
+**   - buffer[1] will have the number of characters read
+**   - the actual string starts at buffer + 2
+**   - trailing CRLF are removed
+**   - terminating \0 is appended
+**   - therefore the maximum number of characters which can be read is the size
+**     of the buffer - 3!
+**
+**   param: buffer - where to save the input
+**  return: buffer + 2 (i.e. start of the string) if successful, NULL otherwise
+**  author: Russell-S-Harper
+*/
+
 int cscanf (const char* format, ...);
 /* Like scanf(), but uses direct keyboard input */
 

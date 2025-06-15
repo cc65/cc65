@@ -39,7 +39,8 @@ TARGETS = agat         \
           sim65c02     \
           supervision  \
           sym1         \
-          telestrat
+          telestrat    \
+          mega65
 
 TARGETTEST = none     \
              sim6502  \
@@ -187,6 +188,8 @@ ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
   SRCDIRS += $(addprefix geos-common/,$(GEOSDIRS))
 endif
 
+ifeq ($(TARGET),mega65)
+else
 SRCDIRS += common   \
            conio    \
            dbg      \
@@ -197,6 +200,7 @@ SRCDIRS += common   \
            serial   \
            tgi      \
            zlib
+endif
 
 vpath %.s $(SRCDIRS)
 vpath %.c $(SRCDIRS)

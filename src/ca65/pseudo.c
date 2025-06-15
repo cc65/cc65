@@ -1586,6 +1586,14 @@ static void DoP4510 (void)
 
 
 
+static void DoP45GS02 (void)
+/* Switch to 45GS02 CPU */
+{
+    SetCPU (CPU_45GS02);
+}
+
+
+
 static void DoPDTV (void)
 /* Switch to C64DTV CPU */
 {
@@ -2132,6 +2140,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFNREF */
     { ccKeepToken,      DoConditionals  },      /* .IFP02 */
     { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP45GS02 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
@@ -2165,6 +2174,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoOut           },
     { ccNone,           DoP02           },
     { ccNone,           DoP4510         },
+    { ccNone,           DoP45GS02       },
     { ccNone,           DoP816          },
     { ccNone,           DoPageLength    },
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */

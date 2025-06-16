@@ -186,10 +186,11 @@ void GetEA (EffAddr* A)
 
         /* Remaining stuff:
         **
-        ** adr
-        ** adr,x
-        ** adr,y
-        ** adr,s
+        ** addr
+        ** addr, x
+        ** addr, y
+        ** addr, s
+        ** addr, relative addr
         */
         A->Expr = Expression ();
 

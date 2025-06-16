@@ -138,6 +138,11 @@ static void PutJSR816 (const InsDesc* Ins);
 ** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
 */
 
+static void PutJSR_m740 (const InsDesc* Ins);
+/* Handle the JSR instruction for the m740
+** Allowing the special page feature.
+*/
+
 static void PutRTS (const InsDesc* Ins attribute ((unused)));
 /* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
 ** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
@@ -1053,6 +1058,9 @@ static const struct {
     }
 };
 
+/* CAUTION: in the pdf $1a is dec a, and $3a is inc a - if that is really the case,
+ * the table below (and the handler) should be fixed and this notice removed */
+
 /* Instruction table for the m740 CPU */
 static const struct {
     unsigned Count;
@@ -1091,82 +1099,82 @@ static const struct {
         { "BRK",  0x00000001, 0x00, 0, PutAll },
         { "BVC",  0x00020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x00020000, 0x70, 0, PutPCRel8 },
-        { "CLB0", 0x0000006, 0x1b, 10, PutAll },
-        { "CLB1", 0x0000006, 0x3b, 10, PutAll },
-        { "CLB2", 0x0000006, 0x5b, 10, PutAll },
-        { "CLB3", 0x0000006, 0x7b, 10, PutAll },
-        { "CLB4", 0x0000006, 0x9b, 10, PutAll },
-        { "CLB5", 0x0000006, 0xbb, 10, PutAll },
-        { "CLB6", 0x0000006, 0xdb, 10, PutAll },
-        { "CLB7", 0x0000006, 0xfb, 10, PutAll },
-        { "CLC",  0x0000001, 0x18, 0, PutAll },
-        { "CLD",  0x0000001, 0xd8, 0, PutAll },
-        { "CLI",  0x0000001, 0x58, 0, PutAll },
-        { "CLT",  0x0000001, 0x12, 0, PutAll },
-        { "CLV",  0x0000001, 0xb8, 0, PutAll },
-        { "CMP",  0x080A26C, 0xc0, 0, PutAll },
-        { "COM",  0x0000004, 0x44, 1, PutAll },
-        { "CPX",  0x080000C, 0xe0, 1, PutAll },
-        { "CPY",  0x080000C, 0xc0, 1, PutAll },
-        { "DEC",  0x000006F, 0x00, 3, PutAll },
-        { "DEX",  0x0000001, 0xca, 0, PutAll },
-        { "DEY",  0x0000001, 0x88, 0, PutAll },
-        { "EOR",  0x080A26C, 0x40, 0, PutAll },
-        { "FST",  0x0000001, 0xe2, 0, PutAll },
-        { "INC",  0x000006f, 0x00, 4, PutAll },
-        { "INX",  0x0000001, 0xe8, 0, PutAll },
-        { "INY",  0x0000001, 0xc8, 0, PutAll },
-        { "JMP",  0x0000C08, 0x00, 12, PutAll },
-        { "JSR",  0x0080808, 0x00, 13, PutAll },
-        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
+        { "CLB0", 0x00000006, 0x1b, 10, PutAll },
+        { "CLB1", 0x00000006, 0x3b, 10, PutAll },
+        { "CLB2", 0x00000006, 0x5b, 10, PutAll },
+        { "CLB3", 0x00000006, 0x7b, 10, PutAll },
+        { "CLB4", 0x00000006, 0x9b, 10, PutAll },
+        { "CLB5", 0x00000006, 0xbb, 10, PutAll },
+        { "CLB6", 0x00000006, 0xdb, 10, PutAll },
+        { "CLB7", 0x00000006, 0xfb, 10, PutAll },
+        { "CLC",  0x00000001, 0x18, 0, PutAll },
+        { "CLD",  0x00000001, 0xd8, 0, PutAll },
+        { "CLI",  0x00000001, 0x58, 0, PutAll },
+        { "CLT",  0x00000001, 0x12, 0, PutAll },
+        { "CLV",  0x00000001, 0xb8, 0, PutAll },
+        { "CMP",  0x0080A26C, 0xc0, 0, PutAll },
+        { "COM",  0x00000004, 0x44, 1, PutAll },
+        { "CPX",  0x0080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x0080000C, 0xc0, 1, PutAll },
+        { "DEC",  0x0000006F, 0x00, 3, PutAll },
+        { "DEX",  0x00000001, 0xca, 0, PutAll },
+        { "DEY",  0x00000001, 0x88, 0, PutAll },
+        { "EOR",  0x0080A26C, 0x40, 0, PutAll },
+        { "FST",  0x00000001, 0xe2, 0, PutAll },
+        { "INC",  0x0000006f, 0x00, 4, PutAll },
+        { "INX",  0x00000001, 0xe8, 0, PutAll },
+        { "INY",  0x00000001, 0xc8, 0, PutAll },
+        { "JMP",  0x00000C08, 0x00, 12, PutAll },
+        { "JSR",  0x20000408, 0x00, 13, PutJSR_m740 },
+        { "LDA",  0x0080A26C, 0xa0, 0, PutAll },
         { "LDM",  0x10000000, 0x3c, 0, PutLDM_m740 },
-        { "LDX",  0x080030C, 0xa2, 1, PutAll },
-        { "LDY",  0x080006C, 0xa0, 1, PutAll },
-        { "LSR",  0x000006F, 0x42, 1, PutAll },
-        { "NOP",  0x0000001, 0xea, 0, PutAll },
-        { "ORA",  0x080A26C, 0x00, 0, PutAll },
-        { "PHA",  0x0000001, 0x48, 0, PutAll },
-        { "PHP",  0x0000001, 0x08, 0, PutAll },
-        { "PLA",  0x0000001, 0x68, 0, PutAll },
-        { "PLP",  0x0000001, 0x28, 0, PutAll },
-        { "RMB0", 0x0000006, 0x1b, 10, PutAll },
-        { "RMB1", 0x0000006, 0x3b, 10, PutAll },
-        { "RMB2", 0x0000006, 0x5b, 10, PutAll },
-        { "RMB3", 0x0000006, 0x7b, 10, PutAll },
-        { "RMB4", 0x0000006, 0x9b, 10, PutAll },
-        { "RMB5", 0x0000006, 0xbb, 10, PutAll },
-        { "RMB6", 0x0000006, 0xdb, 10, PutAll },
-        { "RMB7", 0x0000006, 0xfb, 10, PutAll },
-        { "ROL",  0x000006F, 0x22, 1, PutAll },
-        { "ROR",  0x000006F, 0x62, 1, PutAll },
-        { "RRF",  0x0000004, 0x82, 6, PutAll },
-        { "RTI",  0x0000001, 0x40, 0, PutAll },
-        { "RTS",  0x0000001, 0x60, 0, PutAll },
-        { "SBC",  0x080A26C, 0xe0, 0, PutAll },
-        { "SEB0", 0x0000006, 0x0b, 10, PutAll },
-        { "SEB1", 0x0000006, 0x2b, 10, PutAll },
-        { "SEB2", 0x0000006, 0x4b, 10, PutAll },
-        { "SEB3", 0x0000006, 0x6b, 10, PutAll },
-        { "SEB4", 0x0000006, 0x8b, 10, PutAll },
-        { "SEB5", 0x0000006, 0xab, 10, PutAll },
-        { "SEB6", 0x0000006, 0xcb, 10, PutAll },
-        { "SEB7", 0x0000006, 0xeb, 10, PutAll },
-        { "SEC",  0x0000001, 0x38, 0, PutAll },
-        { "SED",  0x0000001, 0xf8, 0, PutAll },
-        { "SEI",  0x0000001, 0x78, 0, PutAll },
-        { "SET",  0x0000001, 0x32, 0, PutAll },
-        { "SLW",  0x0000001, 0xC2, 0, PutAll },
-        { "STA",  0x000A26C, 0x80, 0, PutAll },
-        { "STP",  0x0000001, 0x42, 0, PutAll },
-        { "STX",  0x000010c, 0x82, 1, PutAll },
-        { "STY",  0x000002c, 0x80, 1, PutAll },
-        { "TAX",  0x0000001, 0xaa, 0, PutAll },
-        { "TAY",  0x0000001, 0xa8, 0, PutAll },
-        { "TST",  0x0000004, 0x64, 0, PutAll },
-        { "TSX",  0x0000001, 0xba, 0, PutAll },
-        { "TXA",  0x0000001, 0x8a, 0, PutAll },
-        { "TXS",  0x0000001, 0x9a, 0, PutAll },
-        { "TYA",  0x0000001, 0x98, 0, PutAll }
+        { "LDX",  0x0080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x0080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x0000006F, 0x42, 1, PutAll },
+        { "NOP",  0x00000001, 0xea, 0, PutAll },
+        { "ORA",  0x0080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x00000001, 0x48, 0, PutAll },
+        { "PHP",  0x00000001, 0x08, 0, PutAll },
+        { "PLA",  0x00000001, 0x68, 0, PutAll },
+        { "PLP",  0x00000001, 0x28, 0, PutAll },
+        { "RMB0", 0x00000006, 0x1b, 10, PutAll },
+        { "RMB1", 0x00000006, 0x3b, 10, PutAll },
+        { "RMB2", 0x00000006, 0x5b, 10, PutAll },
+        { "RMB3", 0x00000006, 0x7b, 10, PutAll },
+        { "RMB4", 0x00000006, 0x9b, 10, PutAll },
+        { "RMB5", 0x00000006, 0xbb, 10, PutAll },
+        { "RMB6", 0x00000006, 0xdb, 10, PutAll },
+        { "RMB7", 0x00000006, 0xfb, 10, PutAll },
+        { "ROL",  0x0000006F, 0x22, 1, PutAll },
+        { "ROR",  0x0000006F, 0x62, 1, PutAll },
+        { "RRF",  0x00000004, 0x82, 6, PutAll },
+        { "RTI",  0x00000001, 0x40, 0, PutAll },
+        { "RTS",  0x00000001, 0x60, 0, PutAll },
+        { "SBC",  0x0080A26C, 0xe0, 0, PutAll },
+        { "SEB0", 0x00000006, 0x0b, 10, PutAll },
+        { "SEB1", 0x00000006, 0x2b, 10, PutAll },
+        { "SEB2", 0x00000006, 0x4b, 10, PutAll },
+        { "SEB3", 0x00000006, 0x6b, 10, PutAll },
+        { "SEB4", 0x00000006, 0x8b, 10, PutAll },
+        { "SEB5", 0x00000006, 0xab, 10, PutAll },
+        { "SEB6", 0x00000006, 0xcb, 10, PutAll },
+        { "SEB7", 0x00000006, 0xeb, 10, PutAll },
+        { "SEC",  0x00000001, 0x38, 0, PutAll },
+        { "SED",  0x00000001, 0xf8, 0, PutAll },
+        { "SEI",  0x00000001, 0x78, 0, PutAll },
+        { "SET",  0x00000001, 0x32, 0, PutAll },
+        { "SLW",  0x00000001, 0xC2, 0, PutAll },
+        { "STA",  0x0000A26C, 0x80, 0, PutAll },
+        { "STP",  0x00000001, 0x42, 0, PutAll },
+        { "STX",  0x0000010c, 0x82, 1, PutAll },
+        { "STY",  0x0000002c, 0x80, 1, PutAll },
+        { "TAX",  0x00000001, 0xaa, 0, PutAll },
+        { "TAY",  0x00000001, 0xa8, 0, PutAll },
+        { "TST",  0x00000004, 0x64, 1, PutAll },
+        { "TSX",  0x00000001, 0xba, 0, PutAll },
+        { "TXA",  0x00000001, 0x8a, 0, PutAll },
+        { "TXS",  0x00000001, 0x9a, 0, PutAll },
+        { "TYA",  0x00000001, 0x98, 0, PutAll }
 /* END SORTED.SH */
     }
 };
@@ -1197,43 +1205,43 @@ static unsigned char EATab[14][AM65I_COUNT] = {
         0x00, 0x00, 0x00, 0x03, 0x13, 0x09, 0x00, 0x09,
         0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 1 */
+    {   /* Table 1 (rol, ror, stx, sty) */
         0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
         0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x80, 0x00
     },
-    {   /* Table 2 */
+    {   /* Table 2 (bit) */
         0x00, 0x00, 0x24, 0x2C, 0x0F, 0x34, 0x3C, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x89, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 3 */
+    {   /* Table 3 (dec, dea) */
         0x3A, 0x3A, 0xC6, 0xCE, 0x00, 0xD6, 0xDE, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 4 */
+    {   /* Table 4 (inc) */
         0x1A, 0x1A, 0xE6, 0xEE, 0x00, 0xF6, 0xFE, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 5 */
+    {   /* Table 5 (stz) */
         0x00, 0x00, 0x60, 0x98, 0x00, 0x70, 0x9E, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 6 */
+    {   /* Table 6 (jmp) */
         0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
         0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x90, 0x00
     },
-    {   /* Table 7 (Subroutine opcodes) */
+    {   /* Table 7 (Subroutine opcodes) (jsr) */
         0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,
         0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1245,7 +1253,7 @@ static unsigned char EATab[14][AM65I_COUNT] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 9 */
+    {   /* Table 9 (dew, inw) */
         0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x30, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1644,7 +1652,7 @@ static void PutBitBranch_m740 (const InsDesc* Ins)
         /* Accu */
         Emit0 (A.Opcode);
         ConsumeComma ();
-        EmitSigned (GenBranchExpr (1), 1);
+        EmitSigned (GenBranchExpr (2), 1);
     } else if (A.AddrModeSet == 0x10000000) {
         A.Opcode += 0x04;
         /* Zeropage */
@@ -1869,6 +1877,59 @@ static void PutJSR816 (const InsDesc* Ins)
     }
 }
 
+
+static void PutJSR_m740 (const InsDesc* Ins)
+/* Handle a JSR instruction for m740 */
+{
+    EffAddr A;
+
+    /* Evaluate the addressing mode used */
+    GetEA (&A);
+
+    /* From the possible addressing modes, remove the ones that are invalid
+    ** for this instruction or CPU.
+    */
+    A.AddrModeSet &= Ins->AddrMode;
+
+    /* Check if we have any adressing modes left */
+    if (A.AddrModeSet == 0) {
+        Error ("Illegal addressing mode");
+        return;
+    }
+    A.AddrMode    = BitFind (A.AddrModeSet);
+    A.AddrModeBit = (0x01UL << A.AddrMode);
+
+    /* Build the opcode */
+    /* A.Opcode = Ins->BaseCode | EATab[Ins->ExtCode][A.AddrMode] | A.Reg; */
+    A.Opcode = Ins->BaseCode;
+
+    switch (A.AddrMode) {
+        case AM65I_DIR_IND:
+            A.Opcode = 0x02;
+            Emit1 (A.Opcode, A.Expr);
+            break;
+        case AM65I_ABS:
+            /* If we have an expression and it's const, get it's value */
+            if (A.Expr) {
+                long Val = -1;
+                if (IsConstExpr (A.Expr, &Val)) {
+                    if ((Val & 0xff00) == 0xff00) {
+                        /* direct page */
+                        A.Opcode = 0x22;
+                        Emit0 (A.Opcode);
+                        EmitByte(GenByteExpr(A.Expr));
+                        return;
+                    }
+                }
+            }
+            A.Opcode = 0x20;
+            Emit2 (A.Opcode, A.Expr);
+            break;
+        default:
+            Internal ("Invalid Opcode 0x%02x", A.Opcode);
+    }
+
+}
 
 
 static void PutRTS (const InsDesc* Ins attribute ((unused)))

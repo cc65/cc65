@@ -795,14 +795,14 @@ void OH_JmpDirectIndirect (const OpcDesc* D)
 
 void OH_SpecialPage (const OpcDesc* D)
 {
-  /* Get the operand */
-  unsigned Addr = 0xFF00 + GetCodeByte (PC+1);
+    /* Get the operand */
+    unsigned Addr = 0xFF00 + GetCodeByte (PC+1);
 
-  /* Generate a label in pass 1 */
-  GenerateLabel (D->Flags, Addr);
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
 
-  /* OneLine (D, "$FF%02X", (CodeByte (PC+1)); */
-  OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
+    /* OneLine (D, "$FF%02X", (CodeByte (PC+1)); */
+    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
 

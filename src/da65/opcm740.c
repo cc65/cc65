@@ -44,7 +44,8 @@
 /*                                   Data                                    */
 /*****************************************************************************/
 
-
+/* CAUTION: in the pdf $1a is dec, and $3a is inc - if that is really the case,
+ * the table below should be fixed and this notice removed */
 
 /* Descriptions for all opcodes */
 const OpcDesc OpcTable_M740[256] = {
@@ -74,7 +75,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "bbc0", 3,  flUseLabel,               OH_BitBranch_m740        }, /* $17 */
     {   "clc",  1,  flNone,                   OH_Implicit              }, /* $18 */
     {   "ora",  3,  flUseLabel,               OH_AbsoluteY             }, /* $19 */
-    {   "dec",  1,  flNone,                   OH_Accumulator           }, /* $1a */
+    {   "inc",  1,  flNone,                   OH_Accumulator           }, /* $1a */
     {   "clb0", 1,  flNone,                   OH_AccumulatorBit        }, /* $1b */
     {   "",     1,  flIllegal,                OH_Illegal               }, /* $1c */
     {   "ora",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $1d */
@@ -106,7 +107,7 @@ const OpcDesc OpcTable_M740[256] = {
     {   "bbc1", 3,  flUseLabel,               OH_BitBranch_m740        }, /* $37 */
     {   "sec",  1,  flNone,                   OH_Implicit              }, /* $38 */
     {   "and",  3,  flUseLabel,               OH_AbsoluteY             }, /* $39 */
-    {   "inc",  1,  flNone,                   OH_Accumulator           }, /* $3a */
+    {   "dec",  1,  flNone,                   OH_Accumulator           }, /* $3a */
     {   "clb1", 1,  flNone,                   OH_AccumulatorBit        }, /* $3b */
     {   "ldm",  3,  flLabel,                  OH_DirectImmediate       }, /* $3c */
     {   "and",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $3d */

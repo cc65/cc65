@@ -103,28 +103,36 @@ struct StrBuf;
 void PrintFileInclusionInfo (const LineInfo* LI);
 /* Print hierarchy of file inclusion */
 
-void Fatal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
+void _Fatal (const char *file, int line, const char* Format, ...) attribute ((noreturn, format (printf, 3, 4)));
+#define Fatal(...) _Fatal(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a message about a fatal error and die */
 
-void Internal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
+void _Internal (const char *file, int line, const char* Format, ...) attribute ((noreturn, format (printf, 3, 4)));
+#define Internal(...) _Internal(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a message about an internal compiler error and die */
 
-void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
+void _Error (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+#define Error(...) _Error(__FILE__, __LINE__, __VA_ARGS__)
 /* Print an error message */
 
-void LIError (errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void _LIError (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 5, 6)));
+#define LIError(...) _LIError(__FILE__, __LINE__, __VA_ARGS__)
 /* Print an error message with the line info given explicitly */
 
-void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
+void _PPError (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+#define PPError(...) _PPError(__FILE__, __LINE__, __VA_ARGS__)
 /* Print an error message. For use within the preprocessor */
 
-void Warning (const char* Format, ...) attribute ((format (printf, 1, 2)));
+void _Warning (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+#define Warning(...) _Warning(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a warning message */
 
-void LIWarning (errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void _LIWarning (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 5, 6)));
+#define LIWarning(...) _LIWarning(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a warning message with the line info given explicitly */
 
-void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
+void _PPWarning (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+#define PPWarning(...) _PPWarning(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a warning message. For use within the preprocessor */
 
 void UnreachableCodeWarning (void);
@@ -140,13 +148,16 @@ IntStack* FindWarning (const char* Name);
 void ListWarnings (FILE* F);
 /* Print a list of warning types/names to the given file */
 
-void Note (const char* Format, ...) attribute ((format (printf, 1, 2)));
+void _Note (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+#define Note(...) _Note(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a note message */
 
-void LINote (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
+void _LINote (const char *file, int line, const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 4, 5)));
+#define LINote(...) _LINote(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a note message with the line info given explicitly */
 
-void PPNote (const char* Format, ...) attribute ((format (printf, 1, 2)));
+void _PPNote (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+#define PPNote(...) _PPNote(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a note message. For use within the preprocessor */
 
 unsigned GetTotalErrors (void);

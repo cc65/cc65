@@ -152,7 +152,7 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
-        6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510
+        6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510, m740
 
 
   <label id="option-create-dep">
@@ -440,6 +440,8 @@ The assembler accepts
       <tt><ref id=".P816" name=".P816"></tt> command was given).
 <item>all valid 4510 mnemonics when in 4510 mode (after the
       <tt><ref id=".P4510" name=".P4510"></tt> command was given).
+<item>all valid M740 mnemonics when in M740 mode (after the
+      <tt><ref id=".PM740" name=".PM740"></tt> command was given).
 </itemize>
 
 On 6502-derived platforms the <tt/BRK/ instruction has an optional signature
@@ -527,6 +529,15 @@ branch you have to prefix these with an "L" (e.g. "<tt>LBNE</tt>" instead of
 For more information about the Commodore C65/C64DX and the 4510 CPU, see
 <url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and
 <url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
+
+
+<sect1>M740 mode<p>
+
+The M740 is a microcontroller by Mitsubishi, which was marketed for embedded
+devices in the mid 80s.
+
+For more information about the M740 Controllers, see
+<url url="https://en.wikipedia.org/wiki/Mitsubishi_740" name="Wikipedia">.
 
 
 <sect1>sweet16 mode<label id="sweet16-mode"><p>
@@ -4012,18 +4023,22 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510 and HuC6280.
+  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510, HuC6280 and m740.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
+       <tt><ref id=".IFP02X" name=".IFP02"></tt>,
        <tt><ref id=".IFPDTV" name=".IFPDTV"></tt>,
        <tt><ref id=".IFP816" name=".IFP816"></tt>,
        <tt><ref id=".IFPC02" name=".IFPC02"></tt>,
+       <tt><ref id=".IFPM740" name=".IFPM740"></tt>,
        <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
        <tt><ref id=".P02" name=".P02"></tt>,
+       <tt><ref id=".P02X" name=".P02"></tt>,
        <tt><ref id=".P816" name=".P816"></tt>,
        <tt><ref id=".P4510" name=".P4510"></tt>,
        <tt><ref id=".PC02" name=".PC02"></tt>,
+       <tt><ref id=".PM740" name=".PM740"></tt>,
        <tt><ref id=".PSC02" name=".PSC02"></tt>
 
 

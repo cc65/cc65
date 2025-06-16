@@ -184,7 +184,7 @@ static unsigned GetDiagnosticLineNum (void)
 
 
 
-void _Fatal (const char *file, int line, const char* Format, ...)
+void Fatal_ (const char *file, int line, const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
     va_list ap;
@@ -208,7 +208,7 @@ void _Fatal (const char *file, int line, const char* Format, ...)
 
 
 
-void _Internal (const char *file, int line, const char* Format, ...)
+void Internal_ (const char *file, int line, const char* Format, ...)
 /* Print a message about an internal compiler error and die */
 {
     va_list ap;
@@ -279,7 +279,7 @@ static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 
 
 
-void _LIError (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
+void LIError_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
 /* Print an error message with the line info given explicitly */
 {
     va_list ap;
@@ -295,7 +295,7 @@ void _LIError (const char *file, int line, errcat_t EC, LineInfo* LI, const char
 
 
 
-void _Error (const char *file, int line, const char* Format, ...)
+void Error_ (const char *file, int line, const char* Format, ...)
 /* Print an error message */
 {
     va_list ap;
@@ -311,7 +311,7 @@ void _Error (const char *file, int line, const char* Format, ...)
 
 
 
-void _PPError (const char *file, int line, const char* Format, ...)
+void PPError_ (const char *file, int line, const char* Format, ...)
 /* Print an error message. For use within the preprocessor */
 {
     va_list ap;
@@ -370,7 +370,7 @@ static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 
 
 
-void _LIWarning (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
+void LIWarning_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
 /* Print a warning message with the line info given explicitly */
 {
     va_list ap;
@@ -386,7 +386,7 @@ void _LIWarning (const char *file, int line, errcat_t EC, LineInfo* LI, const ch
 
 
 
-void _Warning (const char *file, int line, const char* Format, ...)
+void Warning_ (const char *file, int line, const char* Format, ...)
 /* Print a warning message */
 {
     va_list ap;
@@ -402,7 +402,7 @@ void _Warning (const char *file, int line, const char* Format, ...)
 
 
 
-void _PPWarning (const char *file, int line, const char* Format, ...)
+void PPWarning_ (const char *file, int line, const char* Format, ...)
 /* Print a warning message. For use within the preprocessor */
 {
     va_list ap;
@@ -475,7 +475,7 @@ static void IntNote (const LineInfo* LI, const char* Msg, va_list ap)
 
 
 
-void _LINote (const char *file, int line, const LineInfo* LI, const char* Format, ...)
+void LINote_ (const char *file, int line, const LineInfo* LI, const char* Format, ...)
 /* Print a note message with the line info given explicitly */
 {
     va_list ap;
@@ -491,7 +491,7 @@ void _LINote (const char *file, int line, const LineInfo* LI, const char* Format
 
 
 
-void _Note (const char *file, int line, const char* Format, ...)
+void Note_ (const char *file, int line, const char* Format, ...)
 /* Print a note message */
 {
     va_list ap;
@@ -507,7 +507,7 @@ void _Note (const char *file, int line, const char* Format, ...)
 
 
 
-void _PPNote (const char *file, int line, const char* Format, ...)
+void PPNote_ (const char *file, int line, const char* Format, ...)
 /* Print a note message. For use within the preprocessor */
 {
     va_list ap;

@@ -133,13 +133,10 @@ int MacroCmp (const Macro* M1, const Macro* M2);
 void PrintMacroStats (FILE* F);
 /* Print macro statistics to the given text file. */
 
-void OutputAllMacrosFull (void);
-/* Output all macros to the output file */
+void OutputPredefMacros (void);
+/* Output all predefined macros to the output file */
 
 void OutputUserMacros (void);
-/* Output the names of all user defined macros to the output file */
-
-void OutputUserMacrosFull (void);
 /* Output all user defined macros to the output file */
 
 

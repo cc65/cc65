@@ -93,9 +93,8 @@ static void Usage (void)
             "  -V\t\t\t\tPrint the compiler version number\n"
             "  -W [-+]warning[,...]\t\tControl warnings ('-' disables, '+' enables)\n"
             "  -d\t\t\t\tDebug mode\n"
-            "  -dD\t\t\t\tOutput user defined macros (needs -E)\n"
-            "  -dM\t\t\t\tOutput all macro definitions (needs -E)\n"
-            "  -dN\t\t\t\tOutput user defined macro names (needs -E)\n"
+            "  -dM\t\t\t\tOutput all user macros (needs -E)\n"
+            "  -dP\t\t\t\tOutput all predefined macros (needs -E)\n"
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"
             "  -j\t\t\t\tDefault characters are signed\n"
@@ -1025,25 +1024,24 @@ int main (int argc, char* argv[])
                     break;
 
                 case 'd':
-                    switch (Arg[2]) {
-                        case '\0':
-                            OptDebug (Arg, 0);
-                            break;
-                        case 'D':
-                            DumpUserMacrosFull = 1;
-                            break;
-                        case 'M':
-                            DumpAllMacrosFull = 1;
-                            break;
-                        case 'N':
-                            DumpUserMacros = 1;
-                            break;
-                        default:
-                            UnknownOption (Arg);
-                            break;
-                    }
-                    if (Arg[2] && Arg[3]) {
-                        UnknownOption (Arg);
+                    P = Arg + 2;
+                    if (*P == '\0') {
+                        OptDebug (Arg, 0);
+                    } else {
+                        while (*P) {
+                            switch (*P) {
+                                case 'M':
+                                    DumpUserMacros = 1;
+                                    break;
+                                case 'P':
+                                    DumpPredefMacros = 1;
+                                    break;
+                                default:
+                                    UnknownOption (Arg);
+                                    break;
+                            }
+                            ++P;
+                        }
                     }
                     break;
 
@@ -1157,10 +1155,8 @@ int main (int argc, char* argv[])
     }
 
     /* The options to output macros can only be used with -E */
-    if (DumpAllMacrosFull || DumpUserMacros || DumpUserMacrosFull) {
-        if (!PreprocessOnly) {
-            AbEnd ("Preprocessor macro output can only be used together with -E");
-        }
+    if ((DumpPredefMacros || DumpUserMacros) && !PreprocessOnly) {
+        AbEnd ("Preprocessor macro output can only be used together with -E");
     }
 
     /* Add the default include search paths. */

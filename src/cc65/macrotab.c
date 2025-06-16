@@ -62,8 +62,8 @@ static Macro* MacroTab[MACRO_TAB_SIZE];
 static Macro* UndefinedMacrosListHead;
 
 /* Some defines for better readability when calling OutputMacros() */
-#define ALL_MACROS      0
-#define USER_MACROS     1
+#define USER_MACROS     0
+#define PREDEF_MACROS   1
 #define NAME_ONLY       0
 #define FULL_DEFINITION 1
 
@@ -107,14 +107,17 @@ static void OutputMacro (const Macro* M, int Full)
 
 
 
-static void OutputMacros (int UserOnly, int Full)
-/* Output macros to the output file depending on the flags given */
+static void OutputMacros (int Predefined, int Full)
+/* Output macros to the output file depending on the flags given. */
 {
+    /* Note: The Full flag is currently not used by any callers but is left in
+    ** place for possible future changes.
+    */
     unsigned I;
     for (I = 0; I < MACRO_TAB_SIZE; ++I) {
         const Macro* M = MacroTab [I];
         while (M) {
-            if (!UserOnly || !M->Predefined) {
+            if ((Predefined != 0) == (M->Predefined != 0)) {
                 OutputMacro (M, Full);
             }
             M = M->Next;
@@ -416,23 +419,15 @@ void PrintMacroStats (FILE* F)
 
 
 
-void OutputAllMacrosFull (void)
-/* Output all macros to the output file */
+void OutputPredefMacros (void)
+/* Output all predefined macros to the output file */
 {
-    OutputMacros (ALL_MACROS, FULL_DEFINITION);
+    OutputMacros (PREDEF_MACROS, FULL_DEFINITION);
 }
 
 
 
 void OutputUserMacros (void)
-/* Output the names of all user defined macros to the output file */
-{
-    OutputMacros (USER_MACROS, NAME_ONLY);
-}
-
-
-
-void OutputUserMacrosFull (void)
 /* Output all user defined macros to the output file */
 {
     OutputMacros (USER_MACROS, FULL_DEFINITION);

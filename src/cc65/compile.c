@@ -497,14 +497,11 @@ void Compile (const char* FileName)
         { /* Nothing */ }
 
         /* Output macros if requested by the user */
-        if (DumpAllMacrosFull) {
-            OutputAllMacrosFull ();
+        if (DumpPredefMacros) {
+            OutputPredefMacros ();
         }
         if (DumpUserMacros) {
             OutputUserMacros ();
-        }
-        if (DumpUserMacrosFull) {
-            OutputUserMacrosFull ();
         }
 
         /* Close the output file */

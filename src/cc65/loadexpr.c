@@ -31,7 +31,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
+#include <stdlib.h>
 
 /* cc65 */
 #include "codegen.h"
@@ -174,54 +174,75 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         switch (ED_GetLoc (Expr)) {
 
             case E_LOC_NONE:
+                /* FIXME: float */
                 /* Immediate number constant */
-                g_getimmed (Flags | CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+                if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
+                    g_getimmed (Flags | CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal), 0);
+                } else {
+                    g_getimmed (Flags | CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+                }
                 break;
 
             case E_LOC_ABS:
+                if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_ABS\n", __FILE__, __LINE__); exit(-1); }
                 /* Absolute numeric addressed variable */
                 g_getstatic (Flags | CF_ABSOLUTE, Expr->IVal, 0);
                 break;
 
             case E_LOC_GLOBAL:
-                /* Global variable */
+                /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_GLOBAL\n", __FILE__, __LINE__); exit(-1); } */
+                /* Global variable, offset in IVal */
                 g_getstatic (Flags | CF_EXTERNAL, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_STATIC:
-                /* Static variable */
+                /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_STATIC\n", __FILE__, __LINE__); exit(-1); } */
+                /* Static variable, offset in IVal */
                 g_getstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_LITERAL:
-                /* Literal in the literal pool */
+                /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_LITERAL\n", __FILE__, __LINE__); exit(-1); } */
+                /* Literal in the literal pool, offset in IVal */
                 g_getstatic (Flags | CF_LITERAL, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_REGISTER:
-                /* Register variable */
+                /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_REGISTER\n", __FILE__, __LINE__); exit(-1); } */
+                /* Register variable, offset in IVal */
                 g_getstatic (Flags | CF_REGVAR, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_CODE:
-                /* Code label location */
+                /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_CODE\n", __FILE__, __LINE__); exit(-1); } */
+                /* Code label location, offset in IVal */
                 g_getstatic (Flags | CF_CODE, Expr->Name, Expr->IVal);
                 break;
 
             case E_LOC_STACK:
-                /* Value on the stack */
+                /* if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_STACK\n", __FILE__, __LINE__); exit(-1); } */
+                /* Fetch value on the stack (with offset in IVal) */
                 g_getlocal (Flags, Expr->IVal);
                 break;
 
             case E_LOC_PRIMARY:
+                /*if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_PRIMARY\n", __FILE__, __LINE__); exit(-1); }*/
                 /* The primary register */
-                if (Expr->IVal != 0) {
-                    /* We have an expression in the primary plus a constant
-                    ** offset. Adjust the value in the primary accordingly.
-                    */
-                    g_inc (Flags | CF_CONST, Expr->IVal);
+                if (CG_TypeOf (Expr->Type) == CF_FLOAT) {
+                    /* FIXME: float */
+                    Flags |= CF_FLOAT;
+                    if (Expr->V.FVal.V != 0.0f) {
+                         g_inc (Flags | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal));
+                    }
+                } else {
+                    if (Expr->IVal != 0) {
+                        /* We have an expression in the primary plus a constant
+                        ** offset. Adjust the value in the primary accordingly.
+                        */
+                        g_inc (Flags | CF_CONST, Expr->IVal);
 
-                    /* We might want to clear the offset, but we can't */
+                        /* We might want to clear the offset, but we can't */
+                    }
                 }
                 if (Flags & CF_TEST) {
                     g_test (Flags);
@@ -229,7 +250,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 break;
 
             case E_LOC_EXPR:
-                /* Reference to address in primary with offset in Expr */
+                /*if (CG_TypeOf (Expr->Type) == CF_FLOAT) { printf("%s:%d FIXME: E_LOC_EXPR\n", __FILE__, __LINE__); exit(-1); }*/
+                /* Reference to address in primary with offset in IVal */
                 g_getind (Flags, Expr->IVal);
 
                 /* Since the content in primary is now overwritten with the

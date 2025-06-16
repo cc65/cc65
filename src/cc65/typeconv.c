@@ -106,7 +106,10 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         ** If both sizes are equal, do also leave the value alone.
         ** If the new size is larger, we must convert the value.
         */
-        if (NewBits > OldBits) {
+        if ((NewBits > OldBits) ||
+            /* FIXME: float */
+            /* when either side is float, emit the call to the conversion code */
+            (IsTypeFloat (OldType) || IsTypeFloat (NewType))) {
             /* Load the value into the primary */
             LoadExpr (CF_NONE, Expr);
 
@@ -122,6 +125,15 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         /* A cast of a constant numeric value to another type. Be sure
         ** to handle sign extension correctly.
         */
+
+        /* convert from float to (signed) long first */
+        if (IsTypeFloat (OldType) && !IsTypeFloat (NewType)) {
+            OldBits = 32;
+            Expr->IVal = FP_D_ToLong(Expr->V.FVal);
+        } else if (!IsTypeFloat (OldType) && IsTypeFloat (NewType)) {
+            OldBits = 0;
+            Expr->V.FVal = FP_D_FromInt(Expr->IVal);
+        }
 
         /* If this is a floating point constant, convert to integer,
         ** and warn if precision is discarded.
@@ -172,7 +184,10 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
         ** not equal, add conversion code. Be sure to convert chars
         ** correctly.
         */
-        if (OldBits != NewBits) {
+        if ((OldBits != NewBits) ||
+            /* FIXME: float */
+            /* when either side is float, emit the call to the conversion code */
+            (IsTypeFloat (OldType) || IsTypeFloat (NewType))) {
 
             /* Load the value into the primary */
             LoadExpr (CF_NONE, Expr);

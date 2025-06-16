@@ -31,10 +31,9 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
@@ -65,7 +64,6 @@
 #include "wrappedcall.h"
 #include "typeconv.h"
 #include "initdata.h"
-
 
 
 /*****************************************************************************/
@@ -165,34 +163,46 @@ static void ClosingCurlyBraces (unsigned BracesExpected)
 static void DefineData (ExprDesc* Expr)
 /* Output a data definition for the given expression */
 {
+    int isfloat = (CG_TypeOf (Expr->Type) == CF_FLOAT);
+
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_NONE:
             /* Immediate numeric value with no storage */
-            g_defdata (CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            /* FIXME: float */
+            if (isfloat) {
+                g_defdata_float (CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, FP_D_As32bitRaw(Expr->V.FVal), 0);
+            } else {
+                g_defdata (CF_IMM | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            }
             break;
-
+        /* FIXME: float - other cases */
         case E_LOC_ABS:
+            if (isfloat) { printf("%s:%d FIXME: E_LOC_ABS\n", __FILE__, __LINE__); exit(-1); }
             /* Absolute numeric address */
             g_defdata (CF_ABSOLUTE | CG_TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:
+            if (isfloat) { printf("%s:%d FIXME: E_LOC_GLOBAL\n", __FILE__, __LINE__); exit(-1); }
             /* Global variable */
             g_defdata (CF_EXTERNAL, Expr->Name, Expr->IVal);
             break;
 
         case E_LOC_STATIC:
+            if (isfloat) { printf("%s:%d FIXME: E_LOC_STATIC\n", __FILE__, __LINE__); exit(-1); }
             /* Static variable */
             g_defdata (CF_STATIC, Expr->Name, Expr->IVal);
             break;
 
         case E_LOC_LITERAL:
+            if (isfloat) { printf("%s:%d FIXME: E_LOC_LITERAL\n", __FILE__, __LINE__); exit(-1); }
             /* Literal in the literal pool */
             g_defdata (CF_LITERAL, Expr->Name, Expr->IVal);
             break;
 
         case E_LOC_REGISTER:
+            if (isfloat) { printf("%s:%d FIXME: E_LOC_REGISTER\n", __FILE__, __LINE__); exit(-1); }
             /* Register variable. Taking the address is usually not
             ** allowed.
             */
@@ -203,6 +213,7 @@ static void DefineData (ExprDesc* Expr)
             break;
 
         case E_LOC_CODE:
+            if (isfloat) { printf("%s:%d FIXME: E_LOC_CODE\n", __FILE__, __LINE__); exit(-1); }
             /* Code label location */
             g_defdata (CF_CODE, Expr->Name, Expr->IVal);
             break;

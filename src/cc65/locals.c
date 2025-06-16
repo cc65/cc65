@@ -32,7 +32,6 @@
 /*****************************************************************************/
 
 
-
 /* common */
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -56,7 +55,6 @@
 #include "symtab.h"
 #include "typeconv.h"
 #include "input.h"
-
 
 
 /*****************************************************************************/
@@ -306,7 +304,19 @@ static void ParseAutoDecl (Declarator* Decl)
                 }
 
                 /* Push the value */
-                g_push (Flags | CG_TypeOf (Sym->Type), Expr.IVal);
+                if (CG_TypeOf (Sym->Type) == CF_FLOAT) {
+#if defined(_MSC_VER)
+#pragma warning( push )
+#pragma warning( disable : 4244 )   // conversion from double to float
+#endif
+                    /* FIXME: float */
+                    g_push_float (Flags | CG_TypeOf (Sym->Type), Expr.V.FVal.V);
+#if defined(_MSC_VER)
+#pragma warning( pop )
+#endif
+                } else {
+                    g_push (Flags | CG_TypeOf (Sym->Type), Expr.IVal);
+                }
 
                 /* This has to be done at sequence point */
                 DoDeferred (SQP_KEEP_NONE, &Expr);

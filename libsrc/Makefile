@@ -178,8 +178,12 @@ endif
 
 SRCDIRS = $(SRCDIR)
 
+SRCDIRS += float/softfloat \
+	float/softmath
+
 ifeq ($(TARGET),$(filter $(TARGET),$(CBMS)))
   SRCDIRS += cbm
+  SRCDIRS += float/cbmkernal
 endif
 
 ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))

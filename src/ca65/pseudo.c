@@ -2135,6 +2135,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
+    { ccKeepToken,      DoConditionals  },      /* .IFPM740 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },

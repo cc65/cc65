@@ -28,6 +28,10 @@
    sac #$00
 .endif
 
+.ifpm740
+   jsr $ff12
+.endif
+
 
 ; step 2: check for bitwise compatibility of instructions sets
 ;         (made verbose for better reading with hexdump/hd(1))
@@ -70,5 +74,9 @@
 
 .if (.cpu .bitand CPU_ISET_6502DTV)
    .byte 0,"CPU_ISET_6502DTV"
+.endif
+
+.if (.cpu .bitand CPU_ISET_M740)
+   .byte 0,"CPU_ISET_M740"
 .endif
 

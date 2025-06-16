@@ -197,6 +197,7 @@ typedef enum token_t {
     TOK_IFP816,
     TOK_IFPC02,
     TOK_IFPDTV,
+    TOK_IFPM740,
     TOK_IFPSC02,
     TOK_IFREF,
     TOK_IMPORT,

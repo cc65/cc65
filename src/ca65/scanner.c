@@ -225,6 +225,7 @@ struct DotKeyword {
     { ".IFP816",        TOK_IFP816              },
     { ".IFPC02",        TOK_IFPC02              },
     { ".IFPDTV",        TOK_IFPDTV              },
+    { ".IFPM740",       TOK_IFPM740             },
     { ".IFPSC02",       TOK_IFPSC02             },
     { ".IFREF",         TOK_IFREF               },
     { ".IMPORT",        TOK_IMPORT              },

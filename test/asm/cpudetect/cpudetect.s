@@ -8,7 +8,7 @@
    lda #$ea
 .endif
 
-.ifp02X
+.ifp02x
    lax #$ea
 .endif
 
@@ -83,7 +83,6 @@
 .if (.cpu .bitand CPU_ISET_M740)
    .byte 0,"CPU_ISET_M740"
 .endif
-
 
 ; step 3: switch through all supported cpus to verify the pseudo-op is there
 

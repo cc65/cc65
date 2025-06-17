@@ -740,7 +740,6 @@ void OH_DirectImmediate (const OpcDesc* D)
 /* NOTE: currently <bit> is part of the instruction */
 void OH_ZeroPageBit (const OpcDesc* D)
 {
-    /* unsigned Bit = GetCodeByte (PC) >> 5; */
     unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
@@ -756,8 +755,6 @@ void OH_ZeroPageBit (const OpcDesc* D)
 /* NOTE: currently <bit> is part of the instruction */
 void OH_AccumulatorBit (const OpcDesc* D)
 {
-    /* unsigned Bit = GetCodeByte (PC) >> 5; */
-
     /* Output the line */
     OneLine (D, "a");
 }
@@ -767,7 +764,6 @@ void OH_AccumulatorBit (const OpcDesc* D)
 /* NOTE: currently <bit> is part of the instruction */
 void OH_AccumulatorBitBranch (const OpcDesc* D)
 {
-    /* unsigned Bit = GetCodeByte (PC) >> 5; */
     signed char BranchOffs = GetCodeByte (PC+1);
 
     /* Calculate the target address for the branch */

@@ -13,8 +13,8 @@ function checkarray_quoted_name
     START="\\/\\* BEGIN SORTED.SH \\*\\/"
     END="\\/\\* END SORTED.SH \\*\\/"
 
-    awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {print count,"##",$0}' "$CHECK_FILE" | \
-        sed -e 's:\(.*\) ##.*\"\(.*\)\".*:\1##\2:g' > .a.tmp
+    awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {printf("%04d##%s\n", count, $0)}' "$CHECK_FILE" | \
+        sed -e 's:\(.*\)##.*\"\(.*\)\".*:\1##\2:g' > .a.tmp
 
     if [[ -z $(grep '[^[:space:]]' .a.tmp) ]] ; then
         echo "error: "$1" table is empty"

@@ -89,18 +89,21 @@
 #define AM65_ZP_REL             0x10000000UL /* ZP, REL (m740) */
 #define AM65_SPECIAL_PAGE       0x20000000UL /* $FFxx (m740) */
 
-
-
 /* Bitmask for all ZP operations that have correspondent ABS ops */
 #define AM65_SET_ZP     (AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
+
 /* Bitmask for all ABS operations that have correspondent FAR ops */
 #define AM65_SET_ABS    (AM65_ABS | AM65_ABS_X)
+
 /* Bitmask for all ZP operations */
 #define AM65_ALL_ZP     (AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
+
 /* Bitmask for all ABS operations */
 #define AM65_ALL_ABS    (AM65_ABS | AM65_ABS_X | AM65_ABS_Y | AM65_ABS_IND | AM65_ABS_X_IND)
+
 /* Bitmask for all FAR operations */
 #define AM65_ALL_FAR    (AM65_ABS_LONG | AM65_ABS_LONG_X)
+
 /* Bitmask for all immediate operations */
 #define AM65_ALL_IMM    (AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT | AM65_IMM_IMPLICIT_WORD)
 

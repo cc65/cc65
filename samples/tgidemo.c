@@ -13,10 +13,9 @@
 #endif
 
 
-/* TGI colors are indices into the default palette. So keep in mind that, if
-   you redefine the palette, those names may no more match the actual colors. */
-#define COLOR_BACK      TGI_COLOR_BLACK
-#define COLOR_FORE      TGI_COLOR_WHITE
+/* Color values passed to TGI functions are indices into the default palette. */
+#define COLOR_BACK      0
+#define COLOR_FORE      1
 
 
 /*****************************************************************************/
@@ -69,33 +68,28 @@ static void DoWarning (void)
 
 
 /*
- * Note that everywhere else in the TGI API, colors are referred to via TGI_COLOR_
- * color indices, which in turn refer to the default TGI palette.
+ * Note that everywhere else in the TGI API, colors are referred to via an index
+ * to the current palette.
  *
- * Redefining the colors (changing the palette) is a target dependend operation,
- * and the colors/values in the palette itself are not portable.
- *
- * That said, for some (perhaps most?) targets, the COLOR_ values may work here.
+ * TGI_COLOR_ values can be used (ONLY!) for setting the palette, using them
+ * with other TGI functions only works by chance, on some targets.
  */
 static void DoPalette (int n)
 {
     static const unsigned char Palette[4][2] = {
 /* FIXME: add some ifdefs with proper values for targets that need it */
 #if !defined(__APPLE2__)
-        { COLOR_BLACK, COLOR_BLUE },
-        { COLOR_WHITE, COLOR_BLACK },
-        { COLOR_RED, COLOR_BLACK },
-        { COLOR_BLACK, COLOR_WHITE }
+        { TGI_COLOR_BLACK, TGI_COLOR_BLUE },
+        { TGI_COLOR_WHITE, TGI_COLOR_BLACK },
+        { TGI_COLOR_RED, TGI_COLOR_BLACK },
 #else
-        { COLOR_WHITE, COLOR_BLACK },
-        { COLOR_BLACK, COLOR_WHITE },
-        { COLOR_WHITE, COLOR_BLACK },
-        { COLOR_BLACK, COLOR_WHITE }
+        { TGI_COLOR_WHITE, TGI_COLOR_BLACK },
+        { TGI_COLOR_BLACK, TGI_COLOR_WHITE },
+        { TGI_COLOR_WHITE, TGI_COLOR_BLACK },
 #endif
     };
     tgi_setpalette (Palette[n]);
 }
-
 
 
 static void DoCircles (void)
@@ -117,7 +111,9 @@ static void DoCircles (void)
             tgi_ellipse (X, Y, I, tgi_imulround (I, AspectRatio));
         }
     }
-
+    while (kbhit ()) {
+        cgetc ();
+    }
     cgetc ();
 }
 
@@ -186,6 +182,9 @@ static void DoDiagram (void)
         tgi_lineto (XOrigin + X, YOrigin + Y);
     }
 
+    while (kbhit ()) {
+        cgetc ();
+    }
     cgetc ();
 }
 
@@ -206,6 +205,9 @@ static void DoLines (void)
         tgi_line (Min, Min, Min-X, 0);
     }
 
+    while (kbhit ()) {
+        cgetc ();
+    }
     cgetc ();
 }
 
@@ -241,8 +243,7 @@ int main (void)
 
     /* Do graphics stuff */
 
-    /* first uses the default palette */
-    DoCircles ();
+    /* use default palette */ DoCircles ();
     DoPalette (0); DoCheckerboard ();
     DoPalette (1); DoDiagram ();
     DoPalette (2); DoLines ();

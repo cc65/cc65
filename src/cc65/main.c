@@ -93,6 +93,8 @@ static void Usage (void)
             "  -V\t\t\t\tPrint the compiler version number\n"
             "  -W [-+]warning[,...]\t\tControl warnings ('-' disables, '+' enables)\n"
             "  -d\t\t\t\tDebug mode\n"
+            "  -dM\t\t\t\tOutput all user macros (needs -E)\n"
+            "  -dP\t\t\t\tOutput all predefined macros (needs -E)\n"
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"
             "  -j\t\t\t\tDefault characters are signed\n"
@@ -1026,7 +1028,25 @@ int main (int argc, char* argv[])
                     break;
 
                 case 'd':
-                    OptDebug (Arg, 0);
+                    P = Arg + 2;
+                    if (*P == '\0') {
+                        OptDebug (Arg, 0);
+                    } else {
+                        while (*P) {
+                            switch (*P) {
+                                case 'M':
+                                    DumpUserMacros = 1;
+                                    break;
+                                case 'P':
+                                    DumpPredefMacros = 1;
+                                    break;
+                                default:
+                                    UnknownOption (Arg);
+                                    break;
+                            }
+                            ++P;
+                        }
+                    }
                     break;
 
                 case 'h':
@@ -1136,6 +1156,11 @@ int main (int argc, char* argv[])
     /* Did we have a file spec on the command line? */
     if (InputFile == 0) {
         AbEnd ("No input files");
+    }
+
+    /* The options to output macros can only be used with -E */
+    if ((DumpPredefMacros || DumpUserMacros) && !PreprocessOnly) {
+        AbEnd ("Preprocessor macro output can only be used together with -E");
     }
 
     /* Add the default include search paths. */

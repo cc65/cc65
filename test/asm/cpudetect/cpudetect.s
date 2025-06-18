@@ -84,6 +84,12 @@
    .byte 0,"CPU_ISET_M740"
 .endif
 
+; FIXME: something with 65816 is quirky
+.if (.not .cpu .bitand CPU_ISET_65816)
+    .include "allinst.inc"
+.endif
+
+
 ; step 3: switch through all supported cpus to verify the pseudo-op is there
 
 .p02

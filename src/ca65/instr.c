@@ -1298,6 +1298,7 @@ static unsigned char Sweet16EATab[2][AMSW16I_COUNT] = {
 };
 
 /* Table that encodes the additional bytes for each 65xx instruction */
+/* NOTE: one entry per addressing mode! */
 unsigned char ExtBytes[AM65I_COUNT] = {
     0,          /* Implicit */
     0,          /* Accu */
@@ -1327,6 +1328,8 @@ unsigned char ExtBytes[AM65I_COUNT] = {
     7,          /* Block transfer (HuC6280) */
     2,          /* Absolute Indirect long */
     2,          /* Immidiate word */
+    2,          /* Direct, Relative short */
+    1,          /* Special Page */
 };
 
 /* Table that encodes the additional bytes for each SWEET16 instruction */

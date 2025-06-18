@@ -10,7 +10,7 @@
 
 .zeropage
 
-sp:             .res    2       ; Stack pointer
+c_sp:             .res    2       ; Stack pointer
 sreg:           .res    2       ; Secondary register/high 16 bit for longs
 regsave:        .res    4       ; Slot to save/restore (E)AX into
 ptr1:           .res    2

@@ -341,10 +341,10 @@ MOVE:
         ldy     #$00            ; Start at top of stack
 
         ; Set x
-        lda     (sp),y
+        lda     (c_sp),y
         iny
         sta     pos1_lo,x
-        lda     (sp),y
+        lda     (c_sp),y
         sta     pos1_hi,x
 
         ; Update cursor

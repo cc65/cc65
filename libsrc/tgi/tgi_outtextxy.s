@@ -8,7 +8,7 @@
         .include        "tgi-kernel.inc"
 
         .import         addysp1
-        .importzp       sp
+        .importzp       c_sp
 
 .proc   _tgi_outtextxy
 
@@ -17,16 +17,16 @@
 
         pha                     ;
         ldy     #0
-        lda     (sp),y
+        lda     (c_sp),y
         sta     _tgi_cury
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     _tgi_cury+1
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     _tgi_curx
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     _tgi_curx+1
         pla
         jsr     addysp1         ; Drop arguments from stack

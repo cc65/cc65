@@ -7,7 +7,7 @@
         .export         _vcprintf
         .import         pushax, popax, popptr1
         .import         __printf, _cputc
-        .importzp       sp, ptr1, ptr2, ptr3, tmp1
+        .importzp       c_sp, ptr1, ptr2, ptr3, tmp1
 
         .macpack        generic
         .macpack        cpu
@@ -138,10 +138,10 @@ _vcprintf:
 ; Get the format parameter and push it again
 
         ldy     #1
-        lda     (sp),y
+        lda     (c_sp),y
         tax
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         jsr     pushax
 
 ; Replace the passed format parameter on the stack by &d - this creates
@@ -150,10 +150,10 @@ _vcprintf:
 
         ldy     #2              ; Low byte of d
         lda     #<outdesc
-        sta     (sp),y
+        sta     (c_sp),y
         iny
         lda     #>outdesc
-        sta     (sp),y
+        sta     (c_sp),y
 
 ; Restore ap and call _printf
 

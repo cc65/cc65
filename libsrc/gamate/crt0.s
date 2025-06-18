@@ -34,8 +34,8 @@ Start:
         ; Set up the stack
         lda     #<(__RAM_START__+__RAM_SIZE__)
         ldx     #>(__RAM_START__+__RAM_SIZE__)
-        sta     sp
-        stx     sp + 1
+        sta     c_sp
+        stx     c_sp + 1
 
         ; Call module constructors
         jsr     initlib

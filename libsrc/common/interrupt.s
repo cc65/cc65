@@ -93,8 +93,8 @@ zpsave: .res    zpsavespace
         ; Set C level interrupt stack
         lda     irqsp
         ldx     irqsp+1
-        sta     sp
-        stx     sp+1
+        sta     c_sp
+        stx     c_sp+1
 
         ; Call C level interrupt request handler
         jsr     irqvec

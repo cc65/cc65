@@ -6,7 +6,7 @@
 
         .export         _printf
         .import         _stdout, pushax, addysp, _vfprintf
-        .importzp       sp, ptr1
+        .importzp       c_sp, ptr1
 
         .macpack        generic
 
@@ -43,8 +43,8 @@ _printf:
 
 ; Now calculate the va_list pointer, which does points to Format
 
-        lda     sp
-        ldx     sp+1
+        lda     c_sp
+        ldx     c_sp+1
         add     ParamSize
         bcc     @L1
         inx

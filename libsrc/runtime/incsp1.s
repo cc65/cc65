@@ -5,13 +5,13 @@
 ;
 
         .export         incsp1
-        .importzp       sp
+        .importzp       c_sp
 
 .proc   incsp1
 
-        inc     sp
+        inc     c_sp
         bne     @L1
-        inc     sp+1
+        inc     c_sp+1
 @L1:    rts
 
 .endproc

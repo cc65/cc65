@@ -42,9 +42,9 @@ _exec:
         ; binary programs so we should do the same too in any case
         ; especially as _we_ rely on it in mainargs.s for argv[0]
         ldy     #$00
-        lda     (sp),y
+        lda     (c_sp),y
         tay
-:       lda     (sp),y
+:       lda     (c_sp),y
         sta     $0280,y
         dey
         bpl     :-

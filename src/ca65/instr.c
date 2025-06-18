@@ -1645,15 +1645,27 @@ static void PutBitBranch_m740 (const InsDesc* Ins)
     /* Evaluate the addressing mode used */
     GetEA(&A);
 
-    A.AddrMode = 2; /* HACK */
+    /* From the possible addressing modes, remove the ones that are invalid
+    ** for this instruction or CPU.
+    */
+    A.AddrModeSet &= Ins->AddrMode;
+
+    /* Check if we have any adressing modes left */
+    if (A.AddrModeSet == 0) {
+        Error ("Illegal addressing mode");
+        return;
+    }
+    A.AddrMode    = BitFind (A.AddrModeSet);
+
     A.Opcode = Ins->BaseCode;
 
-    if (A.AddrModeSet == 0x00000002) {
+    if (A.AddrMode == AM65I_ACCU) {
         /* Accu */
         Emit0 (A.Opcode);
         ConsumeComma ();
         EmitSigned (GenBranchExpr (2), 1);
-    } else if (A.AddrModeSet == 0x10000000) {
+    } else if (A.AddrMode == AM65I_ZP_REL) {
+        /* FIXME: hacky, the comma was already consumed here */
         A.Opcode += 0x04;
         /* Zeropage */
         Emit0 (A.Opcode);

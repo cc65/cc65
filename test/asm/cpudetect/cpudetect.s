@@ -8,6 +8,10 @@
    lda #$ea
 .endif
 
+.ifp02x
+   lax #$ea
+.endif
+
 .ifpsc02
    jmp ($1234,x)
 .endif
@@ -72,3 +76,13 @@
    .byte 0,"CPU_ISET_6502DTV"
 .endif
 
+
+; step 3: switch through all supported cpus to verify the pseudo-op is there
+
+.p02
+.p02X
+.psc02
+.pc02
+.p816
+.p4510
+.pdtv

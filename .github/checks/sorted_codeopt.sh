@@ -13,7 +13,7 @@ function checkarray
     START="\\/\\* BEGIN DECL SORTED_CODEOPT.SH \\*\\/"
     END="\\/\\* END DECL SORTED_CODEOPT.SH \\*\\/"
 
-    awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {print count,"##",$0}' "$CHECK_FILE" | \
+    awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {printf("%04d##%s\n", count, $0)}' "$CHECK_FILE" | \
         sed -e 's:\(.*##\).*"\(.*\)",.*:\1\2:g' > .a.tmp
 
     if [[ -z $(grep '[^[:space:]]' .a.tmp) ]] ; then
@@ -33,7 +33,7 @@ function checkarray
     START="\\/\\* BEGIN SORTED_CODEOPT.SH \\*\\/"
     END="\\/\\* END SORTED_CODEOPT.SH \\*\\/"
 
-    awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {print count,"##",$0}' "$CHECK_FILE" | \
+    awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {printf("%04d##%s\n", count, $0)}' "$CHECK_FILE" | \
         sed -e 's:\(.*##\).*&D\(.*\),.*:\1\2:g' > .b.tmp
 
     if [[ -z $(grep '[^[:space:]]' .b.tmp) ]] ; then

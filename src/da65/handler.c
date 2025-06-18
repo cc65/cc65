@@ -736,9 +736,10 @@ void OH_DirectImmediate (const OpcDesc* D)
 
 
 
-/* <bit> zp */
-/* NOTE: currently <bit> is part of the instruction */
 void OH_ZeroPageBit (const OpcDesc* D)
+/* <bit> zp
+** NOTE: currently <bit> is part of the instruction
+*/
 {
     unsigned Addr = GetCodeByte (PC+1);
 
@@ -751,18 +752,20 @@ void OH_ZeroPageBit (const OpcDesc* D)
 
 
 
-/* <bit> A */
-/* NOTE: currently <bit> is part of the instruction */
 void OH_AccumulatorBit (const OpcDesc* D)
+/* <bit> A
+** NOTE: currently <bit> is part of the instruction
+*/
 {
     /* Output the line */
     OneLine (D, "a");
 }
 
 
-/* <bit> A, rel */
-/* NOTE: currently <bit> is part of the instruction */
 void OH_AccumulatorBitBranch (const OpcDesc* D)
+/* <bit> A, rel
+** NOTE: currently <bit> is part of the instruction
+*/
 {
     signed char BranchOffs = GetCodeByte (PC+1);
 
@@ -788,8 +791,8 @@ void OH_JmpDirectIndirect (const OpcDesc* D)
 }
 
 
-
 void OH_SpecialPage (const OpcDesc* D)
+/* m740 "special page" address mode */
 {
     /* Get the operand */
     unsigned Addr = 0xFF00 + GetCodeByte (PC+1);
@@ -797,7 +800,6 @@ void OH_SpecialPage (const OpcDesc* D)
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
 
-    /* OneLine (D, "$FF%02X", (CodeByte (PC+1)); */
     OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 

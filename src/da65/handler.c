@@ -531,9 +531,10 @@ void OH_BitBranch (const OpcDesc* D)
     xfree (BranchLabel);
 }
 
-/* <bit> zp, rel */
-/* NOTE: currently <bit> is part of the instruction */
 void OH_BitBranch_m740 (const OpcDesc* D)
+/* <bit> zp, rel
+** NOTE: currently <bit> is part of the instruction
+*/
 {
     /* unsigned Bit = GetCodeByte (PC) >> 5; */
     unsigned Addr = GetCodeByte (PC+1);

@@ -216,10 +216,12 @@ typedef enum {
 
 
 /* Preprocessor directive tokens mapping table */
+/* CAUTION: table must be sorted for bsearch */
 static const struct PPDType {
     const char*     Tok;        /* Token */
     ppdirective_t   Type;       /* Type */
 } PPDTypes[] = {
+/* BEGIN SORTED.SH */
     {   "define",       PPD_DEFINE      },
     {   "elif",         PPD_ELIF        },
     {   "else",         PPD_ELSE        },
@@ -233,6 +235,7 @@ static const struct PPDType {
     {   "pragma",       PPD_PRAGMA      },
     {   "undef",        PPD_UNDEF       },
     {   "warning",      PPD_WARNING     },
+/* END SORTED.SH */
 };
 
 /* Number of preprocessor directive types */
@@ -2572,7 +2575,7 @@ static void DoDefine (void)
     CheckForBadIdent (Ident, Std, 0);
 
     /* Create a new macro definition */
-    M = NewMacro (Ident);
+    M = NewMacro (Ident, 0);
 
     /* Check if this is a function-like macro */
     if (CurC == '(') {

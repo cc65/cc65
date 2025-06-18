@@ -33,8 +33,17 @@
 
 
 
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+#if defined(_MSC_VER)
+#  include <process.h>
+#else
+#  include <unistd.h>
+#endif
 
 #include "xmalloc.h"
 #include "fname.h"
@@ -93,7 +102,28 @@ const char* FindName (const char* Path)
     return Path + Len;
 }
 
+char *GetFileDirectory (const char* File)
+/* Return a copy of the path part of a File, or NULL if there is none. */
+{
+    char *Out, *P;
 
+    if (File == NULL) {
+        return NULL;
+    }
+
+    Out = xmalloc (strlen (File) + 1);
+    strcpy(Out, File);
+
+    P = (char *)FindName (Out);
+    if (P == Out) {
+        /* This is a simple filename. */
+        xfree (Out);
+        return NULL;
+    }
+    *P = '\0';
+
+    return Out;
+}
 
 char* MakeFilename (const char* Origin, const char* Ext)
 /* Make a new file name from Origin and Ext. If Origin has an extension, it
@@ -119,35 +149,29 @@ char* MakeFilename (const char* Origin, const char* Ext)
 
 
 
-char* MakeTmpFilename (const char* Ext)
-/* Make a new temporary file name from Ext.  tmpnam(3) is called
-** and Ext is appended to generate the filename.
+char* MakeTmpFilename (const char *Directory, const char *Origin, const char* Ext)
+/* Make a new temporary file name from Origin and Ext.
 ** The result is placed in a malloc'ed buffer and returned.
 */
 {
     char* Out;
-    char Buffer[L_tmpnam * 2]; /* a lazy way to ensure we have space for Ext */
+    size_t Len = 0;
+    static unsigned int Counter = 0;
 
-    /*
-    ** gcc emits the following warning here:
-    **
-    ** warning: the use of `tmpnam' is dangerous, better use `mkstemp'
-    **
-    ** however, mkstemp actually opens a file, which we do not want.
-    ** tmpfile() is unsuitable for the same reason.
-    **
-    ** we could write our own version, but then we would have to struggle
-    ** with supporting multiple build environments.
-    **
-    ** tmpnam(3) is safe here, because ca65 / cc65 / ld65 will simply clobber
-    ** an existing file, or exit if with an error if they are unable to.
-    **
-    ** gcc will also complain, if you don't use the return value from tmpnam(3)
-    */
-    strcat(tmpnam(Buffer), Ext);
+    /* Allocate enough for the directory, ... */
+    if (Directory != NULL) {
+      Len = strlen (Directory);
+    }
 
-    Out = xmalloc (strlen (Buffer) + 1);
-    strcpy (Out, Buffer);
+    /* ... plus the the original name, the maximum length of the PID, the
+     * maximum length of the counter, the extension, and the terminator.
+     */
+    Len += strlen (Origin) + (strlen (".2147483648") * 2) + strlen (Ext) + 1;
+    Out = xmalloc (Len);
+
+    snprintf (Out, Len, "%s%s.%u.%u%s", (Directory != NULL ? Directory : ""),
+                                     FindName(Origin), getpid(), Counter, Ext);
+    Counter++;
 
     return Out;
 }

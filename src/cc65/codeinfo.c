@@ -90,7 +90,9 @@ struct FuncInfo {
 ** routines are marked to use only the A register. The remainder is ignored
 ** anyway.
 */
+/* CAUTION: table must be sorted for bsearch */
 static const FuncInfo FuncInfoTable[] = {
+/* BEGIN SORTED.SH */
     { "addeq0sp",   SLV_TOP | REG_AX,   PSTATE_ALL | REG_AXY                        },
     { "addeqysp",   SLV_IND | REG_AXY,  PSTATE_ALL | REG_AXY                        },
     { "addysp",     REG_SP | REG_Y,     PSTATE_ALL | REG_SP                         },
@@ -190,12 +192,12 @@ static const FuncInfo FuncInfoTable[] = {
     { "ldeaxysp",   SLV_IND | REG_Y,        PSTATE_ALL | REG_EAXY                   },
     { "leaa0sp",    REG_SP | REG_A,         PSTATE_ALL | REG_AX                     },
     { "leaaxsp",    REG_SP | REG_AX,        PSTATE_ALL | REG_AX                     },
-    { "leave00",    REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
-    { "leave0",     REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
     { "leave",      REG_SP,                 PSTATE_ALL | REG_SP | REG_Y             },
-    { "leavey00",   REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
-    { "leavey0",    REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leave0",     REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leave00",    REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
     { "leavey",     REG_SP | REG_Y,         PSTATE_ALL | REG_SP | REG_Y             },
+    { "leavey0",    REG_SP,                 PSTATE_ALL | REG_SP | REG_XY            },
+    { "leavey00",   REG_SP,                 PSTATE_ALL | REG_SP | REG_AXY           },
     { "lsubeq",     REG_EAXY | REG_PTR1_LO, PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
     { "lsubeq0sp",  SLV_TOP | REG_EAX,      PSTATE_ALL | REG_EAXY                   },
     { "lsubeq1",    REG_Y | REG_PTR1_LO,    PSTATE_ALL | REG_EAXY | REG_PTR1_HI     },
@@ -376,11 +378,14 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosxoreax",  SLV_TOP | REG_EAX,  PSTATE_ALL | REG_SP | REG_EAXY | REG_TMP1   },
     { "tsteax",     REG_EAX,            PSTATE_ALL | REG_Y                          },
     { "utsteax",    REG_EAX,            PSTATE_ALL | REG_Y                          },
+/* END SORTED.SH */
 };
 #define FuncInfoCount   (sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
 /* Table with names of zero page locations used by the compiler */
+/* CAUTION: table must be sorted for bsearch */
 static const ZPInfo ZPInfoTable[] = {
+/* BEGIN SORTED.SH */
     {   0, "ptr1",      2,  REG_PTR1_LO,    REG_PTR1    },
     {   0, "ptr1+1",    1,  REG_PTR1_HI,    REG_PTR1    },
     {   0, "ptr2",      2,  REG_PTR2_LO,    REG_PTR2    },
@@ -398,6 +403,7 @@ static const ZPInfo ZPInfoTable[] = {
     {   0, "tmp2",      1,  REG_NONE,       REG_NONE    },
     {   0, "tmp3",      1,  REG_NONE,       REG_NONE    },
     {   0, "tmp4",      1,  REG_NONE,       REG_NONE    },
+/* END SORTED.SH */
 };
 #define ZPInfoCount     (sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 

@@ -131,10 +131,12 @@ static int         C            = 0;    /* Current input character */
 int               ForcedEnd     = 0;
 
 /* List of dot keywords with the corresponding tokens */
+/* CAUTION: table must be sorted for bsearch */
 struct DotKeyword {
     const char* Key;                    /* MUST be first field */
     token_t     Tok;
 } DotKeywords [] = {
+/* BEGIN SORTED.SH */
     { ".A16",           TOK_A16                 },
     { ".A8",            TOK_A8                  },
     { ".ADDR",          TOK_ADDR                },
@@ -219,6 +221,7 @@ struct DotKeyword {
     { ".IFNDEF",        TOK_IFNDEF              },
     { ".IFNREF",        TOK_IFNREF              },
     { ".IFP02",         TOK_IFP02               },
+    { ".IFP02X",        TOK_IFP02X              },
     { ".IFP4510",       TOK_IFP4510             },
     { ".IFP816",        TOK_IFP816              },
     { ".IFPC02",        TOK_IFPC02              },
@@ -257,6 +260,7 @@ struct DotKeyword {
     { ".ORG",           TOK_ORG                 },
     { ".OUT",           TOK_OUT                 },
     { ".P02",           TOK_P02                 },
+    { ".P02X",          TOK_P02X                },
     { ".P4510",         TOK_P4510               },
     { ".P816",          TOK_P816                },
     { ".PAGELEN",       TOK_PAGELENGTH          },
@@ -306,6 +310,7 @@ struct DotKeyword {
     { ".XMATCH",        TOK_XMATCH              },
     { ".XOR",           TOK_BOOLXOR             },
     { ".ZEROPAGE",      TOK_ZEROPAGE            },
+/* END SORTED.SH */
 };
 
 

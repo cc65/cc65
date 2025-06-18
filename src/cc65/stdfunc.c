@@ -78,19 +78,20 @@ static void StdFunc_strlen (FuncDesc*, ExprDesc*);
 
 
 
-/* Table with all known functions and their handlers. Must be sorted
-** alphabetically!
+/* Table with all known functions and their handlers.
+** CAUTION: table must be alphabetically sorted for bsearch
 */
 static struct StdFuncDesc {
     const char*         Name;
     void                (*Handler) (FuncDesc*, ExprDesc*);
 } StdFuncs[] = {
+/* BEGIN SORTED.SH */
     {   "memcpy",       StdFunc_memcpy          },
     {   "memset",       StdFunc_memset          },
     {   "strcmp",       StdFunc_strcmp          },
     {   "strcpy",       StdFunc_strcpy          },
     {   "strlen",       StdFunc_strlen          },
-
+/* END SORTED.SH */
 };
 #define FUNC_COUNT      (sizeof (StdFuncs) / sizeof (StdFuncs[0]))
 

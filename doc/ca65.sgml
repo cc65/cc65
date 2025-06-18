@@ -4807,6 +4807,7 @@ each supported CPU a constant similar to
     CPU_HUC6280
     CPU_4510
     CPU_6502DTV
+    CPU_M740
 </verb></tscreen>
 
 is defined. These constants may be used to determine the exact type of the
@@ -4822,6 +4823,7 @@ another constant is defined:
     CPU_ISET_HUC6280
     CPU_ISET_4510
     CPU_ISET_6502DTV
+    CPU_ISET_M740
 </verb></tscreen>
 
 The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may

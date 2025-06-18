@@ -1,12 +1,8 @@
 # ---- Display info during parsing phase ----
-$(info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~)
-$(info ~~~ Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))))
-ifeq ($(MAKECMDGOALS),)
-  $(info ~~~ Invoked target: (default))
-else
-  $(info ~~~ Invoked target: $(MAKECMDGOALS))
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
 endif
-$(info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~)
 
 #
 # Makefile for cc65 samples

@@ -229,15 +229,15 @@ LABEL1:
     sax ($12,x)     ; $83
     sax $12         ; $87
     nop #$12        ; $89
-    ;xaa #$12        ; $8b  FIXME (implement in assembler)
+    ane #$12        ; $8b
     sax $1234       ; $8f
     jam             ; $92
-    ;ahx ($12),y     ; $93  FIXME (implement in assembler)
+    sha ($12),y     ; $93
     sax $12,y       ; $97
     tas $1234,y     ; $9b
     shy $1234,x     ; $9c
     shx $1234,y     ; $9e
-    ;ahx $1234,y     ; $9f  FIXME (implement in assembler)
+    sha $1234,y     ; $9f
     lax ($12,x)     ; $a3
     lax $12         ; $a7
     lax #$12        ; $ab
@@ -331,8 +331,9 @@ LABEL:
     lax $1234       ; $af
     lax ($12),y     ; $b3
     lax $12,y       ; $b7
-    las $1234,y     ; $bb
     lax $1234,y     ; $bf
+
+    las $1234,y     ; $bb
 
     alr #$12        ; $4b
 

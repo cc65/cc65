@@ -1,6 +1,6 @@
-; Test for #525 taken from the issue
+; Test for #505 taken from the issue
 ; Redefining a variable symbol "reopens" the old name space for cheap locals
-; Behavior should be: First definition of a variable symbol opens a new 
+; Behavior should be: First definition of a variable symbol opens a new
 ; scope for cheap locals, redefinitions of the same symbols do not.
 
 ;this starts a new scope for cheap local lables

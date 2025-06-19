@@ -222,14 +222,9 @@ DONE:
         bit     TXTSET
         bit     LOWSCR
 
-        .ifndef __APPLE2ENH__
-        bit     machinetype
-        bpl     reset_wndtop
-        .endif
         ; Limit SET80COL-HISCR to text
         bit     LORES
 
-reset_wndtop:
         ; Reset the text window top
         lda     #$00
         sta     WNDTOP

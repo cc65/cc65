@@ -429,7 +429,7 @@ LABEL:
     .endscope
 .endif
 
-; FIXME: hack so these opcodes get fixed anyway, while 4510 is still quirky
+; FIXME: hack so these opcodes get tested anyway, while 4510 is still quirky
 .if (.cpu .bitand CPU_ISET_65SC02)
 .if (.not .cpu = CPU_4510)
     ora ($12)       ; $12

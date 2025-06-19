@@ -220,8 +220,12 @@ original aspect ratio.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned char tgi_getcolor (void);/
 <tag/Description/The actual color is an index to a palette. During tgi_init
-you will get a default palette. Note that both the number of colors, and also
-the available colors, depend on the platform.
+you will get a default palette.
+A default palette has always two entries with values equal to TGI_COLOR_BLACK
+and TGI_COLOR_WHITE. However, which default palette entries have those two
+values is target specific.
+Note that both the number of colors, and also the available colors, depend on
+the target and/or driver.
 <tag/Availability/cc65
 <tag/See also/<ref id="tgi_setcolor" name="tgi_setcolor">,
 <ref id="tgi_setpalette" name="tgi_setpalette">
@@ -893,7 +897,9 @@ Palette is a pointer to as many entries as there are colors.
 <tag/Description/Set the palette (not available with all drivers/hardware).
 Palette is a pointer to as many entries as there are colors. The values in the
 palette are target specific, some (hopefully, more or less) portable values are
-defined in the TGI_COLOR_XY defines.
+defined in the TGI_COLOR_XY defines. Note that different platforms provide
+different colors, only TGI_COLOR_BLACK and TGI_COLOR_WHITE are guaranteed to
+exist (needed for the default palette).
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.

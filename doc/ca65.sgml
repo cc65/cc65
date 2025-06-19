@@ -3241,6 +3241,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   (see <tt><ref id=".P02" name=".P02"></tt> command).
 
 
+<sect1><tt>.IFP02X</tt><label id=".IFP02X"><p>
+
+  Conditional assembly: Check if the assembler is currently in 6502X mode
+  (see <tt><ref id=".P02X" name=".P02X"></tt> command).
+
+
 <sect1><tt>.IFP4510</tt><label id=".IFP4510"><p>
 
   Conditional assembly: Check if the assembler is currently in 4510 mode
@@ -3633,6 +3639,16 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
   <tt><ref id=".P4510" name=".P4510"></tt>, and
   <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+
+<sect1><tt>.P02X</tt><label id=".P02X"><p>
+
+  Enable the 6502X instruction set, disable 65SC02, 65C02 and 65816
+  instructions.
+
+  See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 
 <sect1><tt>.P4510</tt><label id=".P4510"><p>
@@ -4041,11 +4057,13 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
+       <tt><ref id=".IFP02X" name=".IFP02X"></tt>,
        <tt><ref id=".IFPDTV" name=".IFPDTV"></tt>,
        <tt><ref id=".IFP816" name=".IFP816"></tt>,
        <tt><ref id=".IFPC02" name=".IFPC02"></tt>,
        <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
        <tt><ref id=".P02" name=".P02"></tt>,
+       <tt><ref id=".P02X" name=".P02X"></tt>,
        <tt><ref id=".P816" name=".P816"></tt>,
        <tt><ref id=".P4510" name=".P4510"></tt>,
        <tt><ref id=".P45GS02" name=".P45GS02"></tt>,

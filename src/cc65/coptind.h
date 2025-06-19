@@ -66,6 +66,9 @@ unsigned OptDupLoads (CodeSeg* S);
 unsigned OptStoreLoad (CodeSeg* S);
 /* Remove a store followed by a load from the same location. */
 
+unsigned OptLoadStore1 (CodeSeg* S);
+/* Remove an 8 bit load followed by a store into the same location. */
+
 unsigned OptLoadStoreLoad (CodeSeg* S);
 /* Remove a load, store followed by a reload of the same location. */
 

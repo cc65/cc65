@@ -13,10 +13,10 @@ function checkarray_quoted_name
     START="\\/\\* BEGIN SORTED_OPCODES.SH \\*\\/"
     END="\\/\\* END SORTED_OPCODES.SH \\*\\/"
 
-    awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {print count,"##",$0}' "$CHECK_FILE" | \
+    awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {printf("%04d##%s\n", count, $0)}' "$CHECK_FILE" | \
         sed 's:/\*.*::g' | \
         grep '".*",' | \
-        sed -e 's:\(.*\) ##.*\"\(.*\)\".*:\1##\2:g' > .a.tmp
+        sed -e 's:\(.*\)##.*\"\(.*\)\".*:\1##\2:g' > .a.tmp
 
     if [[ -z $(grep '[^[:space:]]' .a.tmp) ]] ; then
         echo "error: "$1" table is empty"

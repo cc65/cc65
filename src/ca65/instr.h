@@ -140,8 +140,8 @@
 #define AM65I_IMM_IMPLICIT_WORD  27
 #define AM65I_ZP_REL             28
 #define AM65I_SPECIAL_PAGE       29
-#define AM65_32BIT_BASE_IND_Z    30
-#define AM65_Q                   31
+#define AM65I_32BIT_BASE_IND_Z   30
+#define AM65I_Q                  31
 #define AM65I_COUNT              32
 
 

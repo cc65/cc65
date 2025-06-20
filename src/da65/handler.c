@@ -518,11 +518,11 @@ void OH_Relative (const OpcDesc* D)
     GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    if (HaveLabel(Addr)) {
+    if (HaveLabel (Addr)) {
         OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
     } else {
         /* No label -- make a relative address expression */
-        OneLine (D, "* + (%d)", (int) Offs + 2);
+        OneLine (D, "*%+d", (int) Offs + 2);
     }
 }
 

@@ -32,6 +32,10 @@
    sac #$00
 .endif
 
+.ifpm740
+   jsr $ff12
+.endif
+
 
 ; step 2: check for bitwise compatibility of instructions sets
 ;         (made verbose for better reading with hexdump/hd(1))
@@ -76,6 +80,15 @@
    .byte 0,"CPU_ISET_6502DTV"
 .endif
 
+.if (.cpu .bitand CPU_ISET_M740)
+   .byte 0,"CPU_ISET_M740"
+.endif
+
+; FIXME: something with 65816 is quirky
+.if (.not .cpu .bitand CPU_ISET_65816)
+    .include "allinst.inc"
+.endif
+
 
 ; step 3: switch through all supported cpus to verify the pseudo-op is there
 
@@ -86,3 +99,4 @@
 .p816
 .p4510
 .pdtv
+.pm740

@@ -119,12 +119,13 @@ Here is a description of all the command line options:
   <item>huc6280
   <item>4510
   <item>45GS02
+  <item>m740
   </itemize>
 
   6502x is for the NMOS 6502 with unofficial opcodes. 6502dtv is for the
   emulated CPU of the C64DTV device. huc6280 is the CPU of the PC engine.
   4510 is the CPU of the Commodore C65. 45GS02 is the CPU of the MEGA65.
-  65816 is the CPU of the SNES.
+  65816 is the CPU of the SNES. M740 is a Microcontroller by Mitsubishi.
 
 
   <label id="option--formfeeds">

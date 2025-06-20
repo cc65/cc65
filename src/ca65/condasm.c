@@ -454,6 +454,16 @@ void DoConditionals (void)
                 CalcOverallIfCond ();
                 break;
 
+            case TOK_IFPM740:
+                D = AllocIf (".IFPM740", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_M740);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
             case TOK_IFPSC02:
                 D = AllocIf (".IFPSC02", 1);
                 NextTok ();
@@ -511,6 +521,7 @@ int CheckConditionals (void)
         case TOK_IFP816:
         case TOK_IFPC02:
         case TOK_IFPDTV:
+        case TOK_IFPM740:
         case TOK_IFPSC02:
         case TOK_IFREF:
             DoConditionals ();

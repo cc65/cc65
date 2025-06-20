@@ -186,10 +186,11 @@ void GetEA (EffAddr* A)
 
         /* Remaining stuff:
         **
-        ** adr
-        ** adr,x
-        ** adr,y
-        ** adr,s
+        ** addr
+        ** addr, x
+        ** addr, y
+        ** addr, s
+        ** addr, relative addr
         */
         A->Expr = Expression ();
 
@@ -214,7 +215,9 @@ void GetEA (EffAddr* A)
                     break;
 
                 default:
-                    Error ("Syntax error");
+                    /* FIXME: syntax error if not zp, ind */
+                    A->AddrModeSet = AM65_ZP_REL;
+                    break;
 
             }
 

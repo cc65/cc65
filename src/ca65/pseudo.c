@@ -1563,7 +1563,7 @@ static void DoP02 (void)
 
 
 static void DoP02X (void)
-/* Switch to 6502 CPU */
+/* Switch to 6502X CPU */
 {
     SetCPU (CPU_6502X);
 }
@@ -1598,6 +1598,14 @@ static void DoPDTV (void)
 /* Switch to C64DTV CPU */
 {
     SetCPU (CPU_6502DTV);
+}
+
+
+
+static void DoPM740 (void)
+/* Switch to M740 CPU */
+{
+    SetCPU (CPU_M740);
 }
 
 
@@ -2146,6 +2154,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
+    { ccKeepToken,      DoConditionals  },      /* .IFPM740 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },      /* .IMPORT */
@@ -2182,6 +2191,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
     { ccNone,           DoPC02          },      /* .PSC02 */
     { ccNone,           DoPDTV          },      /* .PDTV */
+    { ccNone,           DoPM740         },      /* .PM740 */
     { ccNone,           DoPopCharmap    },      /* .POPCHARMAP */
     { ccNone,           DoPopCPU        },      /* .POPCPU */
     { ccNone,           DoPopSeg        },      /* .POPSEG */

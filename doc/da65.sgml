@@ -46,14 +46,16 @@ The assembler accepts the following options:
 ---------------------------------------------------------------------------
 Usage: da65 [options] [inputfile]
 Short options:
+  -d                    Debug mode
   -g                    Add debug info to object file
   -h                    Help (this text)
   -i name               Specify an info file
+  -m                    Run multiple passes to resolve labels
   -o name               Name the output file
   -v                    Increase verbosity
   -F                    Add formfeeds to the output
-  -s                    Accept line markers in the info file
   -S addr               Set the start/load address
+  -s                    Accept line markers in the info file
   -V                    Print the disassembler version
 
 Long options:
@@ -61,6 +63,7 @@ Long options:
   --comment-column n    Specify comment start column
   --comments n          Set the comment level for the output
   --cpu type            Set cpu type
+  --debug               Debug mode
   --debug-info          Add debug info to object file
   --formfeeds           Add formfeeds to the output
   --help                Help (this text)
@@ -68,6 +71,7 @@ Long options:
   --info name           Specify an info file
   --label-break n       Add newline if label exceeds length n
   --mnemonic-column n   Specify mnemonic start column
+  --multi-pass          Run multiple passes to resolve labels
   --pagelength n        Set the page length for the listing
   --start-addr addr     Set the start/load address
   --sync-lines          Accept line markers in the info file
@@ -121,6 +125,12 @@ Here is a description of all the command line options:
   <item>45GS02 - the CPU of the Commodore MEGA65
   <item>M740 - a Microcontroller by Mitsubishi
   </itemize>
+
+
+  <tag><tt>-d, --debug</tt></tag>
+
+  Enables debug mode, something that should not be needed for mere
+  mortals:-)
 
 
   <label id="option--formfeeds">
@@ -177,6 +187,15 @@ Here is a description of all the command line options:
 
   This option overrides the <ref id="global-options" name="global option">
   <tt><ref id="LABELBREAK" name="LABELBREAK"></tt>.
+
+
+  <tag><tt>-m, --multi-pass</tt></tag>
+
+  This option causes the disassembler to run multiple passes over the input
+  binary to find and create all necessary labels. Without this option the
+  disassembler may detect the necessity for a label in the final pass, when
+  output was already partially generated. It will output numerical addresses
+  or program counter relative expressions in this case.
 
 
   <label id="option--mnemonic-column">

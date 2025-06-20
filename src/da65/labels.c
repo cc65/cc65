@@ -74,6 +74,9 @@ struct Label {
 #define LABEL_HASH_SIZE         4096u   /* Must be power of two */
 static Label* LabelTab[LABEL_HASH_SIZE];
 
+/* Total number of labels */
+static unsigned long LabelCount = 0;
+
 
 
 /*****************************************************************************/
@@ -187,6 +190,9 @@ static void AddLabel (uint32_t Addr, attr_t Attr, const char* Name)
 
     /* Remember the attribute */
     MarkAddr (Addr, Attr);
+
+    /* Count labels */
+    ++LabelCount;
 }
 
 
@@ -537,4 +543,12 @@ void DefOutOfRangeLabels (void)
 
     /* Free allocated storage */
     DoneCollection (&Labels);
+}
+
+
+
+unsigned long GetLabelCount (void)
+/* Return the total number of labels defined so far */
+{
+    return LabelCount;
 }

@@ -23,7 +23,7 @@ _tgi_error:         .res    1           ; Last error code
 _tgi_gmode:         .res    1           ; Flag: Graphics mode active
 _tgi_curx:          .res    2           ; Current drawing cursor X
 _tgi_cury:          .res    2           ; Current drawing cursor Y
-_tgi_color:         .res    1           ; Current drawing color
+_tgi_color:         .res    1           ; Current drawing color (palette index)
 _tgi_font:          .res    1           ; Which font to use
 _tgi_textdir:       .res    1           ; Current text direction
 _tgi_vectorfont:    .res    2           ; Pointer to vector font

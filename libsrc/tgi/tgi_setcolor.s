@@ -2,8 +2,8 @@
 ; 2002-06-21, Ullrich von Bassewitz
 ; 2020-06-04, Greg King
 ;
-; void __fastcall__ tgi_setcolor (unsigned char color);
-; /* Set the current drawing color */
+; void __fastcall__ tgi_setcolor (unsigned char color_index);
+; /* Set the current drawing color (palette index) */
 
 
         .include        "tgi-kernel.inc"

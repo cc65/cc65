@@ -1370,7 +1370,7 @@ const InsTable* InsTab = (const InsTable*) &InsTab6502;
 ** addressing mode. (The value in the table is ORed with the base opcode)
 ** NOTE: each table has one entry per addressing mode!
 */
-static unsigned char EATab[15][AM65I_COUNT] = {
+static unsigned char EATab[16][AM65I_COUNT] = {
     {   /* Table 0 (sec, sed, seo, set, slw, sta, stp, tax, tay, tsx, txa, txs, tya) */
         0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
         0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,

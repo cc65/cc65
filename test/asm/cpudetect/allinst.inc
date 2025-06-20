@@ -636,7 +636,7 @@ LABEL3:
 .endif
 
 
-; The 4502 is a superset of the 65CE02. Opcode 5c (originally a "4-byte NOP
+; The 4510 is a superset of the 65CE02. Opcode 5c (originally a "4-byte NOP
 ; reserved for future expansion") has been changed to the "map" instruction,
 ; now using implied addressing.
 ;
@@ -656,9 +656,92 @@ LABEL3:
 .endif
 
 
-; TODO: MEGA65
-; The m65 instruction set extends the 4502 instruction set using prefix bytes.
-; Therefore, the "normal" opcode table is the same as for the 4502 cpu
+; The 45GS02 instruction set extends the 4510 instruction set using prefix bytes.
+; Therefore, the "normal" opcode table is the same as for the 4510 cpu
+
+.if (.cpu .bitand CPU_ISET_45GS02)
+    .scope
+
+    orq $12          ; $42 $42 $05
+    aslq $12         ; $42 $42 $06
+    aslq             ; $42 $42 $0a
+    orq $1234        ; $42 $42 $0d
+    aslq $1234       ; $42 $42 $0f
+    orq ($12)        ; $42 $42 $12
+    aslq $12,x       ; $42 $42 $16
+    inq              ; $42 $42 $1a
+    aslq $124,x      ; $42 $42 $1e
+    bitq $12         ; $42 $42 $24
+    andq $12         ; $42 $42 $25
+    rolq $12         ; $42 $42 $26
+    rolq             ; $42 $42 $2a
+    bitq $1234       ; $42 $42 $2c
+    andq $1234       ; $42 $42 $2d
+    rolq $1234       ; $42 $42 $2e
+    andq ($12)       ; $42 $42 $32
+    rolq $12, x      ; $42 $42 $36
+    deq              ; $42 $42 $3a
+    rolq $1234, x    ; $42 $42 $3e
+    asrq             ; $42 $42 $43
+    asrq $12         ; $42 $42 $44
+    eorq $12         ; $42 $42 $45
+    lsrq $12         ; $42 $42 $46
+    lsrq             ; $42 $42 $4a
+    eorq $1234       ; $42 $42 $4d
+    lsrq $1234       ; $42 $42 $4e
+    eorq ($12)       ; $42 $42 $52
+    asrq $12, x      ; $42 $42 $54
+    lsrq $12, x      ; $42 $42 $56
+    lsrq $1234, x    ; $42 $42 $5e
+    adcq $12         ; $42 $42 $65
+    rorq $12         ; $42 $42 $66
+    rorq             ; $42 $42 $6a
+    adcq $1234       ; $42 $42 $6d
+    rorq $1234       ; $42 $42 $6e
+    adcq ($12)       ; $42 $42 $72
+    rorq $12, x      ; $42 $42 $76
+    rorq $1234, x    ; $42 $42 $7e
+    stq $12          ; $42 $42 $85
+    stq $1234        ; $42 $42 $8d
+    stq ($12)        ; $42 $42 $92
+    ldq $12          ; $42 $42 $a5
+    ldq $1234        ; $42 $42 $ad
+    ldq ($12), z     ; $42 $42 $b2
+    cmpq $12         ; $42 $42 $c5
+    deq $12          ; $42 $42 $c6
+    cmpq $1234       ; $42 $42 $cd
+    deq $1234        ; $42 $42 $ce
+    cmpq ($12)       ; $42 $42 $d2
+    deq $12, x       ; $42 $42 $d6
+    deq $1234, x     ; $42 $42 $de
+    sbcq $12         ; $42 $42 $e5
+    inq $12          ; $42 $42 $e6
+    sbcq $1234       ; $42 $42 $ed
+    inq $1234        ; $42 $42 $ee
+    sbcq ($12)       ; $42 $42 $f2
+    inq $12, x       ; $42 $42 $f6
+    inq $1234, x     ; $42 $42 $fe
+
+    ora [$12], z     ; $ea $12
+    and [$12], z     ; $ea $32
+    eor [$12], z     ; $ea $52
+    adc [$12], z     ; $ea $72
+    sta [$12], z     ; $ea $92
+    lda [$12], z     ; $ea $b2
+    cmp [$12], z     ; $ea $d2
+    sbc [$12], z     ; $ea $f2
+
+    orq [$12]        ; $42 $42 $ea $12
+    andq [$12]       ; $42 $42 $ea $32
+    eorq [$12]       ; $42 $42 $ea $52
+    adcq [$12]       ; $42 $42 $ea $72
+    stq [$12]        ; $42 $42 $ea $92
+    ldq [$12], z     ; $42 $42 $ea $b2
+    cmpq [$12]       ; $42 $42 $ea $d2
+    sbcq [$12]       ; $42 $42 $ea $f2
+
+    .endscope
+.endif
 
 
 ; The HUC6280 is a superset of the R65C02. It adds some other instructions:

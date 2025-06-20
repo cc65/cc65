@@ -2253,10 +2253,8 @@ static void Put45GS02_Q (const InsDesc* Ins) {
     if (EvalEA(Ins, &A)) {
         Emit0(0x42);
         Emit0(0x42);
-        /* printf("  42 42 "); */
         if ((A.AddrModeBit == AM65_DIR_IND_LONG) || (A.AddrModeBit == AM65_32BIT_BASE_IND_Z)) {
             Emit0(0xEA); /* NOP prefix */
-            /* printf("EA "); */
         }
         if (A.Opcode == 0xea) {
             A.Opcode = 0x1a;
@@ -2264,7 +2262,6 @@ static void Put45GS02_Q (const InsDesc* Ins) {
         else if (A.Opcode == 0xca) {
             A.Opcode = 0x3a;
         }
-        /* printf("%02x\n", A.Opcode); */
         EmitCode(&A);
     }
 }

@@ -60,6 +60,9 @@
 /* Symbol table */
 static const char* SymTab[0x10000];
 
+/* Total number of labels */
+static unsigned long LabelCount = 0;
+
 /* 65816 symbol table */
 #define MAX_LONG_LABELS 256
 static const char* LongSymVal[MAX_LONG_LABELS];
@@ -150,6 +153,9 @@ static void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
 
     /* Remember the attribute */
     MarkAddr (Addr, Attr);
+
+    /* Count labels */
+    ++LabelCount;
 }
 
 
@@ -476,4 +482,12 @@ void DefOutOfRangeLabels (void)
     }
 
     SeparatorLine ();
+}
+
+
+
+unsigned long GetLabelCount (void)
+/* Return the total number of labels defined so far */
+{
+    return LabelCount;
 }

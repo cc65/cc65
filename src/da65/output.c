@@ -123,7 +123,7 @@ void CloseOutput (void)
 void Output (const char* Format, ...)
 /* Write to the output file */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         va_list ap;
         va_start (ap, Format);
         Col += vfprintf (F, Format, ap);
@@ -136,7 +136,7 @@ void Output (const char* Format, ...)
 void Indent (unsigned N)
 /* Make sure the current line column is at position N (zero based) */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         while (Col < N) {
             fputc (' ', F);
             ++Col;
@@ -149,7 +149,7 @@ void Indent (unsigned N)
 void LineFeed (void)
 /* Add a linefeed to the output file */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         fputc ('\n', F);
         if (PageLength > 0 && ++Line >= PageLength) {
             if (FormFeeds) {
@@ -184,7 +184,7 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
 ** current PC.
 */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         /* Flush existing output if necessary */
         if (Col > 1) {
             LineFeed ();
@@ -211,7 +211,7 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
 void DefConst (const char* Name, const char* Comment, unsigned Addr)
 /* Define an address constant */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         Output ("%s", Name);
         Indent (ACol);
         Output (":= $%04X", Addr);
@@ -312,7 +312,7 @@ void DataDWordLine (unsigned ByteCount)
 void SeparatorLine (void)
 /* Print a separator line */
 {
-    if (Pass == PassCount && Comments >= 1) {
+    if (Pass == PASS_FINAL && Comments >= 1) {
         Output ("; ----------------------------------------------------------------------------");
         LineFeed ();
     }
@@ -323,7 +323,7 @@ void SeparatorLine (void)
 void StartSegment (const char* Name, unsigned AddrSize)
 /* Start a segment */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         LineFeed ();
         Output (".segment");
         Indent (ACol);
@@ -367,7 +367,7 @@ void LineComment (unsigned PC, unsigned Count)
 {
     unsigned I;
 
-    if (Pass == PassCount && Comments >= 2) {
+    if (Pass == PASS_FINAL && Comments >= 2) {
         Indent (CCol);
         Output ("; %04X", PC);
         if (Comments >= 3) {

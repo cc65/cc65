@@ -1719,7 +1719,7 @@ int main (int argc, char* argv [])
         ** Link() may not return if there's an error, so we install
         ** RemoveTempFiles() as an atexit() handler.
         */
-        atexit(RemoveTempFiles);
+        atexit (RemoveTempFiles);
         Link ();
     }
 

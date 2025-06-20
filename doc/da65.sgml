@@ -118,13 +118,14 @@ Here is a description of all the command line options:
   <item>65816
   <item>huc6280
   <item>4510
+  <item>45GS02
   <item>m740
   </itemize>
 
   6502x is for the NMOS 6502 with unofficial opcodes. 6502dtv is for the
   emulated CPU of the C64DTV device. huc6280 is the CPU of the PC engine.
-  4510 is the CPU of the Commodore C65. 65816 is the CPU of the SNES. M740 is a
-  Microcontroller by Mitsubishi.
+  4510 is the CPU of the Commodore C65. 45GS02 is the CPU of the MEGA65.
+  65816 is the CPU of the SNES. M740 is a Microcontroller by Mitsubishi.
 
 
   <label id="option--formfeeds">
@@ -264,6 +265,8 @@ When disassembling 4510 code, due to handling of 16-bit wide branches, da65
 can produce output that can not be re-assembled, when one or more of those
 branches point outside of the disassembled memory. This can happen when text
 or binary data is processed.
+
+Disassembling 45GS02 compound instructions currently not supported.
 
 The 65816 support requires annotating ranges with the M and X flag states.
 This can be recorded with an emulator that supports Code and Data Logging,

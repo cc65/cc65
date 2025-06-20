@@ -671,8 +671,8 @@ void InfoSetName (const char* Name)
 /* Set a name for a config file */
 {
     InfoFile = Name;
-    xfree(InputSrcName);
-    InputSrcName = xstrdup(Name);
+    xfree (InputSrcName);
+    InputSrcName = xstrdup (Name);
 }
 
 

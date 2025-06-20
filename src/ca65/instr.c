@@ -885,7 +885,7 @@ static const struct {
         { "ROL",  0x0000006F, 0x22, 1, PutAll },
         { "ROLQ", 0x800000ec, 0x20, 14, Put45GS02_Q },
         { "ROR",  0x0000006F, 0x62, 1, PutAll },
-        { "RORQ", 0x400000ec, 0x60, 14, Put45GS02_Q },
+        { "RORQ", 0x800000ec, 0x60, 14, Put45GS02_Q },
         { "ROW",  0x00000008, 0xeb, 6, PutAll },
         { "RTI",  0x00000001, 0x40, 0, PutAll },
         { "RTN",  0x00800000, 0x62, 1, PutAll },

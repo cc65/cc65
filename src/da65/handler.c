@@ -962,7 +962,7 @@ void OH_Rts (const OpcDesc* D)
     if (NewlineAfterRTS) {
         LineFeed ();
     }
-    SeparatorLine();
+    SeparatorLine ();
 }
 
 

@@ -666,7 +666,7 @@ static void RangeSection (void)
                 if (InfoSVal[1] == '\0') {
                     InfoError ("AddrMode must be two characters long");
                 }
-                if (tolower(InfoSVal[0]) == 'm') {
+                if (tolower (InfoSVal[0]) == 'm') {
                     if (InfoSVal[0] == 'm') {
                         AddrMode = atMem16;
                     } else {
@@ -675,7 +675,7 @@ static void RangeSection (void)
                 } else {
                     InfoError ("AddrMode syntax: mx");
                 }
-                if (tolower(InfoSVal[1]) == 'x') {
+                if (tolower (InfoSVal[1]) == 'x') {
                     if (InfoSVal[1] == 'x') {
                         AddrMode |= atIdx16;
                     } else {
@@ -735,7 +735,7 @@ static void RangeSection (void)
     if (Attributes & tUnit) {
         unsigned i;
         for (i = Start; i < End; i += Unit) {
-            MarkAddr(i, atTableUnit);
+            MarkAddr (i, atTableUnit);
         }
     }
 
@@ -928,7 +928,7 @@ void ReadInfoFile (void)
 /* Read the info file */
 {
     /* Check if we have a info file given */
-    if (InfoAvail()) {
+    if (InfoAvail ()) {
         /* Open the config file */
         InfoOpenInput ();
 

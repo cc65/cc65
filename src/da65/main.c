@@ -357,7 +357,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the disassembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-    exit(EXIT_SUCCESS);
+    exit (EXIT_SUCCESS);
 }
 
 
@@ -497,11 +497,11 @@ static void OneOpcode (unsigned RemainingBytes)
                     if (PrevAddrMode != AddrMode) {
                         if ((PrevAddrMode & atMem8) != (AddrMode & atMem8) ||
                             (PrevAddrMode & atMem16) != (AddrMode & atMem16)) {
-                            OutputMFlag(!!(AddrMode & atMem8));
+                            OutputMFlag (!!(AddrMode & atMem8));
                         }
                         if ((PrevAddrMode & atIdx8) != (AddrMode & atIdx8) ||
                             (PrevAddrMode & atIdx16) != (AddrMode & atIdx16)) {
-                            OutputXFlag(!!(AddrMode & atIdx8));
+                            OutputXFlag (!!(AddrMode & atIdx8));
                         }
 
                         PrevAddrMode = AddrMode;
@@ -580,7 +580,7 @@ static void OnePass (void)
     PrevAddrMode = 0;
 
     /* Disassemble until nothing left */
-    while ((Count = GetRemainingBytes()) > 0) {
+    while ((Count = GetRemainingBytes ()) > 0) {
         OneOpcode (Count);
     }
 }

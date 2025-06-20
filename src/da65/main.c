@@ -42,8 +42,10 @@
 
 /* common */
 #include "abend.h"
+#include "check.h"
 #include "cmdline.h"
 #include "cpu.h"
+#include "debugflag.h"
 #include "fname.h"
 #include "print.h"
 #include "version.h"
@@ -78,9 +80,11 @@ static void Usage (void)
 {
     printf ("Usage: %s [options] [inputfile]\n"
             "Short options:\n"
+            "  -d\t\t\tDebug mode\n"
             "  -g\t\t\tAdd debug info to object file\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -i name\t\tSpecify an info file\n"
+            "  -m\t\t\tRun multiple passes to resolve labels\n"
             "  -o name\t\tName the output file\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -F\t\t\tAdd formfeeds to the output\n"
@@ -93,6 +97,7 @@ static void Usage (void)
             "  --comment-column n\tSpecify comment start column\n"
             "  --comments n\t\tSet the comment level for the output\n"
             "  --cpu type\t\tSet cpu type\n"
+            "  --debug\t\tDebug mode\n"
             "  --debug-info\t\tAdd debug info to object file\n"
             "  --formfeeds\t\tAdd formfeeds to the output\n"
             "  --help\t\tHelp (this text)\n"
@@ -100,6 +105,7 @@ static void Usage (void)
             "  --info name\t\tSpecify an info file\n"
             "  --label-break n\tAdd newline if label exceeds length n\n"
             "  --mnemonic-column n\tSpecify mnemonic start column\n"
+            "  --multi-pass\t\tRun multiple passes to resolve labels\n"
             "  --pagelength n\tSet the page length for the listing\n"
             "  --start-addr addr\tSet the start/load address\n"
             "  --sync-lines\t\tAccept line markers in the info file\n"
@@ -222,6 +228,15 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptDebug (const char* Opt attribute ((unused)),
+                      const char* Arg attribute ((unused)))
+/* Disassembler debug mode */
+{
+    ++Debug;
+}
+
+
+
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
@@ -293,6 +308,15 @@ static void OptMnemonicColumn (const char* Opt, const char* Arg)
 
     /* Use the value */
     MCol = (unsigned char) Val;
+}
+
+
+
+static void OptMultiPass (const char* Opt attribute ((unused)),
+                         const char* Arg attribute ((unused)))
+/* Handle the --multi-pass option */
+{
+    MultiPass = 1;
 }
 
 
@@ -548,15 +572,37 @@ static void OnePass (void)
 static void Disassemble (void)
 /* Disassemble the code */
 {
-    /* Pass 1 */
-    Pass = 1;
+    /* Preparation pass */
+    Pass = PASS_PREP;
     OnePass ();
+
+    /* If the --multi-pass option is given, repeat this pass until we have no
+    ** new labels.
+    */
+    if (MultiPass) {
+        unsigned long LabelCount = GetLabelCount ();
+        unsigned Passes = 1;
+        while (1) {
+            unsigned long NewLabelCount;
+            ResetCode ();
+            OnePass ();
+            CHECK(++Passes <= 4096);            /* Safety measure */
+            NewLabelCount = GetLabelCount ();
+            if (NewLabelCount <= LabelCount) {
+                break;
+            }
+            LabelCount = NewLabelCount;
+        }
+        if (Debug) {
+            printf ("Run %u preparation passes to resolve labels\n", Passes);
+        }
+    }
 
     Output ("---------------------------");
     LineFeed ();
 
-    /* Pass 2 */
-    Pass = 2;
+    /* Final pass */
+    Pass = PASS_FINAL;
     ResetCode ();
     OutputSettings ();
     DefOutOfRangeLabels ();
@@ -575,6 +621,7 @@ int main (int argc, char* argv [])
         { "--comment-column",   1,      OptCommentColumn        },
         { "--comments",         1,      OptComments             },
         { "--cpu",              1,      OptCPU                  },
+        { "--debug",            0,      OptDebug                },
         { "--debug-info",       0,      OptDebugInfo            },
         { "--formfeeds",        0,      OptFormFeeds            },
         { "--help",             0,      OptHelp                 },
@@ -582,6 +629,7 @@ int main (int argc, char* argv [])
         { "--info",             1,      OptInfo                 },
         { "--label-break",      1,      OptLabelBreak           },
         { "--mnemonic-column",  1,      OptMnemonicColumn       },
+        { "--multi-pass",       0,      OptMultiPass            },
         { "--pagelength",       1,      OptPageLength           },
         { "--start-addr",       1,      OptStartAddr            },
         { "--sync-lines",       0,      OptSyncLines            },
@@ -611,6 +659,14 @@ int main (int argc, char* argv [])
                     LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
                     break;
 
+                case 'd':
+                    if (Arg[2] == '\0') {
+                        OptDebug (Arg, 0);
+                    } else {
+                        UnknownOption (Arg);
+                    }
+                    break;
+
                 case 'g':
                     OptDebugInfo (Arg, 0);
                     break;
@@ -621,6 +677,10 @@ int main (int argc, char* argv [])
 
                 case 'i':
                     OptInfo (Arg, GetArg (&I, 2));
+                    break;
+
+                case 'm':
+                    OptMultiPass (Arg, 0);
                     break;
 
                 case 'o':

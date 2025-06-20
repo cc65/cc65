@@ -152,7 +152,7 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
-        6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510, M740
+        6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510, 45GS02, M740
 
 
   <label id="option-create-dep">
@@ -442,6 +442,8 @@ The assembler accepts
       <tt><ref id=".P816" name=".P816"></tt> command was given).
 <item>all valid 4510 mnemonics when in <ref id="4510-mode" name="4510 mode"> (after the
       <tt><ref id=".P4510" name=".P4510"></tt> command was given).
+<item>all valid 45GS02 mnemonics when in <ref id="45GS02-mode" name="45GS02 mode"> (after the
+      <tt><ref id=".P45GS02" name=".P45GS02"></tt> command was given).
 <item>all valid M740 mnemonics when in <ref id="M740-mode" name="M740 mode"> (after the
       <tt><ref id=".PM740" name=".PM740"></tt> command was given).
 </itemize>
@@ -607,6 +609,11 @@ For more information about the Commodore C65/C64DX and the 4510 CPU, see
 <url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and
 <url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
 
+<sect1>45GS02 mode<label id="45GS02-mode"><p>
+
+The 45GS02 is a microcontroller that is the core of the MEGA65.
+It is an extension of the 4510 CPU and adds 32-bit addressing and a 32-bit
+pseudo register Q that is comprised of the four registers A, X, Y, and Z.
 
 <sect1>HUC6280 mode<label id="HUC6280-mode"><p>
 
@@ -3399,6 +3406,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   (see <tt><ref id=".P4510" name=".P4510"></tt> command).
 
 
+<sect1><tt>.IFP45GS02</tt><label id=".IFP45GS02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 45GS02 mode
+  (see <tt><ref id=".P45GS02" name=".P45GS02"></tt> command).
+
+
 <sect1><tt>.IFP816</tt><label id=".IFP816"><p>
 
   Conditional assembly: Check if the assembler is currently in 65816 mode
@@ -3782,8 +3795,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tt><ref id="option--cpu" name="--cpu"></tt> command line option.
 
   See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 
 <sect1><tt>.P02X</tt><label id=".P02X"><p>
@@ -3802,9 +3816,20 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instruction sets.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
-  <tt><ref id=".P816" name=".P816"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P816" name=".P816"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
+
+<sect1><tt>.P45GS02</tt><label id=".P45GS02"><p>
+
+  Enable the 45GS02 instruction set. This is a superset of the 4510, 65C02, and
+  6502 instruction sets.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P816" name=".P816"></tt>, and
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 <sect1><tt>.P816</tt><label id=".P816"><p>
 
@@ -3812,9 +3837,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instruction sets.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
-
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 <sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
 
@@ -3841,9 +3866,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 and 65SC02 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
-
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 <sect1><tt>.PDTV</tt><label id=".PDTV"><p>
 
@@ -3946,9 +3971,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
-  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
-
+  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 <sect1><tt>.PUSHCHARMAP</tt><label id=".PUSHCHARMAP"><p>
 
@@ -4195,7 +4220,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510, HuC6280 and m740.
+  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510, 45GS02, HuC6280 and m740.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
@@ -4209,6 +4234,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
        <tt><ref id=".P02X" name=".P02X"></tt>,
        <tt><ref id=".P816" name=".P816"></tt>,
        <tt><ref id=".P4510" name=".P4510"></tt>,
+       <tt><ref id=".P45GS02" name=".P45GS02"></tt>,
        <tt><ref id=".PC02" name=".PC02"></tt>,
        <tt><ref id=".PM740" name=".PM740"></tt>,
        <tt><ref id=".PSC02" name=".PSC02"></tt>
@@ -4948,6 +4974,7 @@ each supported CPU a constant similar to
     CPU_SWEET16
     CPU_HUC6280
     CPU_4510
+    CPU_45GS02
     CPU_6502DTV
     CPU_M740
 </verb></tscreen>
@@ -4964,6 +4991,7 @@ another constant is defined:
     CPU_ISET_SWEET16
     CPU_ISET_HUC6280
     CPU_ISET_4510
+    CPU_ISET_45GS02
     CPU_ISET_6502DTV
     CPU_ISET_M740
 </verb></tscreen>

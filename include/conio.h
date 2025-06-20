@@ -118,10 +118,11 @@ char *cgets (char *buffer);
 **   - call cgets
 **   - buffer[1] will have the number of characters read
 **   - the actual string starts at buffer + 2
-**   - trailing CRLF are removed
 **   - terminating \0 is appended
 **   - therefore the maximum number of characters which can be read is the size
 **     of the buffer - 3!
+**   - note: CR/LF are NOT echoed, typically a following call to cputs or
+**     cprintf will need "\r\n" prepended - "standard" behavior
 **
 **   param: buffer - where to save the input
 **  return: buffer + 2 (i.e. start of the string) if successful, NULL otherwise

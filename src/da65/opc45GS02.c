@@ -61,7 +61,7 @@ const OpcDesc OpcTable_45GS02_extended[256] = {
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $0b */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $0c */
     {   "orq",  3+2,  flUseLabel|flAbsOverride, OH_Absolute_Q                }, /* $0d */
-    {   "aslq", 3+2,  flUseLabel,               OH_BitBranch_Q               }, /* $0e */
+    {   "aslq", 3+2,  flUseLabel,               OH_Absolute_Q                }, /* $0e */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $0f */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $10 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $11 */

@@ -47,6 +47,7 @@
 #include "handler.h"
 #include "labels.h"
 #include "opctable.h"
+#include "opc45GS02.h"
 #include "output.h"
 
 

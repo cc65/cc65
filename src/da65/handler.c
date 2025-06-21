@@ -291,7 +291,7 @@ void OH_Implicit_42_45GS02 (const OpcDesc* D)
             }
         } else {
             /* use another table for these */
-            OpcDesc* NewDesc = &OpcTable_45GS02_extended[opc];
+            const OpcDesc* NewDesc = &OpcTable_45GS02_extended[opc];
             NewDesc->Handler (NewDesc);
             return;
         }

@@ -2,7 +2,7 @@
 ** Modified: <iso-date> <author>
 **    Notes: <e.g. revisions made to support target, edge cases, bugs, etc.>
 **
-** char *cgets(char *buffer);
+** char* __fastcall__ cgets (char *buffer, int size);
 */
 
 #include <stddef.h>
@@ -10,57 +10,22 @@
 #include <string.h>
 #include <ctype.h>
 
-enum {CGETS_SIZE, CGETS_READ, CGETS_DATA, CGETS_HDR_LEN = CGETS_DATA};
+#ifndef CRLF
+#define CRLF "\r\n"
+#endif /* CRLF */
 
-static char *cgetsx (char *buffer, int size);
-
-char *cgets (char *buffer)
-/* Get a string of characters directly from the console. The standard interface
-** is quirky:
+char* __fastcall__ cgets (char *buffer, int size)
+/* Get a string of characters directly from the console. The function returns
+** when size - 1 characters or either CR/LF are read. Note the parameters are
+** more aligned with stdio fgets() as opposed to the quirky "standard" conio
+** cgets(). Besides providing saner parameters, the function also echoes CRLF
+** when either CR/LF are read but does NOT append either in the buffer. This is
+** to correspond to stdio fgets() which echoes CRLF, but prevents a "gotcha"
+** where the buffer might not be able to accommodate both CR and LF at the end.
 **
-**   - set buffer[0] to the size of the buffer - 2, must be > 0
-**   - call cgets
-**   - buffer[1] will have the number of characters read
-**   - the actual string starts at buffer + 2
-**   - terminating \0 is appended
-**   - therefore the maximum number of characters which can be read is the size
-**     of the buffer - 3!
-**   - note: CR/LF are NOT echoed, typically a following call to cputs or
-**     cprintf will need "\r\n" prepended - this is standard behavior!
-**
-**   param: buffer - where to save the input
-**  return: buffer + 2 (i.e. start of the string) or NULL if buffer is NULL
-*/
-{
-    /* Return buffer + 2 or NULL if buffer is NULL */
-    char *result = buffer? buffer + CGETS_HDR_LEN: NULL;
-
-    if (result) {
-        /* Initialize just in case the caller didn't! */
-        buffer[CGETS_READ] = 0;
-        buffer[CGETS_DATA] = '\0';
-
-        /* Call cgetsx to do the real work, ignore the result! */
-        cgetsx (result, (unsigned char)buffer[CGETS_SIZE]);
-
-        /* Set how many characters were read */
-        buffer[CGETS_READ] = (unsigned char)strlen (result);
-    }
-
-    /* Done */
-    return result;
-}
-
-static char *cgetsx (char *buffer, int size)
-/* Like fgets but specifically for the console. Stops when CR/LF or size - 1
-** characters are read. Will append a terminating \0, so at most size - 1
-** characters can be read. Note that this function could be made public and
-** have features added like cursor vs no-cursor, echo vs echo-pwd vs no-echo,
-** or CR/LF handling to extend the functionality.
-**
-**   param: buffer - where to save the input
-**   param: size - the size of buffer
-**  return: buffer if successful, NULL otherwise
+**   param: buffer - where to save the input, must be non-NULL
+**   param: size - size of the buffer, must be > 1
+**  return: buffer if successful, NULL on error
 */
 {
     int i = 0;
@@ -73,8 +38,14 @@ static char *cgetsx (char *buffer, int size)
         /* Actually just the last column! */
         --w;
         cursor (1);
-        for (i = 0, --size; i < size; ) {
+        for (buffer[i] = '\0', --size; i < size; ) {
             c = cgetc ();
+            /* Handle CR/LF */
+            if (strchr (CRLF, c)) {
+                /* Echo CRLF, but don't append either CR/LF */
+                cputs (CRLF);
+                break;
+            }
             /* Handle backspace */
             if (c == '\b') {
                 if (i > 0) {
@@ -95,10 +66,6 @@ static char *cgetsx (char *buffer, int size)
                 cputc (c);
                 buffer[i] = c;
                 buffer[++i] = '\0';
-            /* Handle CR/LF */
-            } else if (c == '\r' || c == '\n') {
-                buffer[i] = '\0';
-                break;
             }
         }
         cursor (0);

@@ -680,39 +680,6 @@ void OH_BitBranch (const OpcDesc* D)
 
 
 
-void OH_BitBranch_Q (const OpcDesc* D)
-{
-    char* BranchLabel;
-
-    /* Get the operands */
-    unsigned char TestAddr   = GetCodeByte (PC+3);
-    signed char   BranchOffs = GetCodeByte (PC+4);
-
-    /* Calculate the target address for the branch */
-    unsigned BranchAddr = (((int) PC+5) + BranchOffs) & 0xFFFF;
-
-    /* Generate labels in pass 1. The bit branch codes are special in that
-    ** they don't really match the remainder of the 6502 instruction set (they
-    ** are a Rockwell addon), so we must pass additional flags as direct
-    ** value to the second GenerateLabel call.
-    */
-    GenerateLabel (D->Flags, TestAddr);
-    GenerateLabel (flLabel, BranchAddr);
-
-    /* Make a copy of an operand, so that
-    ** the other operand can't overwrite it.
-    ** [GetAddrArg() uses a statically-stored buffer.]
-    */
-    BranchLabel = xstrdup (GetAddrArg (flLabel, BranchAddr));
-
-    /* Output the line */
-    OneLine (D, "%s,%s", GetAddrArg (D->Flags, TestAddr), BranchLabel);
-
-    xfree (BranchLabel);
-}
-
-
-
 void OH_BitBranch_m740 (const OpcDesc* D)
 /* <bit> zp, rel
 ** NOTE: currently <bit> is part of the instruction

@@ -369,7 +369,7 @@ static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
 {
     if (D->Flags & flSizeChanges) {
         if (CPU == CPU_45GS02) {
-            if ((D->Handler == OH_Implicit_42_45GS02)) {
+            if (D->Handler == OH_Implicit_42_45GS02) {
                 if (GetCodeByte (PC+1) == 0x42) {
                     /* NEG:NEG prefix (0x42 0x42) */
                     unsigned opc = GetCodeByte (PC+2);
@@ -386,7 +386,7 @@ static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
                         }
                     }
                 }
-            } else if ((D->Handler == OH_Implicit_ea_45GS02)) {
+            } else if (D->Handler == OH_Implicit_ea_45GS02) {
                 /* NOP prefix (0xea) */
                 if ((GetCodeByte (PC+1) & 0x1f) == 0x12) {
                     PC += 2;

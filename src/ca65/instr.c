@@ -2251,7 +2251,7 @@ static void Put45GS02_Q (const InsDesc* Ins)
 {
     EffAddr A;
 
-    if (EvalEA(Ins, &A)) {
+    if (EvalEA (Ins, &A)) {
         Emit0 (0x42);
         Emit0 (0x42);
         if ((A.AddrModeBit == AM65_DIR_IND_LONG) ||

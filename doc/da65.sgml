@@ -263,28 +263,28 @@ disassembler may be told which CPU to support:
 for more details on the various CPUs, see <tt><htmlurl url="ca65.html#6502-mode" name="here"></tt>.
 
 
-<sect1>6502 mode<label id="6502-mode"><p>
+<sect2>6502 mode<label id="6502-mode"><p>
 
 The default (no CPU given on the command line or in the <tt/GLOBAL/ section of
 the info file) is the 6502 CPU. The disassembler knows all "official" opcodes
 for this CPU. Invalid opcodes are translated into <tt/.byte/ commands.
 
-<sect1>6502X mode<label id="6502X-mode"><p>
+<sect2>6502X mode<label id="6502X-mode"><p>
 
 Using 6502X as CPU the illegal opcodes of 6502 CPU are detected and displayed.
 
 
-<sect1>DTV mode<label id="DTV-mode"><p>
+<sect2>DTV mode<label id="DTV-mode"><p>
 
 6502DTV setting recognizes the emulated CPU instructions of the C64DTV device.
 
 
-<sect1>65SC02 mode<label id="65SC02-mode"><p>
+<sect2>65SC02 mode<label id="65SC02-mode"><p>
 
 The first CMOS instruction set, without bit manipulation or wai/stp.
 
 
-<sect1>65C02 mode<label id="65C02-mode"><p>
+<sect2>65C02 mode<label id="65C02-mode"><p>
 
 The 65C02 understands the same opcodes as the 65SC02, plus 16 additional bit
 manipulation and bit test-and-branch commands.
@@ -292,7 +292,7 @@ manipulation and bit test-and-branch commands.
 This mode also supports wai/stp.
 
 
-<sect1>4510 mode<label id="4510-mode"><p>
+<sect2>4510 mode<label id="4510-mode"><p>
 
 When disassembling 4510 code, due to handling of 16-bit wide branches, da65
 can produce output that can not be re-assembled, when one or more of those
@@ -300,22 +300,22 @@ branches point outside of the disassembled memory. This can happen when text
 or binary data is processed.
 
 
-<sect1>45GS02 mode<label id="45GS02-mode"><p>
+<sect2>45GS02 mode<label id="45GS02-mode"><p>
 
 All compound instructions are supported.
 
 
-<sect1>HUC6280 mode<label id="HUC6280-mode"><p>
+<sect2>HUC6280 mode<label id="HUC6280-mode"><p>
 
 All special opcodes are supported.
 
 
-<sect1>M740 mode<label id="M740-mode"><p>
+<sect2>M740 mode<label id="M740-mode"><p>
 
 All special opcodes are supported.
 
 
-<sect1>65816 mode<label id="65816-mode"><p><p>
+<sect2>65816 mode<label id="65816-mode"><p><p>
 
 The 65816 support requires annotating ranges with the M and X flag states.
 This can be recorded with an emulator that supports Code and Data Logging,

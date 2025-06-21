@@ -110,7 +110,7 @@ char cgetc (void);
 ** 1 (see below), a blinking cursor is displayed while waiting.
 */
 
-char* __fastcall__ cgets (char *buffer, int size);
+char* __fastcall__ cgets (char* buffer, int size);
 /* Get a string of characters directly from the console. The function returns
 ** when size - 1 characters or either CR/LF are read. Note the parameters are
 ** more aligned with stdio fgets() as opposed to the quirky "standard" conio

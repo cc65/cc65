@@ -89,7 +89,7 @@ void SetComment (unsigned Addr, const char* Comment)
             Warning ("Duplicate comment for address $%06X", Addr);
         } else {
             if (LongCommentsUsed >= MAX_LONG_COMMENTS) {
-                Error("Too many long-address comments");
+                Error ("Too many long-address comments");
             }
             LongCommentVal[LongCommentsUsed] = xstrdup (Comment);
             LongCommentAddr[LongCommentsUsed] = Addr;

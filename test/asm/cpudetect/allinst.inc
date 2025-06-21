@@ -651,6 +651,7 @@ LABEL3:
     map                         ; $5c   ("4-byte NOP reserved for future expansion" on 65CE02)
     asw $1234                   ; $cb   (wai on W65C02)
     phz                         ; $db   (stp on W65C02)
+    eom                         ; $ea   "end of mapping" - but really just a NOP
 
     .endscope
 .endif
@@ -666,11 +667,11 @@ LABEL3:
     aslq $12         ; $42 $42 $06
     aslq             ; $42 $42 $0a
     orq $1234        ; $42 $42 $0d
-    aslq $1234       ; $42 $42 $0f
+    aslq $1234       ; $42 $42 $0e
     orq ($12)        ; $42 $42 $12
     aslq $12,x       ; $42 $42 $16
     inq              ; $42 $42 $1a
-    aslq $124,x      ; $42 $42 $1e
+    aslq $1234,x     ; $42 $42 $1e
     bitq $12         ; $42 $42 $24
     andq $12         ; $42 $42 $25
     rolq $12         ; $42 $42 $26

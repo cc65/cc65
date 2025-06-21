@@ -151,8 +151,19 @@ Here is a description of all the command line options:
 
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
-
-        6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510, 45GS02, M740
+  <itemize>
+  <item>6502 - NMOS 6502 (all legal instructions)
+  <item>6502X - NMOS 6502 with all undocumented instructions
+  <item>6502DTV - the emulated CPU of the C64DTV device
+  <item>65SC02 - first CMOS instruction set (no bit manipulation, no wai/stp)
+  <item>65C02 - full CMOS instruction set (has bit manipulation and wai/stp)
+  <item>65816 - the CPU of the SNES, and the SCPU
+  <item>HuC6280 - the CPU of the PC engine
+  <item>4510 - the CPU of the Commodore C65
+  <item>45GS02 - the CPU of the Commodore MEGA65
+  <item>M740 - a Microcontroller by Mitsubishi
+  <item>sweet16 - an interpreter for a pseudo 16 bit CPU
+  </itemize>
 
 
   <label id="option-create-dep">

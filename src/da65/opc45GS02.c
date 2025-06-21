@@ -45,7 +45,7 @@
 
 
 
-/* Descriptions for all compound instructions with NEG:NEG prefix */
+/* Descriptions for all compound instructions with NEG:NEG prefix (0x42 0x42) */
 const OpcDesc OpcTable_45GS02_extended[256] = {
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $00 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $01 */

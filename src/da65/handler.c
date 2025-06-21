@@ -47,6 +47,7 @@
 #include "handler.h"
 #include "labels.h"
 #include "opctable.h"
+#include "opc45GS02.h"
 #include "output.h"
 
 
@@ -226,6 +227,82 @@ void OH_Implicit (const OpcDesc* D)
 
 
 
+void OH_Implicit_ea_45GS02 (const OpcDesc* D)
+/* handle disassembling EOM prefixed opcodes, $ea $xx */
+{
+    /* Get byte after EOM */
+    unsigned opc = GetCodeByte (PC+1);
+    static const char *mnemonics[8] = {
+        "ora", "and", "eor", "adc", "sta", "lda", "cmp", "sbc"
+    };
+
+    if ((opc & 0x1f) == 0x12) {
+        unsigned zp = GetCodeByte (PC+2);
+
+        Indent (MCol);
+        Output ("%s", mnemonics[(opc >> 5) & 7]);
+
+        Indent (ACol);
+        Output ("[$%02X],z", zp);
+
+        /* Add the code stuff as comment */
+        LineComment (PC, 3);
+
+        /* End the line */
+        LineFeed ();
+    } else {
+        OH_Implicit (D);
+    }
+}
+
+
+
+void OH_Implicit_42_45GS02 (const OpcDesc* D)
+/* handle disassembling NEG NEG prefixed opcodes, $42 42 ($ea) $xx */
+{
+    /* Get bytes after NEG */
+    unsigned n1 = GetCodeByte (PC+1);
+    unsigned opc = GetCodeByte (PC+2);
+    /* NEG:NEG:NOP (42 42 ea) prefix */
+    static const char *mnemonics[8] = {
+        "orq", "andq", "eorq", "adcq", "stq", "ldq", "cmpq", "sbcq"
+    };
+
+    if (n1 == 0x42) {
+        /* detected 0x42 0x42 */
+        if (opc == 0xea) {
+            /* detected 0x42 0x42 0xea */
+            unsigned opc = GetCodeByte (PC+3);
+            if ((opc & 0x1f) == 0x12) {
+                unsigned zp = GetCodeByte (PC+4);
+
+                Indent (MCol);
+                Output ("%s", mnemonics[(opc >> 5) & 7]);
+
+                Indent (ACol);
+                Output ("[$%02X]", zp); /* with or without ,z ? */
+
+                /* Add the code stuff as comment */
+                LineComment (PC, 5);
+
+                /* End the line */
+                LineFeed ();
+                return;
+            }
+        } else {
+            /* use another table for these */
+            const OpcDesc* NewDesc = &OpcTable_45GS02_extended[opc];
+            NewDesc->Handler (NewDesc);
+            return;
+        }
+    }
+
+    /* no prefix detected */
+    OH_Implicit (D);
+}
+
+
+
 void OH_Immediate (const OpcDesc* D)
 {
     OneLine (D, "#$%02X", GetCodeByte (PC+1));
@@ -276,10 +353,38 @@ void OH_Direct (const OpcDesc* D)
 
 
 
+void OH_Direct_Q (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+3);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
+}
+
+
+
 void OH_DirectX (const OpcDesc* D)
 {
     /* Get the operand */
     unsigned Addr = GetCodeByte (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s,x", GetAddrArg (D->Flags, Addr));
+}
+
+
+
+void OH_DirectX_Q (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+3);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -318,10 +423,38 @@ void OH_Absolute (const OpcDesc* D)
 
 
 
+void OH_Absolute_Q (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeWord (PC+3);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s%s", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
+}
+
+
+
 void OH_AbsoluteX (const OpcDesc* D)
 {
     /* Get the operand */
     unsigned Addr = GetCodeWord (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s%s,x", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
+}
+
+
+
+void OH_AbsoluteX_Q (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeWord (PC+3);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -472,6 +605,20 @@ void OH_DirectIndirectZ (const OpcDesc* D)
 
 
 
+void OH_DirectIndirectZ_Q (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+3);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "(%s),z", GetAddrArg (D->Flags, Addr));
+}
+
+
+
 void OH_DirectXIndirect (const OpcDesc* D)
 {
     /* Get the operand */
@@ -530,6 +677,8 @@ void OH_BitBranch (const OpcDesc* D)
 
     xfree (BranchLabel);
 }
+
+
 
 void OH_BitBranch_m740 (const OpcDesc* D)
 /* <bit> zp, rel

@@ -28,6 +28,10 @@
    taz
 .endif
 
+.ifp45GS02
+   orq $1234
+.endif
+
 .ifpdtv
    sac #$00
 .endif
@@ -76,6 +80,10 @@
    .byte 0,"CPU_ISET_4510"
 .endif
 
+.if (.cpu .bitand CPU_ISET_45GS02)
+   .byte 0,"CPU_ISET_45GS02"
+.endif
+
 .if (.cpu .bitand CPU_ISET_6502DTV)
    .byte 0,"CPU_ISET_6502DTV"
 .endif
@@ -98,5 +106,6 @@
 .pc02
 .p816
 .p4510
+.p45GS02
 .pdtv
 .pm740

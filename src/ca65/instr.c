@@ -2214,7 +2214,7 @@ static void Emit4510 (EffAddr* A) {
     }
 
     /* No error, output code */
-    EmitCode(A);
+    EmitCode (A);
 }
 
 
@@ -2226,7 +2226,7 @@ static void Put4510 (const InsDesc* Ins)
 
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
-        Emit4510(&A);
+        Emit4510 (&A);
     }
 }
 
@@ -2237,24 +2237,26 @@ static void Put45GS02 (const InsDesc* Ins)
 {
     EffAddr A;
 
-    if (EvalEA(Ins, &A)) {
+    if (EvalEA (Ins, &A)) {
         if (A.AddrModeSet == AM65_32BIT_BASE_IND_Z) {
-            Emit0(0xEA); /* NOP prefix */
+            Emit0 (0xEA); /* NOP prefix */
         }
-        Emit4510(&A);
+        Emit4510 (&A);
     }
 }
 
 
 
-static void Put45GS02_Q (const InsDesc* Ins) {
+static void Put45GS02_Q (const InsDesc* Ins)
+{
     EffAddr A;
 
     if (EvalEA(Ins, &A)) {
-        Emit0(0x42);
-        Emit0(0x42);
-        if ((A.AddrModeBit == AM65_DIR_IND_LONG) || (A.AddrModeBit == AM65_32BIT_BASE_IND_Z)) {
-            Emit0(0xEA); /* NOP prefix */
+        Emit0 (0x42);
+        Emit0 (0x42);
+        if ((A.AddrModeBit == AM65_DIR_IND_LONG) ||
+            (A.AddrModeBit == AM65_32BIT_BASE_IND_Z)) {
+            Emit0 (0xEA); /* NOP prefix */
         }
         if (A.Opcode == 0xea) {
             A.Opcode = 0x1a;
@@ -2262,7 +2264,7 @@ static void Put45GS02_Q (const InsDesc* Ins) {
         else if (A.Opcode == 0xca) {
             A.Opcode = 0x3a;
         }
-        EmitCode(&A);
+        EmitCode (&A);
     }
 }
 

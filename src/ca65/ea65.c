@@ -101,7 +101,7 @@ void GetEA (EffAddr* A)
     if (TokIsSep (CurTok.Tok)) {
 
         A->AddrModeSet = AM65_IMPLICIT;
-        if (GetCPU() == CPU_45GS02) {
+        if (GetCPU () == CPU_45GS02) {
             A->AddrModeSet |= AM65_Q;
         }
 
@@ -194,12 +194,12 @@ void GetEA (EffAddr* A)
         if (CurTok.Tok == TOK_COMMA) {
             /* [dir],y */
             NextTok ();
-            if (GetCPU() == CPU_45GS02) {
-                Consume(TOK_Z, "'Z' expected");
+            if (GetCPU () == CPU_45GS02) {
+                Consume (TOK_Z, "'Z' expected");
                 A->AddrModeSet = AM65_32BIT_BASE_IND_Z;
             }
             else {
-                Consume(TOK_Y, "'Y' expected");
+                Consume (TOK_Y, "'Y' expected");
                 A->AddrModeSet = AM65_DIR_IND_LONG_Y;
             }
         } else {

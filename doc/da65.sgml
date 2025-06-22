@@ -248,8 +248,8 @@ With the command line option <tt><ref id="option--cpu" name="--cpu"></tt>, the
 disassembler may be told which CPU to support:
 
   <itemize>
-  <item><ref id="6502-mode" name="6502 mode"> - NMOS 6502 (all legal instructions)
-  <item><ref id="6502X-mode" name="6502X mode"> - NMOS 6502 with all undocumented instructions
+  <item><ref id="6502-mode" name="6502"> - NMOS 6502 (all legal instructions)
+  <item><ref id="6502X-mode" name="6502X"> - NMOS 6502 with all undocumented instructions
   <item><ref id="DTV-mode" name="6502DTV"> - the emulated CPU of the C64DTV device
   <item><ref id="65SC02-mode" name="65SC02"> - first CMOS instruction set (no bit manipulation, no wai/stp)
   <item><ref id="65C02-mode" name="65C02"> - full CMOS instruction set (has bit manipulation and wai/stp)

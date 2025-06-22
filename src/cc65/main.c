@@ -301,6 +301,14 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SYM1__", 1);
             break;
 
+        case TGT_C65:
+            cbmsys ("__C65__");
+            break;
+
+        case TGT_MEGA65:
+            cbmsys ("__MEGA65__");
+            break;
+
         case TGT_KIM1:
             DefineNumericMacro ("__KIM1__", 1);
             break;

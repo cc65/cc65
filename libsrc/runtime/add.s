@@ -20,34 +20,34 @@ tosaddax:
 
 .if (.cpu .bitand ::CPU_ISET_65SC02)
 
-        adc     (c_sp)            ; (7)
+        adc     (c_sp)          ; (7)
         tay                     ; (9)
-        inc     c_sp              ; (14)
+        inc     c_sp            ; (14)
         bne     hiadd           ; (17)
-        inc     c_sp+1            ; (-1+5)
+        inc     c_sp+1          ; (-1+5)
 hiadd:  txa                     ; (19)
-        adc     (c_sp)            ; (24)
+        adc     (c_sp)          ; (24)
         tax                     ; (26)
-        inc     c_sp              ; (31)
+        inc     c_sp            ; (31)
         bne     done            ; (34)
-        inc     c_sp+1            ; (-1+5)
+        inc     c_sp+1          ; (-1+5)
 done:   tya                     ; (36)
 
 .else
 
         ldy     #0              ; (4)
-        adc     (c_sp),y          ; (9) lo byte
+        adc     (c_sp),y        ; (9) lo byte
         iny                     ; (11)
         sta     tmp1            ; (14) save it
         txa                     ; (16)
-        adc     (c_sp),y          ; (21) hi byte
+        adc     (c_sp),y        ; (21) hi byte
         tax                     ; (23)
         clc                     ; (25)
-        lda     c_sp              ; (28)
+        lda     c_sp            ; (28)
         adc     #2              ; (30)
-        sta     c_sp              ; (33)
+        sta     c_sp            ; (33)
         bcc     L1              ; (36)
-        inc     c_sp+1            ; (-1+5)
+        inc     c_sp+1          ; (-1+5)
 L1:     lda     tmp1            ; (39) restore low byte
 
 .endif

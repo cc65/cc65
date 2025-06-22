@@ -27,20 +27,20 @@ tosoreax:
         ldy     #1
 .else
         ldy     #0
-        ora     (c_sp),y          ; byte 0
+        ora     (c_sp),y        ; byte 0
         iny
 .endif
         sta     tmp1
         txa
-        ora     (c_sp),y          ; byte 1
+        ora     (c_sp),y        ; byte 1
         tax
         iny
         lda     sreg
-        ora     (c_sp),y          ; byte 2
+        ora     (c_sp),y        ; byte 2
         sta     sreg
         iny
         lda     sreg+1
-        ora     (c_sp),y          ; byte 3
+        ora     (c_sp),y        ; byte 3
         sta     sreg+1
 
         lda     tmp1

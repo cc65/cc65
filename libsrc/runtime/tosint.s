@@ -19,7 +19,7 @@
         lda     (c_sp)
 .else
         ldy     #0
-        lda     (c_sp),y          ; c_sp+1
+        lda     (c_sp),y        ; c_sp+1
 .endif
         ldy     #2
         sta     (c_sp),y

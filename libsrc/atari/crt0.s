@@ -75,11 +75,11 @@ start:
         lda     MEMTOP
         sbc     #<__RESERVED_MEMORY__
         sta     APPMHI                  ; initialize our APPMHI value
-        sta     c_sp                      ; set up runtime stack part 1
+        sta     c_sp                    ; set up runtime stack part 1
         lda     MEMTOP+1
         sbc     #>__RESERVED_MEMORY__
         sta     APPMHI+1
-        sta     c_sp+1                    ; set up runtime stack part 2
+        sta     c_sp+1                  ; set up runtime stack part 2
 
 .endif
 

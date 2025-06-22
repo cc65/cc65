@@ -12,10 +12,10 @@ addysp1:
 addysp: pha                     ; Save A
         clc
         tya                     ; Get the value
-        adc     c_sp              ; Add low byte
-        sta     c_sp              ; Put it back
+        adc     c_sp            ; Add low byte
+        sta     c_sp            ; Put it back
         bcc     @L1             ; If no carry, we're done
-        inc     c_sp+1            ; Inc high byte
+        inc     c_sp+1          ; Inc high byte
 @L1:    pla                     ; Restore A
         rts
 

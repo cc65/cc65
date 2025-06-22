@@ -18,7 +18,7 @@ tosulong:
         ldy     #2
         lda     (c_sp),y
 .if (.cpu .bitand CPU_ISET_65SC02)
-        sta     (c_sp)            ; 65C02 version
+        sta     (c_sp)          ; 65C02 version
         iny                     ; Y = 3
 .else
         ldy     #0
@@ -44,7 +44,7 @@ toslong:
         ldy     #2
         lda     (c_sp),y
 .if (.cpu .bitand CPU_ISET_65SC02)
-        sta     (c_sp)            ; 65C02 version
+        sta     (c_sp)          ; 65C02 version
         iny                     ; Y = 3
 .else
         ldy     #0

@@ -24,6 +24,6 @@
 .else
         .error Unknown CPU type.
 .endif
-        .byte   c_sp                             ; c_sp address
+        .byte   c_sp                           ; c_sp address
         .addr   __MAIN_START__                 ; load address
         .addr   startup                        ; reset address

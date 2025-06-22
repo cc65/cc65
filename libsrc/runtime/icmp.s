@@ -17,16 +17,16 @@ tosicmp:
         stx     sreg+1          ; Save ax
 
         ldy     #$00
-        lda     (c_sp),y          ; Get low byte
+        lda     (c_sp),y        ; Get low byte
         tax
-        inc     c_sp              ; 5
+        inc     c_sp            ; 5
         bne     @L1             ; 3
-        inc     c_sp+1            ; (5)
+        inc     c_sp+1          ; (5)
 @L1:
-        lda     (c_sp),y          ; Get high byte
-        inc     c_sp              ; 5
+        lda     (c_sp),y        ; Get high byte
+        inc     c_sp            ; 5
         bne     @L2             ; 3
-        inc     c_sp+1            ; (5)
+        inc     c_sp+1          ; (5)
 
 ; Do the compare.
 

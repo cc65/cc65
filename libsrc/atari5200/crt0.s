@@ -28,7 +28,7 @@ start:
         lda     #<(__RAM_START__ + __RAM_SIZE__ - __RESERVED_MEMORY__)
         ldx     #>(__RAM_START__ + __RAM_SIZE__ - __RESERVED_MEMORY__)
         sta     c_sp
-        stx     c_sp+1            ; Set argument stack ptr
+        stx     c_sp+1          ; Set argument stack ptr
 
 ; Call the module constructors.
 

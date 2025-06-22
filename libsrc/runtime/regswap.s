@@ -12,10 +12,10 @@
         sta     tmp1                    ; Store count
 @L1:    lda     regbank,x               ; Get old value
         pha                             ; Save it
-        lda     (c_sp),y                  ; Get stack loc
+        lda     (c_sp),y                ; Get stack loc
         sta     regbank,x               ; Store new value
         pla
-        sta     (c_sp),y                  ; Store old value
+        sta     (c_sp),y                ; Store old value
         inx
         iny
         dec     tmp1

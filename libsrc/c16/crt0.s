@@ -50,7 +50,7 @@ L1:     lda     c_sp,x
         ldy     #$80
         ldx     #$00
 MemOk:  stx     c_sp
-        sty     c_sp+1            ; set argument stack ptr
+        sty     c_sp+1          ; set argument stack ptr
 
 ; Call the module constructors.
 

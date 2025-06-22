@@ -54,7 +54,7 @@ L1:     lda     c_sp,x
         lda     MEMSIZE
         sta     c_sp
         lda     MEMSIZE+1
-        sta     c_sp+1            ; Set argument stack ptr
+        sta     c_sp+1          ; Set argument stack ptr
 
 ; Call the module constructors.
 

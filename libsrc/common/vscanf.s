@@ -31,7 +31,7 @@ _vscanf:
 ; Move the format down
 
         ldy     #2
-        lda     (c_sp),y          ; Load byte of format
+        lda     (c_sp),y        ; Load byte of format
         ldy     #0
         sta     (c_sp),y
         ldy     #3

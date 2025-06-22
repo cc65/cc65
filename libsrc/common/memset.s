@@ -39,7 +39,7 @@ common:                         ; Fill value is in X!
         lda     (c_sp),y
         sta     ptr1+1          ; save high byte of ptr
         dey                     ; Y = 0
-        lda     (c_sp),y          ; Get ptr
+        lda     (c_sp),y        ; Get ptr
         sta     ptr1
 
         lsr     ptr3+1          ; divide number of

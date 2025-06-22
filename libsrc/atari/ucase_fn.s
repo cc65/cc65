@@ -69,7 +69,7 @@ loop2:  lda     (ptr4),y
         cmp     #'a'
         bcc     L1              ; Not lowercase
         and     #$DF            ; make upper case char, assume ASCII chars
-        sta     (c_sp),y          ; store back
+        sta     (c_sp),y        ; store back
 L1:
         iny
         bpl     loop2           ; bpl: this way we only support a max. length of 127
@@ -93,7 +93,7 @@ copy_end:
         jsr     subysp          ; adjust stack pointer
         dey
 cpdev:  lda     __defdev,y
-        sta     (c_sp),y          ; insert device name, number and ':'
+        sta     (c_sp),y        ; insert device name, number and ':'
         dey
         bpl     cpdev
 hasdev2:

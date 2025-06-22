@@ -14,7 +14,7 @@ tosanda0:
         ldx     #$00
 tosandax:
 .if (.cpu .bitand CPU_ISET_65SC02)
-        and     (c_sp)            ; 65SC02 version, saves 2 cycles and 1 byte
+        and     (c_sp)          ; 65SC02 version, saves 2 cycles and 1 byte
         ldy     #1
 .else
         ldy     #0

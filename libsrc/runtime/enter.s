@@ -13,6 +13,6 @@ enter:  tya                     ; get arg size
         dec     c_sp+1
 L1:     dec     c_sp
         ldy     #0
-        sta     (c_sp),y          ; Store the arg count
+        sta     (c_sp),y        ; Store the arg count
         rts
 

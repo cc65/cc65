@@ -24,12 +24,12 @@ tosrsubax:
         ldy     #1
 .else
         ldy     #0
-        sbc     (c_sp),y          ; lo byte
+        sbc     (c_sp),y        ; lo byte
         iny
 .endif
         sta     tmp1            ; save lo byte
         txa
-        sbc     (c_sp),y          ; hi byte
+        sbc     (c_sp),y        ; hi byte
         tax
         lda     tmp1
         jmp     addysp1         ; drop TOS, set condition codes

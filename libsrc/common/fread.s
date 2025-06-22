@@ -152,7 +152,7 @@
         lda     (c_sp),y
         sta     ptr1+1
         adc     #0
-        sta     (c_sp),y                  ; ptr1 = buf++;
+        sta     (c_sp),y                ; ptr1 = buf++;
 
 ; Get the buffered character and place it as first character into the read
 ; buffer.

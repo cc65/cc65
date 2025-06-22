@@ -12,9 +12,9 @@
 ldax0sp:
         ldy     #1
 ldaxysp:
-        lda     (c_sp),y          ; get high byte
+        lda     (c_sp),y        ; get high byte
         tax                     ; and save it
         dey                     ; point to lo byte
-        lda     (c_sp),y          ; load low byte
+        lda     (c_sp),y        ; load low byte
         rts
 

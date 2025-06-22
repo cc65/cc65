@@ -121,12 +121,12 @@ _vfprintf:
 ; exactly as _printf expects it. Parameters will get dropped by _printf.
 
         ldy     #2
-        lda     (c_sp),y          ; Low byte of f
+        lda     (c_sp),y        ; Low byte of f
         sta     ptr
         lda     #<outdesc
         sta     (c_sp),y
         iny
-        lda     (c_sp),y          ; High byte of f
+        lda     (c_sp),y        ; High byte of f
         sta     ptr+1
         lda     #>outdesc
         sta     (c_sp),y

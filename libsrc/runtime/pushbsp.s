@@ -11,7 +11,7 @@
 pushbsp:
         ldy     #0
 pushbysp:
-        lda     (c_sp),y          ; get lo byte
+        lda     (c_sp),y        ; get lo byte
         jmp     pusha0          ; promote to unsigned and push
 
 

@@ -31,7 +31,7 @@ leavey:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
 
 leave:  tay                     ; save A a sec
-        lda     (c_sp)            ; that's the pushed arg size
+        lda     (c_sp)          ; that's the pushed arg size
         sec                     ; Count the byte, the count's stored in
         adc     c_sp
         sta     c_sp
@@ -43,7 +43,7 @@ L1:     tya                     ; Get return value back
 
 leave:  pha                     ; save A a sec
         ldy     #0
-        lda     (c_sp),y          ; that's the pushed arg size
+        lda     (c_sp),y        ; that's the pushed arg size
         sec                     ; Count the byte, the count's stored in
         adc     c_sp
         sta     c_sp

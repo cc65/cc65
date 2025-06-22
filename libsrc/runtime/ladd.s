@@ -20,24 +20,24 @@ tosadd0ax:
 tosaddeax:
         clc
 .if (.cpu .bitand CPU_ISET_65SC02)
-        adc     (c_sp)            ; 65SC02 version - saves 2 cycles
+        adc     (c_sp)          ; 65SC02 version - saves 2 cycles
         ldy     #1
 .else
         ldy     #0
-        adc     (c_sp),y          ; lo byte
+        adc     (c_sp),y        ; lo byte
         iny
 .endif
         sta     tmp1            ; use as temp storage
         txa
-        adc     (c_sp),y          ; byte 1
+        adc     (c_sp),y        ; byte 1
         tax
         iny
         lda     sreg
-        adc     (c_sp),y          ; byte 2
+        adc     (c_sp),y        ; byte 2
         sta     sreg
         iny
         lda     sreg+1
-        adc     (c_sp),y          ; byte 3
+        adc     (c_sp),y        ; byte 3
         sta     sreg+1
         lda     tmp1            ; load byte 0
         jmp     addysp1         ; drop TOS

@@ -74,6 +74,6 @@ memcpy_getparams:               ; IMPORTANT! Function has to leave with Y=0!
         tax
         stx     ptr2+1          ; save high byte of ptr2
         dey                     ; Y = 0
-        lda     (c_sp),y          ; Get ptr2 low
+        lda     (c_sp),y        ; Get ptr2 low
         sta     ptr2
         rts

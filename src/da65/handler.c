@@ -33,6 +33,7 @@
 
 
 
+#include <inttypes.h>
 #include <stdarg.h>
 
 /* common */
@@ -95,7 +96,7 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
 
 
 
-static const char* GetAbsOverride (unsigned Flags, unsigned Addr)
+static const char* GetAbsOverride (unsigned Flags, uint32_t Addr)
 /* If the instruction requires an abs override modifier, return the necessary
 ** string, otherwise return the empty string.
 */
@@ -111,7 +112,7 @@ static const char* GetAbsOverride (unsigned Flags, unsigned Addr)
 
 
 
-static const char* GetAddrArg (unsigned Flags, unsigned Addr)
+static const char* GetAddrArg (unsigned Flags, uint32_t Addr)
 /* Return an address argument - a label if we have one, or the address itself */
 {
     const char* Label = 0;
@@ -123,11 +124,11 @@ static const char* GetAddrArg (unsigned Flags, unsigned Addr)
     } else {
         static char Buf [32];
         if (Addr < 0x100) {
-            xsprintf (Buf, sizeof (Buf), "$%02X", Addr);
+            xsprintf (Buf, sizeof (Buf), "$%02" PRIX32, Addr);
         } else if (Addr < 0x10000) {
-            xsprintf (Buf, sizeof (Buf), "$%04X", Addr);
+            xsprintf (Buf, sizeof (Buf), "$%04" PRIX32, Addr);
         } else {
-            xsprintf (Buf, sizeof (Buf), "$%06X", Addr);
+            xsprintf (Buf, sizeof (Buf), "$%06" PRIX32, Addr);
         }
         return Buf;
     }
@@ -135,7 +136,7 @@ static const char* GetAddrArg (unsigned Flags, unsigned Addr)
 
 
 
-static void GenerateLabel (unsigned Flags, unsigned Addr)
+static void GenerateLabel (unsigned Flags, uint32_t Addr)
 /* Generate a label in pass one if requested */
 {
     /* Generate labels in pass #1, and only if we don't have a label already */
@@ -305,7 +306,7 @@ void OH_Implicit_42_45GS02 (const OpcDesc* D)
 
 void OH_Immediate (const OpcDesc* D)
 {
-    OneLine (D, "#$%02X", GetCodeByte (PC+1));
+    OneLine (D, "#$%02" PRIX8, GetCodeByte (PC+1));
 }
 
 
@@ -313,9 +314,9 @@ void OH_Immediate (const OpcDesc* D)
 void OH_Immediate65816M (const OpcDesc* D)
 {
     if (GetAttr (PC) & atMem16) {
-        OneLine (D, "#$%04X", GetCodeWord (PC+1));
+        OneLine (D, "#$%04" PRIX16, GetCodeWord (PC+1));
     } else {
-        OneLine (D, "#$%02X", GetCodeByte (PC+1));
+        OneLine (D, "#$%02" PRIX8, GetCodeByte (PC+1));
     }
 }
 
@@ -324,9 +325,9 @@ void OH_Immediate65816M (const OpcDesc* D)
 void OH_Immediate65816X (const OpcDesc* D)
 {
     if (GetAttr (PC) & atIdx16) {
-        OneLine (D, "#$%04X", GetCodeWord (PC+1));
+        OneLine (D, "#$%04" PRIX16, GetCodeWord (PC+1));
     } else {
-        OneLine (D, "#$%02X", GetCodeByte (PC+1));
+        OneLine (D, "#$%02" PRIX8, GetCodeByte (PC+1));
     }
 }
 
@@ -334,7 +335,7 @@ void OH_Immediate65816X (const OpcDesc* D)
 
 void OH_ImmediateWord (const OpcDesc* D)
 {
-    OneLine (D, "#$%04X", GetCodeWord (PC+1));
+    OneLine (D, "#$%04" PRIX16, GetCodeWord (PC+1));
 }
 
 
@@ -342,7 +343,7 @@ void OH_ImmediateWord (const OpcDesc* D)
 void OH_Direct (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -370,7 +371,7 @@ void OH_Direct_Q (const OpcDesc* D)
 void OH_DirectX (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -398,7 +399,7 @@ void OH_DirectX_Q (const OpcDesc* D)
 void OH_DirectY (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -412,7 +413,7 @@ void OH_DirectY (const OpcDesc* D)
 void OH_Absolute (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord (PC+1);
+    uint32_t Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -440,7 +441,7 @@ void OH_Absolute_Q (const OpcDesc* D)
 void OH_AbsoluteX (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord (PC+1);
+    uint32_t Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -468,7 +469,7 @@ void OH_AbsoluteX_Q (const OpcDesc* D)
 void OH_AbsoluteY (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord (PC+1);
+    uint32_t Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -482,7 +483,7 @@ void OH_AbsoluteY (const OpcDesc* D)
 void OH_AbsoluteLong (const OpcDesc* D attribute ((unused)))
 {
     /* Get the operand */
-    unsigned Addr = GetCodeLongAddr (PC+1);
+    uint32_t Addr = GetCodeLongAddr (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -496,7 +497,7 @@ void OH_AbsoluteLong (const OpcDesc* D attribute ((unused)))
 void OH_AbsoluteLongX (const OpcDesc* D attribute ((unused)))
 {
     /* Get the operand */
-    unsigned Addr = GetCodeLongAddr (PC+1);
+    uint32_t Addr = GetCodeLongAddr (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -513,7 +514,7 @@ void OH_Relative (const OpcDesc* D)
     signed char Offs = GetCodeByte (PC+1);
 
     /* Calculate the target address */
-    unsigned Addr = (((int) PC+2) + Offs) & 0xFFFF;
+    uint32_t Addr = (((int) PC+2) + Offs) & 0xFFFF;
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -535,7 +536,7 @@ void OH_RelativeLong (const OpcDesc* D attribute ((unused)))
     signed short Offs = GetCodeWord (PC+1);
 
     /* Calculate the target address */
-    unsigned Addr = (((int) PC+3) + Offs) & 0xFFFF;
+    uint32_t Addr = (((int) PC+3) + Offs) & 0xFFFF;
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -552,7 +553,7 @@ void OH_RelativeLong4510 (const OpcDesc* D attribute ((unused)))
     signed short Offs = GetCodeWord (PC+1);
 
     /* Calculate the target address */
-    unsigned Addr = (((int) PC+2) + Offs) & 0xFFFF;
+    uint32_t Addr = (((int) PC+2) + Offs) & 0xFFFF;
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -566,7 +567,7 @@ void OH_RelativeLong4510 (const OpcDesc* D attribute ((unused)))
 void OH_DirectIndirect (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -580,7 +581,7 @@ void OH_DirectIndirect (const OpcDesc* D)
 void OH_DirectIndirectY (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -594,7 +595,7 @@ void OH_DirectIndirectY (const OpcDesc* D)
 void OH_DirectIndirectZ (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -622,7 +623,7 @@ void OH_DirectIndirectZ_Q (const OpcDesc* D)
 void OH_DirectXIndirect (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -636,7 +637,7 @@ void OH_DirectXIndirect (const OpcDesc* D)
 void OH_AbsoluteIndirect (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord (PC+1);
+    uint32_t Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -652,11 +653,11 @@ void OH_BitBranch (const OpcDesc* D)
     char* BranchLabel;
 
     /* Get the operands */
-    unsigned char TestAddr   = GetCodeByte (PC+1);
-    signed char   BranchOffs = GetCodeByte (PC+2);
+    uint32_t TestAddr = GetCodeByte (PC+1);
+    int8_t BranchOffs = GetCodeByte (PC+2);
 
     /* Calculate the target address for the branch */
-    unsigned BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
+    uint32_t BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
 
     /* Generate labels in pass 1. The bit branch codes are special in that
     ** they don't really match the remainder of the 6502 instruction set (they
@@ -686,11 +687,11 @@ void OH_BitBranch_m740 (const OpcDesc* D)
 */
 {
     /* unsigned Bit = GetCodeByte (PC) >> 5; */
-    unsigned Addr = GetCodeByte (PC+1);
-    signed char BranchOffs = GetCodeByte (PC+2);
+    uint32_t Addr     = GetCodeByte (PC+1);
+    int8_t BranchOffs = (int8_t) GetCodeByte (PC+2);
 
     /* Calculate the target address for the branch */
-    unsigned BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
+    uint32_t BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -700,10 +701,12 @@ void OH_BitBranch_m740 (const OpcDesc* D)
     OneLine (D, "%s, %s", GetAddrArg (D->Flags, Addr), GetAddrArg (flLabel, BranchAddr));
 }
 
+
+
 void OH_ImmediateDirect (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+2);
+    uint32_t Addr = GetCodeByte (PC+2);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -717,7 +720,7 @@ void OH_ImmediateDirect (const OpcDesc* D)
 void OH_ImmediateDirectX (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+2);
+    uint32_t Addr = GetCodeByte (PC+2);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -731,7 +734,7 @@ void OH_ImmediateDirectX (const OpcDesc* D)
 void OH_ImmediateAbsolute (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord (PC+2);
+    uint32_t Addr = GetCodeWord (PC+2);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -745,7 +748,7 @@ void OH_ImmediateAbsolute (const OpcDesc* D)
 void OH_ImmediateAbsoluteX (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord (PC+2);
+    uint32_t Addr = GetCodeWord (PC+2);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -790,7 +793,7 @@ void OH_StackRelativeIndirectY4510 (const OpcDesc* D attribute ((unused)))
 void OH_DirectIndirectLong (const OpcDesc* D attribute ((unused)))
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -804,7 +807,7 @@ void OH_DirectIndirectLong (const OpcDesc* D attribute ((unused)))
 void OH_DirectIndirectLongY (const OpcDesc* D attribute ((unused)))
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -820,9 +823,9 @@ void OH_BlockMove (const OpcDesc* D)
     char* DstLabel;
 
     /* Get source operand */
-    unsigned Src = GetCodeWord (PC+1);
+    uint32_t Src = GetCodeWord (PC+1);
     /* Get destination operand */
-    unsigned Dst = GetCodeWord (PC+3);
+    uint32_t Dst = GetCodeWord (PC+3);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Src);
@@ -835,7 +838,7 @@ void OH_BlockMove (const OpcDesc* D)
     DstLabel = xstrdup (GetAddrArg (D->Flags, Dst));
 
     /* Output the line */
-    OneLine (D, "%s%s,%s%s,$%04X",
+    OneLine (D, "%s%s,%s%s,$%04" PRIX16,
              GetAbsOverride (D->Flags, Src), GetAddrArg (D->Flags, Src),
              GetAbsOverride (D->Flags, Dst), DstLabel,
              GetCodeWord (PC+5));
@@ -848,12 +851,12 @@ void OH_BlockMove (const OpcDesc* D)
 void OH_BlockMove65816 (const OpcDesc* D)
 {
     /* Get source operand */
-    unsigned Src = GetCodeByte (PC+2);
+    uint8_t Src = GetCodeByte (PC+2);
     /* Get destination operand */
-    unsigned Dst = GetCodeByte (PC+1);
+    uint8_t Dst = GetCodeByte (PC+1);
 
     /* Output the line */
-    OneLine (D, "#$%02X, #$%02X", Src, Dst);
+    OneLine (D, "#$%02" PRIX8 ", #$%02" PRIX8, Src, Dst);
 }
 
 
@@ -861,7 +864,7 @@ void OH_BlockMove65816 (const OpcDesc* D)
 void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord (PC+1);
+    uint32_t Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -875,7 +878,7 @@ void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
 void OH_DirectImmediate (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -891,7 +894,7 @@ void OH_ZeroPageBit (const OpcDesc* D)
 ** NOTE: currently <bit> is part of the instruction
 */
 {
-    unsigned Addr = GetCodeByte (PC+1);
+    uint32_t Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -917,10 +920,10 @@ void OH_AccumulatorBitBranch (const OpcDesc* D)
 ** NOTE: currently <bit> is part of the instruction
 */
 {
-    signed char BranchOffs = GetCodeByte (PC+1);
+    int8_t BranchOffs = GetCodeByte (PC+1);
 
     /* Calculate the target address for the branch */
-    unsigned BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
+    uint32_t BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
 
     /* Generate labels in pass 1 */
     GenerateLabel (flLabel, BranchAddr);
@@ -945,7 +948,7 @@ void OH_SpecialPage (const OpcDesc* D)
 /* m740 "special page" address mode */
 {
     /* Get the operand */
-    unsigned Addr = 0xFF00 + GetCodeByte (PC+1);
+    uint32_t Addr = 0xFF00 + GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -1004,16 +1007,13 @@ void OH_JsrAbsolute (const OpcDesc* D)
     unsigned ParamSize = SubroutineParamSize[GetCodeWord (PC+1)];
     OH_Absolute (D);
     if (ParamSize > 0) {
-        unsigned RemainingBytes;
-        unsigned BytesLeft;
+        uint32_t RemainingBytes;
+        uint32_t BytesLeft;
         PC += D->Size;
         RemainingBytes = GetRemainingBytes ();
-        if (RemainingBytes < ParamSize) {
-            ParamSize = RemainingBytes;
-        }
-        BytesLeft = ParamSize;
+        BytesLeft = (RemainingBytes < ParamSize)? RemainingBytes : ParamSize;
         while (BytesLeft > 0) {
-            unsigned Chunk = (BytesLeft > BytesPerLine) ? BytesPerLine : BytesLeft;
+            uint32_t Chunk = (BytesLeft > BytesPerLine) ? BytesPerLine : BytesLeft;
             DataByteLine (Chunk);
             BytesLeft -= Chunk;
             PC        += Chunk;
@@ -1024,7 +1024,7 @@ void OH_JsrAbsolute (const OpcDesc* D)
 
 
 
-void SetSubroutineParamSize (unsigned Addr, unsigned Size)
+void SetSubroutineParamSize (uint32_t Addr, unsigned Size)
 {
     SubroutineParamSize[Addr] = Size;
 }

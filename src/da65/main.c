@@ -313,7 +313,8 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
-    StartAddr = CvtNumber (Opt, Arg);
+    StartAddr = (uint32_t) CvtNumber (Opt, Arg);
+    HaveStartAddr = 1;
 }
 
 
@@ -409,11 +410,11 @@ static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
 static void OneOpcode (unsigned RemainingBytes)
 /* Disassemble one opcode */
 {
-    unsigned I;
-    unsigned OldPC = PC;
+    uint32_t I;
+    uint32_t OldPC = PC;
 
     /* Get the opcode from the current address */
-    unsigned char OPC = GetCodeByte (PC);
+    uint8_t OPC = GetCodeByte (PC);
 
     /* Get the opcode description for the opcode byte */
     const OpcDesc* D = &OpcTable[OPC];
@@ -574,7 +575,7 @@ static void OneOpcode (unsigned RemainingBytes)
 static void OnePass (void)
 /* Make one pass through the code */
 {
-    unsigned Count;
+    uint32_t Count;
 
     PrevAddrMode = 0;
 

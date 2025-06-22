@@ -414,6 +414,16 @@ void DoConditionals (void)
                 CalcOverallIfCond ();
                 break;
 
+            case TOK_IFP45GS02:
+                D = AllocIf (".IFP45GS02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_45GS02);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
             case TOK_IFP816:
                 D = AllocIf (".IFP816", 1);
                 NextTok ();
@@ -439,6 +449,16 @@ void DoConditionals (void)
                 NextTok ();
                 if (IfCond) {
                     SetIfCond (D, GetCPU() == CPU_6502DTV);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFPM740:
+                D = AllocIf (".IFPM740", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_M740);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -497,9 +517,11 @@ int CheckConditionals (void)
         case TOK_IFP02:
         case TOK_IFP02X:
         case TOK_IFP4510:
+        case TOK_IFP45GS02:
         case TOK_IFP816:
         case TOK_IFPC02:
         case TOK_IFPDTV:
+        case TOK_IFPM740:
         case TOK_IFPSC02:
         case TOK_IFREF:
             DoConditionals ();

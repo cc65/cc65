@@ -146,8 +146,7 @@ unsigned GetGranularity (attr_t Style)
         case atAddrTab:  return 2;
         case atRtsTab:   return 2;
         case atTextTab:  return 1;
-
-        case atSkip:
+        case atSkip:     return 1;
         default:
             Internal ("GetGranularity called for style = %d", Style);
             return 0;

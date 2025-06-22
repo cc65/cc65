@@ -119,7 +119,8 @@ static OptFunc DOptBNegAX1      = { OptBNegAX1,      "OptBNegAX1",      100, 0, 
 static OptFunc DOptBNegAX2      = { OptBNegAX2,      "OptBNegAX2",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBinOps       = { OptBinOps,       "OptBinOps",         0, 0, 0, 0, 0, 0 };
+static OptFunc DOptBinOps1      = { OptBinOps1,      "OptBinOps1",        0, 0, 0, 0, 0, 0 };
+static OptFunc DOptBinOps2      = { OptBinOps2,      "OptBinOps2",        0, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolCmp      = { OptBoolCmp,      "OptBoolCmp",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolUnary1   = { OptBoolUnary1,   "OptBoolUnary1",    40, 0, 0, 0, 0, 0 };
@@ -154,6 +155,8 @@ static OptFunc DOptJumpTarget3  = { OptJumpTarget3,  "OptJumpTarget3",  100, 0, 
 static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad2        = { OptLoad2,        "OptLoad2",        200, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad3        = { OptLoad3,        "OptLoad3",          0, 0, 0, 0, 0, 0 };
+static OptFunc DOptLoadStore1   = { OptLoadStore1,   "OptLoadStore1",     0, 0, 0, 0, 0, 0 };
+static OptFunc DOptLoadStore2   = { OptLoadStore2,   "OptLoadStore2",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoadStoreLoad= { OptLoadStoreLoad,"OptLoadStoreLoad",  0, 0, 0, 0, 0, 0 };
 static OptFunc DOptLongAssign   = { OptLongAssign,   "OptLongAssign",   100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLongCopy     = { OptLongCopy,     "OptLongCopy",     100, 0, 0, 0, 0, 0 };
@@ -238,7 +241,8 @@ static OptFunc* OptFuncs[] = {
     &DOptBNegAX2,
     &DOptBNegAX3,
     &DOptBNegAX4,
-    &DOptBinOps,
+    &DOptBinOps1,
+    &DOptBinOps2,
     &DOptBoolCmp,
     &DOptBoolTrans,
     &DOptBoolUnary1,
@@ -273,6 +277,8 @@ static OptFunc* OptFuncs[] = {
     &DOptLoad1,
     &DOptLoad2,
     &DOptLoad3,
+    &DOptLoadStore1,
+    &DOptLoadStore2,
     &DOptLoadStoreLoad,
     &DOptLongAssign,
     &DOptLongCopy,
@@ -649,6 +655,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptSub1, 1);
     Changes += RunOptFunc (S, &DOptSub3, 1);
     Changes += RunOptFunc (S, &DOptLongAssign, 1);
+    Changes += RunOptFunc (S, &DOptLoadStore2, 1);
     Changes += RunOptFunc (S, &DOptStore4, 1);
     Changes += RunOptFunc (S, &DOptStore5, 1);
     Changes += RunOptFunc (S, &DOptShift1, 1);
@@ -741,9 +748,10 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptJumpTarget3, 1);   /* After OptCondBranches2 */
         C += RunOptFunc (S, &DOptUnusedLoads, 1);
         C += RunOptFunc (S, &DOptUnusedStores, 1);
-        C += RunOptFunc (S, &DOptDupLoads, 1);
         C += RunOptFunc (S, &DOptStoreLoad, 1);
         C += RunOptFunc (S, &DOptLoadStoreLoad, 1);
+        C += RunOptFunc (S, &DOptDupLoads, 1);
+        C += RunOptFunc (S, &DOptLoadStore1, 1);
         C += RunOptFunc (S, &DOptTransfers1, 1);
         C += RunOptFunc (S, &DOptTransfers3, 1);
         C += RunOptFunc (S, &DOptTransfers4, 1);
@@ -755,7 +763,8 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptPrecalc, 1);
         C += RunOptFunc (S, &DOptShiftBack, 1);
         C += RunOptFunc (S, &DOptSignExtended, 1);
-        C += RunOptFunc (S, &DOptBinOps, 1);
+        C += RunOptFunc (S, &DOptBinOps1, 1);
+        C += RunOptFunc (S, &DOptBinOps2, 1);
 
         Changes += C;
 

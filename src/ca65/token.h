@@ -68,6 +68,7 @@ typedef enum token_t {
     TOK_Y,              /* Y register */
     TOK_Z,              /* Z register */
     TOK_S,              /* S register */
+    TOK_Q,              /* Q pseudo register */
     TOK_REG,            /* Sweet16 R.. register (in sweet16 mode) */
 
     TOK_ASSIGN,         /* := */
@@ -195,9 +196,11 @@ typedef enum token_t {
     TOK_IFP02,
     TOK_IFP02X,
     TOK_IFP4510,
+    TOK_IFP45GS02,
     TOK_IFP816,
     TOK_IFPC02,
     TOK_IFPDTV,
+    TOK_IFPM740,
     TOK_IFPSC02,
     TOK_IFREF,
     TOK_IMPORT,
@@ -229,11 +232,13 @@ typedef enum token_t {
     TOK_P02,
     TOK_P02X,
     TOK_P4510,
+    TOK_P45GS02,
     TOK_P816,
     TOK_PAGELENGTH,
     TOK_PARAMCOUNT,
     TOK_PC02,
     TOK_PDTV,
+    TOK_PM740,
     TOK_POPCHARMAP,
     TOK_POPCPU,
     TOK_POPSEG,

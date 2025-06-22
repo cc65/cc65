@@ -151,8 +151,19 @@ Here is a description of all the command line options:
 
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
-
-        6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510, M740
+  <itemize>
+  <item>6502 - NMOS 6502 (all legal instructions)
+  <item>6502X - NMOS 6502 with all undocumented instructions
+  <item>6502DTV - the emulated CPU of the C64DTV device
+  <item>65SC02 - first CMOS instruction set (no bit manipulation, no wai/stp)
+  <item>65C02 - full CMOS instruction set (has bit manipulation and wai/stp)
+  <item>65816 - the CPU of the SNES, and the SCPU
+  <item>HuC6280 - the CPU of the PC engine
+  <item>4510 - the CPU of the Commodore C65
+  <item>45GS02 - the CPU of the Commodore MEGA65
+  <item>M740 - a Microcontroller by Mitsubishi
+  <item>sweet16 - an interpreter for a pseudo 16 bit CPU
+  </itemize>
 
 
   <label id="option-create-dep">
@@ -442,6 +453,8 @@ The assembler accepts
       <tt><ref id=".P816" name=".P816"></tt> command was given).
 <item>all valid 4510 mnemonics when in <ref id="4510-mode" name="4510 mode"> (after the
       <tt><ref id=".P4510" name=".P4510"></tt> command was given).
+<item>all valid 45GS02 mnemonics when in <ref id="45GS02-mode" name="45GS02 mode"> (after the
+      <tt><ref id=".P45GS02" name=".P45GS02"></tt> command was given).
 <item>all valid M740 mnemonics when in <ref id="M740-mode" name="M740 mode"> (after the
       <tt><ref id=".PM740" name=".PM740"></tt> command was given).
 </itemize>
@@ -455,12 +468,12 @@ byte. If omitted, the assembler will only produce only 1 byte.
                 brk     #$34            ; 2-bytes: $00 $34
 </verb></tscreen>
 
-<sect1>6502 mode<label id="6502-mode"><p>
+<sect2>6502 mode<label id="6502-mode"><p>
 
 In 6502 mode (which is the default) the assembler accepts all regular "legal"
 6502 mnemonics and addressing modes.
 
-<sect1>6502X mode<label id="6502X-mode"><p>
+<sect2>6502X mode<label id="6502X-mode"><p>
 
 6502X mode is an extension to the normal 6502 mode. In this mode, several
 mnemonics for undocumented instructions of the NMOS 6502 CPUs are accepted.
@@ -492,7 +505,7 @@ for them.
 </itemize>
 
 
-<sect1>DTV mode<label id="DTV-mode"><p>
+<sect2>DTV mode<label id="DTV-mode"><p>
 
 The C64DTV CPU is based on the 6510, but adds some instructions, and does not
 support all undocumented instructions.
@@ -520,7 +533,7 @@ Supported undocumented instructions:
 </itemize>
 
 
-<sect1>65SC02 mode<label id="65SC02-mode"><p>
+<sect2>65SC02 mode<label id="65SC02-mode"><p>
 
 65SC02 mode supports all regular 6502 instructions, plus the following:
 
@@ -555,7 +568,7 @@ $fa  plx
 </verb></tscreen>
 
 
-<sect1>65C02 mode<label id="65C02-mode"><p>
+<sect2>65C02 mode<label id="65C02-mode"><p>
 
 65C02 mode supports all "official" W65C02 opcodes.
 
@@ -576,7 +589,7 @@ $db  stp    wait for reset
 </verb></tscreen>
 
 
-<sect1>4510 mode<label id="4510-mode"><p>
+<sect2>4510 mode<label id="4510-mode"><p>
 
 The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
 It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
@@ -607,8 +620,13 @@ For more information about the Commodore C65/C64DX and the 4510 CPU, see
 <url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and
 <url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
 
+<sect2>45GS02 mode<label id="45GS02-mode"><p>
 
-<sect1>HUC6280 mode<label id="HUC6280-mode"><p>
+The 45GS02 is a microcontroller that is the core of the MEGA65.
+It is an extension of the 4510 CPU and adds 32-bit addressing and a 32-bit
+pseudo register Q that is comprised of the four registers A, X, Y, and Z.
+
+<sect2>HUC6280 mode<label id="HUC6280-mode"><p>
 
 The HUC6280 is a superset of the R65C02. It adds some other instructions:
 
@@ -644,7 +662,7 @@ $f4  set
 Note that this CPU does not implement <tt>wai</tt> and <tt>stp</tt>.
 
 
-<sect1>M740 mode<label id="M740-mode"><p>
+<sect2>M740 mode<label id="M740-mode"><p>
 
 The M740 is a microcontroller by Mitsubishi, which was marketed for embedded
 devices in the mid 80s. It is a superset of 6502, and a subset of 65SC02, plus
@@ -654,7 +672,7 @@ For more information about the M740 Controllers, see
 <url url="https://en.wikipedia.org/wiki/Mitsubishi_740" name="Wikipedia">.
 
 
-<sect1>65816 mode<label id="65816-mode"><p><p>
+<sect2>65816 mode<label id="65816-mode"><p><p>
 
 In 65816 mode, several aliases are accepted, in addition to the official
 mnemonics:
@@ -682,7 +700,7 @@ or two far addresses whose high byte will be used.
 </verb></tscreen>
 
 
-<sect1>sweet16 mode<label id="sweet16-mode"><p>
+<sect2>sweet16 mode<label id="sweet16-mode"><p>
 
 SWEET 16 is an interpreter for a pseudo 16 bit CPU written by Steve Wozniak
 for the Apple ][ machines. It is available in the Apple ][ ROM. ca65 can
@@ -3399,6 +3417,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   (see <tt><ref id=".P4510" name=".P4510"></tt> command).
 
 
+<sect1><tt>.IFP45GS02</tt><label id=".IFP45GS02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 45GS02 mode
+  (see <tt><ref id=".P45GS02" name=".P45GS02"></tt> command).
+
+
 <sect1><tt>.IFP816</tt><label id=".IFP816"><p>
 
   Conditional assembly: Check if the assembler is currently in 65816 mode
@@ -3782,8 +3806,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tt><ref id="option--cpu" name="--cpu"></tt> command line option.
 
   See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 
 <sect1><tt>.P02X</tt><label id=".P02X"><p>
@@ -3802,9 +3827,20 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instruction sets.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
-  <tt><ref id=".P816" name=".P816"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P816" name=".P816"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
+
+<sect1><tt>.P45GS02</tt><label id=".P45GS02"><p>
+
+  Enable the 45GS02 instruction set. This is a superset of the 4510, 65C02, and
+  6502 instruction sets.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P816" name=".P816"></tt>, and
+  <tt><ref id=".P4510" name=".P4510"></tt>
 
 <sect1><tt>.P816</tt><label id=".P816"><p>
 
@@ -3812,9 +3848,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instruction sets.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
-
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 <sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
 
@@ -3841,9 +3877,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 and 65SC02 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
-
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 <sect1><tt>.PDTV</tt><label id=".PDTV"><p>
 
@@ -3946,9 +3982,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
-  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
-
+  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 <sect1><tt>.PUSHCHARMAP</tt><label id=".PUSHCHARMAP"><p>
 
@@ -4195,7 +4231,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510, HuC6280 and m740.
+  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510, 45GS02, HuC6280 and m740.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
@@ -4209,6 +4245,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
        <tt><ref id=".P02X" name=".P02X"></tt>,
        <tt><ref id=".P816" name=".P816"></tt>,
        <tt><ref id=".P4510" name=".P4510"></tt>,
+       <tt><ref id=".P45GS02" name=".P45GS02"></tt>,
        <tt><ref id=".PC02" name=".PC02"></tt>,
        <tt><ref id=".PM740" name=".PM740"></tt>,
        <tt><ref id=".PSC02" name=".PSC02"></tt>
@@ -4948,6 +4985,7 @@ each supported CPU a constant similar to
     CPU_SWEET16
     CPU_HUC6280
     CPU_4510
+    CPU_45GS02
     CPU_6502DTV
     CPU_M740
 </verb></tscreen>
@@ -4964,6 +5002,7 @@ another constant is defined:
     CPU_ISET_SWEET16
     CPU_ISET_HUC6280
     CPU_ISET_4510
+    CPU_ISET_45GS02
     CPU_ISET_6502DTV
     CPU_ISET_M740
 </verb></tscreen>

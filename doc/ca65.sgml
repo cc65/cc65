@@ -313,7 +313,7 @@ Here is a description of all the command line options:
   character constants into the character set of the target platform. The
   default for the target system is "none", which means that no translation
   will take place. The assembler supports the same target systems as the
-  compiler, see there for a list.
+  compiler, see <htmlurl url="ca65.html#option-t" name="there for a list">.
 
   Depending on the target, the default CPU type is also set. This can be
   overridden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.

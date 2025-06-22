@@ -610,27 +610,42 @@ Here is a description of all the command line options:
 
   <itemize>
   <item>none
+  <item>agat (a russian apple2 like computer)
   <item>apple2
   <item>apple2enh
   <item>atari
+  <item>atari2600
+  <item>atari5200
+  <item>atari7800
   <item>atarixl
   <item>atmos
+  <item>bbc
   <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
+  <item>c65
   <item>c128
   <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM-II II computers with 80 column video)
+  <item>creativision
+  <item>cx16
+  <item>gamate
   <item>geos-apple
   <item>geos-cbm
+  <item>geos (alias for geos-cbm)
+  <item>kim1
   <item>lunix
   <item>lynx
+  <item>mega65
   <item>nes
   <item>osic1p
+  <item>pce (PC engine)
   <item>pet (all CBM PET systems except the 2001)
   <item>plus4
+  <item>p6502
   <item>sim6502
   <item>sim65c02
   <item>supervision
+  <item>sym1
   <item>telestrat
   <item>vic20
   </itemize>

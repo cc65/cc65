@@ -507,7 +507,7 @@ void DefOutOfRangeLabels (void)
     ** sorted by address for better readability. This is not directly
     ** possible when using a hash table, so an intermediate data structure
     ** is required. It is not possible to collect out-of-range labels while
-    ** generating them, since they may come from an info file and where added
+    ** generating them, since they may come from an info file and are added
     ** while no input file was read. Which means it cannot be determined at
     ** that point if they're out-of-range or not.
     */

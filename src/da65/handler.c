@@ -125,10 +125,8 @@ static const char* GetAddrArg (unsigned Flags, uint32_t Addr)
         static char Buf [32];
         if (Addr < 0x100) {
             xsprintf (Buf, sizeof (Buf), "$%02" PRIX32, Addr);
-        } else if (Addr < 0x10000) {
-            xsprintf (Buf, sizeof (Buf), "$%04" PRIX32, Addr);
         } else {
-            xsprintf (Buf, sizeof (Buf), "$%06" PRIX32, Addr);
+            xsprintf (Buf, sizeof (Buf), "$%04" PRIX32, Addr);
         }
         return Buf;
     }

@@ -100,6 +100,9 @@ void ForwardLabel (unsigned Offs);
 void DefOutOfRangeLabels (void);
 /* Output any labels that are out of the loaded code range */
 
+unsigned long GetLabelCount (void);
+/* Return the total number of labels defined so far */
+
 
 
 /* End of labels.h */

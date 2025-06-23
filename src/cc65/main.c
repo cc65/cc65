@@ -301,6 +301,14 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SYM1__", 1);
             break;
 
+        case TGT_C65:
+            cbmsys ("__C65__");
+            break;
+
+        case TGT_MEGA65:
+            cbmsys ("__MEGA65__");
+            break;
+
         case TGT_KIM1:
             DefineNumericMacro ("__KIM1__", 1);
             break;
@@ -340,7 +348,6 @@ static void DefineCpuMacros (void)
         case CPU_NONE:
         case CPU_SWEET16:
         case CPU_M740:
-        case CPU_4510:
         case CPU_UNKNOWN:
             CPUName = (CPU == CPU_UNKNOWN)? "unknown" : CPUNames[CPU];
             Internal ("Invalid CPU \"%s\"", CPUName);
@@ -374,6 +381,14 @@ static void DefineCpuMacros (void)
             DefineNumericMacro ("__CPU_HUC6280__", 1);
             break;
 
+        case CPU_4510:
+            DefineNumericMacro ("__CPU_4510__", 1);
+            break;
+
+        case CPU_45GS02:
+            DefineNumericMacro ("__CPU_45GS02__", 1);
+            break;
+
         default:
             FAIL ("Unexpected value in switch");
             break;
@@ -389,6 +404,8 @@ static void DefineCpuMacros (void)
     DefineNumericMacro ("__CPU_ISET_65C02__", CPU_ISET_65C02);
     DefineNumericMacro ("__CPU_ISET_65816__", CPU_ISET_65816);
     DefineNumericMacro ("__CPU_ISET_HUC6280__", CPU_ISET_HUC6280);
+    DefineNumericMacro ("__CPU_ISET_4510__", CPU_ISET_4510);
+    DefineNumericMacro ("__CPU_ISET_45GS02__", CPU_ISET_45GS02);
 
     /* Now define the macro that contains the bit set with the available
     ** cpu instructions.

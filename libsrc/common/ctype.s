@@ -7,7 +7,7 @@
 ;
 ; See "LICENSE" file for legal information.
 ;
-; Character specification table, matching serveral consoles.
+; Character specification table, matching several consoles.
 ;
 
         .include        "ctypetable.inc"

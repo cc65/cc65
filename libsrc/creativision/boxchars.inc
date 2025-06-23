@@ -2,7 +2,7 @@
 
 boxchars:
         ; Vertical Line
-        .byte   $18     
+        .byte   $18
         .byte   $18
         .byte   $18
         .byte   $18
@@ -29,7 +29,7 @@ boxchars:
         .byte   $18
         .byte   $18
         .byte   $18
-        .byte   $18     
+        .byte   $18
 
         ; Top Right
         .byte   $00
@@ -39,7 +39,7 @@ boxchars:
         .byte   $18
         .byte   $18
         .byte   $18
-        .byte   $18     
+        .byte   $18
 
         ; Bottom Left
         .byte   $18
@@ -49,7 +49,7 @@ boxchars:
         .byte   $00
         .byte   $00
         .byte   $00
-        .byte   $00       
+        .byte   $00
 
         ; Bottom Right
         .byte   $18
@@ -59,4 +59,4 @@ boxchars:
         .byte   $00
         .byte   $00
         .byte   $00
-        .byte   $00       
+        .byte   $00

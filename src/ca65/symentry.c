@@ -211,6 +211,8 @@ static void SymReplaceExprRefs (SymEntry* S)
 void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags)
 /* Define a new symbol */
 {
+    int Redef = 0;      /* Flag for symbol redefinition */
+
     if (S->Flags & SF_IMPORT) {
         /* Defined symbol is marked as imported external symbol */
         Error ("Symbol '%m%p' is already an import", GetSymName (S));
@@ -238,6 +240,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
             */
             FreeExpr (S->Expr);
             S->Expr = 0;
+            Redef = 1;
         }
     }
 
@@ -291,8 +294,10 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
         }
     }
 
-    /* If this is not a local symbol, remember it as the last global one */
-    if ((S->Flags & SF_LOCAL) == 0) {
+    /* If this is not a local symbol and not a redefinition for a variable
+    ** symbol, remember it as the last global one.
+    */
+    if ((S->Flags & SF_LOCAL) == 0 && !Redef) {
         SymLast = S;
     }
 }
@@ -551,6 +556,18 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
         return;
     }
 
+    /* If the symbol is already defined, check symbol size against the
+    ** exported size.
+    */
+    if (S->Flags & SF_DEFINED) {
+        if (AddrSize == ADDR_SIZE_DEFAULT) {
+            /* Use the real size of the symbol */
+            AddrSize = S->AddrSize;
+        } else if (S->AddrSize != AddrSize) {
+            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+        }
+    }
+
     /* If the symbol was already marked as an export or global, check if
     ** this was done specifiying the same address size. In case of a global
     ** declaration, silently remove the global flag.
@@ -562,18 +579,6 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
         S->Flags &= ~SF_GLOBAL;
     }
     S->ExportSize = AddrSize;
-
-    /* If the symbol is already defined, check symbol size against the
-    ** exported size.
-    */
-    if (S->Flags & SF_DEFINED) {
-        if (S->ExportSize == ADDR_SIZE_DEFAULT) {
-            /* Use the real size of the symbol */
-            S->ExportSize = S->AddrSize;
-        } else if (S->AddrSize != S->ExportSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
-        }
-    }
 
     /* If the symbol already was declared as a condes of this type,
     ** check if the new priority value is the same as the old one.

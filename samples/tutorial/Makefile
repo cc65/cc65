@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
@@ -29,9 +35,12 @@ else
   CC := $(if $(wildcard ../../bin/cc65*),../../bin/cc65,cc65)
   CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
-endif 
+endif
 
 EXELIST_atari2600 = \
+	notavailable
+
+EXELIST_atari5200 = \
 	notavailable
 
 EXELIST_bbc = \

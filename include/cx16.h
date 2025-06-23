@@ -3,7 +3,7 @@
 /*                                  cx16.h                                   */
 /*                                                                           */
 /*                      CX16 system-specific definitions                     */
-/*                             For prerelease 38                             */
+/*                             For prerelease 43                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided "as-is", without any expressed or implied       */
@@ -70,7 +70,6 @@
 #define CH_LIGHTBLUE            0x9A
 #define CH_GRAY3                0x9B
 #define CH_PURPLE               0x9C
-#define CH_VIOLET               CH_PURPLE
 #define CH_YELLOW               0x9E
 #define CH_CYAN                 0x9F
 #define CH_SHIFT_SPACE          0xA0
@@ -96,8 +95,7 @@
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
-#define COLOR_VIOLET            0x04
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            0x04
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
@@ -116,7 +114,6 @@
 #define TGI_COLOR_WHITE         COLOR_WHITE
 #define TGI_COLOR_RED           COLOR_RED
 #define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
 #define TGI_COLOR_PURPLE        COLOR_PURPLE
 #define TGI_COLOR_GREEN         COLOR_GREEN
 #define TGI_COLOR_BLUE          COLOR_BLUE
@@ -172,11 +169,21 @@ enum {
 };
 
 /* Video modes for videomode() */
-#define VIDEOMODE_40x30         0x00
-#define VIDEOMODE_80x60         0x02
-#define VIDEOMODE_40COL         VIDEOMODE_40x30
+#define VIDEOMODE_80x60         0x00
+#define VIDEOMODE_80x30         0x01
+#define VIDEOMODE_40x60         0x02
+#define VIDEOMODE_40x30         0x03
+#define VIDEOMODE_40x15         0x04
+#define VIDEOMODE_20x30         0x05
+#define VIDEOMODE_20x15         0x06
+#define VIDEOMODE_22x23         0x07
+#define VIDEOMODE_64x50         0x08
+#define VIDEOMODE_64x25         0x09
+#define VIDEOMODE_32x50         0x0A
+#define VIDEOMODE_32x25         0x0B
 #define VIDEOMODE_80COL         VIDEOMODE_80x60
-#define VIDEOMODE_320x200       0x80
+#define VIDEOMODE_40COL         VIDEOMODE_40x30
+#define VIDEOMODE_320x240       0x80
 #define VIDEOMODE_SWAP          (-1)
 
 /* VERA's address increment/decrement numbers */
@@ -224,6 +231,13 @@ enum {
 
 /* Define hardware. */
 
+#define RAM_BANK        (*(unsigned char *)0x00)
+#define ROM_BANK        (*(unsigned char *)0x01)
+
+#include <_6522.h>
+#define VIA1    (*(volatile struct __6522 *)0x9F00)
+#define VIA2    (*(volatile struct __6522 *)0x9F10)
+
 /* A structure with the Video Enhanced Retro Adapter's external registers */
 struct __vera {
     unsigned short      address;        /* Address for data ports */
@@ -246,6 +260,42 @@ struct __vera {
             unsigned char hstop;        /* Horizontal stop position */
             unsigned char vstart;       /* Vertical start position */
             unsigned char vstop;        /* Vertical stop position */
+        };
+        struct {                        /* Visible when DCSEL flag = 2 */
+            unsigned char fxctrl;
+            unsigned char fxtilebase;
+            unsigned char fxmapbase;
+            unsigned char fxmult;
+        };
+        struct {                        /* Visible when DCSEL flag = 3 */
+            unsigned char fxxincrl;
+            unsigned char fxxincrh;
+            unsigned char fxyincrl;
+            unsigned char fxyincrh;
+        };
+        struct {                        /* Visible when DCSEL flag = 4 */
+            unsigned char fxxposl;
+            unsigned char fxxposh;
+            unsigned char fxyposl;
+            unsigned char fxyposh;
+        };
+        struct {                        /* Visible when DCSEL flag = 5 */
+            unsigned char fxxposs;
+            unsigned char fxyposs;
+            unsigned char fxpolyfilll;
+            unsigned char fxpolyfillh;
+        };
+        struct {                        /* Visible when DCSEL flag = 6 */
+            unsigned char fxcachel;
+            unsigned char fxcachem;
+            unsigned char fxcacheh;
+            unsigned char fxcacheu;
+        };
+        struct {                        /* Visible when DCSEL flag = 63 */
+            unsigned char dcver0;
+            unsigned char dcver1;
+            unsigned char dcver2;
+            unsigned char dcver3;
         };
     } display;
     struct {
@@ -274,12 +324,15 @@ struct __vera {
 };
 #define VERA    (*(volatile struct __vera *)0x9F20)
 
-#include <_6522.h>
-#define VIA1    (*(volatile struct __6522 *)0x9F60)
-#define VIA2    (*(volatile struct __6522 *)0x9F70)
-
-#define RAM_BANK        (VIA1.pra)
-#define ROM_BANK        (VIA1.prb)
+/* Audio chip */
+struct __ym2151 {
+    unsigned char       reg;            /* Register number for data */
+    union {
+        unsigned char   data;
+        unsigned char   status;         /* Busy flag */
+    };
+};
+#define YM2151  (*(volatile struct __ym2151 *)0x9F40)
 
 /* A structure with the x16emu's settings registers */
 struct __emul {

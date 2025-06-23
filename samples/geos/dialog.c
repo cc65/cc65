@@ -1,4 +1,4 @@
-/* Note: 
+/* Note:
 ** This is just a sample piece of code that shows how to use some structs -
 ** it may not even run.
 */
@@ -28,5 +28,5 @@ static const dlgBoxStr myDialog = {
 
 void main (void)
 {
-    DoDlgBox (&myDialog);   
+    DoDlgBox (&myDialog);
 }

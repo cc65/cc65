@@ -48,6 +48,7 @@
 typedef enum token_t {
     INFOTOK_NONE,
     INFOTOK_INTCON,
+    INFOTOK_OFFSET_INTCON,
     INFOTOK_STRCON,
     INFOTOK_CHARCON,
     INFOTOK_IDENT,
@@ -89,6 +90,8 @@ typedef enum token_t {
     INFOTOK_START,
     INFOTOK_END,
     INFOTOK_TYPE,
+    INFOTOK_ADDRMODE,
+    INFOTOK_UNIT,
 
     INFOTOK_CODE,
     INFOTOK_BYTETAB,
@@ -188,7 +191,7 @@ void InfoAssureChar (void);
 void InfoAssureIdent (void);
 /* Make sure the next token is an identifier */
 
-void InfoRangeCheck (long Lo, long Hi);
+void InfoRangeCheck (const char* Attr, long Lo, long Hi);
 /* Check the range of InfoIVal */
 
 void InfoSpecialToken (const IdentTok* Table, unsigned Size, const char* Name);

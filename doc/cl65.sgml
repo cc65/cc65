@@ -57,11 +57,11 @@ Short options:
   -O                            Optimize code
   -Oi                           Optimize code, inline more code
   -Or                           Optimize code, honour the register keyword
-  -Os                           Optimize code, inline standard funtions
+  -Os                           Optimize code, inline standard functions
   -S                            Compile but don't assemble and link
   -T                            Include source as comment
   -V                            Print the version number
-  -W name[,...]                 Supress compiler warnings
+  -W name[,...]                 Suppress compiler warnings
   -Wa options                   Pass options to the assembler
   -Wc options                   Pass options to the compiler
   -Wl options                   Pass options to the linker
@@ -260,6 +260,9 @@ different options for different files on the command line. As an example.
 
 translates main.c with full optimization and module.c with less optimization
 and debug info enabled.
+
+Note that the target system (-t , --target) must be specified before any file
+unless using the default target of c64
 
 The type of an input file is derived from its extension:
 

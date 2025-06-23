@@ -937,7 +937,7 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
         unsigned      Len      = strlen (Name);
 
         /* Skip segment flags, read size */
-        (void) ReadVar (F);     
+        (void) ReadVar (F);
         Size = ReadVar (F);
 
         /* Skip alignment, type and fragment count */

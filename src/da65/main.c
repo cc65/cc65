@@ -42,8 +42,10 @@
 
 /* common */
 #include "abend.h"
+#include "check.h"
 #include "cmdline.h"
 #include "cpu.h"
+#include "debugflag.h"
 #include "fname.h"
 #include "print.h"
 #include "version.h"
@@ -55,13 +57,17 @@
 #include "data.h"
 #include "error.h"
 #include "global.h"
+#include "handler.h"
 #include "infofile.h"
 #include "labels.h"
 #include "opctable.h"
+#include "opc45GS02.h"
 #include "output.h"
 #include "scanner.h"
 #include "segment.h"
 
+
+static unsigned PrevAddrMode;
 
 
 /*****************************************************************************/
@@ -75,9 +81,11 @@ static void Usage (void)
 {
     printf ("Usage: %s [options] [inputfile]\n"
             "Short options:\n"
+            "  -d\t\t\tDebug mode\n"
             "  -g\t\t\tAdd debug info to object file\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -i name\t\tSpecify an info file\n"
+            "  -m\t\t\tRun multiple passes to resolve labels\n"
             "  -o name\t\tName the output file\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -F\t\t\tAdd formfeeds to the output\n"
@@ -90,6 +98,7 @@ static void Usage (void)
             "  --comment-column n\tSpecify comment start column\n"
             "  --comments n\t\tSet the comment level for the output\n"
             "  --cpu type\t\tSet cpu type\n"
+            "  --debug\t\tDebug mode\n"
             "  --debug-info\t\tAdd debug info to object file\n"
             "  --formfeeds\t\tAdd formfeeds to the output\n"
             "  --help\t\tHelp (this text)\n"
@@ -97,6 +106,7 @@ static void Usage (void)
             "  --info name\t\tSpecify an info file\n"
             "  --label-break n\tAdd newline if label exceeds length n\n"
             "  --mnemonic-column n\tSpecify mnemonic start column\n"
+            "  --multi-pass\t\tRun multiple passes to resolve labels\n"
             "  --pagelength n\tSet the page length for the listing\n"
             "  --start-addr addr\tSet the start/load address\n"
             "  --sync-lines\t\tAccept line markers in the info file\n"
@@ -219,6 +229,15 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptDebug (const char* Opt attribute ((unused)),
+                      const char* Arg attribute ((unused)))
+/* Disassembler debug mode */
+{
+    ++Debug;
+}
+
+
+
 static void OptDebugInfo (const char* Opt attribute ((unused)),
                           const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
@@ -294,6 +313,15 @@ static void OptMnemonicColumn (const char* Opt, const char* Arg)
 
 
 
+static void OptMultiPass (const char* Opt attribute ((unused)),
+                         const char* Arg attribute ((unused)))
+/* Handle the --multi-pass option */
+{
+    MultiPass = 1;
+}
+
+
+
 static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --pagelength option */
 {
@@ -309,7 +337,8 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
-    StartAddr = CvtNumber (Opt, Arg);
+    StartAddr = (uint32_t) CvtNumber (Opt, Arg);
+    HaveStartAddr = 1;
 }
 
 
@@ -352,7 +381,52 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the disassembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-    exit(EXIT_SUCCESS);
+    exit (EXIT_SUCCESS);
+}
+
+
+
+static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
+/* Instructions that have flSizeChanges set may use a different size than what
+** the table says. This function adjusts the PC accordingly, so after this only
+** the size from the table needs to be added to make up for the correct value
+*/
+{
+    if (D->Flags & flSizeChanges) {
+        if (CPU == CPU_45GS02) {
+            if (D->Handler == OH_Implicit_42_45GS02) {
+                if (GetCodeByte (PC+1) == 0x42) {
+                    /* NEG:NEG prefix (0x42 0x42) */
+                    unsigned opc = GetCodeByte (PC+2);
+                    if (opc == 0xea) {
+                        /* 42 42 ea */
+                        if ((GetCodeByte (PC+3) & 0x1f) == 0x12) {
+                            PC += 4;
+                        }
+                    } else {
+                        /* 42 42 xx */
+                        const OpcDesc* ED = &OpcTable_45GS02_extended[opc];
+                        if (ED->Handler != OH_Illegal) {
+                            PC += (ED->Size - 1);
+                        }
+                    }
+                }
+            } else if (D->Handler == OH_Implicit_ea_45GS02) {
+                /* NOP prefix (0xea) */
+                if ((GetCodeByte (PC+1) & 0x1f) == 0x12) {
+                    PC += 2;
+                }
+            }
+        } else if (CPU == CPU_65816) {
+            if ((D->Handler == OH_Immediate65816M &&
+                GetAttr (PC) & atMem16) ||
+                (D->Handler == OH_Immediate65816X &&
+                GetAttr (PC) & atIdx16)) {
+                PC++;
+            }
+        }
+    }
+    return PC;
 }
 
 
@@ -360,11 +434,11 @@ static void OptVersion (const char* Opt attribute ((unused)),
 static void OneOpcode (unsigned RemainingBytes)
 /* Disassemble one opcode */
 {
-    unsigned I;
-    unsigned OldPC = PC;
+    uint32_t I;
+    uint32_t OldPC = PC;
 
     /* Get the opcode from the current address */
-    unsigned char OPC = GetCodeByte (PC);
+    uint8_t OPC = GetCodeByte (PC);
 
     /* Get the opcode description for the opcode byte */
     const OpcDesc* D = &OpcTable[OPC];
@@ -427,8 +501,14 @@ static void OneOpcode (unsigned RemainingBytes)
     switch (Style) {
 
         case atDefault:
-            D->Handler (D);
-            PC += D->Size;
+            if (CPU == CPU_65816) {
+                DataByteLine (1);
+                ++PC;
+            } else {
+                D->Handler (D);
+                PC = HandleChangedLength (D, PC);
+                PC += D->Size;
+            }
             break;
 
         case atCode:
@@ -436,12 +516,30 @@ static void OneOpcode (unsigned RemainingBytes)
             ** following insn, fall through to byte mode.
             */
             if (D->Size <= RemainingBytes) {
+                if (CPU == CPU_65816) {
+                    const unsigned AddrMode = GetAttr (PC) & at65816Mask;
+                    if (PrevAddrMode != AddrMode) {
+                        if ((PrevAddrMode & atMem8) != (AddrMode & atMem8) ||
+                            (PrevAddrMode & atMem16) != (AddrMode & atMem16)) {
+                            OutputMFlag (!!(AddrMode & atMem8));
+                        }
+                        if ((PrevAddrMode & atIdx8) != (AddrMode & atIdx8) ||
+                            (PrevAddrMode & atIdx16) != (AddrMode & atIdx16)) {
+                            OutputXFlag (!!(AddrMode & atIdx8));
+                        }
+
+                        PrevAddrMode = AddrMode;
+                    }
+                }
+
                 /* Output labels within the next insn */
                 for (I = 1; I < D->Size; ++I) {
                     ForwardLabel (I);
                 }
                 /* Output the insn */
                 D->Handler (D);
+
+                PC = HandleChangedLength (D, PC);
                 PC += D->Size;
                 break;
             }
@@ -501,10 +599,12 @@ static void OneOpcode (unsigned RemainingBytes)
 static void OnePass (void)
 /* Make one pass through the code */
 {
-    unsigned Count;
+    uint32_t Count;
+
+    PrevAddrMode = 0;
 
     /* Disassemble until nothing left */
-    while ((Count = GetRemainingBytes()) > 0) {
+    while ((Count = GetRemainingBytes ()) > 0) {
         OneOpcode (Count);
     }
 }
@@ -514,15 +614,37 @@ static void OnePass (void)
 static void Disassemble (void)
 /* Disassemble the code */
 {
-    /* Pass 1 */
-    Pass = 1;
+    /* Preparation pass */
+    Pass = PASS_PREP;
     OnePass ();
+
+    /* If the --multi-pass option is given, repeat this pass until we have no
+    ** new labels.
+    */
+    if (MultiPass) {
+        unsigned long LabelCount = GetLabelCount ();
+        unsigned Passes = 1;
+        while (1) {
+            unsigned long NewLabelCount;
+            ResetCode ();
+            OnePass ();
+            CHECK(++Passes <= 4096);            /* Safety measure */
+            NewLabelCount = GetLabelCount ();
+            if (NewLabelCount <= LabelCount) {
+                break;
+            }
+            LabelCount = NewLabelCount;
+        }
+        if (Debug) {
+            printf ("Run %u preparation passes to resolve labels\n", Passes);
+        }
+    }
 
     Output ("---------------------------");
     LineFeed ();
 
-    /* Pass 2 */
-    Pass = 2;
+    /* Final pass */
+    Pass = PASS_FINAL;
     ResetCode ();
     OutputSettings ();
     DefOutOfRangeLabels ();
@@ -541,6 +663,7 @@ int main (int argc, char* argv [])
         { "--comment-column",   1,      OptCommentColumn        },
         { "--comments",         1,      OptComments             },
         { "--cpu",              1,      OptCPU                  },
+        { "--debug",            0,      OptDebug                },
         { "--debug-info",       0,      OptDebugInfo            },
         { "--formfeeds",        0,      OptFormFeeds            },
         { "--help",             0,      OptHelp                 },
@@ -548,6 +671,7 @@ int main (int argc, char* argv [])
         { "--info",             1,      OptInfo                 },
         { "--label-break",      1,      OptLabelBreak           },
         { "--mnemonic-column",  1,      OptMnemonicColumn       },
+        { "--multi-pass",       0,      OptMultiPass            },
         { "--pagelength",       1,      OptPageLength           },
         { "--start-addr",       1,      OptStartAddr            },
         { "--sync-lines",       0,      OptSyncLines            },
@@ -577,6 +701,14 @@ int main (int argc, char* argv [])
                     LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
                     break;
 
+                case 'd':
+                    if (Arg[2] == '\0') {
+                        OptDebug (Arg, 0);
+                    } else {
+                        UnknownOption (Arg);
+                    }
+                    break;
+
                 case 'g':
                     OptDebugInfo (Arg, 0);
                     break;
@@ -587,6 +719,10 @@ int main (int argc, char* argv [])
 
                 case 'i':
                     OptInfo (Arg, GetArg (&I, 2));
+                    break;
+
+                case 'm':
+                    OptMultiPass (Arg, 0);
                     break;
 
                 case 'o':

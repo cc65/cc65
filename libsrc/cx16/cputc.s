@@ -11,7 +11,10 @@
         .import         gotoxy, PLOT
 
         .include        "cx16.inc"
+        .macpack        generic
 
+
+screen_addr     :=      $1B000  ; VRAM address of text screen
 
 ; Move to a cursor position, then print a character.
 
@@ -79,16 +82,17 @@ putchar:
         tax
         stz     VERA::CTRL      ; Use port 0
         lda     CURS_Y
+        add     #<(>screen_addr)
         sta     VERA::ADDR+1    ; Set row number
-        lda     #VERA::INC1     ; Address increments by one
+        lda     #VERA::INC1 | ^screen_addr      ; Address increments by one
         sta     VERA::ADDR+2
         ldy     CURS_X          ; Get character column into .Y
         tya
         asl     a               ; Each character has two bytes
         sta     VERA::ADDR
-        stx     VERA::DATA0
+        stx     VERA::DATA0     ; Put the character
         lda     CHARCOLOR
-        sta     VERA::DATA0
+        sta     VERA::DATA0     ; Put its colors
         rts
 
 

@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
@@ -46,7 +52,6 @@ clean:
 	$(RM) -r ../html ../info
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 ifeq ($(wildcard ../html),../html)
 	$(INSTALL) -d $(DESTDIR)$(htmldir)
 	$(INSTALL) -m0644 ../html/*.* $(DESTDIR)$(htmldir)

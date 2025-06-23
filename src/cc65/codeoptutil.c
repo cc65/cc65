@@ -1128,8 +1128,10 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
             InsertEntry (D, X, D->IP++);
         }
 
-        /* In both cases, we can remove the load */
-        LI->X.Flags |= LI_REMOVE;
+        /* If this is the right hand side, we can remove the load. */
+        if (LI == &D->Rhs) {
+            LI->X.Flags |= LI_REMOVE;
+        }
 
     } else {
         /* opc zphi */
@@ -1223,6 +1225,12 @@ static int CmpHarmless (const void* Key, const void* Entry)
 }
 
 
+/* CAUTION: table must be sorted for bsearch */
+static const char* const Tab[] = {
+/* BEGIN SORTED.SH */
+    "_abs",
+/* END SORTED.SH */
+};
 
 int HarmlessCall (const CodeEntry* E, int PushedBytes)
 /* Check if this is a call to a harmless subroutine that will not interrupt
@@ -1250,10 +1258,6 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes)
         }
         return 1;
     } else {
-        static const char* const Tab[] = {
-            "_abs",
-        };
-
         void* R = bsearch (E->Arg,
                             Tab,
                             sizeof (Tab) / sizeof (Tab[0]),

@@ -85,6 +85,12 @@ static void PutBlockTransfer (const InsDesc* Ins);
 static void PutBitBranch (const InsDesc* Ins);
 /* Handle 65C02 branch on bit condition */
 
+static void PutBitBranch_m740 (const InsDesc* Ins);
+/* Handle m740 branch on bit condition */
+
+static void PutLDM_m740 (const InsDesc* Ins);
+/* Handle m740 LDM instruction */
+
 static void PutREP (const InsDesc* Ins);
 /* Emit a REP instruction, track register sizes */
 
@@ -120,9 +126,26 @@ static void PutJMP (const InsDesc* Ins);
 ** to check for this case and is otherwise identical to PutAll.
 */
 
+static void PutJMP816 (const InsDesc* Ins);
+/* Handle the JMP instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
+** Note that JMP [abs] and JML [abs] are always both permitted for instruction $DC,
+** because the [] notation for long indirection makes the generated instruction unambiguous.
+*/
+
+static void PutJSR816 (const InsDesc* Ins);
+/* Handle the JSR instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
+*/
+
+static void PutJSR_m740 (const InsDesc* Ins);
+/* Handle the JSR instruction for the m740
+** Allowing the special page feature.
+*/
+
 static void PutRTS (const InsDesc* Ins attribute ((unused)));
 /* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
-** the enclosing scope is FAR.
+** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
 */
 
 static void PutAll (const InsDesc* Ins);
@@ -130,6 +153,12 @@ static void PutAll (const InsDesc* Ins);
 
 static void Put4510 (const InsDesc* Ins);
 /* Handle instructions of 4510 not matching any EATab */
+
+static void Put45GS02 (const InsDesc* Ins);
+/* Handle [adr],z instructions of 45GS02 */
+
+static void Put45GS02_Q (const InsDesc* Ins);
+/* Handle Q instructions of 45GS02 */
 
 static void PutSweet16 (const InsDesc* Ins);
 /* Handle a generic sweet16 instruction */
@@ -157,8 +186,10 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[56];
 } InsTab6502 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502.Ins) / sizeof (InsTab6502.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "AND",  0x080A26C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -169,7 +200,7 @@ static const struct {
         { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -215,6 +246,7 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -223,8 +255,10 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[75];
 } InsTab6502X = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502X.Ins) / sizeof (InsTab6502X.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
         { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
@@ -240,7 +274,7 @@ static const struct {
         { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -300,20 +334,23 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
-/* Instruction table for the 6502 with DTV extra opcodes (DTV) and 
+/* Instruction table for the 6502 with DTV extra opcodes (DTV) and
 ** those illegal instructions (X) which are supported by DTV.
-** Note: illegals opcodes which contain more subinstructions 
+** Note: illegals opcodes which contain more subinstructions
 ** (ASO, DCM, LSE, LXA, SBX and SHS) are not enlisted.
 */
 static const struct {
     unsigned Count;
     InsDesc  Ins[71];
 } InsTab6502DTV = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab6502DTV.Ins) / sizeof (InsTab6502DTV.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
         { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
@@ -330,7 +367,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x12, 0, PutPCRel8 },      /* DTV */
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -385,6 +422,7 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -393,8 +431,10 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[66];
 } InsTab65SC02 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65SC02.Ins) / sizeof (InsTab65SC02.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -406,7 +446,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -461,6 +501,7 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -469,8 +510,10 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[100];
 } InsTab65C02 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65C02.Ins) / sizeof (InsTab65C02.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -498,7 +541,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
         { "CLC",  0x0000001, 0x18, 0, PutAll },
@@ -571,6 +614,7 @@ static const struct {
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "WAI",  0x0000001, 0xcb, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -579,8 +623,10 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[133];
 } InsTab4510 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab4510.Ins) / sizeof (InsTab4510.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -610,7 +656,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BSR",  0x0040000, 0x63, 0, PutPCRel4510 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -714,16 +760,183 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "TYS",  0x0000001, 0x2b, 0, PutAll },
         { "TZA",  0x0000001, 0x6b, 0, PutAll },
+/* END SORTED.SH */
     }
 };
+
+
+/* Instruction table for the 45GS02 */
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[149];
+} InsTab45GS02 = {
+    /* CAUTION: table must be sorted for bsearch */
+    sizeof (InsTab45GS02.Ins) / sizeof (InsTab45GS02.Ins[0]),
+    {
+/* BEGIN SORTED.SH */
+        { "ADC",  0x4080A66C, 0x60, 0, Put45GS02 },
+        { "ADCQ", 0x0000140C, 0x60, 13, Put45GS02_Q },
+        { "AND",  0x4080A66C, 0x20, 0, Put45GS02 },
+        { "ANDQ", 0x0000140C, 0x20, 13, Put45GS02_Q },
+        { "ASL",  0x0000006e, 0x02, 1, PutAll },
+        { "ASLQ", 0x800000ee, 0x00, 14, Put45GS02_Q },
+        { "ASR",  0x00000026, 0x43, 0, Put4510 },
+        { "ASRQ", 0x80000026, 0x40, 15, Put45GS02_Q },
+        { "ASW",  0x00000008, 0xcb, 6, PutAll },
+        { "BBR0", 0x00000000, 0x0F, 0, PutBitBranch },
+        { "BBR1", 0x00000000, 0x1F, 0, PutBitBranch },
+        { "BBR2", 0x00000000, 0x2F, 0, PutBitBranch },
+        { "BBR3", 0x00000000, 0x3F, 0, PutBitBranch },
+        { "BBR4", 0x00000000, 0x4F, 0, PutBitBranch },
+        { "BBR5", 0x00000000, 0x5F, 0, PutBitBranch },
+        { "BBR6", 0x00000000, 0x6F, 0, PutBitBranch },
+        { "BBR7", 0x00000000, 0x7F, 0, PutBitBranch },
+        { "BBS0", 0x00000000, 0x8F, 0, PutBitBranch },
+        { "BBS1", 0x00000000, 0x9F, 0, PutBitBranch },
+        { "BBS2", 0x00000000, 0xAF, 0, PutBitBranch },
+        { "BBS3", 0x00000000, 0xBF, 0, PutBitBranch },
+        { "BBS4", 0x00000000, 0xCF, 0, PutBitBranch },
+        { "BBS5", 0x00000000, 0xDF, 0, PutBitBranch },
+        { "BBS6", 0x00000000, 0xEF, 0, PutBitBranch },
+        { "BBS7", 0x00000000, 0xFF, 0, PutBitBranch },
+        { "BCC",  0x00020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x00020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x00020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x00A0006C, 0x00, 2, PutAll },
+        { "BITQ", 0x0000000c, 0x20, 15, Put45GS02_Q },
+        { "BMI",  0x00020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x00020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x00020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x00020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x00000001, 0x00, 0, PutAll },
+        { "BSR",  0x00040000, 0x63, 0, PutPCRel4510 },
+        { "BVC",  0x00020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x00020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x00000001, 0x18, 0, PutAll },
+        { "CLD",  0x00000001, 0xd8, 0, PutAll },
+        { "CLE",  0x00000001, 0x02, 0, PutAll },
+        { "CLI",  0x00000001, 0x58, 0, PutAll },
+        { "CLV",  0x00000001, 0xb8, 0, PutAll },
+        { "CMP",  0x4080A66C, 0xc0, 0, Put45GS02 },
+        { "CMPQ", 0x0000140C, 0xC0, 13, Put45GS02_Q },
+        { "CPX",  0x0080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x0080000C, 0xc0, 1, PutAll },
+        { "CPZ",  0x0080000C, 0xd0, 1, Put4510 },
+        { "DEA",  0x00000001, 0x00, 3, PutAll },   /* == DEC */
+        { "DEC",  0x0000006F, 0x00, 3, PutAll },
+        { "DEQ",  0x800000ee, 0xc0, 14, Put45GS02_Q },
+        { "DEW",  0x00000004, 0xc3, 9, PutAll },
+        { "DEX",  0x00000001, 0xca, 0, PutAll },
+        { "DEY",  0x00000001, 0x88, 0, PutAll },
+        { "DEZ",  0x00000001, 0x3B, 0, PutAll },
+        { "EOM",  0x00000001, 0xea, 0, PutAll },
+        { "EOR",  0x4080A66C, 0x40, 0, Put45GS02 },
+        { "EORQ", 0x0000140C, 0x40, 13, Put45GS02_Q },
+        { "INA",  0x00000001, 0x00, 4, PutAll },   /* == INC */
+        { "INC",  0x0000006f, 0x00, 4, PutAll },
+        { "INQ",  0x800000ee, 0xe0, 14, Put45GS02_Q },
+        { "INW",  0x00000004, 0xe3, 9, PutAll },
+        { "INX",  0x00000001, 0xe8, 0, PutAll },
+        { "INY",  0x00000001, 0xc8, 0, PutAll },
+        { "INZ",  0x00000001, 0x1B, 0, PutAll },
+        { "JMP",  0x00010808, 0x4c, 6, PutAll },
+        { "JSR",  0x00010808, 0x20, 7, Put4510 },
+        { "LBCC", 0x00040000, 0x93, 0, PutPCRel4510 },
+        { "LBCS", 0x00040000, 0xb3, 0, PutPCRel4510 },
+        { "LBEQ", 0x00040000, 0xf3, 0, PutPCRel4510 },
+        { "LBMI", 0x00040000, 0x33, 0, PutPCRel4510 },
+        { "LBNE", 0x00040000, 0xd3, 0, PutPCRel4510 },
+        { "LBPL", 0x00040000, 0x13, 0, PutPCRel4510 },
+        { "LBRA", 0x00040000, 0x83, 0, PutPCRel4510 },
+        { "LBVC", 0x00040000, 0x53, 0, PutPCRel4510 },
+        { "LBVS", 0x00040000, 0x73, 0, PutPCRel4510 },
+        { "LDA",  0x4090A66C, 0xa0, 0, Put45GS02 },
+        { "LDQ",  0x4000140C, 0xa0, 13, Put45GS02_Q },
+        { "LDX",  0x0080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x0080006C, 0xa0, 1, PutAll },
+        { "LDZ",  0x00800048, 0xa3, 1, Put4510 },
+        { "LSR",  0x0000006F, 0x42, 1, PutAll },
+        { "LSRQ", 0x800000ee, 0x40, 14, Put45GS02_Q },
+        { "MAP",  0x00000001, 0x5C, 0, PutAll },
+        { "NEG",  0x00000001, 0x42, 0, PutAll },
+        { "NOP",  0x00000001, 0xea, 0, PutAll }, /* == EOM */
+        { "ORA",  0x4080A66C, 0x00, 0, Put45GS02 },
+        { "ORQ",  0x0000140C, 0x00, 13, Put45GS02_Q },
+        { "PHA",  0x00000001, 0x48, 0, PutAll },
+        { "PHD",  0x08000008, 0xf4, 1, PutAll }, /* == PHW */
+        { "PHP",  0x00000001, 0x08, 0, PutAll },
+        { "PHW",  0x08000008, 0xf4, 1, PutAll },
+        { "PHX",  0x00000001, 0xda, 0, PutAll },
+        { "PHY",  0x00000001, 0x5a, 0, PutAll },
+        { "PHZ",  0x00000001, 0xdb, 0, PutAll },
+        { "PLA",  0x00000001, 0x68, 0, PutAll },
+        { "PLP",  0x00000001, 0x28, 0, PutAll },
+        { "PLX",  0x00000001, 0xfa, 0, PutAll },
+        { "PLY",  0x00000001, 0x7a, 0, PutAll },
+        { "PLZ",  0x00000001, 0xfb, 0, PutAll },
+        { "RMB0", 0x00000004, 0x07, 1, PutAll },
+        { "RMB1", 0x00000004, 0x17, 1, PutAll },
+        { "RMB2", 0x00000004, 0x27, 1, PutAll },
+        { "RMB3", 0x00000004, 0x37, 1, PutAll },
+        { "RMB4", 0x00000004, 0x47, 1, PutAll },
+        { "RMB5", 0x00000004, 0x57, 1, PutAll },
+        { "RMB6", 0x00000004, 0x67, 1, PutAll },
+        { "RMB7", 0x00000004, 0x77, 1, PutAll },
+        { "ROL",  0x0000006F, 0x22, 1, PutAll },
+        { "ROLQ", 0x800000ee, 0x20, 14, Put45GS02_Q },
+        { "ROR",  0x0000006F, 0x62, 1, PutAll },
+        { "RORQ", 0x800000ee, 0x60, 14, Put45GS02_Q },
+        { "ROW",  0x00000008, 0xeb, 6, PutAll },
+        { "RTI",  0x00000001, 0x40, 0, PutAll },
+        { "RTN",  0x00800000, 0x62, 1, PutAll },
+        { "RTS",  0x00000001, 0x60, 0, PutAll },
+        { "SBC",  0x4080A66C, 0xe0, 0, Put45GS02 },
+        { "SBCQ", 0x0000140C, 0xe0, 13, Put45GS02_Q },
+        { "SEC",  0x00000001, 0x38, 0, PutAll },
+        { "SED",  0x00000001, 0xf8, 0, PutAll },
+        { "SEE",  0x00000001, 0x03, 0, PutAll },
+        { "SEI",  0x00000001, 0x78, 0, PutAll },
+        { "SMB0", 0x00000004, 0x87, 1, PutAll },
+        { "SMB1", 0x00000004, 0x97, 1, PutAll },
+        { "SMB2", 0x00000004, 0xA7, 1, PutAll },
+        { "SMB3", 0x00000004, 0xB7, 1, PutAll },
+        { "SMB4", 0x00000004, 0xC7, 1, PutAll },
+        { "SMB5", 0x00000004, 0xD7, 1, PutAll },
+        { "SMB6", 0x00000004, 0xE7, 1, PutAll },
+        { "SMB7", 0x00000004, 0xF7, 1, PutAll },
+        { "STA",  0x4010A66C, 0x80, 0, Put45GS02 },
+        { "STQ",  0x0000140C, 0x80, 13, Put45GS02_Q },
+        { "STX",  0x0000030c, 0x82, 1, Put4510 },
+        { "STY",  0x0000006c, 0x80, 1, Put4510 },
+        { "STZ",  0x0000006c, 0x04, 5, PutAll },
+        { "TAB",  0x00000001, 0x5b, 0, PutAll },
+        { "TAX",  0x00000001, 0xaa, 0, PutAll },
+        { "TAY",  0x00000001, 0xa8, 0, PutAll },
+        { "TAZ",  0x00000001, 0x4b, 0, PutAll },
+        { "TBA",  0x00000001, 0x7b, 0, PutAll },
+        { "TRB",  0x0000000c, 0x10, 1, PutAll },
+        { "TSB",  0x0000000c, 0x00, 1, PutAll },
+        { "TSX",  0x00000001, 0xba, 0, PutAll },
+        { "TSY",  0x00000001, 0x0b, 0, PutAll },
+        { "TXA",  0x00000001, 0x8a, 0, PutAll },
+        { "TXS",  0x00000001, 0x9a, 0, PutAll },
+        { "TYA",  0x00000001, 0x98, 0, PutAll },
+        { "TYS",  0x00000001, 0x2b, 0, PutAll },
+        { "TZA",  0x00000001, 0x6b, 0, PutAll },
+/* END SORTED.SH */
+    }
+};
+
 
 /* Instruction table for the 65816 */
 static const struct {
     unsigned Count;
     InsDesc  Ins[100];
 } InsTab65816 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65816.Ins) / sizeof (InsTab65816.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x0b8f6fc, 0x60, 0, PutAll },
         { "AND",  0x0b8f6fc, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -735,7 +948,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000005, 0x00, 6, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BRL",  0x0040000, 0x82, 0, PutPCRel16 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -744,7 +957,7 @@ static const struct {
         { "CLI",  0x0000001, 0x58, 0, PutAll },
         { "CLV",  0x0000001, 0xb8, 0, PutAll },
         { "CMP",  0x0b8f6fc, 0xc0, 0, PutAll },
-        { "COP",  0x0000004, 0x02, 6, PutAll },
+        { "COP",  0x0800005, 0x02, 6, PutAll },
         { "CPA",  0x0b8f6fc, 0xc0, 0, PutAll },   /* == CMP */
         { "CPX",  0x0c0000c, 0xe0, 1, PutAll },
         { "CPY",  0x0c0000c, 0xc0, 1, PutAll },
@@ -758,9 +971,9 @@ static const struct {
         { "INX",  0x0000001, 0xe8, 0, PutAll },
         { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "JML",  0x4000010, 0x5c, 1, PutAll },
-        { "JMP",  0x4010818, 0x4c, 6, PutAll },
+        { "JMP",  0x4010818, 0x4c, 6, PutJMP816 },
         { "JSL",  0x0000010, 0x20, 7, PutAll },
-        { "JSR",  0x0010018, 0x20, 7, PutAll },
+        { "JSR",  0x0010018, 0x20, 7, PutJSR816 },
         { "LDA",  0x0b8f6fc, 0xa0, 0, PutAll },
         { "LDX",  0x0c0030c, 0xa2, 1, PutAll },
         { "LDY",  0x0c0006c, 0xa0, 1, PutAll },
@@ -821,9 +1034,10 @@ static const struct {
         { "TYA",  0x0000001, 0x98, 0, PutAll },
         { "TYX",  0x0000001, 0xbb, 0, PutAll },
         { "WAI",  0x0000001, 0xcb, 0, PutAll },
-        { "WDM",  0x0000004, 0x42, 6, PutAll },
+        { "WDM",  0x0800004, 0x42, 6, PutAll },
         { "XBA",  0x0000001, 0xeb, 0, PutAll },
         { "XCE",  0x0000001, 0xfb, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
@@ -832,8 +1046,10 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[26];
 } InsTabSweet16 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTabSweet16.Ins) / sizeof (InsTabSweet16.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADD",  AMSW16_REG,              0xA0, 0, PutSweet16 },
         { "BC",   AMSW16_BRA,              0x03, 0, PutSweet16Branch },
         { "BK",   AMSW16_IMP,              0x0A, 0, PutSweet16 },
@@ -860,6 +1076,7 @@ static const struct {
         { "STD",  AMSW16_IND,              0x70, 0, PutSweet16 },
         { "STP",  AMSW16_IND,              0x90, 0, PutSweet16 },
         { "SUB",  AMSW16_REG,              0xB0, 0, PutSweet16 },
+/* END SORTED.SH */
     }
 };
 
@@ -868,8 +1085,10 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[135];
 } InsTabHuC6280 = {
+    /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTabHuC6280.Ins) / sizeof (InsTabHuC6280.Ins[0]),
     {
+/* BEGIN SORTED.SH */
         { "ADC",  0x080A66C, 0x60, 0, PutAll },
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
@@ -897,7 +1116,7 @@ static const struct {
         { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
         { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
         { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRK",  0x0800005, 0x00, 6, PutAll },
         { "BSR",  0x0020000, 0x44, 0, PutPCRel8 },
         { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
         { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
@@ -1005,10 +1224,130 @@ static const struct {
         { "TXA",  0x0000001, 0x8a, 0, PutAll },
         { "TXS",  0x0000001, 0x9a, 0, PutAll },
         { "TYA",  0x0000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
     }
 };
 
+/* CAUTION: in the pdf $1a is dec a, and $3a is inc a - if that is really the case,
+ * the table below (and the handler) should be fixed and this notice removed */
 
+/* Instruction table for the m740 CPU */
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[106];
+} InsTabm740 = {
+    sizeof (InsTabm740.Ins) / sizeof (InsTabm740.Ins[0]),
+    {
+/* BEGIN SORTED.SH */
+        { "ADC",  0x0080A26C, 0x60, 0, PutAll },
+        { "AND",  0x0080A26C, 0x20, 0, PutAll },
+        { "ASL",  0x0000006e, 0x02, 1, PutAll },
+        { "BBC0", 0x10000002, 0x13, 10, PutBitBranch_m740 },
+        { "BBC1", 0x10000002, 0x33, 10, PutBitBranch_m740 },
+        { "BBC2", 0x10000002, 0x53, 10, PutBitBranch_m740 },
+        { "BBC3", 0x10000002, 0x73, 10, PutBitBranch_m740 },
+        { "BBC4", 0x10000002, 0x93, 10, PutBitBranch_m740 },
+        { "BBC5", 0x10000002, 0xb3, 10, PutBitBranch_m740 },
+        { "BBC6", 0x10000002, 0xd3, 10, PutBitBranch_m740 },
+        { "BBC7", 0x10000002, 0xf3, 10, PutBitBranch_m740 },
+        { "BBS0", 0x10000002, 0x03, 10, PutBitBranch_m740 },
+        { "BBS1", 0x10000002, 0x23, 10, PutBitBranch_m740 },
+        { "BBS2", 0x10000002, 0x43, 10, PutBitBranch_m740 },
+        { "BBS3", 0x10000002, 0x63, 10, PutBitBranch_m740 },
+        { "BBS4", 0x10000002, 0x83, 10, PutBitBranch_m740 },
+        { "BBS5", 0x10000002, 0xa3, 10, PutBitBranch_m740 },
+        { "BBS6", 0x10000002, 0xc3, 10, PutBitBranch_m740 },
+        { "BBS7", 0x10000002, 0xe3, 10, PutBitBranch_m740 },
+        { "BCC",  0x00020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x00020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x00020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x0000000C, 0x00, 2, PutAll },
+        { "BMI",  0x00020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x00020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x00020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x00020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x00000001, 0x00, 0, PutAll },
+        { "BVC",  0x00020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x00020000, 0x70, 0, PutPCRel8 },
+        { "CLB0", 0x00000006, 0x1b, 10, PutAll },
+        { "CLB1", 0x00000006, 0x3b, 10, PutAll },
+        { "CLB2", 0x00000006, 0x5b, 10, PutAll },
+        { "CLB3", 0x00000006, 0x7b, 10, PutAll },
+        { "CLB4", 0x00000006, 0x9b, 10, PutAll },
+        { "CLB5", 0x00000006, 0xbb, 10, PutAll },
+        { "CLB6", 0x00000006, 0xdb, 10, PutAll },
+        { "CLB7", 0x00000006, 0xfb, 10, PutAll },
+        { "CLC",  0x00000001, 0x18, 0, PutAll },
+        { "CLD",  0x00000001, 0xd8, 0, PutAll },
+        { "CLI",  0x00000001, 0x58, 0, PutAll },
+        { "CLT",  0x00000001, 0x12, 0, PutAll },
+        { "CLV",  0x00000001, 0xb8, 0, PutAll },
+        { "CMP",  0x0080A26C, 0xc0, 0, PutAll },
+        { "COM",  0x00000004, 0x44, 1, PutAll },
+        { "CPX",  0x0080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x0080000C, 0xc0, 1, PutAll },
+        { "DEC",  0x0000006F, 0x00, 3, PutAll },
+        { "DEX",  0x00000001, 0xca, 0, PutAll },
+        { "DEY",  0x00000001, 0x88, 0, PutAll },
+        { "EOR",  0x0080A26C, 0x40, 0, PutAll },
+        { "FST",  0x00000001, 0xe2, 0, PutAll },
+        { "INC",  0x0000006f, 0x00, 4, PutAll },
+        { "INX",  0x00000001, 0xe8, 0, PutAll },
+        { "INY",  0x00000001, 0xc8, 0, PutAll },
+        { "JMP",  0x00000C08, 0x00, 12, PutAll },
+        { "JSR",  0x20000408, 0x00, 0, PutJSR_m740 },
+        { "LDA",  0x0080A26C, 0xa0, 0, PutAll },
+        { "LDM",  0x10000000, 0x3c, 0, PutLDM_m740 },
+        { "LDX",  0x0080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x0080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x0000006F, 0x42, 1, PutAll },
+        { "NOP",  0x00000001, 0xea, 0, PutAll },
+        { "ORA",  0x0080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x00000001, 0x48, 0, PutAll },
+        { "PHP",  0x00000001, 0x08, 0, PutAll },
+        { "PLA",  0x00000001, 0x68, 0, PutAll },
+        { "PLP",  0x00000001, 0x28, 0, PutAll },
+        { "RMB0", 0x00000006, 0x1b, 10, PutAll },
+        { "RMB1", 0x00000006, 0x3b, 10, PutAll },
+        { "RMB2", 0x00000006, 0x5b, 10, PutAll },
+        { "RMB3", 0x00000006, 0x7b, 10, PutAll },
+        { "RMB4", 0x00000006, 0x9b, 10, PutAll },
+        { "RMB5", 0x00000006, 0xbb, 10, PutAll },
+        { "RMB6", 0x00000006, 0xdb, 10, PutAll },
+        { "RMB7", 0x00000006, 0xfb, 10, PutAll },
+        { "ROL",  0x0000006F, 0x22, 1, PutAll },
+        { "ROR",  0x0000006F, 0x62, 1, PutAll },
+        { "RRF",  0x00000004, 0x82, 6, PutAll },
+        { "RTI",  0x00000001, 0x40, 0, PutAll },
+        { "RTS",  0x00000001, 0x60, 0, PutAll },
+        { "SBC",  0x0080A26C, 0xe0, 0, PutAll },
+        { "SEB0", 0x00000006, 0x0b, 10, PutAll },
+        { "SEB1", 0x00000006, 0x2b, 10, PutAll },
+        { "SEB2", 0x00000006, 0x4b, 10, PutAll },
+        { "SEB3", 0x00000006, 0x6b, 10, PutAll },
+        { "SEB4", 0x00000006, 0x8b, 10, PutAll },
+        { "SEB5", 0x00000006, 0xab, 10, PutAll },
+        { "SEB6", 0x00000006, 0xcb, 10, PutAll },
+        { "SEB7", 0x00000006, 0xeb, 10, PutAll },
+        { "SEC",  0x00000001, 0x38, 0, PutAll },
+        { "SED",  0x00000001, 0xf8, 0, PutAll },
+        { "SEI",  0x00000001, 0x78, 0, PutAll },
+        { "SET",  0x00000001, 0x32, 0, PutAll },
+        { "SLW",  0x00000001, 0xC2, 0, PutAll },
+        { "STA",  0x0000A26C, 0x80, 0, PutAll },
+        { "STP",  0x00000001, 0x42, 0, PutAll },
+        { "STX",  0x0000010c, 0x82, 1, PutAll },
+        { "STY",  0x0000002c, 0x80, 1, PutAll },
+        { "TAX",  0x00000001, 0xaa, 0, PutAll },
+        { "TAY",  0x00000001, 0xa8, 0, PutAll },
+        { "TST",  0x00000004, 0x64, 1, PutAll },
+        { "TSX",  0x00000001, 0xba, 0, PutAll },
+        { "TXA",  0x00000001, 0x8a, 0, PutAll },
+        { "TXS",  0x00000001, 0x9a, 0, PutAll },
+        { "TYA",  0x00000001, 0x98, 0, PutAll }
+/* END SORTED.SH */
+    }
+};
 
 /* An array with instruction tables */
 static const InsTable* InsTabs[CPU_COUNT] = {
@@ -1021,87 +1360,113 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTab65816,
     (const InsTable*) &InsTabSweet16,
     (const InsTable*) &InsTabHuC6280,
-    0,                                  /* Mitsubishi 740 */
+    (const InsTable*) &InsTabm740,           /* Mitsubishi 740 */
     (const InsTable*) &InsTab4510,
+    (const InsTable*) &InsTab45GS02,
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 
 /* Table to build the effective 65xx opcode from a base opcode and an
 ** addressing mode. (The value in the table is ORed with the base opcode)
+** NOTE: each table has one entry per addressing mode!
 */
-static unsigned char EATab[12][AM65I_COUNT] = {
-    {   /* Table 0 */
+static unsigned char EATab[16][AM65I_COUNT] = {
+    {   /* Table 0 (sec, sed, seo, set, slw, sta, stp, tax, tay, tsx, txa, txs, tya) */
         0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
         0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
         0x00, 0x00, 0x00, 0x03, 0x13, 0x09, 0x00, 0x09,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x00
     },
-    {   /* Table 1 */
+    {   /* Table 1 (rol, ror, stx, sty, tst, cpx, cpy) */
         0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
         0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x80, 0x00
+        0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 2 */
+    {   /* Table 2 (bit) */
         0x00, 0x00, 0x24, 0x2C, 0x0F, 0x34, 0x3C, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x89, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 3 */
+    {   /* Table 3 (dec, dea) */
         0x3A, 0x3A, 0xC6, 0xCE, 0x00, 0xD6, 0xDE, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 4 */
+    {   /* Table 4 (inc) */
         0x1A, 0x1A, 0xE6, 0xEE, 0x00, 0xF6, 0xFE, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 5 */
+    {   /* Table 5 (stz) */
         0x00, 0x00, 0x60, 0x98, 0x00, 0x70, 0x9E, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 6 */
+    {   /* Table 6 (jmp, rrf) */
         0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
         0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x90, 0x00
+        0x00, 0x00, 0x90, 0x00, 0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 7 (Subroutine opcodes) */
+    {   /* Table 7 (jsr) */
         0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,
         0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 8 */
         0x00, 0x40, 0x01, 0x41, 0x00, 0x09, 0x49, 0x00,
         0x00, 0x00, 0x00, 0x51, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 9 */
+    {   /* Table 9 (dew, inw) */
         0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x30, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
-    {   /* Table 10 (NOPs) */
+    {   /* Table 10 (NOPs, clbX, sebX) */
         0xea, 0x00, 0x04, 0x0c, 0x00, 0x14, 0x1c, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80,
-        0x00, 0x00, 0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     },
     {   /* Table 11 (LAX) */
         0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
         0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
-        0x00, 0x00, 0x80, 0x00
+        0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00
     },
+    {   /* Table 12 (m740: JMP) */
+        0x00, 0x00, 0x00, 0x4c, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0xb2, 0x6c, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    },
+    {   /* Table 13 (Q) */
+        0x00, 0x00, 0x05, 0x0D, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x00
+    },
+    {   /* Table 14 (45GS02: ASLQ) */
+        0x0a, 0x0a, 0x06, 0x0e, 0x00, 0x16, 0x1e, 0x00,
+        0x00, 0x00, 0x12, 0x00, 0x12, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a
+    },
+    {   /* Table 15 (45GS02: ASRQ) */
+        0x03, 0x03, 0x04, 0x0c, 0x00, 0x14, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03
+    }
 };
 
 /* Table to build the effective SWEET16 opcode from a base opcode and an
@@ -1117,6 +1482,7 @@ static unsigned char Sweet16EATab[2][AMSW16I_COUNT] = {
 };
 
 /* Table that encodes the additional bytes for each 65xx instruction */
+/* NOTE: one entry per addressing mode! */
 unsigned char ExtBytes[AM65I_COUNT] = {
     0,          /* Implicit */
     0,          /* Accu */
@@ -1146,6 +1512,10 @@ unsigned char ExtBytes[AM65I_COUNT] = {
     7,          /* Block transfer (HuC6280) */
     2,          /* Absolute Indirect long */
     2,          /* Immidiate word */
+    2,          /* Direct, Relative short */
+    1,          /* Special Page */
+    1,          /* [Direct],z */
+    0,          /* Q */
 };
 
 /* Table that encodes the additional bytes for each SWEET16 instruction */
@@ -1207,9 +1577,9 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
             } else {
                 ED.AddrSize = DataAddrSize;
                 /* If the default address size of the data segment is unequal
-                ** to zero page addressing, but zero page addressing is 
-                ** allowed by the instruction, mark all symbols in the 
-                ** expression tree. This mark will be checked at end of 
+                ** to zero page addressing, but zero page addressing is
+                ** allowed by the instruction, mark all symbols in the
+                ** expression tree. This mark will be checked at end of
                 ** assembly, and a warning is issued, if a zero page symbol
                 ** was guessed wrong here.
                 */
@@ -1257,7 +1627,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         ExprNode* Left = A->Expr->Left;
         if ((A->Expr->Op == EXPR_BYTE0 || A->Expr->Op == EXPR_BYTE1) &&
             Left->Op == EXPR_SYMBOL                                  &&
-            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP) {
+            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP             &&
+            !(A->Flags & EFFADDR_OVERRIDE_ZP)) {
 
             /* Output a warning */
             Warning (1, "Suspicious address expression");
@@ -1298,7 +1669,7 @@ static void EmitCode (EffAddr* A)
             break;
 
         case 2:
-            if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y))) {
+            if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y | AM65_ABS_X_IND))) {
                 /* This is a 16 bit mode that uses an address. If in 65816,
                 ** mode, force this address into 16 bit range to allow
                 ** addressing inside a 64K segment.
@@ -1320,6 +1691,20 @@ static void EmitCode (EffAddr* A)
     }
 }
 
+
+static void PutLDM_m740 (const InsDesc* Ins)
+{
+    EffAddr A;
+    /* Evaluate the addressing mode */
+    if (EvalEA (Ins, &A) == 0) {
+        /* An error occurred */
+        return;
+    }
+    Emit0 (Ins->BaseCode);
+    EmitByte (A.Expr);
+    Consume (TOK_HASH, "'#' expected");
+    EmitByte (Expression ());
+}
 
 
 static long PutImmed8 (const InsDesc* Ins)
@@ -1441,6 +1826,42 @@ static void PutBitBranch (const InsDesc* Ins)
     EmitSigned (GenBranchExpr (1), 1);
 }
 
+static void PutBitBranch_m740 (const InsDesc* Ins)
+/* Handle m740 branch on bit condition */
+{
+    EffAddr A;
+
+    /* Evaluate the addressing mode used */
+    GetEA(&A);
+
+    /* From the possible addressing modes, remove the ones that are invalid
+    ** for this instruction or CPU.
+    */
+    A.AddrModeSet &= Ins->AddrMode;
+
+    /* Check if we have any adressing modes left */
+    if (A.AddrModeSet == 0) {
+        Error ("Illegal addressing mode");
+        return;
+    }
+    A.AddrMode    = BitFind (A.AddrModeSet);
+
+    A.Opcode = Ins->BaseCode;
+
+    if (A.AddrMode == AM65I_ACCU) {
+        /* Accu */
+        Emit0 (A.Opcode);
+        ConsumeComma ();
+        EmitSigned (GenBranchExpr (2), 1);
+    } else if (A.AddrMode == AM65I_ZP_REL) {
+        /* FIXME: hacky, the comma was already consumed here */
+        A.Opcode += 0x04;
+        /* Zeropage */
+        Emit0 (A.Opcode);
+        EmitByte (A.Expr);
+        EmitSigned (GenBranchExpr (1), 1);
+    }
+}
 
 
 static void PutREP (const InsDesc* Ins)
@@ -1544,7 +1965,6 @@ static void PutTMAn (const InsDesc* Ins)
 ** an immediate argument.
 */
 {
-    /* Emit the TMA opcode itself */
     Emit0 (0x43);
 
     /* Emit the argument, which is the opcode from the table */
@@ -1600,16 +2020,15 @@ static void PutJMP (const InsDesc* Ins)
 */
 {
     EffAddr A;
-
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
-
         /* Check for indirect addressing */
-        if (A.AddrModeBit & AM65_ABS_IND) {
+        if ((A.AddrModeBit & AM65_ABS_IND) && (CPU < CPU_65SC02) && (RelaxChecks == 0)) {
 
             /* Compare the low byte of the expression to 0xFF to check for
             ** a page cross. Be sure to use a copy of the expression otherwise
-            ** things will go weird later.
+            ** things will go weird later. This only affects the 6502 CPU,
+            ** and was corrected in 65C02 and later CPUs in this family.
             */
             ExprNode* E = GenNE (GenByteExpr (CloneExpr (A.Expr)), 0xFF);
 
@@ -1617,7 +2036,7 @@ static void PutJMP (const InsDesc* Ins)
             unsigned Msg = GetStringId ("\"jmp (abs)\" across page border");
 
             /* Generate the assertion */
-            AddAssertion (E, ASSERT_ACT_WARN, Msg);
+            AddAssertion (E, ASSERT_ACT_ERROR, Msg);
         }
 
         /* No error, output code */
@@ -1627,12 +2046,97 @@ static void PutJMP (const InsDesc* Ins)
 
 
 
-static void PutRTS (const InsDesc* Ins attribute ((unused)))
-/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
-** the enclosing scope is FAR.
+static void PutJMP816 (const InsDesc* Ins)
+/* Handle the JMP instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JMP.
+** Note that JMP [abs] and JML [abs] are always both permitted for instruction $DC,
+** because the [] notation for long indirection makes the generated instruction unambiguous.
 */
 {
-    if (SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
+    if (LongJsrJmpRts) {
+        PutJMP (Ins);
+    } else {
+        InsDesc InsAbs = *Ins;
+        InsAbs.AddrMode &= ~(AM65_ABS_LONG);
+        PutJMP (&InsAbs);
+    }
+}
+
+
+
+static void PutJSR816 (const InsDesc* Ins)
+/* Handle the JSR instruction for the 816.
+** Allowing the long_jsr_jmp_rts feature to permit a long JSR.
+*/
+{
+    if (LongJsrJmpRts) {
+        PutAll (Ins);
+    } else {
+        InsDesc InsAbs = *Ins;
+        InsAbs.AddrMode &= ~(AM65_ABS_LONG);
+        PutJMP (&InsAbs);
+    }
+}
+
+
+static void PutJSR_m740 (const InsDesc* Ins)
+/* Handle a JSR instruction for m740 */
+{
+    EffAddr A;
+
+    /* Evaluate the addressing mode used */
+    GetEA (&A);
+
+    /* From the possible addressing modes, remove the ones that are invalid
+    ** for this instruction or CPU.
+    */
+    A.AddrModeSet &= Ins->AddrMode;
+
+    /* Check if we have any adressing modes left */
+    if (A.AddrModeSet == 0) {
+        Error ("Illegal addressing mode");
+        return;
+    }
+    A.AddrMode    = BitFind (A.AddrModeSet);
+
+    /* Build the opcode */
+    A.Opcode = Ins->BaseCode;
+
+    switch (A.AddrMode) {
+        case AM65I_DIR_IND:
+            A.Opcode = 0x02;
+            Emit1 (A.Opcode, A.Expr);
+            break;
+        case AM65I_ABS:
+            /* If we have an expression and it's const, get it's value */
+            if (A.Expr) {
+                long Val = -1;
+                if (IsConstExpr (A.Expr, &Val)) {
+                    if ((Val & 0xff00) == 0xff00) {
+                        /* direct page */
+                        A.Opcode = 0x22;
+                        Emit0 (A.Opcode);
+                        EmitByte(GenByteExpr(A.Expr));
+                        return;
+                    }
+                }
+            }
+            A.Opcode = 0x20;
+            Emit2 (A.Opcode, A.Expr);
+            break;
+        default:
+            Internal ("Invalid Opcode 0x%02x", A.Opcode);
+    }
+
+}
+
+
+static void PutRTS (const InsDesc* Ins attribute ((unused)))
+/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
+** the enclosing scope is FAR, but only if the long_jsr_jmp_rts feature applies.
+*/
+{
+    if (LongJsrJmpRts && SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
         Emit0 (0x6B);       /* RTL */
     } else {
         Emit0 (0x60);       /* RTS */
@@ -1655,9 +2159,7 @@ static void PutAll (const InsDesc* Ins)
 
 
 
-static void Put4510 (const InsDesc* Ins)
-/* Handle all other instructions, with modifications for 4510 */
-{
+static void Emit4510 (EffAddr* A) {
     /* The 4510 uses all 256 possible opcodes, so the last ones were crammed
     ** in where an opcode was still undefined. As a result, some of those
     ** don't follow any rules for encoding the addressmodes. So the EATab
@@ -1677,25 +2179,91 @@ static void Put4510 (const InsDesc* Ins)
     ** $d0 -> $c2 : CPZ #$00
     ** $fc -> $23 : JSR ($1234,X)
     */
+    switch (A->Opcode) {
+        case 0x47:
+            A->Opcode = 0x44;
+            break;
+        case 0x57:
+            A->Opcode = 0x54;
+            break;
+        case 0x93:
+            A->Opcode = 0x82;
+            break;
+        case 0x9C:
+            A->Opcode = 0x8B;
+            break;
+        case 0x9E:
+            A->Opcode = 0x9B;
+            break;
+        case 0xAF:
+            A->Opcode = 0xAB;
+            break;
+        case 0xBF:
+            A->Opcode = 0xBB;
+            break;
+        case 0xB3:
+            A->Opcode = 0xE2;
+            break;
+        case 0xD0:
+            A->Opcode = 0xC2;
+            break;
+        case 0xFC:
+            A->Opcode = 0x23;
+            break;
+        default: /* Keep opcode as it is */ break;
+    }
+
+    /* No error, output code */
+    EmitCode (A);
+}
+
+
+
+static void Put4510 (const InsDesc* Ins)
+/* Handle all other instructions, with modifications for 4510 */
+{
     EffAddr A;
 
     /* Evaluate the addressing mode used */
     if (EvalEA (Ins, &A)) {
-        switch (A.Opcode) {
-            case 0x47: A.Opcode = 0x44; break;
-            case 0x57: A.Opcode = 0x54; break;
-            case 0x93: A.Opcode = 0x82; break;
-            case 0x9C: A.Opcode = 0x8B; break;
-            case 0x9E: A.Opcode = 0x9B; break;
-            case 0xAF: A.Opcode = 0xAB; break;
-            case 0xBF: A.Opcode = 0xBB; break;
-            case 0xB3: A.Opcode = 0xE2; break;
-            case 0xD0: A.Opcode = 0xC2; break;
-            case 0xFC: A.Opcode = 0x23; break;
-            default: /* Keep opcode as it is */ break;
-        }
+        Emit4510 (&A);
+    }
+}
 
-        /* No error, output code */
+
+
+static void Put45GS02 (const InsDesc* Ins)
+/* Handle all other instructions, with modifications for 45GS02 */
+{
+    EffAddr A;
+
+    if (EvalEA (Ins, &A)) {
+        if (A.AddrModeSet == AM65_32BIT_BASE_IND_Z) {
+            Emit0 (0xEA); /* NOP prefix */
+        }
+        Emit4510 (&A);
+    }
+}
+
+
+
+static void Put45GS02_Q (const InsDesc* Ins)
+{
+    EffAddr A;
+
+    if (EvalEA (Ins, &A)) {
+        Emit0 (0x42);
+        Emit0 (0x42);
+        if ((A.AddrModeBit == AM65_DIR_IND_LONG) ||
+            (A.AddrModeBit == AM65_32BIT_BASE_IND_Z)) {
+            Emit0 (0xEA); /* NOP prefix */
+        }
+        if (A.Opcode == 0xea) {
+            A.Opcode = 0x1a;
+        }
+        else if (A.Opcode == 0xca) {
+            A.Opcode = 0x3a;
+        }
         EmitCode (&A);
     }
 }

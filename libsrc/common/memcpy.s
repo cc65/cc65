@@ -67,7 +67,7 @@ memcpy_getparams:               ; IMPORTANT! Function has to leave with Y=0!
         jsr     popptr1         ; save src to ptr1
 
                                 ; save dest to ptr2
-        iny                     ; Y=0 guaranteed by popptr1, we need '1' here...                        
+        iny                     ; Y=0 guaranteed by popptr1, we need '1' here...
                                 ; (direct stack access is three cycles faster
                                 ; (total cycle count with return))
         lda     (sp),y

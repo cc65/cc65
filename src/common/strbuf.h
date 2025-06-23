@@ -53,10 +53,17 @@
 /*****************************************************************************/
 
 
+/* We want to track whether a character is "raw" or not. */
+/* "raw" characters should NOT be translated when translating a string. */
+/* We do this by keeping a second array parallel to "Buf" called "Cooked". */
+/* Think of "cooked" as the inverse of "raw". */
+/* If Cooked[n] is 0, then the character is raw and should not be translated. */
+/* This was done to keep LIT_STR_BUFFER sane. */
 
 typedef struct StrBuf StrBuf;
 struct StrBuf {
     char*       Buf;                    /* Pointer to buffer */
+    char*       Cooked;                 /* Pointer to cooked buffer */
     unsigned    Len;                    /* Length of the string */
     unsigned    Index;                  /* Used for reading (Get and friends) */
     unsigned    Allocated;              /* Size of allocated memory */
@@ -66,13 +73,13 @@ struct StrBuf {
 extern const StrBuf EmptyStrBuf;
 
 /* Initializer for static string bufs */
-#define STATIC_STRBUF_INITIALIZER       { 0, 0, 0, 0 }
+#define STATIC_STRBUF_INITIALIZER       { 0, 0, 0, 0, 0 }
 
 /* Initializer for auto string bufs */
-#define AUTO_STRBUF_INITIALIZER         { 0, 0, 0, 0 }
+#define AUTO_STRBUF_INITIALIZER         { 0, 0, 0, 0, 0 }
 
 /* Initialize with a string literal (beware: evaluates str twice!) */
-#define LIT_STRBUF_INITIALIZER(str)     { (char*)str, sizeof(str)-1, 0, 0 }
+#define LIT_STRBUF_INITIALIZER(str)     { (char*)str, (char *)str, sizeof(str)-1, 0, 0 }
 
 
 
@@ -162,6 +169,16 @@ INLINE char* SB_GetBuf (StrBuf* B)
 }
 #else
 #  define SB_GetBuf(B)     (B)->Buf
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE char* SB_GetCooked (StrBuf* B)
+/* Return a cooked pointer */
+{
+    return B->Cooked;
+}
+#else
+#  define SB_GetCooked(B)     (B)->Cooked
 #endif
 
 #if defined(HAVE_INLINE)
@@ -310,6 +327,9 @@ void SB_Terminate (StrBuf* B);
 void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size);
 /* Copy Buf to Target, discarding the old contents of Target */
 
+void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char *Cooked, unsigned Size);
+/* Copy Buf and Cooked to Target, discarding the old contents of Target */
+
 #if defined(HAVE_INLINE)
 INLINE void SB_CopyStr (StrBuf* Target, const char* S)
 /* Copy S to Target, discarding the old contents of Target */
@@ -325,7 +345,7 @@ void SB_CopyStr (StrBuf* Target, const char* S);
 INLINE void SB_Copy (StrBuf* Target, const StrBuf* Source)
 /* Copy Source to Target, discarding the old contents of Target */
 {
-    SB_CopyBuf (Target, Source->Buf, Source->Len);
+    SB_CopyBufCooked (Target, Source->Buf, Source->Cooked, Source->Len);
     Target->Index = Source->Index;
 }
 #else
@@ -335,6 +355,9 @@ void SB_Copy (StrBuf* Target, const StrBuf* Source);
 
 void SB_AppendChar (StrBuf* B, int C);
 /* Append a character to a string buffer */
+
+void SB_AppendCharCooked (StrBuf* B, int C, int Cooked);
+/* Append a character to a string buffer, raw if Cooked == 0 */
 
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size);
 /* Append a character buffer to the end of the string buffer */
@@ -354,7 +377,13 @@ void SB_AppendStr (StrBuf* B, const char* S);
 INLINE void SB_Append (StrBuf* Target, const StrBuf* Source)
 /* Append the contents of Source to Target */
 {
-    SB_AppendBuf (Target, Source->Buf, Source->Len);
+    unsigned NewLen = Target->Len + Source->Len;
+    if (NewLen > Target->Allocated) {
+        SB_Realloc (Target, NewLen);
+    }
+    memcpy (Target->Buf + Target->Len, Source->Buf, Source->Len);
+    memcpy (Target->Cooked + Target->Len, Source->Cooked, Source->Len);
+    Target->Len = NewLen;
 }
 #else
 void SB_Append (StrBuf* Target, const StrBuf* Source);

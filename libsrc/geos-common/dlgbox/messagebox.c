@@ -7,6 +7,7 @@
 
 #include <geos.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 void _mbprintout(void);
 

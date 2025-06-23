@@ -1,4 +1,4 @@
-/*****************************************************************************/
+
 /*                                                                           */
 /*                                macrotab.h                                 */
 /*                                                                           */
@@ -42,6 +42,8 @@
 
 /* cc65 */
 #include "error.h"
+#include "output.h"
+#include "preproc.h"
 #include "macrotab.h"
 
 
@@ -56,6 +58,73 @@
 #define MACRO_TAB_SIZE  211
 static Macro* MacroTab[MACRO_TAB_SIZE];
 
+/* The undefined macros list head */
+static Macro* UndefinedMacrosListHead;
+
+/* Some defines for better readability when calling OutputMacros() */
+#define USER_MACROS     0
+#define PREDEF_MACROS   1
+#define NAME_ONLY       0
+#define FULL_DEFINITION 1
+
+
+
+/*****************************************************************************/
+/*                                  helpers                                  */
+/*****************************************************************************/
+
+
+
+static void OutputMacro (const Macro* M, int Full)
+/* Output one macro. If Full is true, the replacement is also output. */
+{
+    WriteOutput ("#define %s", M->Name);
+    int ParamCount = M->ParamCount;
+    if (M->ParamCount >= 0) {
+        int I;
+        if (M->Variadic) {
+            CHECK (ParamCount > 0);
+            --ParamCount;
+        }
+        WriteOutput ("(");
+        for (I = 0; I < ParamCount; ++I) {
+            const char* Name = CollConstAt (&M->Params, I);
+            WriteOutput ("%s%s", (I == 0)? "" : ",", Name);
+        }
+        if (M->Variadic) {
+            WriteOutput ("%s...", (ParamCount == 0)? "" : ",");
+        }
+        WriteOutput (")");
+    }
+    WriteOutput (" ");
+    if (Full) {
+        WriteOutput ("%.*s",
+                     SB_GetLen (&M->Replacement),
+                     SB_GetConstBuf (&M->Replacement));
+    }
+    WriteOutput ("\n");
+}
+
+
+
+static void OutputMacros (int Predefined, int Full)
+/* Output macros to the output file depending on the flags given. */
+{
+    /* Note: The Full flag is currently not used by any callers but is left in
+    ** place for possible future changes.
+    */
+    unsigned I;
+    for (I = 0; I < MACRO_TAB_SIZE; ++I) {
+        const Macro* M = MacroTab [I];
+        while (M) {
+            if ((Predefined != 0) == (M->Predefined != 0)) {
+                OutputMacro (M, Full);
+            }
+            M = M->Next;
+        }
+    }
+}
+
 
 
 /*****************************************************************************/
@@ -64,25 +133,24 @@ static Macro* MacroTab[MACRO_TAB_SIZE];
 
 
 
-Macro* NewMacro (const char* Name)
+Macro* NewMacro (const char* Name, unsigned char Predefined)
 /* Allocate a macro structure with the given name. The structure is not
 ** inserted into the macro table.
 */
 {
     /* Get the length of the macro name */
-    unsigned Len = strlen(Name);
+    unsigned Len = strlen (Name);
 
     /* Allocate the structure */
     Macro* M = (Macro*) xmalloc (sizeof(Macro) + Len);
 
     /* Initialize the data */
-    M->Next        = 0;
-    M->Expanding   = 0;
-    M->ArgCount    = -1;        /* Flag: Not a function like macro */
-    M->MaxArgs     = 0;
-    InitCollection (&M->FormalArgs);
+    M->Next         = 0;
+    M->ParamCount   = -1;        /* Flag: Not a function-like macro */
+    InitCollection (&M->Params);
     SB_Init (&M->Replacement);
-    M->Variadic    = 0;
+    M->Predefined   = Predefined;
+    M->Variadic     = 0;
     memcpy (M->Name, Name, Len+1);
 
     /* Return the new macro */
@@ -98,18 +166,41 @@ void FreeMacro (Macro* M)
 {
     unsigned I;
 
-    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-        xfree (CollAtUnchecked (&M->FormalArgs, I));
+    for (I = 0; I < CollCount (&M->Params); ++I) {
+        xfree (CollAtUnchecked (&M->Params, I));
     }
-    DoneCollection (&M->FormalArgs);
+    DoneCollection (&M->Params);
     SB_Done (&M->Replacement);
     xfree (M);
 }
 
 
 
+Macro* CloneMacro (const Macro* M)
+/* Clone a macro definition. The function is not insert the macro into the
+** macro table, thus the cloned instance cannot be freed with UndefineMacro.
+** Use FreeMacro for that.
+*/
+{
+    Macro* New = NewMacro (M->Name, M->Predefined);
+    unsigned I;
+
+    for (I = 0; I < CollCount (&M->Params); ++I) {
+        /* Copy the parameter */
+        const char* Param = CollAtUnchecked (&M->Params, I);
+        CollAppend (&New->Params, xstrdup (Param));
+    }
+    New->ParamCount = M->ParamCount;
+    New->Variadic = M->Variadic;
+    SB_Copy (&New->Replacement, &M->Replacement);
+
+    return New;
+}
+
+
+
 void DefineNumericMacro (const char* Name, long Val)
-/* Define a macro for a numeric constant */
+/* Define a predefined macro for a numeric constant */
 {
     char Buf[64];
 
@@ -123,10 +214,10 @@ void DefineNumericMacro (const char* Name, long Val)
 
 
 void DefineTextMacro (const char* Name, const char* Val)
-/* Define a macro for a textual constant */
+/* Define a predefined macro for a textual constant */
 {
     /* Create a new macro */
-    Macro* M = NewMacro (Name);
+    Macro* M = NewMacro (Name, 1);
 
     /* Set the value as replacement text */
     SB_CopyStr (&M->Replacement, Val);
@@ -150,10 +241,11 @@ void InsertMacro (Macro* M)
 
 
 
-int UndefineMacro (const char* Name)
-/* Search for the macro with the given name and remove it from the macro
-** table if it exists. Return 1 if a macro was found and deleted, return
-** 0 otherwise.
+Macro* UndefineMacro (const char* Name)
+/* Search for the macro with the given name, if it exists, remove it from
+** the defined macro table and insert it to a list for pending deletion.
+** Return the macro if it was found and removed, return 0 otherwise.
+** To safely free the removed macro, use FreeUndefinedMacros().
 */
 {
     /* Get the hash value of the macro name */
@@ -173,11 +265,12 @@ int UndefineMacro (const char* Name)
                 L->Next = M->Next;
             }
 
-            /* Delete the macro */
-            FreeMacro (M);
+            /* Add this macro to pending deletion list */
+            M->Next = UndefinedMacrosListHead;
+            UndefinedMacrosListHead = M;
 
             /* Done */
-            return 1;
+            return M;
         }
 
         /* Next macro */
@@ -187,6 +280,23 @@ int UndefineMacro (const char* Name)
 
     /* Not found */
     return 0;
+}
+
+
+
+void FreeUndefinedMacros (void)
+/* Free all undefined macros */
+{
+    Macro* Next;
+
+    while (UndefinedMacrosListHead != 0) {
+        Next = UndefinedMacrosListHead->Next;
+
+        /* Delete the macro */
+        FreeMacro (UndefinedMacrosListHead);
+
+        UndefinedMacrosListHead = Next;
+    }
 }
 
 
@@ -201,6 +311,10 @@ Macro* FindMacro (const char* Name)
     Macro* M = MacroTab[Hash];
     while (M) {
         if (strcmp (M->Name, Name) == 0) {
+            /* Check for some special macro names */
+            if (Name[0] == '_') {
+                HandleSpecialMacro (M, Name);
+            }
             /* Found it */
             return M;
         }
@@ -215,14 +329,14 @@ Macro* FindMacro (const char* Name)
 
 
 
-int FindMacroArg (Macro* M, const char* Arg)
-/* Search for a formal macro argument. If found, return the index of the
-** argument. If the argument was not found, return -1.
+int FindMacroParam (const Macro* M, const char* Param)
+/* Search for a macro parameter. If found, return the index of the parameter.
+** If the parameter was not found, return -1.
 */
 {
     unsigned I;
-    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-        if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
+    for (I = 0; I < CollCount (&M->Params); ++I) {
+        if (strcmp (CollAtUnchecked (&M->Params, I), Param) == 0) {
             /* Found */
             return I;
         }
@@ -234,25 +348,25 @@ int FindMacroArg (Macro* M, const char* Arg)
 
 
 
-void AddMacroArg (Macro* M, const char* Arg)
-/* Add a formal macro argument. */
+void AddMacroParam (Macro* M, const char* Param)
+/* Add a macro parameter. */
 {
-    /* Check if we have a duplicate macro argument, but add it anyway.
-    ** Beware: Don't use FindMacroArg here, since the actual argument array
+    /* Check if we have a duplicate macro parameter, but add it anyway.
+    ** Beware: Don't use FindMacroParam here, since the actual argument array
     ** may not be initialized.
     */
     unsigned I;
-    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-        if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
+    for (I = 0; I < CollCount (&M->Params); ++I) {
+        if (strcmp (CollAtUnchecked (&M->Params, I), Param) == 0) {
             /* Found */
-            Error ("Duplicate macro parameter: '%s'", Arg);
+            PPError ("Duplicate macro parameter: '%s'", Param);
             break;
         }
     }
 
-    /* Add the new argument */
-    CollAppend (&M->FormalArgs, xstrdup (Arg));
-    ++M->ArgCount;
+    /* Add the new parameter */
+    CollAppend (&M->Params, xstrdup (Param));
+    ++M->ParamCount;
 }
 
 
@@ -263,14 +377,14 @@ int MacroCmp (const Macro* M1, const Macro* M2)
     int I;
 
     /* Argument count must be identical */
-    if (M1->ArgCount != M2->ArgCount) {
+    if (M1->ParamCount != M2->ParamCount) {
         return 1;
     }
 
-    /* Compare the arguments */
-    for (I = 0; I < M1->ArgCount; ++I) {
-        if (strcmp (CollConstAt (&M1->FormalArgs, I),
-                    CollConstAt (&M2->FormalArgs, I)) != 0) {
+    /* Compare the parameters */
+    for (I = 0; I < M1->ParamCount; ++I) {
+        if (strcmp (CollConstAt (&M1->Params, I),
+                    CollConstAt (&M2->Params, I)) != 0) {
             return 1;
         }
     }
@@ -301,4 +415,20 @@ void PrintMacroStats (FILE* F)
             fprintf (F, "empty\n");
         }
     }
+}
+
+
+
+void OutputPredefMacros (void)
+/* Output all predefined macros to the output file */
+{
+    OutputMacros (PREDEF_MACROS, FULL_DEFINITION);
+}
+
+
+
+void OutputUserMacros (void)
+/* Output all user defined macros to the output file */
+{
+    OutputMacros (USER_MACROS, FULL_DEFINITION);
 }

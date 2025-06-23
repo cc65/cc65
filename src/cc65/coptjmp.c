@@ -194,6 +194,37 @@ unsigned OptBranchDist (CodeSeg* S)
 
 
 
+unsigned OptBranchDist2 (CodeSeg* S)
+/* Change BRA to JMP if target is an external symbol */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+       if ((CPUIsets[CPU] & (CPU_ISET_65SC02 |CPU_ISET_6502DTV)) != 0 && /* CPU has BRA */
+           (E->Info & OF_UBRA) != 0                                   && /* is a unconditional branch */
+           E->JumpTo == NULL) {                                          /* target is extern */
+            /* BRA jumps to external symbol and must be replaced by a JMP on the 65C02 CPU */
+            CE_ReplaceOPC (E, OP65_JMP);
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*                        Replace jumps to RTS by RTS                        */
 /*****************************************************************************/
@@ -867,17 +898,13 @@ unsigned OptJumpTarget3 (CodeSeg* S)
 
 
 
-unsigned OptCondBranches1 (CodeSeg* S)
-/* Performs several optimization steps:
-**
+unsigned OptCondBranch1 (CodeSeg* S)
+/* Performs some optimization steps:
 **  - If an immediate load of a register is followed by a conditional jump that
 **    is never taken because the load of the register sets the flags in such a
 **    manner, remove the conditional branch.
 **  - If the conditional branch is always taken because of the register load,
 **    replace it by a jmp.
-**  - If a conditional branch jumps around an unconditional branch, remove the
-**    conditional branch and make the jump a conditional branch with the
-**    inverse condition of the first one.
 */
 {
     unsigned Changes = 0;
@@ -887,7 +914,6 @@ unsigned OptCondBranches1 (CodeSeg* S)
     while (I < CS_GetEntryCount (S)) {
 
         CodeEntry* N;
-        CodeLabel* L;
 
         /* Get next entry */
         CodeEntry* E = CS_GetEntry (S, I);
@@ -929,6 +955,35 @@ unsigned OptCondBranches1 (CodeSeg* S)
 
         }
 
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptCondBranch2 (CodeSeg* S)
+/* If a conditional branch jumps around an unconditional branch, remove the
+** conditional branch and make the jump a conditional branch with the inverse
+** condition of the first one.
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+        CodeLabel* L;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
         if ((E->Info & OF_CBRA) != 0              &&  /* It's a conditional branch */
             (L = E->JumpTo) != 0                  &&  /* ..referencing a local label */
             (N = CS_GetNextEntry (S, I)) != 0     &&  /* There is a following entry */
@@ -960,7 +1015,51 @@ unsigned OptCondBranches1 (CodeSeg* S)
 
 
 
-unsigned OptCondBranches2 (CodeSeg* S)
+unsigned OptCondBranch3 (CodeSeg* S)
+/* If the conditional branch is always taken because it follows an inverse
+** conditional branch, replace it by a jmp.
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check if it's a conditional branch */
+        if ((E->Info & OF_CBRA) != 0            &&  /* It's a conditional branch */
+            (N = CS_GetNextEntry (S, I)) != 0   &&  /* There is a following entry */
+            (N->Info & OF_CBRA) != 0            &&  /* ..which is a conditional branch */
+            !CE_HasLabel (N)) {                     /* ..and does not have a label */
+
+            /* Check if the branches conditions are inverse of each other */
+            if (GetInverseCond (GetBranchCond (N->OPC)) == GetBranchCond (E->OPC)) {
+                /* The branch is always taken, replace it by a jump */
+                CE_ReplaceOPC (N, OP65_JMP);
+
+                /* Remember, we had changes */
+                ++Changes;
+            }
+
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptCondBranchC (CodeSeg* S)
 /* If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
 ** we can remove the rol and branch on the state of the carry flag.
 */

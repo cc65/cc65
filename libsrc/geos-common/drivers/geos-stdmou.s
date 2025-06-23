@@ -5,7 +5,7 @@
 ;
 ; Driver for GEOS standard input device interface
 ;
-                                         
+
             .export _mouse_init, _mouse_done
             .export _mouse_hide, _mouse_show
             .export _mouse_box

@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
@@ -53,7 +59,7 @@ test.s: test.grc
 	$(GRC) -s test.s test.grc
 
 vlir.cvt: vlir.grc vlir0.s vlir1.s vlir2.s
-# using seperate calls here for demonstration purposes:
+# using separate calls here for demonstration purposes:
 	$(GRC) -t $(SYS) -s vlir.s vlir.grc
 	$(AS) -t $(SYS) vlir.s
 	$(AS) -t $(SYS) vlir0.s
@@ -63,7 +69,7 @@ vlir.cvt: vlir.grc vlir0.s vlir1.s vlir2.s
 
 # you can also do the above in one command:
 #	$(CL) -t $(SYS) -o vlir.cvt vlir.grc vlir0.s vlir1.s vlir2.s
-	
+
 clean:
 	@$(DEL) test.s test.h 2>$(NULLDEV)
 	@$(DEL) vlir.s vlir.cvt vlir.c vlir.h 2>$(NULLDEV)

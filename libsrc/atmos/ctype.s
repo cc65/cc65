@@ -119,7 +119,7 @@ __ctypeidx:
         ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 186/ba ___________, 187/bb ___________
         ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 188/bc ___________, 189/bd ___________
         ct_mix  CT_NONE_IDX, CT_NONE_IDX                 ; 190/be ___________, 191/bf ___________
-        
+
         ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 192/c0 ___________, 193/c1 ___________
         ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 194/c2 ___________, 195/c3 ___________
         ct_mix  CT_UPPER_IDX, CT_UPPER_IDX               ; 196/c4 ___________, 197/c5 ___________

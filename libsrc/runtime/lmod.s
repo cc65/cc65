@@ -23,7 +23,7 @@ tosmod0ax:
         sty     sreg+1
 .endif
 
-tosmodeax:                         
+tosmodeax:
         jsr     poplsargs       ; Get arguments from stack, adjust sign
         jsr     udiv32          ; Do the division, remainder is in (ptr2:tmp3:tmp4)
 

@@ -17,7 +17,7 @@ int main (void) {
   x = 1234;
   n = f1 (x);
   sprintf (str2, "%p\n", &x);
-  
+
   if (strcmp(str1, str2)) {
       puts("not equal");
       failures++;
@@ -31,7 +31,7 @@ int main (void) {
   x = 2345;
   n = f2 (x);
   sprintf (str2, "%p\n", &x);
-  
+
   if (strcmp(str1, str2)) {
       puts("not equal");
       failures++;

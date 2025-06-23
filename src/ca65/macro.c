@@ -390,7 +390,20 @@ void MacDef (unsigned Style)
 {
     Macro* M;
     TokNode* N;
+    FilePos Pos;
     int HaveParams;
+    int LastTokWasSep;
+
+    /* For classic macros, remember if we are at the beginning of the line.
+    ** If the macro name and parameters pass our checks then we will be on a
+    ** new line, so set it now
+    */
+    LastTokWasSep = 1;
+
+    /* Save the position of the start of the macro definition to allow
+    ** using Perror to display the error if .endmacro isn't found
+    */
+    Pos = CurTok.Pos;
 
     /* We expect a macro name here */
     if (CurTok.Tok != TOK_IDENT) {
@@ -489,33 +502,18 @@ void MacDef (unsigned Style)
     ** the .LOCAL command is detected and removed, at this time.
     */
     while (1) {
-        /* Check for include */
-        if (CurTok.Tok == TOK_INCLUDE && Style == MAC_STYLE_CLASSIC) {
-            /* Include another file */
-            NextTok ();
-            /* Name must follow */
-            if (CurTok.Tok != TOK_STRCON) {
-                ErrorSkip ("String constant expected");
-            } else {
-                SB_Terminate (&CurTok.SVal);
-                if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
-                    /* Error opening the file, skip remainder of line */
-                    SkipUntilSep ();
-                }
-            }
-            NextTok ();
-        }
-
         /* Check for end of macro */
         if (Style == MAC_STYLE_CLASSIC) {
-            /* In classic macros, only .endmacro is allowed */
-            if (CurTok.Tok == TOK_ENDMACRO) {
+            /* In classic macros, if .endmacro is not at the start of the line
+            ** it will be added to the macro definition instead of closing it.
+            */
+            if (CurTok.Tok == TOK_ENDMACRO && LastTokWasSep) {
                 /* Done */
                 break;
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
-                Error ("'.ENDMACRO' expected");
+                PError (&Pos, "'.ENDMACRO' expected for macro '%m%p'", &M->Name);
                 goto Done;
             }
         } else {
@@ -590,6 +588,11 @@ void MacDef (unsigned Style)
         }
         ++M->TokCount;
 
+        /* Save if last token was a separator to know if .endmacro is at
+        ** the start of a line
+        */
+        LastTokWasSep = TokIsSep(CurTok.Tok);
+
         /* Read the next token */
         NextTok ();
     }
@@ -637,7 +640,7 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
 
 
 static int MacExpand (void* Data)
-/* If we're currently expanding a macro, set the the scanner token and
+/* If we're currently expanding a macro, set the scanner token and
 ** attribute to the next value and return true. If we are not expanding
 ** a macro, return false.
 */
@@ -801,9 +804,6 @@ static void StartExpClassic (MacExp* E)
 {
     token_t Term;
 
-    /* Skip the macro name */
-    NextTok ();
-
     /* Does this invocation have any arguments? */
     if (!TokIsSep (CurTok.Tok)) {
 
@@ -887,9 +887,6 @@ static void StartExpDefine (MacExp* E)
     */
     unsigned Count = E->M->ParamCount;
 
-    /* Skip the current token */
-    NextTok ();
-
     /* Read the actual parameters */
     while (Count--) {
         TokNode* Last;
@@ -965,14 +962,19 @@ static void StartExpDefine (MacExp* E)
 void MacExpandStart (Macro* M)
 /* Start expanding a macro */
 {
+    FilePos Pos;
     MacExp* E;
 
     /* Check the argument */
     PRECONDITION (M && (M->Style != MAC_STYLE_DEFINE || DisableDefines == 0));
 
+    /* Remember the current file position, then skip the macro name token */
+    Pos = CurTok.Pos;
+    NextTok ();
+
     /* We cannot expand an incomplete macro */
     if (M->Incomplete) {
-        Error ("Cannot expand an incomplete macro");
+        PError (&Pos, "Cannot expand an incomplete macro");
         return;
     }
 
@@ -980,7 +982,7 @@ void MacExpandStart (Macro* M)
     ** to force an endless loop and assembler crash.
     */
     if (MacExpansions >= MAX_MACEXPANSIONS) {
-        Error ("Too many nested macro expansions");
+        PError (&Pos, "Too many nested macro expansions");
         return;
     }
 

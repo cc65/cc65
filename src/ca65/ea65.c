@@ -72,11 +72,13 @@ void GetEA (EffAddr* A)
     /* Clear the output struct */
     A->AddrModeSet = 0;
     A->Expr = 0;
+    A->Flags = 0;
 
     /* Handle an addressing size override */
     switch (CurTok.Tok) {
         case TOK_OVERRIDE_ZP:
             Restrictions = AM65_DIR | AM65_DIR_X | AM65_DIR_Y;
+            A->Flags |= EFFADDR_OVERRIDE_ZP;
             NextTok ();
             break;
 
@@ -99,6 +101,9 @@ void GetEA (EffAddr* A)
     if (TokIsSep (CurTok.Tok)) {
 
         A->AddrModeSet = AM65_IMPLICIT;
+        if (GetCPU () == CPU_45GS02) {
+            A->AddrModeSet |= AM65_Q;
+        }
 
     } else if (CurTok.Tok == TOK_HASH) {
 
@@ -111,6 +116,11 @@ void GetEA (EffAddr* A)
 
         NextTok ();
         A->AddrModeSet = AM65_ACCU;
+
+    } else if (CurTok.Tok == TOK_Q) {
+
+        NextTok ();
+        A->AddrModeSet = AM65_Q;
 
     } else if (CurTok.Tok == IndirectEnter) {
 
@@ -158,8 +168,19 @@ void GetEA (EffAddr* A)
                 }
             } else {
                 /* (adr) */
-                A->AddrModeSet = (CPU == CPU_4510) ? AM65_ABS_IND
-                                                   : AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
+                switch (CPU) {
+                    case CPU_4510:
+                        A->AddrModeSet = AM65_ABS_IND;
+                        break;
+
+                    case CPU_45GS02:
+                        A->AddrModeSet = AM65_ABS_IND | AM65_DIR_IND;
+                        break;
+
+                    default:
+                        A->AddrModeSet = AM65_ABS_IND | AM65_ABS_IND_LONG | AM65_DIR_IND;
+                        break;
+                }
             }
         }
 
@@ -173,8 +194,14 @@ void GetEA (EffAddr* A)
         if (CurTok.Tok == TOK_COMMA) {
             /* [dir],y */
             NextTok ();
-            Consume (TOK_Y, "'Y' expected");
-            A->AddrModeSet = AM65_DIR_IND_LONG_Y;
+            if (GetCPU () == CPU_45GS02) {
+                Consume (TOK_Z, "'Z' expected");
+                A->AddrModeSet = AM65_32BIT_BASE_IND_Z;
+            }
+            else {
+                Consume (TOK_Y, "'Y' expected");
+                A->AddrModeSet = AM65_DIR_IND_LONG_Y;
+            }
         } else {
             /* [dir] */
             A->AddrModeSet = AM65_DIR_IND_LONG | AM65_ABS_IND_LONG;
@@ -184,10 +211,11 @@ void GetEA (EffAddr* A)
 
         /* Remaining stuff:
         **
-        ** adr
-        ** adr,x
-        ** adr,y
-        ** adr,s
+        ** addr
+        ** addr, x
+        ** addr, y
+        ** addr, s
+        ** addr, relative addr
         */
         A->Expr = Expression ();
 
@@ -212,7 +240,9 @@ void GetEA (EffAddr* A)
                     break;
 
                 default:
-                    Error ("Syntax error");
+                    /* FIXME: syntax error if not zp, ind */
+                    A->AddrModeSet = AM65_ZP_REL;
+                    break;
 
             }
 

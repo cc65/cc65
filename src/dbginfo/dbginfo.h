@@ -135,7 +135,7 @@ struct cc65_csymdata {
     unsigned char       csym_kind;      /* Kind of c symbol */
     unsigned char       csym_sc;        /* Storage class of c symbol */
     int                 csym_offs;      /* Offset for auto and register */
-    unsigned            type_id;        /* Id of the data type */ 
+    unsigned            type_id;        /* Id of the data type */
     unsigned            symbol_id;      /* Attached asm symbol if any */
     unsigned            scope_id;       /* Scope of c symbol */
     const char*         csym_name;      /* Name of the symbol */
@@ -258,7 +258,8 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo handle,
                                          unsigned source_id,
                                          cc65_line line);
 /* Return line information for a source file/line number combination. The
-** function returns NULL if no line information was found.
+** function returns NULL if no line information was found, otherwise a list
+** of line infos.
 */
 
 const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned source_id);
@@ -520,6 +521,7 @@ struct cc65_segmentdata {
     cc65_size           segment_size;   /* Size of segment */
     const char*         output_name;    /* Output file this seg was written to */
     unsigned long       output_offs;    /* Offset of this seg in output file */
+    unsigned            segment_bank;
 };
 
 typedef struct cc65_segmentinfo cc65_segmentinfo;

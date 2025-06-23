@@ -33,6 +33,7 @@
 
 
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -208,13 +209,13 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
 
 
 
-void DefConst (const char* Name, const char* Comment, unsigned Addr)
+void DefConst (const char* Name, const char* Comment, uint32_t Addr)
 /* Define an address constant */
 {
     if (Pass == PassCount) {
         Output ("%s", Name);
         Indent (ACol);
-        Output (":= $%04X", Addr);
+        Output (":= $%04" PRIX32, Addr);
         if (Comment) {
             Indent (CCol);
             Output ("; %s", Comment);
@@ -225,19 +226,19 @@ void DefConst (const char* Name, const char* Comment, unsigned Addr)
 
 
 
-void DataByteLine (unsigned ByteCount)
+void DataByteLine (uint32_t ByteCount)
 /* Output a line with bytes */
 {
-    unsigned I;
+    uint32_t I;
 
     Indent (MCol);
     Output (".byte");
     Indent (ACol);
     for (I = 0; I < ByteCount; ++I) {
         if (I > 0) {
-            Output (",$%02X", CodeBuf[PC+I]);
+            Output (",$%02" PRIX8, CodeBuf[PC+I]);
         } else {
-            Output ("$%02X", CodeBuf[PC+I]);
+            Output ("$%02" PRIX8, CodeBuf[PC+I]);
         }
     }
     LineComment (PC, ByteCount);
@@ -246,19 +247,19 @@ void DataByteLine (unsigned ByteCount)
 
 
 
-void DataDByteLine (unsigned ByteCount)
+void DataDByteLine (uint32_t ByteCount)
 /* Output a line with dbytes */
 {
-    unsigned I;
+    uint32_t I;
 
     Indent (MCol);
     Output (".dbyt");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
         if (I > 0) {
-            Output (",$%04X", GetCodeDByte (PC+I));
+            Output (",$%04" PRIX16, GetCodeDByte (PC+I));
         } else {
-            Output ("$%04X", GetCodeDByte (PC+I));
+            Output ("$%04" PRIX16, GetCodeDByte (PC+I));
         }
     }
     LineComment (PC, ByteCount);
@@ -267,19 +268,19 @@ void DataDByteLine (unsigned ByteCount)
 
 
 
-void DataWordLine (unsigned ByteCount)
+void DataWordLine (uint32_t ByteCount)
 /* Output a line with words */
 {
-    unsigned I;
+    uint32_t I;
 
     Indent (MCol);
     Output (".word");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
         if (I > 0) {
-            Output (",$%04X", GetCodeWord (PC+I));
+            Output (",$%04" PRIX16, GetCodeWord (PC+I));
         } else {
-            Output ("$%04X", GetCodeWord (PC+I));
+            Output ("$%04" PRIX16, GetCodeWord (PC+I));
         }
     }
     LineComment (PC, ByteCount);
@@ -288,19 +289,19 @@ void DataWordLine (unsigned ByteCount)
 
 
 
-void DataDWordLine (unsigned ByteCount)
+void DataDWordLine (uint32_t ByteCount)
 /* Output a line with dwords */
 {
-    unsigned I;
+    uint32_t I;
 
     Indent (MCol);
     Output (".dword");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 4) {
         if (I > 0) {
-            Output (",$%08lX", GetCodeDWord (PC+I));
+            Output (",$%08" PRIX32, GetCodeDWord (PC+I));
         } else {
-            Output ("$%08lX", GetCodeDWord (PC+I));
+            Output ("$%08" PRIX32, GetCodeDWord (PC+I));
         }
     }
     LineComment (PC, ByteCount);
@@ -372,12 +373,12 @@ void LineComment (unsigned PC, unsigned Count)
         Output ("; %04X", PC);
         if (Comments >= 3) {
             for (I = 0; I < Count; ++I) {
-                Output (" %02X", CodeBuf [PC+I]);
+                Output (" %02" PRIX8, CodeBuf [PC+I]);
             }
             if (Comments >= 4) {
                 Indent (TCol);
                 for (I = 0; I < Count; ++I) {
-                    unsigned char C = CodeBuf [PC+I];
+                    uint8_t C = CodeBuf [PC+I];
                     if (!isprint (C)) {
                         C = '.';
                     }

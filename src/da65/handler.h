@@ -38,6 +38,8 @@
 
 
 
+#include <stdint.h>
+
 /* common */
 #include "attrib.h"
 
@@ -119,7 +121,7 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D);
 void OH_JmpAbsoluteXIndirect (const OpcDesc* D);
 void OH_JsrAbsolute (const OpcDesc*);
 
-void SetSubroutineParamSize (unsigned Addr, unsigned Size);
+void SetSubroutineParamSize (uint32_t Addr, unsigned Size);
 
 
 /* End of handler.h */

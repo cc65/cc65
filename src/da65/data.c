@@ -50,17 +50,17 @@
 
 
 
-static unsigned GetSpan (attr_t Style)
+static uint32_t GetSpan (attr_t Style)
 /* Get the number of bytes for a given style */
 {
     /* Get the number of bytes still available */
-    unsigned RemainingBytes = GetRemainingBytes ();
+    uint32_t RemainingBytes = GetRemainingBytes ();
 
     /* Count how many bytes are available. This number is limited by the
     ** number of remaining bytes, a label, a segment change, or the end of
     ** the given Style attribute.
     */
-    unsigned Count = 1;
+    uint32_t Count = 1;
     while (Count < RemainingBytes) {
         attr_t Attr;
         if (MustDefLabel(PC+Count)) {
@@ -85,10 +85,10 @@ static unsigned GetSpan (attr_t Style)
 static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (unsigned))
 /* Output a table of bytes */
 {
-    unsigned BytesLeft;
+    uint32_t BytesLeft;
 
     /* Count how many bytes may be output. */
-    unsigned Count = GetSpan (Style);
+    uint32_t Count = GetSpan (Style);
 
     /* If the count is less than the member size, print a row of Count data
     ** bytes. We assume here that there is no member with a size that is less
@@ -108,7 +108,7 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
     while (BytesLeft > 0) {
 
         /* Calculate the number of bytes for the next line */
-        unsigned Chunk = (BytesLeft > BytesPerLine)? BytesPerLine : BytesLeft;
+        uint32_t Chunk = (BytesLeft > BytesPerLine)? BytesPerLine : BytesLeft;
 
         /* Output a line with these bytes */
         TableFunc (Chunk);
@@ -129,7 +129,7 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
 
 
 
-unsigned ByteTable (void)
+uint32_t ByteTable (void)
 /* Output a table of bytes */
 {
     /* Call the low level function */
@@ -138,7 +138,7 @@ unsigned ByteTable (void)
 
 
 
-unsigned DByteTable (void)
+uint32_t DByteTable (void)
 /* Output a table of dbytes */
 {
     /* Call the low level function */
@@ -147,7 +147,7 @@ unsigned DByteTable (void)
 
 
 
-unsigned WordTable (void)
+uint32_t WordTable (void)
 /* Output a table of words */
 {
     /* Call the low level function */
@@ -156,7 +156,7 @@ unsigned WordTable (void)
 
 
 
-unsigned DWordTable (void)
+uint32_t DWordTable (void)
 /* Output a table of double words */
 {
     /* Call the low level function */
@@ -165,18 +165,18 @@ unsigned DWordTable (void)
 
 
 
-unsigned AddrTable (void)
+uint32_t AddrTable (void)
 /* Output a table of addresses */
 {
-    unsigned long BytesLeft = GetRemainingBytes ();
-    unsigned long Start = PC;
+    uint32_t BytesLeft = GetRemainingBytes ();
+    uint32_t Start = PC;
 
     /* Loop while table bytes left and we don't need to create a label at the
     ** current position.
     */
     while (BytesLeft && GetStyleAttr (PC) == atAddrTab) {
 
-        unsigned Addr;
+        uint32_t Addr;
 
         /* If just one byte is left, define it and bail out */
         if (BytesLeft == 1 || GetStyleAttr (PC+1) != atAddrTab) {
@@ -231,18 +231,18 @@ unsigned AddrTable (void)
 
 
 
-unsigned RtsTable (void)
+uint32_t RtsTable (void)
 /* Output a table of RTS addresses (address - 1) */
 {
-    unsigned long BytesLeft = GetRemainingBytes ();
-    unsigned long Start = PC;
+    uint32_t BytesLeft = GetRemainingBytes ();
+    uint32_t Start = PC;
 
     /* Loop while table bytes left and we don't need to create a label at the
     ** current position.
     */
     while (BytesLeft && GetStyleAttr (PC) == atRtsTab) {
 
-        unsigned Addr;
+        uint32_t Addr;
 
         /* If just one byte is left, define it and bail out */
         if (BytesLeft == 1 || GetStyleAttr (PC+1) != atRtsTab) {
@@ -297,14 +297,14 @@ unsigned RtsTable (void)
 
 
 
-unsigned TextTable (void)
+uint32_t TextTable (void)
 /* Output a table of text messages */
 {
     /* Count how many bytes may be output. */
-    unsigned ByteCount = GetSpan (atTextTab);
+    uint32_t ByteCount = GetSpan (atTextTab);
 
     /* Output as many data bytes lines as needed. */
-    unsigned BytesLeft = ByteCount;
+    uint32_t BytesLeft = ByteCount;
     while (BytesLeft > 0) {
 
         unsigned I;
@@ -312,7 +312,7 @@ unsigned TextTable (void)
         /* Count the number of characters that can be output as such */
         unsigned Count = 0;
         while (Count < BytesLeft && Count < BytesPerLine*4-1) {
-            unsigned char C = GetCodeByte (PC + Count);
+            uint8_t C = GetCodeByte (PC + Count);
             if (C >= 0x20 && C <= 0x7E && C != '\"') {
                 ++Count;
             } else {
@@ -348,7 +348,7 @@ unsigned TextTable (void)
         /* Count the number of bytes that must be output as bytes */
         Count = 0;
         while (Count < BytesLeft && Count < BytesPerLine) {
-            unsigned char C = GetCodeByte (PC + Count);
+            uint8_t C = GetCodeByte (PC + Count);
             if (C < 0x20 || C > 0x7E || C == '\"') {
                 ++Count;
             } else {

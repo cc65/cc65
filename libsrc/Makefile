@@ -197,9 +197,9 @@ ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
 endif
 
 ifeq ($(TARGET),c65)
-# FIXME: the compiler does not work for 4510 yet
+# FIXME: this does not work because of the SP vs C_SP clash
 else ifeq ($(TARGET),mega65)
-# FIXME: the compiler does not work for 45GS02 yet
+# FIXME: this does not work because of the SP vs C_SP clash
 else
 SRCDIRS += common   \
            conio    \

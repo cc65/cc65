@@ -23,8 +23,8 @@ _waitvsync:
 
 @c80:
         ;FIXME: do we have to switch banks?
+        lda     #$20
 @l3:
-        lda     VDC_INDEX
-        and     #$20
+        and     VDC_INDEX
         beq     @l3
         rts

@@ -44,6 +44,7 @@ Short options:
   -lc                           List all possible conversions
   -r file[,attrlist]            Read an input file
   -v                            Increase verbosity
+  -p tgt,file[,attrlist]        Write the palette to a file
   -w file[,attrlist]            Write the output to a file
 
 Long options:
@@ -56,6 +57,7 @@ Long options:
   --slice x,y,w,h               Generate a slice from the loaded bitmap
   --verbose                     Increase verbosity
   --version                     Print the version number and exit
+  --palette tgt,file{,attrlist] Write the palette to a file
   --write file[,attrlist]       Write the output to a file
 ---------------------------------------------------------------------------
 </verb></tscreen>
@@ -122,6 +124,13 @@ attribute lists see <ref id="attr-lists" name="below">.
 
   Print the version number of the assembler. If you send any suggestions or
   bugfixes, please include the version number.
+
+
+  <label id="option--palette">
+  <tag><tt>-p, --palette target,filename[,attrlist]</tt></tag>
+
+  Write the palette of the input bitmap to a file in a format suitable of
+  the target.
 
 
   <label id="option--write">
@@ -265,6 +274,7 @@ of a sprite is roughly 508 pixels but in reality the Lynx screen is only 160 by
 102 pixels which makes very large sprites useless.
 
 The number per pixels is taken from the number of colors of the input bitmap.
+You can also force the number of pens used in the conversion.
 
 There are a few attributes that you can give to the conversion software.
 
@@ -273,7 +283,7 @@ There are a few attributes that you can give to the conversion software.
   <tag/mode/
   The first is what kind of encoding to use for the sprite. The attribute for
   this is called "mode" and the possible values are "literal", "packed" or
-  "transparent". The default is "packed" if no mode is specified.
+  "shaped". The default is "packed" if no mode is specified.
 
   The "literal" is a totally literal mode with no packing. In this mode the
   number of pixels per scanline will be a multiple of 8 both right and left from
@@ -290,10 +300,26 @@ There are a few attributes that you can give to the conversion software.
   using run-length encoding and literal coding mixed for optimisation to
   produce a small sprite.
 
-  The last encoding mode "transparent" is like packed. But here we know that
-  the index 0 will be transparent so we can clip off all 0 pixels from the left
-  and right edge of the sprite. This will produce the smallest sprite possible
-  on the Lynx. The sprite is not rectangular anymore.
+  The last encoding mode "shaped" is like packed. But we can stop the conversion
+  to the right abd left edge when we get the first "edge" colour. If no edge
+  colour is specified we stop at the first index 0 colour.
+  If your edge index is outside the range 0..15 then your sprite can use all
+  the colours in the defined palette.
+  This will also produce the smallest sprite possible on the Lynx. The sprite
+  is not rectangular anymore.
+
+  <tag/edge/
+  This keyword is only meaningful for shaped sprites. By default it is 0.
+  The shaped sprite outer edge is defined by the colour index "edge".
+
+  <tag/pen/
+  This keyword defines the order the colours in the original bitmap is
+  mapped to the Lynx sprite. The length of the pen also defines the depth
+  of the generated sprite.
+  If you want to create a 1 BPP sprite you can define the two indices used
+  in the sprite like pen=34. Now areas in colour index 3 will be mapped as 0.
+  Areas in colour index 4 will be mapped as 1.
+  The default pen=0123456789abcdef.
 
   <tag/ax/
   The sprite is painted around the Anchor point. The anchor point x can be
@@ -301,7 +327,9 @@ There are a few attributes that you can give to the conversion software.
   painting the sprite in location 10,20 will set the left edge of the sprite
   10 pixels from the left of the Lynx screen. When the sprite is scaled by
   hardware the anchor point stays in place and the sprite grows or shrinks
-  around the anchor point. The default value is 0 (left).
+  around the anchor point. You can also define the location using the words
+  "mid" for the center or "max" for the right edge.
+  The default value is 0 (left).
 
   <tag/ay/
   The sprite is painted around the Anchor point. The anchor point y can be
@@ -309,7 +337,8 @@ There are a few attributes that you can give to the conversion software.
   painting the sprite in location 10,20 will set the top of the sprite 20
   pixels from the top of the Lynx screen. When the sprite is scaled by
   hardware the anchor point stays in place and the sprite grows or shrinks
-  around the anchor point. The default value is 0 (top).
+  around the anchor point. You can also define the location using the words
+  "mid" for the center or "max" for the bottom. The default value is 0 (top).
 
 </descrip>
 

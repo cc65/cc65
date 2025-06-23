@@ -24,6 +24,14 @@ DOSWARM :=      $03D0   ; DOS warmstart vector
 BRKVec  :=      $03F0   ; Break vector
 SOFTEV  :=      $03F2   ; Vector for warm start
 PWREDUP :=      $03F4   ; This must be = EOR #$A5 of SOFTEV+1
+ROM_RST :=      $FFFC   ; 6502 reset vector
+ROM_IRQ :=      $FFFE   ; 6502 IRQ vector
+
+;-----------------------------------------------------------------------------
+; 80 column firmware
+
+OURCH   :=      $057B   ; Cursor horizontal position
+OURCV   :=      $05FB   ; Cursor vertical position
 
 ;-----------------------------------------------------------------------------
 ; Hardware

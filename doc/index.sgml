@@ -59,7 +59,7 @@
   Contains hints on creating the most effective code with cc65.
 
   <tag><htmlurl url="cc65-intern.html" name="cc65-intern.html"></tag>
-  Describes internal details of cc65, such as calling conventions.
+  Describes internal details of cc65: linker configuration, calling conventions, etc.
 
   <tag><htmlurl url="using-make.html" name="using-make.html"></tag>
   Build programs, using the GNU Make utility.
@@ -109,6 +109,9 @@
 
 <descrip>
 
+  <tag><htmlurl url="agat.html" name="agat.html"></tag>
+  Topics specific to the Agat machines.
+
   <tag><htmlurl url="apple2.html" name="apple2.html"></tag>
   Topics specific to the Apple&nbsp;&rsqb;&lsqb;.
 
@@ -154,6 +157,9 @@
   <tag><htmlurl url="gamate.html" name="gamate.html"></tag>
   Topics specific to the Bit Corporation Gamate Console.
 
+  <tag><htmlurl url="kim1.html" name="kim1.html"></tag>
+  Topics specific to the MOS Technology KIM-1.
+
   <tag><htmlurl url="lynx.html" name="lynx.html"></tag>
   Topics specific to the Atari Lynx Game Console.
 
@@ -171,6 +177,9 @@
 
   <tag><htmlurl url="plus4.html" name="plus4.html"></tag>
   Topics specific to the Commodore Plus/4.
+
+  <tag><htmlurl url="rp6502.html" name="rp6502.html"></tag>
+  Topics specific to the Picocomputer 6502.
 
   <tag><htmlurl url="supervision.html" name="supervision.html"></tag>
   Topics specific to the Watara Supervision Console.

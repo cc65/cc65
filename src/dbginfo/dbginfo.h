@@ -258,7 +258,8 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo handle,
                                          unsigned source_id,
                                          cc65_line line);
 /* Return line information for a source file/line number combination. The
-** function returns NULL if no line information was found.
+** function returns NULL if no line information was found, otherwise a list
+** of line infos.
 */
 
 const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned source_id);
@@ -520,6 +521,7 @@ struct cc65_segmentdata {
     cc65_size           segment_size;   /* Size of segment */
     const char*         output_name;    /* Output file this seg was written to */
     unsigned long       output_offs;    /* Offset of this seg in output file */
+    unsigned            segment_bank;
 };
 
 typedef struct cc65_segmentinfo cc65_segmentinfo;

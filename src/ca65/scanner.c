@@ -46,6 +46,7 @@
 #include "check.h"
 #include "filestat.h"
 #include "fname.h"
+#include "tgttrans.h"
 #include "xmalloc.h"
 
 /* ca65 */
@@ -112,6 +113,8 @@ struct CharSource {
     CharSource*                 Next;   /* Linked list of char sources */
     token_t                     Tok;    /* Last token */
     int                         C;      /* Last character */
+    int                         SkipN;  /* For '\r\n' line endings, skip '\n\ if next */
+    InputStack                  IStack; /* Saved input stack */
     const CharSourceFunctions*  Func;   /* Pointer to function table */
     union {
         InputFile               File;   /* File data */
@@ -128,10 +131,12 @@ static int         C            = 0;    /* Current input character */
 int               ForcedEnd     = 0;
 
 /* List of dot keywords with the corresponding tokens */
+/* CAUTION: table must be sorted for bsearch */
 struct DotKeyword {
     const char* Key;                    /* MUST be first field */
     token_t     Tok;
 } DotKeywords [] = {
+/* BEGIN SORTED.SH */
     { ".A16",           TOK_A16                 },
     { ".A8",            TOK_A8                  },
     { ".ADDR",          TOK_ADDR                },
@@ -216,10 +221,13 @@ struct DotKeyword {
     { ".IFNDEF",        TOK_IFNDEF              },
     { ".IFNREF",        TOK_IFNREF              },
     { ".IFP02",         TOK_IFP02               },
+    { ".IFP02X",        TOK_IFP02X              },
     { ".IFP4510",       TOK_IFP4510             },
+    { ".IFP45GS02",     TOK_IFP45GS02           },
     { ".IFP816",        TOK_IFP816              },
     { ".IFPC02",        TOK_IFPC02              },
     { ".IFPDTV",        TOK_IFPDTV              },
+    { ".IFPM740",       TOK_IFPM740             },
     { ".IFPSC02",       TOK_IFPSC02             },
     { ".IFREF",         TOK_IFREF               },
     { ".IMPORT",        TOK_IMPORT              },
@@ -254,13 +262,16 @@ struct DotKeyword {
     { ".ORG",           TOK_ORG                 },
     { ".OUT",           TOK_OUT                 },
     { ".P02",           TOK_P02                 },
+    { ".P02X",          TOK_P02X                },
     { ".P4510",         TOK_P4510               },
+    { ".P45GS02",       TOK_P45GS02             },
     { ".P816",          TOK_P816                },
     { ".PAGELEN",       TOK_PAGELENGTH          },
     { ".PAGELENGTH",    TOK_PAGELENGTH          },
     { ".PARAMCOUNT",    TOK_PARAMCOUNT          },
     { ".PC02",          TOK_PC02                },
     { ".PDTV",          TOK_PDTV                },
+    { ".PM740",         TOK_PM740               },
     { ".POPCHARMAP",    TOK_POPCHARMAP          },
     { ".POPCPU",        TOK_POPCPU              },
     { ".POPSEG",        TOK_POPSEG              },
@@ -303,6 +314,7 @@ struct DotKeyword {
     { ".XMATCH",        TOK_XMATCH              },
     { ".XOR",           TOK_BOOLXOR             },
     { ".ZEROPAGE",      TOK_ZEROPAGE            },
+/* END SORTED.SH */
 };
 
 
@@ -320,11 +332,15 @@ static void UseCharSource (CharSource* S)
     S->Tok      = CurTok.Tok;
     S->C        = C;
 
+    /* Remember the current input stack */
+    S->IStack   = RetrieveInputStack ();
+
     /* Use the new input source */
     S->Next     = Source;
     Source      = S;
 
     /* Read the first character from the new file */
+    S->SkipN    = 0;
     S->Func->NextChar (S);
 
     /* Setup the next token so it will be skipped on the next call to
@@ -345,7 +361,10 @@ static void DoneCharSource (void)
 
     /* Restore the old token */
     CurTok.Tok = Source->Tok;
-    C   = Source->C;
+    C = Source->C;
+
+    /* Restore the old input source */
+    RestoreInputStack (Source->IStack);
 
     /* Remember the last stacked input source */
     S = Source->Next;
@@ -386,6 +405,11 @@ static void IFNextChar (CharSource* S)
         while (1) {
 
             int N = fgetc (S->V.File.F);
+            if (N == '\n' && S->SkipN) {
+                N = fgetc (S->V.File.F);
+            }
+            S->SkipN = 0;
+
             if (N == EOF) {
                 /* End of file. Accept files without a newline at the end */
                 if (SB_NotEmpty (&S->V.File.Line)) {
@@ -401,8 +425,11 @@ static void IFNextChar (CharSource* S)
 
             /* Check for end of line */
             } else if (N == '\n') {
-
                 /* End of line */
+                break;
+            } else if (N == '\r') {
+                /* End of line, skip '\n' if it's the next character */
+                S->SkipN = 1;
                 break;
 
             /* Collect other stuff */
@@ -738,24 +765,7 @@ static token_t FindDotKeyword (void)
     R = bsearch (&K, DotKeywords, sizeof (DotKeywords) / sizeof (DotKeywords [0]),
                  sizeof (DotKeywords [0]), CmpDotKeyword);
     if (R != 0) {
-
-        /* By default, disable any somewhat experiemental DotKeyword. */
-
-        switch (R->Tok) {
-
-            case TOK_ADDRSIZE:
-                /* Disallow .ADDRSIZE function by default */
-                if (AddrSize == 0) {
-                    return TOK_NONE;
-                }
-                break;
-
-            default:
-                break;
-        }
-
         return R->Tok;
-
     } else {
         return TOK_NONE;
     }
@@ -788,14 +798,33 @@ static void ReadIdent (void)
 static void ReadStringConst (int StringTerm)
 /* Read a string constant into SVal. */
 {
+    int NeedNext;
+
     /* Skip the leading string terminator */
     NextChar ();
 
     /* Read the string */
     while (1) {
+        int Cooked = 1;
+        NeedNext = 1;
+
+        if (StringTerm == 0 && SB_GetLen(&CurTok.SVal) == 1) {
+            if (C == '\'') {
+                break;
+            }
+            else if (MissingCharTerm) {
+               NeedNext = 0;
+               break;
+            }
+            else {
+                Error ("Illegal character constant");
+            }
+        }
+
         if (C == StringTerm) {
             break;
         }
+
         if (C == '\n' || C == EOF) {
             Error ("Newline in string constant");
             break;
@@ -808,20 +837,74 @@ static void ReadStringConst (int StringTerm)
                 case EOF:
                     Error ("Unterminated escape sequence in string constant");
                     break;
-                case '\\':
-                case '\'':
-                case '"':
+                case '?':
+                    C = '\?';
                     break;
-                case 't':
-                    C = '\x09';
+                case 'a':
+                    C = '\a';
+                    break;
+                case 'b':
+                    C = '\b';
+                    break;
+                case 'e':
+                    C = '\x1B'; /* see comments in cc65/scanner.c */
+                    break;
+                case 'f':
+                    C = '\f';
                     break;
                 case 'r':
-                    C = '\x0D';
+                    C = '\r';
                     break;
                 case 'n':
-                    C = '\x0A';
+                    C = '\n';
                     break;
+                case 't':
+                    C = '\t';
+                    break;
+                case 'v':
+                    C = '\v';
+                    break;
+                case '\\':
+                    C = '\\'; /* unnecessary but more readable */
+                    break;
+                case '\'':
+                    C = '\''; /* unnecessary but more readable */
+                    if (StringTerm == 0) {
+                        /* special case used by character constants
+                        ** when LooseStringTerm not set.  this will
+                        ** cause '\' to be a valid character constant
+                        */
+                        C = '\\';
+                        NeedNext = 0;
+                    }
+                    break;
+                case '\"':
+                    C = '\"'; /* unnecessary but more readable */
+                    break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                    { /* brace needed for scoping */
+                        int Count = 1;
+                        int Final = DigitVal(C);
+                        Cooked = 0;
+                        NextChar ();
+                        while (IsODigit (C) && Count++ < 3) {
+                           Final = (Final << 3) | DigitVal(C);
+                           NextChar();
+                        }
+                        if (C >= 256)
+                            Error ("Octal character constant out of range");
+                    }
+                    break;
+                case 'X':
                 case 'x':
+                    Cooked = 0;
                     NextChar ();
                     if (IsXDigit (C)) {
                         char high_nibble = DigitVal (C) << 4;
@@ -839,14 +922,19 @@ static void ReadStringConst (int StringTerm)
         }
 
         /* Append the char to the string */
-        SB_AppendChar (&CurTok.SVal, C);
+        SB_AppendCharCooked (&CurTok.SVal, C, Cooked);
 
-        /* Skip the character */
-        NextChar ();
+        if (NeedNext) {
+            /* Skip the character */
+            NextChar ();
+            NeedNext = 1;
+        }
     }
 
-    /* Skip the trailing terminator */
-    NextChar ();
+    if (NeedNext) {
+        /* Skip the trailing terminator */
+        NextChar ();
+    }
 
     /* Terminate the string */
     SB_Terminate (&CurTok.SVal);
@@ -1131,17 +1219,33 @@ Again:
     /* Local symbol? */
     if (C == LocalStart) {
 
-        /* Read the identifier. */
-        ReadIdent ();
+        NextChar ();
 
-        /* Start character alone is not enough */
-        if (SB_GetLen (&CurTok.SVal) == 1) {
-            Error ("Invalid cheap local symbol");
-            goto Again;
+        if (IsIdChar (C)) {
+            /* Read a local identifier */
+            CurTok.Tok = TOK_LOCAL_IDENT;
+            SB_AppendChar (&CurTok.SVal, LocalStart);
+            ReadIdent ();
+        } else {
+            /* Read an unnamed label */
+            CurTok.IVal = 0;
+            CurTok.Tok = TOK_ULABEL;
+
+            if (C == '-' || C == '<') {
+                int PrevC = C;
+                do {
+                    --CurTok.IVal;
+                    NextChar ();
+                } while (C == PrevC);
+            } else if (C == '+' || C == '>') {
+                int PrevC = C;
+                do {
+                    ++CurTok.IVal;
+                    NextChar ();
+                } while (C == PrevC);
+            }
         }
 
-        /* A local identifier */
-        CurTok.Tok = TOK_LOCAL_IDENT;
         return;
     }
 
@@ -1177,8 +1281,15 @@ Again:
                         break;
 
                     case 'S':
-                        if ((CPU == CPU_4510) || (CPU == CPU_65816)) {
+                        if ((CPU == CPU_4510) || (CPU == CPU_45GS02) || (CPU == CPU_65816)) {
                             CurTok.Tok = TOK_S;
+                            return;
+                        }
+                        break;
+
+                    case 'Q':
+                        if (CPU == CPU_45GS02) {
+                            CurTok.Tok = TOK_Q;
                             return;
                         }
                         break;
@@ -1197,7 +1308,7 @@ Again:
                             CurTok.Tok = TOK_OVERRIDE_ZP;
                            return;
                         } else {
-                            if (CPU == CPU_4510) {
+                            if ((CPU == CPU_4510) || (CPU == CPU_45GS02)) {
                                 CurTok.Tok = TOK_Z;
                                 return;
                             }
@@ -1209,7 +1320,7 @@ Again:
                 }
                 break;
             case 2:
-                if ((CPU == CPU_4510) &&
+                if ((CPU == CPU_4510 || CPU == CPU_45GS02) &&
                     (toupper (SB_AtUnchecked (&CurTok.SVal, 0)) == 'S') &&
                     (toupper (SB_AtUnchecked (&CurTok.SVal, 1)) == 'P')) {
 
@@ -1321,22 +1432,30 @@ CharAgain:
                     break;
 
                 case '-':
+                case '<':
+                {
+                    int PrevC = C;
                     CurTok.IVal = 0;
                     do {
                         --CurTok.IVal;
                         NextChar ();
-                    } while (C == '-');
+                    } while (C == PrevC);
                     CurTok.Tok = TOK_ULABEL;
                     break;
+                }
 
                 case '+':
+                case '>':
+                {
+                    int PrevC = C;
                     CurTok.IVal = 0;
                     do {
                         ++CurTok.IVal;
                         NextChar ();
-                    } while (C == '+');
+                    } while (C == PrevC);
                     CurTok.Tok = TOK_ULABEL;
                     break;
+                }
 
                 case '=':
                     NextChar ();
@@ -1441,11 +1560,11 @@ CharAgain:
             return;
 
         case '\'':
-            /* Hack: If we allow ' as terminating character for strings, read
-            ** the following stuff as a string, and check for a one character
-            ** string later.
-            */
             if (LooseStringTerm) {
+                /* Hack: If we allow ' as terminating character for strings, read
+                ** the following stuff as a string, and check for a one character
+                ** string later.
+                */
                 ReadStringConst ('\'');
                 if (SB_GetLen (&CurTok.SVal) == 1) {
                     CurTok.IVal = SB_AtUnchecked (&CurTok.SVal, 0);
@@ -1454,22 +1573,16 @@ CharAgain:
                     CurTok.Tok = TOK_STRCON;
                 }
             } else {
-                /* Always a character constant */
-                NextChar ();
-                if (C == EOF || IsControl (C)) {
+                /* Always a character constant
+                ** Hack: Pass 0 to ReadStringConst for special handling.
+                */
+                ReadStringConst(0);
+                if (SB_GetLen(&CurTok.SVal) != 1) {
                     Error ("Illegal character constant");
                     goto CharAgain;
                 }
-                CurTok.IVal = C;
+                CurTok.IVal = SB_AtUnchecked (&CurTok.SVal, 0);
                 CurTok.Tok = TOK_CHARCON;
-                NextChar ();
-                if (C != '\'') {
-                    if (!MissingCharTerm) {
-                        Error ("Illegal character constant");
-                    }
-                } else {
-                    NextChar ();
-                }
             }
             return;
 
@@ -1504,7 +1617,7 @@ CharAgain:
             /* In case of the main file, do not close it, but return EOF. */
             if (Source && Source->Next) {
                 DoneCharSource ();
-                goto Again;
+                goto Restart;
             } else {
                 CurTok.Tok = TOK_EOF;
             }

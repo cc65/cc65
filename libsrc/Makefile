@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
@@ -15,7 +21,9 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-TARGETS = apple2       \
+# FIXME: c65 (and perhaps mega65?) should be moved up to CBMS maybe
+TARGETS = agat         \
+          apple2       \
           apple2enh    \
           atari        \
           atarixl      \
@@ -23,20 +31,28 @@ TARGETS = apple2       \
           atari5200    \
           atari7800    \
           atmos        \
+          c65          \
           creativision \
           $(CBMS)      \
           $(GEOS)      \
           gamate       \
+          kim1         \
           lynx         \
           nes          \
           none         \
           osic1p       \
           pce          \
+          rp6502       \
           sim6502      \
           sim65c02     \
           supervision  \
           sym1         \
-          telestrat
+          telestrat    \
+          mega65
+
+TARGETTEST = none     \
+             sim6502  \
+             sim65c02
 
 DRVTYPES = emd \
            joy \
@@ -52,7 +68,7 @@ OUTPUTDIRS := lib                                                               
               $(subst ../,,$(wildcard ../target/*/drv/*))                                     \
               $(subst ../,,$(wildcard ../target/*/util))
 
-.PHONY: all mostlyclean clean install zip lib $(TARGETS)
+.PHONY: all mostlyclean clean install zip lib libtest $(TARGETS)
 
 .SUFFIXES:
 
@@ -79,6 +95,8 @@ ifndef TARGET
 datadir = $(PREFIX)/share/cc65
 
 all lib: $(TARGETS)
+
+libtest: $(TARGETTEST)
 
 mostlyclean:
 	$(call RMDIR,../libwrk)
@@ -115,13 +133,17 @@ endef # ZIP_recipe
 zip:
 	$(foreach dir,$(OUTPUTDIRS),$(ZIP_recipe))
 
-$(TARGETS):
+$(TARGETS): | ../lib
 	@$(MAKE) --no-print-directory $@
+
+# ../lib must be created globally before doing lib targets in parallel
+../lib:
+	@$(call MKDIR,$@)
 
 else # TARGET
 
-CA65FLAGS =
-CC65FLAGS = -Or -W error
+CA65FLAGS = -g
+CC65FLAGS = -g -Or -W error
 
 EXTZP = cbm510 \
         cbm610 \
@@ -174,6 +196,11 @@ ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
   SRCDIRS += $(addprefix geos-common/,$(GEOSDIRS))
 endif
 
+ifeq ($(TARGET),c65)
+# FIXME: this does not work because of the SP vs C_SP clash
+else ifeq ($(TARGET),mega65)
+# FIXME: this does not work because of the SP vs C_SP clash
+else
 SRCDIRS += common   \
            conio    \
            dbg      \
@@ -184,6 +211,7 @@ SRCDIRS += common   \
            serial   \
            tgi      \
            zlib
+endif
 
 vpath %.s $(SRCDIRS)
 vpath %.c $(SRCDIRS)
@@ -286,10 +314,12 @@ $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
 	@echo $(TARGET) - $(<F)
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
+$(EXTRA_OBJS): | ../lib
+
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../target/$(TARGET)/util:
+../libwrk/$(TARGET) ../target/$(TARGET)/util:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

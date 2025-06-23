@@ -55,13 +55,17 @@
 #include "data.h"
 #include "error.h"
 #include "global.h"
+#include "handler.h"
 #include "infofile.h"
 #include "labels.h"
 #include "opctable.h"
+#include "opc45GS02.h"
 #include "output.h"
 #include "scanner.h"
 #include "segment.h"
 
+
+static unsigned PrevAddrMode;
 
 
 /*****************************************************************************/
@@ -309,7 +313,8 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
-    StartAddr = CvtNumber (Opt, Arg);
+    StartAddr = (uint32_t) CvtNumber (Opt, Arg);
+    HaveStartAddr = 1;
 }
 
 
@@ -352,7 +357,52 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the disassembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-    exit(EXIT_SUCCESS);
+    exit (EXIT_SUCCESS);
+}
+
+
+
+static unsigned HandleChangedLength(const OpcDesc* D, unsigned PC)
+/* Instructions that have flSizeChanges set may use a different size than what
+** the table says. This function adjusts the PC accordingly, so after this only
+** the size from the table needs to be added to make up for the correct value
+*/
+{
+    if (D->Flags & flSizeChanges) {
+        if (CPU == CPU_45GS02) {
+            if (D->Handler == OH_Implicit_42_45GS02) {
+                if (GetCodeByte (PC+1) == 0x42) {
+                    /* NEG:NEG prefix (0x42 0x42) */
+                    unsigned opc = GetCodeByte (PC+2);
+                    if (opc == 0xea) {
+                        /* 42 42 ea */
+                        if ((GetCodeByte (PC+3) & 0x1f) == 0x12) {
+                            PC += 4;
+                        }
+                    } else {
+                        /* 42 42 xx */
+                        const OpcDesc* ED = &OpcTable_45GS02_extended[opc];
+                        if (ED->Handler != OH_Illegal) {
+                            PC += (ED->Size - 1);
+                        }
+                    }
+                }
+            } else if (D->Handler == OH_Implicit_ea_45GS02) {
+                /* NOP prefix (0xea) */
+                if ((GetCodeByte (PC+1) & 0x1f) == 0x12) {
+                    PC += 2;
+                }
+            }
+        } else if (CPU == CPU_65816) {
+            if ((D->Handler == OH_Immediate65816M &&
+                GetAttr (PC) & atMem16) ||
+                (D->Handler == OH_Immediate65816X &&
+                GetAttr (PC) & atIdx16)) {
+                PC++;
+            }
+        }
+    }
+    return PC;
 }
 
 
@@ -360,11 +410,11 @@ static void OptVersion (const char* Opt attribute ((unused)),
 static void OneOpcode (unsigned RemainingBytes)
 /* Disassemble one opcode */
 {
-    unsigned I;
-    unsigned OldPC = PC;
+    uint32_t I;
+    uint32_t OldPC = PC;
 
     /* Get the opcode from the current address */
-    unsigned char OPC = GetCodeByte (PC);
+    uint8_t OPC = GetCodeByte (PC);
 
     /* Get the opcode description for the opcode byte */
     const OpcDesc* D = &OpcTable[OPC];
@@ -427,8 +477,14 @@ static void OneOpcode (unsigned RemainingBytes)
     switch (Style) {
 
         case atDefault:
-            D->Handler (D);
-            PC += D->Size;
+            if (CPU == CPU_65816) {
+                DataByteLine (1);
+                ++PC;
+            } else {
+                D->Handler (D);
+                PC = HandleChangedLength (D, PC);
+                PC += D->Size;
+            }
             break;
 
         case atCode:
@@ -436,12 +492,30 @@ static void OneOpcode (unsigned RemainingBytes)
             ** following insn, fall through to byte mode.
             */
             if (D->Size <= RemainingBytes) {
+                if (CPU == CPU_65816) {
+                    const unsigned AddrMode = GetAttr (PC) & at65816Mask;
+                    if (PrevAddrMode != AddrMode) {
+                        if ((PrevAddrMode & atMem8) != (AddrMode & atMem8) ||
+                            (PrevAddrMode & atMem16) != (AddrMode & atMem16)) {
+                            OutputMFlag (!!(AddrMode & atMem8));
+                        }
+                        if ((PrevAddrMode & atIdx8) != (AddrMode & atIdx8) ||
+                            (PrevAddrMode & atIdx16) != (AddrMode & atIdx16)) {
+                            OutputXFlag (!!(AddrMode & atIdx8));
+                        }
+
+                        PrevAddrMode = AddrMode;
+                    }
+                }
+
                 /* Output labels within the next insn */
                 for (I = 1; I < D->Size; ++I) {
                     ForwardLabel (I);
                 }
                 /* Output the insn */
                 D->Handler (D);
+
+                PC = HandleChangedLength (D, PC);
                 PC += D->Size;
                 break;
             }
@@ -501,10 +575,12 @@ static void OneOpcode (unsigned RemainingBytes)
 static void OnePass (void)
 /* Make one pass through the code */
 {
-    unsigned Count;
+    uint32_t Count;
+
+    PrevAddrMode = 0;
 
     /* Disassemble until nothing left */
-    while ((Count = GetRemainingBytes()) > 0) {
+    while ((Count = GetRemainingBytes ()) > 0) {
         OneOpcode (Count);
     }
 }

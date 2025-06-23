@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 #
 # Makefile for cc65 testcode
 #
@@ -540,12 +546,13 @@ EXELIST_sym1 = \
 	strnlen \
 	strqtok-test
 
-# omitted: clock-test cpeek-test conio deb dir-test em-test exec-test1 exec-test2
+# omitted: clock-test cpeek-test deb dir-test em-test exec-test1 exec-test2
 # fileio-test ft mouse-test posixio-test rename-test seek ser-test
 EXELIST_atmos = \
 	minimal \
 	arg-test \
 	clock \
+	conio \
 	cprintf \
 	cursor \
 	div-test \
@@ -623,6 +630,7 @@ EXELIST_pce = \
 # stroserror-test strqtok-test uname-test
 EXELIST_osic1p = \
 	minimal \
+	conio \
 	cursor \
 	mul-test
 
@@ -693,6 +701,17 @@ EXELIST_bbc = \
 EXELIST_lunix = \
 	notavailable
 
+# omitted: arg-test clock-test clock cpeek-test conio cprintf cursor deb dir-test
+# em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test
+# mouse-test mul-test posixio-test rename-test scanf-test seek ser-test strdup-test
+# stroserror-test uname-test
+EXELIST_kim1 = \
+	minimal \
+	div-test \
+	moddiv-test \
+	strnlen \
+	strqtok-test
+
 # Unlisted targets will try to build everything.
 # That lets us learn what they cannot build, and what settings
 # we need to use for programs that can be built and run.
@@ -742,6 +761,7 @@ TARGETS :=     \
   creativision \
   cx16         \
   gamate       \
+  kim1		   \
   lunix        \
   lynx         \
   nes          \

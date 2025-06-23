@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 .PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util checkstyle check
 
 .SUFFIXES:
@@ -21,7 +27,7 @@ mostlyclean clean:
 avail unavail bin:
 	@$(MAKE) -C src     --no-print-directory $@
 
-lib:
+lib libtest:
 	@$(MAKE) -C libsrc  --no-print-directory $@
 
 doc html info:
@@ -41,15 +47,21 @@ util:
 
 # check the code style
 checkstyle:
-	@$(MAKE) -C .github/checks       --no-print-directory $@
+	@$(MAKE) -C .github/checks --no-print-directory $@
 
-# simple "test" target, only run regression tests for c64 target
+# check bsearch tables
+sorted:
+	@$(MAKE) -C .github/checks --no-print-directory $@
+
+# runs regression tests, requires libtest target libraries
 test:
 	@$(MAKE) -C test                 --no-print-directory $@
 
 # GNU "check" target, which runs all tests
 check:
 	@$(MAKE) -C .github/checks checkstyle --no-print-directory
+	@$(MAKE) -C .github/checks sorted     --no-print-directory
+	@$(MAKE) -C src test                  --no-print-directory
 	@$(MAKE) test
 	@$(MAKE) -C targettest platforms      --no-print-directory
 	@$(MAKE) -C samples platforms         --no-print-directory

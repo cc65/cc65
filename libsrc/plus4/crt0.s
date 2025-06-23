@@ -9,8 +9,7 @@
         .import         callirq_y, initlib, donelib
         .import         callmain, zerobss
         .import         __INTERRUPTOR_COUNT__
-        .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
-        .import         __STACKSIZE__                   ; Linker generated
+        .import         __HIMEM__                       ; Linker generated
 
         .include        "zeropage.inc"
         .include        "plus4.inc"
@@ -51,19 +50,28 @@ L1:     lda     sp,x
         tsx
         stx     spsave          ; Save system stk ptr
 
-        lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
+        lda     #<__HIMEM__
+        ldx     #>__HIMEM__
         sta     sp
         stx     sp+1
 
 ; Set up the IRQ vector in the banked RAM; and, switch off the ROM.
 
-        ldx     #<IRQ
-        ldy     #>IRQ
+        lda     #<IRQ
+        ldx     #>IRQ
         sei                     ; No ints, handler not yet in place
         sta     ENABLE_RAM
-        stx     $FFFE           ; Install interrupt handler
-        sty     $FFFF
+        sta     $FFFE           ; Install interrupt handler
+        stx     $FFFF
+        lda     IRQVec
+        ldx     IRQVec+1
+        sta     IRQInd+1
+        stx     IRQInd+2
+        lda     #<IRQStub
+        ldx     #>IRQStub
+        sta     IRQVec
+        stx     IRQVec+1
+
         cli                     ; Allow interrupts
 
 ; Clear the BSS data.
@@ -94,6 +102,13 @@ _exit:  pha                     ; Save the return code
         lda     #0
         sta     irqcount        ; Disable custom IRQ handlers
 
+        sei
+        ldx     IRQInd+1
+        ldy     IRQInd+2
+        stx     IRQVec
+        sty     IRQVec+1
+        cli
+
 ; Copy back the zero-page stuff.
 
         ldx     #zpspace-1
@@ -121,9 +136,13 @@ L2:     lda     zpsave,x
 ; IRQ handler. The handler in the ROM enables the Kernal, and jumps to
 ; $CE00, where the ROM code checks for a BRK or IRQ, and branches via the
 ; indirect vectors at $314/$316.
-; To make our stub as fast as possible, we skip the whole part of the ROM
-; handler, and jump to the indirect vectors directly. We do also call our
-; own interrupt handlers if we have any; so, they need not use $314.
+;
+; When RAM is banked in, we skip the whole part of the ROM handler, and jump to
+; the indirect vectors directly, after calling our own interrupt handlers.
+;
+; When ROM is banked in, a stub installed in the $314 indirect vector ensures
+; that our interrupt handlers are still called (otherwise, interrupts that are
+; not serviced by the ROM handler may cause a deadlock).
 
 .segment        "LOWCODE"
 
@@ -138,15 +157,6 @@ IRQ:    cld                     ; Just to be sure
         and     #$10            ; Test for BRK bit
         bne     dobreak
 
-; It's an IRQ; and, RAM is enabled. If we have handlers, call them. We will use
-; a flag here instead of loading __INTERRUPTOR_COUNT__ directly, since the
-; condes function is not reentrant. The irqcount flag will be set/reset from
-; the main code, to avoid races.
-
-        ldy     irqcount
-        beq     @L1
-        jsr     callirq_y       ; Call the IRQ functions
-
 ; Since the ROM handler will end with an RTI, we have to fake an IRQ return
 ; on the stack, so that we get control of the CPU after the ROM handler,
 ; and can switch back to RAM.
@@ -160,7 +170,7 @@ IRQ:    cld                     ; Just to be sure
         pha                     ; Push faked X register
         pha                     ; Push faked Y register
         sta     ENABLE_ROM      ; Switch to ROM
-        jmp     (IRQVec)        ; Jump indirect to Kernal IRQ handler
+        jmp     (IRQVec)        ; Jump indirect to IRQ stub
 
 irq_ret:
         sta     ENABLE_RAM      ; Switch back to RAM
@@ -181,6 +191,22 @@ dobreak:
 nohandler:
         sta     ENABLE_ROM
         jmp     (BRKVec)        ; Jump indirect to the break vector
+
+
+; IRQ stub installed at $314, called by our handler above if RAM is banked in,
+; or the Kernal IRQ handler if ROM is banked in.
+
+; If we have handlers, call them. We will use a flag here instead of loading
+; __INTERRUPTOR_COUNT__ directly, since the condes function is not reentrant.
+; The irqcount flag will be set/reset from the main code, to avoid races.
+IRQStub:
+        cld                     ; Just to be sure
+        sta     ENABLE_RAM
+        ldy     irqcount
+        beq     @L1
+        jsr     callirq_y       ; Call the IRQ functions
+@L1:    sta     ENABLE_ROM
+        jmp     (IRQInd+1)      ; Jump to the saved IRQ vector
 
 ; ------------------------------------------------------------------------
 ; Data

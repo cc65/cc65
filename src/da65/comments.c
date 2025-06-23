@@ -33,6 +33,9 @@
 
 
 
+#include <inttypes.h>
+#include <string.h>
+
 /* common */
 #include "xmalloc.h"
 
@@ -49,8 +52,82 @@
 
 
 
-/* Comment table */
-static const char* CommentTab[0x10000];
+/* Comment structure how it is found in the comment table */
+typedef struct Comment Comment;
+struct Comment {
+    struct Comment*     Next;           /* Next entry in linked list */
+    uint32_t            Addr;           /* The full address */
+    char                Text[1];        /* Text, dynamically allocated */
+};
+
+/* Comments use a hash table and a linear list for collision resolution. The
+** hash function is easy and effective. It evaluates just the lower bits of
+** the address. Since we don't expect many comments, we can keep the table
+** small.
+*/
+#define COMMENT_HASH_SIZE       256u    /* Must be power of two */
+static Comment* CommentTab[COMMENT_HASH_SIZE];
+
+
+
+/*****************************************************************************/
+/*                              struct Comment                               */
+/*****************************************************************************/
+
+
+
+static Comment* NewComment (uint32_t Addr, const char* Text)
+/* Create a new comment structure and return it */
+{
+    /* Get the length of the text */
+    unsigned Len = strlen (Text);
+
+    /* Create a new comment */
+    Comment* C = xmalloc (sizeof (Comment) + Len);
+
+    /* Fill in the data */
+    C->Next = 0;
+    C->Addr = Addr;
+    memcpy (C->Text, Text, Len + 1);
+
+    /* Return the comment just created */
+    return C;
+}
+
+
+
+static uint32_t GetCommentHash (uint32_t Addr)
+/* Get the hash for a comment at the given address */
+{
+    return (Addr & (COMMENT_HASH_SIZE - 1));
+}
+
+
+
+static Comment* FindComment (uint32_t Addr)
+/* Search for a comment for the given address and return it. Returns NULL if
+** no comment exists for the address.
+*/
+{
+    Comment* C = CommentTab[GetCommentHash (Addr)];
+    while (C) {
+        if (C->Addr == Addr) {
+            break;
+        }
+        C = C->Next;
+    }
+    return C;
+}
+
+
+
+static void InsertComment (Comment* C)
+/* Insert a comment into the hash table */
+{
+    uint32_t Hash = GetCommentHash (C->Addr);
+    C->Next = CommentTab[Hash];
+    CommentTab[Hash] = C;
+}
 
 
 
@@ -60,28 +137,30 @@ static const char* CommentTab[0x10000];
 
 
 
-void SetComment (unsigned Addr, const char* Comment)
+void SetComment (uint32_t Addr, const char* Text)
 /* Set a comment for the given address */
 {
     /* Check the given address */
     AddrCheck (Addr);
 
     /* If we do already have a comment, warn and ignore the new one */
-    if (CommentTab[Addr]) {
-        Warning ("Duplicate comment for address $%04X", Addr);
+    Comment* C = FindComment (Addr);
+    if (C) {
+        Warning ("Duplicate comment for address $%04" PRIX32, Addr);
     } else {
-        CommentTab[Addr] = xstrdup (Comment);
+        InsertComment (NewComment (Addr, Text));
     }
 }
 
 
 
-const char* GetComment (unsigned Addr)
+const char* GetComment (uint32_t Addr)
 /* Return the comment for an address */
 {
     /* Check the given address */
     AddrCheck (Addr);
 
-    /* Return the label if any */
-    return CommentTab[Addr];
+    /* Check for a comment and return it */
+    const Comment* C = FindComment (Addr);
+    return C? C->Text : 0;
 }

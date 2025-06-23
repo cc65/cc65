@@ -52,7 +52,7 @@
 
 
 
-static struct Segments* CurrentFunctionSegment;
+static struct SegContext* CurrentFunctionSegment;
 
 
 
@@ -62,7 +62,7 @@ static struct Segments* CurrentFunctionSegment;
 
 
 
-void UseLabelPoolFromSegments (struct Segments* Seg)
+void UseLabelPoolFromSegments (struct SegContext* Seg)
 /* Use the info in segments for generating new label numbers */
 {
     CurrentFunctionSegment = Seg;

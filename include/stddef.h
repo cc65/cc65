@@ -53,9 +53,8 @@ typedef unsigned size_t;
 #endif
 
 /* NULL pointer */
-#ifndef _HAVE_NULL
-#define NULL    ((void *) 0)
-#define _HAVE_NULL
+#ifndef NULL
+#define NULL ((void *) 0)
 #endif
 
 /* offsetof macro */
@@ -65,6 +64,3 @@ typedef unsigned size_t;
 
 /* End of stddef.h */
 #endif
-
-
-

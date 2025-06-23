@@ -38,9 +38,8 @@
 
 
 /* NULL pointer */
-#ifndef _HAVE_NULL
-#define NULL    0
-#define _HAVE_NULL
+#ifndef NULL
+#define NULL ((void *) 0)
 #endif
 
 /* size_t is needed */
@@ -87,6 +86,10 @@ extern FILE* stderr;
 #  define FILENAME_MAX      (80+1)
 #elif defined(__TELESTRAT__)
 #  define FILENAME_MAX      (50+1)
+#elif defined(__SIM6502__)
+#  define FILENAME_MAX      (1024+1)
+#elif defined(__SIM65C02__)
+#  define FILENAME_MAX      (1024+1)
 #else
 #  define FILENAME_MAX      (16+1)
 #endif

@@ -216,10 +216,12 @@ typedef enum {
 
 
 /* Preprocessor directive tokens mapping table */
+/* CAUTION: table must be sorted for bsearch */
 static const struct PPDType {
     const char*     Tok;        /* Token */
     ppdirective_t   Type;       /* Type */
 } PPDTypes[] = {
+/* BEGIN SORTED.SH */
     {   "define",       PPD_DEFINE      },
     {   "elif",         PPD_ELIF        },
     {   "else",         PPD_ELSE        },
@@ -233,6 +235,7 @@ static const struct PPDType {
     {   "pragma",       PPD_PRAGMA      },
     {   "undef",        PPD_UNDEF       },
     {   "warning",      PPD_WARNING     },
+/* END SORTED.SH */
 };
 
 /* Number of preprocessor directive types */
@@ -842,7 +845,7 @@ static void AddPreLine (StrBuf* Str)
             SB_AppendChar (Str, '\n');
         }
         SB_Printf (&Comment, "#line %u \"%s\"\n",
-                   GetCurrentLineNum () - ContinuedLines, GetCurrentFilename ());
+                   GetCurrentLineNum () - ContinuedLines, GetCurrentFileName ());
         SB_Append (Str, &Comment);
     } else {
         /* Output new lines */
@@ -2572,7 +2575,7 @@ static void DoDefine (void)
     CheckForBadIdent (Ident, Std, 0);
 
     /* Create a new macro definition */
-    M = NewMacro (Ident);
+    M = NewMacro (Ident, 0);
 
     /* Check if this is a function-like macro */
     if (CurC == '(') {
@@ -2640,6 +2643,19 @@ static void DoDefine (void)
             goto Error_Handler;
         }
         NextChar ();
+
+    } else {
+
+        /* Object like macro. Check ISO/IEC 9899:1999 (E) 6.10.3p3:
+        ** "There shall be white-space between the identifier and the
+        ** replacement list in the definition of an object-like macro."
+        ** Note: C89 doesn't have this constraint.
+        ** Note: if there is no replacement list, a space is not required.
+        */
+        if (Std == STD_C99 && !IsSpace (CurC) && CurC != 0) {
+            PPWarning ("ISO C99 requires whitespace after the macro name");
+        }
+
     }
 
     /* Remove whitespace and comments from the line, store the preprocessed
@@ -2812,11 +2828,30 @@ static void DoInclude (void)
     InputType   IT;
     StrBuf      Filename = AUTO_STRBUF_INITIALIZER;
 
-    /* Macro-replace a single line with special support for <filename> */
-    SB_Clear (MLine);
-    PreprocessDirective (Line, MLine, MSM_TOK_HEADER);
+    /* Skip whitespace so the input pointer points to the argument */
+    SkipWhitespace (0);
 
-    /* Read from the processed line */
+    /* We may have three forms of the #include directive:
+    **
+    ** - # include "q-char-sequence" new-line
+    ** - # include <h-char-sequence> new-line
+    ** - # include pp-tokens new-line
+    **
+    ** The former two are processed as is while the latter is preprocessed and
+    ** must then resemble one of the first two forms.
+    */
+    if (CurC == '"' || CurC == '<') {
+        /* Copy the argument part over to MLine */
+        unsigned Start = SB_GetIndex (Line);
+        unsigned Length = SB_GetLen (Line) - Start;
+        SB_Slice (MLine, Line, Start, Length);
+    } else {
+        /* Macro-replace a single line with special support for <filename> */
+        SB_Clear (MLine);
+        PreprocessDirective (Line, MLine, MSM_TOK_HEADER);
+    }
+
+    /* Read from the copied/preprocessed line */
     SB_Reset (MLine);
     MLine = InitLine (MLine);
 
@@ -2894,7 +2929,7 @@ static unsigned GetLineDirectiveNum (void)
 
     /* Ensure the buffer is terminated with a '\0' */
     SB_Terminate (&Buf);
-    if (SkipWhitespace (0) != 0 || CurC == '\0') {
+    if (SB_GetLen (&Buf) > 0) {
         const char* Str = SB_GetConstBuf (&Buf);
         if (Str[0] == '\0') {
             PPWarning ("#line directive interprets number as decimal, not octal");
@@ -2910,9 +2945,10 @@ static unsigned GetLineDirectiveNum (void)
             }
         }
     } else {
-        PPError ("#line directive requires a simple decimal digit sequence");
+        PPError ("#line directive requires a decimal digit sequence");
         ClearLine ();
     }
+    SkipWhitespace (0);
 
     /* Done with the buffer */
     SB_Done (&Buf);
@@ -2943,7 +2979,7 @@ static void DoLine (void)
             StrBuf Filename = AUTO_STRBUF_INITIALIZER;
             if (SB_GetString (Line, &Filename)) {
                 SB_Terminate (&Filename);
-                SetCurrentFilename (SB_GetConstBuf (&Filename));
+                SetCurrentFileName (SB_GetConstBuf (&Filename));
             } else {
                 PPError ("Invalid filename for #line directive");
                 LineNum = 0;
@@ -3220,7 +3256,7 @@ void HandleSpecialMacro (Macro* M, const char* Name)
     } else if (strcmp (Name, "__FILE__") == 0) {
         /* Replace __FILE__ with the current filename */
         StrBuf B = AUTO_STRBUF_INITIALIZER;
-        SB_InitFromString (&B, GetCurrentFilename ());
+        SB_InitFromString (&B, GetCurrentFileName ());
         SB_Clear (&M->Replacement);
         Stringize (&B, &M->Replacement);
         SB_Done (&B);
@@ -3332,7 +3368,7 @@ void Preprocess (void)
     PLine = InitLine (PLine);
 
     if (Verbosity > 1 && SB_NotEmpty (Line)) {
-        printf ("%s:%u: %.*s\n", GetCurrentFilename (), GetCurrentLineNum (),
+        printf ("%s:%u: %.*s\n", GetCurrentFileName (), GetCurrentLineNum (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 

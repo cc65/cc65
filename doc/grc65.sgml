@@ -270,7 +270,7 @@ required for the correct process of GEOS sequential application building.
 <p>Large GEOS applications typically don't fit in one piece in their designated
 memory area.  They are therefore split into overlays which are loaded into memory
 on demand.  The individual overlays are stored as records of a VLIR (Variable
-Length Index Record) file.  When GEOS starts a VLIR overlay appliation it loads
+Length Index Record) file.  When GEOS starts a VLIR overlay application it loads
 record number 0 which is supposed to contain the main program.  The record numbers
 starting with 1 are to be used for the actual overlays.
 

@@ -12,12 +12,18 @@ compiler is working as expected (when the tests behave as described):
 /val  - The bulk of tests are contained here, individual tests should exit with
         an exit code of EXIT_SUCCESS when they pass, or EXIT_FAILURE on error.
 
+/err  - contains tests that MUST NOT compile
+
 /standard - like the tests in /val, the tests must exit with EXIT_SUCCESS on
         success. Unlike the tests in /val these are not compiled for every
         combination of optimizer options, but instead always with -Osir and then
         for each supported C-standard (C89, C99, CC65). The goal is to use these
         to check for regressions in standard conformance of the compiler and the
         library.
+
+/standard_err - like the tests in /err, these tests MUST NOT compile, and like
+        the tests in /standard, these are compiled -Osir and then for each
+        supported C-Standard.
 
 /ref  - These tests produce output that must be compared with reference output.
         Normally the reference output is produced by compiling the program on the
@@ -43,8 +49,6 @@ compiler is working as expected (when the tests behave as described):
         only ever use this as a last resort when something can not be tested by
         other means.
 
-/err  - contains tests that MUST NOT compile
-
 
 /todo and /misc generally contain the tests that fail because of known bugs:
 
@@ -68,7 +72,11 @@ compiler is working as expected (when the tests behave as described):
         which will require additional changes to the makefile(s).
 
 
-To run the tests use "make" in this (top) directory, the makefile should exit
+These tests only require a subset of the platform libraries. In the (top)
+directory above this one, "make libtest" can be used to build only those
+libraries needed for testing, instead of "make lib".
+
+To run the tests use "make" in this (test) directory, the makefile should exit
 with no error.
 
 When a test failed you can use "make continue" to run further tests.

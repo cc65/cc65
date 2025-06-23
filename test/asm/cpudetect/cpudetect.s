@@ -8,6 +8,10 @@
    lda #$ea
 .endif
 
+.ifp02x
+   lax #$ea
+.endif
+
 .ifpsc02
    jmp ($1234,x)
 .endif
@@ -24,8 +28,16 @@
    taz
 .endif
 
+.ifp45GS02
+   orq $1234
+.endif
+
 .ifpdtv
    sac #$00
+.endif
+
+.ifpm740
+   jsr $ff12
 .endif
 
 
@@ -68,7 +80,32 @@
    .byte 0,"CPU_ISET_4510"
 .endif
 
+.if (.cpu .bitand CPU_ISET_45GS02)
+   .byte 0,"CPU_ISET_45GS02"
+.endif
+
 .if (.cpu .bitand CPU_ISET_6502DTV)
    .byte 0,"CPU_ISET_6502DTV"
 .endif
 
+.if (.cpu .bitand CPU_ISET_M740)
+   .byte 0,"CPU_ISET_M740"
+.endif
+
+; FIXME: something with 65816 is quirky
+.if (.not .cpu .bitand CPU_ISET_65816)
+    .include "allinst.inc"
+.endif
+
+
+; step 3: switch through all supported cpus to verify the pseudo-op is there
+
+.p02
+.p02X
+.psc02
+.pc02
+.p816
+.p4510
+.p45GS02
+.pdtv
+.pm740

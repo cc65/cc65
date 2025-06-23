@@ -87,6 +87,10 @@ typedef enum {
     TGT_C65,
     TGT_CX16,
     TGT_SYM1,
+    TGT_MEGA65,
+    TGT_KIM1,
+    TGT_RP6502,
+    TGT_AGAT,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 

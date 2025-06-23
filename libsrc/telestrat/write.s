@@ -42,16 +42,16 @@ next:
         ldy     ptr3+1
         ldx     tmp1            ; send fd in X
         BRK_TELEMON  XFWRITE
+
         ;  compute nb of bytes written
-
-
-        lda     PTR_READ_DEST+1
         sec
+        lda     PTR_READ_DEST
+        sbc     ptr1
+        pha
+        lda     PTR_READ_DEST+1
         sbc     ptr1+1
         tax
-        lda     PTR_READ_DEST
-        sec
-        sbc     ptr1
+        pla
         rts
 
 
@@ -65,7 +65,7 @@ L2:     ldy     #0
         cpx     #$0A            ; check for \n
         bne     L3
         BRK_TELEMON  XWR0       ; macro send char to screen (channel 0 in telemon terms)
-        lda     #$0D            ; return to the beggining of the line
+        lda     #$0D            ; return to the beginning of the line
         BRK_TELEMON  XWR0       ; macro
 
 

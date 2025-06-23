@@ -127,6 +127,7 @@ typedef enum {
     TOK_ABSOLUTE = TOK_FIRST_KEYWORD,   /* ABSOLUTE keyword */
     TOK_ADDRSIZE,                       /* ADDRSIZE keyword */
     TOK_AUTO,                           /* AUTO keyword */
+    TOK_BANK,                           /* BANK keyword */
     TOK_COUNT,                          /* COUNT keyword */
     TOK_CSYM,                           /* CSYM keyword */
     TOK_DEF,                            /* DEF keyword */
@@ -347,6 +348,7 @@ struct SegInfo {
     cc65_size           Size;           /* Size of segment */
     char*               OutputName;     /* Name of output file */
     unsigned long       OutputOffs;     /* Offset in output file */
+    unsigned            Bank;           /* Bank number of memory area */
     char                Name[1];        /* Name of segment */
 };
 
@@ -1618,7 +1620,8 @@ static int CompareScopeInfoByName (const void* L, const void* R)
 
 static SegInfo* NewSegInfo (const StrBuf* Name, unsigned Id,
                             cc65_addr Start, cc65_addr Size,
-                            const StrBuf* OutputName, unsigned long OutputOffs)
+                            const StrBuf* OutputName, unsigned long OutputOffs,
+                            unsigned Bank)
 /* Create a new SegInfo struct and return it */
 {
     /* Allocate memory */
@@ -1628,6 +1631,7 @@ static SegInfo* NewSegInfo (const StrBuf* Name, unsigned Id,
     S->Id         = Id;
     S->Start      = Start;
     S->Size       = Size;
+    S->Bank       = Bank;
     if (SB_GetLen (OutputName) > 0) {
         /* Output file given */
         S->OutputName = SB_StrDup (OutputName);
@@ -1676,6 +1680,7 @@ static void CopySegInfo (cc65_segmentdata* D, const SegInfo* S)
     D->segment_size  = S->Size;
     D->output_name   = S->OutputName;
     D->output_offs   = S->OutputOffs;
+    D->segment_bank  = S->Bank;
 }
 
 
@@ -2518,6 +2523,7 @@ static void NextChar (InputData* D)
 
 
 
+/* CAUTION: table must be sorted for bsearch */
 static void NextToken (InputData* D)
 /* Read the next token from the input stream */
 {
@@ -2525,9 +2531,11 @@ static void NextToken (InputData* D)
         const char      Keyword[12];
         Token           Tok;
     } KeywordTable[] = {
+/* BEGIN SORTED.SH */
         { "abs",        TOK_ABSOLUTE    },
         { "addrsize",   TOK_ADDRSIZE    },
         { "auto",       TOK_AUTO        },
+        { "bank",       TOK_BANK        },
         { "count",      TOK_COUNT       },
         { "csym",       TOK_CSYM        },
         { "def",        TOK_DEF         },
@@ -2572,6 +2580,7 @@ static void NextToken (InputData* D)
         { "var",        TOK_VAR         },
         { "version",    TOK_VERSION     },
         { "zp",         TOK_ZEROPAGE    },
+/* END SORTED.SH */
     };
 
 
@@ -3838,6 +3847,7 @@ static void ParseSegment (InputData* D)
     StrBuf          Name = STRBUF_INITIALIZER;
     StrBuf          OutputName = STRBUF_INITIALIZER;
     unsigned long   OutputOffs = 0;
+    unsigned        Bank = 0;
     SegInfo*        S;
     enum {
         ibNone      = 0x000,
@@ -3850,6 +3860,7 @@ static void ParseSegment (InputData* D)
         ibSize      = 0x020,
         ibStart     = 0x040,
         ibType      = 0x080,
+        ibBank      = 0x100,
 
         ibRequired  = ibId | ibName | ibStart | ibSize | ibAddrSize | ibType,
     } InfoBits = ibNone;
@@ -3863,10 +3874,11 @@ static void ParseSegment (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_ID         &&
-            D->Tok != TOK_NAME          && D->Tok != TOK_OUTPUTNAME &&
-            D->Tok != TOK_OUTPUTOFFS    && D->Tok != TOK_SIZE       &&
-            D->Tok != TOK_START         && D->Tok != TOK_TYPE) {
+        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_BANK       &&
+            D->Tok != TOK_ID            && D->Tok != TOK_NAME       &&
+            D->Tok != TOK_OUTPUTNAME    && D->Tok != TOK_OUTPUTOFFS &&
+            D->Tok != TOK_SIZE          && D->Tok != TOK_START      &&
+            D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -3890,6 +3902,15 @@ static void ParseSegment (InputData* D)
             case TOK_ADDRSIZE:
                 NextToken (D);
                 InfoBits |= ibAddrSize;
+                break;
+
+            case TOK_BANK:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Bank = D->IVal;
+                InfoBits |= ibBank;
+                NextToken (D);
                 break;
 
             case TOK_ID:
@@ -3992,7 +4013,7 @@ static void ParseSegment (InputData* D)
     }
 
     /* Create the segment info and remember it */
-    S = NewSegInfo (&Name, Id, Start, Size, &OutputName, OutputOffs);
+    S = NewSegInfo (&Name, Id, Start, Size, &OutputName, OutputOffs, Bank);
     CollReplaceExpand (&D->Info->SegInfoById, S, Id);
     CollAppend (&D->Info->SegInfoByName, S);
 
@@ -4736,14 +4757,18 @@ static SpanInfoListEntry* FindSpanInfoByAddr (const SpanInfoList* L, cc65_addr A
 
 
 
-static LineInfo* FindLineInfoByLine (const Collection* LineInfos, cc65_line Line)
-/* Find the LineInfo for a given line number. The function returns the line
-** info or NULL if none was found.
+static int FindLineInfoByLine (const Collection* LineInfos, cc65_line Line,
+                               unsigned *Index)
+/* Find the LineInfo for a given line number. The function returns true if the
+** name was found. In this case, Index contains the index of the first item
+** that matches. If the item wasn't found, the function returns false and
+** Index contains the insert position for Name.
 */
 {
     /* Do a binary search */
     int Lo = 0;
     int Hi = (int) CollCount (LineInfos) - 1;
+    int Found = 0;
     while (Lo <= Hi) {
 
         /* Mid of range */
@@ -4755,16 +4780,20 @@ static LineInfo* FindLineInfoByLine (const Collection* LineInfos, cc65_line Line
         /* Found? */
         if (Line > CurItem->Line) {
             Lo = Cur + 1;
-        } else if (Line < CurItem->Line) {
-            Hi = Cur - 1;
         } else {
-            /* Found */
-            return CurItem;
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+            ** the first item that has a match.
+            */
+            if(Line == CurItem->Line) {
+                Found = 1;
+            }
         }
     }
 
-    /* Not found */
-    return 0;
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
 }
 
 
@@ -6127,13 +6156,17 @@ const cc65_lineinfo* cc65_line_byid (cc65_dbginfo Handle, unsigned Id)
 const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
                                          cc65_line Line)
 /* Return line information for a source file/line number combination. The
-** function returns NULL if no line information was found.
+** function returns NULL if no line information was found, otherwise a list
+** of line infos.
 */
 {
     const DbgInfo*  Info;
     const FileInfo* F;
     cc65_lineinfo*  D;
     LineInfo*       L = 0;
+    unsigned        I;
+    unsigned        Index;
+    unsigned        Count;
 
     /* Check the parameter */
     assert (Handle != 0);
@@ -6150,18 +6183,31 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
     F = CollAt (&Info->FileInfoById, FileId);
 
     /* Search in the file for the given line */
-    L = FindLineInfoByLine (&F->LineInfoByLine, Line);
-
-    /* Bail out if we didn't find the line */
-    if (L == 0) {
+    if(!FindLineInfoByLine (&F->LineInfoByLine, Line, &Index)) {
+        /* Not found */
         return 0;
     }
 
+    /* Index contains the first position. Count how many lines with this number
+    ** we have. Skip the first one, since we have at least one.
+    */
+    Count = 1;
+
+    while ((unsigned) Index + Count < CollCount( &F->LineInfoByLine)) {
+        L = CollAt (&F->LineInfoByLine, (unsigned) Index + Count);
+        if (L->Line != Line) {
+            break;
+        }
+        ++Count;
+    }
+
     /* Prepare the struct we will return to the caller */
-    D = new_cc65_lineinfo (1);
+    D = new_cc65_lineinfo (Count);
 
     /* Copy the data */
-    CopyLineInfo (D->data, L);
+    for (I = 0; I < Count; ++I) {
+        CopyLineInfo (D->data + I, CollAt (&F->LineInfoByLine, Index++));
+    }
 
     /* Return the allocated struct */
     return D;

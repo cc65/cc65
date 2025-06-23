@@ -68,15 +68,17 @@ typedef enum {
     TCF_VOID_PTR_ON_LEFT    = 0x01, /* lhs is a void pointer */
     TCF_VOID_PTR_ON_RIGHT   = 0x02, /* rhs is a void pointer */
     TCF_MASK_VOID_PTR       = TCF_VOID_PTR_ON_LEFT | TCF_VOID_PTR_ON_RIGHT,
-    TCF_QUAL_DIFF           = 0x04, /* CVR qualifiers differ in a way that doesn't matter */
+    TCF_QUAL_DIFF           = 0x04, /* lhs doesn't have all of CVR qualifiers of rhs */
     TCF_QUAL_IMPLICIT       = 0x08, /* CVR qualifiers of lhs are stricter than those of rhs */
-    TCF_PTR_QUAL_DIFF       = 0x10, /* CVR qualifiers of pointers differ */
-    TCF_PTR_QUAL_IMPLICIT   = 0x20, /* CVR qualifiers of pointers are stricter on lhs than those on rhs */
-    TCF_MASK_C_QUAL_DIFF    = 0x3C, /* All C Standard qualifiers */
+    TCF_MASK_CVR_DIFF       = 0x0C, /* All CVR qualifiers */
+    TCF_PTR_QUAL_DIFF       = 0x10, /* lhs pointee doesn't have all of CVR qualifiers of rhs pointee */
+    TCF_PTR_QUAL_IMPLICIT   = 0x20, /* CVR qualifiers of pointees are stricter on lhs than those on rhs */
+    TCF_MASK_PTR_QUAL_DIFF  = 0x30, /* All CVR qualifiers of pointees */
     TCF_ADDRSIZE_QUAL_DIFF  = 0x40, /* Address size qualifiers differ */
     TCF_CCONV_QUAL_DIFF     = 0x80, /* Function calling conventions differ. Unused now */
     TCF_INCOMPATIBLE_QUAL   = TCF_ADDRSIZE_QUAL_DIFF | TCF_CCONV_QUAL_DIFF,
-    TCF_MASK_QUAL           = TCF_MASK_C_QUAL_DIFF | TCF_INCOMPATIBLE_QUAL,
+    TCF_MASK_PARAM_DIFF     = TCF_MASK_PTR_QUAL_DIFF | TCF_INCOMPATIBLE_QUAL,
+    TCF_MASK_QUAL           = TCF_MASK_CVR_DIFF | TCF_MASK_PTR_QUAL_DIFF | TCF_INCOMPATIBLE_QUAL,
 } typecmpflag_t;
 
 typedef struct {
@@ -97,7 +99,10 @@ typecmp_t TypeCmp (const Type* lhs, const Type* rhs);
 /* Compare two types and return the result */
 
 void TypeCompatibilityDiagnostic (const Type* NewType, const Type* OldType, int IsError, const char* Msg);
-/* Print error or warning message about type compatibility with proper type names */
+/* Print error or warning message about type compatibility with proper type
+** names. The format string shall contain two '%s' specifiers for the names of
+** the two types.
+*/
 
 
 

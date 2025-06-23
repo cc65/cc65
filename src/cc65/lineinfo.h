@@ -60,15 +60,24 @@ struct IFile;
 
 
 
+/* Struct that describes an input file for line info */
+typedef struct LineInfoFile LineInfoFile;
+struct LineInfoFile {
+    struct IFile*       InputFile;      /* Points to corresponding IFile */
+    unsigned            LineNum;        /* Presumed line number for this file */
+    char                Name[1];        /* Presumed name of the file */
+};
+
 /* The text for the actual line is allocated at the end of the structure, so
 ** the size of the structure varies.
 */
 typedef struct LineInfo LineInfo;
 struct LineInfo {
-    unsigned        RefCount;             /* Reference counter */
-    struct IFile*   InputFile;            /* Input file for this line */
-    unsigned        LineNum;              /* Line number */
-    char            Line[1];              /* Source code line */
+    unsigned            RefCount;       /* Reference counter */
+    LineInfoFile*       File;           /* Presumed input files for this line */
+    unsigned            ActualLineNum;  /* Actual line number for this file */
+    struct Collection*  IncFiles;       /* Presumed inclusion input files */
+    char                Line[1];        /* Text of source code line */
 };
 
 
@@ -92,14 +101,26 @@ LineInfo* GetCurLineInfo (void);
 ** increased, use UseLineInfo for that purpose.
 */
 
-void UpdateLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line);
-/* Update the line info - called if a new line is read */
+void UpdateCurrentLineInfo (const StrBuf* Line);
+/* Update the current line info - called if a new line is read */
 
-const char* GetInputName (const LineInfo* LI);
-/* Return the file name from a line info */
+void RememberCheckedLI (struct LineInfo* LI);
+/* Remember the latest checked line info struct */
 
-unsigned GetInputLine (const LineInfo* LI);
-/* Return the line number from a line info */
+LineInfo* GetPrevCheckedLI (void);
+/* Get the latest checked line info struct */
+
+const char* GetPresumedFileName (const LineInfo* LI);
+/* Return the presumed file name from a line info */
+
+unsigned GetPresumedLineNum (const LineInfo* LI);
+/* Return the presumed line number from a line info */
+
+const char* GetActualFileName (const struct LineInfo* LI);
+/* Return the actual name of the source file from a line info struct */
+
+unsigned GetActualLineNum (const struct LineInfo* LI);
+/* Return the actual line number of the source file from a line info struct */
 
 
 

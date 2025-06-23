@@ -56,7 +56,7 @@
 
 
 /* Use static local variables for speed */
-#pragma static-locals (1);
+#pragma static-locals (1)
 
 
 

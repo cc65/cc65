@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 #
 # Makefile for cc65 samples
 #
@@ -99,6 +105,7 @@ DISK_apple2    = samples.dsk
 DISK_apple2enh = samples.dsk
 DISK_atari     = samples.atr
 DISK_atarixl   = samples.atr
+DISK_plus4     = samples.d64
 
 # --------------------------------------------------------------------------
 # System-dependent settings
@@ -146,6 +153,8 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 .o:
 ifeq ($(SYS),vic20)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
+else ifeq ($(SYS),plus4)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C plus4-hires.cfg -m $@.map $^ $(SYS).lib
 else
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 endif
@@ -154,10 +163,15 @@ endif
 # Lists of subdirectories
 
 # disasm depends on cpp
-DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 cbm
+DIRLIST = tutorial geos atari2600 atari5200 apple2 gamate lynx supervision sym1 kim1 cbm
 
 # --------------------------------------------------------------------------
 # Lists of executables
+EXELIST_agat =     \
+        ascii      \
+        checkversion \
+        hello      \
+        sieve
 
 EXELIST_apple2 =   \
         ascii      \
@@ -321,9 +335,11 @@ EXELIST_plus4 =    \
         enumdevdir \
         gunzip65   \
         hello      \
+        mandelbrot \
         terminal   \
         tinyshell  \
-        sieve
+        sieve      \
+        tgidemo
 
 EXELIST_sim6502 =  \
         checkversion \
@@ -335,6 +351,9 @@ EXELIST_supervision = \
         notavailable
 
 EXELIST_sym1 =     \
+        notavailable
+
+EXELIST_kim1 =     \
         notavailable
 
 EXELIST_telestrat = \
@@ -387,6 +406,7 @@ all:
 # --------------------------------------------------------------------------
 # List of every supported platform
 TARGETS :=     \
+  agat         \
   apple2       \
   apple2enh    \
   atari        \
@@ -403,6 +423,7 @@ TARGETS :=     \
   creativision \
   cx16         \
   gamate       \
+  kim1         \
   lunix        \
   lynx         \
   nes          \
@@ -441,7 +462,15 @@ multdemo: multidemo.o
 ovrldemo: overlaydemo.o
 	$(LD) $(LDFLAGS) -o $@ -C $(SYS)-overlay.cfg -m $@.map $^ $(SYS).lib
 
-OVERLAYLIST := $(foreach I,1 2 3,multdemo.$I ovrldemo.$I)
+OVERLAYLIST :=
+
+ifneq ($(filter ovrldemo,$(EXELIST_$(SYS))),)
+OVERLAYLIST += $(foreach I,1 2 3,ovrldemo.$I)
+endif
+
+ifneq ($(filter multdemo,$(EXELIST_$(SYS))),)
+OVERLAYLIST += $(foreach I,1 2 3,multdemo.$I)
+endif
 
 # --------------------------------------------------------------------------
 # TGI programs on the VIC-20 need a special ld65 configuration file.
@@ -558,6 +587,11 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/cbm
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/gamate
 	$(INSTALL) -d $(DESTDIR)$(samplesdir)/supervision
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/disasm
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/lynx
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sim65
+	$(INSTALL) -d $(DESTDIR)$(samplesdir)/sym1
 	$(INSTALL) -m0644 *.* $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 readme.txt $(DESTDIR)$(samplesdir)
 	$(INSTALL) -m0644 Makefile $(DESTDIR)$(samplesdir)
@@ -569,6 +603,11 @@ install:
 	$(INSTALL) -m0644 cbm/*.* $(DESTDIR)$(samplesdir)/cbm
 	$(INSTALL) -m0644 gamate/*.* $(DESTDIR)$(samplesdir)/gamate
 	$(INSTALL) -m0644 supervision/*.* $(DESTDIR)$(samplesdir)/supervision
+	$(INSTALL) -m0644 disasm/*.* $(DESTDIR)$(samplesdir)/disasm
+	$(INSTALL) -m0644 kim1/*.* $(DESTDIR)$(samplesdir)/kim1
+	$(INSTALL) -m0644 lynx/*.* $(DESTDIR)$(samplesdir)/lynx
+	$(INSTALL) -m0644 sim65/*.* $(DESTDIR)$(samplesdir)/sim65
+	$(INSTALL) -m0644 sym1/*.* $(DESTDIR)$(samplesdir)/sym1
 
 # --------------------------------------------------------------------------
 # Packaging rules

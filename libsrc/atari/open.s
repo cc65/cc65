@@ -19,7 +19,7 @@
         .import findfreeiocb
         .import incsp4
         .import ldaxysp,addysp
-        .import ___oserror
+        .import ___oserror, returnFFFF
 .ifdef  UCASE_FILENAME
         .import ucase_fn
 .endif
@@ -39,9 +39,7 @@ parmok: jsr     findfreeiocb
         lda     #<EMFILE        ; "too many open files"
 seterr: jsr     ___directerrno
         jsr     incsp4          ; clean up stack
-        lda     #$FF
-        tax
-        rts                     ; return -1
+        jmp     returnFFFF
 
         ; process the mode argument
 

@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
@@ -115,7 +121,11 @@ install:
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 
 avail:
+ifneq ($(patsubst %,../bin/%,$(PROGS)),$(wildcard $(patsubst %,../bin/%,$(PROGS))))
+	$(error executables are missing, please run make first)
+else
 	$(foreach prog,$(PROGS),$(AVAIL_recipe))
+endif
 
 unavail:
 	$(foreach prog,$(PROGS),$(UNAVAIL_recipe))
@@ -163,5 +173,20 @@ $(eval $(call OBJS_template,common))
 	$(AR) r $@ $?
 
 $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
+
+
+.PHONY: dbginfo dbgsh test
+
+test: dbginfo dbgsh
+
+$(eval $(call OBJS_template,dbginfo))
+
+dbginfo: $(dbginfo_OBJS)
+
+../wrk/dbgsh$(EXE_SUFFIX): $(dbginfo_OBJS) ../wrk/common/common.a
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+dbgsh: ../wrk/dbgsh$(EXE_SUFFIX)
+
 
 -include $(DEPS)

@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 # Makefile for the regression tests that return an error code on failure
 
 ifneq ($(shell echo),)
@@ -22,7 +28,7 @@ ifdef QUIET
   NULLERR = 2>$(NULLDEV)
 endif
 
-SIM65FLAGS = -x 5000000000 -c
+SIM65FLAGS = -x 4000000000 -c
 
 CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
 CA65 := $(if $(wildcard ../../bin/ca65*),..$S..$Sbin$Sca65,ca65)

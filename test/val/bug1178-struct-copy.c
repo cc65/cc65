@@ -62,7 +62,7 @@ void dotest2(void)
 
     StructArray2[0] = test2;
 
-    printf ("test2: %d, %d, %d, %d, %d\n",
+    printf ("test2: %d, %d, %d, %d\n",
             (int)StructArray2[0].a, (int)StructArray2[0].b,
             (int)StructArray2[0].c, (int)StructArray2[0].d);
     if ((StructArray2[0].a != 42) ||

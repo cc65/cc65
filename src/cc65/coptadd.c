@@ -62,15 +62,15 @@ unsigned OptAdd1 (CodeSeg* S)
 ** and replace it by:
 **
 **      ldy     #xx-1
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     #yy-3
 **      clc
-**      adc     (sp),y
+**      adc     (c_sp),y
 **      pha
 **      ldy     #xx
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     #yy-2
-**      adc     (sp),y
+**      adc     (c_sp),y
 **      tax
 **      pla
 */
@@ -104,8 +104,8 @@ unsigned OptAdd1 (CodeSeg* S)
             /* Correct the stack of the first Y register load */
             CE_SetNumArg (L[0], L[0]->Num - 1);
 
-            /* lda (sp),y */
-            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+            /* lda (c_sp),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
             CS_InsertEntry (S, X, I+1);
 
             /* ldy #yy-3 */
@@ -117,8 +117,8 @@ unsigned OptAdd1 (CodeSeg* S)
             X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[5]->LI);
             CS_InsertEntry (S, X, I+3);
 
-            /* adc (sp),y */
-            X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[5]->LI);
+            /* adc (c_sp),y */
+            X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "c_sp", 0, L[5]->LI);
             CS_InsertEntry (S, X, I+4);
 
             /* pha */
@@ -130,8 +130,8 @@ unsigned OptAdd1 (CodeSeg* S)
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
             CS_InsertEntry (S, X, I+6);
 
-            /* lda (sp),y */
-            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+            /* lda (c_sp),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
             CS_InsertEntry (S, X, I+7);
 
             /* ldy #yy-2 */
@@ -139,8 +139,8 @@ unsigned OptAdd1 (CodeSeg* S)
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[4]->LI);
             CS_InsertEntry (S, X, I+8);
 
-            /* adc (sp),y */
-            X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[5]->LI);
+            /* adc (c_sp),y */
+            X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "c_sp", 0, L[5]->LI);
             CS_InsertEntry (S, X, I+9);
 
             /* tax */
@@ -181,16 +181,16 @@ unsigned OptAdd2 (CodeSeg* S)
 ** and replace it by:
 **
 **      ldy     #xx-1
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     #yy
 **      clc
-**      adc     (sp),y
-**      sta     (sp),y
+**      adc     (c_sp),y
+**      sta     (c_sp),y
 **      ldy     #xx
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     #yy+1
-**      adc     (sp),y
-**      sta     (sp),y
+**      adc     (c_sp),y
+**      sta     (c_sp),y
 **
 ** provided that a/x is not used later.
 */
@@ -226,8 +226,8 @@ unsigned OptAdd2 (CodeSeg* S)
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[0]->LI);
             CS_InsertEntry (S, X, I+4);
 
-            /* lda     (sp),y */
-            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+            /* lda     (c_sp),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
             CS_InsertEntry (S, X, I+5);
 
             /* ldy     #yy */
@@ -238,20 +238,20 @@ unsigned OptAdd2 (CodeSeg* S)
             X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
             CS_InsertEntry (S, X, I+7);
 
-            /* adc     (sp),y */
-            X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[3]->LI);
+            /* adc     (c_sp),y */
+            X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "c_sp", 0, L[3]->LI);
             CS_InsertEntry (S, X, I+8);
 
-            /* sta     (sp),y */
-            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[3]->LI);
+            /* sta     (c_sp),y */
+            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "c_sp", 0, L[3]->LI);
             CS_InsertEntry (S, X, I+9);
 
             /* ldy     #xx */
             X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
             CS_InsertEntry (S, X, I+10);
 
-            /* lda     (sp),y */
-            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+            /* lda     (c_sp),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
             CS_InsertEntry (S, X, I+11);
 
             /* ldy     #yy+1 */
@@ -259,12 +259,12 @@ unsigned OptAdd2 (CodeSeg* S)
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[2]->LI);
             CS_InsertEntry (S, X, I+12);
 
-            /* adc     (sp),y */
-            X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[3]->LI);
+            /* adc     (c_sp),y */
+            X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "c_sp", 0, L[3]->LI);
             CS_InsertEntry (S, X, I+13);
 
-            /* sta     (sp),y */
-            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[3]->LI);
+            /* sta     (c_sp),y */
+            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "c_sp", 0, L[3]->LI);
             CS_InsertEntry (S, X, I+14);
 
             /* Delete the old code */

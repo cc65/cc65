@@ -31,7 +31,7 @@ exit:
     bpl    :-
     ldx    #zpspace-1
 :   lda    zpsave,x
-    sta    sp,x
+    sta    c_sp,x
     dex
     bpl    :-
     ldx    #$FF
@@ -44,7 +44,7 @@ exit:
 
 init:
     ldx    #zpspace-1
-:   lda    sp,x
+:   lda    c_sp,x
     sta    zpsave,x
     dex
     bpl    :-
@@ -57,8 +57,8 @@ init:
 
     lda    HIMEM
     ldx    HIMEM+1
-    sta    sp
-    stx    sp+1
+    sta    c_sp
+    stx    c_sp+1
     ldx    #<_exit
     lda    #>_exit
     jsr    reset

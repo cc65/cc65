@@ -323,10 +323,10 @@ MOVE:   sei                             ; No interrupts
         jsr     MoveY
 
         ldy     #$01
-        lda     (sp),y
+        lda     (c_sp),y
         tax
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         jsr     MoveX                   ; Move the cursor
 
         cli                             ; Allow interrupts

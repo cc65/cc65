@@ -371,7 +371,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
                     g_defcodelabel (Label);
                     AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg2.Expr, -Offs));
-                    AddCodeLine ("sta (sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("dey");
                     AddCodeLine ("bpl %s", LocalLabelName (Label));
                 } else {
@@ -379,7 +379,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
                     g_defcodelabel (Label);
                     AddCodeLine ("lda %s,x", ED_GetLabelName (&Arg2.Expr, 0));
-                    AddCodeLine ("sta (sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("dey");
                     AddCodeLine ("dex");
                     AddCodeLine ("bpl %s", LocalLabelName (Label));
@@ -391,7 +391,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
                     g_defcodelabel (Label);
                     AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg2.Expr, -Offs));
-                    AddCodeLine ("sta (sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("iny");
                     AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
                     AddCodeLine ("bne %s", LocalLabelName (Label));
@@ -400,7 +400,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
                     g_defcodelabel (Label);
                     AddCodeLine ("lda %s,x", ED_GetLabelName (&Arg2.Expr, 0));
-                    AddCodeLine ("sta (sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("iny");
                     AddCodeLine ("inx");
                     AddCmpCodeIfSizeNot256 ("cpx #$%02X", Arg3.Expr.IVal);
@@ -448,7 +448,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 if (Offs == 0) {
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
                     g_defcodelabel (Label);
-                    AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, 0));
                     AddCodeLine ("dey");
                     AddCodeLine ("bpl %s", LocalLabelName (Label));
@@ -456,7 +456,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldx #$%02X", (unsigned char) (Arg3.Expr.IVal-1));
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
                     g_defcodelabel (Label);
-                    AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sta %s,x", ED_GetLabelName (&Arg1.Expr, 0));
                     AddCodeLine ("dey");
                     AddCodeLine ("dex");
@@ -468,7 +468,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 if (Offs == 0 || AllowOneIndex) {
                     AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
                     g_defcodelabel (Label);
-                    AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, -Offs));
                     AddCodeLine ("iny");
                     AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
@@ -477,7 +477,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldx #$00");
                     AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
                     g_defcodelabel (Label);
-                    AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sta %s,x", ED_GetLabelName (&Arg1.Expr, 0));
                     AddCodeLine ("iny");
                     AddCodeLine ("inx");
@@ -512,14 +512,14 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             if (Arg3.Expr.IVal <= 129) {
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
                 g_defcodelabel (Label);
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("sta (ptr1),y");
                 AddCodeLine ("dey");
                 AddCodeLine ("bpl %s", LocalLabelName (Label));
             } else {
                 AddCodeLine ("ldy #$00");
                 g_defcodelabel (Label);
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("sta (ptr1),y");
                 AddCodeLine ("iny");
                 AddCmpCodeIfSizeNot256 ("cpy #$%02X", Arg3.Expr.IVal);
@@ -703,7 +703,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
             AddCodeLine ("lda #$%02X", (unsigned char) Arg2.Expr.IVal);
             g_defcodelabel (Label);
-            AddCodeLine ("sta (sp),y");
+            AddCodeLine ("sta (c_sp),y");
             AddCodeLine ("iny");
             AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
             AddCodeLine ("bne %s", LocalLabelName (Label));
@@ -857,7 +857,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 /* Generate code */
                 AddCodeLine ("ldy #$%02X", Offs);
                 AddCodeLine ("ldx #$00");
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
             } else if (IsArray && ED_IsLocConst (&Arg1.Expr)) {
                 /* Drop the generated code */
                 RemoveCode (&Arg1.Load);
@@ -1090,14 +1090,14 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             if (Offs == 0 || AllowOneIndex) {
                 g_defcodelabel (L1);
                 AddCodeLine ("iny");
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, -Offs));
             } else {
                 AddCodeLine ("ldx #$FF");
                 g_defcodelabel (L1);
                 AddCodeLine ("iny");
                 AddCodeLine ("inx");
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("sta %s,x", ED_GetLabelName (&Arg1.Expr, 0));
             }
             AddCodeLine ("bne %s", LocalLabelName (L1));
@@ -1138,14 +1138,14 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 g_defcodelabel (L1);
                 AddCodeLine ("iny");
                 AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg2.Expr, -Offs));
-                AddCodeLine ("sta (sp),y");
+                AddCodeLine ("sta (c_sp),y");
             } else {
                 AddCodeLine ("ldx #$FF");
                 g_defcodelabel (L1);
                 AddCodeLine ("iny");
                 AddCodeLine ("inx");
                 AddCodeLine ("lda %s,x", ED_GetLabelName (&Arg2.Expr, 0));
-                AddCodeLine ("sta (sp),y");
+                AddCodeLine ("sta (c_sp),y");
             }
             AddCodeLine ("bne %s", LocalLabelName (L1));
 
@@ -1285,7 +1285,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             g_defcodelabel (L);
             AddCodeLine ("inx");
             AddCodeLine ("iny");
-            AddCodeLine ("lda (sp),y");
+            AddCodeLine ("lda (c_sp),y");
             AddCodeLine ("bne %s", LocalLabelName (L));
             AddCodeLine ("txa");
             AddCodeLine ("ldx #$00");

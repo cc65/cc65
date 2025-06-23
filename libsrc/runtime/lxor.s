@@ -7,7 +7,7 @@
 
         .export         tosxor0ax, tosxoreax
         .import         addysp1
-        .importzp       sp, sreg, tmp1
+        .importzp       c_sp, sreg, tmp1
 
         .macpack        cpu
 
@@ -23,24 +23,24 @@ tosxor0ax:
 
 tosxoreax:
 .if (.cpu .bitand ::CPU_ISET_65SC02)
-        eor     (sp)            ; byte 0
+        eor     (c_sp)          ; byte 0
         ldy     #1
 .else
         ldy     #0
-        eor     (sp),y          ; byte 0
+        eor     (c_sp),y        ; byte 0
         iny
 .endif
         sta     tmp1
         txa
-        eor     (sp),y          ; byte 1
+        eor     (c_sp),y        ; byte 1
         tax
         iny
         lda     sreg
-        eor     (sp),y          ; byte 2
+        eor     (c_sp),y        ; byte 2
         sta     sreg
         iny
         lda     sreg+1
-        eor     (sp),y          ; byte 3
+        eor     (c_sp),y        ; byte 3
         sta     sreg+1
 
         lda     tmp1

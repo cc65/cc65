@@ -110,6 +110,21 @@ char cgetc (void);
 ** 1 (see below), a blinking cursor is displayed while waiting.
 */
 
+char* __fastcall__ cgets (char* buffer, int size);
+/* Get a string of characters directly from the console. The function returns
+** when size - 1 characters or either CR/LF are read. Note the parameters are
+** more aligned with stdio fgets() as opposed to the quirky "standard" conio
+** cgets(). Besides providing saner parameters, the function also echoes CRLF
+** when either CR/LF are read but does NOT append either in the buffer. This is
+** to correspond to stdio fgets() which echoes CRLF, but prevents a "gotcha"
+** where the buffer might not be able to accommodate both CR and LF at the end.
+**
+**   param: buffer - where to save the input, must be non-NULL
+**   param: size - size of the buffer, must be > 1
+**  return: buffer if successful, NULL on error
+**  author: Russell-S-Harper
+*/
+
 int cscanf (const char* format, ...);
 /* Like scanf(), but uses direct keyboard input */
 

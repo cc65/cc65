@@ -289,6 +289,7 @@ function.
 <item><ref id="cclear" name="cclear">
 <item><ref id="cclearxy" name="cclearxy">
 <item><ref id="cgetc" name="cgetc">
+<item><ref id="cgets" name="cgets">
 <item><ref id="chline" name="chline">
 <item><ref id="chlinexy" name="chlinexy">
 <item><ref id="clrscr" name="clrscr">
@@ -2711,6 +2712,44 @@ see anything that you type.  (See the description of <tt/cbm_k_scnkey()/.)
 <ref id="cursor" name="cursor">,
 <ref id="kbhit" name="kbhit">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cgets<label id="cgets"><p>
+
+<quote>
+<descrip>
+<tag/Function/Input a string directly to the console.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/char* __fastcall__ cgets (const char* buffer, int size);/
+<tag/Description/The function inputs a string of at most <tt/size - 1/
+characters from the console into <tt/buffer/. It returns when <tt/size - 1/
+characters or either <tt/CR/ or <tt/LF/ are entered. It also handles both
+multi-line input and backspacing.
+<tag/Notes/<itemize>
+<item>The function echoes <tt/CRLF/ when either <tt/CR/ or <tt/LF/ are read
+but does NOT append either in <tt/buffer/.
+<item>The function is only available as fastcall function, so it may only
+be used in the presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cgetc" name="cgetc">
+<tag/Example/<verb>
+#include &lt;conio.h&gt;
+
+int main ()
+{
+    char buffer[200], *p;
+
+    cputs ("Type a lot and backspace a lot: ");
+    if (p = cgets (buffer, sizeof(buffer)))
+        cputs (p);
+
+    return 0;
+}
+</verb>
 </descrip>
 </quote>
 

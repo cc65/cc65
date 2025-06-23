@@ -63,7 +63,7 @@ static uint32_t GetSpan (attr_t Style)
     uint32_t Count = 1;
     while (Count < RemainingBytes) {
         attr_t Attr;
-        if (MustDefLabel(PC+Count)) {
+        if (MustDefLabel (PC+Count)) {
             break;
         }
         Attr = GetAttr (PC+Count);
@@ -119,7 +119,7 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
     }
 
     /* If the next line is not the same style, add a separator */
-    if (CodeLeft() && GetStyleAttr (PC) != Style) {
+    if (CodeLeft () && GetStyleAttr (PC) != Style) {
         SeparatorLine ();
     }
 
@@ -221,7 +221,7 @@ uint32_t AddrTable (void)
     }
 
     /* If the next line is not an address table line, add a separator */
-    if (CodeLeft() && GetStyleAttr (PC) != atAddrTab) {
+    if (CodeLeft () && GetStyleAttr (PC) != atAddrTab) {
         SeparatorLine ();
     }
 
@@ -287,7 +287,7 @@ uint32_t RtsTable (void)
     }
 
     /* If the next line is not a return address table line, add a separator */
-    if (CodeLeft() && GetStyleAttr (PC) != atRtsTab) {
+    if (CodeLeft () && GetStyleAttr (PC) != atRtsTab) {
         SeparatorLine ();
     }
 
@@ -366,7 +366,7 @@ uint32_t TextTable (void)
     }
 
     /* If the next line is not a byte table line, add a separator */
-    if (CodeLeft() && GetStyleAttr (PC) != atTextTab) {
+    if (CodeLeft () && GetStyleAttr (PC) != atTextTab) {
         SeparatorLine ();
     }
 

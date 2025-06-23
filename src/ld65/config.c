@@ -2107,7 +2107,9 @@ unsigned CfgProcess (void)
                             FillLevel - M->Size, (FillLevel - M->Size == 1) ? "" : "s");
             }
             if (FillLevel > M->FillLevel) {
-                /* Regular segments increase FillLevel. Overwrite segments may increase but not decrease FillLevel. */
+                /* Regular segments increase FillLevel. Overwrite segments may
+                ** increase but not decrease FillLevel.
+                */
                 FillAdded = FillLevel - M->FillLevel;
                 M->FillLevel = FillLevel;
             }
@@ -2127,15 +2129,18 @@ unsigned CfgProcess (void)
             /* Calculate the new address */
             Addr += S->Seg->Size;
 
-            /* If this segment will go out to the file, or its place
-            ** in the file will be filled, then increase the file size.
-            ** An OVERWRITE segment will only increase the size if it overlapped some of the fill area.
+            /* If this segment will go out to the file, or its place in the
+            ** file will be filled, then increase the file size. An OVERWRITE
+            ** segment will only increase the size if it overlapped some of
+            ** the fill area.
             */
             if (S->Load == M &&
                 ((S->Flags & SF_BSS) == 0 || (M->Flags & MF_FILL) != 0)) {
-                M->F->Size += (!(S->Flags & SF_OVERWRITE)) ?
-                    (Addr - StartAddr) :
-                    FillAdded;
+                if ((S->Flags & SF_OVERWRITE) == 0) {
+                    M->F->Size += Addr - StartAddr;
+                } else {
+                    M->F->Size += FillAdded;
+                }
             }
         }
 
@@ -2173,7 +2178,7 @@ unsigned CfgProcess (void)
         ** area, account for that in the file size.
         */
         if ((M->Flags & MF_OVERFLOW) == 0 && (M->Flags & MF_FILL) != 0) {
-            M->F->Size += (M->Size - M->FillLevel);
+            M->F->Size = M->FileOffs + M->Size;
         }
     }
 

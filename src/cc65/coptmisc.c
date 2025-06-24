@@ -492,9 +492,9 @@ unsigned OptGotoSPAdj (CodeSeg* S)
             L[1]->AM == AM65_ABS             &&
             L[2]->OPC == OP65_CLC            &&
             L[3]->OPC == OP65_ADC            &&
-            strcmp (L[3]->Arg, "sp") == 0    &&
+            strcmp (L[3]->Arg, "c_sp") == 0    &&
             L[6]->OPC == OP65_ADC            &&
-            strcmp (L[6]->Arg, "sp+1") == 0  &&
+            strcmp (L[6]->Arg, "c_sp+1") == 0  &&
             L[9]->OPC == OP65_JMP) {
             adjustment = FindSPAdjustment (L[1]->Arg);
 
@@ -663,7 +663,7 @@ unsigned OptLoad1 (CodeSeg* S)
             CS_InsertEntry (S, X, I+1);
 
             /* Load from stack */
-            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, E->LI);
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, E->LI);
             CS_InsertEntry (S, X, I+2);
 
             /* Now remove the call to the subroutine */
@@ -719,8 +719,8 @@ unsigned OptLoad2 (CodeSeg* S)
                 ** later
                 */
 
-                /* lda (sp),y */
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
+                /* lda (c_sp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
                 /* sta abs */
@@ -731,8 +731,8 @@ unsigned OptLoad2 (CodeSeg* S)
                 X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+5);
 
-                /* lda (sp),y */
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
+                /* lda (c_sp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+6);
 
                 /* sta abs */
@@ -746,8 +746,8 @@ unsigned OptLoad2 (CodeSeg* S)
 
                 /* Standard replacement */
 
-                /* lda (sp),y */
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
+                /* lda (c_sp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
 
                 /* tax */
@@ -758,8 +758,8 @@ unsigned OptLoad2 (CodeSeg* S)
                 X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                /* lda (sp),y */
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
+                /* lda (c_sp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+4);
 
                 /* Now remove the call to the subroutine */

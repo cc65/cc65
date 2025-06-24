@@ -113,10 +113,10 @@ unsigned OptCmp5 (CodeSeg* S);
 /* Optimize compares of local variables:
 **
 **      ldy     #o
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      tax
 **      dey
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      cpx     #a
 **      bne     L1
 **      cmp     #b

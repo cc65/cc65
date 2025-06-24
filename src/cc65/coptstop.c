@@ -1292,10 +1292,10 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
                 }
                 InsertEntry (D, X, D->IP++);
 
-                /* cmp src,y OR cmp (sp),y */
+                /* cmp src,y OR cmp (c_sp),y */
                 if (D->Rhs.A.LoadEntry->OPC == OP65_JSR) {
-                    /* opc (sp),y */
-                    X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+                    /* opc (c_sp),y */
+                    X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
                 } else {
                     /* opc src,y */
                     X = NewCodeEntry (OP65_CMP, D->Rhs.A.LoadEntry->AM, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);

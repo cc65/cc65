@@ -6,12 +6,12 @@
 
         .export         bpushbsp, bpushbysp
         .import         pusha
-        .importzp       sp
+        .importzp       c_sp
 
 bpushbsp:
         ldy     #0
 bpushbysp:
-        lda     (sp),y
+        lda     (c_sp),y
         jmp     pusha
 
 

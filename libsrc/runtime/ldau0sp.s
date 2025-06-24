@@ -5,17 +5,17 @@
 ;
 
         .export         ldau00sp, ldau0ysp
-        .importzp       sp, ptr1
+        .importzp       c_sp, ptr1
 
         .macpack        cpu
 
 ldau00sp:
         ldy     #1
 ldau0ysp:
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1+1
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1
         ldx     #0
 .if (.cpu .bitand CPU_ISET_65SC02)

@@ -136,6 +136,7 @@ static OptFunc DOptCmp5         = { OptCmp5,         "OptCmp5",         100, 0, 
 static OptFunc DOptCmp7         = { OptCmp7,         "OptCmp7",          85, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp8         = { OptCmp8,         "OptCmp8",          50, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp9         = { OptCmp9,         "OptCmp9",          85, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp10        = { OptCmp10,        "OptCmp10",         33, 0, 0, 0, 0, 0 };
 static OptFunc DOptComplAX1     = { OptComplAX1,     "OptComplAX1",      65, 0, 0, 0, 0, 0 };
 static OptFunc DOptCondBranch1  = { OptCondBranch1,  "OptCondBranch1",   80, 0, 0, 0, 0, 0 };
 static OptFunc DOptCondBranch2  = { OptCondBranch2,  "OptCondBranch2",   40, 0, 0, 0, 0, 0 };
@@ -251,6 +252,7 @@ static OptFunc* OptFuncs[] = {
     &DOptBranchDist,
     &DOptBranchDist2,
     &DOptCmp1,
+    &DOptCmp10,
     &DOptCmp2,
     &DOptCmp3,
     &DOptCmp4,
@@ -729,6 +731,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptCondBranch3, 1);
         C += RunOptFunc (S, &DOptCondBranchC, 1);
         C += RunOptFunc (S, &DOptRTSJumps1, 1);
+        C += RunOptFunc (S, &DOptCmp10, 1);         /* After OptRTSJumps1 */
         C += RunOptFunc (S, &DOptBoolCmp, 1);
         C += RunOptFunc (S, &DOptBoolTrans, 1);
         C += RunOptFunc (S, &DOptBNegA2, 1);        /* After OptCondBranch's */

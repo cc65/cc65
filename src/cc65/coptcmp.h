@@ -146,6 +146,11 @@ unsigned OptCmp9 (CodeSeg* S);
 ** flag instead of the carry flag and remove the asl.
 */
 
+unsigned OptCmp10 (CodeSeg* S);
+/* Remove compare instructions before an RTS. This is safe since no C function
+** passes back something in the flags.
+*/
+
 
 
 /* End of coptcmp.h */

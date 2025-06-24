@@ -741,3 +741,40 @@ unsigned OptCmp9 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
+
+
+
+unsigned OptCmp10 (CodeSeg* S)
+/* Remove compare instructions before an RTS. This is safe since no C function
+** passes back something in the flags.
+*/
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for a compare followed by an RTS */
+        if ((E->Info & OF_CMP) != 0             &&      /* Compare insn */
+            (N = CS_GetNextEntry (S, I)) != 0   &&      /* Next entry ... */
+            N->OPC == OP65_RTS) {                       /* ... is RTS */
+
+            /* Found, remove the compare */
+            CS_DelEntry (S, I);
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}

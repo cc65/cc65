@@ -73,6 +73,24 @@
 #define COLOR_LIGHTBLUE         0x0E
 #define COLOR_GRAY3             0x0F
 
+/* TGI color defines */
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_WHITE         COLOR_WHITE
+#define TGI_COLOR_RED           COLOR_RED
+#define TGI_COLOR_CYAN          COLOR_CYAN
+#define TGI_COLOR_PURPLE        COLOR_PURPLE
+#define TGI_COLOR_GREEN         COLOR_GREEN
+#define TGI_COLOR_BLUE          COLOR_BLUE
+#define TGI_COLOR_YELLOW        COLOR_YELLOW
+#define TGI_COLOR_ORANGE        COLOR_ORANGE
+#define TGI_COLOR_BROWN         COLOR_BROWN
+#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED
+#define TGI_COLOR_GRAY1         COLOR_GRAY1
+#define TGI_COLOR_GRAY2         COLOR_GRAY2
+#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
+#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
+#define TGI_COLOR_GRAY3         COLOR_GRAY3
+
 /* Masks for joy_read */
 #define JOY_UP_MASK             0x01
 #define JOY_DOWN_MASK           0x02

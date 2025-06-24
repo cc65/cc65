@@ -241,7 +241,12 @@ EXELIST_c64 =      \
         tgidemo
 
 EXELIST_c65 = \
-        checkversion
+        ascii \
+        checkversion \
+        enumdevdir \
+        hello \
+        sieve \
+        tinyshell
 
 EXELIST_c128 =     \
         ascii      \
@@ -316,7 +321,12 @@ EXELIST_lynx = \
         notavailable
 
 EXELIST_mega65 = \
-        checkversion
+        ascii \
+        checkversion \
+        enumdevdir \
+        hello \
+        sieve \
+        tinyshell
 
 EXELIST_nes = \
         hello

@@ -233,3 +233,7 @@ CASSMOT         = $20           ; Cassette motor on
 TP_FAST         = $80           ; Switch Rossmoeller TurboProcess to fast mode
 
 RAMONLY         = $F8           ; (~(LORAM | HIRAM | IOEN)) & $FF
+
+; temporary, to get conio working
+XSIZE = 80
+YSIZE = 50

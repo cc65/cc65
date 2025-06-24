@@ -11,9 +11,11 @@ endif
 CBMS = c128   \
        c16    \
        c64    \
+       c65    \
        cbm510 \
        cbm610 \
        cx16   \
+       mega65 \
        pet    \
        plus4  \
        vic20
@@ -21,7 +23,6 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-# FIXME: c65 (and perhaps mega65?) should be moved up to CBMS maybe
 TARGETS = agat         \
           apple2       \
           apple2enh    \
@@ -31,7 +32,6 @@ TARGETS = agat         \
           atari5200    \
           atari7800    \
           atmos        \
-          c65          \
           creativision \
           $(CBMS)      \
           $(GEOS)      \
@@ -47,8 +47,7 @@ TARGETS = agat         \
           sim65c02     \
           supervision  \
           sym1         \
-          telestrat    \
-          mega65
+          telestrat
 
 TARGETTEST = none     \
              sim6502  \
@@ -196,11 +195,6 @@ ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
   SRCDIRS += $(addprefix geos-common/,$(GEOSDIRS))
 endif
 
-ifeq ($(TARGET),c65)
-# FIXME: this does not work because of the SP vs C_SP clash
-else ifeq ($(TARGET),mega65)
-# FIXME: this does not work because of the SP vs C_SP clash
-else
 SRCDIRS += common   \
            conio    \
            dbg      \
@@ -211,7 +205,6 @@ SRCDIRS += common   \
            serial   \
            tgi      \
            zlib
-endif
 
 vpath %.s $(SRCDIRS)
 vpath %.c $(SRCDIRS)

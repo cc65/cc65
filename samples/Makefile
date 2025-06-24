@@ -240,6 +240,9 @@ EXELIST_c64 =      \
         tinyshell  \
         tgidemo
 
+EXELIST_c65 = \
+        checkversion
+
 EXELIST_c128 =     \
         ascii      \
         checkversion \
@@ -311,6 +314,9 @@ EXELIST_lunix = \
 
 EXELIST_lynx = \
         notavailable
+
+EXELIST_mega65 = \
+        checkversion
 
 EXELIST_nes = \
         hello
@@ -418,6 +424,7 @@ TARGETS :=     \
   c128         \
   c16          \
   c64          \
+  c65          \
   cbm510       \
   cbm610       \
   creativision \
@@ -426,6 +433,7 @@ TARGETS :=     \
   kim1         \
   lunix        \
   lynx         \
+  mega65       \
   nes          \
   osic1p       \
   pce          \

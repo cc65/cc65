@@ -468,7 +468,7 @@ unsigned OptPtrStore2 (CodeSeg* S)
             L[6]->OPC == OP65_LDX                               &&
             L[7]->OPC == OP65_LDA                               &&
             L[7]->AM == AM65_ZP_INDY                            &&
-            strcmp (L[7]->Arg, "c_sp") == 0                       &&
+            strcmp (L[7]->Arg, "c_sp") == 0                     &&
             L[8]->OPC == OP65_LDY                               &&
             (L[8]->AM == AM65_ABS                       ||
              L[8]->AM == AM65_ZP                        ||

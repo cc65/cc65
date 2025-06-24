@@ -41,7 +41,7 @@ int main(void)
   printf("  data:            $%04X  (data)\n", &data);
   printf("  _dos_type:       $%04X  (bss)\n", &_dos_type);
   printf("  allocmem:        $%04X  (dyn. data)\n", allocmem);
-  printf("  c_sp:              $%04X  (stack ptr)\n", getsp());
+  printf("  c_sp:            $%04X  (stack ptr)\n", getsp());
 
   if (allocmem) free(allocmem);
   if (doesclrscrafterexit()) cgetc();

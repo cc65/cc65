@@ -218,10 +218,10 @@ UDTIM          := $FFEA
   KBDREAD      := $E5CF
   UPDCRAMPTR   := $EAB2
 .elseif .def(__C64__)
-  CLRSCR       := $E544
-  KBDREAD      := $E5B4
+  CLRSCR       := $E544     ; Clear the screen
+  KBDREAD      := $E5B4     ; Get Character From Keyboard Buffer
   NMIEXIT      := $FEBC
-  UPDCRAMPTR   := $EA24
+  UPDCRAMPTR   := $EA24     ; Update color ram pointer
 .elseif .def(__C128__)
   CLRSCR       := $C142
   KBDREAD      := $C006

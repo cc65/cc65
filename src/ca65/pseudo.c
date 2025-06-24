@@ -2024,6 +2024,14 @@ static void DoWarning (void)
 
 
 
+static void DoWeak (void)
+/* Declare a weak symbol */
+{
+    ExportImport (SymGlobal, ADDR_SIZE_DEFAULT, SF_WEAK);
+}
+
+
+
 static void DoWord (void)
 /* Define words */
 {
@@ -2235,6 +2243,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnion         },      /* .UNION */
     { ccNone,           DoUnexpected    },      /* .VERSION */
     { ccNone,           DoWarning       },      /* .WARNING */
+    { ccNone,           DoWeak          },      /* .WEAK */
     { ccNone,           DoWord          },      /* .WORD */
     { ccNone,           DoUnexpected    },      /* .XMATCH */
     { ccNone,           DoZeropage      },      /* .ZEROPAGE */

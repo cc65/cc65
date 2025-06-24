@@ -42,7 +42,6 @@
         .export         STOP
         .export         GETIN
         .export         CLALL
-        .export         UDTIM
         .export         SCREEN
         .export         IOBASE
         .export         PLOT

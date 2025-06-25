@@ -123,6 +123,11 @@ unsigned OptCmp5 (CodeSeg* S);
 **      jne/jeq L2
 */
 
+unsigned OptCmp6 (CodeSeg* S);
+/* Remove compare instructions before an RTS or an exit by jumping to some
+** other function.
+*/
+
 unsigned OptCmp7 (CodeSeg* S);
 /* Search for a sequence ldx/txa/branch and remove the txa if A is not
 ** used later.
@@ -144,11 +149,6 @@ unsigned OptCmp9 (CodeSeg* S);
 **
 ** If A is not used later (which should be the case), we can branch on the N
 ** flag instead of the carry flag and remove the asl.
-*/
-
-unsigned OptCmp10 (CodeSeg* S);
-/* Remove compare instructions before an RTS. This is safe since no C function
-** passes back something in the flags.
 */
 
 

@@ -9,9 +9,9 @@
         .export         newline, plot
         .import         gotoxy
         .import         PLOT
+        .importzp       ptr4
 
         .include        "mega65.inc"
-
 
 _cputcxy:
         pha                     ; Save C
@@ -96,23 +96,25 @@ plot:   ldy     CURS_X
 
 putchar:
         ora     RVS             ; Set revers bit
-        ldy     CURS_X
 
-        pha
+        tay
         lda     SCREEN_PTR + 1
         clc
         adc     #>$0800
-        sta     SCREEN_PTR + 1
-        pla
+        sta     ptr4 + 1
+        lda     SCREEN_PTR
+        sta     ptr4
+        tya
 
-        sta     (SCREEN_PTR),y  ; Set char
+        ldy     CURS_X
+        sta     (ptr4),y  ; Set char
 
-        lda     SCREEN_PTR + 1
-        sec
-        sbc     #>$0800
-        sta     SCREEN_PTR + 1
+        lda     ptr4 + 1
+        clc
+        adc     #>$d000
+        sta     ptr4 + 1
 
         lda     CHARCOLOR
-;        lda #$88
-;        sta     (CRAM_PTR),y    ; Set color
+        sta     (ptr4),y    ; Set color
+
         rts

@@ -19,6 +19,6 @@ _kbhit:
 
         lda #1
 :
-        ldx #0
+        ldx #>$0000
         rts
 

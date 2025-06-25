@@ -5,29 +5,21 @@
 ; char cpeekc (void);
 ;
 
+        .include        "c65.inc"
+
         .export         _cpeekc
-
-; Get a system-specific file.
-; Note:  The cbm610, and c128 targets need special
-; versions that handle RAM banking and the 80-column VDC.
-
-.if     .def(__C16__)
-        .include        "plus4.inc"     ; both C16 and Plus4
-.elseif .def(__C64__)
-        .include        "c64.inc"
-.elseif .def(__CBM510__)
-        .import         CURS_X: zp, SCREEN_PTR: zp
-        .include        "cbm510.inc"
-.elseif .def(__PET__)
-        .include        "pet.inc"
-.elseif .def(__VIC20__)
-        .include        "vic20.inc"
-.endif
-
+        .importzp       ptr1
 
 _cpeekc:
+        lda     SCREEN_PTR + 1
+        clc
+        adc     #>$0800
+        sta     ptr1 + 1
+        lda     SCREEN_PTR
+        sta     ptr1
+
         ldy     CURS_X
-        lda     (SCREEN_PTR),y  ; get screen code
+        lda     (ptr1),y  ; get screen code
         ldx     #>$0000
         and     #<~$80          ; remove reverse bit
 

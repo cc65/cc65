@@ -17,10 +17,6 @@
         .include        "c64.inc"
 .elseif .def(__VIC20__)
         .include        "vic20.inc"
-.elseif .def(__C65__)
-        .include        "c65.inc"
-.elseif .def(__MEGA65__)
-        .include        "mega65.inc"
 .endif
 
 

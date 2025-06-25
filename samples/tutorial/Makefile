@@ -43,6 +43,9 @@ EXELIST_atari2600 = \
 EXELIST_atari5200 = \
 	notavailable
 
+EXELIST_atari7800 = \
+	notavailable
+
 EXELIST_bbc = \
 	notavailable
 

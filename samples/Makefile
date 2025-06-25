@@ -213,6 +213,9 @@ EXELIST_atari2600 = \
 EXELIST_atari5200 = \
         notavailable
 
+EXELIST_atari7800 = \
+        notavailable
+
 EXELIST_atmos =    \
         ascii      \
         checkversion \
@@ -299,9 +302,7 @@ EXELIST_gamate =   \
         hello
 
 EXELIST_geos-cbm = \
-        ascii      \
-        checkversion \
-        diodemo
+        ascii
 
 EXELIST_geos-apple = \
         ascii
@@ -346,6 +347,9 @@ EXELIST_sim6502 =  \
         gunzip65
 
 EXELIST_sim65c02 = $(EXELIST_sim6502)
+
+EXELIST_rp6502 = \
+        notavailable
 
 EXELIST_supervision = \
         notavailable
@@ -413,6 +417,7 @@ TARGETS :=     \
   atarixl      \
   atari2600    \
   atari5200    \
+  atari7800    \
   atmos        \
   bbc          \
   c128         \
@@ -423,6 +428,8 @@ TARGETS :=     \
   creativision \
   cx16         \
   gamate       \
+  geos-apple   \
+  geos-cbm     \
   kim1         \
   lunix        \
   lynx         \
@@ -431,6 +438,7 @@ TARGETS :=     \
   pce          \
   pet          \
   plus4        \
+  rp6502       \
   sim6502      \
   sim65c02     \
   supervision  \
@@ -438,12 +446,14 @@ TARGETS :=     \
   telestrat    \
   vic20
 
+
 # --------------------------------------------------------------------------
 # Rule to make the binaries for every platform
 
 define TARGET_recipe
 
 @echo making samples for: $(T)
+@$(MAKE) --no-print-directory clean SYS:=$(T)
 @$(MAKE) -j2 SYS:=$(T)
 @$(MAKE) --no-print-directory clean SYS:=$(T)
 

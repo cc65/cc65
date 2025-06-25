@@ -112,73 +112,73 @@ FDC             := $D080
 ; ---------------------------------------------------------------------------
 ; I/O: SID
 
-SID0            := $D400
-SID0_S1Lo       := $D400
-SID0_S1Hi       := $D401
-SID0_PB1Lo      := $D402
-SID0_PB1Hi      := $D403
-SID0_Ctl1       := $D404
-SID0_AD1        := $D405
-SID0_SUR1       := $D406
+SID1            := $D400
+SID1_S1Lo       := $D400
+SID1_S1Hi       := $D401
+SID1_PB1Lo      := $D402
+SID1_PB1Hi      := $D403
+SID1_Ctl1       := $D404
+SID1_AD1        := $D405
+SID1_SUR1       := $D406
 
-SID0_S2Lo       := $D407
-SID0_S2Hi       := $D408
-SID0_PB2Lo      := $D409
-SID0_PB2Hi      := $D40A
-SID0_Ctl2       := $D40B
-SID0_AD2        := $D40C
-SID0_SUR2       := $D40D
+SID1_S2Lo       := $D407
+SID1_S2Hi       := $D408
+SID1_PB2Lo      := $D409
+SID1_PB2Hi      := $D40A
+SID1_Ctl2       := $D40B
+SID1_AD2        := $D40C
+SID1_SUR2       := $D40D
 
-SID0_S3Lo       := $D40E
-SID0_S3Hi       := $D40F
-SID0_PB3Lo      := $D410
-SID0_PB3Hi      := $D411
-SID0_Ctl3       := $D412
-SID0_AD3        := $D413
-SID0_SUR3       := $D414
+SID1_S3Lo       := $D40E
+SID1_S3Hi       := $D40F
+SID1_PB3Lo      := $D410
+SID1_PB3Hi      := $D411
+SID1_Ctl3       := $D412
+SID1_AD3        := $D413
+SID1_SUR3       := $D414
 
-SID0_FltLo      := $D415
-SID0_FltHi      := $D416
-SID0_FltCtl     := $D417
-SID0_Amp        := $D418
-SID0_ADConv1    := $D419
-SID0_ADConv2    := $D41A
-SID0_Noise      := $D41B
-SID0_Read3      := $D41C
+SID1_FltLo      := $D415
+SID1_FltHi      := $D416
+SID1_FltCtl     := $D417
+SID1_Amp        := $D418
+SID1_ADConv1    := $D419
+SID1_ADConv2    := $D41A
+SID1_Noise      := $D41B
+SID1_Read3      := $D41C
 
-SID1            := $D420
-SID1_S1Lo       := $D420
-SID1_S1Hi       := $D421
-SID1_PB1Lo      := $D422
-SID1_PB1Hi      := $D423
-SID1_Ctl1       := $D424
-SID1_AD1        := $D425
-SID1_SUR1       := $D426
+SID2            := $D420
+SID2_S1Lo       := $D420
+SID2_S1Hi       := $D421
+SID2_PB1Lo      := $D422
+SID2_PB1Hi      := $D423
+SID2_Ctl1       := $D424
+SID2_AD1        := $D425
+SID2_SUR1       := $D426
 
-SID1_S2Lo       := $D427
-SID1_S2Hi       := $D428
-SID1_PB2Lo      := $D429
-SID1_PB2Hi      := $D42A
-SID1_Ctl2       := $D42B
-SID1_AD2        := $D42C
-SID1_SUR2       := $D42D
+SID2_S2Lo       := $D427
+SID2_S2Hi       := $D428
+SID2_PB2Lo      := $D429
+SID2_PB2Hi      := $D42A
+SID2_Ctl2       := $D42B
+SID2_AD2        := $D42C
+SID2_SUR2       := $D42D
 
-SID1_S3Lo       := $D42E
-SID1_S3Hi       := $D42F
-SID1_PB3Lo      := $D430
-SID1_PB3Hi      := $D431
-SID1_Ctl3       := $D432
-SID1_AD3        := $D433
-SID1_SUR3       := $D434
+SID2_S3Lo       := $D42E
+SID2_S3Hi       := $D42F
+SID2_PB3Lo      := $D430
+SID2_PB3Hi      := $D431
+SID2_Ctl3       := $D432
+SID2_AD3        := $D433
+SID2_SUR3       := $D434
 
-SID1_FltLo      := $D435
-SID1_FltHi      := $D436
-SID1_FltCtl     := $D437
-SID1_Amp        := $D438
-SID1_ADConv1    := $D439
-SID1_ADConv2    := $D43A
-SID1_Noise      := $D43B
-SID1_Read3      := $D43C
+SID2_FltLo      := $D435
+SID2_FltHi      := $D436
+SID2_FltCtl     := $D437
+SID2_Amp        := $D438
+SID2_ADConv1    := $D439
+SID2_ADConv2    := $D43A
+SID2_Noise      := $D43B
+SID2_Read3      := $D43C
 
 ; ---------------------------------------------------------------------------
 ; I/O: Complex Interface Adapters

@@ -244,4 +244,5 @@ UDTIM          := $FFEA
   KBDREAD      := $D8C1
 .elseif .def(__C65__) ||  .def(__MEGA65__)
 ;  CLRSCR       := $E0EC ; ???
+  KBDREAD      := $E006
 .endif

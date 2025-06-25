@@ -63,16 +63,24 @@
   MOUSE_GET                     := $FF6B
 .endif
 
-.if .def(__C65__) || .def (__MEGA65__)
+.if .def (__MEGA65__)
   ; extended C65 jump table
-  VERSIONQ     := $FF2F
-  RESET_RUN    := $FF32
-  CURSOR       := $FF35
+
+; memory before $ff3b is all $ff in mega65 ROM?
+;  VERSIONQ     := $FF2F
+;  RESET_RUN    := $FF32
+;  CURSOR       := $FF35
+
   SAVEFL       := $FF3B
   GETIO        := $FF41
   GETLFS       := $FF44
   KEYLOCKS     := $FF47
   ADDKEY       := $FF4A
+.endif
+
+.if .def(__C65__) || .def (__MEGA65__)
+  CURSOR       := $E030     ; in editor ROM
+
   SPIN_SPOUT   := $FF4D
   CLSALL       := $FF50
   C64MODE      := $FF53

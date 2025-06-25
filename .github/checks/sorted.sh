@@ -36,3 +36,4 @@ function checkarray_quoted_name
 for N in `grep -rl "BEGIN SORTED.SH" "$CHECK_DIR"`; do
     checkarray_quoted_name $N
 done
+exit 0

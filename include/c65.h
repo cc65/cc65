@@ -100,7 +100,7 @@
 
 
 /* Define hardware */
-#include <_vic2.h>
+#include <_vic3.h>
 #define VIC     (*(struct __vic2*)0xD000)
 
 #include <_sid.h>

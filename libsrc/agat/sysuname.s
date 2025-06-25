@@ -1,6 +1,5 @@
 ;
-; 2003-08-12, Ullrich von Bassewitz
-; 2019-09-08, Greg King
+; Ullrich von Bassewitz, 2003-08-12
 ;
 ; unsigned char __fastcall__ _sysuname (struct utsname* buf);
 ;
@@ -9,10 +8,10 @@
 
         .import         utscopy
 
-__sysuname      :=      utscopy
+        __sysuname = utscopy
 
 ;--------------------------------------------------------------------------
-; Data. We define a fixed utsname struct here, and just copy it.
+; Data. We define a fixed utsname struct here and just copy it.
 
 .rodata
 
@@ -34,4 +33,5 @@ utsdata:
         .byte           $00
 
         ; machine
-        .asciiz         "Commander X16"
+        .asciiz         "Agat"
+

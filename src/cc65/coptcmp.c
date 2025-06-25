@@ -503,6 +503,51 @@ unsigned OptCmp5 (CodeSeg* S)
 
 
 
+unsigned OptCmp6 (CodeSeg* S)
+/* Remove compare instructions before an RTS or an subroutine call that doesn't
+** use the flags.
+*/
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for a compare followed by something else.
+        ** Note: The test could be improved by checking the flag usage of the
+        ** function explicitly against the flags set by the compare instruction.
+        ** For current code generation this makes no difference, however.
+        */
+        if ((E->Info & OF_CMP) != 0                     &&
+            (N = CS_GetNextEntry (S, I)) != 0           &&
+            (N->OPC == OP65_RTS                 ||  /* Either RTS, or ... */
+             (N->OPC == OP65_JSR            &&      /* ... or JSR ... */
+              N->JumpTo == 0                &&      /* ... to external ... */
+              (N->Use & PSTATE_ALL) == 0    &&      /* ... with no flags used ... */
+              (N->Chg & PSTATE_ALL) == PSTATE_ALL))) {  /* ... but all destroyed */
+
+            /* Found, remove the compare */
+            CS_DelEntry (S, I);
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 unsigned OptCmp7 (CodeSeg* S)
 /* Search for a sequence ldx/txa/branch and remove the txa if A is not
 ** used later.

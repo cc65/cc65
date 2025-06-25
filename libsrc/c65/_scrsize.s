@@ -5,8 +5,13 @@
 ;
 
         .export         screensize
-        .import         SCREEN
+        .include        "cbm_kernal.inc"
 
-screensize      = SCREEN
+.proc   screensize
 
+        jsr     SCREEN
+        inx
+        iny
+        rts
 
+.endproc

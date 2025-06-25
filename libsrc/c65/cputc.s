@@ -9,6 +9,7 @@
         .export         newline, plot
         .import         gotoxy
         .import         PLOT
+        .importzp       ptr4
 
         .include        "c65.inc"
 

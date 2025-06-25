@@ -108,6 +108,8 @@ DISK_apple2enh = samples.dsk
 DISK_atari     = samples.atr
 DISK_atarixl   = samples.atr
 DISK_plus4     = samples.d64
+DISK_c65       = samples.d81
+DISK_mega65    = samples.d81
 
 # --------------------------------------------------------------------------
 # System-dependent settings
@@ -253,6 +255,7 @@ EXELIST_c65 = \
         checkversion \
         enumdevdir \
         hello \
+        joydemo    \
         sieve \
         tinyshell
 
@@ -336,6 +339,7 @@ EXELIST_mega65 = \
         checkversion \
         enumdevdir \
         hello \
+        joydemo    \
         sieve \
         tinyshell
 
@@ -556,6 +560,12 @@ endef # D64_WRITE_SEQ_recipe
 
 samples.d64: samples
 	@$(C1541) -format "samples,00" d64 $@ >$(NULLDEV)
+	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(D64_WRITE_SEQ_recipe))
+
+samples.d81: samples
+	@$(C1541) -format "samples,00" d81 $@ >$(NULLDEV)
 	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
 	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))
 	$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(D64_WRITE_SEQ_recipe))

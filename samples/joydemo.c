@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <joystick.h>
 
+/* define 0 to link the standard driver statically */
+/* #define DYN_DRV         0 */
+
 #ifndef DYN_DRV
 #  define DYN_DRV       1
 #endif
@@ -31,7 +34,7 @@ int main (void)
     PRINTF("Driver init..." CR);
 
 #if DYN_DRV
-    /* Load and initialize the driver */
+    /* Load and initialize the standard driver driver */
     if ((err = joy_load_driver (joy_stddrv))) {
         PRINTF ("Driver load error (code %d)." CR
                 "Warning: This program needs the JOY" CR
@@ -40,7 +43,7 @@ int main (void)
     }
     PRINTF("Driver loaded OK" CR);
 #else
-    /* Install the driver */
+    /* Install the standard driver */
     joy_install (joy_static_stddrv);
 #endif
 

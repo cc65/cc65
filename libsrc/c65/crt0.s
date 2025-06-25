@@ -105,7 +105,6 @@ L1:     lda     c_sp,x
 
 ; Switch to the second charset.
 
-; FIXME
         lda     #14
         jsr     BSOUT
 

@@ -608,6 +608,64 @@ EXELIST_cx16 = \
 	strqtok-test \
 	uname-test
 
+# omitted: deb em-test joy-test mouse-test ser-test seek
+EXELIST_c65 = \
+    arg-test \
+    clock \
+    clock-test \
+    conio \
+    cpeek-test \
+    cprintf \
+    cursor \
+    dir-test \
+    div-test \
+    exec-test1 \
+    exec-test2 \
+    fileio-test \
+    ft \
+    getopt-test \
+    heaptest \
+    moddiv-test \
+    mul-test \
+    posixio-test \
+    rename-test \
+    scanf-test \
+    strdup-test \
+    strnlen \
+    stroserror-test \
+    strqtok-test \
+    uname-test \
+    minimal
+
+# omitted: deb em-test joy-test mouse-test ser-test seek
+EXELIST_mega65 = \
+    arg-test \
+    clock \
+    clock-test \
+    conio \
+    cpeek-test \
+    cprintf \
+    cursor \
+    dir-test \
+    div-test \
+    exec-test1 \
+    exec-test2 \
+    fileio-test \
+    ft \
+    getopt-test \
+    heaptest \
+    moddiv-test \
+    mul-test \
+    posixio-test \
+    rename-test \
+    scanf-test \
+    strdup-test \
+    strnlen \
+    stroserror-test \
+    strqtok-test \
+    uname-test \
+    minimal
+
 # omitted: arg-test clock-test clock cpeek-test cprintf cursor deb dir-test div-test
 # em-test exec-test1 exec-test2 fileio-test ft getopt-test heaptest joy-test moddiv-test
 # mouse-test mul-test posixio-test rename-test scanf-test seek ser-test strdup-test
@@ -756,6 +814,7 @@ TARGETS :=     \
   c128         \
   c16          \
   c64          \
+  c65          \
   cbm510       \
   cbm610       \
   creativision \
@@ -764,6 +823,7 @@ TARGETS :=     \
   kim1		   \
   lunix        \
   lynx         \
+  mega65       \
   nes          \
   osic1p       \
   pce          \

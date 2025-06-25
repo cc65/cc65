@@ -84,10 +84,12 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   EMD := $(wildcard $(TARGET_PATH)/$(SYS)/drv/emd/*)
   MOU := $(wildcard $(TARGET_PATH)/$(SYS)/drv/mou/*)
   TGI := $(wildcard $(TARGET_PATH)/$(SYS)/drv/tgi/*)
+  JOY := $(wildcard $(TARGET_PATH)/$(SYS)/drv/joy/*)
 
   EMD := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/emd/,$(notdir $(filter %.emd,$(EMD))))
   MOU := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/mou/,$(notdir $(filter %.mou,$(MOU))))
   TGI := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/tgi/,$(notdir $(filter %.tgi,$(TGI))))
+  JOY := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/joy/,$(notdir $(filter %.joy,$(JOY))))
 
   # This one comes with the VICE emulator.
   # See http://vice-emu.sourceforge.net/
@@ -180,6 +182,7 @@ EXELIST_apple2 =   \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         mousedemo  \
         multdemo   \
@@ -213,10 +216,14 @@ EXELIST_atari2600 = \
 EXELIST_atari5200 = \
         notavailable
 
+EXELIST_atari7800 = \
+        notavailable
+
 EXELIST_atmos =    \
         ascii      \
         checkversion \
         hello      \
+        joydemo    \
         mandelbrot \
         sieve      \
         terminal   \
@@ -231,6 +238,7 @@ EXELIST_c64 =      \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         mousedemo  \
         multdemo   \
@@ -254,6 +262,7 @@ EXELIST_c128 =     \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         mousedemo  \
         sieve      \
@@ -266,13 +275,15 @@ EXELIST_c16 =      \
         checkversion \
         enumdevdir \
         tinyshell  \
-        hello
+        hello      \
+        joydemo
 
 EXELIST_cbm510 =   \
         ascii      \
         checkversion \
         gunzip65   \
         hello      \
+        joydemo    \
         mousedemo  \
         terminal   \
         tinyshell  \
@@ -297,6 +308,7 @@ EXELIST_cx16 =     \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         mousedemo  \
         sieve      \
@@ -308,7 +320,6 @@ EXELIST_gamate =   \
 
 EXELIST_geos-cbm = \
         ascii      \
-        checkversion \
         diodemo
 
 EXELIST_geos-apple = \
@@ -329,19 +340,22 @@ EXELIST_mega65 = \
         tinyshell
 
 EXELIST_nes = \
-        hello
+        hello      \
+        joydemo
 
 EXELIST_osic1p = \
         notavailable
 
 EXELIST_pce = \
-        hello
+        hello      \
+        joydemo
 
 EXELIST_pet =      \
         ascii      \
         checkversion \
         enumdevdir \
         hello      \
+        joydemo    \
         tinyshell  \
         sieve
 
@@ -351,6 +365,7 @@ EXELIST_plus4 =    \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         terminal   \
         tinyshell  \
@@ -377,6 +392,7 @@ EXELIST_telestrat = \
         checkversion \
         gunzip65    \
         hello       \
+        joydemo    \
         mandelbrot  \
         sieve       \
         tgidemo
@@ -386,6 +402,7 @@ EXELIST_vic20 =    \
         checkversion \
         enumdevdir \
         hello      \
+        joydemo    \
         mandelbrot \
         sieve      \
         tgidemo
@@ -541,7 +558,7 @@ samples.d64: samples
 	@$(C1541) -format "samples,00" d64 $@ >$(NULLDEV)
 	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
 	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))
-	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
+	$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(D64_WRITE_SEQ_recipe))
 
 # --------------------------------------------------------------------------
 # Rule to make an Apple II disk with all samples. Needs the AppleCommander
@@ -566,7 +583,7 @@ samples.dsk: samples
 	cp prodos.dsk $@
 	$(foreach file,$(EXELIST_$(SYS)),$(DSK_WRITE_BIN_recipe))
 	$(foreach file,$(OVERLAYLIST),$(DSK_WRITE_REL_recipe))
-	$(foreach file,$(EMD) $(MOU) $(TGI),$(DSK_WRITE_REL_recipe))
+	$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(DSK_WRITE_REL_recipe))
 
 # --------------------------------------------------------------------------
 # Rule to make an Atari disk with all samples. Needs the dir2atr program
@@ -585,7 +602,7 @@ samples.atr: samples
 	cp "dup.sys" atr/dup.sys
 	@$(foreach file,$(EXELIST_$(SYS)),$(ATR_WRITE_recipe))
 	@$(foreach file,$(OVERLAYLIST),$(ATR_WRITE_recipe))
-	@$(foreach file,$(EMD) $(MOU) $(TGI),$(ATR_WRITE_recipe))
+	@$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(ATR_WRITE_recipe))
 	$(DIR2ATR) -d -b MyDos4534 3200 $@ atr
 	@$(RMDIR) atr
 

@@ -10,9 +10,9 @@
         .import         RESTOR, BSOUT, CLRCH
         .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; Linker generated
-        .importzp       ST
 
         .include        "zeropage.inc"
+        .include        "vic20.inc"
 
 ; ------------------------------------------------------------------------
 ; Startup code
@@ -72,7 +72,7 @@ L2:     lda     zpsave,x
 ; Place the program return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Restore the stack pointer.
 

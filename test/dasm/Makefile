@@ -14,14 +14,19 @@ ifdef CMD_EXE
   EXE = .exe
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = -rmdir /q /s $(subst /,\,$1)
+  NULLDEV = nul:
 else
   EXE =
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
+  NULLDEV = /dev/null
 endif
 
 ifdef QUIET
   .SILENT:
+  NULLOUT = >$(NULLDEV)
+  NULLERR = 2>$(NULLDEV)
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
 endif
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)

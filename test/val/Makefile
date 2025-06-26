@@ -28,6 +28,7 @@ ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
 endif
 
 SIM65FLAGS = -x 4000000000 -c
@@ -56,10 +57,10 @@ define PRG_template
 
 $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
 	$(if $(QUIET),echo val/$$*.$1.$2.prg)
-	$(CC65) -t sim$2 $$(CC65FLAGS) --add-source -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
-	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
-	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
-	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$@.out $(CATRES)
+	$(CC65) -t sim$2 $$(CC65FLAGS) --add-source -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
+	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLOUT) $(CATERR)
+	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLOUT) $(CATERR)
+	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$@.out 2> $(WORKDIR)/$$@.out $(CATRES)
 
 endef # PRG_template
 

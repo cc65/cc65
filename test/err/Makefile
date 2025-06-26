@@ -26,8 +26,11 @@ endif
 
 ifdef QUIET
   .SILENT:
+  NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
 endif
+
 
 CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
 
@@ -45,7 +48,7 @@ $(WORKDIR):
 
 $(WORKDIR)/%.s: %.c | $(WORKDIR)
 	$(if $(QUIET),echo err/$*.s)
-	$(NOT) $(CC65) -o $@ $< $(NULLERR)
+	$(NOT) $(CC65) -o $@ $< $(NULLOUT) $(CATERR)
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

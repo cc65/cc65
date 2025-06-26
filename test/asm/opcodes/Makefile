@@ -22,6 +22,9 @@ endif
 
 ifdef QUIET
   .SILENT:
+  NULLOUT = >$(NULLDEV)
+  NULLERR = 2>$(NULLDEV)
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
 endif
 
 CA65 := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)

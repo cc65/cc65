@@ -21,7 +21,7 @@ else
   NULLDEV = /dev/null
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
-  CATRES = $$@ > $(WORKDIR)/$$@.out 2> $(WORKDIR)/$$@.out || (cat $(WORKDIR)/$$@.out && false)
+  CATRES = > $(WORKDIR)/$$@.out 2> $(WORKDIR)/$$@.out || (cat $(WORKDIR)/$$@.out && false)
 endif
 
 ifdef QUIET
@@ -62,7 +62,7 @@ $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
 	$(CC65) -t sim$2 $$(CC65FLAGS) --add-source -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLOUT) $(CATERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLOUT) $(CATERR)
-	$(SIM65) $(SIM65FLAGS) $(CATRES)
+	$(SIM65) $(SIM65FLAGS) $$@ $(CATRES)
 
 endef # PRG_template
 

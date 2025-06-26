@@ -130,12 +130,12 @@ DISK_atarixl   = testcode.atr
 %: %.s
 
 .c.o:
-	$(if $(QUIET),echo targettest/$*.c)
+	$(if $(QUIET),echo $(SYS):$*.c)
 	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $<
 	$(AS) $(<:.c=.s)
 
 .s.o:
-	$(if $(QUIET),echo targettest/$*.s)
+	$(if $(QUIET),echo $(SYS):$*.s)
 	$(AS) $(ASFLAGS) -t $(SYS) $<
 
 .PRECIOUS: %.o
@@ -813,10 +813,12 @@ platforms:
 # some programs link against getsp.o
 
 mouse-test: mouse-test.o getsp.o
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS) -t $(SYS) -o $@ $^ $(SYS).lib
 
 ifneq ($(SYS),vic20)
 ft: ft.o getsp.o
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS) -t $(SYS) -o $@ $^ $(SYS).lib
 endif
 
@@ -824,6 +826,7 @@ endif
 
 ifeq ($(SYS),vic20)
 ft:  ft.o getsp.o
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
 endif
 

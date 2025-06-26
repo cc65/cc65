@@ -64,13 +64,13 @@ else
 endif
 
 audiotest.bin: audiotest.s
-	$(if $(QUIET),echo $@)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -l audiotest.lst -t gamate -o audiotest.bin audiotest.s
 lcdtest.bin: lcdtest.s
-	$(if $(QUIET),echo $@)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -l lcdtest.lst -t gamate -o lcdtest.bin lcdtest.s
 ctest.bin: ctest.c
-	$(if $(QUIET),echo $@)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -l ctest.lst -t gamate -o ctest.bin ctest.c
 
 clean:

@@ -79,7 +79,7 @@ else
 endif
 
 %.bin: %.c
-	$(if $(QUIET),echo $@)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
 ifndef QUIET
 	@echo "use 'make conio.pce' to produce a .pce file using dd"

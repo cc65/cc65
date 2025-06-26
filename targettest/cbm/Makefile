@@ -81,14 +81,14 @@ endif
 
 ifeq ($(SYS),c64)
 petscii.prg: petscii.c
-	$(if $(QUIET),echo $@)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o petscii.prg petscii.c
 else
 petscii.prg:
 endif
 
 cbmdir-test.prg: cbmdir-test.c
-	$(if $(QUIET),echo $@)
+	$(if $(QUIET),echo $(SYS):$@)
 ifeq ($(SYS),vic20)
 	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
 else
@@ -96,7 +96,7 @@ else
 endif
 
 cbmread.prg: cbmread.c
-	$(if $(QUIET),echo $@)
+	$(if $(QUIET),echo $(SYS):$@)
 ifeq ($(SYS),vic20)
 	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
 else

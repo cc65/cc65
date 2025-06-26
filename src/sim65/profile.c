@@ -216,7 +216,13 @@ static void ReadMapFile(void) {
     }
 }
 
+static double percentage(uint64_t num, uint64_t den) {
+   int tmp = num * 1000 / den;
+   return tmp / 10.0;
+}
+
 static void ProfileDump(void) {
+    uint64_t grandTotal, self;
     int i, j, k;
     int gap = 0;
 
@@ -224,7 +230,7 @@ static void ProfileDump(void) {
 
     /* the startup function isn't called by a JSR, so we need to update it here. */
     /* it is always first */
-    functions[0].totalTicks = Peripherals.Counter.ClockCycles;
+    grandTotal = functions[0].totalTicks = Peripherals.Counter.ClockCycles;
 
     for (i = 0; i < functionCount; i++) {
         gap = 0;
@@ -251,9 +257,13 @@ static void ProfileDump(void) {
         }
         gap = 0;
         printf("\n");
-        printf("\t selfTicks : %12" PRIu64 "\n", functions[i].totalTicks - functions[i].childTicks);
-        printf("\tchildTicks : %12" PRIu64 "\n", functions[i].childTicks);
-        printf("\ttotalTicks : %12" PRIu64 "\n", functions[i].totalTicks);
+        self = functions[i].totalTicks - functions[i].childTicks;
+        printf("\t selfTicks : %12" PRIu64 " (%6.1f%%)\n",
+            self, percentage(self, grandTotal));
+        printf("\tchildTicks : %12" PRIu64 " (%6.1f%%)\n",
+            functions[i].childTicks, percentage(functions[i].childTicks, grandTotal));
+        printf("\ttotalTicks : %12" PRIu64 " (%6.1f%%)\n",
+            functions[i].totalTicks, percentage(functions[i].totalTicks, grandTotal));
         for (j = 0; j < functions[i].children; j++) {
             if (gap == 0) {
                 gap = 1;

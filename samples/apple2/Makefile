@@ -40,6 +40,14 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_apple2 = \
         hgrshow \
         hgrtest \
@@ -63,6 +71,7 @@ endif
 disk: hgr.dsk dhgr.dsk
 
 hgr.dsk: hgrshow hgrtest
+	$(if $(QUIET),echo $(SYS):$@)
 	cp prodos.dsk $@
 	java -jar $(AC) -as $@ hgrshow <hgrshow
 	java -jar $(AC) -as $@ hgrtest <hgrtest
@@ -75,12 +84,15 @@ hgr.dsk: hgrshow hgrtest
 	java -jar $(AC) -p  $@ winston.hgr    bin 0x2000 <winston.hgr
 
 hgrshow: hgrshow.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -Oirs -t apple2 --start-addr 0x4000 -m hgrshow.map $^
 
 hgrtest: hgrtest.c werner.s
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -Oirs -t apple2 -C apple2-hgr.cfg -m hgrtest.map $^
 
 dhgr.dsk: dhgrshow
+	$(if $(QUIET),echo $(SYS):$@)
 	cp prodos.dsk $@
 	java -jar $(AC) -as $@ dhgrshow <dhgrshow
 	java -jar $(AC) -p  $@ catface.dhgr  bin 0x2000 <catface.dhgr
@@ -91,6 +103,7 @@ dhgr.dsk: dhgrshow
 	java -jar $(AC) -p  $@ venice.dhgr   bin 0x2000 <venice.dhgr
 
 dhgrshow: dhgrshow.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -Oirs -t apple2enh --start-addr 0x4000 -m dhgrshow.map $^
 
 clean:

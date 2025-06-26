@@ -37,6 +37,14 @@ else
   DA := $(if $(wildcard ../../bin/da65*),../../bin/da65,da65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 CPP = cpp
 #CPPFLAGS = -DTEST_ERROR
 
@@ -56,6 +64,7 @@ $(DAIS): fixed.da
 	$(DA) --sync-lines -o $@ -i $< image.bin
 
 image.bin: image.s image.cfg
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t none -C image.cfg -o image.bin image.s
 
 clean:

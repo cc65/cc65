@@ -56,9 +56,10 @@ init:   ldx     #zpspace-1
         bpl     :-
 
         ; Check for ProDOS.
-        ldy     $BF00           ; MLI call entry point
-        cpy     #$4C            ; Is MLI present? (JMP opcode)
-        php                     ; Remember whether we're running ProDOS
+        lda     $BF00           ; MLI call entry point
+        sec
+        sbc     #$4C            ; Is MLI present? (JMP opcode)
+        pha                     ; Backup the result for later
         bne     basic
 
         ; Check the ProDOS system bit map.
@@ -100,8 +101,8 @@ basic:  lda     HIMEM
         bit     $C081
         bit     $C081
 
-        plp                     ; Are we running ProDOS?
-        beq     :+              ; Yes, no need to patch vectors
+        pla                     ; If not running ProDOS, we need to patch 6502 vectors.
+        beq     :+
 
         lda     #<reset_6502
         ldx     #>reset_6502

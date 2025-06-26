@@ -217,21 +217,51 @@ static void ReadMapFile(void) {
 }
 
 static void ProfileDump(void) {
-    int i, j;
+    int i, j, k;
+    int gap = 0;
 
     ReadMapFile();
 
     /* the startup function isn't called by a JSR, so we need to update it here. */
+    /* it is always first */
     functions[0].totalTicks = Peripherals.Counter.ClockCycles;
 
     for (i = 0; i < functionCount; i++) {
+        gap = 0;
+        if (i != 0) {
+            printf("\n");
+            printf("----------\n");
+            printf("\n");
+        }
         printf("function x%04x %s\n", functions[i].caller, FindFunctionName(functions[i].caller));
+        for (k = 0; k < functionCount; k++) {
+            for (j = 0; j < functions[k].children; j++) {
+                if (functions[k].calls[j].callee == functions[i].caller) {
+                    if (!gap) {
+                        gap = 1;
+                        printf("\n");
+                    }
+                    printf("\t%8d call%c from x%04x %s\n",
+                        functions[k].calls[j].count,
+                        (functions[k].calls[j].count == 1) ? ' ' : 's',
+                        functions[k].caller,
+                        FindFunctionName(functions[k].caller));
+                }
+            }
+        }
+        gap = 0;
+        printf("\n");
         printf("\t selfTicks : %12" PRIu64 "\n", functions[i].totalTicks - functions[i].childTicks);
         printf("\tchildTicks : %12" PRIu64 "\n", functions[i].childTicks);
         printf("\ttotalTicks : %12" PRIu64 "\n", functions[i].totalTicks);
         for (j = 0; j < functions[i].children; j++) {
-            printf("\t%8d calls to x%04x %s\n",
+            if (gap == 0) {
+                gap = 1;
+                printf("\n");
+            }
+            printf("\t%8d call%c to x%04x %s\n",
                 functions[i].calls[j].count,
+                (functions[i].calls[j].count == 1) ? ' ' : 's',
                 functions[i].calls[j].callee,
                 FindFunctionName(functions[i].calls[j].callee));
         }

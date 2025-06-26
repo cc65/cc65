@@ -55,8 +55,8 @@ jobs:
       - name: Build the tools.
         shell: bash
         run: |
-            make -j2 bin USER_CFLAGS=-Werror
-            make -j2 util
+            make -j2 bin USER_CFLAGS=-Werror  QUIET=1
+            make -j2 util QUIET=1
       - name: Build the platform libraries.
         shell: bash
         run: make -j2 lib QUIET=1
@@ -65,26 +65,26 @@ jobs:
         run: make -j2 test QUIET=1
       - name: Test that the samples can be built.
         shell: bash
-        run: make -j2 samples
+        run: make -j2 samples QUIET=1
       - name: Remove the output from the samples tests.
         shell: bash
-        run: make -C samples clean
+        run: make -C samples clean QUIET=1
       - name: Remove programs in util directory
         shell: bash
-        run: make -C util clean
+        run: make -C util clean QUIET=1
       - name: Build the document files.
         shell: bash
-        run: make -j2 doc
+        run: make -j2 doc QUIET=1
       - name: Build and package 64-bit Windows versions of the tools.
         run: |
-          make -C src clean
+          make -C src clean QUIET=1
           make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
           make zip
           mv cc65.zip cc65-snapshot-win64.zip
       - name: Build and package 32-bit Windows versions of the tools.
         run: |
-          make -C src clean
-          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=i686-w64-mingw32-
+          make -C src clean QUIET=1
+          make -j2 bin USER_CFLAGS=-Werror QUIET=1 CROSS_COMPILE=i686-w64-mingw32-
           make zip
           mv cc65.zip cc65-snapshot-win32.zip
 

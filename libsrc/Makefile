@@ -8,6 +8,16 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+endif
+
 CBMS = c128   \
        c16    \
        c64    \
@@ -134,7 +144,7 @@ zip:
 	$(foreach dir,$(OUTPUTDIRS),$(ZIP_recipe))
 
 $(TARGETS): | ../lib
-	@$(MAKE) --no-print-directory $@
+	@$(MAKE) $(PD) $@ $(PQ)
 
 # ../lib must be created globally before doing lib targets in parallel
 ../lib:
@@ -259,8 +269,8 @@ $1_DYNS = $$(patsubst $$($1_SRCPAT),$$($1_DYNPAT),$$($1_SRCS))
 $1_DRVS = $$(patsubst $$($1_DYNPAT),$$($1_DRVPAT),$$($1_DYNS))
 
 $$($1_STCPAT): $$($1_SRCPAT)
-	@echo $$(TARGET) - $$< - static
-	@$$(CA65) -t $$(TARGET) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
+	$$(if $$(QUIET),@echo $$(TARGET) - $$< - static)
+	$$(CA65) -t $$(TARGET) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
 
 OBJS += $$($1_STCS)
 DEPS += $$($1_STCS:.o=.d)
@@ -268,8 +278,8 @@ DEPS += $$($1_STCS:.o=.d)
 $$($1_DYNS): | $$($1_DYNDIR)
 
 $$($1_DRVPAT): $$($1_DYNPAT) $$(ZPOBJ) | $$($1_DRVDIR)
-	@echo $$(TARGET) - $$(<F)
-	@$$(LD65) -o $$@ -t module $$^
+	$$(if $$(QUIET),@echo $$(TARGET) - $$(<F))
+	$$(LD65) -o $$@ -t module $$^
 
 $$($1_DYNDIR) $$($1_DRVDIR):
 	@$$(call MKDIR,$$@)
@@ -291,16 +301,16 @@ export CC65_HOME := $(abspath ..)
 
 define ASSEMBLE_recipe
 
-$(if $(QUIET),,@echo $(TARGET) - $<)
-@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
+    $(if $(QUIET),@echo $(TARGET) - $<)
+    $(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 endef # ASSEMBLE_recipe
 
 define COMPILE_recipe
 
-$(if $(QUIET),,@echo $(TARGET) - $<)
-@$(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
-@$(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
+    $(if $(QUIET),@echo $(TARGET) - $<)
+    $(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
+    $(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
 
 endef # COMPILE_recipe
 
@@ -311,12 +321,13 @@ endef # COMPILE_recipe
 	$(COMPILE_recipe)
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
-	@echo $(TARGET) - $(<F)
+	$(if $(QUIET),@echo $(TARGET) - $(<F))
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
 $(EXTRA_OBJS): | ../lib
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
+	$(if $(QUIET),@echo $(TARGET) - $<)
 	$(AR65) a $@ $?
 
 ../libwrk/$(TARGET) ../target/$(TARGET)/util:

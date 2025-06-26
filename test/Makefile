@@ -17,11 +17,12 @@ else
 endif
 
 ifeq ($(SILENT),s)
-    QUIET := 1
+    QUIET = 1
 endif
 
-ifneq ($(QUIET),1)
-    QUIET := 0
+ifdef QUIET
+    PQ = "QUIET=1"
+    PD = --no-print-directory
 endif
 
 WORKDIR = ../testwrk
@@ -33,15 +34,15 @@ test:
 	@$(MAKE) continue
 
 continue:
-	@$(MAKE) -C asm all QUIET=$(QUIET)
-	@$(MAKE) -C dasm all QUIET=$(QUIET)
-	@$(MAKE) -C val all QUIET=$(QUIET)
-	@$(MAKE) -C ref all QUIET=$(QUIET)
-	@$(MAKE) -C err all QUIET=$(QUIET)
-	@$(MAKE) -C standard all QUIET=$(QUIET)
-	@$(MAKE) -C standard_err all QUIET=$(QUIET)
-	@$(MAKE) -C misc all QUIET=$(QUIET)
-	@$(MAKE) -C todo all QUIET=$(QUIET)
+	@$(MAKE) $(PD) -C asm all $(PQ)
+	@$(MAKE) $(PD) -C dasm all $(PQ)
+	@$(MAKE) $(PD) -C val all $(PQ)
+	@$(MAKE) $(PD) -C ref all $(PQ)
+	@$(MAKE) $(PD) -C err all $(PQ)
+	@$(MAKE) $(PD) -C standard all $(PQ)
+	@$(MAKE) $(PD) -C standard_err all $(PQ)
+	@$(MAKE) $(PD) -C misc all $(PQ)
+	@$(MAKE) $(PD) -C todo all $(PQ)
 	@$(MAKE) success_message
 
 success_message:
@@ -50,15 +51,15 @@ success_message:
 	$(info ###################################)
 
 mostlyclean:
-	@$(MAKE) -C asm clean QUIET=$(QUIET)
-	@$(MAKE) -C dasm clean QUIET=$(QUIET)
-	@$(MAKE) -C val clean QUIET=$(QUIET)
-	@$(MAKE) -C ref clean QUIET=$(QUIET)
-	@$(MAKE) -C err clean QUIET=$(QUIET)
-	@$(MAKE) -C standard clean QUIET=$(QUIET)
-	@$(MAKE) -C standard_err clean QUIET=$(QUIET)
-	@$(MAKE) -C misc clean QUIET=$(QUIET)
-	@$(MAKE) -C todo clean QUIET=$(QUIET)
+	@$(MAKE) $(PD) -C asm clean $(PQ)
+	@$(MAKE) $(PD) -C dasm clean $(PQ)
+	@$(MAKE) $(PD) -C val clean $(PQ)
+	@$(MAKE) $(PD) -C ref clean $(PQ)
+	@$(MAKE) $(PD) -C err clean $(PQ)
+	@$(MAKE) $(PD) -C standard clean $(PQ)
+	@$(MAKE) $(PD) -C standard_err clean $(PQ)
+	@$(MAKE) $(PD) -C misc clean $(PQ)
+	@$(MAKE) $(PD) -C todo clean $(PQ)
 
 clean: mostlyclean
 	@$(call RMDIR,$(WORKDIR))

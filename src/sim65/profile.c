@@ -46,6 +46,8 @@ bool enableProfiling = false;
 
 const char *profileMap = NULL;
 
+static uint16_t resetVector = 0xFFFF;
+
 typedef struct ProfileCallEntry {
     uint16_t callee;
     int count;
@@ -226,11 +228,11 @@ static void ProfileDump(void) {
     int i, j, k;
     int gap = 0;
 
-    ReadMapFile();
-
     /* the startup function isn't called by a JSR, so we need to update it here. */
-    /* it is always first */
-    grandTotal = functions[0].totalTicks = Peripherals.Counter.ClockCycles;
+    ProfileTimeEntry *startup = EnsureTimeEntry(resetVector);
+    grandTotal = startup->totalTicks = Peripherals.Counter.ClockCycles;
+
+    ReadMapFile();
 
     for (i = 0; i < functionCount; i++) {
         gap = 0;
@@ -311,6 +313,7 @@ void ProfileReset(uint16_t pc) {
         atexit(ProfileDump);
     }
 
+    resetVector = pc;
     profilePtr = 0;
     profileStack[profilePtr].pc = pc;
     profileStack[profilePtr].clock = Peripherals.Counter.ClockCycles;

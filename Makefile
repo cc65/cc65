@@ -4,6 +4,40 @@ ifneq ($(SILENT),s)
     $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
 endif
 
+
+
+ifeq ($(OS),Windows_NT)
+    HOST_OS := windows
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Darwin)
+        HOST_OS := mac
+    else ifeq ($(UNAME_S),Linux)
+        HOST_OS := linux
+    else
+        HOST_OS := unknown
+    endif
+endif
+export HOST_OS
+$(info Detected OS: $(HOST_OS))
+
+
+
+# Set default DESTDIR if not on Windows and DESTDIR is unset or empty
+ifeq ($(HOST_OS),windows)
+    # Do nothing
+else
+    ifndef DESTDIR
+        DESTDIR := /usr/local
+    endif
+    ifeq ($(strip $(DESTDIR)),)
+        DESTDIR := /usr/local
+    endif
+endif
+export DESTDIR
+
+
+
 .PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util checkstyle check
 
 .SUFFIXES:

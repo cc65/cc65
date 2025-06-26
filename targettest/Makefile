@@ -791,6 +791,12 @@ TARGETS :=     \
 # --------------------------------------------------------------------------
 # Rule to make the binaries for every platform
 
+define TARGETDIR_recipe
+
+@+$(MAKE) -C $(dir) $(PD) $(PQ)
+
+endef # TARGETDIR_recipe
+
 define TARGET_recipe
 
 @echo making targettest for: $(T)
@@ -801,6 +807,7 @@ endef # TARGET_recipe
 
 platforms:
 	$(foreach T,$(TARGETS),$(TARGET_recipe))
+	$(foreach dir,$(DIRLIST),$(TARGETDIR_recipe))
 
 # --------------------------------------------------------------------------
 # some programs link against getsp.o

@@ -13,6 +13,12 @@
         .globalzp       tmp1, tmp2, tmp3, tmp4
         .globalzp       regbank
 
+        ; The following symbol is supplied for compatibility reasons only, it
+        ; will get removed in future versions. Using it will cause a linker
+        ; warning.
+        .globalzp       sp
+
+
 ; The size of the register bank
 regbanksize     = 6
 

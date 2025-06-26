@@ -221,9 +221,13 @@ static void ProfileDump(void) {
 
     ReadMapFile();
 
+    /* the startup function isn't called by a JSR, so we need to update it here. */
+    functions[0].totalTicks = Peripherals.Counter.ClockCycles;
+
     for (i = 0; i < functionCount; i++) {
         printf("function x%04x %s\n", functions[i].caller, FindFunctionName(functions[i].caller));
-        printf("\t selfTicks : %12" PRIu64 "\n", functions[i].totalTicks - functions[i].childTicks);
+        printf("\t selfTicks : %12" PRIu64 "\n",
+            (functions[i].totalTicks == 0) ? 0 : functions[i].totalTicks - functions[i].childTicks);
         printf("\tchildTicks : %12" PRIu64 "\n", functions[i].childTicks);
         printf("\ttotalTicks : %12" PRIu64 "\n", functions[i].totalTicks);
         for (j = 0; j < functions[i].children; j++) {
@@ -270,6 +274,6 @@ void ProfileReset(uint16_t pc) {
 
     profilePtr = 0;
     profileStack[profilePtr].pc = pc;
-    profileStack[profilePtr].clock = 0;
+    profileStack[profilePtr].clock = Peripherals.Counter.ClockCycles;
     profilePtr++;
 }

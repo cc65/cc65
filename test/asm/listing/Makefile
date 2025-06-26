@@ -32,7 +32,9 @@ ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
+ifndef CMD_EXE
   CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+endif
 endif
 
 CA65 := $(if $(wildcard ../../../bin/ca65*),..$S..$S..$Sbin$Sca65,ca65)

@@ -26,7 +26,9 @@ ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
+ifndef CMD_EXE
   CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+endif
 endif
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)

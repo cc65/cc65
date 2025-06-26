@@ -31,7 +31,9 @@ ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
+ifndef CMD_EXE
   CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+endif
 endif
 
 SIM65FLAGS = -x 200000000

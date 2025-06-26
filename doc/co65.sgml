@@ -9,7 +9,7 @@ co65 is an object file conversion utility. It converts o65 object files into
 the native object file format used by the cc65 tool chain. Since o65 is the
 file format used by cc65 for loadable drivers, the co65 utility allows (among
 other things) to link drivers statically to the generated executables instead
-of loading them from disk.
+of loading them from disk (not recommended anymore).
 </abstract>
 
 <!-- Table of contents -->
@@ -278,7 +278,7 @@ driver!
 <sect1>Example - Convert and link a graphics driver<p>
 
 As an example, here are some instructions to convert and use the c64-hi.tgi
-graphics driver:
+graphics driver (not recommended anymore):
 
 First, convert the driver, generating a label named "_c64_hi" for the code
 segment. Use the assembler to generate an object file from the assembler

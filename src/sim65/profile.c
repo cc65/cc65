@@ -226,8 +226,7 @@ static void ProfileDump(void) {
 
     for (i = 0; i < functionCount; i++) {
         printf("function x%04x %s\n", functions[i].caller, FindFunctionName(functions[i].caller));
-        printf("\t selfTicks : %12" PRIu64 "\n",
-            (functions[i].totalTicks == 0) ? 0 : functions[i].totalTicks - functions[i].childTicks);
+        printf("\t selfTicks : %12" PRIu64 "\n", functions[i].totalTicks - functions[i].childTicks);
         printf("\tchildTicks : %12" PRIu64 "\n", functions[i].childTicks);
         printf("\ttotalTicks : %12" PRIu64 "\n", functions[i].totalTicks);
         for (j = 0; j < functions[i].children; j++) {

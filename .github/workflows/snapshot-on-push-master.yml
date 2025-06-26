@@ -78,7 +78,7 @@ jobs:
       - name: Build and package 64-bit Windows versions of the tools.
         run: |
           make -C src clean QUIET=1
-          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
+          make -j2 bin QUIET=1 USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
           make zip
           mv cc65.zip cc65-snapshot-win64.zip
       - name: Build and package 32-bit Windows versions of the tools.

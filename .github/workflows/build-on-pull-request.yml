@@ -59,8 +59,8 @@ jobs:
           path: ./html
       - name: Build 64-bit Windows versions of the tools.
         run: |
-          make -C src clean
-          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
+          make -C src clean QUIET=1
+          make -j2 bin QUIET=1 USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
 
   build_windows:
     name: Build and Test (Windows)

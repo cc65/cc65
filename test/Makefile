@@ -16,6 +16,14 @@ else
   RMDIR = $(RM) -r $1
 endif
 
+ifeq ($(SILENT),s)
+    QUIET := 1
+endif
+
+ifneq ($(QUIET),1)
+    QUIET := 0
+endif
+
 WORKDIR = ../testwrk
 
 .PHONY: test continue mostlyclean clean success_message
@@ -25,15 +33,15 @@ test:
 	@$(MAKE) continue
 
 continue:
-	@$(MAKE) -C asm all
-	@$(MAKE) -C dasm all
-	@$(MAKE) -C val all
-	@$(MAKE) -C ref all
-	@$(MAKE) -C err all
-	@$(MAKE) -C standard all
-	@$(MAKE) -C standard_err all
-	@$(MAKE) -C misc all
-	@$(MAKE) -C todo all
+	@$(MAKE) -C asm all QUIET=$(QUIET)
+	@$(MAKE) -C dasm all QUIET=$(QUIET)
+	@$(MAKE) -C val all QUIET=$(QUIET)
+	@$(MAKE) -C ref all QUIET=$(QUIET)
+	@$(MAKE) -C err all QUIET=$(QUIET)
+	@$(MAKE) -C standard all QUIET=$(QUIET)
+	@$(MAKE) -C standard_err all QUIET=$(QUIET)
+	@$(MAKE) -C misc all QUIET=$(QUIET)
+	@$(MAKE) -C todo all QUIET=$(QUIET)
 	@$(MAKE) success_message
 
 success_message:
@@ -42,15 +50,15 @@ success_message:
 	$(info ###################################)
 
 mostlyclean:
-	@$(MAKE) -C asm clean
-	@$(MAKE) -C dasm clean
-	@$(MAKE) -C val clean
-	@$(MAKE) -C ref clean
-	@$(MAKE) -C err clean
-	@$(MAKE) -C standard clean
-	@$(MAKE) -C standard_err clean
-	@$(MAKE) -C misc clean
-	@$(MAKE) -C todo clean
+	@$(MAKE) -C asm clean QUIET=$(QUIET)
+	@$(MAKE) -C dasm clean QUIET=$(QUIET)
+	@$(MAKE) -C val clean QUIET=$(QUIET)
+	@$(MAKE) -C ref clean QUIET=$(QUIET)
+	@$(MAKE) -C err clean QUIET=$(QUIET)
+	@$(MAKE) -C standard clean QUIET=$(QUIET)
+	@$(MAKE) -C standard_err clean QUIET=$(QUIET)
+	@$(MAKE) -C misc clean QUIET=$(QUIET)
+	@$(MAKE) -C todo clean QUIET=$(QUIET)
 
 clean: mostlyclean
 	@$(call RMDIR,$(WORKDIR))

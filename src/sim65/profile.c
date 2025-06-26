@@ -217,7 +217,7 @@ static void ReadMapFile(void) {
 }
 
 static double percentage(uint64_t num, uint64_t den) {
-   int tmp = num * 1000 / den;
+   int tmp = (int) (num * 1000 / den);
    return tmp / 10.0;
 }
 

@@ -39,6 +39,9 @@ jobs:
       - name: Build the platform libraries.
         shell: bash
         run: make -j2 lib QUIET=1
+      - name: check test that no modules use sp
+        shell: bash
+        run: make -j2 checksp QUIET=1             
       - name: Run the regression tests.
         shell: bash
         run: make -j2 test QUIET=1

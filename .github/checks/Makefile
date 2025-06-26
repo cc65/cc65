@@ -40,4 +40,7 @@ sorted: sorted.sh sorted_codeopt.sh sorted_opcodes.sh
 	@./sorted_codeopt.sh
 	@./sorted_opcodes.sh
 
+checksp: checksp.sh
+	@./checksp.sh
+
 endif

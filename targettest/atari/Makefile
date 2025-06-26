@@ -37,6 +37,14 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_atari = \
         charmapping.xex \
         defdev.xex \
@@ -64,24 +72,33 @@ else
 endif
 
 charmapping.xex: charmapping.c
+	$(if $(QUIET),echo $@)
 	$(CL) -t atari -o charmapping.xex charmapping.c
 defdev.xex: defdev.c
+	$(if $(QUIET),echo $@)
 	$(CL) -t atari -o defdev.xex defdev.c
 displaylist.xex: displaylist.c
+	$(if $(QUIET),echo $@)
 	$(CL) -t atari -o displaylist.xex displaylist.c
 mem.xex: mem.c ../getsp.s
+	$(if $(QUIET),echo $@)
 	$(CL) -t atari -o mem.xex mem.c ../getsp.s
 multi.xex: multi-xex.s multi-xex.cfg
+	$(if $(QUIET),echo $@)
 	$(CL) -t atari -C multi-xex.cfg multi-xex.s -o multi.xex
 ostype.xex: ostype.c
+	$(if $(QUIET),echo $@)
 	$(CL) -t atari -o ostype.xex ostype.c
 scrcode.com: scrcode.s
+	$(if $(QUIET),echo $@)
 #	ca65 -t atari -o scrcode.o scrcode.s
 #	ld65 -C atari-asm.cfg -o scrcode.com scrcode.o
 	$(CL) -t atari -C atari-asm.cfg -o scrcode.com scrcode.s
 sys.xex: sys.c
+	$(if $(QUIET),echo $@)
 	$(CL) -t atari -o sys.xex sys.c
 sound.xex: sound.c
+	$(if $(QUIET),echo $@)
 	$(CL) -t atari -o sound.xex sound.c
 clean:
 	@$(DEL) charmapping.xex 2>$(NULLDEV)

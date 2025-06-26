@@ -47,6 +47,16 @@ else
   LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+endif
+
 ifneq ($(filter disk testcode.%,$(MAKECMDGOALS)),)
   ifdef CC65_HOME
     TARGET_PATH = $(CC65_HOME)/target
@@ -120,10 +130,12 @@ DISK_atarixl   = testcode.atr
 %: %.s
 
 .c.o:
+	$(if $(QUIET),echo targettest/$*.c)
 	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $<
 	$(AS) $(<:.c=.s)
 
 .s.o:
+	$(if $(QUIET),echo targettest/$*.s)
 	$(AS) $(ASFLAGS) -t $(SYS) $<
 
 .PRECIOUS: %.o
@@ -721,7 +733,7 @@ endif
 
 define SUBDIR_recipe
 
-@+$(MAKE) -C $(dir) --no-print-directory $@
+@+$(MAKE) -C $(dir) $(PD) $@ $(PQ)
 
 endef # SUBDIR_recipe
 
@@ -783,7 +795,7 @@ define TARGET_recipe
 
 @echo making targettest for: $(T)
 @$(MAKE) -j2 SYS:=$(T)
-@$(MAKE) --no-print-directory clean SYS:=$(T)
+@$(MAKE) $(PD) clean SYS:=$(T)
 
 endef # TARGET_recipe
 

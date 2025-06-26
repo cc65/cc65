@@ -53,6 +53,10 @@ checkstyle:
 sorted:
 	@$(MAKE) -C .github/checks --no-print-directory $@
 
+# check that no modules use "sp", requires the binaries to be built first
+checksp:
+	@$(MAKE) -C .github/checks --no-print-directory $@
+
 # runs regression tests, requires libtest target libraries
 test:
 	@$(MAKE) -C test                 --no-print-directory $@

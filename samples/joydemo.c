@@ -26,9 +26,11 @@ int main (void)
     unsigned char num_joy;
     unsigned char raw_value;
     unsigned char i;
+#if DYN_DRV
     unsigned char err;
-    unsigned char y;
+#endif
 #ifdef USECONIO
+    unsigned char y;
     clrscr();
 #endif
     PRINTF("Driver init..." CR);

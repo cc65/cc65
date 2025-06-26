@@ -13,7 +13,6 @@
 
         .include        "c65.inc"
 
-
 _cputcxy:
         pha                     ; Save C
         jsr     gotoxy          ; Set cursor, drop x and y

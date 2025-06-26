@@ -54,6 +54,9 @@ struct PPIfStack {
     int             Index;
 };
 
+/* Forward */
+struct IFile;
+
 
 
 /*****************************************************************************/
@@ -62,20 +65,11 @@ struct PPIfStack {
 
 
 
+void HandleSpecialMacro (Macro* M, const char* Name);
+/* Handle special "magic" macros that may change */
+
 void Preprocess (void);
 /* Preprocess a line */
-
-void SetPPIfStack (PPIfStack* Stack);
-/* Specify which PP #if stack to use */
-
-void ContinueLine (void);
-/* Continue the current line ended with a '\\' */
-
-void PreprocessBegin (void);
-/* Initialize preprocessor with current file */
-
-void PreprocessEnd (void);
-/* Preprocessor done with current file */
 
 void InitPreprocess (void);
 /* Init preprocessor */
@@ -83,8 +77,19 @@ void InitPreprocess (void);
 void DonePreprocess (void);
 /* Done with preprocessor */
 
-void HandleSpecialMacro (Macro* M, const char* Name);
-/* Handle special "magic" macros that may change */
+void SetPPIfStack (PPIfStack* Stack);
+/* Specify which PP #if stack to use */
+
+void ContinueLine (void);
+/* Continue the current line ended with a '\\' */
+
+void PreprocessBegin (struct IFile* Input);
+/* Initialize the preprocessor for a new input file */
+
+void PreprocessEnd (struct IFile* Input);
+/* Preprocessor done with current file. The parameter is the file we're
+** switching back to.
+*/
 
 
 

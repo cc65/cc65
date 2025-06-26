@@ -260,12 +260,21 @@ static void ProfileDump(void) {
         gap = 0;
         printf("\n");
         self = functions[i].totalTicks - functions[i].childTicks;
-        printf("\t selfTicks : %12" PRIu64 " (%6.1f%%)\n",
-            self, percentage(self, grandTotal));
-        printf("\tchildTicks : %12" PRIu64 " (%6.1f%%)\n",
-            functions[i].childTicks, percentage(functions[i].childTicks, grandTotal));
+
+        printf("\t selfTicks : %12" PRIu64 " (%6.1f%%) (%6.1f%%)\n",
+            self,
+            percentage(self, grandTotal),
+            percentage(self, functions[i].totalTicks));
+
+        printf("\tchildTicks : %12" PRIu64 " (%6.1f%%) (%6.1f%%)\n",
+            functions[i].childTicks,
+            percentage(functions[i].childTicks, grandTotal),
+            percentage(functions[i].childTicks, functions[i].totalTicks));
+
         printf("\ttotalTicks : %12" PRIu64 " (%6.1f%%)\n",
-            functions[i].totalTicks, percentage(functions[i].totalTicks, grandTotal));
+            functions[i].totalTicks,
+            percentage(functions[i].totalTicks, grandTotal));
+
         for (j = 0; j < functions[i].children; j++) {
             if (gap == 0) {
                 gap = 1;

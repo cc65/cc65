@@ -63,7 +63,7 @@ const char* CPUNames[CPU_COUNT] = {
     "huc6280",
     "m740",
     "4510",
-    "45GS02"
+    "45GS02",
     "W65C02",   /* CMOS with WDC extensions */
     "65CE02",   /* CMOS with GTE extensions */
 };

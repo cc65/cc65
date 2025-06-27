@@ -16,6 +16,15 @@ else
   RMDIR = $(RM) -r $1
 endif
 
+ifeq ($(SILENT),s)
+    QUIET := 1
+endif
+
+ifdef QUIET
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+endif
+
 WORKDIR = ../testwrk/asm
 
 .PHONY: all continue mostlyclean clean
@@ -23,20 +32,20 @@ WORKDIR = ../testwrk/asm
 all: mostlyclean continue
 
 continue: mostlyclean
-	@$(MAKE) -C cpudetect all
-	@$(MAKE) -C opcodes all
-	@$(MAKE) -C listing all
-	@$(MAKE) -C val all
-	@$(MAKE) -C err all
-	@$(MAKE) -C misc all
+	@$(MAKE) $(PD) -C cpudetect all $(PQ)
+	@$(MAKE) $(PD) -C opcodes all $(PQ)
+	@$(MAKE) $(PD) -C listing all $(PQ)
+	@$(MAKE) $(PD) -C val all $(PQ)
+	@$(MAKE) $(PD) -C err all $(PQ)
+	@$(MAKE) $(PD) -C misc all $(PQ)
 
 mostlyclean:
-	@$(MAKE) -C cpudetect clean
-	@$(MAKE) -C opcodes clean
-	@$(MAKE) -C listing clean
-	@$(MAKE) -C val clean
-	@$(MAKE) -C err clean
-	@$(MAKE) -C misc clean
+	@$(MAKE) $(PD) -C cpudetect clean $(PQ)
+	@$(MAKE) $(PD) -C opcodes clean $(PQ)
+	@$(MAKE) $(PD) -C listing clean $(PQ)
+	@$(MAKE) $(PD) -C val clean $(PQ)
+	@$(MAKE) $(PD) -C err clean $(PQ)
+	@$(MAKE) $(PD) -C misc clean $(PQ)
 
 clean: mostlyclean
 	@$(call RMDIR,$(WORKDIR))

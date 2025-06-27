@@ -39,6 +39,14 @@ else
   SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   ifdef CC65_HOME
     TARGET_PATH = $(CC65_HOME)/target
@@ -139,12 +147,16 @@ else
 endif
 
 fire: fire.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o fire -m fire.map fire.c
 plasma: plasma.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o plasma -m plasma.map plasma.c
 nachtm: nachtm.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o nachtm -m nachtm.map nachtm.c
 hello: hello-asm.s
+	$(if $(QUIET),echo $(SYS):$@)
         # Use separate assembler ...
 	$(AS) -t $(SYS) hello-asm.s
         # ... and linker commands ...
@@ -171,6 +183,7 @@ $(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)),s >$(
 endef # D64_WRITE_SEQ_recipe
 
 samples.d64: samples
+	$(if $(QUIET),echo $(SYS):$@)
 	@$(C1541) -format "samples,00" d64 $@ >$(NULLDEV)
 	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
 #	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))

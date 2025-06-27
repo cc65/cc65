@@ -26,8 +26,13 @@ endif
 
 ifdef QUIET
   .SILENT:
+  NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
+ifndef CMD_EXE
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
 endif
+endif
+
 
 CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
 
@@ -49,7 +54,7 @@ define PRG_template
 
 $(WORKDIR)/%.$1.$2.prg: %.c | $(WORKDIR)
 	$(if $(QUIET),echo standard_err/$$*.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 $$(CC65FLAGS) -Osir --add-source --standard $1 -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(NOT) $(CC65) -t sim$2 $$(CC65FLAGS) -Osir --add-source --standard $1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 
 endef # PRG_template
 

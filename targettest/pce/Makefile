@@ -37,6 +37,14 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 .PHONY: all clean test
 
 # Size of cartridge to generate.
@@ -71,8 +79,11 @@ else
 endif
 
 %.bin: %.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
+ifndef QUIET
 	@echo "use 'make conio.pce' to produce a .pce file using dd"
+endif
 
 %.pce: %.bin
 	dd if=$< bs=8K skip=${COUNT} > $@

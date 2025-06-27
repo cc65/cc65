@@ -4,6 +4,13 @@ ifneq ($(SILENT),s)
     $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
 
 CC = $(CROSS_COMPILE)gcc
 
@@ -35,6 +42,7 @@ warning:
 	@echo "note that you need zlib installed first"
 
 deflater: deflater.c
+	$(if $(QUIET),echo HOST:$@)
 	$(CC) $(CFLAGS) -o deflater deflater.c -lz
 
 mostlyclean clean:

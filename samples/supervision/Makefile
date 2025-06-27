@@ -39,6 +39,14 @@ else
   SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_supervision = \
         hello
 
@@ -58,6 +66,7 @@ else
 endif
 
 hello: hello.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o hello -m hello.map hello.c
 	
 clean:

@@ -8,12 +8,6 @@ ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
-ifneq ($(V),1)
-  Q=@
-else
-  Q=
-endif
-
 PROGS = ar65     \
         ca65     \
         cc65     \
@@ -52,6 +46,21 @@ else
   RMDIR = $(RM) -r $1
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+    NULLOUT = >$(NULLDEV)
+    NULLERR = 2>$(NULLDEV)
+endif
+
+ifdef QUIET
+    .SILENT:
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+ifndef CMD_EXE
+    CATERR = 2> ../wrk/common/$$@.errlog || (cat ../wrk/common/$$@.errlog && false)
+endif
+endif
+
 CC = $(CROSS_COMPILE)gcc
 AR = $(CROSS_COMPILE)ar
 
@@ -70,7 +79,10 @@ ifndef BUILD_ID
     BUILD_ID := N/A
   endif
 endif
-$(info BUILD_ID: $(BUILD_ID))
+
+ifneq ($(SILENT),s)
+  $(info BUILD_ID: $(BUILD_ID))
+endif
 
 CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
@@ -161,8 +173,8 @@ $1: ../bin/$1$(EXE_SUFFIX)
 endef # PROG_template
 
 ../wrk/%.o: %.c
-	@echo $<
-	$(Q)$(CC) -c $(CFLAGS) -o $@ $<
+	$(if $(QUIET),echo CC:$@)
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 ../bin:
 	@$(call MKDIR,$@)
@@ -170,7 +182,8 @@ endef # PROG_template
 $(eval $(call OBJS_template,common))
 
 ../wrk/common/common.a: $(common_OBJS)
-	$(AR) r $@ $?
+	$(if $(QUIET),echo AR:$@)
+	$(AR) r $@ $? $(CATERR)
 
 $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
 
@@ -184,6 +197,7 @@ $(eval $(call OBJS_template,dbginfo))
 dbginfo: $(dbginfo_OBJS)
 
 ../wrk/dbgsh$(EXE_SUFFIX): $(dbginfo_OBJS) ../wrk/common/common.a
+	$(if $(QUIET),echo LINK:$@)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 dbgsh: ../wrk/dbgsh$(EXE_SUFFIX)

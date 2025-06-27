@@ -47,6 +47,16 @@ else
   LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+endif
+
 ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   ifdef CC65_HOME
     TARGET_PATH = $(CC65_HOME)/target
@@ -156,10 +166,13 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 
 .o:
 ifeq ($(SYS),vic20)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
 else ifeq ($(SYS),plus4)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C plus4-hires.cfg -m $@.map $^ $(SYS).lib
 else
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 endif
 
@@ -422,7 +435,7 @@ endif
 
 define SUBDIR_recipe
 
-@+$(MAKE) -C $(dir) --no-print-directory $@
+@+$(MAKE) -C $(dir) $(PD) $@ $(PQ)
 
 endef # SUBDIR_recipe
 
@@ -487,17 +500,23 @@ TARGETS :=     \
 # --------------------------------------------------------------------------
 # Rule to make the binaries for every platform
 
+define TARGETDIR_recipe
+
+@+$(MAKE) -C $(dir) $(PD) $(PQ)
+
+endef # TARGETDIR_recipe
+
 define TARGET_recipe
 
 @echo making samples for: $(T)
-@$(MAKE) --no-print-directory clean SYS:=$(T)
-@$(MAKE) -j2 SYS:=$(T)
-@$(MAKE) --no-print-directory clean SYS:=$(T)
+@$(MAKE) -j2 SYS:=$(T) $(PQ)
+@$(MAKE) $(PD) clean SYS:=$(T) $(PQ)
 
 endef # TARGET_recipe
 
 platforms:
 	$(foreach T,$(TARGETS),$(TARGET_recipe))
+	$(foreach dir,$(DIRLIST),$(TARGETDIR_recipe))
 
 # --------------------------------------------------------------------------
 # Overlay rules. Overlays need special ld65 configuration files.  Also, the

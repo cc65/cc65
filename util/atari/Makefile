@@ -4,6 +4,13 @@ ifneq ($(SILENT),s)
     $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
 
 CC = $(CROSS_COMPILE)gcc
 
@@ -28,6 +35,7 @@ CFLAGS += -O3 -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS)
 atari: ataricvt
 
 ataricvt: ataricvt.c
+	$(if $(QUIET),echo HOST:$@)
 	$(CC) $(CFLAGS) -o ataricvt ataricvt.c
 
 mostlyclean clean:

@@ -43,10 +43,12 @@ int main(void)
 
     printf("__CC65__ defined as %04x\n", __CC65__);
     printf("compiler version is %u.%u\n", VER_MAJOR, VER_MINOR);
+#pragma warn (const-comparison, push, off)
     if (__CC65__ == VERSION) {
         printf("__CC65__ is defined correctly as (VER_MAJOR * 0x100) + VER_MINOR\n");
         return EXIT_SUCCESS;
     }
+#pragma warn (const-comparison, pop)
     printf("__CC65__ is incorrectly defined as (VER_MAJOR * 0x100) + (VER_MINOR * 0x10)\n");
     return EXIT_FAILURE;
 }

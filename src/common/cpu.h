@@ -47,7 +47,7 @@
 /* CPUs */
 typedef enum {
     CPU_UNKNOWN = -1,           /* Not specified or invalid target */
-    CPU_NONE,                   /* No CPU - for assembler */
+    CPU_NONE = 0,               /* No CPU - for assembler */
     CPU_6502,
     CPU_6502X,                  /* "Extended", that is: with illegal opcodes */
     CPU_6502DTV,                /* CPU_6502 + DTV extra and illegal opcodes */
@@ -62,7 +62,7 @@ typedef enum {
     CPU_COUNT                   /* Number of different CPUs */
 } cpu_t;
 
-/* CPU instruction sets */
+/* CPU instruction sets (make sure this matches asminc/cpu.mac) */
 enum {
     CPU_ISET_NONE       = 1 << CPU_NONE,
     CPU_ISET_6502       = 1 << CPU_6502,

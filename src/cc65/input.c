@@ -45,6 +45,7 @@
 #include "print.h"
 #include "strbuf.h"
 #include "xmalloc.h"
+#include "pathutil.h"
 
 /* cc65 */
 #include "codegen.h"
@@ -296,10 +297,11 @@ void OpenMainFile (const char* Name)
 
 
 
-void OpenIncludeFile (const char* Name, InputType IT)
+void OpenIncludeFile (const char* Name, InputType IT, StringPool *FilesToIgnore)
 /* Open an include file and insert it into the tables. */
 {
     char*  N;
+    char*  M;
     FILE*  F;
     IFile* IF;
     AFile* AF;
@@ -316,6 +318,23 @@ void OpenIncludeFile (const char* Name, InputType IT)
         PPError ("Include file '%s' not found", Name);
         return;
     }
+
+    /* Resolve real path of file in case of a symlink */
+    M = FindRealPath(N);
+    if (M == 0) {
+        PPError ("Cannot resolve absolute path of '%s'", N);
+        xfree (N);
+        return;
+    }
+
+    if (SP_LookupStr(FilesToIgnore, M) != 0) {
+        /* This file should not be included. */
+        xfree (M);
+        xfree (N);
+        return;
+    }
+
+    xfree (M);
 
     /* Search the list of all input files for this file. If we don't find
     ** it, create a new IFile object.

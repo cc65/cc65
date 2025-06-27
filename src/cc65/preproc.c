@@ -44,6 +44,9 @@
 #include "inline.h"
 #include "print.h"
 #include "xmalloc.h"
+#include "strpool.h"
+#include "abend.h"
+#include "pathutil.h"
 
 /* cc65 */
 #include "codegen.h"
@@ -112,6 +115,8 @@ static RescanInputStack* CurRescanStack;
 static StrBuf* PLine;   /* Buffer for macro expansion */
 static StrBuf* MLine;   /* Buffer for macro expansion in #pragma */
 static StrBuf* OLine;   /* Buffer for #pragma output */
+
+static StringPool* PragmaOnceSeenFiles;
 
 /* Newlines to be added to preprocessed text */
 static unsigned PendingNewLines;
@@ -2820,7 +2825,6 @@ static int DoIfDef (int skip, int flag)
 }
 
 
-
 static void DoInclude (void)
 /* Open an include file. */
 {
@@ -2889,8 +2893,8 @@ static void DoInclude (void)
         NextChar ();
         /* Check for extra tokens following the filename */
         CheckExtraTokens ("include");
-        /* Open the include file */
-        OpenIncludeFile (SB_GetConstBuf (&Filename), IT);
+        /* Open the include file, if it is not marked with #pragma once */
+        OpenIncludeFile (SB_GetConstBuf (&Filename), IT, PragmaOnceSeenFiles);
     } else {
         /* No terminator found */
         PPError ("#include expects \"FILENAME\" or <FILENAME>");
@@ -2999,14 +3003,28 @@ static void DoLine (void)
     MLine = InitLine (MLine);
 }
 
+static void DoPragmaOnce (void)
+/* Marks the current file as seen by #pragma once. */
+{
+    const char * const Filename = GetCurrentFilename ();
 
+    char * const FullPath = FindRealPath (Filename);
+
+    if (FullPath == NULL) {
+        AbEnd ("Failed to find the real path for the file %s", Filename);
+    }
+
+    SP_AddStr (PragmaOnceSeenFiles, FullPath);
+
+    free (FullPath);
+}
 
 static void DoPragma (void)
 /* Handle a #pragma line by converting the #pragma preprocessor directive into
 ** the _Pragma() compiler operator.
 */
 {
-    StrBuf* PragmaLine = OLine;
+    StrBuf* const PragmaLine = OLine;
 
     PRECONDITION (PragmaLine != 0);
 
@@ -3017,11 +3035,16 @@ static void DoPragma (void)
     SB_Clear (MLine);
     PreprocessDirective (Line, MLine, MSM_NONE);
 
-    /* Convert #pragma to _Pragma () */
-    SB_AppendStr (PragmaLine, "_Pragma (");
-    SB_Reset (MLine);
-    Stringize (MLine, PragmaLine);
-    SB_AppendChar (PragmaLine, ')');
+    if (SB_CompareStr(MLine, "once") == 0) {
+        DoPragmaOnce ();
+    }
+    else {
+        /* Convert #pragma to _Pragma () */
+        SB_AppendStr (PragmaLine, "_Pragma (");
+        SB_Reset (MLine);
+        Stringize (MLine, PragmaLine);
+        SB_AppendChar (PragmaLine, ')');
+    }
 
     /* End this line */
     SB_SetIndex (PragmaLine, SB_GetLen (PragmaLine));
@@ -3193,6 +3216,7 @@ static int ParseDirectives (unsigned ModeFlags)
                         if (!PPSkip) {
                             if ((ModeFlags & MSM_IN_ARG_LIST) == 0) {
                                 DoPragma ();
+
                                 return Whitespace;
                             } else {
                                 PPError ("Embedded #pragma directive within macro arguments is unsupported");
@@ -3384,6 +3408,9 @@ void InitPreprocess (void)
     /* Create the output buffers */
     MLine = NewStrBuf ();
     PLine = NewStrBuf ();
+
+    /* 64 is a sensible number of slots for the hash table */
+    PragmaOnceSeenFiles = NewStringPool(64);
 }
 
 
@@ -3394,6 +3421,7 @@ void DonePreprocess (void)
     /* Done with the output buffers */
     SB_Done (MLine);
     SB_Done (PLine);
+    FreeStringPool(PragmaOnceSeenFiles);
 }
 
 

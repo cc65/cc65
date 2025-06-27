@@ -33,6 +33,7 @@
 
 
 
+#include <stdbool.h>
 #include <limits.h>
 
 /* common */
@@ -63,11 +64,12 @@
 
 typedef struct SwitchCtrl SwitchCtrl;
 struct SwitchCtrl {
-    Collection* Nodes;          /* CaseNode tree */
-    const Type* ExprType;       /* Switch controlling expression type */
-    unsigned    Depth;          /* Number of bytes the selector type has */
-    unsigned    DefaultLabel;   /* Label for the default branch */
-    CodeMark    CaseCodeStart;  /* Start of code marker */
+    Collection* Nodes;             /* CaseNode tree */
+    const Type* ExprType;          /* Switch controlling expression type */
+    unsigned    Depth;             /* Number of bytes the selector type has */
+    unsigned    DefaultLabel;      /* Label for the default branch */
+    CodeMark    CaseCodeStart;     /* Start of code marker */
+    bool        CaseCodeStartFlag; /* flag to tell if we've done an override */
 
 
 
@@ -132,6 +134,7 @@ void SwitchStatement (void)
     ** find a "case" or "default" label.
     */
     GetCodePos (&SwitchData.CaseCodeStart);
+    SwitchData.CaseCodeStartFlag = false;
 
     /* Setup the control structure, save the old and activate the new one */
     SwitchData.Nodes        = NewCollection ();
@@ -230,6 +233,12 @@ void CaseLabel (void)
         int         OutOfRange  = 0;
         const char* DiagMsg     = 0;
 
+        /* we want switch logic before the first case/default label */
+        if (!Switch->CaseCodeStartFlag) {
+            Switch->CaseCodeStartFlag = true;
+            GetCodePos (&Switch->CaseCodeStart);
+        }
+
         CaseExpr.Type = IntPromotion (Switch->ExprType);
         LimitExprValue (&CaseExpr, 1);
 
@@ -266,11 +275,6 @@ void CaseLabel (void)
         if (OutOfRange == 0) {
             unsigned CodeLabel;
 
-            /* we want switch logic before the first case/default label */
-            if (CollCount (Switch->Nodes) == 0 && Switch->DefaultLabel == 0) {
-               GetCodePos (&Switch->CaseCodeStart);
-            }
-
             /* Insert the case selector into the selector table */
             CodeLabel = InsertCaseValue (Switch->Nodes, CaseExpr.IVal, Switch->Depth);
 
@@ -306,8 +310,9 @@ void DefaultLabel (void)
         if (Switch->DefaultLabel == 0) {
 
             /* we want switch logic before the first case/default label */
-            if (CollCount (Switch->Nodes) == 0 && Switch->DefaultLabel == 0) {
-               GetCodePos (&Switch->CaseCodeStart);
+            if (!Switch->CaseCodeStartFlag) {
+                Switch->CaseCodeStartFlag = true;
+                GetCodePos (&Switch->CaseCodeStart);
             }
 
             /* Generate and emit the default label */

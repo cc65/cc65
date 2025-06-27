@@ -125,7 +125,7 @@ void SwitchStatement (void)
     */
     SwitchCodeLabel = GetLocalLabel ();
     /* save state for switch logic */
-    g_switchsave (SwitchData.Depth);
+    g_switchsave (SizeOf (SwitchExpr.Type));
 
     /* Remember the current code position. We will move the switch code
     ** to this position later.  This will get overwritten if we actually

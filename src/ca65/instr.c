@@ -732,7 +732,7 @@ static const struct {
 /* Instruction table for the 65CE02 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[131];
+    InsDesc  Ins[133];
 } InsTab65CE02 = {
     /* CAUTION: table must be sorted for bsearch */
     sizeof (InsTab65CE02.Ins) / sizeof (InsTab65CE02.Ins[0]),
@@ -742,6 +742,7 @@ static const struct {
         { "AND",  0x080A66C, 0x20, 0, PutAll },
         { "ASL",  0x000006e, 0x02, 1, PutAll },
         { "ASR",  0x0000026, 0x43, 0, Put4510 },
+        { "ASW",  0x0000008, 0xcb, 6, PutAll },
         { "BBR0", 0x0000000, 0x0F, 0, PutBitBranch },
         { "BBR1", 0x0000000, 0x1F, 0, PutBitBranch },
         { "BBR2", 0x0000000, 0x2F, 0, PutBitBranch },
@@ -819,6 +820,7 @@ static const struct {
         { "PHW",  0x8000008, 0xf4, 1, PutAll },
         { "PHX",  0x0000001, 0xda, 0, PutAll },
         { "PHY",  0x0000001, 0x5a, 0, PutAll },
+        { "PHZ",  0x0000001, 0xdb, 0, PutAll },
         { "PLA",  0x0000001, 0x68, 0, PutAll },
         { "PLP",  0x0000001, 0x28, 0, PutAll },
         { "PLX",  0x0000001, 0xfa, 0, PutAll },

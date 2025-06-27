@@ -1,0 +1,342 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>ca65/da65 Users Guide
+<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">,<newline>
+<url url="mailto:groepaz@gmx.net" name="Groepaz">
+
+<abstract>
+An Overview on all supported CPUs
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+
+<sect1>Supported CPUs<p>
+
+  <itemize>
+  <item><ref id="6502-mode" name="6502"> - NMOS 6502 (all legal instructions)
+  <item><ref id="6502X-mode" name="6502X"> - NMOS 6502 with all undocumented instructions
+  <item><ref id="DTV-mode" name="6502DTV"> - the emulated CPU of the C64DTV device
+  <item><ref id="65SC02-mode" name="65SC02"> - first CMOS instruction set (no bit manipulation)
+  <item><ref id="65C02-mode" name="65C02"> - full CMOS instruction set (has bit manipulation)
+  <item><ref id="W65C02-mode" name="W65C02"> - CMOS with WDC extensions
+  <item><ref id="65CE02-mode" name="65CE02"> - CMOS with GTE extensions
+  <item><ref id="65816-mode" name="65816"> - the CPU of the SNES, and the SCPU
+  <item><ref id="HUC6280-mode" name="HuC6280"> - the CPU of the PC engine
+  <item><ref id="4510-mode" name="4510"> - the CPU of the Commodore C65
+  <item><ref id="45GS02-mode" name="45GS02"> - the CPU of the Commodore MEGA65
+  <item><ref id="M740-mode" name="M740"> - a Microcontroller by Mitsubishi
+  <item><ref id="sweet16-mode" name="Sweet16"> - an interpreter for a pseudo 16 bit CPU
+  </itemize>
+
+
+<sect2>6502 mode<label id="6502-mode"><p>
+
+The default (no CPU given on the command line or in the <tt/GLOBAL/ section of
+the info file) is the 6502 CPU. The disassembler knows all "official" opcodes
+for this CPU. Invalid opcodes are translated into <tt/.byte/ commands.
+
+<sect2>6502X mode<label id="6502X-mode"><p>
+
+6502X mode is an extension to the normal 6502 mode. In this mode, several
+mnemonics for undocumented instructions of the NMOS 6502 CPUs are accepted.
+
+Note: Since these instructions are undocumented, there are no official mnemonics
+for them.
+
+<itemize>
+<item><tt>ALR: A:=(A and #{imm})/2;</tt>
+<item><tt>ANC: A:= A and #{imm};</tt> Generates opcode &dollar;0B.
+<item><tt>ANE: A:= (A or CONST) and X and #{imm};</tt>
+<item><tt>ARR: A:=(A and #{imm})/2;</tt>
+<item><tt>AXS: X:=A and X-#{imm};</tt>
+<item><tt>DCP: {addr}:={addr}-1; A-{addr};</tt>
+<item><tt>ISC: {addr}:={addr}+1; A:=A-{addr};</tt>
+<item><tt>JAM:</tt>
+<item><tt>LAS: A,X,S:={addr} and S;</tt>
+<item><tt>LAX: A,X:={addr};</tt>
+<item><tt>NOP: #{imm}; zp; zp,x; abs; abs,x</tt>
+<item><tt>RLA: {addr}:={addr}rol; A:=A and {addr};</tt>
+<item><tt>RRA: {addr}:={addr}ror; A:=A adc {addr};</tt>
+<item><tt>SAX: {addr}:=A and X;</tt>
+<item><tt>SHA: {addr}:=A and X and {addr hi +1};</tt>
+<item><tt>SHX: {addr}:=X and {addr hi +1};</tt>
+<item><tt>SHY: {addr}:=Y and {addr hi +1};</tt>
+<item><tt>SLO: {addr}:={addr}*2; A:=A or {addr};</tt>
+<item><tt>SRE: {addr}:={addr}/2; A:=A xor {addr};</tt>
+<item><tt>TAS: {addr}:=A and X and {addr hi +1}; SP:=A and X;</tt>
+</itemize>
+
+
+<sect2>DTV mode<label id="DTV-mode"><p>
+
+The C64DTV CPU is based on the 6510, but adds some instructions, and does not
+support all undocumented instructions.
+
+<itemize>
+<item><tt>bra {rel}</tt> Generates opcode &dollar;12.
+<item><tt>sac #{imm}</tt> Generates opcode &dollar;32.
+<item><tt>sir #{imm}</tt> Generates opcode &dollar;42.
+</itemize>
+
+Supported undocumented instructions:
+
+<itemize>
+<item><tt>ALR: A:=(A and #{imm})/2;</tt>
+<item><tt>ANC: A:=A and #{imm};</tt> Generates opcode &dollar;0B.
+<item><tt>ARR: A:=(A and #{imm})/2;</tt>
+<item><tt>AXS: X:=A and X-#{imm};</tt>
+<item><tt>LAS: A,X,S:={addr} and S;</tt>
+<item><tt>LAX: A,X:={addr};</tt>
+<item><tt>NOP: #{imm}; zp; zp,x; abs; abs,x</tt>
+<item><tt>RLA: {addr}:={addr}rol; A:=A and {addr};</tt>
+<item><tt>RRA: {addr}:={addr}ror; A:=A adc {addr};</tt>
+<item><tt>SHX: {addr}:=X and {addr hi +1};</tt>
+<item><tt>SHY: {addr}:=y and {addr hi +1};</tt>
+</itemize>
+
+
+<sect2>65SC02 (Original CMOS)<label id="65SC02-mode"><p>
+
+The first CMOS instruction set, without bit manipulation or wai/stp.
+
+<tscreen><verb>
+$04  tsb zp
+$0c  tsb abs16
+$12  ora (zp)
+$14  trb zp
+$1a  inc
+$1c  trb abs16
+$32  and (zp)
+$34  bit zp, x
+$3a  dec
+$3c  bit abs16, x
+$52  eor (zp)
+$5a  phy
+$64  stz zp
+$72  adc (zp)
+$74  stz zp, x
+$7a  ply
+$7c  jmp (abs16, x)
+$80  bra rel8
+$89  bit #imm8
+$92  sta (zp)
+$9c  stz abs16
+$9e  stz abs16, x
+$b2  lda (zp)
+$d2  cmp (zp)
+$da  phx
+$f2  sbc (zp)
+$fa  plx
+</verb></tscreen>
+
+
+<sect2>65C02 (CMOS with Rockwell extensions)<label id="65C02-mode"><p>
+
+The 65C02 understands the same opcodes as the 65SC02, plus 16 additional bit
+manipulation and bit test-and-branch commands.
+
+The R65C02 adds bit manipulation instructions:
+
+<tscreen><verb>
+smbB zp         set bit in zp location
+rmbB zp         reset bit in zp location
+bbsB zp, rel8   branch if bit is set in zp location
+bbrB zp, rel8   branch if bit is reset in zp location
+</verb></tscreen>
+
+
+<sect2>W65C02 (CMOS with WDC extensions)<label id="W65C02-mode"><p>
+
+This mode also supports wai/stp.
+
+<tscreen><verb>
+$cb  wai    wait for interrupt
+$db  stp    wait for reset
+</verb></tscreen>
+
+
+<sect2>65CE02 (CMOS with GTE extensions)<label id="65CE02-mode"><p>
+
+<tscreen><verb>
+$02  cle              clear stack extend disable
+$03  see              set stack extend disable
+$0b  tsy              transfer stack_ptr_high to Y
+$12  ora (zp), z
+$13  lbpl rel16
+$1b  inz              increment Z
+$22  jsr (abs16)
+$23  jsr (abs16, x)
+$2b  tys              transfer Y to stack_ptr_high
+$32  and (zp), z
+$33  lbmi rel16
+$3b  dez              decrement Z
+$42  neg              negate A
+$43  asr
+$44  asr zp
+$4b  taz              transfer A to Z
+$52  eor (zp), z
+$53  lbvc rel16
+$54  asr zp, x
+$5b  tab
+$5c  aug              "4-byte NOP reserved for future expansion"
+$62  rtn #imm8
+$63  lbsr rel16       relative jsr, "branch to subroutine"
+$64  stz zp           store Z
+$6b  tza              transfer Z to A
+$72  adc (zp), z
+$73  lbvs rel16
+$74  stz zp, x        store Z
+$7b  tba
+$82  sta (off8, s), y
+$83  lbra rel16       relative jmp
+$8b  sty abs16, x
+$92  sta (zp), z
+$93  lbcc rel16
+$9b  stx abs16, y
+$9c  stz abs16        store Z
+$9e  stz abs16, x     store Z
+$a3  ldz #imm8
+$ab  ldz abs16
+$b2  lda (zp), z
+$b3  lbcs rel16
+$bb  ldz abs16, x
+$c2  cpz #imm8
+$c3  dew zp
+$cb  asw abs16
+$d2  cmp (zp), z
+$d3  lbne rel16
+$d4  cpz zp
+$db  phz              push Z
+$dc  cpz abs16
+$e2  lda (off8, s), y
+$e3  inw zp
+$eb  row abs16
+$f2  sbc (zp), z
+$f3  lbeq rel16
+$f4  phw #imm16
+$fb  plz              pull Z
+$fc  phw abs16
+</verb></tscreen>
+
+
+<sect2>4510 mode<label id="4510-mode"><p>
+
+The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
+It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
+address mapping for 20 bits of address space (1 megabyte addressable area).
+
+The 4510 mode supports the complete (legal) 65CE02 instruction set, but changes
+the 4-Byte NOP into the "map" instruction:
+
+<tscreen><verb>
+$5c  map             "4-byte NOP reserved for future expansion" on 65CE02
+</verb></tscreen>
+
+For more information about the Commodore C65/C64DX and the 4510 CPU, see
+<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and
+<url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
+
+
+<sect2>45GS02 mode<label id="45GS02-mode"><p>
+
+The 45GS02 is a microcontroller that is the core of the MEGA65.
+It is an extension of the 4510 CPU and adds 32-bit addressing and a 32-bit
+pseudo register Q that is comprised of the four registers A, X, Y, and Z.
+
+
+<sect2>HUC6280 mode<label id="HUC6280-mode"><p>
+
+The HUC6280 is a superset of 65C02. It adds some other instructions:
+
+<tscreen><verb>
+$02  sxy
+$03  st0 #{imm}
+$13  st1 #{imm}
+$22  sax
+$23  st2 #{imm}
+$42  say
+$43  tma #{imm}
+$44  bsr {rel}
+$53  tam #{imm}
+$54  csl
+$62  cla
+$73  tii {addr}, {addr}, {addr}
+$82  clx
+$83  tst #{imm}, {zp}
+$82  clx
+$83  tst #{imm}, {zp}
+$93  tst #{imm}, {addr}
+$a3  tst #{imm}, {zp}, x
+$b3  tst #{imm}, {addr}, x
+$c2  cly
+$c3  tdd {addr}, {addr}, {addr}
+$d3  tin {addr}, {addr}, {addr}
+$d4  csh
+$e3  tia {addr}, {addr}, {addr}
+$f3  tai {addr}, {addr}, {addr}
+$f4  set
+</verb></tscreen>
+
+
+<sect2>M740 mode<label id="M740-mode"><p>
+
+The M740 is a microcontroller by Mitsubishi, which was marketed for embedded
+devices in the mid 80s. It is a superset of 6502, and a subset of 65SC02, plus
+some new instructions.
+
+For more information about the M740 Controllers, see
+<url url="https://en.wikipedia.org/wiki/Mitsubishi_740" name="Wikipedia">.
+
+
+
+<sect2>65816 mode<label id="65816-mode"><p><p>
+
+The 65816 support requires annotating ranges with the M and X flag states.
+This can be recorded with an emulator that supports Code and Data Logging,
+for example. Disassemble one bank at a time.
+
+
+<sect2>Sweet16<label id="sweet16-mode"><p><p>
+
+SWEET 16 is an interpreter for a pseudo 16 bit CPU written by Steve Wozniak
+for the Apple ][ machines. It is available in the Apple ][ ROM.
+
+For more information about SWEET 16, see
+<url url="http://www.6502.org/source/interpreters/sweet16.htm">.
+
+
+<sect>Copyright<p>
+
+ca65 (and all cc65 binutils) are (C) Copyright 1998-2003 Ullrich von
+Bassewitz. For usage of the binaries and/or sources the following
+conditions do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
+</enum>
+
+
+
+</article>

@@ -459,6 +459,8 @@ The assembler accepts
       <tt><ref id=".PM740" name=".PM740"></tt> command was given).
 </itemize>
 
+for more details on the various CPUs, see <tt><htmlurl url="cpus.html" name="here"></tt>.
+
 On 6502-derived platforms the <tt/BRK/ instruction has an optional signature
 byte. If omitted, the assembler will only produce only 1 byte.
 
@@ -535,58 +537,22 @@ Supported undocumented instructions:
 
 <sect2>65SC02 mode<label id="65SC02-mode"><p>
 
-65SC02 mode supports all regular 6502 instructions, plus the following:
-
-<tscreen><verb>
-$04  tsb zp
-$0c  tsb abs16
-$12  ora (zp)
-$14  trb zp
-$1a  inc
-$1c  trb abs16
-$32  and (zp)
-$34  bit zp, x
-$3a  dec
-$3c  bit abs16, x
-$52  eor (zp)
-$5a  phy
-$64  stz zp
-$72  adc (zp)
-$74  stz zp, x
-$7a  ply
-$7c  jmp (abs16, x)
-$80  bra rel8
-$89  bit #imm8
-$92  sta (zp)
-$9c  stz abs16
-$9e  stz abs16, x
-$b2  lda (zp)
-$d2  cmp (zp)
-$da  phx
-$f2  sbc (zp)
-$fa  plx
-</verb></tscreen>
+65SC02 mode supports all regular 6502 instructions, plus the original CMOS
+instructions.
 
 
-<sect2>65C02 mode<label id="65C02-mode"><p>
+<sect2>65C02 mode (CMOS with Rockwell extensions)<label id="65C02-mode"><p>
 
-65C02 mode supports all "official" W65C02 opcodes.
+65C02 mode supports all original CMOS instructions, plus the Rockwell (bit
+manipulation instructions) extensions.
 
-The R65C02 adds bit manipulation instructions:
 
-<tscreen><verb>
-smbB zp         set bit in zp location
-rmbB zp         reset bit in zp location
-bbsB zp, rel8   branch if bit is set in zp location
-bbrB zp, rel8   branch if bit is reset in zp location
-</verb></tscreen>
+<sect2>W65C02 mode (CMOS with WDC extensions)<label id="W65C02-mode"><p>
 
-And the W65C02 adds those:
+W65C02 mode supports the Rockwell extensions, plus wai and stp.
 
-<tscreen><verb>
-$cb  wai    wait for interrupt
-$db  stp    wait for reset
-</verb></tscreen>
+
+<sect2>65CE02 mode<label id="65CE02-mode"><p>
 
 
 <sect2>4510 mode<label id="4510-mode"><p>
@@ -594,14 +560,6 @@ $db  stp    wait for reset
 The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
 It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
 address mapping for 20 bits of address space (1 megabyte addressable area).
-
-The 4510 mode supports the complete (legal) 65CE02 instruction set, plus these
-three, which were changed/added:
-<tscreen><verb>
-$5c  map             "4-byte NOP reserved for future expansion" on 65CE02
-$cb  asw $1234       wai on W65C02
-$db  phz             stp on W65C02
-</verb></tscreen>
 
 As compared to the description of the CPU in the
 <url url="http://www.zimmers.net/anonftp/pub/cbm/c65/c65manualupdated.txt.gz"
@@ -626,40 +584,9 @@ The 45GS02 is a microcontroller that is the core of the MEGA65.
 It is an extension of the 4510 CPU and adds 32-bit addressing and a 32-bit
 pseudo register Q that is comprised of the four registers A, X, Y, and Z.
 
-<sect2>HUC6280 mode<label id="HUC6280-mode"><p>
+<sect2>HUC6280 mode (CMOS with Hudson extensions)<label id="HUC6280-mode"><p>
 
-The HUC6280 is a superset of the R65C02. It adds some other instructions:
-
-<tscreen><verb>
-$02  sxy
-$03  st0 #{imm}
-$13  st1 #{imm}
-$22  sax
-$23  st2 #{imm}
-$42  say
-$43  tma #{imm}
-$44  bsr {rel}
-$53  tam #{imm}
-$54  csl
-$62  cla
-$73  tii {addr}, {addr}, {addr}
-$82  clx
-$83  tst #{imm}, {zp}
-$82  clx
-$83  tst #{imm}, {zp}
-$93  tst #{imm}, {addr}
-$a3  tst #{imm}, {zp}, x
-$b3  tst #{imm}, {addr}, x
-$c2  cly
-$c3  tdd {addr}, {addr}, {addr}
-$d3  tin {addr}, {addr}, {addr}
-$d4  csh
-$e3  tia {addr}, {addr}, {addr}
-$f3  tai {addr}, {addr}, {addr}
-$f4  set
-</verb></tscreen>
-
-Note that this CPU does not implement <tt>wai</tt> and <tt>stp</tt>.
+The HUC6280 is a superset of 65C02, used in the PC Engine.
 
 
 <sect2>M740 mode<label id="M740-mode"><p>

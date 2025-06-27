@@ -23,18 +23,18 @@ $(info Detected OS: $(HOST_OS))
 
 
 
-# Set default DESTDIR if not on Windows and DESTDIR is unset or empty
+# Set default PREFIX if not on Windows and PREFIX is unset or empty
 ifeq ($(HOST_OS),windows)
     # Do nothing
 else
-    ifndef DESTDIR
-        DESTDIR := /usr/local
+    ifndef PREFIX
+        PREFIX := /usr/local
     endif
-    ifeq ($(strip $(DESTDIR)),)
-        DESTDIR := /usr/local
+    ifeq ($(strip $(PREFIX)),)
+        PREFIX := /usr/local
     endif
 endif
-export DESTDIR
+export PREFIX
 
 
 

@@ -743,6 +743,7 @@ static const struct {
         { "ASL",  0x000006e, 0x02, 1, PutAll },
         { "ASR",  0x0000026, 0x43, 0, Put4510 },
         { "ASW",  0x0000008, 0xcb, 6, PutAll },
+        { "AUG",  0x0000001, 0x5C, 0, PutAll },
         { "BBR0", 0x0000000, 0x0F, 0, PutBitBranch },
         { "BBR1", 0x0000000, 0x1F, 0, PutBitBranch },
         { "BBR2", 0x0000000, 0x2F, 0, PutBitBranch },
@@ -810,7 +811,6 @@ static const struct {
         { "LDY",  0x080006C, 0xa0, 1, PutAll },
         { "LDZ",  0x0800048, 0xa3, 1, Put4510 },
         { "LSR",  0x000006F, 0x42, 1, PutAll },
-        { "AUG",  0x0000001, 0x5C, 0, PutAll },
         { "NEG",  0x0000001, 0x42, 0, PutAll },
         { "NOP",  0x0000001, 0xea, 0, PutAll }, /* == EOM */
         { "ORA",  0x080A66C, 0x00, 0, PutAll },

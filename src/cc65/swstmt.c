@@ -67,6 +67,7 @@ struct SwitchCtrl {
     const Type* ExprType;       /* Switch controlling expression type */
     unsigned    Depth;          /* Number of bytes the selector type has */
     unsigned    DefaultLabel;   /* Label for the default branch */
+    CodeMark    CaseCodeStart;  /* Start of code marker */
 
 
 
@@ -87,7 +88,6 @@ void SwitchStatement (void)
 /* Handle a switch statement for chars with a cmp cascade for the selector */
 {
     ExprDesc    SwitchExpr;     /* Switch statement expression */
-    CodeMark    CaseCodeStart;  /* Start of code marker */
     CodeMark    SwitchCodeStart;/* Start of switch code */
     CodeMark    SwitchCodeEnd;  /* End of switch code */
     unsigned    ExitLabel;      /* Exit label */
@@ -124,12 +124,15 @@ void SwitchStatement (void)
     ** will get removed by the optimizer if it is unnecessary.
     */
     SwitchCodeLabel = GetLocalLabel ();
-    g_jump (SwitchCodeLabel);
+    /* save state for switch logic */
+    g_switchsave (SwitchData.Depth);
+    //g_jump (SwitchCodeLabel);
 
     /* Remember the current code position. We will move the switch code
-    ** to this position later.
+    ** to this position later.  This will get overwritten if we actually
+    ** find a "case" or "default" label.
     */
-    GetCodePos (&CaseCodeStart);
+    GetCodePos (&SwitchData.CaseCodeStart);
 
     /* Setup the control structure, save the old and activate the new one */
     SwitchData.Nodes        = NewCollection ();
@@ -172,6 +175,9 @@ void SwitchStatement (void)
     /* Output the switch code label */
     g_defcodelabel (SwitchCodeLabel);
 
+    /* restore state for switch logic */
+    g_switchrest (SwitchData.Depth);
+
     /* Generate code */
     if (SwitchData.DefaultLabel == 0) {
         /* No default label, use switch exit */
@@ -181,7 +187,7 @@ void SwitchStatement (void)
 
     /* Move the code to the front */
     GetCodePos (&SwitchCodeEnd);
-    MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &CaseCodeStart);
+    MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &SwitchData.CaseCodeStart);
 
     /* Define the exit label */
     g_defcodelabel (ExitLabel);
@@ -259,8 +265,15 @@ void CaseLabel (void)
         }
 
         if (OutOfRange == 0) {
+            unsigned CodeLabel;
+
+            /* we want switch logic before the first case/default label */
+            if (CollCount (Switch->Nodes) == 0 && Switch->DefaultLabel == 0) {
+               GetCodePos (&Switch->CaseCodeStart);
+            }
+
             /* Insert the case selector into the selector table */
-            unsigned CodeLabel = InsertCaseValue (Switch->Nodes, CaseExpr.IVal, Switch->Depth);
+            CodeLabel = InsertCaseValue (Switch->Nodes, CaseExpr.IVal, Switch->Depth);
 
             /* Define this label */
             g_defcodelabel (CodeLabel);
@@ -292,6 +305,11 @@ void DefaultLabel (void)
 
         /* Check if we do already have a default branch */
         if (Switch->DefaultLabel == 0) {
+
+            /* we want switch logic before the first case/default label */
+            if (CollCount (Switch->Nodes) == 0 && Switch->DefaultLabel == 0) {
+               GetCodePos (&Switch->CaseCodeStart);
+            }
 
             /* Generate and emit the default label */
             Switch->DefaultLabel = GetLocalLabel ();

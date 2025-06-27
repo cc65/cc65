@@ -5,6 +5,11 @@
 
 unsigned failures;
 
+/* this is not a valid test.
+** this is a legitimate duplicate case label
+** and the first one should win.
+*/
+#if 0
 int f1(void)
 {
     unsigned char c = 0xFF;
@@ -14,7 +19,13 @@ int f1(void)
     }
     return -1;
 }
+#endif
 
+/* this is not a valid test.
+** this is a legitimate duplicate case label
+** and the first one should win.
+*/
+#if 0
 int f2(void)
 {
     signed char c = SCHAR_MIN;
@@ -24,6 +35,7 @@ int f2(void)
     }
     return -1;
 }
+#endif
 
 int f3(void)
 {
@@ -45,6 +57,7 @@ int f4(void)
 
 int main(void)
 {
+#if 0
     if (f1())
     {
         ++failures;
@@ -56,6 +69,7 @@ int main(void)
         ++failures;
         printf("f2() failed\n");
     }
+#endif
 
     if (f3())
     {

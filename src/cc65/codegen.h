@@ -502,6 +502,12 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
 
 
 
+void g_switchsave (unsigned Depth);
+/* Generate save code for a switch statement */
+
+void g_switchrest (unsigned Depth);
+/* Generate restore code for a switch statement */
+
 void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth);
 /* Generate code for a switch statement */
 

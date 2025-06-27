@@ -4923,6 +4923,32 @@ void g_extractbitfield (unsigned Flags, unsigned FullWidthFlags, int IsSigned,
 
 
 
+void g_switchsave (unsigned Depth)
+/* Generate save code for a switch statement */
+{
+    switch(Depth) {
+        case 1:
+            /* TODO FIX this can be optimized, falthrough for now */
+        case 2:
+            /* TODO FIX this can be optimized, falthrough for now */
+        default:
+            AddCodeLine ("jsr saveeax");
+    }
+}
+
+void g_switchrest (unsigned Depth)
+/* Generate restore code for a switch statement */
+{
+    switch(Depth) {
+        case 1:
+            /* TODO FIX this can be optimized, falthrough for now */
+        case 2:
+            /* TODO FIX this can be optimized, falthrough for now */
+        default:
+            AddCodeLine ("jsr resteax");
+    }
+}
+
 void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth)
 /* Generate code for a switch statement */
 {

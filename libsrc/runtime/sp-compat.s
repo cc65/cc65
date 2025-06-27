@@ -5,7 +5,15 @@
 ; linker warning if it is used. Added after renaming "sp" to "c_sp".
 ;
 
+; FIXME: there must be a less ugly way to do this
+.ifp4510
+.else
+.ifp45GS02
+.else
+
 .include        "zeropage.inc"
 .export         sp := c_sp
 .assert         0, ldwarning, "Symbol 'sp' is deprecated - please use 'c_sp' instead"
 
+.endif
+.endif

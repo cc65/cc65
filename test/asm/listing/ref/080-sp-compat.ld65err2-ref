@@ -1,1 +1,1 @@
-ld65: Warning: runtime/sp-compat.s:10: Symbol 'sp' is deprecated - please use 'c_sp' instead
+ld65: Warning: runtime/sp-compat.s:16: Symbol 'sp' is deprecated - please use 'c_sp' instead

@@ -6,35 +6,14 @@ endif
 
 
 
-ifeq ($(OS),Windows_NT)
-    HOST_OS := windows
-else
-    UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Darwin)
-        HOST_OS := mac
-    else ifeq ($(UNAME_S),Linux)
-        HOST_OS := linux
-    else
-        HOST_OS := unknown
-    endif
+# used only on non Windows builds if user did not pass
+# in a PREFIX variable.
+ifneq ($(OS),Windows_NT)
+ifndef PREFIX
+    PREFIX := /usr/local
+    export PREFIX
 endif
-export HOST_OS
-$(info Detected OS: $(HOST_OS))
-
-
-
-# Set default PREFIX if not on Windows and PREFIX is unset or empty
-ifeq ($(HOST_OS),windows)
-    # Do nothing
-else
-    ifndef PREFIX
-        PREFIX := /usr/local
-    endif
-    ifeq ($(strip $(PREFIX)),)
-        PREFIX := /usr/local
-    endif
 endif
-export PREFIX
 
 
 

@@ -1594,14 +1594,6 @@ static void DoPCE02 (void)
 
 
 
-static void DoP816 (void)
-/* Switch to 65816 CPU */
-{
-    SetCPU (CPU_65816);
-}
-
-
-
 static void DoP4510 (void)
 /* Switch to 4510 CPU */
 {
@@ -1614,6 +1606,22 @@ static void DoP45GS02 (void)
 /* Switch to 45GS02 CPU */
 {
     SetCPU (CPU_45GS02);
+}
+
+
+
+static void DoP6280 (void)
+/* Switch to HuC6280 CPU */
+{
+    SetCPU (CPU_HUC6280);
+}
+
+
+
+static void DoP816 (void)
+/* Switch to 65816 CPU */
+{
+    SetCPU (CPU_65816);
 }
 
 
@@ -2176,6 +2184,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFP02X */
     { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
     { ccKeepToken,      DoConditionals  },      /* .IFP45GS02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP6280 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPCE02 */
@@ -2214,6 +2223,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoP02X          },      /* .P02X */
     { ccNone,           DoP4510         },      /* .P4510 */
     { ccNone,           DoP45GS02       },      /* .P45GS02 */
+    { ccNone,           DoP6280         },      /* .P6280 */
     { ccNone,           DoP816          },      /* .P816 */
     { ccNone,           DoPageLength    },      /* .PAGELEN, .PAGELENGTH */
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */

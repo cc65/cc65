@@ -45,6 +45,11 @@
    sac #$00
 .endif
 
+.ifp6280
+   sax
+   cla
+.endif
+
 .ifpm740
    jsr $ff12
 .endif
@@ -123,8 +128,10 @@
 .pc02
 .pwc02
 .pce02
-.p816
 .p4510
 .p45GS02
 .pdtv
+.p6280
 .pm740
+.p816
+; FIXME: sweet16

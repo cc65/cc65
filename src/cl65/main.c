@@ -469,9 +469,11 @@ static void RemoveTempFiles (void)
     unsigned I;
 
     for (I = 0; I < RM.FileCount; ++I) {
-        if (remove (RM.Files[I]) < 0) {
-            Warning ("Cannot remove temporary file '%s': %s",
-                     RM.Files[I], strerror (errno));
+        if (!KeepTemps) {
+            if (remove (RM.Files[I]) < 0) {
+                Warning ("Cannot remove temporary file '%s': %s",
+                         RM.Files[I], strerror (errno));
+            }
         }
     }
 }
@@ -609,9 +611,11 @@ static void AssembleIntermediate (const char* SourceFile, const char* TmpFile)
     AssembleFile (AsmName, AsmTmpName, CA65.ArgCount);
 
     /* Remove the input file */
-    if (remove (AsmTmpName ? AsmTmpName : AsmName) < 0) {
-        Warning ("Cannot remove temporary file '%s': %s",
-                 AsmTmpName ? AsmTmpName : AsmName, strerror (errno));
+    if (!KeepTemps) {
+        if (remove (AsmTmpName ? AsmTmpName : AsmName) < 0) {
+            Warning ("Cannot remove temporary file '%s': %s",
+                     AsmTmpName ? AsmTmpName : AsmName, strerror (errno));
+        }
     }
 
     /* Free the assembler file name which was allocated from the heap */
@@ -815,6 +819,7 @@ static void Usage (void)
             "  -d\t\t\t\tDebug mode\n"
             "  -g\t\t\t\tAdd debug info\n"
             "  -h\t\t\t\tHelp (this text)\n"
+            "  -k\t\t\t\tKeep temporary files, for debugging\n"
             "  -l name\t\t\tCreate an assembler listing file\n"
             "  -m name\t\t\tCreate a map file\n"
             "  -mm model\t\t\tSet the memory model\n"
@@ -870,6 +875,7 @@ static void Usage (void)
             "  --force-import sym\t\tForce an import of symbol 'sym'\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet a compiler include directory path\n"
+            "  --keep-temps\t\t\tKeep temporary files, for debugging\n"
             "  --ld-args options\t\tPass options to the linker\n"
             "  --lib-path path\t\tSpecify a library search path\n"
             "  --list-targets\t\tList all available targets\n"
@@ -1086,6 +1092,15 @@ static void OptDebug (const char* Opt attribute ((unused)),
     CmdAddArg (&CC65, "-d");
     CmdAddArg (&CO65, "-d");
     Debug = 1;
+}
+
+
+
+static void OptKeepTemps (const char* Opt attribute ((unused)),
+                          const char* Arg attribute ((unused)))
+/* Keep temporary files */
+{
+    KeepTemps = 1;
 }
 
 
@@ -1440,6 +1455,7 @@ int main (int argc, char* argv [])
         { "--force-import",      1, OptForceImport    },
         { "--help",              0, OptHelp           },
         { "--include-dir",       1, OptIncludeDir     },
+        { "--keep-temps",        0, OptKeepTemps      },
         { "--ld-args",           1, OptLdArgs         },
         { "--lib-path",          1, OptLibPath        },
         { "--list-targets",      0, OptListTargets    },
@@ -1613,6 +1629,11 @@ int main (int argc, char* argv [])
                 case 'j':
                     /* Default characters are signed */
                     OptSignedChars (Arg, 0);
+                    break;
+
+                case 'k':
+                    /* Keep temporary files */
+                    OptKeepTemps (Arg, 0);
                     break;
 
                 case 'l':

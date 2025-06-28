@@ -250,6 +250,86 @@ The 45GS02 is a microcontroller that is the core of the MEGA65.
 It is an extension of the 4510 CPU and adds 32-bit addressing and a 32-bit
 pseudo register Q that is comprised of the four registers A, X, Y, and Z.
 
+<tscreen><verb>
+$42 $42 $05         orq $12
+$42 $42 $06         aslq $12
+$42 $42 $0a         aslq
+$42 $42 $0d         orq $1234
+$42 $42 $0e         aslq $1234
+$42 $42 $12         orq ($12)
+$42 $42 $16         aslq $12,x
+$42 $42 $1a         inq
+$42 $42 $1e         aslq $1234,x
+$42 $42 $24         bitq $12
+$42 $42 $25         andq $12
+$42 $42 $26         rolq $12
+$42 $42 $2a         rolq
+$42 $42 $2c         bitq $1234
+$42 $42 $2d         andq $1234
+$42 $42 $2e         rolq $1234
+$42 $42 $32         andq ($12)
+$42 $42 $36         rolq $12, x
+$42 $42 $3a         deq
+$42 $42 $3e         rolq $1234, x
+$42 $42 $43         asrq
+$42 $42 $44         asrq $12
+$42 $42 $45         eorq $12
+$42 $42 $46         lsrq $12
+$42 $42 $4a         lsrq
+$42 $42 $4d         eorq $1234
+$42 $42 $4e         lsrq $1234
+$42 $42 $52         eorq ($12)
+$42 $42 $54         asrq $12, x
+$42 $42 $56         lsrq $12, x
+$42 $42 $5e         lsrq $1234, x
+$42 $42 $65         adcq $12
+$42 $42 $66         rorq $12
+$42 $42 $6a         rorq
+$42 $42 $6d         adcq $1234
+$42 $42 $6e         rorq $1234
+$42 $42 $72         adcq ($12)
+$42 $42 $76         rorq $12, x
+$42 $42 $7e         rorq $1234, x
+$42 $42 $85         stq $12
+$42 $42 $8d         stq $1234
+$42 $42 $92         stq ($12)
+$42 $42 $a5         ldq $12
+$42 $42 $ad         ldq $1234
+$42 $42 $b2         ldq ($12), z
+$42 $42 $c5         cmpq $12
+$42 $42 $c6         deq $12
+$42 $42 $cd         cmpq $1234
+$42 $42 $ce         deq $1234
+$42 $42 $d2         cmpq ($12)
+$42 $42 $d6         deq $12, x
+$42 $42 $de         deq $1234, x
+$42 $42 $e5         sbcq $12
+$42 $42 $e6         inq $12
+$42 $42 $ed         sbcq $1234
+$42 $42 $ee         inq $1234
+$42 $42 $f2         sbcq ($12)
+$42 $42 $f6         inq $12, x
+$42 $42 $fe         inq $1234, x
+
+$ea $12             ora [$12], z
+$ea $32             and [$12], z
+$ea $52             eor [$12], z
+$ea $72             adc [$12], z
+$ea $92             sta [$12], z
+$ea $b2             lda [$12], z
+$ea $d2             cmp [$12], z
+$ea $f2             sbc [$12], z
+
+$42 $42 $ea $12     orq [$12]
+$42 $42 $ea $32     andq [$12]
+$42 $42 $ea $52     eorq [$12]
+$42 $42 $ea $72     adcq [$12]
+$42 $42 $ea $92     stq [$12]
+$42 $42 $ea $b2     ldq [$12], z
+$42 $42 $ea $d2     cmpq [$12]
+$42 $42 $ea $f2     sbcq [$12]
+</verb></tscreen>
+
 
 <sect2>HUC6280 mode<label id="HUC6280-mode"><p>
 

@@ -20,6 +20,15 @@
    rmb0 $12
 .endif
 
+.ifpwc02
+   wai
+   stp
+.endif
+
+.ifpce02
+   ldz #$12
+.endif
+
 .ifp816
    xba
 .endif
@@ -64,6 +73,14 @@
    .byte 0,"CPU_ISET_65C02"
 .endif
 
+.if (.cpu .bitand CPU_ISET_W65C02)
+   .byte 0,"CPU_ISET_W65C02"
+.endif
+
+.if (.cpu .bitand CPU_ISET_65CE02)
+   .byte 0,"CPU_ISET_65CE02"
+.endif
+
 .if (.cpu .bitand CPU_ISET_65816)
    .byte 0,"CPU_ISET_65816"
 .endif
@@ -104,6 +121,8 @@
 .p02X
 .psc02
 .pc02
+.pwc02
+.pce02
 .p816
 .p4510
 .p45GS02

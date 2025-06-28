@@ -101,6 +101,8 @@
     <ClCompile Include="da65\opc65816.c" />
     <ClCompile Include="da65\opc65c02.c" />
     <ClCompile Include="da65\opc65sc02.c" />
+    <ClCompile Include="da65\opc65ce02.c" />
+    <ClCompile Include="da65\opcw65c02.c" />
     <ClCompile Include="da65\opchuc6280.c" />
     <ClCompile Include="da65\opcm740.c" />
     <ClCompile Include="da65\opctable.c" />

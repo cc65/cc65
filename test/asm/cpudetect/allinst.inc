@@ -359,9 +359,9 @@ LABEL:
 
 
 ;------------------------------------------------------------------------------
-; The 65c02 is the CMOS re-design of the 6502. It has a few improvements:
+; The 65sc02 is the original CMOS re-design of the 6502.
 ;
-;      65C02            65ce02
+;      65SC02           65ce02
 ;
 ; $04  tsb zp
 ; $0c  tsb abs16
@@ -391,68 +391,61 @@ LABEL:
 ; $f2  sbc (zp)         (-> sbc (zp), z)
 ; $fa  plx
 
-; FIXME: currently CPU_ISET_65SC02 and CPU_65SC02 really means "65C02"
-
-; FIXME: should really check for 65C02
-
 .if (.cpu .bitand CPU_ISET_65SC02)
     .scope
     ; 65c02 instruction set adds some extra legal instructions to 6502
     tsb $12         ; $04
     tsb $1234       ; $0c
-    ;ora ($12)       ; $12  FIXME: not working with 4510:ora (zp), z
+    ora ($12)       ; $12  FIXME: not working with 4510:ora (zp), z
     trb $12         ; $14
     inc a           ; $1a
     trb $1234       ; $1c
-    ;and ($12)       ; $32  FIXME: not working with 4510:and (zp), z
+    and ($12)       ; $32  FIXME: not working with 4510:and (zp), z
     bit $12,x       ; $34
     dec a           ; $3a
     bit $1234,x     ; $3c
-    ;eor ($12)       ; $52  FIXME: not working with 4510:eor (zp), z
+    eor ($12)       ; $52  FIXME: not working with 4510:eor (zp), z
     phy             ; $5a
     stz $12         ; $64
-    ;adc ($12)       ; $72  FIXME: not working with 4510:adc (zp), z
+    adc ($12)       ; $72  FIXME: not working with 4510:adc (zp), z
     stz $12,x       ; $74
     ply             ; $7a
     jmp ($1234)     ; $7c
 LABEL:
     bra LABEL       ; $80
     bit #$12        ; $89
-    ;sta ($12)       ; $92  FIXME: not working with 4510:sta (zp), z
+    sta ($12)       ; $92  FIXME: not working with 4510:sta (zp), z
     stz $1234       ; $9c
     stz $1234,x     ; $9e
-    ;lda ($12)       ; $b2  FIXME: not working with 4510:lda (zp), z
-    ;cmp ($12)       ; $d2  FIXME: not working with 4510:cmp (zp), z
+    lda ($12)       ; $b2  FIXME: not working with 4510:lda (zp), z
+    cmp ($12)       ; $d2  FIXME: not working with 4510:cmp (zp), z
     phx             ; $da
-    ;sbc ($12)       ; $f2  FIXME: not working with 4510:sbc (zp), z
+    sbc ($12)       ; $f2  FIXME: not working with 4510:sbc (zp), z
     plx             ; $fa
     .endscope
 .endif
 
-; FIXME: hack so these opcodes get tested anyway, while 4510 is still quirky
-.if (.cpu .bitand CPU_ISET_65SC02)
-.if (.not .cpu = CPU_4510)
-    ora ($12)       ; $12
-    and ($12)       ; $32
-    eor ($12)       ; $52
-    adc ($12)       ; $72
-    sta ($12)       ; $92
-    lda ($12)       ; $b2
-    cmp ($12)       ; $d2
-    sbc ($12)       ; $f2
-.endif
-.endif
 
-; TODO: R65C02
+; Rockwell Datasheet "R65C02, R65C102, R65C112   R65C00 Microprocessors (CPU)" 1987,rev6:
+;
+; The 8-bit R65C00 microprocessor family of devices are produced using CMOS [...]
+; technology which provides advanced [...] performance speed and [...] over their
+; NMOS counterparts, the R6500 family of microprocessor devices. [...]
+; The CMOS family ... has been designed with many enhancements over the R6502
+; NMOS device [...]
+;
 ; The R65C02 is a superset of the 65C02. It adds bit manipulation instructions:
+;
 ;   smbB zp         set bit in zp location
 ;   rmbB zp         reset bit in zp location
 ;   bbsB zp, rel8   branch if bit is set in zp location
 ;   bbrB zp, rel8   branch if bit is reset in zp location
-
-; FIXME: currently CPU_ISET_65C02 and CPU_65C02 really means "W65C02"
-
-; FIXME: should really check for R65C02
+;
+; 12 new instructions for a total of 68
+; 59 new op ocdes, for a total of 210
+; two new addressing modes
+; seven software/operational enhancements
+; two hardware enhancements
 
 .if (.cpu .bitand CPU_ISET_65C02)
 
@@ -494,23 +487,17 @@ LABEL3:
 .endif
 
 
-; TODO: W65C02
 ; The W65C02 is a superset of the R65C02. It only adds two instructions:
 ;
 ; $cb  wai             wait for interrupt
 ; $db  stp             wait for reset
 
-; FIXME: currently CPU_ISET_65C02 and CPU_65C02 really means "W65C02"
-
-; FIXME: should really check for W65C02
-
-.if (.cpu = CPU_65C02)
+.if (.cpu .bitand CPU_ISET_W65C02)
     wai             ; $cb
     stp             ; $db
 .endif
 
 
-; TODO: 65CE02
 ; The 65CE02 is another superset of the R65C02. It has several improvements:
 ;
 ; $02  cle              clear stack extend disable
@@ -572,9 +559,7 @@ LABEL3:
 ; $fb  plz              pull Z
 ; $fc  phw abs16
 
-; FIXME: should really check for 65CE02
-
-.if (.cpu .bitand CPU_ISET_4510)
+.if (.cpu .bitand CPU_ISET_65CE02)
     .scope
     ; 65CE02 adds the following:
     cle                         ; $02
@@ -649,8 +634,6 @@ LABEL3:
 
     ; added to 65CE02
     map                         ; $5c   ("4-byte NOP reserved for future expansion" on 65CE02)
-    asw $1234                   ; $cb   (wai on W65C02)
-    phz                         ; $db   (stp on W65C02)
     eom                         ; $ea   "end of mapping" - but really just a NOP
 
     .endscope

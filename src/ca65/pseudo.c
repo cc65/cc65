@@ -1578,6 +1578,22 @@ static void DoPC02 (void)
 
 
 
+static void DoPWC02 (void)
+/* Switch to W65C02 CPU */
+{
+    SetCPU (CPU_W65C02);
+}
+
+
+
+static void DoPCE02 (void)
+/* Switch to 65CE02 CPU */
+{
+    SetCPU (CPU_65CE02);
+}
+
+
+
 static void DoP816 (void)
 /* Switch to 65816 CPU */
 {
@@ -2162,9 +2178,11 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFP45GS02 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPCE02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
     { ccKeepToken,      DoConditionals  },      /* .IFPM740 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPWC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },      /* .IMPORT */
     { ccNone,           DoImportZP      },      /* .IMPORTZP */
@@ -2199,7 +2217,8 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoP816          },      /* .P816 */
     { ccNone,           DoPageLength    },      /* .PAGELEN, .PAGELENGTH */
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
-    { ccNone,           DoPC02          },      /* .PSC02 */
+    { ccNone,           DoPC02          },      /* .PC02 */
+    { ccNone,           DoPCE02         },      /* .PCE02 */
     { ccNone,           DoPDTV          },      /* .PDTV */
     { ccNone,           DoPM740         },      /* .PM740 */
     { ccNone,           DoPopCharmap    },      /* .POPCHARMAP */
@@ -2210,6 +2229,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoPushCharmap   },      /* .PUSHCHARMAP */
     { ccNone,           DoPushCPU       },      /* .PUSHCPU */
     { ccNone,           DoPushSeg       },      /* .PUSHSEG */
+    { ccNone,           DoPWC02         },      /* .PWC02 */
     { ccNone,           DoUnexpected    },      /* .REF, .REFERENCED */
     { ccNone,           DoReferTo       },      /* .REFTO, .REFERTO */
     { ccNone,           DoReloc         },      /* .RELOC */

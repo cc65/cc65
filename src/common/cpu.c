@@ -65,7 +65,7 @@ const char* CPUNames[CPU_COUNT] = {
     "4510",
     "45GS02",
     "W65C02",   /* CMOS with WDC extensions */
-    "65CE02",   /* CMOS with GTE extensions */
+    "65CE02",   /* CMOS with CSG extensions */
 };
 
 /* Tables with CPU instruction sets

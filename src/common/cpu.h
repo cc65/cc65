@@ -60,7 +60,7 @@ typedef enum {
     CPU_4510,                   /* CPU of C65 */
     CPU_45GS02,                 /* CPU of MEGA65 */
     CPU_W65C02,                 /* CMOS with WDC extensions */
-    CPU_65CE02,                 /* CMOS with GTE extensions */
+    CPU_65CE02,                 /* CMOS with CSG extensions */
     CPU_COUNT                   /* Number of different CPUs */
 } cpu_t;
 

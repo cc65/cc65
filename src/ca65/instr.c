@@ -1621,7 +1621,7 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTab4510,
     (const InsTable*) &InsTab45GS02,
     (const InsTable*) &InsTabW65C02,        /* CMOS with WDC extensions */
-    (const InsTable*) &InsTab65CE02,        /* CMOS with GTE extensions */
+    (const InsTable*) &InsTab65CE02,        /* CMOS with CSG extensions */
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 

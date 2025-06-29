@@ -636,6 +636,13 @@ or two far addresses whose high byte will be used.
                 mvp     $123456, $789ABC   ; bank $12 to $78
 </verb></tscreen>
 
+also see <ref id="long_jsr_jmp_rts" name="long_jsr_jmp_rts">
+ <ref id=".SMART" name=".SMART">
+ <ref id=".A8" name=".A8">
+ <ref id=".A16" name=".A16">
+ <ref id=".I8" name=".I8">
+ <ref id=".I16" name=".I16">
+
 
 <sect2>sweet16 mode<label id="sweet16-mode"><p>
 

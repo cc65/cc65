@@ -934,7 +934,7 @@ $13  ora (offs8, s), y
 $17  ora [dp], y
 $1b  tcs                    transfer C to stack pointer
 $1f  ora abs24, x
-$22  jsr abs24
+$22  jsl abs24
 $23  and offs8, s
 $27  and [dp]
 $2b  pld                    pull direct page register
@@ -953,7 +953,7 @@ $53  eor (offs8, s), y
 $54  mvn src, dst
 $57  eor [dp], y
 $5b  tcd                    transfer C to direct page register
-$5c  jmp abs24
+$5c  jml abs24
 $5f  eor abs24, x
 $62  per rel16              push effective relative address
 $63  adc offs8, s

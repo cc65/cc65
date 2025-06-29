@@ -1212,6 +1212,14 @@ The compiler defines several macros at startup:
   given, but can be changed using the <tt/<ref id="option--cpu" name="--cpu">/
   command line option.
 
+  <tag><tt>__CPU_4510__</tt></tag>
+
+  This macro is defined if the code is compiled for a 4510 CPU.
+
+  <tag><tt>__CPU_45GS02__</tt></tag>
+
+  This macro is defined if the code is compiled for a 45GS02 CPU.
+
   <tag><tt>__CPU_6502__</tt></tag>
 
   This macro is defined if the code is compiled for a 6502 CPU.
@@ -1233,6 +1241,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the code is compiled for a 65C02 CPU.
 
+  <tag><tt>__CPU_65CE02__</tt></tag>
+
+  This macro is defined if the code is compiled for a 65CE02 CPU.
+
   <tag><tt>__CPU_65816__</tt></tag>
 
   This macro is defined if the code is compiled for a 65816 CPU.
@@ -1240,6 +1252,14 @@ The compiler defines several macros at startup:
   <tag><tt>__CPU_HUC6280__</tt></tag>
 
   This macro is defined if the code is compiled for a HUC6280 CPU.
+
+  <tag><tt>__CPU_M740__</tt></tag>
+
+  This macro is defined if the code is compiled for a M740 CPU.
+
+  <tag><tt>__CPU_W65C02__</tt></tag>
+
+  This macro is defined if the code is compiled for a W65C02 CPU.
 
   <tag><tt>__CPU_ISET_6502__</tt></tag>
 
@@ -1271,6 +1291,12 @@ The compiler defines several macros at startup:
   <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
   of the 65C02 CPU.
 
+  <tag><tt>__CPU_ISET_65CE02__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the 65CE02 CPU.
+
   <tag><tt>__CPU_ISET_65816__</tt></tag>
 
   This macro expands to a numeric constant that can be used to check the
@@ -1282,6 +1308,18 @@ The compiler defines several macros at startup:
   This macro expands to a numeric constant that can be used to check the
   <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
   of the HUC6280 CPU.
+
+  <tag><tt>__CPU_ISET_M740__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the M740 CPU.
+
+  <tag><tt>__CPU_ISET_W65C02__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the W65C02 CPU.
 
   <tag><tt>__CX16__</tt></tag>
 

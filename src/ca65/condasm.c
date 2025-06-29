@@ -424,6 +424,16 @@ void DoConditionals (void)
                 CalcOverallIfCond ();
                 break;
 
+            case TOK_IFP6280:
+                D = AllocIf (".IFP6280", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_HUC6280);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
             case TOK_IFP816:
                 D = AllocIf (".IFP816", 1);
                 NextTok ();
@@ -439,6 +449,16 @@ void DoConditionals (void)
                 NextTok ();
                 if (IfCond) {
                     SetIfCond (D, GetCPU() == CPU_65C02);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFPCE02:
+                D = AllocIf (".IFPCE02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_65CE02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -469,6 +489,26 @@ void DoConditionals (void)
                 NextTok ();
                 if (IfCond) {
                     SetIfCond (D, GetCPU() == CPU_65SC02);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFPSWEET16:
+                D = AllocIf (".IFPSWEET16", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_SWEET16);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFPWC02:
+                D = AllocIf (".IFPWC02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_W65C02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -518,11 +558,15 @@ int CheckConditionals (void)
         case TOK_IFP02X:
         case TOK_IFP4510:
         case TOK_IFP45GS02:
+        case TOK_IFP6280:
         case TOK_IFP816:
         case TOK_IFPC02:
+        case TOK_IFPCE02:
         case TOK_IFPDTV:
         case TOK_IFPM740:
         case TOK_IFPSC02:
+        case TOK_IFPSWEET16:
+        case TOK_IFPWC02:
         case TOK_IFREF:
             DoConditionals ();
             return 1;

@@ -156,12 +156,14 @@ Here is a description of all the command line options:
   <item>6502X - NMOS 6502 with all undocumented instructions
   <item>6502DTV - the emulated CPU of the C64DTV device
   <item>65SC02 - first CMOS instruction set (no bit manipulation, no wai/stp)
-  <item>65C02 - full CMOS instruction set (has bit manipulation and wai/stp)
-  <item>65816 - the CPU of the SNES, and the SCPU
-  <item>HuC6280 - the CPU of the PC engine
+  <item>65C02 - CMOS with Rockwell extensions
+  <item>W65C02 - full CMOS instruction set (has bit manipulation and wai/stp)
+  <item>65CE02 - CMOS with CSG extensions
   <item>4510 - the CPU of the Commodore C65
   <item>45GS02 - the CPU of the Commodore MEGA65
+  <item>HuC6280 - the CPU of the PC engine
   <item>M740 - a Microcontroller by Mitsubishi
+  <item>65816 - the CPU of the SNES, and the SCPU
   <item>sweet16 - an interpreter for a pseudo 16 bit CPU
   </itemize>
 
@@ -449,15 +451,23 @@ The assembler accepts
       <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
 <item>all valid 65C02 mnemonics when in <ref id="65C02-mode" name="65C02 mode"> (after the
       <tt><ref id=".PC02" name=".PC02"></tt> command was given).
-<item>all valid 65816 mnemonics when in <ref id="65816-mode" name="65816 mode"> (after the
-      <tt><ref id=".P816" name=".P816"></tt> command was given).
+<item>all valid W65C02 mnemonics when in <ref id="W65C02-mode" name="W65C02 mode"> (after the
+      <tt><ref id=".PWC02" name=".PWC02"></tt> command was given).
+<item>all valid 65CE02 mnemonics when in <ref id="65CE02-mode" name="65CE02 mode"> (after the
+      <tt><ref id=".PCE02" name=".PCE02"></tt> command was given).
 <item>all valid 4510 mnemonics when in <ref id="4510-mode" name="4510 mode"> (after the
       <tt><ref id=".P4510" name=".P4510"></tt> command was given).
 <item>all valid 45GS02 mnemonics when in <ref id="45GS02-mode" name="45GS02 mode"> (after the
       <tt><ref id=".P45GS02" name=".P45GS02"></tt> command was given).
+<item>all valid HuC6280 mnemonics when in <ref id="HUC6280-mode" name="HuC6280 mode"> (after the
+      <tt><ref id=".P6280" name=".P6280"></tt> command was given).
 <item>all valid M740 mnemonics when in <ref id="M740-mode" name="M740 mode"> (after the
       <tt><ref id=".PM740" name=".PM740"></tt> command was given).
+<item>all valid 65816 mnemonics when in <ref id="65816-mode" name="65816 mode"> (after the
+      <tt><ref id=".P816" name=".P816"></tt> command was given).
 </itemize>
+
+for more details on the various CPUs, see <tt><htmlurl url="cpus.html" name="here"></tt>.
 
 On 6502-derived platforms the <tt/BRK/ instruction has an optional signature
 byte. If omitted, the assembler will only produce only 1 byte.
@@ -535,58 +545,24 @@ Supported undocumented instructions:
 
 <sect2>65SC02 mode<label id="65SC02-mode"><p>
 
-65SC02 mode supports all regular 6502 instructions, plus the following:
-
-<tscreen><verb>
-$04  tsb zp
-$0c  tsb abs16
-$12  ora (zp)
-$14  trb zp
-$1a  inc
-$1c  trb abs16
-$32  and (zp)
-$34  bit zp, x
-$3a  dec
-$3c  bit abs16, x
-$52  eor (zp)
-$5a  phy
-$64  stz zp
-$72  adc (zp)
-$74  stz zp, x
-$7a  ply
-$7c  jmp (abs16, x)
-$80  bra rel8
-$89  bit #imm8
-$92  sta (zp)
-$9c  stz abs16
-$9e  stz abs16, x
-$b2  lda (zp)
-$d2  cmp (zp)
-$da  phx
-$f2  sbc (zp)
-$fa  plx
-</verb></tscreen>
+65SC02 mode supports all regular 6502 instructions, plus the original CMOS
+instructions.
 
 
-<sect2>65C02 mode<label id="65C02-mode"><p>
+<sect2>65C02 mode (CMOS with Rockwell extensions)<label id="65C02-mode"><p>
 
-65C02 mode supports all "official" W65C02 opcodes.
+65C02 mode supports all original CMOS instructions, plus the Rockwell (bit
+manipulation instructions) extensions.
 
-The R65C02 adds bit manipulation instructions:
 
-<tscreen><verb>
-smbB zp         set bit in zp location
-rmbB zp         reset bit in zp location
-bbsB zp, rel8   branch if bit is set in zp location
-bbrB zp, rel8   branch if bit is reset in zp location
-</verb></tscreen>
+<sect2>W65C02 mode (CMOS with WDC extensions)<label id="W65C02-mode"><p>
 
-And the W65C02 adds those:
+W65C02 mode supports the Rockwell extensions, plus wai and stp.
 
-<tscreen><verb>
-$cb  wai    wait for interrupt
-$db  stp    wait for reset
-</verb></tscreen>
+
+<sect2>65CE02 mode<label id="65CE02-mode"><p>
+
+All 65CE02 instructions are accepted, plus the Rockwell extensions.
 
 
 <sect2>4510 mode<label id="4510-mode"><p>
@@ -594,14 +570,6 @@ $db  stp    wait for reset
 The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
 It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
 address mapping for 20 bits of address space (1 megabyte addressable area).
-
-The 4510 mode supports the complete (legal) 65CE02 instruction set, plus these
-three, which were changed/added:
-<tscreen><verb>
-$5c  map             "4-byte NOP reserved for future expansion" on 65CE02
-$cb  asw $1234       wai on W65C02
-$db  phz             stp on W65C02
-</verb></tscreen>
 
 As compared to the description of the CPU in the
 <url url="http://www.zimmers.net/anonftp/pub/cbm/c65/c65manualupdated.txt.gz"
@@ -626,40 +594,9 @@ The 45GS02 is a microcontroller that is the core of the MEGA65.
 It is an extension of the 4510 CPU and adds 32-bit addressing and a 32-bit
 pseudo register Q that is comprised of the four registers A, X, Y, and Z.
 
-<sect2>HUC6280 mode<label id="HUC6280-mode"><p>
+<sect2>HUC6280 mode (CMOS with Hudson extensions)<label id="HUC6280-mode"><p>
 
-The HUC6280 is a superset of the R65C02. It adds some other instructions:
-
-<tscreen><verb>
-$02  sxy
-$03  st0 #{imm}
-$13  st1 #{imm}
-$22  sax
-$23  st2 #{imm}
-$42  say
-$43  tma #{imm}
-$44  bsr {rel}
-$53  tam #{imm}
-$54  csl
-$62  cla
-$73  tii {addr}, {addr}, {addr}
-$82  clx
-$83  tst #{imm}, {zp}
-$82  clx
-$83  tst #{imm}, {zp}
-$93  tst #{imm}, {addr}
-$a3  tst #{imm}, {zp}, x
-$b3  tst #{imm}, {addr}, x
-$c2  cly
-$c3  tdd {addr}, {addr}, {addr}
-$d3  tin {addr}, {addr}, {addr}
-$d4  csh
-$e3  tia {addr}, {addr}, {addr}
-$f3  tai {addr}, {addr}, {addr}
-$f4  set
-</verb></tscreen>
-
-Note that this CPU does not implement <tt>wai</tt> and <tt>stp</tt>.
+The HUC6280 is a superset of 65C02, used in the PC Engine.
 
 
 <sect2>M740 mode<label id="M740-mode"><p>
@@ -698,6 +635,13 @@ or two far addresses whose high byte will be used.
                 mvp     #$12, #$78         ; bank $12 to $78
                 mvp     $123456, $789ABC   ; bank $12 to $78
 </verb></tscreen>
+
+also see <ref id="long_jsr_jmp_rts" name="long_jsr_jmp_rts">
+ <ref id=".SMART" name=".SMART">
+ <ref id=".A8" name=".A8">
+ <ref id=".A16" name=".A16">
+ <ref id=".I8" name=".I8">
+ <ref id=".I16" name=".I16">
 
 
 <sect2>sweet16 mode<label id="sweet16-mode"><p>
@@ -3423,6 +3367,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   (see <tt><ref id=".P45GS02" name=".P45GS02"></tt> command).
 
 
+<sect1><tt>.IFP6280</tt><label id=".IFP816"><p>
+
+  Conditional assembly: Check if the assembler is currently in HuC6280 mode
+  (see <tt><ref id=".P6280" name=".P6280"></tt> command).
+
+
 <sect1><tt>.IFP816</tt><label id=".IFP816"><p>
 
   Conditional assembly: Check if the assembler is currently in 65816 mode
@@ -3433,6 +3383,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
   Conditional assembly: Check if the assembler is currently in 65C02 mode
   (see <tt><ref id=".PC02" name=".PC02"></tt> command).
+
+
+<sect1><tt>.IFPCE02</tt><label id=".IFPCE02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 65CE02 mode
+  (see <tt><ref id=".PCE02" name=".PCE02"></tt> command).
 
 
 <sect1><tt>.IFPDTV</tt><label id=".IFPDTV"><p>
@@ -3451,6 +3407,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
   Conditional assembly: Check if the assembler is currently in 65SC02 mode
   (see <tt><ref id=".PSC02" name=".PSC02"></tt> command).
+
+
+<sect1><tt>.IFPSWEET16</tt><label id=".IFPSWEET16"><p>
+
+  Conditional assembly: Check if the assembler is currently in Sweet16 mode
+  (see <tt><ref id=".PSWEET16" name=".PSWEET16"></tt> command).
 
 
 <sect1><tt>.IFREF</tt><label id=".IFREF"><p>
@@ -3474,6 +3436,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
   See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>, and
   <tt><ref id=".REFERTO" name=".REFERTO"></tt>
+
+
+<sect1><tt>.IFPWC02</tt><label id=".IFPWC02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 65WC02 mode
+  (see <tt><ref id=".PWC02" name=".PWC02"></tt> command).
 
 
 <sect1><tt>.IMPORT</tt><label id=".IMPORT"><p>
@@ -3842,6 +3810,18 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tt><ref id=".P816" name=".P816"></tt>, and
   <tt><ref id=".P4510" name=".P4510"></tt>
 
+
+<sect1><tt>.P6280</tt><label id=".P6280"><p>
+
+  Enable the HuC6280 instruction set. This is a superset of the 65C02 and
+  6502 instruction sets.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+
 <sect1><tt>.P816</tt><label id=".P816"><p>
 
   Enable the 65816 instruction set. This is a superset of the 65SC02 and
@@ -3851,6 +3831,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
   <tt><ref id=".P4510" name=".P4510"></tt>, and
   <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
 
 <sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
 
@@ -3880,6 +3861,17 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
   <tt><ref id=".P4510" name=".P4510"></tt>, and
   <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+<sect1><tt>.PCE02</tt><label id=".PCE02"><p>
+
+  Enable the 65CE02 instructions set. This instruction set includes all
+  6502 and extended 65CE02 instructions.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
 
 <sect1><tt>.PDTV</tt><label id=".PDTV"><p>
 
@@ -3986,6 +3978,17 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tt><ref id=".P4510" name=".P4510"></tt>, and
   <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
+
+<sect1><tt>.PSWEET16</tt><label id=".PSWEET16"><p>
+
+  Enable the Sweet16 instructions set.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
+  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+
 <sect1><tt>.PUSHCHARMAP</tt><label id=".PUSHCHARMAP"><p>
 
   Push the currently active character mapping onto a stack. The stack has a size of 16
@@ -4032,6 +4035,17 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   full, when this command is issued.
 
   See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
+
+
+<sect1><tt>.PWC02</tt><label id=".PWC02"><p>
+
+  Enable the W65C02 instructions set. This instruction set includes all
+  6502, 65SC02, 65C02 and two extra instructions (wai and stp)
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 
 <sect1><tt>.REFERTO, .REFTO</tt><label id=".REFERTO"><p>

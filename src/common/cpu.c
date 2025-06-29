@@ -56,14 +56,16 @@ const char* CPUNames[CPU_COUNT] = {
     "6502",
     "6502X",
     "6502DTV",
-    "65SC02",
-    "65C02",
+    "65SC02",   /* the original CMOS instruction set */
+    "65C02",    /* CMOS with Rockwell extensions */
     "65816",
     "sweet16",
     "huc6280",
     "m740",
     "4510",
-    "45GS02"
+    "45GS02",
+    "W65C02",   /* CMOS with WDC extensions */
+    "65CE02",   /* CMOS with CSG extensions */
 };
 
 /* Tables with CPU instruction sets
@@ -76,16 +78,16 @@ const unsigned CPUIsets[CPU_COUNT] = {
     CPU_ISET_6502DTV | CPU_ISET_6502,
     CPU_ISET_65SC02  | CPU_ISET_6502,
     CPU_ISET_65C02   | CPU_ISET_6502 | CPU_ISET_65SC02,
-    /* FIXME: does 65816 have both wai/stp and indirect-zp (without z)? */
-    CPU_ISET_65816   | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
+    /* 65816 has wai/stp and NO bit manipulation */
+    CPU_ISET_65816   | CPU_ISET_6502 | CPU_ISET_65SC02,
     CPU_ISET_SWEET16,
-    /* FIXME: HUC6280 does not have wai/stp */
     CPU_ISET_HUC6280 | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
     CPU_ISET_M740    | CPU_ISET_6502,
     /* 4510 does NOT have indirect-zp (without z), so we can not use 65SC02 */
-    /* FIXME: 4510 does not have wai/stp */
-    CPU_ISET_4510    | CPU_ISET_6502 |  CPU_ISET_65C02,
-    CPU_ISET_45GS02  | CPU_ISET_6502 |  CPU_ISET_65C02 | CPU_ISET_4510,
+    CPU_ISET_4510    | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02,
+    CPU_ISET_45GS02  | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02 | CPU_ISET_4510,
+    CPU_ISET_W65C02  | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
+    CPU_ISET_65CE02  | CPU_ISET_6502                   | CPU_ISET_65C02,
 };
 
 

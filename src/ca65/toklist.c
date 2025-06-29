@@ -46,7 +46,9 @@
 #include "nexttok.h"
 #include "scanner.h"
 #include "toklist.h"
-
+#include "macro.h"
+#include "listing.h"
+#include "global.h"
 
 
 /*****************************************************************************/
@@ -248,6 +250,26 @@ static int ReplayTokList (void* List)
     }
     L->LI = StartLine (&CurTok.Pos, LI_TYPE_ASM, PushCounter);
 
+    /* see description in macro.c */
+    static int new_expand_line = 1;
+    if (ExpandMacros) {
+        if (new_expand_line) {
+            if (LineLast->FragList == 0 && ExpandMacros==1) {
+                LineCur->Output--;
+            }
+            StrBuf mac_line = MakeLineFromTokens (L->Last);
+            if (L->Last->T.Tok == TOK_SEGMENT) {
+                LineCur->Output = 2;
+            }
+            NewListingLine (&mac_line, 0, 0);
+            InitListingLine ();
+            SB_Done (&mac_line);
+            new_expand_line = 0;
+        }
+        if (L->Last->T.Tok == TOK_SEP) {
+            new_expand_line = 1;
+        }
+    }
     /* If a check function is defined, call it, so it may look at the token
     ** just set and changed it as apropriate.
     */

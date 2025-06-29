@@ -74,6 +74,9 @@ void CheckInputStack (void);
 ** stuff on the input stack.
 */
 
+
+unsigned GetStackDepth (void);
+
 InputStack RetrieveInputStack (void);
 /* Retrieve the current input stack. This will also clear it. Used when
 ** including a file. The current input stack is stored together with the old

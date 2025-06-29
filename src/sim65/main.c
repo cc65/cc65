@@ -51,6 +51,7 @@
 #include "peripherals.h"
 #include "paravirt.h"
 #include "trace.h"
+#include "profile.h"
 
 
 
@@ -93,6 +94,7 @@ static void Usage (void)
             "Short options:\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -c\t\t\tPrint amount of executed CPU cycles\n"
+            "  -p <mapfile>\t\tEnable profiler\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -V\t\t\tPrint the simulator version number\n"
             "  -x <num>\t\tExit simulator after <num> cycles\n"
@@ -102,6 +104,7 @@ static void Usage (void)
             "  --cycles\t\tPrint amount of executed CPU cycles\n"
             "  --cpu <type>\t\tOverride CPU type (6502, 65C02, 6502X)\n"
             "  --trace\t\tEnable CPU trace\n"
+            "  --profile <mapfile>\t\tEnable profiler\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
             ProgName);
@@ -162,6 +165,16 @@ static void OptCycles (const char* Opt attribute ((unused)),
 /* Set flag to print amount of cycles at the end */
 {
     PrintCycles = 1;
+}
+
+
+
+static void OptProfile (const char* Opt attribute ((unused)),
+                        const char* Arg)
+/* Set flag to enable profiling at the end */
+{
+    enableProfiling = 1;
+    profileMap = strdup(Arg);
 }
 
 
@@ -285,6 +298,7 @@ int main (int argc, char* argv[])
         { "--cycles",           0,      OptCycles    },
         { "--cpu",              1,      OptCPU       },
         { "--trace",            0,      OptTrace     },
+        { "--profile",          1,      OptProfile   },
         { "--verbose",          0,      OptVerbose   },
         { "--version",          0,      OptVersion   },
     };
@@ -323,6 +337,10 @@ int main (int argc, char* argv[])
 
                 case 'c':
                     OptCycles (Arg, 0);
+                    break;
+
+                case 'p':
+                    OptProfile (Arg, GetArg (&I, 2));
                     break;
 
                 case 'v':

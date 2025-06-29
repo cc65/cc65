@@ -50,6 +50,7 @@
 #include "error.h"
 #include "paravirt.h"
 #include "trace.h"
+#include "profile.h"
 
 #include "6502.h"
 
@@ -1564,6 +1565,10 @@ static void OPC_6502_20 (void)
     Regs.PC = AddrLo + (AddrHi << 8);
 
     ParaVirtHooks (&Regs);
+
+    if (enableProfiling) {
+        ProfileJSR(Regs.PC);
+    }
 }
 
 
@@ -2157,6 +2162,10 @@ static void OPC_6502_60 (void)
     Regs.PC = POP ();                /* PCL */
     Regs.PC |= (POP () << 8);        /* PCH */
     Regs.PC += 1;
+
+    if (enableProfiling) {
+        ProfileRTS();
+    }
 }
 
 
@@ -4722,6 +4731,10 @@ void Reset (void)
     /* Bits 5 and 4 aren't used, and always are 1! */
     Regs.SR = 0x30;
     Regs.PC = MemReadWord (0xFFFC);
+
+    if (enableProfiling) {
+        ProfileReset(Regs.PC);
+    }
 }
 
 

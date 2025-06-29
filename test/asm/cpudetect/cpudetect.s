@@ -70,6 +70,10 @@
    .byte 0,"CPU_ISET_6502X"
 .endif
 
+.if (.cpu .bitand CPU_ISET_6502DTV)
+   .byte 0,"CPU_ISET_6502DTV"
+.endif
+
 .if (.cpu .bitand CPU_ISET_65SC02)
    .byte 0,"CPU_ISET_65SC02"
 .endif
@@ -86,18 +90,6 @@
    .byte 0,"CPU_ISET_65CE02"
 .endif
 
-.if (.cpu .bitand CPU_ISET_65816)
-   .byte 0,"CPU_ISET_65816"
-.endif
-
-.if (.cpu .bitand CPU_ISET_SWEET16)
-   .byte 0,"CPU_ISET_SWEET16"
-.endif
-
-.if (.cpu .bitand CPU_ISET_HUC6280)
-   .byte 0,"CPU_ISET_HUC6280"
-.endif
-
 .if (.cpu .bitand CPU_ISET_4510)
    .byte 0,"CPU_ISET_4510"
 .endif
@@ -106,18 +98,27 @@
    .byte 0,"CPU_ISET_45GS02"
 .endif
 
-.if (.cpu .bitand CPU_ISET_6502DTV)
-   .byte 0,"CPU_ISET_6502DTV"
+.if (.cpu .bitand CPU_ISET_HUC6280)
+   .byte 0,"CPU_ISET_HUC6280"
 .endif
 
 .if (.cpu .bitand CPU_ISET_M740)
    .byte 0,"CPU_ISET_M740"
 .endif
 
-; FIXME: something with 65816 is quirky
-.if (.not .cpu .bitand CPU_ISET_65816)
-    .include "allinst.inc"
+.if (.cpu .bitand CPU_ISET_65816)
+   .byte 0,"CPU_ISET_65816"
 .endif
+
+.if (.cpu .bitand CPU_ISET_SWEET16)
+   .byte 0,"CPU_ISET_SWEET16"
+.endif
+
+
+; FIXME: something with 65816 is quirky
+;.if (.not .cpu .bitand CPU_ISET_65816)
+    .include "allinst.inc"
+;.endif
 
 
 ; step 3: switch through all supported cpus to verify the pseudo-op is there

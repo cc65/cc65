@@ -910,8 +910,6 @@ $f2  sbc (zp)
 $fa  plx
 </verb></tscreen>
 
-
-
 For more information about the M740 Controllers, see
 <url url="https://en.wikipedia.org/wiki/Mitsubishi_740" name="Wikipedia">.
 
@@ -919,7 +917,95 @@ For more information about the M740 Controllers, see
 
 <sect1>65816<label id="65816-mode"><p><p>
 
-The 65816 is a 16bit CPU developed by WDC.
+The W65C816S is a 16bit CPU developed by WDC. The instruction set contains the
+complete legal 6502 instructions, the original CMOS instructions (65SC02), plus
+some new instructions and addressing modes. It has wai/stp, but it does NOT have
+the Rockwell extensions (BBRx, BBSx, RMBx and SMBx bit manipulation instructions).
+
+(24 new instructions, 77 new opcodes, 88 instructions/256 opcodes total)
+
+<tscreen><verb>
+$02  cop imm8               coprocessor operation
+$03  ora offs8, s
+$07  ora [dp]
+$0b  phd                    push direct page register
+$0f  ora abs24
+$13  ora (offs8, s), y
+$17  ora [dp], y
+$1b  tcs                    transfer C to stack pointer
+$1f  ora abs24, x
+$22  jsr abs24
+$23  and offs8, s
+$27  and [dp]
+$2b  pld                    pull direct page register
+$2f  and abs24
+$33  and (offs8, s), y
+$37  and [dp], y
+$3b  tsc                    transfer stack pointer to C
+$3f  and abs24, x
+$42  wdm                    (reserved for future expansion)
+$43  eor offs8, s
+$44  mvp src, dst
+$47  eor [dp]
+$4b  phk                    push program bank register
+$4f  eor abs24
+$53  eor (offs8, s), y
+$54  mvn src, dst
+$57  eor [dp], y
+$5b  tcd                    transfer C to direct page register
+$5c  jmp abs24
+$5f  eor abs24, x
+$62  per rel16              push effective relative address
+$63  adc offs8, s
+$67  adc [dp]
+$6b  rtl                    return long (fetches 24-bit address from stack)
+$6f  adc abs24
+$73  adc (offs8, s), y
+$77  adc [dp], y
+$7b  tdc                    transfer direct page register to C
+$7f  adc abs24, x
+$82  brl rel16              branch long (16-bit offset)
+$83  sta offs8, s
+$87  sta [dp]
+$8b  phb                    push data bank register
+$8f  sta abs24
+$93  sta (offs8, s), y
+$97  sta [dp], y
+$9b  txy                    transfer X to Y
+$9f  sta abs24, x
+$a3  lda offs8, s
+$a7  lda [dp]
+$ab  plb                    pull data bank register
+$af  lda abs24
+$b3  lda (offs8, s), y
+$b7  lda [dp], y
+$bb  tyx                    transfer Y to X
+$bf  lda abs24, x
+$c2  rep #imm8              clear bits in status register
+$c3  cmp offs8, s
+$c7  cmp [dp]
+$cb  wai                    wait for interrupt
+$cf  cmp abs24
+$d3  cmp (offs8, s), y
+$d4  pei (dp)               push effective indirect address
+$d7  cmp [dp], y
+$db  stp                    wait for reset
+$dc  jmp [abs16]
+$df  cmp abs24, x
+$e2  sep #imm8              set bits in status register
+$e3  sbc offs8, s
+$e7  sbc [dp]
+$eb  xba                    exchange high and low bytes of accumulator
+$ef  sbc abs24
+$f3  sbc (offs8, s), y
+$f4  pea abs16              push effective absolute address
+$f7  sbc [dp], y
+$fb  xce                    exchange Carry and Emulation bits
+$fc  jsr (abs16, x)
+$ff  sbc abs24, x
+</verb></tscreen>
+
+
 
 <sect>other<p>
 

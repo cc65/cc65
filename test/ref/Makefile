@@ -27,6 +27,10 @@ else
   COPY = cp $1 $2
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
 ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)

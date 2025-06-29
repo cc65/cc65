@@ -24,6 +24,10 @@ else
   CATRES = > $(WORKDIR)/$$@.out 2> $(WORKDIR)/$$@.out || (cat $(WORKDIR)/$$@.out && false)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
 ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)

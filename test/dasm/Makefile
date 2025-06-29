@@ -22,6 +22,10 @@ else
   NULLDEV = /dev/null
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
 ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)

@@ -55,6 +55,9 @@ ifdef QUIET
     .SILENT:
     PQ = "QUIET=1"
     PD = --no-print-directory
+ifndef CMD_EXE
+  CATERR = 2> $$@.errlog || (cat $$@.errlog && false)
+endif
 endif
 
 ifneq ($(filter disk testcode.%,$(MAKECMDGOALS)),)
@@ -131,12 +134,12 @@ DISK_atarixl   = testcode.atr
 
 .c.o:
 	$(if $(QUIET),echo $(SYS):$*.c)
-	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $<
-	$(AS) $(<:.c=.s)
+	$(CC) $(CFLAGS) -Ors --codesize 500 -T -g -t $(SYS) $< $(CATERR)
+	$(AS) $(<:.c=.s) $(CATERR)
 
 .s.o:
 	$(if $(QUIET),echo $(SYS):$*.s)
-	$(AS) $(ASFLAGS) -t $(SYS) $<
+	$(AS) $(ASFLAGS) -t $(SYS) $< $(CATERR)
 
 .PRECIOUS: %.o
 

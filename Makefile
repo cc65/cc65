@@ -17,6 +17,7 @@ endif
 
 
 
+.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util checkstyle check checkprefix
 .SUFFIXES:
 
 all:

@@ -200,6 +200,8 @@ void g_preamble (void)
         case CPU_6502DTV:   AddTextLine ("\t.setcpu\t\t\"6502DTV\"");   break;
         case CPU_65SC02:    AddTextLine ("\t.setcpu\t\t\"65SC02\"");    break;
         case CPU_65C02:     AddTextLine ("\t.setcpu\t\t\"65C02\"");     break;
+        case CPU_W65C02:    AddTextLine ("\t.setcpu\t\t\"W65C02\"");    break;
+        case CPU_65CE02:    AddTextLine ("\t.setcpu\t\t\"65CE02\"");    break;
         case CPU_65816:     AddTextLine ("\t.setcpu\t\t\"65816\"");     break;
         case CPU_HUC6280:   AddTextLine ("\t.setcpu\t\t\"HUC6280\"");   break;
         case CPU_4510:      AddTextLine ("\t.setcpu\t\t\"4510\"");      break;

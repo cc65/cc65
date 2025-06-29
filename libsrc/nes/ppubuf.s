@@ -32,7 +32,9 @@
 
 .proc   ppubuf_wait
 
-        lda     #$ff            ; (($0100/3)*1)
+; $45 is the largest number that didn't cause glitches, $44 gives a bit more
+; breathing room. see issue #1703
+        lda     #$44
 @wait:  cmp     ringcount
         beq     @wait
         rts

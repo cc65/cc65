@@ -47,6 +47,16 @@ else
   LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+endif
+
 ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   ifdef CC65_HOME
     TARGET_PATH = $(CC65_HOME)/target
@@ -84,10 +94,12 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   EMD := $(wildcard $(TARGET_PATH)/$(SYS)/drv/emd/*)
   MOU := $(wildcard $(TARGET_PATH)/$(SYS)/drv/mou/*)
   TGI := $(wildcard $(TARGET_PATH)/$(SYS)/drv/tgi/*)
+  JOY := $(wildcard $(TARGET_PATH)/$(SYS)/drv/joy/*)
 
   EMD := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/emd/,$(notdir $(filter %.emd,$(EMD))))
   MOU := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/mou/,$(notdir $(filter %.mou,$(MOU))))
   TGI := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/tgi/,$(notdir $(filter %.tgi,$(TGI))))
+  JOY := $(addprefix $(SUBST_TARGET_PATH)/$(SYS)/drv/joy/,$(notdir $(filter %.joy,$(JOY))))
 
   # This one comes with the VICE emulator.
   # See http://vice-emu.sourceforge.net/
@@ -106,6 +118,8 @@ DISK_apple2enh = samples.dsk
 DISK_atari     = samples.atr
 DISK_atarixl   = samples.atr
 DISK_plus4     = samples.d64
+DISK_c65       = samples.d81
+DISK_mega65    = samples.d81
 
 # --------------------------------------------------------------------------
 # System-dependent settings
@@ -152,10 +166,13 @@ LDFLAGS_tgidemo_atarixl    = --start-addr 0x4000
 
 .o:
 ifeq ($(SYS),vic20)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C vic20-32k.cfg -m $@.map $^ $(SYS).lib
 else ifeq ($(SYS),plus4)
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -C plus4-hires.cfg -m $@.map $^ $(SYS).lib
 else
+	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 endif
 
@@ -180,6 +197,7 @@ EXELIST_apple2 =   \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         mousedemo  \
         multdemo   \
@@ -220,6 +238,7 @@ EXELIST_atmos =    \
         ascii      \
         checkversion \
         hello      \
+        joydemo    \
         mandelbrot \
         sieve      \
         terminal   \
@@ -234,6 +253,7 @@ EXELIST_c64 =      \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         mousedemo  \
         multdemo   \
@@ -243,12 +263,22 @@ EXELIST_c64 =      \
         tinyshell  \
         tgidemo
 
+EXELIST_c65 = \
+        ascii \
+        checkversion \
+        enumdevdir \
+        hello \
+        joydemo    \
+        sieve \
+        tinyshell
+
 EXELIST_c128 =     \
         ascii      \
         checkversion \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         mousedemo  \
         sieve      \
@@ -261,13 +291,15 @@ EXELIST_c16 =      \
         checkversion \
         enumdevdir \
         tinyshell  \
-        hello
+        hello      \
+        joydemo
 
 EXELIST_cbm510 =   \
         ascii      \
         checkversion \
         gunzip65   \
         hello      \
+        joydemo    \
         mousedemo  \
         terminal   \
         tinyshell  \
@@ -292,6 +324,7 @@ EXELIST_cx16 =     \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         mousedemo  \
         sieve      \
@@ -313,20 +346,32 @@ EXELIST_lunix = \
 EXELIST_lynx = \
         notavailable
 
+EXELIST_mega65 = \
+        ascii \
+        checkversion \
+        enumdevdir \
+        hello \
+        joydemo    \
+        sieve \
+        tinyshell
+
 EXELIST_nes = \
-        hello
+        hello      \
+        joydemo
 
 EXELIST_osic1p = \
         notavailable
 
 EXELIST_pce = \
-        hello
+        hello      \
+        joydemo
 
 EXELIST_pet =      \
         ascii      \
         checkversion \
         enumdevdir \
         hello      \
+        joydemo    \
         tinyshell  \
         sieve
 
@@ -336,6 +381,7 @@ EXELIST_plus4 =    \
         enumdevdir \
         gunzip65   \
         hello      \
+        joydemo    \
         mandelbrot \
         terminal   \
         tinyshell  \
@@ -365,6 +411,7 @@ EXELIST_telestrat = \
         checkversion \
         gunzip65    \
         hello       \
+        joydemo    \
         mandelbrot  \
         sieve       \
         tgidemo
@@ -374,6 +421,7 @@ EXELIST_vic20 =    \
         checkversion \
         enumdevdir \
         hello      \
+        joydemo    \
         mandelbrot \
         sieve      \
         tgidemo
@@ -387,7 +435,7 @@ endif
 
 define SUBDIR_recipe
 
-@+$(MAKE) -C $(dir) --no-print-directory $@
+@+$(MAKE) -C $(dir) $(PD) $@ $(PQ)
 
 endef # SUBDIR_recipe
 
@@ -423,6 +471,7 @@ TARGETS :=     \
   c128         \
   c16          \
   c64          \
+  c65          \
   cbm510       \
   cbm610       \
   creativision \
@@ -433,6 +482,7 @@ TARGETS :=     \
   kim1         \
   lunix        \
   lynx         \
+  mega65       \
   nes          \
   osic1p       \
   pce          \
@@ -450,17 +500,23 @@ TARGETS :=     \
 # --------------------------------------------------------------------------
 # Rule to make the binaries for every platform
 
+define TARGETDIR_recipe
+
+@+$(MAKE) -C $(dir) $(PD) $(PQ)
+
+endef # TARGETDIR_recipe
+
 define TARGET_recipe
 
 @echo making samples for: $(T)
-@$(MAKE) --no-print-directory clean SYS:=$(T)
-@$(MAKE) -j2 SYS:=$(T)
-@$(MAKE) --no-print-directory clean SYS:=$(T)
+@$(MAKE) -j2 SYS:=$(T) $(PQ)
+@$(MAKE) $(PD) clean SYS:=$(T) $(PQ)
 
 endef # TARGET_recipe
 
 platforms:
 	$(foreach T,$(TARGETS),$(TARGET_recipe))
+	$(foreach dir,$(DIRLIST),$(TARGETDIR_recipe))
 
 # --------------------------------------------------------------------------
 # Overlay rules. Overlays need special ld65 configuration files.  Also, the
@@ -533,7 +589,13 @@ samples.d64: samples
 	@$(C1541) -format "samples,00" d64 $@ >$(NULLDEV)
 	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
 	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))
-	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
+	$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(D64_WRITE_SEQ_recipe))
+
+samples.d81: samples
+	@$(C1541) -format "samples,00" d81 $@ >$(NULLDEV)
+	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))
+	$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(D64_WRITE_SEQ_recipe))
 
 # --------------------------------------------------------------------------
 # Rule to make an Apple II disk with all samples. Needs the AppleCommander
@@ -558,7 +620,7 @@ samples.dsk: samples
 	cp prodos.dsk $@
 	$(foreach file,$(EXELIST_$(SYS)),$(DSK_WRITE_BIN_recipe))
 	$(foreach file,$(OVERLAYLIST),$(DSK_WRITE_REL_recipe))
-	$(foreach file,$(EMD) $(MOU) $(TGI),$(DSK_WRITE_REL_recipe))
+	$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(DSK_WRITE_REL_recipe))
 
 # --------------------------------------------------------------------------
 # Rule to make an Atari disk with all samples. Needs the dir2atr program
@@ -577,7 +639,7 @@ samples.atr: samples
 	cp "dup.sys" atr/dup.sys
 	@$(foreach file,$(EXELIST_$(SYS)),$(ATR_WRITE_recipe))
 	@$(foreach file,$(OVERLAYLIST),$(ATR_WRITE_recipe))
-	@$(foreach file,$(EMD) $(MOU) $(TGI),$(ATR_WRITE_recipe))
+	@$(foreach file,$(EMD) $(MOU) $(JOY) $(TGI),$(ATR_WRITE_recipe))
 	$(DIR2ATR) -d -b MyDos4534 3200 $@ atr
 	@$(RMDIR) atr
 

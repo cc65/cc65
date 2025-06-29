@@ -26,10 +26,17 @@ else
   RMDIR = $(RM) -r $1
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
 ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
+ifndef CMD_EXE
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+endif
 endif
 
 SIM65FLAGS = -x 200000000

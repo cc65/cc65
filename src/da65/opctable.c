@@ -43,6 +43,8 @@
 #include "opc65816.h"
 #include "opc65c02.h"
 #include "opc65sc02.h"
+#include "opcw65c02.h"
+#include "opc65ce02.h"
 #include "opchuc6280.h"
 #include "opcm740.h"
 #include "opctable.h"
@@ -75,6 +77,8 @@ void SetOpcTable (cpu_t CPU)
         case CPU_6502DTV: OpcTable = OpcTable_6502DTV;  break;
         case CPU_65SC02:  OpcTable = OpcTable_65SC02;   break;
         case CPU_65C02:   OpcTable = OpcTable_65C02;    break;
+        case CPU_W65C02:  OpcTable = OpcTable_W65C02;   break;
+        case CPU_65CE02:  OpcTable = OpcTable_65CE02;   break;
         case CPU_65816:   OpcTable = OpcTable_65816;    break;
         case CPU_HUC6280: OpcTable = OpcTable_HuC6280;  break;
         case CPU_M740:    OpcTable = OpcTable_M740;     break;

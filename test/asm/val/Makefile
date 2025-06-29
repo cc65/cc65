@@ -22,6 +22,10 @@ else
   RMDIR = $(RM) -r $1
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
 ifdef QUIET
   .SILENT:
   NULLOUT = >$(NULLDEV)
@@ -51,8 +55,8 @@ define PRG_template
 
 $(WORKDIR)/%.$1.prg: %.s | $(WORKDIR)
 	$(if $(QUIET),echo asm/val/$$*.$1.prg)
-	$(CA65) -t sim$1 -o $$(@:.prg=.o) $$< $(NULLERR)
-	$(LD65) -C sim6502-asmtest.cfg -o $$@ $$(@:.prg=.o) sim$1.lib $(NULLERR)
+	$(CA65) -t sim$1 -o $$(@:.prg=.o) $$< $(NULLOUT) $(NULLERR)
+	$(LD65) -C sim6502-asmtest.cfg -o $$@ $$(@:.prg=.o) sim$1.lib $(NULLOUT) $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
 
 endef # PRG_template

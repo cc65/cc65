@@ -40,6 +40,14 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_c64 = \
         petscii.prg \
         cbmdir-test.prg \
@@ -73,12 +81,14 @@ endif
 
 ifeq ($(SYS),c64)
 petscii.prg: petscii.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o petscii.prg petscii.c
 else
 petscii.prg:
 endif
 
 cbmdir-test.prg: cbmdir-test.c
+	$(if $(QUIET),echo $(SYS):$@)
 ifeq ($(SYS),vic20)
 	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
 else
@@ -86,6 +96,7 @@ else
 endif
 
 cbmread.prg: cbmread.c
+	$(if $(QUIET),echo $(SYS):$@)
 ifeq ($(SYS),vic20)
 	$(CL) -t $(SYS) -C vic20-32k.cfg -Oris -o $@ $<
 else

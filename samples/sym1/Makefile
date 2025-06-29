@@ -37,6 +37,14 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_sym1 = \
         symHello.bin symTiny.bin symDisplay.bin symIO.bin symNotepad.bin symExtendedMemory.bin
 
@@ -56,21 +64,27 @@ else
 endif
 
 symHello.bin: symHello.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t sym1 -O -o symHello.bin symHello.c
 
 symTiny.bin: symTiny.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t sym1 -O -o symTiny.bin symTiny.c
 
 symDisplay.bin: symDisplay.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t sym1 -O -o symDisplay.bin symDisplay.c
 
 symIO.bin: symIO.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t sym1 -C sym1-32k.cfg -O -o symIO.bin symIO.c
 
 symNotepad.bin: symNotepad.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t sym1 -C sym1-32k.cfg -O -o symNotepad.bin symNotepad.c
 
 symExtendedMemory.bin: symExtendedMemory.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t sym1 -C sym1-32k.cfg -O -o symExtendedMemory.bin symExtendedMemory.c
 
 

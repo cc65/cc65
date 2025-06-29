@@ -37,6 +37,14 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_atari5200 = \
         hello
 
@@ -56,6 +64,7 @@ else
 endif
 
 hello: hello.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t atari5200 -o hello hello.c
 	
 clean:

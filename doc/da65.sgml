@@ -267,19 +267,21 @@ With the command line option <tt><ref id="option--cpu" name="--cpu"></tt>, the
 disassembler may be told which CPU to support:
 
   <itemize>
-  <item><ref id="6502-mode" name="6502"> - NMOS 6502 (all legal instructions)
-  <item><ref id="6502X-mode" name="6502X"> - NMOS 6502 with all undocumented instructions
-  <item><ref id="DTV-mode" name="6502DTV"> - the emulated CPU of the C64DTV device
-  <item><ref id="65SC02-mode" name="65SC02"> - first CMOS instruction set (no bit manipulation, no wai/stp)
-  <item><ref id="65C02-mode" name="65C02"> - full CMOS instruction set (has bit manipulation and wai/stp)
-  <item><ref id="65816-mode" name="65816"> - the CPU of the SNES, and the SCPU
-  <item><ref id="HUC6280-mode" name="HuC6280"> - the CPU of the PC engine
-  <item><ref id="4510-mode" name="4510"> - the CPU of the Commodore C65
-  <item><ref id="45GS02-mode" name="45GS02"> - the CPU of the Commodore MEGA65
-  <item><ref id="M740-mode" name="M740"> - a Microcontroller by Mitsubishi
+  <item>6502 - NMOS 6502 (all legal instructions)
+  <item>6502X - NMOS 6502 with all undocumented instructions
+  <item>6502DTV - the emulated CPU of the C64DTV device
+  <item>65SC02 - first CMOS instruction set (no bit manipulation, no wai/stp)
+  <item>65C02 - CMOS with Rockwell extensions
+  <item>W65C02 - full CMOS instruction set (has bit manipulation and wai/stp)
+  <item>65CE02 - CMOS with CSG extensions
+  <item>4510 - the CPU of the Commodore C65
+  <item>45GS02 - the CPU of the Commodore MEGA65
+  <item>HuC6280 - the CPU of the PC engine
+  <item>M740 - a Microcontroller by Mitsubishi
+  <item>65816 - the CPU of the SNES, and the SCPU
   </itemize>
 
-for more details on the various CPUs, see <tt><htmlurl url="ca65.html#6502-mode" name="here"></tt>.
+for more details on the various CPUs, see <tt><htmlurl url="cpus.html" name="here"></tt>.
 
 
 <sect2>6502 mode<label id="6502-mode"><p>
@@ -308,7 +310,11 @@ The first CMOS instruction set, without bit manipulation or wai/stp.
 The 65C02 understands the same opcodes as the 65SC02, plus 16 additional bit
 manipulation and bit test-and-branch commands.
 
+<sect2>W65C02 mode<label id="W65C02-mode"><p>
+
 This mode also supports wai/stp.
+
+<sect2>65CE02 mode<label id="65CE02-mode"><p>
 
 
 <sect2>4510 mode<label id="4510-mode"><p>

@@ -1752,6 +1752,14 @@ static void DoPSC02 (void)
 
 
 
+static void DoPSweet16 (void)
+/* Switch to Sweet16 CPU */
+{
+    SetCPU (CPU_SWEET16);
+}
+
+
+
 static void DoPushCharmap (void)
 /* Save the current charmap */
 {
@@ -2191,6 +2199,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
     { ccKeepToken,      DoConditionals  },      /* .IFPM740 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPSWEET16 */
     { ccKeepToken,      DoConditionals  },      /* .IFPWC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
     { ccNone,           DoImport        },      /* .IMPORT */
@@ -2236,6 +2245,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoPopSeg        },      /* .POPSEG */
     { ccNone,           DoProc          },      /* .PROC */
     { ccNone,           DoPSC02         },      /* .PSC02 */
+    { ccNone,           DoPSweet16      },      /* .PSWEET16 */
     { ccNone,           DoPushCharmap   },      /* .PUSHCHARMAP */
     { ccNone,           DoPushCPU       },      /* .PUSHCPU */
     { ccNone,           DoPushSeg       },      /* .PUSHSEG */

@@ -494,6 +494,16 @@ void DoConditionals (void)
                 CalcOverallIfCond ();
                 break;
 
+            case TOK_IFPSWEET16:
+                D = AllocIf (".IFPSWEET16", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_SWEET16);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
             case TOK_IFPWC02:
                 D = AllocIf (".IFPWC02", 1);
                 NextTok ();

@@ -12,6 +12,11 @@
    lax #$ea
 .endif
 
+.ifp6280
+   sax
+   cla
+.endif
+
 .ifpsc02
    jmp ($1234,x)
 .endif
@@ -29,10 +34,6 @@
    ldz #$12
 .endif
 
-.ifp816
-   xba
-.endif
-
 .ifp4510
    taz
 .endif
@@ -45,13 +46,12 @@
    sac #$00
 .endif
 
-.ifp6280
-   sax
-   cla
-.endif
-
 .ifpm740
    jsr $ff12
+.endif
+
+.ifp816
+   xba
 .endif
 
 
@@ -115,10 +115,7 @@
 .endif
 
 
-; FIXME: something with 65816 is quirky
-;.if (.not .cpu .bitand CPU_ISET_65816)
-    .include "allinst.inc"
-;.endif
+.include "allinst.inc"
 
 
 ; step 3: switch through all supported cpus to verify the pseudo-op is there

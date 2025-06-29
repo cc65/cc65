@@ -357,7 +357,6 @@ LABEL:
     .endscope
 .endif
 
-
 ;------------------------------------------------------------------------------
 ; The 65sc02 is the original CMOS re-design of the 6502.
 ;
@@ -426,27 +425,7 @@ LABEL:
 .endif
 
 
-; Rockwell Datasheet "R65C02, R65C102, R65C112   R65C00 Microprocessors (CPU)" 1987,rev6:
-;
-; The 8-bit R65C00 microprocessor family of devices are produced using CMOS [...]
-; technology which provides advanced [...] performance speed and [...] over their
-; NMOS counterparts, the R6500 family of microprocessor devices. [...]
-; The CMOS family ... has been designed with many enhancements over the R6502
-; NMOS device [...]
-;
 ; The R65C02 is a superset of the 65C02. It adds bit manipulation instructions:
-;
-;   smbB zp         set bit in zp location
-;   rmbB zp         reset bit in zp location
-;   bbsB zp, rel8   branch if bit is set in zp location
-;   bbrB zp, rel8   branch if bit is reset in zp location
-;
-; 12 new instructions for a total of 68
-; 59 new op ocdes, for a total of 210
-; two new addressing modes
-; seven software/operational enhancements
-; two hardware enhancements
-
 .if (.cpu .bitand CPU_ISET_65C02)
 
     ; R65C02 instruction set adds some extra legal instructions to 65C02
@@ -488,10 +467,6 @@ LABEL3:
 
 
 ; The W65C02 is a superset of the R65C02. It only adds two instructions:
-;
-; $cb  wai             wait for interrupt
-; $db  stp             wait for reset
-
 .if (.cpu .bitand CPU_ISET_W65C02)
     wai             ; $cb
     stp             ; $db
@@ -499,68 +474,9 @@ LABEL3:
 
 
 ; The 65CE02 is another superset of the R65C02. It has several improvements:
-;
-; $02  cle              clear stack extend disable
-; $03  see              set stack extend disable
-; $0b  tsy              transfer stack_ptr_high to Y
-; $12  ora (zp), z
-; $13  lbpl rel16
-; $1b  inz              increment Z
-; $22  jsr (abs16)
-; $23  jsr (abs16, x)
-; $2b  tys              transfer Y to stack_ptr_high
-; $32  and (zp), z
-; $33  lbmi rel16
-; $3b  dez              decrement Z
-; $42  neg              negate A
-; $43  asr
-; $44  asr zp
-; $4b  taz              transfer A to Z
-; $52  eor (zp), z
-; $53  lbvc rel16
-; $54  asr zp, x
-; $5b  tab
-; $5c  aug              "4-byte NOP reserved for future expansion"
-; $62  rtn #imm8
-; $63  lbsr rel16       relative jsr, "branch to subroutine"
-; $64  stz zp           store Z
-; $6b  tza              transfer Z to A
-; $72  adc (zp), z
-; $73  lbvs rel16
-; $74  stz zp, x        store Z
-; $7b  tba
-; $82  sta (off8, s), y
-; $83  lbra rel16       relative jmp
-; $8b  sty abs16, x
-; $92  sta (zp), z
-; $93  lbcc rel16
-; $9b  stx abs16, y
-; $9c  stz abs16        store Z
-; $9e  stz abs16, x     store Z
-; $a3  ldz #imm8
-; $ab  ldz abs16
-; $b2  lda (zp), z
-; $b3  lbcs rel16
-; $bb  ldz abs16, x
-; $c2  cpz #imm8
-; $c3  dew zp
-; $cb  asw abs16
-; $d2  cmp (zp), z
-; $d3  lbne rel16
-; $d4  cpz zp
-; $db  phz              push Z
-; $dc  cpz abs16
-; $e2  lda (off8, s), y
-; $e3  inw zp
-; $eb  row abs16
-; $f2  sbc (zp), z
-; $f3  lbeq rel16
-; $f4  phw #imm16
-; $fb  plz              pull Z
-; $fc  phw abs16
-
 .if (.cpu .bitand CPU_ISET_65CE02)
     .scope
+
     ; 65CE02 adds the following:
     cle                         ; $02
     see                         ; $03
@@ -879,3 +795,178 @@ LABEL:
     .endscope
 .endif
 
+.if (.cpu .bitand CPU_ISET_65816)
+
+    .smart  -                       ; Stop being smart
+
+    .A8 ; akku 8 bit
+    .I8 ; index registers 8 bit
+
+    .scope
+    cop $12             ; $02  coprocessor operation
+    ora $12, s          ; $03
+    ora [$12]           ; $07
+    phd                 ; $0b  push direct page register
+    ora $123456         ; $0f
+    ora ($12, s), y     ; $13
+    ora [$12], y        ; $17
+    tcs                 ; $1b  transfer C to stack pointer
+    ora $123456, x      ; $1f
+    jsl $123456         ; $22
+    and $12, s          ; $23
+    and [$12]           ; $27
+    pld                 ; $2b  pull direct page register
+    and $123456         ; $2f
+    and ($12, s), y     ; $33
+    and [$12], y        ; $37
+    tsc                 ; $3b  transfer stack pointer to C
+    and $123456, x      ; $3f
+    wdm $12             ; $42  (reserved for future expansion)
+    eor $12, s          ; $43
+    mvp $1234, $5678    ; $44
+    eor [$12]           ; $47
+    phk                 ; $4b  push program bank register
+    eor $123456         ; $4f
+    eor ($12, s), y     ; $53
+    mvn $1234, $5678    ; $54
+    eor [$12], y        ; $57
+    tcd                 ; $5b  transfer C to direct page register
+    jml $123456         ; $5c
+    eor $123456, x      ; $5f
+    per LABEL           ; $62  push effective relative address
+    adc $12, s          ; $63
+    adc [$12]           ; $67
+    rtl                 ; $6b  return long (fetches 24-bit address from stack)
+    adc $123456         ; $6f
+    adc ($12, s), y     ; $73
+    adc [$12], y        ; $77
+    tdc                 ; $7b  transfer direct page register to C
+    adc $123456, x      ; $7f
+LABEL:
+    brl LABEL           ; $82  branch long (16-bit offset)
+    sta $12, s          ; $83
+    sta [$12]           ; $87
+    phb                 ; $8b  push data bank register
+    sta $123456         ; $8f
+    sta ($12, s), y     ; $93
+    sta [$12], y        ; $97
+    txy                 ; $9b  transfer X to Y
+    sta $123456, x      ; $9f
+    lda $12, s          ; $a3
+    lda [$12]           ; $a7
+    plb                 ; $ab  pull data bank register
+    lda $123456         ; $af
+    lda ($12, s), y     ; $b3
+    lda [$12], y        ; $b7
+    tyx                 ; $bb  transfer Y to X
+    lda $123456, x      ; $bf
+    rep #$12            ; $c2  clear bits in status register
+    cmp $12, s          ; $c3
+    cmp [$12]           ; $c7
+    wai                 ; $cb  wait for interrupt
+    cmp $123456         ; $cf
+    cmp ($12, s), y     ; $d3
+    pei ($12)           ; $d4  push effective indirect address
+    cmp [$12], y        ; $d7
+    stp                 ; $db  wait for reset
+    jmp [$1234]         ; $dc
+    cmp $123456, x      ; $df
+    sep #$12            ; $e2  set bits in status register
+    sbc $12, s          ; $e3
+    sbc [$12]           ; $e7
+    xba                 ; $eb  exchange high and low bytes of accumulator
+    sbc $123456         ; $ef
+    sbc ($12, s), y     ; $f3
+    pea $1234           ; $f4  push effective absolute address
+    sbc [$12], y        ; $f7
+    xce                 ; $fb  exchange Carry and Emulation bits
+    jsr ($1234, x)      ; $fc
+    sbc $123456, x      ; $ff
+    .endscope
+
+    .A16 ; akku 16 bit
+    .I16 ; index registers 16 bit
+
+    .scope
+    cop $12             ; $02  coprocessor operation
+    ora $12, s          ; $03
+    ora [$12]           ; $07
+    phd                 ; $0b  push direct page register
+    ora $123456         ; $0f
+    ora ($12, s), y     ; $13
+    ora [$12], y        ; $17
+    tcs                 ; $1b  transfer C to stack pointer
+    ora $123456, x      ; $1f
+    jsl $123456         ; $22
+    and $12, s          ; $23
+    and [$12]           ; $27
+    pld                 ; $2b  pull direct page register
+    and $123456         ; $2f
+    and ($12, s), y     ; $33
+    and [$12], y        ; $37
+    tsc                 ; $3b  transfer stack pointer to C
+    and $123456, x      ; $3f
+    wdm $12             ; $42  (reserved for future expansion)
+    eor $12, s          ; $43
+    mvp $1234, $5678    ; $44
+    eor [$12]           ; $47
+    phk                 ; $4b  push program bank register
+    eor $123456         ; $4f
+    eor ($12, s), y     ; $53
+    mvn $1234, $5678    ; $54
+    eor [$12], y        ; $57
+    tcd                 ; $5b  transfer C to direct page register
+    jml $123456         ; $5c
+    eor $123456, x      ; $5f
+    per LABEL           ; $62  push effective relative address
+    adc $12, s          ; $63
+    adc [$12]           ; $67
+    rtl                 ; $6b  return long (fetches 24-bit address from stack)
+    adc $123456         ; $6f
+    adc ($12, s), y     ; $73
+    adc [$12], y        ; $77
+    tdc                 ; $7b  transfer direct page register to C
+    adc $123456, x      ; $7f
+LABEL:
+    brl LABEL           ; $82  branch long (16-bit offset)
+    sta $12, s          ; $83
+    sta [$12]           ; $87
+    phb                 ; $8b  push data bank register
+    sta $123456         ; $8f
+    sta ($12, s), y     ; $93
+    sta [$12], y        ; $97
+    txy                 ; $9b  transfer X to Y
+    sta $123456, x      ; $9f
+    lda $12, s          ; $a3
+    lda [$12]           ; $a7
+    plb                 ; $ab  pull data bank register
+    lda $123456         ; $af
+    lda ($12, s), y     ; $b3
+    lda [$12], y        ; $b7
+    tyx                 ; $bb  transfer Y to X
+    lda $123456, x      ; $bf
+    rep #$12            ; $c2  clear bits in status register
+    cmp $12, s          ; $c3
+    cmp [$12]           ; $c7
+    wai                 ; $cb  wait for interrupt
+    cmp $123456         ; $cf
+    cmp ($12, s), y     ; $d3
+    pei ($12)           ; $d4  push effective indirect address
+    cmp [$12], y        ; $d7
+    stp                 ; $db  wait for reset
+    jmp [$1234]         ; $dc
+    cmp $123456, x      ; $df
+    sep #$12            ; $e2  set bits in status register
+    sbc $12, s          ; $e3
+    sbc [$12]           ; $e7
+    xba                 ; $eb  exchange high and low bytes of accumulator
+    sbc $123456         ; $ef
+    sbc ($12, s), y     ; $f3
+    pea $1234           ; $f4  push effective absolute address
+    sbc [$12], y        ; $f7
+    xce                 ; $fb  exchange Carry and Emulation bits
+    jsr ($1234, x)      ; $fc
+    sbc $123456, x      ; $ff
+    .endscope
+
+.endif

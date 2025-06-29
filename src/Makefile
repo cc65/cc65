@@ -101,6 +101,11 @@ ifdef CROSS_COMPILE
 endif
 
 all bin: $(PROGS)
+ifeq ($(MAKELEVEL),0)
+ifndef PREFIX
+	$(warning Warning: PREFIX is empty - make install will not work)
+endif
+endif
 
 mostlyclean:
 	$(call RMDIR,../wrk)

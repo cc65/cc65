@@ -3409,6 +3409,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   (see <tt><ref id=".PSC02" name=".PSC02"></tt> command).
 
 
+<sect1><tt>.IFPSWEET16</tt><label id=".IFPSWEET16"><p>
+
+  Conditional assembly: Check if the assembler is currently in Sweet16 mode
+  (see <tt><ref id=".PSWEET16" name=".PSWEET16"></tt> command).
+
+
 <sect1><tt>.IFREF</tt><label id=".IFREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
@@ -3971,6 +3977,17 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
   <tt><ref id=".P4510" name=".P4510"></tt>, and
   <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+
+<sect1><tt>.PSWEET16</tt><label id=".PSWEET16"><p>
+
+  Enable the Sweet16 instructions set.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
+  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
 
 <sect1><tt>.PUSHCHARMAP</tt><label id=".PUSHCHARMAP"><p>
 

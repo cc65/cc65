@@ -54,6 +54,10 @@
    xba
 .endif
 
+.ifpsweet16
+   bk
+.endif
+
 
 ; step 2: check for bitwise compatibility of instructions sets
 ;         (made verbose for better reading with hexdump/hd(1))
@@ -132,4 +136,4 @@
 .p6280
 .pm740
 .p816
-; FIXME: sweet16
+.psweet16

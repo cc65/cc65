@@ -558,12 +558,14 @@ int CheckConditionals (void)
         case TOK_IFP02X:
         case TOK_IFP4510:
         case TOK_IFP45GS02:
+        case TOK_IFP6280:
         case TOK_IFP816:
         case TOK_IFPC02:
         case TOK_IFPCE02:
         case TOK_IFPDTV:
         case TOK_IFPM740:
         case TOK_IFPSC02:
+        case TOK_IFPSWEET16:
         case TOK_IFPWC02:
         case TOK_IFREF:
             DoConditionals ();

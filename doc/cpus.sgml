@@ -16,33 +16,189 @@ An Overview on all supported CPUs
 
 <sect>Overview<p>
 
-
-<sect1>Supported CPUs<p>
-
   <itemize>
   <item><ref id="6502-mode" name="6502"> - NMOS 6502 (all legal instructions)
   <item><ref id="6502X-mode" name="6502X"> - NMOS 6502 with all undocumented instructions
-  <item><ref id="DTV-mode" name="6502DTV"> - the emulated CPU of the C64DTV device
-  <item><ref id="65SC02-mode" name="65SC02"> - first CMOS instruction set (no bit manipulation)
-  <item><ref id="65C02-mode" name="65C02"> - full CMOS instruction set (has bit manipulation)
+  <item><ref id="DTV-mode" name="6502DTV"> - the CPU of the C64 DTV device
+  <item><ref id="65SC02-mode" name="65SC02"> - original CMOS
+  <item><ref id="65C02-mode" name="65C02"> - CMOS with Rockwell extensions
+  <item><ref id="65CE02-mode" name="65CE02"> - CMOS with CSG extensions
   <item><ref id="W65C02-mode" name="W65C02"> - CMOS with WDC extensions
-  <item><ref id="65CE02-mode" name="65CE02"> - CMOS with GTE extensions
-  <item><ref id="65816-mode" name="65816"> - the CPU of the SNES, and the SCPU
-  <item><ref id="HUC6280-mode" name="HuC6280"> - the CPU of the PC engine
   <item><ref id="4510-mode" name="4510"> - the CPU of the Commodore C65
   <item><ref id="45GS02-mode" name="45GS02"> - the CPU of the Commodore MEGA65
+  <item><ref id="HUC6280-mode" name="HuC6280"> - the CPU of the PC engine
   <item><ref id="M740-mode" name="M740"> - a Microcontroller by Mitsubishi
+  <item><ref id="65816-mode" name="65816"> - the CPU of the SNES, and the SCPU
   <item><ref id="sweet16-mode" name="Sweet16"> - an interpreter for a pseudo 16 bit CPU
   </itemize>
 
+<sect>NMOS branch<p>
 
-<sect2>6502 mode<label id="6502-mode"><p>
+<sect1>6502<label id="6502-mode"><p>
 
-The default (no CPU given on the command line or in the <tt/GLOBAL/ section of
-the info file) is the 6502 CPU. The disassembler knows all "official" opcodes
-for this CPU. Invalid opcodes are translated into <tt/.byte/ commands.
+The original NMOS 6502 CPU.
 
-<sect2>6502X mode<label id="6502X-mode"><p>
+For Example: MOS MCS6502 Rev. D, Rockwell R6502, Synertek SY6502, UMC UM6502
+
+(56 instructions, 151 opcodes)
+
+<tscreen><verb>
+$00  brk
+$01  ora (zp,x)
+$05  ora zp
+$06  asl zp
+$08  php
+$09  ora #imm
+$0a  asl a
+$0d  ora addr
+$0e  asl addr
+$10  bpl rel80
+$11  ora (zp),y
+$15  ora zp,x
+$16  asl zp,x
+$18  clc
+$19  ora addr,y
+$1d  ora addr,x
+$1e  asl addr,x
+$20  jsr addr
+$21  and (zp,x)
+$24  bit zp
+$25  and zp
+$26  rol zp
+$28  plp
+$29  and #imm
+$2a  rol a
+$2c  bit addr
+$2d  and addr
+$2e  rol addr
+$30  bmi rel8
+$31  and (zp),y
+$35  and zp,x
+$36  rol zp,x
+$38  sec
+$39  and addr,y
+$3d  and addr,x
+$3e  rol addr,x
+$40  rti
+$41  eor (zp,x)
+$45  eor zp
+$46  lsr zp
+$48  pha
+$49  eor #imm
+$4a  lsr a
+$4c  jmp addr
+$4d  eor addr
+$4e  lsr addr
+$50  bvc rel8
+$51  eor (zp),y
+$55  eor zp,x
+$56  lsr zp,x
+$58  cli
+$59  eor addr,y
+$5d  eor addr,x
+$5e  lsr addr,x
+$60  rts
+$61  adc (zp,x)
+$65  adc zp
+$66  ror zp
+$68  pla
+$69  adc #imm
+$6a  ror a
+$6c  jmp (addr)
+$6d  adc addr
+$6e  ror addr
+$70  bvs rel8
+$71  adc (zp),y
+$75  adc zp,x
+$76  ror zp,x
+$78  sei
+$79  adc addr,y
+$7d  adc addr,x
+$7e  ror addr,x
+$81  sta (zp,x)
+$84  sty zp
+$85  sta zp
+$86  stx zp
+$88  dey
+$8a  txa
+$8c  sty addr
+$8d  sta addr
+$8e  stx addr
+$90  bcc rel8
+$91  sta (zp),y
+$94  sty zp,x
+$95  sta zp,x
+$96  stx zp,y
+$98  tya
+$99  sta addr,y
+$9a  txs
+$9d  sta addr,x
+$a0  ldy #imm
+$a1  lda (zp,x)
+$a2  ldx #imm
+$a4  ldy zp
+$a5  lda zp
+$a6  ldx zp
+$a8  tay
+$a9  lda #imm
+$aa  tax
+$ac  ldy addr
+$ad  lda addr
+$ae  ldx addr
+$b0  bcs rel8
+$b1  lda (zp),y
+$b4  ldy zp,x
+$b5  lda zp,x
+$b6  ldx zp,y
+$b8  clv
+$b9  lda addr,y
+$ba  tsx
+$bc  ldy addr,x
+$bd  lda addr,x
+$be  ldx addr,y
+$c0  cpy #imm
+$c1  cmp (zp,x)
+$c4  cpy zp
+$c5  cmp zp
+$c6  dec zp
+$c8  iny
+$c9  cmp #imm
+$ca  dex
+$cc  cpy addr
+$cd  cmp addr
+$ce  dec addr
+$d0  bne rel8
+$d1  cmp (zp),y
+$d5  cmp zp,x
+$d6  dec zp,x
+$d8  cld
+$d9  cmp addr,y
+$dd  cmp addr,x
+$de  dec addr,x
+$e0  cpx #imm
+$e1  sbc (zp,x)
+$e4  cpx zp
+$e5  sbc zp
+$e6  inc zp
+$e8  inx
+$e9  sbc #imm
+$ea  nop
+$ec  cpx addr
+$ed  sbc addr
+$ee  inc addr
+$f0  beq rel81
+$f1  sbc (zp),y
+$f5  sbc zp,x
+$f6  inc zp,x
+$f8  sed
+$f9  sbc addr,y
+$fd  sbc addr,x
+$fe  inc addr,x
+</verb></tscreen>
+
+
+
+<sect1>6502X<label id="6502X-mode"><p>
 
 6502X mode is an extension to the normal 6502 mode. In this mode, several
 mnemonics for undocumented instructions of the NMOS 6502 CPUs are accepted.
@@ -50,61 +206,239 @@ mnemonics for undocumented instructions of the NMOS 6502 CPUs are accepted.
 Note: Since these instructions are undocumented, there are no official mnemonics
 for them.
 
+(20 new instructions, 105 new opcodes, 76 instructions/256 opcodes total)
+
 <itemize>
-<item><tt>ALR: A:=(A and #{imm})/2;</tt>
-<item><tt>ANC: A:= A and #{imm};</tt> Generates opcode &dollar;0B.
-<item><tt>ANE: A:= (A or CONST) and X and #{imm};</tt>
-<item><tt>ARR: A:=(A and #{imm})/2;</tt>
-<item><tt>AXS: X:=A and X-#{imm};</tt>
-<item><tt>DCP: {addr}:={addr}-1; A-{addr};</tt>
-<item><tt>ISC: {addr}:={addr}+1; A:=A-{addr};</tt>
+<item><tt>ALR: A:=(A and #imm)/2;</tt>
+<item><tt>ANC: A:= A and #imm;</tt> Generates opcode &dollar;0B.
+<item><tt>ANE: A:= (A or CONST) and X and #imm;</tt>
+<item><tt>ARR: A:=(A and #imm)/2;</tt>
+<item><tt>AXS: X:=A and X-#imm;</tt>
+<item><tt>DCP: addr:=addr-1; A-addr;</tt>
+<item><tt>ISC: addr:=addr+1; A:=A-addr;</tt>
 <item><tt>JAM:</tt>
-<item><tt>LAS: A,X,S:={addr} and S;</tt>
-<item><tt>LAX: A,X:={addr};</tt>
-<item><tt>NOP: #{imm}; zp; zp,x; abs; abs,x</tt>
-<item><tt>RLA: {addr}:={addr}rol; A:=A and {addr};</tt>
-<item><tt>RRA: {addr}:={addr}ror; A:=A adc {addr};</tt>
-<item><tt>SAX: {addr}:=A and X;</tt>
-<item><tt>SHA: {addr}:=A and X and {addr hi +1};</tt>
-<item><tt>SHX: {addr}:=X and {addr hi +1};</tt>
-<item><tt>SHY: {addr}:=Y and {addr hi +1};</tt>
-<item><tt>SLO: {addr}:={addr}*2; A:=A or {addr};</tt>
-<item><tt>SRE: {addr}:={addr}/2; A:=A xor {addr};</tt>
-<item><tt>TAS: {addr}:=A and X and {addr hi +1}; SP:=A and X;</tt>
+<item><tt>LAS: A,X,S:=addr and S;</tt>
+<item><tt>LAX: A,X:=addr;</tt>
+<item><tt>NOP: #imm; zp; zp,x; abs; abs,x</tt>
+<item><tt>RLA: addr:=addrrol; A:=A and addr;</tt>
+<item><tt>RRA: addr:=addrror; A:=A adc addr;</tt>
+<item><tt>SAX: addr:=A and X;</tt>
+<item><tt>SHA: addr:=A and X and {addr hi +1};</tt>
+<item><tt>SHX: addr:=X and {addr hi +1};</tt>
+<item><tt>SHY: addr:=Y and {addr hi +1};</tt>
+<item><tt>SLO: addr:=addr*2; A:=A or addr;</tt>
+<item><tt>SRE: addr:=addr/2; A:=A xor addr;</tt>
+<item><tt>TAS: addr:=A and X and {addr hi +1}; SP:=A and X;</tt>
 </itemize>
 
+<tscreen><verb>
+$02  jam
+$03  slo (zp,x)
+$04  nop zp
+$07  slo zp
+$0b  anc #imm
+$0c  nop addr
+$0f  slo addr
+$12  jam
+$13  slo (zp),y
+$14  nop zp,x
+$17  slo zp,y
+$1a  nop
+$1b  slo addr,y
+$1c  nop addr,x
+$1f  slo addr,x
+$22  jam
+$23  rla (zp,x)
+$27  rla zp
+$2b  anc #imm
+$2f  rla addr
+$32  jam
+$33  rla (zp),y
+$34  nop zp,x
+$37  rla zp,y
+$3a  nop
+$3b  rla addr,y
+$3c  nop addr,x
+$3f  rla addr,x
+$42  jam
+$43  sre (zp,x)
+$44  nop zp
+$47  sre zp
+$4b  alr #imm
+$4f  sre addr
+$52  jam
+$53  sre (zp),y
+$54  nop zp,x
+$57  sre zp,y
+$5a  nop
+$5b  sre addr,y
+$5c  nop addr,x
+$5f  sre addr,x
+$62  jam
+$63  rra (zp,x)
+$64  nop zp
+$67  rra zp
+$6b  arr #imm
+$6f  rra addr
+$72  jam
+$73  rra (zp),y
+$74  nop zp,x
+$77  rra zp,y
+$7a  nop
+$7b  rra addr,y
+$7c  nop addr,x
+$7f  rra addr,x
+$80  nop #imm
+$82  nop #imm
+$83  sax (zp,x)
+$87  sax zp
+$89  nop #imm
+$8b  ane #imm
+$8f  sax addr
+$92  jam
+$93  sha (zp),y
+$97  sax zp,y
+$9b  tas addr,y
+$9c  shy addr,x
+$9e  shx addr,y
+$9f  sha addr,y
+$a3  lax (zp,x)
+$a7  lax zp
+$ab  lax #imm
+$af  lax addr
+$b2  jam
+$b3  lax (zp),y
+$b7  lax zp,y
+$bb  las addr,y
+$bf  lax addr,y
+$c2  nop #imm
+$c3  dcp (zp,x)
+$c7  dcp zp
+$cb  axs #imm
+$cf  dcp addr
+$d2  jam
+$d3  dcp (zp),y
+$d4  nop zp,x
+$d7  dcp zp,y
+$da  nop
+$db  dcp addr,y
+$dc  nop addr,x
+$df  dcp addr,x
+$e2  nop #imm
+$e3  isc (zp,x)
+$e7  isc zp
+$eb  sbc #imm
+$ef  isc addr
+$f2  jam
+$f3  isc (zp),y
+$f4  nop zp,x
+$f7  isc zp,y
+$fa  nop
+$fb  isc addr,y
+$fc  nop addr,x
+$ff  isc addr,x
+</verb></tscreen>
 
-<sect2>DTV mode<label id="DTV-mode"><p>
-
-The C64DTV CPU is based on the 6510, but adds some instructions, and does not
-support all undocumented instructions.
-
-<itemize>
-<item><tt>bra {rel}</tt> Generates opcode &dollar;12.
-<item><tt>sac #{imm}</tt> Generates opcode &dollar;32.
-<item><tt>sir #{imm}</tt> Generates opcode &dollar;42.
-</itemize>
-
-Supported undocumented instructions:
-
-<itemize>
-<item><tt>ALR: A:=(A and #{imm})/2;</tt>
-<item><tt>ANC: A:=A and #{imm};</tt> Generates opcode &dollar;0B.
-<item><tt>ARR: A:=(A and #{imm})/2;</tt>
-<item><tt>AXS: X:=A and X-#{imm};</tt>
-<item><tt>LAS: A,X,S:={addr} and S;</tt>
-<item><tt>LAX: A,X:={addr};</tt>
-<item><tt>NOP: #{imm}; zp; zp,x; abs; abs,x</tt>
-<item><tt>RLA: {addr}:={addr}rol; A:=A and {addr};</tt>
-<item><tt>RRA: {addr}:={addr}ror; A:=A adc {addr};</tt>
-<item><tt>SHX: {addr}:=X and {addr hi +1};</tt>
-<item><tt>SHY: {addr}:=y and {addr hi +1};</tt>
-</itemize>
 
 
-<sect2>65SC02 (Original CMOS)<label id="65SC02-mode"><p>
+<sect1>6502DTV<label id="DTV-mode"><p>
 
-The first CMOS instruction set, without bit manipulation or wai/stp.
+The CPU of the C64 DTV is based on the 6510. It adds some instructions, and does
+not support all undocumented 6510 instructions.
+
+(3+10 new instructions, 3+56 new opcodes, 69 instructions/210 opcodes total)
+
+Opcodes added over 6502 (these are JAM on 6502):
+
+<tscreen><verb>
+$12  bra rel8
+$32  sac #imm
+$42  sir #imm
+</verb></tscreen>
+
+Supported undocumented 6510 instructions (nop, anc, rla, lax, las, alr, arr,
+rra, shy, shx, axs, sbc):
+
+<tscreen><verb>
+$04  nop zp
+$0b  anc #imm
+$0c  nop addr
+$14  nop zp,x
+$1a  nop
+$1c  nop addr,x
+$23  rla (zp,x)
+$27  rla zp
+$2b  anc #imm
+$2f  rla addr
+$33  rla (zp),y
+$34  nop zp,x
+$37  rla zp,y
+$3a  nop
+$3b  rla addr,y
+$3c  nop addr,x
+$3f  rla addr,x
+$44  nop zp
+$4b  alr #imm
+$54  nop zp,x
+$5a  nop
+$5c  nop addr,x
+$63  rra (zp,x)
+$64  nop zp
+$67  rra zp
+$6b  arr #imm
+$6f  rra addr
+$73  rra (zp),y
+$74  nop zp,x
+$77  rra zp,y
+$7a  nop
+$7b  rra addr,y
+$7c  nop addr,x
+$7f  rra addr,x
+$80  nop #imm
+$82  nop #imm
+$89  nop #imm
+$9c  shy addr,x
+$9e  shx addr,y
+$a3  lax (zp,x)
+$a7  lax zp
+$ab  lax #imm
+$af  lax addr
+$b3  lax (zp),y
+$b7  lax zp,y
+$bb  las addr,y
+$bf  lax addr,y
+$c2  nop #imm
+$cb  axs #imm
+$d4  nop zp,x
+$da  nop
+$dc  nop addr,x
+$e2  nop #imm
+$eb  sbc #imm
+$f4  nop zp,x
+$fa  nop
+$fc  nop addr,x
+</verb></tscreen>
+
+
+<sect>CMOS branch<p>
+
+The original CMOS version was apparently developed already back in the Commodore
+days, but never saw the light of day. It was then licensed by (now) WDC to
+different other vendors. Unfortunately some of those named their chips "65C02"
+(not SC), which causes a lot of confusion now. So keep that in mind: some chips
+that are named "65C02" will only support the original 65SC02 instruction set.
+
+
+<sect1>65SC02 (Original CMOS)<label id="65SC02-mode"><p>
+
+The first CMOS instruction set, without bit manipulation, nor wai/stp. It adds
+8 new instructions (phx, phy, plx, ply, bra, stz, tsb, trb) and two new address
+modes (zeropage-indirect, absolute-x-indexed-indirect) to the original (legal)
+6502 instructions.
+
+For example: Synertek SY65C02, GTE G65SC02, CMD G65SC02, NCR 65C02
+
+(8 new instructions, 27 new opcodes, 64 instructions/178 opcodes total)
 
 <tscreen><verb>
 $04  tsb zp
@@ -137,32 +471,81 @@ $fa  plx
 </verb></tscreen>
 
 
-<sect2>65C02 (CMOS with Rockwell extensions)<label id="65C02-mode"><p>
 
-The 65C02 understands the same opcodes as the 65SC02, plus 16 additional bit
-manipulation and bit test-and-branch commands.
+<sect1>65C02 (CMOS with Rockwell extensions)<label id="65C02-mode"><p>
 
-The R65C02 adds bit manipulation instructions:
+The Rockwell extensions add additional bit manipulation and bit test-and-branch
+commands to the original 65SC02 instruction set.
+
+For Example: Rockwell R65C02, Ricoh RP65C02, NCR 65CX02
+
+(4 new instructions, 32 new opcodes, 68 instructions/210 opcodes total)
 
 <tscreen><verb>
-smbB zp         set bit in zp location
-rmbB zp         reset bit in zp location
-bbsB zp, rel8   branch if bit is set in zp location
-bbrB zp, rel8   branch if bit is reset in zp location
+$07  rmb0 zp          clear bit in zp location
+$0f  bbr0 zp, rel8    branch if bit is not set in zp location
+$17  rmb1 zp
+$1f  bbr1 zp, rel8
+$27  rmb2 zp
+$2f  bbr2 zp, rel8
+$37  rmb3 zp
+$3f  bbr3 zp, rel8
+$47  rmb4 zp
+$4f  bbr4 zp, rel8
+$57  rmb5 zp
+$5f  bbr5 zp, rel8
+$67  rmb6 zp
+$6f  bbr6 zp, rel8
+$77  rmb7 zp
+$7f  bbr7 zp, rel8
+$87  smb0 zp          set bit in zp location
+$8f  bbs0 zp, rel8    branch if bit is set in zp location
+$97  smb1 zp
+$9f  bbs1 zp, rel8
+$a7  smb2 zp
+$af  bbs2 zp, rel8
+$b7  smb3 zp
+$bf  bbs3 zp, rel8
+$c7  smb4 zp
+$cf  bbs4 zp, rel8
+$d7  smb5 zp
+$df  bbs5 zp, rel8
+$e7  smb6 zp
+$ef  bbs6 zp, rel8
+$f7  smb7 zp
+$ff  bbs7 zp, rel8
 </verb></tscreen>
 
+All "illegal" opcodes perform NOP on this CPU.
 
-<sect2>W65C02 (CMOS with WDC extensions)<label id="W65C02-mode"><p>
 
-This mode also supports wai/stp.
+
+<sect1>W65C02 (CMOS with WDC extensions)<label id="W65C02-mode"><p>
+
+For their W65C02S WDC took the Rockwell extensions, and added two extra
+instructions (which they also added to the 65C816/65C802)
+
+(2 new instructions, 2 new opcodes, 70 instructions/212 opcodes total)
 
 <tscreen><verb>
 $cb  wai    wait for interrupt
 $db  stp    wait for reset
 </verb></tscreen>
 
+All "illegal" opcodes perform NOP on this CPU.
 
-<sect2>65CE02 (CMOS with GTE extensions)<label id="65CE02-mode"><p>
+
+
+<sect1>65CE02 (CMOS with CSG extensions)<label id="65CE02-mode"><p>
+
+CSG took the Rockwell extensions and developed them further. Notable additions
+are long relative branches/jumps, and finally a real z register. Note that the
+two opcodes used by the WDC extensions have been repurposed for something else,
+so the 65CE02 is not 100% compatible with the W65C02.
+
+For Example: CSG 65CE02 (used on the Amiga A2232 Serial Card)
+
+(34 new instructions, 46 new opcodes, 102 instructions/256 opcodes total)
 
 <tscreen><verb>
 $02  cle              clear stack extend disable
@@ -225,18 +608,48 @@ $fb  plz              pull Z
 $fc  phw abs16
 </verb></tscreen>
 
+One notable change is that some instructions of the original CMOS instruction set
+were changed from "zeropage indirect" addressing to "zeropage indirect, z indexed".
+This could be done, because the z register is initially guaranteed to be zero,
+making the CPU binary compatible with older CMOS variants.
 
-<sect2>4510 mode<label id="4510-mode"><p>
+<tscreen><verb>
+$12  ora (zp)  ->  ora (zp), z
+$32  and (zp)  ->  and (zp), z
+$52  eor (zp)  ->  eor (zp), z
+$72  adc (zp)  ->  adc (zp), z
+$92  sta (zp)  ->  sta (zp), z
+$b2  lda (zp)  ->  cmp (zp), z
+$d2  cmp (zp)  ->  lda (zp), z
+$f2  sbc (zp)  ->  sbc (zp), z
+</verb></tscreen>
+
+Additional to that, the meaning of the following instruction changes from "store
+zero" to "store z register". Again, this makes the CPU binary compatible with
+older CMOS variants
+
+<tscreen><verb>
+$64  stz zp
+$74  stz zp, x
+$9c  stz abs16
+$9e  stz abs16, x
+</verb></tscreen>
+
+The other 65SC02 instructions (phx, phy, plx, ply, tsb, trb, bra) are unchanged.
+
+
+
+<sect1>4510<label id="4510-mode"><p>
 
 The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
 It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
 address mapping for 20 bits of address space (1 megabyte addressable area).
 
-The 4510 mode supports the complete (legal) 65CE02 instruction set, but changes
+The 4510 supports the complete 65CE02 instruction set, but changes
 the 4-Byte NOP into the "map" instruction:
 
 <tscreen><verb>
-$5c  map             "4-byte NOP reserved for future expansion" on 65CE02
+$5c  map
 </verb></tscreen>
 
 For more information about the Commodore C65/C64DX and the 4510 CPU, see
@@ -244,152 +657,313 @@ For more information about the Commodore C65/C64DX and the 4510 CPU, see
 <url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
 
 
-<sect2>45GS02 mode<label id="45GS02-mode"><p>
+
+<sect1>45GS02<label id="45GS02-mode"><p>
 
 The 45GS02 is a microcontroller that is the core of the MEGA65.
 It is an extension of the 4510 CPU and adds 32-bit addressing and a 32-bit
 pseudo register Q that is comprised of the four registers A, X, Y, and Z.
 
 <tscreen><verb>
-$42 $42 $05         orq $12
-$42 $42 $06         aslq $12
-$42 $42 $0a         aslq
-$42 $42 $0d         orq $1234
-$42 $42 $0e         aslq $1234
-$42 $42 $12         orq ($12)
-$42 $42 $16         aslq $12,x
-$42 $42 $1a         inq
-$42 $42 $1e         aslq $1234,x
-$42 $42 $24         bitq $12
-$42 $42 $25         andq $12
-$42 $42 $26         rolq $12
-$42 $42 $2a         rolq
-$42 $42 $2c         bitq $1234
-$42 $42 $2d         andq $1234
-$42 $42 $2e         rolq $1234
-$42 $42 $32         andq ($12)
-$42 $42 $36         rolq $12, x
-$42 $42 $3a         deq
-$42 $42 $3e         rolq $1234, x
-$42 $42 $43         asrq
-$42 $42 $44         asrq $12
-$42 $42 $45         eorq $12
-$42 $42 $46         lsrq $12
-$42 $42 $4a         lsrq
-$42 $42 $4d         eorq $1234
-$42 $42 $4e         lsrq $1234
-$42 $42 $52         eorq ($12)
-$42 $42 $54         asrq $12, x
-$42 $42 $56         lsrq $12, x
-$42 $42 $5e         lsrq $1234, x
-$42 $42 $65         adcq $12
-$42 $42 $66         rorq $12
-$42 $42 $6a         rorq
-$42 $42 $6d         adcq $1234
-$42 $42 $6e         rorq $1234
-$42 $42 $72         adcq ($12)
-$42 $42 $76         rorq $12, x
-$42 $42 $7e         rorq $1234, x
-$42 $42 $85         stq $12
-$42 $42 $8d         stq $1234
-$42 $42 $92         stq ($12)
-$42 $42 $a5         ldq $12
-$42 $42 $ad         ldq $1234
-$42 $42 $b2         ldq ($12), z
-$42 $42 $c5         cmpq $12
-$42 $42 $c6         deq $12
-$42 $42 $cd         cmpq $1234
-$42 $42 $ce         deq $1234
-$42 $42 $d2         cmpq ($12)
-$42 $42 $d6         deq $12, x
-$42 $42 $de         deq $1234, x
-$42 $42 $e5         sbcq $12
-$42 $42 $e6         inq $12
-$42 $42 $ed         sbcq $1234
-$42 $42 $ee         inq $1234
-$42 $42 $f2         sbcq ($12)
-$42 $42 $f6         inq $12, x
-$42 $42 $fe         inq $1234, x
+$42 $42 $05      orq zp
+$42 $42 $06      aslq zp
+$42 $42 $0a      aslq
+$42 $42 $0d      orq addr
+$42 $42 $0e      aslq addr
+$42 $42 $12      orq (zp)
+$42 $42 $16      aslq zp,x
+$42 $42 $1a      inq
+$42 $42 $1e      aslq addr,x
+$42 $42 $24      bitq zp
+$42 $42 $25      andq zp
+$42 $42 $26      rolq zp
+$42 $42 $2a      rolq
+$42 $42 $2c      bitq addr
+$42 $42 $2d      andq addr
+$42 $42 $2e      rolq addr
+$42 $42 $32      andq (zp)
+$42 $42 $36      rolq zp, x
+$42 $42 $3a      deq
+$42 $42 $3e      rolq addr, x
+$42 $42 $43      asrq
+$42 $42 $44      asrq zp
+$42 $42 $45      eorq zp
+$42 $42 $46      lsrq zp
+$42 $42 $4a      lsrq
+$42 $42 $4d      eorq addr
+$42 $42 $4e      lsrq addr
+$42 $42 $52      eorq (zp)
+$42 $42 $54      asrq zp, x
+$42 $42 $56      lsrq zp, x
+$42 $42 $5e      lsrq addr, x
+$42 $42 $65      adcq zp
+$42 $42 $66      rorq zp
+$42 $42 $6a      rorq
+$42 $42 $6d      adcq addr
+$42 $42 $6e      rorq addr
+$42 $42 $72      adcq (zp)
+$42 $42 $76      rorq zp, x
+$42 $42 $7e      rorq addr, x
+$42 $42 $85      stq zp
+$42 $42 $8d      stq addr
+$42 $42 $92      stq (zp)
+$42 $42 $a5      ldq zp
+$42 $42 $ad      ldq addr
+$42 $42 $b2      ldq (zp), z
+$42 $42 $c5      cmpq zp
+$42 $42 $c6      deq zp
+$42 $42 $cd      cmpq addr
+$42 $42 $ce      deq addr
+$42 $42 $d2      cmpq (zp)
+$42 $42 $d6      deq zp, x
+$42 $42 $de      deq addr, x
+$42 $42 $e5      sbcq zp
+$42 $42 $e6      inq zp
+$42 $42 $ed      sbcq addr
+$42 $42 $ee      inq addr
+$42 $42 $f2      sbcq (zp)
+$42 $42 $f6      inq zp, x
+$42 $42 $fe      inq addr, x
 
-$ea $12             ora [$12], z
-$ea $32             and [$12], z
-$ea $52             eor [$12], z
-$ea $72             adc [$12], z
-$ea $92             sta [$12], z
-$ea $b2             lda [$12], z
-$ea $d2             cmp [$12], z
-$ea $f2             sbc [$12], z
+$ea $12          ora [zp], z
+$ea $32          and [zp], z
+$ea $52          eor [zp], z
+$ea $72          adc [zp], z
+$ea $92          sta [zp], z
+$ea $b2          lda [zp], z
+$ea $d2          cmp [zp], z
+$ea $f2          sbc [zp], z
 
-$42 $42 $ea $12     orq [$12]
-$42 $42 $ea $32     andq [$12]
-$42 $42 $ea $52     eorq [$12]
-$42 $42 $ea $72     adcq [$12]
-$42 $42 $ea $92     stq [$12]
-$42 $42 $ea $b2     ldq [$12], z
-$42 $42 $ea $d2     cmpq [$12]
-$42 $42 $ea $f2     sbcq [$12]
+$42 $42 $ea $12  orq [zp]
+$42 $42 $ea $32  andq [zp]
+$42 $42 $ea $52  eorq [zp]
+$42 $42 $ea $72  adcq [zp]
+$42 $42 $ea $92  stq [zp]
+$42 $42 $ea $b2  ldq [zp], z
+$42 $42 $ea $d2  cmpq [zp]
+$42 $42 $ea $f2  sbcq [zp]
 </verb></tscreen>
 
 
-<sect2>HUC6280 mode<label id="HUC6280-mode"><p>
+<sect1>HUC6280<label id="HUC6280-mode"><p>
 
-The HUC6280 is a superset of 65C02. It adds some other instructions:
+The HUC6280 is a superset of 65C02. It implements the original CMOS instructions
+with Rockwell extensions, plus some other instructions:
 
 <tscreen><verb>
 $02  sxy
-$03  st0 #{imm}
-$13  st1 #{imm}
+$03  st0 #imm
+$13  st1 #imm
 $22  sax
-$23  st2 #{imm}
+$23  st2 #imm
 $42  say
-$43  tma #{imm}
-$44  bsr {rel}
-$53  tam #{imm}
+$43  tma #imm
+$44  bsr rel8
+$53  tam #imm
 $54  csl
 $62  cla
-$73  tii {addr}, {addr}, {addr}
+$73  tii addr, addr, addr
 $82  clx
-$83  tst #{imm}, {zp}
+$83  tst #imm, zp
 $82  clx
-$83  tst #{imm}, {zp}
-$93  tst #{imm}, {addr}
-$a3  tst #{imm}, {zp}, x
-$b3  tst #{imm}, {addr}, x
+$83  tst #imm, zp
+$93  tst #imm, addr
+$a3  tst #imm, zp, x
+$b3  tst #imm, addr, x
 $c2  cly
-$c3  tdd {addr}, {addr}, {addr}
-$d3  tin {addr}, {addr}, {addr}
+$c3  tdd addr, addr, addr
+$d3  tin addr, addr, addr
 $d4  csh
-$e3  tia {addr}, {addr}, {addr}
-$f3  tai {addr}, {addr}, {addr}
+$e3  tia addr, addr, addr
+$f3  tai addr, addr, addr
 $f4  set
 </verb></tscreen>
 
 
-<sect2>M740 mode<label id="M740-mode"><p>
+<sect1>M740<label id="M740-mode"><p>
 
 The M740 is a microcontroller by Mitsubishi, which was marketed for embedded
-devices in the mid 80s. It is a superset of 6502, and a subset of 65SC02, plus
-some new instructions.
+devices in the mid 80s. It is a superset of 6502, the added CMOS instructions
+seem to be completely custom however:
+
+<tscreen><verb>
+$02  jsr (zp)
+$03  bbs0 a, rel8
+$07  bbs0 zp, rel8
+$0b  seb0 a
+$0f  seb0 zp
+$12  clt
+$13  bbc0 a, rel8
+$17  bbc0 zp, rel8
+$1a  inc a
+$1b  clb0 a
+$1f  clb0 zp
+$22  jsr $ff12
+$23  bbs1 a, rel8
+$27  bbs1 zp, rel8
+$2b  seb1 a
+$2f  seb1 zp
+$32  set
+$33  bbc1 a, rel8
+$37  bbc1 zp, rel8
+$3a  dec a
+$3b  clb1 a
+$3c  ldm zp, #imm
+$3f  clb1 zp
+$42  stp
+$43  bbs2 a, rel8
+$44  com zp
+$47  bbs2 zp, rel8
+$4b  seb2 a
+$4f  seb2 zp
+$53  bbc2 a, rel8
+$57  bbc2 zp, rel8
+$5b  clb2 a
+$5f  clb2 zp
+$63  bbs3 a, rel8
+$64  tst zp
+$67  bbs3 zp, rel8
+$6b  seb3 a
+$6f  seb3 zp
+$73  bbc3 a, rel8
+$77  bbc3 zp, rel8
+$7b  clb3 a
+$7f  clb3 zp
+$80  bra rel8
+$82  rrf zp
+$83  bbs4 a, rel8
+$87  bbs4 zp, rel8
+$8b  seb4 a
+$8f  seb4 zp
+$93  bbc4 a, rel8
+$97  bbc4 zp, rel8
+$9b  clb4 a
+$9f  clb4 zp
+$a3  bbs5 a, rel8
+$a7  bbs5 zp, rel8
+$ab  seb5 a
+$af  seb5 zp
+$b2  lda (zp)
+$b3  bbc5 a, rel8
+$b7  bbc5 zp, rel8
+$bb  clb5 a
+$bf  clb5 zp
+$c2  slw
+$c3  bbs6 a, rel8
+$c7  bbs6 zp, rel8
+$cb  seb6 a
+$cf  seb6 zp
+$d3  bbc6 a, rel8
+$d7  bbc6 zp, rel8
+$db  clb6 a
+$df  clb6 zp
+$e2  fst
+$e3  bbs7 a, rel8
+$e7  bbs7 zp, rel8
+$eb  seb7 a
+$ef  seb7 zp
+$f3  bbc7 a, rel8
+$f7  bbc7 zp, rel8
+$fb  clb7 a
+$ff  clb7 zp
+</verb></tscreen>
+
+Four instructions are the same on 65SC02:
+
+<tscreen><verb>
+$1a  inc a
+$3a  dec a
+$80  bra rel8
+$b2  lda (zp)
+</verb></tscreen>
+
+These four instructions are different from 65SC02:
+
+<tscreen><verb>
+$12  ora (zp)     -> clt
+$32  and (zp)     -> set
+$3c  bit addr,x   -> ldm zp, #imm
+$64  stz zp       -> tst zp
+</verb></tscreen>
+
+The following 65SC02 instructions are not implemented:
+
+<tscreen><verb>
+$04  tsb zp
+$0c  tsb addr
+$14  trb zp
+$1c  trb addr
+$34  bit zp,y
+$52  eor (zp)
+$5a  phy
+$72  adc (zp)
+$74  stz zp,y
+$7a  ply
+$7c  jmp (addr)
+$89  bit #imm8
+$92  sta (zp)
+$9c  stz addr
+$9e  stz addr,x
+$d2  cmp (zp)
+$da  phx
+$f2  sbc (zp)
+$fa  plx
+</verb></tscreen>
+
+
 
 For more information about the M740 Controllers, see
 <url url="https://en.wikipedia.org/wiki/Mitsubishi_740" name="Wikipedia">.
 
 
 
-<sect2>65816 mode<label id="65816-mode"><p><p>
+<sect1>65816<label id="65816-mode"><p><p>
 
-The 65816 support requires annotating ranges with the M and X flag states.
-This can be recorded with an emulator that supports Code and Data Logging,
-for example. Disassemble one bank at a time.
+The 65816 is a 16bit CPU developed by WDC.
 
+<sect>other<p>
 
-<sect2>Sweet16<label id="sweet16-mode"><p><p>
+<sect1>Sweet16<label id="sweet16-mode"><p><p>
 
 SWEET 16 is an interpreter for a pseudo 16 bit CPU written by Steve Wozniak
 for the Apple ][ machines. It is available in the Apple ][ ROM.
 
+It implements the following opcodes:
+
+<tscreen><verb>
+00   1     RTN                                (Return to 6502 mode)
+01   2     BR        ea                       (Branch always)
+02   2     BNC       ea                       (Branch if No Carry)
+03   2     BC        ea                       (Branch if Carry)
+04   2     BP        ea                       (Branch if Plus)
+05   2     BM        ea                       (Branch if Minus)
+06   2     BZ        ea                       (Branch if Zero)
+07   2     BNZ       ea                       (Branch if NonZero)
+08   2     BM1       ea                       (Branch if Minus 1)
+09   2     BNM1      ea                       (Branch if Not Minus 1)
+0A   1     BK                                 (Break to Monitor)
+0B   1     RS                                 (Return from Subroutine)
+0C   1     BS        ea                       (Branch to Subroutine)
+1n   3     SET       Rn    R<-2 byte constant (Set Constant) (load register immediate)
+2n   1     LD        Rn    ACC<-R             (Load)
+3n   1     ST        Rn    ACC->R (Store)
+4n   1     LD        @Rn   ACC<-@R, R<-R+1    (Load Indirect)
+5n   1     ST        @Rn   ACC->@R, R<-R+1    (Store Indirect)
+6n   1     LDD       @Rn   ACC<-@R double     (Load Double Indirect)
+7n   1     STD       @Rn   ACC->@R double     (Store Double Indirect)
+8n   1     POP       @Rn   R<-R-1, ACC<-@R    (pop) (Pop Indirect)
+9n   1     STP       @Rn   R<-R-1, ACC->@R    (Store POP Indirect)
+An   1     ADD       Rn    ACC<-@R            (pop) double (Add)
+Bn   1     SUB       Rn    compare ACC to R   (Sub)
+Cn   1     POPD      @Rn   ACC<-ACC+R         (Pop Double Indirect)
+Dn   1     CPR       Rn    ACC<-ACC-R         (Compare)
+En   1     INR       Rn    R<-R+1             (Increment)
+Fn   1     DCR       Rn    R<-R-1             (Decrement)
+</verb></tscreen>
+
 For more information about SWEET 16, see
 <url url="http://www.6502.org/source/interpreters/sweet16.htm">.
+
 
 
 <sect>Copyright<p>

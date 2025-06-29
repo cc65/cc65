@@ -33,6 +33,7 @@
 
 
 
+#include <stdbool.h>
 #include <limits.h>
 
 /* common */
@@ -63,10 +64,12 @@
 
 typedef struct SwitchCtrl SwitchCtrl;
 struct SwitchCtrl {
-    Collection* Nodes;          /* CaseNode tree */
-    const Type* ExprType;       /* Switch controlling expression type */
-    unsigned    Depth;          /* Number of bytes the selector type has */
-    unsigned    DefaultLabel;   /* Label for the default branch */
+    Collection* Nodes;             /* CaseNode tree */
+    const Type* ExprType;          /* Switch controlling expression type */
+    unsigned    Depth;             /* Number of bytes the selector type has */
+    unsigned    DefaultLabel;      /* Label for the default branch */
+    CodeMark    CaseCodeStart;     /* Start of code marker */
+    bool        CaseCodeStartFlag; /* flag to tell if we've done an override */
 
 
 
@@ -87,7 +90,6 @@ void SwitchStatement (void)
 /* Handle a switch statement for chars with a cmp cascade for the selector */
 {
     ExprDesc    SwitchExpr;     /* Switch statement expression */
-    CodeMark    CaseCodeStart;  /* Start of code marker */
     CodeMark    SwitchCodeStart;/* Start of switch code */
     CodeMark    SwitchCodeEnd;  /* End of switch code */
     unsigned    ExitLabel;      /* Exit label */
@@ -124,12 +126,15 @@ void SwitchStatement (void)
     ** will get removed by the optimizer if it is unnecessary.
     */
     SwitchCodeLabel = GetLocalLabel ();
-    g_jump (SwitchCodeLabel);
+    /* save state for switch logic */
+    g_switchsave (SizeOf (SwitchExpr.Type));
 
     /* Remember the current code position. We will move the switch code
-    ** to this position later.
+    ** to this position later.  This will get overwritten if we actually
+    ** find a "case" or "default" label.
     */
-    GetCodePos (&CaseCodeStart);
+    GetCodePos (&SwitchData.CaseCodeStart);
+    SwitchData.CaseCodeStartFlag = false;
 
     /* Setup the control structure, save the old and activate the new one */
     SwitchData.Nodes        = NewCollection ();
@@ -172,6 +177,9 @@ void SwitchStatement (void)
     /* Output the switch code label */
     g_defcodelabel (SwitchCodeLabel);
 
+    /* restore state for switch logic */
+    g_switchrest (SwitchData.Depth);
+
     /* Generate code */
     if (SwitchData.DefaultLabel == 0) {
         /* No default label, use switch exit */
@@ -181,7 +189,7 @@ void SwitchStatement (void)
 
     /* Move the code to the front */
     GetCodePos (&SwitchCodeEnd);
-    MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &CaseCodeStart);
+    MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &SwitchData.CaseCodeStart);
 
     /* Define the exit label */
     g_defcodelabel (ExitLabel);
@@ -225,6 +233,12 @@ void CaseLabel (void)
         int         OutOfRange  = 0;
         const char* DiagMsg     = 0;
 
+        /* we want switch logic before the first case/default label */
+        if (!Switch->CaseCodeStartFlag) {
+            Switch->CaseCodeStartFlag = true;
+            GetCodePos (&Switch->CaseCodeStart);
+        }
+
         CaseExpr.Type = IntPromotion (Switch->ExprType);
         LimitExprValue (&CaseExpr, 1);
 
@@ -259,8 +273,10 @@ void CaseLabel (void)
         }
 
         if (OutOfRange == 0) {
+            unsigned CodeLabel;
+
             /* Insert the case selector into the selector table */
-            unsigned CodeLabel = InsertCaseValue (Switch->Nodes, CaseExpr.IVal, Switch->Depth);
+            CodeLabel = InsertCaseValue (Switch->Nodes, CaseExpr.IVal, Switch->Depth);
 
             /* Define this label */
             g_defcodelabel (CodeLabel);
@@ -292,6 +308,12 @@ void DefaultLabel (void)
 
         /* Check if we do already have a default branch */
         if (Switch->DefaultLabel == 0) {
+
+            /* we want switch logic before the first case/default label */
+            if (!Switch->CaseCodeStartFlag) {
+                Switch->CaseCodeStartFlag = true;
+                GetCodePos (&Switch->CaseCodeStart);
+            }
 
             /* Generate and emit the default label */
             Switch->DefaultLabel = GetLocalLabel ();

@@ -8,13 +8,20 @@ endif
 
 .SUFFIXES:
 
-all zip:
+all:
 	@$(MAKE) -C src         --no-print-directory $@
 	@$(MAKE) -C libsrc      --no-print-directory $@
 	@$(MAKE) -C doc         --no-print-directory $@
 	@$(MAKE) -C util        --no-print-directory $@
 	@$(MAKE) -C samples     --no-print-directory $@
 	@$(MAKE) checkprefix    --no-print-directory
+
+zip:
+	@$(MAKE) -C src         --no-print-directory $@
+	@$(MAKE) -C libsrc      --no-print-directory $@
+	@$(MAKE) -C doc         --no-print-directory $@
+	@$(MAKE) -C util        --no-print-directory $@
+	@$(MAKE) -C samples     --no-print-directory $@
 
 install:
 ifndef PREFIX

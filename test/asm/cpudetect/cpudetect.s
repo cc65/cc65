@@ -12,6 +12,11 @@
    lax #$ea
 .endif
 
+.ifp6280
+   sax
+   cla
+.endif
+
 .ifpsc02
    jmp ($1234,x)
 .endif
@@ -20,8 +25,13 @@
    rmb0 $12
 .endif
 
-.ifp816
-   xba
+.ifpwc02
+   wai
+   stp
+.endif
+
+.ifpce02
+   ldz #$12
 .endif
 
 .ifp4510
@@ -40,6 +50,14 @@
    jsr $ff12
 .endif
 
+.ifp816
+   xba
+.endif
+
+.ifpsweet16
+   bk
+.endif
+
 
 ; step 2: check for bitwise compatibility of instructions sets
 ;         (made verbose for better reading with hexdump/hd(1))
@@ -56,6 +74,10 @@
    .byte 0,"CPU_ISET_6502X"
 .endif
 
+.if (.cpu .bitand CPU_ISET_6502DTV)
+   .byte 0,"CPU_ISET_6502DTV"
+.endif
+
 .if (.cpu .bitand CPU_ISET_65SC02)
    .byte 0,"CPU_ISET_65SC02"
 .endif
@@ -64,16 +86,12 @@
    .byte 0,"CPU_ISET_65C02"
 .endif
 
-.if (.cpu .bitand CPU_ISET_65816)
-   .byte 0,"CPU_ISET_65816"
+.if (.cpu .bitand CPU_ISET_W65C02)
+   .byte 0,"CPU_ISET_W65C02"
 .endif
 
-.if (.cpu .bitand CPU_ISET_SWEET16)
-   .byte 0,"CPU_ISET_SWEET16"
-.endif
-
-.if (.cpu .bitand CPU_ISET_HUC6280)
-   .byte 0,"CPU_ISET_HUC6280"
+.if (.cpu .bitand CPU_ISET_65CE02)
+   .byte 0,"CPU_ISET_65CE02"
 .endif
 
 .if (.cpu .bitand CPU_ISET_4510)
@@ -84,18 +102,24 @@
    .byte 0,"CPU_ISET_45GS02"
 .endif
 
-.if (.cpu .bitand CPU_ISET_6502DTV)
-   .byte 0,"CPU_ISET_6502DTV"
+.if (.cpu .bitand CPU_ISET_HUC6280)
+   .byte 0,"CPU_ISET_HUC6280"
 .endif
 
 .if (.cpu .bitand CPU_ISET_M740)
    .byte 0,"CPU_ISET_M740"
 .endif
 
-; FIXME: something with 65816 is quirky
-.if (.not .cpu .bitand CPU_ISET_65816)
-    .include "allinst.inc"
+.if (.cpu .bitand CPU_ISET_65816)
+   .byte 0,"CPU_ISET_65816"
 .endif
+
+.if (.cpu .bitand CPU_ISET_SWEET16)
+   .byte 0,"CPU_ISET_SWEET16"
+.endif
+
+
+.include "allinst.inc"
 
 
 ; step 3: switch through all supported cpus to verify the pseudo-op is there
@@ -104,8 +128,12 @@
 .p02X
 .psc02
 .pc02
-.p816
+.pwc02
+.pce02
 .p4510
 .p45GS02
 .pdtv
+.p6280
 .pm740
+.p816
+.psweet16

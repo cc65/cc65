@@ -373,8 +373,16 @@ static void DefineCpuMacros (void)
             DefineNumericMacro ("__CPU_65C02__", 1);
             break;
 
+        case CPU_65CE02:
+            DefineNumericMacro ("__CPU_65CE02__", 1);
+            break;
+
         case CPU_65816:
             DefineNumericMacro ("__CPU_65816__", 1);
+            break;
+
+        case CPU_W65C02:
+            DefineNumericMacro ("__CPU_W65C02__", 1);
             break;
 
         case CPU_HUC6280:
@@ -402,6 +410,8 @@ static void DefineCpuMacros (void)
     DefineNumericMacro ("__CPU_ISET_6502DTV__", CPU_ISET_6502DTV);
     DefineNumericMacro ("__CPU_ISET_65SC02__", CPU_ISET_65SC02);
     DefineNumericMacro ("__CPU_ISET_65C02__", CPU_ISET_65C02);
+    DefineNumericMacro ("__CPU_ISET_W65C02__", CPU_ISET_W65C02);
+    DefineNumericMacro ("__CPU_ISET_65CE02__", CPU_ISET_65CE02);
     DefineNumericMacro ("__CPU_ISET_65816__", CPU_ISET_65816);
     DefineNumericMacro ("__CPU_ISET_HUC6280__", CPU_ISET_HUC6280);
     DefineNumericMacro ("__CPU_ISET_4510__", CPU_ISET_4510);

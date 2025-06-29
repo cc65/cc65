@@ -78,13 +78,12 @@ const unsigned CPUIsets[CPU_COUNT] = {
     CPU_ISET_6502DTV | CPU_ISET_6502,
     CPU_ISET_65SC02  | CPU_ISET_6502,
     CPU_ISET_65C02   | CPU_ISET_6502 | CPU_ISET_65SC02,
-    /* FIXME: does 65816 have both wai/stp and indirect-zp (without z)? */
-    CPU_ISET_65816   | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
+    /* 65816 has wai/stp and NO bit manipulation */
+    CPU_ISET_65816   | CPU_ISET_6502 | CPU_ISET_65SC02,
     CPU_ISET_SWEET16,
     CPU_ISET_HUC6280 | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
     CPU_ISET_M740    | CPU_ISET_6502,
     /* 4510 does NOT have indirect-zp (without z), so we can not use 65SC02 */
-    /* FIXME: 4510 does not have wai/stp */
     CPU_ISET_4510    | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02,
     CPU_ISET_45GS02  | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02 | CPU_ISET_4510,
     CPU_ISET_W65C02  | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,

@@ -46,6 +46,8 @@
 
 extern unsigned char Debug;             /* Debug mode enabled? */
 
+extern unsigned char KeepTemps;         /* Keep temporary files? */
+
 
 
 /* End of global.h */

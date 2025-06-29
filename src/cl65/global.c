@@ -44,3 +44,4 @@
 
 
 unsigned char Debug     = 0;            /* Debug mode enabled? */
+unsigned char KeepTemps = 0;            /* Keep temporary files? */

@@ -4,8 +4,20 @@ ifneq ($(SILENT),s)
     $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
 endif
 
-.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util checkstyle check checkprefix
 
+
+# used only on non Windows builds if user did not pass
+# in a PREFIX variable.
+ifneq ($(OS),Windows_NT)
+ifndef PREFIX
+    PREFIX := /usr/local
+    export PREFIX
+endif
+endif
+
+
+
+.PHONY: all mostlyclean clean install zip avail unavail bin lib doc html info samples test util checkstyle check checkprefix
 .SUFFIXES:
 
 all:

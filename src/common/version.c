@@ -99,7 +99,7 @@
 const char* GetVersionAsString (void)
 /* Returns the version number as a string in a static buffer */
 {
-    static char Buf[60];
+    static char Buf[256];
 #if defined(BUILD_ID)
     xsnprintf (Buf, sizeof (Buf), "%u.%u - %s", VER_MAJOR, VER_MINOR, BUILD_ID);
 #else

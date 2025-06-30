@@ -73,6 +73,7 @@ ifdef USER_CFLAGS
   $(info USER_CFLAGS: $(USER_CFLAGS))
 endif
 
+# short, used to add a comment to the zip file
 ifndef BUILD_ID
   BUILD_ID := Git $(shell git rev-parse --short HEAD 2>$(NULLDEV) || svnversion 2>$(NULLDEV))
   ifneq ($(words $(BUILD_ID)),2)
@@ -80,15 +81,35 @@ ifndef BUILD_ID
   endif
 endif
 
+# long, to give humans more details
+ifndef BUILD_DETAILS
+  ifeq ($(shell git rev-parse --is-inside-work-tree 2>$(NULLDEV)),true)
+    BUILD_HASH   := $(shell git rev-parse --short HEAD 2>$(NULLDEV))
+    BUILD_DATE   := $(shell git show -s --format=%cd --date=format:%Y.%m.%d HEAD 2>$(NULLDEV))
+    BUILD_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2>$(NULLDEV))
+    GIT_DIRTY    := $(shell git diff --quiet --ignore-submodules HEAD 2>$(NULLDEV) || echo -dirty)
+
+    ifeq ($(BUILD_BRANCH),master)
+      BUILD_DETAILS := Git $(BUILD_HASH)-$(BUILD_DATE)$(GIT_DIRTY)
+    else
+      BUILD_BRANCH_SAFE := $(subst /,-,$(BUILD_BRANCH))
+      BUILD_DETAILS := Git $(BUILD_HASH)-$(BUILD_DATE)-$(BUILD_BRANCH_SAFE)$(GIT_DIRTY)
+    endif
+  else
+    BUILD_DETAILS := N/A
+  endif
+endif
+
 ifneq ($(SILENT),s)
   $(info BUILD_ID: $(BUILD_ID))
+  $(info BUILD_DETAILS: $(BUILD_DETAILS))
 endif
 
 CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
           -DCA65_INC="\"$(CA65_INC)\"" -DCC65_INC="\"$(CC65_INC)\"" -DCL65_TGT="\"$(CL65_TGT)\"" \
           -DLD65_LIB="\"$(LD65_LIB)\"" -DLD65_OBJ="\"$(LD65_OBJ)\"" -DLD65_CFG="\"$(LD65_CFG)\"" \
-          -DBUILD_ID="\"$(BUILD_ID)\""
+          -DBUILD_ID="\"$(BUILD_DETAILS)\""
 
 LDLIBS += -lm
 

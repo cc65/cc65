@@ -137,6 +137,7 @@ typedef enum token_t {
     TOK_BLANK,
     TOK_BSS,
     TOK_BYTE,
+    TOK_CAP,
     TOK_CASE,
     TOK_CHARMAP,
     TOK_CODE,

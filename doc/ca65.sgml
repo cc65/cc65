@@ -1423,6 +1423,10 @@ writable.
   </verb></tscreen>
 
 
+  See also: <tt><ref id=".CAP" name=".CAP"></tt>
+
+
+
 <sect1><tt>.ISIZE</tt><label id=".ISIZE"><p>
 
   Reading this pseudo variable will return the current size of the Index
@@ -1591,6 +1595,56 @@ either a string or an expression value.
   <tscreen><verb>
         .if     .blank({arg})
   </verb></tscreen>
+
+
+
+<sect1><tt>.CAP, .CAPABILITY</tt><label id=".CAP"><p>
+
+  Builtin function. The function allows to check for capabilities of the
+  currently selected CPU or target system. It must be called with a comma
+  separated list of identifiers and returns non zero if all of the given
+  capabilities are available. Otherwise it returns zero.
+
+  Existing capabilities are:
+
+<descrip>
+
+  <tag><tt>CPU_HAS_BRA8</tt></tag>
+  Checks for the availability of a short (8 bit) branch.
+
+  <tag><tt>CPU_HAS_INA</tt></tag>
+  Checks for the availability of accu inc/dec instructions.
+
+  <tag><tt>CPU_HAS_PUSHXY</tt></tag>
+  Checks for the capability to push and pop the X and Y registers.
+
+  <tag><tt>CPU_HAS_ZPIND</tt></tag>
+  Checks for the availability of the "zeropage indirect" addressing mode.
+
+  <tag><tt>CPU_HAS_STZ</tt></tag>
+  Checks for the availability of the "store zero" instruction.
+
+</descrip>
+
+  Case is ignored when checking the identifiers. The <tt/.cap/ function is
+  easier to use than checking <tt/.cpu/ and requires no intimate knowledge
+  of all instruction sets. For more detailed checking <tt/.cpu/ is still
+  available.
+
+  Example:
+
+  <tscreen><verb>
+        .if     .cap(CPU_HAS_BRA, CPU_HAS_PUSHXY)
+                phx
+                bra     L1
+        .else
+                txa
+                pha
+                jmp     L1
+        .endif
+  </verb></tscreen>
+
+  See also: <tt><ref id=".CPU" name=".CPU"></tt>
 
 
 

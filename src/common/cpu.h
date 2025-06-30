@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "capability.h"
+
+
+
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -106,6 +111,9 @@ cpu_t FindCPU (const char* Name);
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
 ** the given name is no valid target.
 */
+
+int CPUHasCap (capability_t Cap);
+/* Check if the current CPU has the given capability */
 
 
 

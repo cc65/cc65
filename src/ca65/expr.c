@@ -37,6 +37,7 @@
 #include <time.h>
 
 /* common */
+#include "capability.h"
 #include "check.h"
 #include "cpu.h"
 #include "exprdefs.h"
@@ -405,6 +406,66 @@ static ExprNode* FuncBlank (void)
 
 
 
+static ExprNode* FuncCapability (void)
+/* Handle the .CAPABILITY builtin function */
+{
+    int Result = 1;
+
+    /* What follows is a comma separated list of identifiers. An empty list is
+    ** not allowed.
+    */
+    while (1) {
+
+        const char* Name;
+        capability_t Cap;
+
+        /* We must have an identifier */
+        if (CurTok.Tok != TOK_IDENT) {
+            Error ("Arguments to .CAPABILITY must be identifiers");
+            /* Skip tokens until closing paren or end of line */
+            while (CurTok.Tok != TOK_RPAREN && !TokIsSep (CurTok.Tok)) {
+                NextTok ();
+            }
+            return GenLiteral0 ();
+        }
+
+        /* Search for the capability that matches this identifier. Ignore case
+        ** on the specified capabilities.
+        */
+        UpcaseSVal ();
+        SB_Terminate (&CurTok.SVal);
+        Name = SB_GetConstBuf (&CurTok.SVal);
+        Cap = FindCapability (Name);
+
+        /* Check if the capability is supported */
+        if (Cap == CAP_INVALID) {
+            Error ("Not a valid capability name: %s", Name);
+            Result = 0;
+        } else {
+            /* The pseudo function result is the logical AND of all capabilities
+            ** given.
+            */
+            if (!CPUHasCap (Cap)) {
+                Result = 0;
+            }
+        }
+
+        /* Skip the capability name */
+        NextTok ();
+
+        /* Handle end of list or next capability */
+        if (CurTok.Tok != TOK_COMMA) {
+            break;
+        }
+        NextTok ();
+    }
+
+    /* Done */
+    return GenLiteralExpr (Result);
+}
+
+
+
 static ExprNode* FuncConst (void)
 /* Handle the .CONST builtin function */
 {
@@ -484,9 +545,10 @@ static ExprNode* FuncIsMnemonic (void)
             if (FindMacro (&CurTok.SVal) == 0) {
                 Instr = FindInstruction (&CurTok.SVal);
             }
-        }
-        else {
-            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+        } else {
+            /* Macros and symbols may NOT use the names of instructions, so
+            ** just check for the instruction.
+            */
             Instr = FindInstruction (&CurTok.SVal);
         }
     }
@@ -532,7 +594,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     token_t Term = GetTokListTerm (TOK_COMMA);
     while (CurTok.Tok != Term) {
 
-        /* We may not end-of-line of end-of-file here */
+        /* We may not end-of-line or end-of-file here */
         if (TokIsSep (CurTok.Tok)) {
             Error ("Unexpected end of line");
             return GenLiteral0 ();
@@ -570,7 +632,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     Node = Root;
     while (CurTok.Tok != Term) {
 
-        /* We may not end-of-line of end-of-file here */
+        /* We may not end-of-line or end-of-file here */
         if (TokIsSep (CurTok.Tok)) {
             Error ("Unexpected end of line");
             return GenLiteral0 ();
@@ -1127,6 +1189,10 @@ static ExprNode* Factor (void)
 
         case TOK_BLANK:
             N = Function (FuncBlank);
+            break;
+
+        case TOK_CAP:
+            N = Function (FuncCapability);
             break;
 
         case TOK_CONST:

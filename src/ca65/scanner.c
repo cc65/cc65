@@ -158,6 +158,8 @@ struct DotKeyword {
     { ".BSS",           TOK_BSS                 },
     { ".BYT",           TOK_BYTE                },
     { ".BYTE",          TOK_BYTE                },
+    { ".CAP",           TOK_CAP                 },
+    { ".CAPABILITY",    TOK_CAP                 },
     { ".CASE",          TOK_CASE                },
     { ".CHARMAP",       TOK_CHARMAP             },
     { ".CODE",          TOK_CODE                },

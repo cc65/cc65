@@ -33,6 +33,8 @@
 
 
 
+#include <stdint.h>
+
 /* common */
 #include "addrsize.h"
 #include "check.h"
@@ -88,6 +90,77 @@ const unsigned CPUIsets[CPU_COUNT] = {
     CPU_ISET_45GS02  | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02 | CPU_ISET_4510,
     CPU_ISET_W65C02  | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
     CPU_ISET_65CE02  | CPU_ISET_6502                   | CPU_ISET_65C02,
+};
+
+/* Defines for capabilities. Currently the entries are uint32_ts but the table
+** is deliberately hidden from the outside so it can be extended to 64 bit or
+** even more.
+*/
+#define CAP_NONE        UINT32_C (0)
+#define CAP_6502        UINT32_C (0)
+#define CAP_6502X       UINT32_C (0)
+#define CAP_6502DTV     UINT32_C (0)
+#define CAP_65SC02                              \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
+     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY)   |   \
+     (UINT32_C (1) << CAP_CPU_HAS_ZPIND)    |   \
+     (UINT32_C (1) << CAP_CPU_HAS_STZ))
+#define CAP_65C02                               \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
+     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY)   |   \
+     (UINT32_C (1) << CAP_CPU_HAS_ZPIND)    |   \
+     (UINT32_C (1) << CAP_CPU_HAS_STZ))
+#define CAP_65816                               \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
+     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY)   |   \
+     (UINT32_C (1) << CAP_CPU_HAS_ZPIND)    |   \
+     (UINT32_C (1) << CAP_CPU_HAS_STZ))
+#define CAP_SWEET16     UINT32_C (0)
+#define CAP_HUC6280                             \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
+     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY)   |   \
+     (UINT32_C (1) << CAP_CPU_HAS_ZPIND)    |   \
+     (UINT32_C (1) << CAP_CPU_HAS_STZ))
+#define CAP_M740                                \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA))
+#define CAP_4510                                \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
+     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY))
+#define CAP_45GS02                              \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
+     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY))
+#define CAP_W65C02                              \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
+     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY))
+#define CAP_65CE02                              \
+    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
+     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
+     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY))
+
+/* Table containing one capability entry per CPU */
+static const uint64_t CPUCaps[CPU_COUNT] = {
+    CAP_NONE,                   /* CPU_NONE */
+    CAP_6502,                   /* CPU_6502 */
+    CAP_6502X,                  /* CPU_6502X */
+    CAP_6502DTV,                /* CPU_6502DTV */
+    CAP_65SC02,                 /* CPU_65SC02 */
+    CAP_65C02,                  /* CPU_65C02 */
+    CAP_65816,                  /* CPU_65816 */
+    CAP_SWEET16,                /* CPU_SWEET16 */
+    CAP_HUC6280,                /* CPU_HUC6280 */
+    CAP_M740,                   /* CPU_M740 */
+    CAP_4510,                   /* CPU_4510 */
+    CAP_45GS02,                 /* CPU_45GS02 */
+    CAP_W65C02,                 /* CPU_W65C02 */
+    CAP_65CE02,                 /* CPU_65CE02 */
 };
 
 
@@ -147,4 +220,13 @@ cpu_t FindCPU (const char* Name)
 
     /* Not found */
     return CPU_UNKNOWN;
+}
+
+
+
+int CPUHasCap (capability_t Cap)
+/* Check if the current CPU has the given capability */
+{
+    PRECONDITION (CPU >= 0 && CPU < CPU_COUNT);
+    return (CPUCaps[CPU] & (UINT32_C (1) << Cap)) != 0;
 }

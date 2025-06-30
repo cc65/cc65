@@ -2114,7 +2114,8 @@ struct CtrlDesc {
 };
 
 /* NOTE: .AND, .BITAND, .BITNOT, .BITOR, .BITXOR, .MOD, .NOT, .OR, .SHL, .SHR
-         and .XOR do NOT go into this table */
+** and .XOR do NOT go into this table.
+*/
 #define PSEUDO_COUNT    (sizeof (CtrlCmdTab) / sizeof (CtrlCmdTab [0]))
 static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoA16           },      /* .A16 */
@@ -2132,6 +2133,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnexpected    },      /* .BLANK */
     { ccNone,           DoBss           },      /* .BSS */
     { ccNone,           DoByte          },      /* .BYT, .BYTE */
+    { ccNone,           DoUnexpected    },      /* .CAP */
     { ccNone,           DoCase          },      /* .CASE */
     { ccNone,           DoCharMap       },      /* .CHARMAP */
     { ccNone,           DoCode          },      /* .CODE */

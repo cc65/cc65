@@ -103,7 +103,9 @@ endif
 all bin: $(PROGS)
 ifeq ($(MAKELEVEL),0)
 ifndef PREFIX
-	$(warning Warning: PREFIX is empty - make install will not work)
+ifndef DESTDIR
+	$(warning Warning: PREFIX and DESTDIR are empty - make install will not work)
+endif
 endif
 endif
 

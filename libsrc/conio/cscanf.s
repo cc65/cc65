@@ -23,8 +23,8 @@ _cscanf:
 
 ; Now, calculate the va_list pointer -- which points to format.
 
-        ldx     sp+1
-        add     sp
+        ldx     c_sp+1
+        add     c_sp
         bcc     @L1
         inx
 @L1:    sta     ptr1

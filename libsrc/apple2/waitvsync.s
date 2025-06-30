@@ -3,18 +3,26 @@
 ;
 ; void waitvsync (void);
 ;
-        .ifdef  __APPLE2ENH__
-
         .export         _waitvsync
         .import         ostype
+
+        .ifndef  __APPLE2ENH__
+        .import         machinetype
+        .endif
 
         .include        "apple2.inc"
 
 _waitvsync:
+        .ifndef  __APPLE2ENH__
+        bit     machinetype     ; IIe/enh?
+        bpl     out             ; No, silently fail
+        .endif
+
         bit     ostype
         bmi     iigs            ; $8x
         bvs     iic             ; $4x
 
+        ; Apple IIe
 :       bit     RDVBLBAR
         bpl     :-              ; Blanking
 :       bit     RDVBLBAR
@@ -42,6 +50,4 @@ iic:    php
         bit     DISVBL
 :       sta     IOUDISON        ; IIc Tech Ref Man: The firmware normally leaves IOUDIS on.
         plp
-        rts
-
-        .endif                  ; __APPLE2ENH__
+out:    rts

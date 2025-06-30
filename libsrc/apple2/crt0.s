@@ -43,7 +43,7 @@
 
         ; Save the zero-page locations that we need.
 init:   ldx     #zpspace-1
-:       lda     sp,x
+:       lda     c_sp,x
         sta     zpsave,x
         dex
         bpl     :-
@@ -56,8 +56,10 @@ init:   ldx     #zpspace-1
         bpl     :-
 
         ; Check for ProDOS.
-        ldy     $BF00           ; MLI call entry point
-        cpy     #$4C            ; Is MLI present? (JMP opcode)
+        lda     $BF00           ; MLI call entry point
+        sec
+        sbc     #$4C            ; Is MLI present? (JMP opcode)
+        pha                     ; Backup the result for later
         bne     basic
 
         ; Check the ProDOS system bit map.
@@ -81,8 +83,8 @@ basic:  lda     HIMEM
         ldx     HIMEM+1
 
         ; Set up the C stack.
-:       sta     sp
-        stx     sp+1
+:       sta     c_sp
+        stx     c_sp+1
 
         ; ProDOS TechRefMan, chapter 5.3.5:
         ; "Your system program should place in the RESET vector the
@@ -99,7 +101,20 @@ basic:  lda     HIMEM
         bit     $C081
         bit     $C081
 
-        ; Set the source start address.
+        pla                     ; If not running ProDOS, we need to patch 6502 vectors.
+        beq     :+
+
+        lda     #<reset_6502
+        ldx     #>reset_6502
+        sta     ROM_RST
+        stx     ROM_RST+1
+
+        lda     #<irq_6502
+        ldx     #>irq_6502
+        sta     ROM_IRQ
+        stx     ROM_IRQ+1
+
+:       ; Set the source start address.
         ; Aka __LC_LOAD__ iff segment LC exists.
         lda     #<(__ONCE_LOAD__ + __ONCE_SIZE__)
         ldy     #>(__ONCE_LOAD__ + __ONCE_SIZE__)
@@ -143,6 +158,14 @@ return: rts
 quit:   jsr     $BF00           ; MLI call entry point
         .byte   $65             ; Quit
         .word   q_param
+
+reset_6502:                     ; Used with DOS3.3 programs
+        bit     $C082           ; Switch in ROM
+        jmp     (ROM_RST)       ; Jump to ROM's RESET vector
+
+irq_6502:                       ; Used with DOS3.3 programs
+        bit     $C082           ; Switch in ROM
+        jmp     (ROM_IRQ)       ; Jump to ROM's IRQ/BRK vector
 
 ; ------------------------------------------------------------------------
 

@@ -2523,6 +2523,7 @@ static void NextChar (InputData* D)
 
 
 
+/* CAUTION: table must be sorted for bsearch */
 static void NextToken (InputData* D)
 /* Read the next token from the input stream */
 {
@@ -2530,6 +2531,7 @@ static void NextToken (InputData* D)
         const char      Keyword[12];
         Token           Tok;
     } KeywordTable[] = {
+/* BEGIN SORTED.SH */
         { "abs",        TOK_ABSOLUTE    },
         { "addrsize",   TOK_ADDRSIZE    },
         { "auto",       TOK_AUTO        },
@@ -2578,6 +2580,7 @@ static void NextToken (InputData* D)
         { "var",        TOK_VAR         },
         { "version",    TOK_VERSION     },
         { "zp",         TOK_ZEROPAGE    },
+/* END SORTED.SH */
     };
 
 

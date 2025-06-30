@@ -72,22 +72,22 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs);
 ** current PC.
 */
 
-void DefConst (const char* Name, const char* Comment, unsigned Addr);
+void DefConst (const char* Name, const char* Comment, uint32_t Addr);
 /* Define an address constant */
 
 void OneDataByte (void);
 /* Output a .byte line with the current code byte */
 
-void DataByteLine (unsigned ByteCount);
+void DataByteLine (uint32_t ByteCount);
 /* Output a line with bytes */
 
-void DataDByteLine (unsigned ByteCount);
+void DataDByteLine (uint32_t ByteCount);
 /* Output a line with dbytes */
 
-void DataWordLine (unsigned ByteCount);
+void DataWordLine (uint32_t ByteCount);
 /* Output a line with words */
 
-void DataDWordLine (unsigned ByteCount);
+void DataDWordLine (uint32_t ByteCount);
 /* Output a line with dwords */
 
 void SeparatorLine (void);

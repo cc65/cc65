@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 # Makefile for the assembler regression tests
 
 ifneq ($(shell echo),)
@@ -14,8 +20,17 @@ else
   RMDIR = $(RM) -r $1
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
 ifdef QUIET
   .SILENT:
+  NULLOUT = >$(NULLDEV)
+  NULLERR = 2>$(NULLDEV)
+ifndef CMD_EXE
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+endif
 endif
 
 CA65 := $(if $(wildcard ../../../bin/ca65*),../../../bin/ca65,ca65)
@@ -46,8 +61,8 @@ define CPUDETECT_template
 
 $(WORKDIR)/$1-cpudetect.bin: cpudetect.s $1-cpudetect.ref $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1-cpudetect.bin)
-	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$<
-	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
+	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$< $(CATERR)
+	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib $(CATERR)
 	$(ISEQUAL) $1-cpudetect.ref $$@
 
 endef # CPUDETECT_template
@@ -55,7 +70,7 @@ endef # CPUDETECT_template
 $(foreach cpu,$(CPUDETECT_CPUS),$(eval $(call CPUDETECT_template,$(cpu))))
 
 $(WORKDIR)/%.o: %.s | $(WORKDIR)
-	$(CA65) -l $(@:.o=.lst) -o $@ $<
+	$(CA65) -l $(@:.o=.lst) -o $@ $< $(NULLOUT) $(CATERR)
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

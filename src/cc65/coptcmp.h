@@ -113,14 +113,19 @@ unsigned OptCmp5 (CodeSeg* S);
 /* Optimize compares of local variables:
 **
 **      ldy     #o
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      tax
 **      dey
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      cpx     #a
 **      bne     L1
 **      cmp     #b
 **      jne/jeq L2
+*/
+
+unsigned OptCmp6 (CodeSeg* S);
+/* Remove compare instructions before an RTS or an exit by jumping to some
+** other function.
 */
 
 unsigned OptCmp7 (CodeSeg* S);

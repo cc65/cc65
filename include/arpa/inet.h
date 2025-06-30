@@ -40,6 +40,20 @@
 /*****************************************************************************/
 
 
+#if (__CPU__ & __CPU_ISET_65SC02__)
+/* Always inline, three bytes is not more than a jsr */
+
+#define ntohs(x)                \
+    (                           \
+        __AX__=(x),             \
+        asm("phx"),             \
+        asm("tax"),             \
+        asm("pla"),             \
+        __AX__                  \
+    )
+#define htons(x) ntohs(x)
+
+#else
 
 #if (__OPT_i__ < 200)
 int __fastcall__ ntohs (int val);
@@ -56,12 +70,12 @@ int __fastcall__ htons (int val);
     )
 #define htons(x) ntohs(x)
 
-#endif
+#endif /* __OPT_i__ < 200 */
+
+#endif /* __CPU__ & __CPU_ISET_65SC02__ */
 
 long __fastcall__ ntohl (long val);
 long __fastcall__ htonl (long val);
-
-
 
 /* End of arpa/inet.h */
 #endif

@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/utsname.h>
 
 #if ((__CC65__ >> 8) > 3) || ((__CC65__ & 0x000f) > 0)
 /* compiler version is 2.19-git or higher */
@@ -29,12 +30,25 @@
 
 int main(void)
 {
+#if !defined(__SIM6502__) && !defined(__SIM65C02__) && !defined(__AGAT__)
+    struct utsname buf;
+    uname (&buf);
+
+    printf("utsname.sysname: %s\n", buf.sysname);
+    printf("utsname.nodename: %s\n", buf.nodename);
+    printf("utsname.release: %s\n", buf.release);
+    printf("utsname.version: %s\n", buf.version);
+    printf("utsname.machine: %s\n", buf.machine);
+#endif
+
     printf("__CC65__ defined as %04x\n", __CC65__);
     printf("compiler version is %u.%u\n", VER_MAJOR, VER_MINOR);
+#pragma warn (const-comparison, push, off)
     if (__CC65__ == VERSION) {
         printf("__CC65__ is defined correctly as (VER_MAJOR * 0x100) + VER_MINOR\n");
         return EXIT_SUCCESS;
     }
+#pragma warn (const-comparison, pop)
     printf("__CC65__ is incorrectly defined as (VER_MAJOR * 0x100) + (VER_MINOR * 0x10)\n");
     return EXIT_FAILURE;
 }

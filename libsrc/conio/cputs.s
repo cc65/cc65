@@ -23,31 +23,17 @@ _cputsxy:
 _cputs: sta     ptr1            ; Save s
         stx     ptr1+1
 
+L0:
 .if (.cpu .bitand CPU_ISET_65SC02)
-
-L0:     lda     (ptr1)          ; (5)
-        beq     L9              ; (7)  Jump if done
-        jsr     _cputc          ; (13) Output char, advance cursor
-        inc     ptr1            ; (18) Bump low byte
-        bne     L0              ; (20) Next char
-        inc     ptr1+1          ; (25) Bump high byte
-        bne     L0
-
+        lda     (ptr1)          ; (5)
 .else
-
-L0:     ldy     #0              ; (2)
-L1:     lda     (ptr1),y        ; (7)
-        beq     L9              ; (9)  Jump if done
-        iny
-        sty     tmp1            ; (14) Save offset
-        jsr     _cputc          ; (20) Output char, advance cursor
-        ldy     tmp1            ; (23) Get offset
-        bne     L1              ; (25) Next char
-        inc     ptr1+1          ; (30) Bump high byte
-        bne     L1
-
+        ldy     #0              ; (2)
+        lda     (ptr1),y        ; (7)
 .endif
-
-; Done
-
+        beq     L9              ; (7/9)  Jump if done
+        jsr     _cputc          ; (13/15) Output char, advance cursor
+        inc     ptr1            ; (18/20) Bump low byte
+        bne     L0              ; (20/22) Next char
+        inc     ptr1+1          ; (25/27) Bump high byte
+        bne     L0
 L9:     rts

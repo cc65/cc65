@@ -43,7 +43,7 @@ of range.
 <ref id="tgi_setcolor" name="tgi_setcolor">
 <tag/Example/<tscreen><verb>
 /* Draw the upper half of an ellipse */
-tgi_setcolor(TGI_COLOR_BLUE);
+tgi_setcolor(1);
 tgi_arc (50, 50, 40, 20, 0, 180);
 </verb></tscreen>
 </descrip>
@@ -67,7 +67,7 @@ be used in presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/Other tgi function
 <tag/Example/<tscreen><verb>
-tgi_setcolor(TGI_COLOR_GREEN);
+tgi_setcolor(1);
 tgi_bar(10, 10, 100, 60);
 </verb></tscreen>
 </descrip>
@@ -94,7 +94,7 @@ be used in presence of a prototype.
 <ref id="tgi_pieslice" name="tgi_pieslice">,
 <ref id="tgi_setcolor" name="tgi_setcolor">
 <tag/Example/<tscreen><verb>
-tgi_setcolor(TGI_COLOR_BLACK);
+tgi_setcolor(1);
 tgi_circle(50, 40, 40);
 </verb></tscreen>
 </descrip>
@@ -154,7 +154,7 @@ be used in presence of a prototype.
 <ref id="tgi_pieslice" name="tgi_pieslice">,
 <ref id="tgi_setcolor" name="tgi_setcolor">
 <tag/Example/<tscreen><verb>
-tgi_setcolor(TGI_COLOR_RED);
+tgi_setcolor(1);
 tgi_ellipse (50, 40, 40, 20);
 </verb></tscreen>
 </descrip>
@@ -216,17 +216,19 @@ original aspect ratio.
 
 <quote>
 <descrip>
-<tag/Function/Return the current drawing color.
+<tag/Function/Return the current drawing color (palette index).
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned char tgi_getcolor (void);/
 <tag/Description/The actual color is an index to a palette. During tgi_init
-you will get a default palette. The number of colors depend on the platform.
-All platforms recognize at least TGI_COLOR_BLACK and TGI_COLOR_WHITE. But some
-platforms have many more predefined colors. If you paint using TGI_COLOR_GREEN
-and then you change the green of the palette to blue using tgi_setpalette then
-after this painting in TGI_COLOR_GREEN will actually be blue.
+you will get a default palette.
+A default palette has always two entries with values equal to TGI_COLOR_BLACK
+and TGI_COLOR_WHITE. However, which default palette entries have those two
+values is target specific.
+Note that both the number of colors, and also the available colors, depend on
+the target and/or driver.
 <tag/Availability/cc65
-<tag/See also/Other tgi functions
+<tag/See also/<ref id="tgi_setcolor" name="tgi_setcolor">,
+<ref id="tgi_setpalette" name="tgi_setpalette">
 <tag/Example/<tscreen><verb>
 color = tgi_getcolor();
 </verb></tscreen>
@@ -238,7 +240,8 @@ color = tgi_getcolor();
 
 <quote>
 <descrip>
-<tag/Function/Get the number of available colors.
+<tag/Function/Get the number of available colors in the palette for the current
+driver.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned char tgi_getcolorcount (void);/
 <tag/Description/TGI platforms use indexed color palettes. This function
@@ -287,8 +290,6 @@ if (num_colors == 0) {
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/const unsigned char* tgi_getdefpalette (void);/
 <tag/Description/The tgi driver has a default palette that is active at startup.
-The named colors TGI_COLOR_BLACK, TGI_COLOR_WHITE, TGI_COLOR_RED... need this
-palette to work correctly.
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -418,10 +419,10 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Get the color of a pixel from the viewpage.
+<tag/Function/Get the color (palette index) of a pixel from the viewpage.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ tgi_getpixel (int x, int y);/
-<tag/Description/Get the color of a pixel from the viewpage.
+<tag/Description/Get the color (palette index) of a pixel from the viewpage.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -626,7 +627,7 @@ be used in presence of a prototype.
 #define tgi_updatedisplay() tgi_ioctl(4, (void*)1)
 if (!tgi_busy()) {
   tgi_sprite(&amp;background);
-  tgi_setcolor(TGI_COLOR_BLUE);
+  tgi_setcolor(1);
   tgi_outttextxy(20,40,"Hello World");
   tgi_updatedisplay();
 }
@@ -791,7 +792,7 @@ of range.
 <ref id="tgi_setcolor" name="tgi_setcolor">
 <tag/Example/<tscreen><verb>
 /* Draw the closed upper half of an ellipse */
-tgi_setcolor(TGI_COLOR_BLUE);
+tgi_setcolor(1);
 tgi_pieslice (50, 50, 40, 20, 0, 180);
 </verb></tscreen>
 </descrip>
@@ -834,20 +835,21 @@ only in the presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Set color to be used in future draw operations.
+<tag/Function/Set color (palette index) to be used in future draw operations.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_setcolor (unsigned char color);/
-<tag/Description/Set color to be used in future draw operations.
+<tag/Declaration/<tt/void __fastcall__ tgi_setcolor (unsigned char color_index);/
+<tag/Description/Set color (palette index) to be used in future draw operations.
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
-<tag/See also/Other tgi functions.
+<tag/See also/<ref id="tgi_getcolor" name="tgi_getcolor">,
+<ref id="tgi_setpalette" name="tgi_setpalette">
 <tag/Example/<tscreen><verb>
-tgi_setcolor(TGI_COLOR_BLACK);
+tgi_setcolor(1);
 tgi_bar(0,0,30,30);
-tgi_setcolor(TGI_COLOR_WHITE);
+tgi_setcolor(2);
 tgi_bar(10,10,20,20);
 </verb></tscreen>
 </descrip>
@@ -893,13 +895,21 @@ Palette is a pointer to as many entries as there are colors.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_setpalette (const unsigned char* palette);/
 <tag/Description/Set the palette (not available with all drivers/hardware).
-Palette is a pointer to as many entries as there are colors.
+Palette is a pointer to as many entries as there are colors. The values in the
+palette are target specific, some (hopefully, more or less) portable values are
+defined in the TGI_COLOR_XY defines. Note that different platforms provide
+different colors, only TGI_COLOR_BLACK and TGI_COLOR_WHITE are guaranteed to
+exist (needed for the default palette).
 <tag/Notes/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+<item>The palette is the (only) place where to use the TGI_COLOR_XY values. This
+has been an ongoing and reoccurring misunderstanding in the past: At every other
+place, the "color" values are indices into the current palette.
 </itemize>
 <tag/Availability/cc65
-<tag/See also/Other tgi functions.
+<tag/See also/<ref id="tgi_setcolor" name="tgi_setcolor">,
+<ref id="tgi_getpalette" name="tgi_getpalette">
 <tag/Example/None.
 </descrip>
 </quote>

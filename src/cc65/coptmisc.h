@@ -99,6 +99,9 @@ unsigned OptStackPtrOps (CodeSeg* S);
 unsigned OptGotoSPAdj (CodeSeg* S);
 /* Optimize SP adjustment for forward 'goto' */
 
+unsigned OptLoadStore2 (CodeSeg* S);
+/* Remove 16 bit stack loads followed by a store into the same location. */
+
 unsigned OptLoad1 (CodeSeg* S);
 /* Search for a call to ldaxysp where X is not used later and replace it by
 ** a load of just the A register.
@@ -107,9 +110,14 @@ unsigned OptLoad1 (CodeSeg* S);
 unsigned OptLoad2 (CodeSeg* S);
 /* Replace calls to ldaxysp by inline code */
 
-unsigned OptBinOps (CodeSeg* S);
+unsigned OptBinOps1 (CodeSeg* S);
 /* Search for an AND/EOR/ORA where the value of A or the operand is known and
 ** replace it by something simpler.
+*/
+
+unsigned OptBinOps2 (CodeSeg* S);
+/* Search for an AND/EOR/ORA for identical memory locations and replace it
+** by something simpler.
 */
 
 

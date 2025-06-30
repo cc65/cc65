@@ -1292,10 +1292,10 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
                 }
                 InsertEntry (D, X, D->IP++);
 
-                /* cmp src,y OR cmp (sp),y */
+                /* cmp src,y OR cmp (c_sp),y */
                 if (D->Rhs.A.LoadEntry->OPC == OP65_JSR) {
-                    /* opc (sp),y */
-                    X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+                    /* opc (c_sp),y */
+                    X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
                 } else {
                     /* opc src,y */
                     X = NewCodeEntry (OP65_CMP, D->Rhs.A.LoadEntry->AM, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
@@ -1464,7 +1464,9 @@ static unsigned Opt_a_tosxor (StackOpData* D)
 
 /* The first column of these two tables must be sorted in lexical order */
 
+/* CAUTION: table must be sorted for bsearch */
 static const OptFuncDesc FuncTable[] = {
+/* BEGIN SORTED.SH */
     { "___bzero",   Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
     { "staspidx",   Opt_staspidx,  REG_NONE, OP_NONE                                   },
     { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                                   },
@@ -1485,9 +1487,12 @@ static const OptFuncDesc FuncTable[] = {
     { "tosuleax",   Opt_tosuleax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tosultax",   Opt_tosultax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                                   },
+/* END SORTED.SH */
 };
 
+/* CAUTION: table must be sorted for bsearch */
 static const OptFuncDesc FuncRegATable[] = {
+/* BEGIN SORTED.SH */
     { "tosandax",   Opt_a_tosand,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "toseqax",    Opt_a_toseq,   REG_NONE, OP_NONE                                   },
     { "tosgeax",    Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
@@ -1503,6 +1508,7 @@ static const OptFuncDesc FuncRegATable[] = {
     { "tosuleax",   Opt_a_tosule,  REG_NONE, OP_NONE                                   },
     { "tosultax",   Opt_a_tosult,  REG_NONE, OP_NONE                                   },
     { "tosxorax",   Opt_a_tosxor,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+/* END SORTED.SH */
 };
 
 #define FUNC_COUNT(Table) (sizeof(Table) / sizeof(Table[0]))

@@ -431,22 +431,22 @@ unsigned OptCmp5 (CodeSeg* S)
 
                 /* The value is zero, we may use the simple code version:
                 **      ldy     #o-1
-                **      lda     (sp),y
+                **      lda     (c_sp),y
                 **      ldy     #o
-                **      ora     (sp),y
+                **      ora     (c_sp),y
                 **      jne/jeq ...
                 */
                 sprintf (Buf, "$%02X", (int)(L[0]->Num-1));
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
 
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+2);
 
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                X = NewCodeEntry (OP65_ORA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+                X = NewCodeEntry (OP65_ORA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+4);
 
                 CS_DelEntries (S, I+5, 3);   /* cpx/bne/cmp */
@@ -461,18 +461,18 @@ unsigned OptCmp5 (CodeSeg* S)
                 ** of the low byte after the first branch if possible:
                 **
                 **      ldy     #o
-                **      lda     (sp),y
+                **      lda     (c_sp),y
                 **      cmp     #a
                 **      bne     L1
                 **      ldy     #o-1
-                **      lda     (sp),y
+                **      lda     (c_sp),y
                 **      cmp     #b
                 **      jne/jeq ...
                 */
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+4);
 
                 X = NewCodeEntry (OP65_CMP, L[2]->AM, L[2]->Arg, 0, L[2]->LI);
@@ -482,7 +482,7 @@ unsigned OptCmp5 (CodeSeg* S)
                 X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+7);
 
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[1]->LI);
                 CS_InsertEntry (S, X, I+8);
 
                 CS_DelEntries (S, I, 3);          /* ldy/jsr/cpx */
@@ -495,6 +495,51 @@ unsigned OptCmp5 (CodeSeg* S)
         /* Next entry */
         ++I;
 
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptCmp6 (CodeSeg* S)
+/* Remove compare instructions before an RTS or an subroutine call that doesn't
+** use the flags.
+*/
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for a compare followed by something else.
+        ** Note: The test could be improved by checking the flag usage of the
+        ** function explicitly against the flags set by the compare instruction.
+        ** For current code generation this makes no difference, however.
+        */
+        if ((E->Info & OF_CMP) != 0                     &&
+            (N = CS_GetNextEntry (S, I)) != 0           &&
+            (N->OPC == OP65_RTS                 ||  /* Either RTS, or ... */
+             (N->OPC == OP65_JSR            &&      /* ... or JSR ... */
+              N->JumpTo == 0                &&      /* ... to external ... */
+              (N->Use & PSTATE_ALL) == 0    &&      /* ... with no flags used ... */
+              (N->Chg & PSTATE_ALL) == PSTATE_ALL))) {  /* ... but all destroyed */
+
+            /* Found, remove the compare */
+            CS_DelEntry (S, I);
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
     }
 
     /* Return the number of changes made */

@@ -56,9 +56,12 @@ struct PaletteMapEntry {
     StrBuf*             (*PaletteFunc) (const Bitmap*, const Collection*);
 };
 
-/* Converter table, alphabetically sorted */
+/* Converter table */
+/* CAUTION: table must be alphabetically sorted for bsearch */
 static const PaletteMapEntry PaletteMap[] = {
+/* BEGIN SORTED.SH */
     {   "lynx-palette",         GenLynxPalette  },
+/* END SORTED.SH */
 };
 
 

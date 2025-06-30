@@ -1562,6 +1562,14 @@ static void DoP02 (void)
 
 
 
+static void DoP02X (void)
+/* Switch to 6502X CPU */
+{
+    SetCPU (CPU_6502X);
+}
+
+
+
 static void DoPC02 (void)
 /* Switch to 65C02 CPU */
 {
@@ -1570,10 +1578,18 @@ static void DoPC02 (void)
 
 
 
-static void DoP816 (void)
-/* Switch to 65816 CPU */
+static void DoPWC02 (void)
+/* Switch to W65C02 CPU */
 {
-    SetCPU (CPU_65816);
+    SetCPU (CPU_W65C02);
+}
+
+
+
+static void DoPCE02 (void)
+/* Switch to 65CE02 CPU */
+{
+    SetCPU (CPU_65CE02);
 }
 
 
@@ -1586,10 +1602,42 @@ static void DoP4510 (void)
 
 
 
+static void DoP45GS02 (void)
+/* Switch to 45GS02 CPU */
+{
+    SetCPU (CPU_45GS02);
+}
+
+
+
+static void DoP6280 (void)
+/* Switch to HuC6280 CPU */
+{
+    SetCPU (CPU_HUC6280);
+}
+
+
+
+static void DoP816 (void)
+/* Switch to 65816 CPU */
+{
+    SetCPU (CPU_65816);
+}
+
+
+
 static void DoPDTV (void)
 /* Switch to C64DTV CPU */
 {
     SetCPU (CPU_6502DTV);
+}
+
+
+
+static void DoPM740 (void)
+/* Switch to M740 CPU */
+{
+    SetCPU (CPU_M740);
 }
 
 
@@ -1700,6 +1748,14 @@ static void DoPSC02 (void)
 /* Switch to 65SC02 CPU */
 {
     SetCPU (CPU_65SC02);
+}
+
+
+
+static void DoPSweet16 (void)
+/* Switch to Sweet16 CPU */
+{
+    SetCPU (CPU_SWEET16);
 }
 
 
@@ -2057,70 +2113,72 @@ struct CtrlDesc {
     void        (*Handler) (void);      /* Command handler */
 };
 
+/* NOTE: .AND, .BITAND, .BITNOT, .BITOR, .BITXOR, .MOD, .NOT, .OR, .SHL, .SHR
+         and .XOR do NOT go into this table */
 #define PSEUDO_COUNT    (sizeof (CtrlCmdTab) / sizeof (CtrlCmdTab [0]))
 static CtrlDesc CtrlCmdTab [] = {
-    { ccNone,           DoA16           },
-    { ccNone,           DoA8            },
+    { ccNone,           DoA16           },      /* .A16 */
+    { ccNone,           DoA8            },      /* .A8 */
     { ccNone,           DoAddr          },      /* .ADDR */
     { ccNone,           DoUnexpected    },      /* .ADDRSIZE */
-    { ccNone,           DoAlign         },
-    { ccNone,           DoASCIIZ        },
+    { ccNone,           DoAlign         },      /* .ALIGN */
+    { ccNone,           DoASCIIZ        },      /* .ASCIIZ */
     { ccNone,           DoUnexpected    },      /* .ASIZE */
-    { ccNone,           DoAssert        },
-    { ccNone,           DoAutoImport    },
+    { ccNone,           DoAssert        },      /* .ASSERT */
+    { ccNone,           DoAutoImport    },      /* .AUTOIMPORT */
     { ccNone,           DoUnexpected    },      /* .BANK */
     { ccNone,           DoUnexpected    },      /* .BANKBYTE */
-    { ccNone,           DoBankBytes     },
+    { ccNone,           DoBankBytes     },      /* .BANKBYTES */
     { ccNone,           DoUnexpected    },      /* .BLANK */
-    { ccNone,           DoBss           },
-    { ccNone,           DoByte          },
-    { ccNone,           DoCase          },
-    { ccNone,           DoCharMap       },
-    { ccNone,           DoCode          },
+    { ccNone,           DoBss           },      /* .BSS */
+    { ccNone,           DoByte          },      /* .BYT, .BYTE */
+    { ccNone,           DoCase          },      /* .CASE */
+    { ccNone,           DoCharMap       },      /* .CHARMAP */
+    { ccNone,           DoCode          },      /* .CODE */
     { ccNone,           DoUnexpected,   },      /* .CONCAT */
-    { ccNone,           DoConDes        },
+    { ccNone,           DoConDes        },      /* .CONDES */
     { ccNone,           DoUnexpected    },      /* .CONST */
-    { ccNone,           DoConstructor   },
+    { ccNone,           DoConstructor   },      /* .CONSTRUCTOR */
     { ccNone,           DoUnexpected    },      /* .CPU */
-    { ccNone,           DoData          },
-    { ccNone,           DoDbg,          },
-    { ccNone,           DoDByt          },
-    { ccNone,           DoDebugInfo     },
-    { ccKeepToken,      DoDefine        },
+    { ccNone,           DoData          },      /* .DATA */
+    { ccNone,           DoDbg,          },      /* .DBG */
+    { ccNone,           DoDByt          },      /* .DBYT */
+    { ccNone,           DoDebugInfo     },      /* .DEBUGINFO */
+    { ccKeepToken,      DoDefine        },      /* .DEF, .DEFINE */
     { ccNone,           DoUnexpected    },      /* .DEFINED */
     { ccNone,           DoUnexpected    },      /* .DEFINEDMACRO */
-    { ccNone,           DoDelMac        },
-    { ccNone,           DoDestructor    },
-    { ccNone,           DoDWord         },
+    { ccNone,           DoDelMac        },      /* .DELMAC, .DELMACRO */
+    { ccNone,           DoDestructor    },      /* .DESTRUCTOR */
+    { ccNone,           DoDWord         },      /* .DWORD */
     { ccKeepToken,      DoConditionals  },      /* .ELSE */
     { ccKeepToken,      DoConditionals  },      /* .ELSEIF */
-    { ccKeepToken,      DoEnd           },
+    { ccKeepToken,      DoEnd           },      /* .END */
     { ccNone,           DoUnexpected    },      /* .ENDENUM */
     { ccKeepToken,      DoConditionals  },      /* .ENDIF */
-    { ccNone,           DoUnexpected    },      /* .ENDMACRO */
-    { ccNone,           DoEndProc       },
-    { ccNone,           DoUnexpected    },      /* .ENDREPEAT */
-    { ccNone,           DoEndScope      },
+    { ccNone,           DoUnexpected    },      /* .ENDMAC, .ENDMACRO */
+    { ccNone,           DoEndProc       },      /* .ENDPROC */
+    { ccNone,           DoUnexpected    },      /* .ENDREP, .ENDREPEAT */
+    { ccNone,           DoEndScope      },      /* .ENDSCOPE */
     { ccNone,           DoUnexpected    },      /* .ENDSTRUCT */
     { ccNone,           DoUnexpected    },      /* .ENDUNION */
-    { ccNone,           DoEnum          },
-    { ccNone,           DoError         },
-    { ccNone,           DoExitMacro     },
-    { ccNone,           DoExport        },
-    { ccNone,           DoExportZP      },
-    { ccNone,           DoFarAddr       },
-    { ccNone,           DoFatal         },
-    { ccNone,           DoFeature       },
-    { ccNone,           DoFileOpt       },
-    { ccNone,           DoForceImport   },
+    { ccNone,           DoEnum          },      /* .ENUM */
+    { ccNone,           DoError         },      /* .ERROR */
+    { ccNone,           DoExitMacro     },      /* .EXITMAC, .EXITMACRO */
+    { ccNone,           DoExport        },      /* .EXPORT */
+    { ccNone,           DoExportZP      },      /* .EXPORTZP */
+    { ccNone,           DoFarAddr       },      /* .FARADDR */
+    { ccNone,           DoFatal         },      /* .FATAL */
+    { ccNone,           DoFeature       },      /* .FEATURE */
+    { ccNone,           DoFileOpt       },      /* .FOPT, .FILEOPT */
+    { ccNone,           DoForceImport   },      /* .FORCEIMPORT */
     { ccNone,           DoUnexpected    },      /* .FORCEWORD */
-    { ccNone,           DoGlobal        },
-    { ccNone,           DoGlobalZP      },
+    { ccNone,           DoGlobal        },      /* .GLOBAL */
+    { ccNone,           DoGlobalZP      },      /* .GLOBALZP */
     { ccNone,           DoUnexpected    },      /* .HIBYTE */
-    { ccNone,           DoHiBytes       },
+    { ccNone,           DoHiBytes       },      /* .HIBYTES */
     { ccNone,           DoUnexpected    },      /* .HIWORD */
-    { ccNone,           DoI16           },
-    { ccNone,           DoI8            },
+    { ccNone,           DoI16           },      /* .I16 */
+    { ccNone,           DoI8            },      /* .I8 */
     { ccNone,           DoUnexpected    },      /* .IDENT */
     { ccKeepToken,      DoConditionals  },      /* .IF */
     { ccKeepToken,      DoConditionals  },      /* .IFBLANK */
@@ -2131,81 +2189,95 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFNDEF */
     { ccKeepToken,      DoConditionals  },      /* .IFNREF */
     { ccKeepToken,      DoConditionals  },      /* .IFP02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP02X */
     { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP45GS02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP6280 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPCE02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
+    { ccKeepToken,      DoConditionals  },      /* .IFPM740 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPSWEET16 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPWC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
-    { ccNone,           DoImport        },
-    { ccNone,           DoImportZP      },
-    { ccNone,           DoIncBin        },
-    { ccNone,           DoInclude       },
-    { ccNone,           DoInterruptor   },
+    { ccNone,           DoImport        },      /* .IMPORT */
+    { ccNone,           DoImportZP      },      /* .IMPORTZP */
+    { ccNone,           DoIncBin        },      /* .INCBIN */
+    { ccNone,           DoInclude       },      /* .INCLUDE */
+    { ccNone,           DoInterruptor   },      /* .INTERRUPTPOR */
     { ccNone,           DoUnexpected    },      /* .ISIZE */
     { ccNone,           DoUnexpected    },      /* .ISMNEMONIC */
     { ccNone,           DoInvalid       },      /* .LEFT */
-    { ccNone,           DoLineCont      },
-    { ccNone,           DoList          },
-    { ccNone,           DoListBytes     },
-    { ccNone,           DoLiteral       },
+    { ccNone,           DoLineCont      },      /* .LINECONT */
+    { ccNone,           DoList          },      /* .LIST */
+    { ccNone,           DoListBytes     },      /* .LISTBYTES */
+    { ccNone,           DoLiteral       },      /* .LITERAL */
     { ccNone,           DoUnexpected    },      /* .LOBYTE */
-    { ccNone,           DoLoBytes       },
+    { ccNone,           DoLoBytes       },      /* .LOBYTES */
     { ccNone,           DoUnexpected    },      /* .LOCAL */
-    { ccNone,           DoLocalChar     },
+    { ccNone,           DoLocalChar     },      /* .LOCALCHAR */
     { ccNone,           DoUnexpected    },      /* .LOWORD */
-    { ccNone,           DoMacPack       },
-    { ccNone,           DoMacro         },
+    { ccNone,           DoMacPack       },      /* .MACPACK */
+    { ccNone,           DoMacro         },      /* .MAC, .MACRO */
     { ccNone,           DoUnexpected    },      /* .MATCH */
     { ccNone,           DoUnexpected    },      /* .MAX */
     { ccNone,           DoInvalid       },      /* .MID */
     { ccNone,           DoUnexpected    },      /* .MIN */
-    { ccNone,           DoNull          },
-    { ccNone,           DoOrg           },
-    { ccNone,           DoOut           },
-    { ccNone,           DoP02           },
-    { ccNone,           DoP4510         },
-    { ccNone,           DoP816          },
-    { ccNone,           DoPageLength    },
+    { ccNone,           DoNull          },      /* .NULL */
+    { ccNone,           DoOrg           },      /* .ORG */
+    { ccNone,           DoOut           },      /* .OUT */
+    { ccNone,           DoP02           },      /* .P02 */
+    { ccNone,           DoP02X          },      /* .P02X */
+    { ccNone,           DoP4510         },      /* .P4510 */
+    { ccNone,           DoP45GS02       },      /* .P45GS02 */
+    { ccNone,           DoP6280         },      /* .P6280 */
+    { ccNone,           DoP816          },      /* .P816 */
+    { ccNone,           DoPageLength    },      /* .PAGELEN, .PAGELENGTH */
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
-    { ccNone,           DoPC02          },
-    { ccNone,           DoPDTV          },
-    { ccNone,           DoPopCharmap    },
-    { ccNone,           DoPopCPU        },
-    { ccNone,           DoPopSeg        },
-    { ccNone,           DoProc          },
-    { ccNone,           DoPSC02         },
-    { ccNone,           DoPushCharmap   },
-    { ccNone,           DoPushCPU       },
-    { ccNone,           DoPushSeg       },
-    { ccNone,           DoUnexpected    },      /* .REFERENCED */
-    { ccNone,           DoReferTo       },      /* .REFERTO */
-    { ccNone,           DoReloc         },
-    { ccNone,           DoRepeat        },
-    { ccNone,           DoRes           },
+    { ccNone,           DoPC02          },      /* .PC02 */
+    { ccNone,           DoPCE02         },      /* .PCE02 */
+    { ccNone,           DoPDTV          },      /* .PDTV */
+    { ccNone,           DoPM740         },      /* .PM740 */
+    { ccNone,           DoPopCharmap    },      /* .POPCHARMAP */
+    { ccNone,           DoPopCPU        },      /* .POPCPU */
+    { ccNone,           DoPopSeg        },      /* .POPSEG */
+    { ccNone,           DoProc          },      /* .PROC */
+    { ccNone,           DoPSC02         },      /* .PSC02 */
+    { ccNone,           DoPSweet16      },      /* .PSWEET16 */
+    { ccNone,           DoPushCharmap   },      /* .PUSHCHARMAP */
+    { ccNone,           DoPushCPU       },      /* .PUSHCPU */
+    { ccNone,           DoPushSeg       },      /* .PUSHSEG */
+    { ccNone,           DoPWC02         },      /* .PWC02 */
+    { ccNone,           DoUnexpected    },      /* .REF, .REFERENCED */
+    { ccNone,           DoReferTo       },      /* .REFTO, .REFERTO */
+    { ccNone,           DoReloc         },      /* .RELOC */
+    { ccNone,           DoRepeat        },      /* .REPEAT */
+    { ccNone,           DoRes           },      /* .RES */
     { ccNone,           DoInvalid       },      /* .RIGHT */
-    { ccNone,           DoROData        },
-    { ccNone,           DoScope         },
-    { ccNone,           DoSegment       },
+    { ccNone,           DoROData        },      /* .RODATA */
+    { ccNone,           DoScope         },      /* .SCOPE */
+    { ccNone,           DoSegment       },      /* .SEGMENT */
     { ccNone,           DoUnexpected    },      /* .SET */
-    { ccNone,           DoSetCPU        },
+    { ccNone,           DoSetCPU        },      /* .SETCPU */
     { ccNone,           DoUnexpected    },      /* .SIZEOF */
-    { ccNone,           DoSmart         },
+    { ccNone,           DoSmart         },      /* .SMART */
     { ccNone,           DoUnexpected    },      /* .SPRINTF */
     { ccNone,           DoUnexpected    },      /* .STRAT */
     { ccNone,           DoUnexpected    },      /* .STRING */
     { ccNone,           DoUnexpected    },      /* .STRLEN */
-    { ccNone,           DoStruct        },
-    { ccNone,           DoTag           },
+    { ccNone,           DoStruct        },      /* .STRUCT */
+    { ccNone,           DoTag           },      /* .TAG */
     { ccNone,           DoUnexpected    },      /* .TCOUNT */
     { ccNone,           DoUnexpected    },      /* .TIME */
-    { ccKeepToken,      DoUnDef         },
-    { ccNone,           DoUnion         },
+    { ccKeepToken,      DoUnDef         },      /* .UNDEF, .UNDEFINE */
+    { ccNone,           DoUnion         },      /* .UNION */
     { ccNone,           DoUnexpected    },      /* .VERSION */
-    { ccNone,           DoWarning       },
-    { ccNone,           DoWord          },
+    { ccNone,           DoWarning       },      /* .WARNING */
+    { ccNone,           DoWord          },      /* .WORD */
     { ccNone,           DoUnexpected    },      /* .XMATCH */
-    { ccNone,           DoZeropage      },
+    { ccNone,           DoZeropage      },      /* .ZEROPAGE */
 };
 
 

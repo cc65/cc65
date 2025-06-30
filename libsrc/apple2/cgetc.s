@@ -7,6 +7,10 @@
 ;
 
         .export         _cgetc
+
+        .ifndef __APPLE2ENH__
+        .import         machinetype
+        .endif
         .import         cursor, putchardirect
 
         .include        "zeropage.inc"
@@ -18,11 +22,14 @@ _cgetc:
         beq     :+
 
         ; Show caret.
-        .ifdef  __APPLE2ENH__
-        lda     #$7F | $80      ; Checkerboard, screen code
-        .else
+        .ifndef __APPLE2ENH__
         lda     #' ' | $40      ; Blank, flashing
+        bit     machinetype
+        bpl     put_caret
         .endif
+
+        lda     #$7F | $80      ; Checkerboard, screen code
+put_caret:
         jsr     putchardirect   ; Saves old character in tmp3
 
         ; Wait for keyboard strobe.
@@ -44,10 +51,14 @@ _cgetc:
 
         ; At this time, the high bit of the key pressed is set.
 :       bit     KBDSTRB         ; Clear keyboard strobe
-        .ifdef __APPLE2ENH__
+
+        .ifndef __APPLE2ENH__
+        bit     machinetype     ; Apple //e or more recent?
+        bpl     clear
+        .endif
         bit     BUTN0           ; Check if OpenApple is down
         bmi     done
-        .endif
-        and     #$7F            ; If not down, then clear high bit
+
+clear:  and     #$7F            ; If not down, then clear high bit
 done:   ldx     #>$0000
         rts

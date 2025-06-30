@@ -65,6 +65,28 @@ typedef enum {
     IT_USRINC = 0x04,           /* User include file (using "") */
 } InputType;
 
+/* A bitmapped set of flags for include guard processing in the preprocessor */
+typedef enum {
+    IG_NONE         = 0x00,
+    IG_NEWFILE      = 0x01,     /* File processing started */
+    IG_ISGUARDED    = 0x02,     /* File contains an include guard */
+    IG_GUARDCLOSED  = 0x04,     /* Include guard was closed */
+    IG_COMPLETE     = IG_ISGUARDED | IG_GUARDCLOSED,
+} GuardFlags;
+
+/* Struct that describes an input file */
+typedef struct IFile IFile;
+struct IFile {
+    unsigned        Index;      /* File index */
+    unsigned        Usage;      /* Usage counter */
+    unsigned long   Size;       /* File size */
+    unsigned long   MTime;      /* Time of last modification */
+    InputType       Type;       /* Type of input file */
+    GuardFlags      GFlags;     /* Flags for include guard processing */
+    StrBuf          GuardMacro; /* Include guard macro name */
+    char            Name[1];    /* Name of file (dynamically allocated) */
+};
+
 /* The current input line */
 extern StrBuf* Line;
 

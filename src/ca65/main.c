@@ -342,12 +342,20 @@ static void SetSys (const char* Sys)
             NewSymbol ("__SYM1__", 1);
             break;
 
+        case TGT_MEGA65:
+            CBMSystem ("__MEGA65__");
+            break;
+
         case TGT_KIM1:
             NewSymbol ("__KIM1__", 1);
             break;
 
         case TGT_RP6502:
             NewSymbol ("__RP6502__", 1);
+            break;
+
+        case TGT_AGAT:
+            NewSymbol ("__AGAT__", 1);
             break;
 
         default:

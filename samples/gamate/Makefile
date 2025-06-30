@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
@@ -31,6 +37,14 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_gamate = \
         nachtm.bin
 
@@ -50,6 +64,7 @@ else
 endif
 
 nachtm.bin: nachtm.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -Os -l nachtm.lst -t gamate -o nachtm.bin nachtm.c
 	../../util/gamate/gamate-fixcart nachtm.bin
 

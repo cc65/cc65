@@ -48,8 +48,10 @@
 
 
 
+/* CAUTION: table must be sorted for bsearch */
 static const FileId TypeTable[] = {
     /* Upper case stuff for obsolete operating systems */
+/* BEGIN SORTED.SH */
     {   "A",    FILETYPE_LIB    },
     {   "A65",  FILETYPE_ASM    },
     {   "ASM",  FILETYPE_ASM    },
@@ -65,7 +67,6 @@ static const FileId TypeTable[] = {
     {   "S",    FILETYPE_ASM    },
     {   "SER",  FILETYPE_O65    },
     {   "TGI",  FILETYPE_O65    },
-
     {   "a",    FILETYPE_LIB    },
     {   "a65",  FILETYPE_ASM    },
     {   "asm",  FILETYPE_ASM    },
@@ -81,6 +82,7 @@ static const FileId TypeTable[] = {
     {   "s",    FILETYPE_ASM    },
     {   "ser",  FILETYPE_O65    },
     {   "tgi",  FILETYPE_O65    },
+/* END SORTED.SH */
 };
 
 #define FILETYPE_COUNT (sizeof (TypeTable) / sizeof (TypeTable[0]))

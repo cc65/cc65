@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 # Makefile for the assembler regression tests
 
 ifneq ($(shell echo),)
@@ -11,6 +17,7 @@ ifdef CMD_EXE
   RMDIR = -rmdir /q /s $(subst /,\,$1)
   TRUE = exit 0
   CAT = type $(subst /,\,$1)
+  NULLDEV = nul:
 else
   S = /
   EXE =
@@ -18,10 +25,20 @@ else
   RMDIR = $(RM) -r $1
   TRUE = true
   CAT = cat $1
+  NULLDEV = /dev/null
+endif
+
+ifeq ($(SILENT),s)
+    QUIET = 1
 endif
 
 ifdef QUIET
-#  .SILENT:
+  .SILENT:
+  NULLOUT = >$(NULLDEV)
+  NULLERR = 2>$(NULLDEV)
+ifndef CMD_EXE
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+endif
 endif
 
 CA65 := $(if $(wildcard ../../../bin/ca65*),..$S..$S..$Sbin$Sca65,ca65)
@@ -76,48 +93,52 @@ endif
 endif
 
 ifneq ($(wildcard ref/$1.err-ref),)
-	$(ISEQUAL) ref/$1.err-ref $$(@:.bin=.err)
+	$(ISEQUAL) ref/$1.err-ref $$(@:.bin=.err) $(NULLERR)
 else
-	$(ISEQUAL) --empty $$(@:.bin=.err)
+	$(ISEQUAL) --empty $$(@:.bin=.err) $(NULLERR)
 endif
 
 ifneq ($(wildcard ref/$1.err2-ref),)
-	$(ISEQUAL) ref/$1.err2-ref $$(@:.bin=.err2)
+	$(ISEQUAL) ref/$1.err2-ref $$(@:.bin=.err2) $(NULLERR)
 else
-	$(ISEQUAL) --empty $$(@:.bin=.err2)
+	$(ISEQUAL) --empty $$(@:.bin=.err2) $(NULLERR)
 endif
 
 ifneq ($(wildcard ref/$1.bin-ref),)
-	$(ISEQUAL) --binary ref/$1.bin-ref $$@
+	$(ISEQUAL) --binary ref/$1.bin-ref $$@ $(NULLERR)
 endif
 
 #	rem $(indfo $(CAT) $(subst /,$$S,$$$(@:.bin=.ld65-err)))
 
 ifneq ($(wildcard ref/$1.ld65err-ref),)
+ifndef QUIET
 	@echo $(CAT) $$(@:.bin=.ld65-err)
 # FIXME: somehow this refuses to work in cmd.exe
 ifndef CMD_EXE
 	$(call CAT,$$(@:.bin=.ld65-err))
 	-diff -u ref/$1.ld65err-ref $$(@:.bin=.ld65-err)
 endif
-	$(ISEQUAL) --wildcards ref/$1.ld65err-ref $$(@:.bin=.ld65-err)
+endif
+	$(ISEQUAL) --wildcards ref/$1.ld65err-ref $$(@:.bin=.ld65-err) $(NULLERR)
 else
 ifneq ($(wildcard $(WORKDIR)/$1.ld65-err),)
-	$(ISEQUAL) --empty $$(@:.bin=.ld65-err)
+	$(ISEQUAL) --empty $$(@:.bin=.ld65-err) $(NULLERR)
 endif
 endif
 
 ifneq ($(wildcard ref/$1.ld65err2-ref),)
+ifndef QUIET
 	@echo $(CAT) $$(@:.bin=.ld65-err2)
 # FIXME: somehow this refuses to work in cmd.exe
 ifndef CMD_EXE
 	$(call CAT,$$(@:.bin=.ld65-err2))
 	-diff -u ref/$1.ld65err2-ref $$(@:.bin=.ld65-err2)
 endif
-	$(ISEQUAL) --wildcards ref/$1.ld65err2-ref $$(@:.bin=.ld65-err2)
+endif
+	$(ISEQUAL) --wildcards ref/$1.ld65err2-ref $$(@:.bin=.ld65-err2) $(NULLERR)
 else
 ifneq ($(wildcard $(WORKDIR)/$1.ld65-err2),)
-	$(ISEQUAL) --empty $$(@:.bin=.ld65-err2)
+	$(ISEQUAL) --empty $$(@:.bin=.ld65-err2) $(NULLERR)
 endif
 endif
 
@@ -143,37 +164,37 @@ endif
 endif
 
 ifneq ($(wildcard ref/$1.err-ref),)
-	$(ISEQUAL) ref/$1.err-ref $$(@:.bin=.list-err)
+	$(ISEQUAL) ref/$1.err-ref $$(@:.bin=.list-err) $(NULLERR)
 else
-	$(ISEQUAL) --empty $$(@:.bin=.list-err)
+	$(ISEQUAL) --empty $$(@:.bin=.list-err) $(NULLERR)
 endif
 
 ifneq ($(wildcard ref/$1.ld65err-ref),)
-	$(ISEQUAL) --wildcards ref/$1.ld65err-ref $$(@:.bin=.list-ld65-err)
+	$(ISEQUAL) --wildcards ref/$1.ld65err-ref $$(@:.bin=.list-ld65-err) $(NULLERR)
 else
 ifneq ($(wildcard $(WORKDIR)/$1.list-ld65-err),)
-	$(ISEQUAL) --empty $$(@:.bin=.list-ld65-err)
+	$(ISEQUAL) --empty $$(@:.bin=.list-ld65-err) $(NULLERR)
 endif
 endif
 
 ifneq ($(wildcard ref/$1.err2-ref),)
-	$(ISEQUAL) ref/$1.err2-ref $$(@:.bin=.list-err2)
+	$(ISEQUAL) ref/$1.err2-ref $$(@:.bin=.list-err2) $(NULLERR)
 else
-	$(ISEQUAL) --empty $$(@:.bin=.list-err2)
+	$(ISEQUAL) --empty $$(@:.bin=.list-err2) $(NULLERR)
 endif
 
 ifneq ($(wildcard ref/$1.ld65err2-ref),)
-	$(ISEQUAL) --wildcards ref/$1.ld65err2-ref $$(@:.bin=.list-ld65-err2)
+	$(ISEQUAL) --wildcards ref/$1.ld65err2-ref $$(@:.bin=.list-ld65-err2) $(NULLERR)
 else
 ifneq ($(wildcard $(WORKDIR)/$1.list-ld65-err2),)
-	$(ISEQUAL) --empty $$(@:.bin=.list-ld65-err2)
+	$(ISEQUAL) --empty $$(@:.bin=.list-ld65-err2) $(NULLERR)
 endif
 endif
 
 #	check if the result bin is the same as without listing file
 ifeq ($(wildcard control/$1.err),)
 ifeq ($(wildcard control/$1.err2),)
-	$(ISEQUAL) $$@ $$(@:.bin=.list-bin)
+	$(ISEQUAL) $$@ $$(@:.bin=.list-bin) $(NULLERR)
 endif
 endif
 
@@ -181,7 +202,7 @@ ifneq ($(wildcard ref/$1.list-ref),)
 #	we have a reference file, compare that, too
 
 #	remove first line which contains a version number
-	$(ISEQUAL) --skip=1 ref/$1.list-ref $$(@:.bin=.list-lst)
+	$(ISEQUAL) --skip=1 ref/$1.list-ref $$(@:.bin=.list-lst) $(NULLERR)
 endif
 
 endef # LISTING_template

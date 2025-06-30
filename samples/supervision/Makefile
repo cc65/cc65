@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
@@ -33,6 +39,14 @@ else
   SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_supervision = \
         hello
 
@@ -52,6 +66,7 @@ else
 endif
 
 hello: hello.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o hello -m hello.map hello.c
 	
 clean:

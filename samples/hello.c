@@ -7,6 +7,7 @@
 
 
 
+#define DYN_BOX_DRAW
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>

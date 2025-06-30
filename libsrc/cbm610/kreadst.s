@@ -11,7 +11,7 @@
 
         .include        "cbm610.inc"
 
-
+; preserves X and Y, returns status in A and in status flags
 .proc   READST
 
         jsr     sys_bank

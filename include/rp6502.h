@@ -121,7 +121,7 @@ int __cdecl__ xregn (char device, char channel, unsigned char address, unsigned 
     ...);
 int __cdecl__ xreg (char device, char channel, unsigned char address, ...);
 int phi2 (void);
-int codepage (void);
+int codepage (int);
 long lrand (void);
 int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length);
 int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);

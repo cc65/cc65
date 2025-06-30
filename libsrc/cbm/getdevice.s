@@ -10,7 +10,8 @@
         .import         isdisk
         .import         opencmdchannel
         .import         closecmdchannel
-        .importzp       ST
+        .import         initst
+        .import         READST
         .importzp       tmp2
 
 ;------------------------------------------------------------------------------
@@ -40,8 +41,7 @@ next:   inx
 ; only [in|de]crement the reference count of the shared cmdchannel
 ; so we need to explicitly initialize ST here
 
-        lda     #$00
-        sta     ST
+        jsr     initst
 
         stx     tmp2
         jsr     opencmdchannel
@@ -49,10 +49,7 @@ next:   inx
         jsr     closecmdchannel
         ldx     tmp2
 
-; As we had to reference ST above anyway we can as well do so
-; here too (instead of calling READST)
-
-        lda     ST
+        jsr     READST
 
 ; Either the Kernal calls above were successful or there was
 ; already a cmdchannel to the device open - which is a pretty

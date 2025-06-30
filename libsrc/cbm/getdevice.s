@@ -41,15 +41,18 @@ next:   inx
 ; only [in|de]crement the reference count of the shared cmdchannel
 ; so we need to explicitly initialize ST here
 
+        stx     tmp2    ; further calls may use X
+
         jsr     initst
 
-        stx     tmp2
+        ldx     tmp2    ; get unit number back
         jsr     opencmdchannel
-        ldx     tmp2
+        ldx     tmp2    ; get unit number back
         jsr     closecmdchannel
-        ldx     tmp2
 
         jsr     READST
+
+        ldx     tmp2    ; get unit number back
 
 ; Either the Kernal calls above were successful or there was
 ; already a cmdchannel to the device open - which is a pretty

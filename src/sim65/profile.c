@@ -44,7 +44,8 @@
 
 bool enableProfiling = false;
 
-const char *profileMap = NULL;
+const char *symInfoFile = NULL;
+/* file containing symbol infor used by profiler */
 
 static uint16_t resetVector = 0xFFFF;
 
@@ -156,6 +157,9 @@ static int ComparePC2Name(const void *a, const void *b) {
 }
 
 static void AddFunction(int pc, const char *name) {
+    if (name[0] == '.') {
+        name++;
+    }
     pc2name = realloc(pc2name, sizeof(PC2Name) * (pc2nameCount + 1));
     pc2name[pc2nameCount].pc = pc;
     pc2name[pc2nameCount].name = strdup(name);
@@ -177,7 +181,7 @@ static void ReadMapFile(void) {
     char buf[128];
     char pieces[6][64];
     int mode = 0;
-    FILE *f = fopen(profileMap, "r");
+    FILE *f = fopen(symInfoFile, "r");
     int items;
     if (f) {
         while (fgets(buf, sizeof(buf), f)) {
@@ -203,7 +207,6 @@ static void ReadMapFile(void) {
                         }
                     }
                     else {
-                        qsort(pc2name, pc2nameCount, sizeof(PC2Name), ComparePC2Name);
                         mode++;
                     }
                 default:
@@ -214,7 +217,58 @@ static void ReadMapFile(void) {
         fclose(f);
     }
     else {
-        printf("Unable to open map file '%s'\n", profileMap);
+        printf("Unable to open map file '%s'\n", symInfoFile);
+    }
+}
+
+static void ReadViceFile(void) {
+    char buf[128];
+    char al[128];
+    int addr;
+    char nam[128];
+    FILE *f = fopen(symInfoFile, "r");
+    if (f) {
+        while (fgets(buf, sizeof(buf), f)) {
+            if (3 == sscanf(buf, "%s %x %s", al, &addr, nam)) {
+                if (!strcmp(al, "al")) {
+                    AddFunction(addr, nam);
+                }
+                else {
+                    printf("unexpected data '%s'\n", buf);
+                }
+            }
+            else {
+                printf("unexpected data '%s'\n", buf);
+            }
+        }
+        fclose(f);
+    }
+    else {
+        printf("Unable to open vice file '%s'\n", symInfoFile);
+    }
+}
+
+static void ReadSymInfo(void) {
+    char buf[128];
+    FILE *f = fopen(symInfoFile, "r");
+    if (f) {
+        if (fgets(buf, sizeof(buf), f)) {
+            fclose(f);
+            /* TODO FIX add support for dbginfo! */
+            if (!strncmp(buf, "al 0", 4)) {
+                ReadViceFile();
+            }
+            else {
+                ReadMapFile();
+            }
+            qsort(pc2name, pc2nameCount, sizeof(PC2Name), ComparePC2Name);
+        }
+        else {
+            printf("Unable to read file '%s'\n", symInfoFile);
+        }
+    }
+    else {
+        printf("Unable to open file '%s'\n", symInfoFile);
     }
 }
 
@@ -232,7 +286,7 @@ static void ProfileDump(void) {
     ProfileTimeEntry *startup = EnsureTimeEntry(resetVector);
     grandTotal = startup->totalTicks = Peripherals.Counter.ClockCycles;
 
-    ReadMapFile();
+    ReadSymInfo();
 
     for (i = 0; i < functionCount; i++) {
         gap = 0;

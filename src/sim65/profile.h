@@ -40,8 +40,8 @@
 extern bool enableProfiling;
 /* false if profiling disabled */
 
-extern const char *profileMap;
-/* map file used by profiler */
+extern const char *symInfoFile;
+/* file containing symbol info used by profiler */
 
 void ProfileJSR(uint16_t pc);
 /* Log a JSR instruction */

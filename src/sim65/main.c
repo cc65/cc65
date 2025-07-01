@@ -94,7 +94,7 @@ static void Usage (void)
             "Short options:\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -c\t\t\tPrint amount of executed CPU cycles\n"
-            "  -p <mapfile>\t\tEnable profiler\n"
+            "  -p <map, vice, or dbginfo file>\t\tEnable profiler\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -V\t\t\tPrint the simulator version number\n"
             "  -x <num>\t\tExit simulator after <num> cycles\n"
@@ -174,7 +174,7 @@ static void OptProfile (const char* Opt attribute ((unused)),
 /* Set flag to enable profiling at the end */
 {
     enableProfiling = 1;
-    profileMap = strdup(Arg);
+    symInfoFile = strdup(Arg);
 }
 
 

@@ -61,6 +61,7 @@
 #include "studyexpr.h"
 #include "symbol.h"
 #include "symtab.h"
+#include "target.h"
 #include "toklist.h"
 #include "ulabel.h"
 #include "macro.h"
@@ -445,7 +446,7 @@ static ExprNode* FuncCapability (void)
             /* The pseudo function result is the logical AND of all capabilities
             ** given.
             */
-            if (!CPUHasCap (Cap)) {
+            if (!CPUHasCap (Cap) && !TargetHasCap (Cap)) {
                 Result = 0;
             }
         }

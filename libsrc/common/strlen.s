@@ -10,7 +10,6 @@
 
         .export         _strlen, _strlen_ptr4
         .importzp       ptr4
-        .macpack        cpu
 
 _strlen:
         sta     ptr4            ; Save s

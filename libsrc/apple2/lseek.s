@@ -6,7 +6,6 @@
 
         .export         _lseek
         .import         popax, popptr1
-        .macpack        cpu
 
         .include        "zeropage.inc"
         .include        "errno.inc"

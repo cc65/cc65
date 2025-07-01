@@ -225,13 +225,13 @@ static void ReadViceFile(void) {
     char buf[128];
     char al[128];
     int addr;
-    char nam[128];
+    char name[128];
     FILE *f = fopen(symInfoFile, "r");
     if (f) {
         while (fgets(buf, sizeof(buf), f)) {
-            if (3 == sscanf(buf, "%s %x %s", al, &addr, nam)) {
+            if (3 == sscanf(buf, "%s %x %s", al, &addr, name)) {
                 if (!strcmp(al, "al")) {
-                    AddFunction(addr, nam);
+                    AddFunction(addr, name);
                 }
                 else {
                     printf("unexpected data '%s'\n", buf);
@@ -248,15 +248,47 @@ static void ReadViceFile(void) {
     }
 }
 
+static void ReadDbginfoFile(void) {
+    char buf[512];
+    char *p;
+    char *name;
+    int addr;
+    FILE *f = fopen(symInfoFile, "r");
+    if (f) {
+        while (fgets(buf, sizeof(buf), f)) {
+            if (!strncmp(buf, "sym\t", 4)) {
+                for (p = strtok(buf, "\r\n\t,"); p; p = strtok(NULL, "\r\n\t,")) {
+                    if (!strncmp(p, "name=", 5)) {
+                        name = p + strlen("name=\"");
+                        name[strlen(name) - 1] = 0;
+                    }
+                    else if (!strncmp(p, "val=", 4)) {
+                        sscanf(p, "val=0x%x", &addr);
+                    }
+                    else if (!strcmp(p, "type=lab")) {
+                        AddFunction(addr, name);
+                    }
+                }
+            }
+        }
+        fclose(f);
+    }
+    else {
+        printf("Unable to open vice file '%s'\n", symInfoFile);
+    }
+}
+
 static void ReadSymInfo(void) {
     char buf[128];
     FILE *f = fopen(symInfoFile, "r");
     if (f) {
         if (fgets(buf, sizeof(buf), f)) {
             fclose(f);
-            /* TODO FIX add support for dbginfo! */
             if (!strncmp(buf, "al 0", 4)) {
                 ReadViceFile();
+            }
+            else if (!strncmp(buf, "version\t", 8)) {
+                ReadDbginfoFile();
             }
             else {
                 ReadMapFile();

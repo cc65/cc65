@@ -151,7 +151,7 @@ const unsigned CPUIsets[CPU_COUNT] = {
      CAP_BIT (CAP_CPU_HAS_PUSHXY))
 
 /* Table containing one capability entry per CPU */
-static const uint64_t CPUCaps[CPU_COUNT] = {
+static const uint32_t CPUCaps[CPU_COUNT] = {
     CAP_NONE,                   /* CPU_NONE */
     CAP_6502,                   /* CPU_6502 */
     CAP_6502X,                  /* CPU_6502X */

@@ -12,8 +12,6 @@
         .import         _strlen_ptr4, _malloc, _memcpy, pushax
         .export         _strdup
 
-        .macpack        cpu
-
 _strdup:
         ; Get length (and store source in ptr4)
         sta     ptr4
@@ -22,7 +20,7 @@ _strdup:
         jsr     _strlen_ptr4    ; strlen may increment
 
         ; Add null byte for terminator
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_INA)
         inc     a
 .else
         clc

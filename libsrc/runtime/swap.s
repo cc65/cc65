@@ -8,8 +8,6 @@
         .export         swapstk
         .importzp       c_sp, ptr4
 
-        .macpack        cpu
-
 swapstk:
         sta     ptr4
         stx     ptr4+1
@@ -18,7 +16,7 @@ swapstk:
         tax
         lda     ptr4+1
         sta     (c_sp),y
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)
         tay
         lda     ptr4

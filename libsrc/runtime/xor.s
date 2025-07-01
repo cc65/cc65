@@ -9,12 +9,10 @@
         .import         addysp1
         .importzp       c_sp, tmp1
 
-        .macpack        cpu
-
 tosxora0:
         ldx     #$00
 tosxorax:
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         eor     (c_sp)
         ldy     #1
 .else

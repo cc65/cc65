@@ -7,11 +7,9 @@
         .export         popa
         .importzp       c_sp
 
-        .macpack        cpu
-
 .proc   popa
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)
 .else
         ldy     #0              ; (2)

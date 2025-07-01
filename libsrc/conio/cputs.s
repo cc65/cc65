@@ -8,13 +8,12 @@
         .export         _cputsxy, _cputs
         .import         gotoxy, _cputc
         .importzp       ptr1, tmp1
-        .macpack        cpu
 
 _cputsxy:
         sta     ptr1            ; Save s for later
         stx     ptr1+1
         jsr     gotoxy          ; Set cursor, pop x and y
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_BRA8)
         bra     L0              ; Same as cputs...
 .else
         jmp     L0              ; Same as cputs...
@@ -24,7 +23,7 @@ _cputs: sta     ptr1            ; Save s
         stx     ptr1+1
 
 L0:
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (ptr1)          ; (5)
 .else
         ldy     #0              ; (2)

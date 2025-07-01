@@ -9,10 +9,8 @@
         .import         getlop, udiv32
         .importzp       sreg, tmp3, tmp4, ptr2
 
-        .macpack        cpu
-
 tosumod0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else

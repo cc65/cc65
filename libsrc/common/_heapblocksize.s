@@ -12,7 +12,6 @@
         .include        "_heap.inc"
 
         .macpack        generic
-        .macpack        cpu
 
 ;-----------------------------------------------------------------------------
 ; Code
@@ -39,7 +38,7 @@ ___heapblocksize:
         ldy     #usedblock::size+1
         lda     (ptr2),y
         tax
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (ptr2)
 .else
         dey

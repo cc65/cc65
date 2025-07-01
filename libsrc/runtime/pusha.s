@@ -7,8 +7,6 @@
         .export         pusha0sp, pushaysp, pusha
         .importzp       c_sp
 
-        .macpack        cpu
-
 ; Beware: The optimizer knows about this function!
 
 pusha0sp:

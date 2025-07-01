@@ -16,8 +16,6 @@
 
         .include        "time.inc"
 
-        .macpack        cpu
-
 __time_t_to_tm:
         ; Divide number of seconds since epoch, in ptr1:sreg,
         ; by 86400 to get the number of days since epoch, and
@@ -80,7 +78,7 @@ __time_t_to_tm:
 
         ; Zero the two high bytes of the divisor and the high byte
         ; of the dividend.
-        .if .cpu .bitand CPU_ISET_65SC02
+        .if .cap(CPU_HAS_STZ)
         stz     ptr4
         stz     ptr4+1
         stz     sreg+1

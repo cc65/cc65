@@ -11,14 +11,12 @@
         .export         tosadda0, tosaddax
         .importzp       c_sp, tmp1
 
-        .macpack        cpu
-
 tosadda0:
         ldx     #0
 tosaddax:
         clc                     ; (2)
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
 
         adc     (c_sp)          ; (7)
         tay                     ; (9)

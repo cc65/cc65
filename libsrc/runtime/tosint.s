@@ -8,14 +8,12 @@
         .import         incsp2
         .importzp       c_sp
 
-        .macpack        cpu
-
 ; Convert TOS from long to int by cutting of the high 16bit
 
 .proc   tosint
 
         pha
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)
 .else
         ldy     #0

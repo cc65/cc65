@@ -1681,10 +1681,12 @@ either a string or an expression value.
   Checks for the capability to push and pop the X and Y registers.
 
   <tag><tt>CPU_HAS_ZPIND</tt></tag>
-  Checks for the availability of the "zeropage indirect" addressing mode.
+  Checks for the availability of the "zeropage indirect" addressing mode as it
+  is implemented in the 65SC02 CPU.
 
   <tag><tt>CPU_HAS_STZ</tt></tag>
-  Checks for the availability of the "store zero" instruction.
+  Checks for the availability of the "store zero" instruction as it is
+  implemented in the 65SC02 CPU.
 
 </descrip>
 

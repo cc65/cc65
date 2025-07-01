@@ -233,5 +233,5 @@ int CPUHasCap (capability_t Cap)
 /* Check if the current CPU has the given capability */
 {
     PRECONDITION (CPU >= 0 && CPU < CPU_COUNT);
-    return (CPUCaps[CPU] & (UINT32_C (1) << Cap)) != 0;
+    return (CPUCaps[CPU] & CAP_BIT (Cap)) != 0;
 }

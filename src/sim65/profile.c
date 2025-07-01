@@ -160,8 +160,7 @@ static void AddFunction(int pc, const char *name) {
     if (!name) {
         return;
     }
-
-    if (name[0] == '.') {
+    else if (name[0] == '.') {
         name++;
     }
 
@@ -256,7 +255,7 @@ static void ReadViceFile(void) {
 static void ReadDbginfoFile(void) {
     char buf[512];
     char *p;
-    char *name;
+    char *name = NULL;
     int addr;
     FILE *f = fopen(symInfoFile, "r");
     if (f) {

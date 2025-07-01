@@ -830,6 +830,7 @@ static void Usage (void)
             "  -E\t\t\t\tStop after the preprocessing stage\n"
             "  -I dir\t\t\tSet a compiler include directory path\n"
             "  -L path\t\t\tSpecify a library search path\n"
+            "  -Ld name\t\t\tCreate a dbginfo file\n"
             "  -Ln name\t\t\tCreate a VICE label file\n"
             "  -O\t\t\t\tOptimize code\n"
             "  -Oi\t\t\t\tOptimize code, inline runtime functions\n"
@@ -1540,6 +1541,9 @@ int main (int argc, char* argv [])
                     if (Arg[2] == 'n' && Arg[3] == '\0') {
                         /* VICE label file (linker) */
                         CmdAddArg2 (&LD65, "-Ln", GetArg (&I, 3));
+                    } else if (Arg[2] == 'd' && Arg[3] == '\0') {
+                        /* debug info file (linker) */
+                        CmdAddArg2 (&LD65, "--dbgfile", GetArg (&I, 3));
                     } else {
                         /* Library search path (linker) */
                         OptLibPath (Arg, GetArg (&I, 2));

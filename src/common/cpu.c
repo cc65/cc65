@@ -96,54 +96,59 @@ const unsigned CPUIsets[CPU_COUNT] = {
 ** is deliberately hidden from the outside so it can be extended to 64 bit or
 ** even more.
 */
+#define CAP_BIT(Cap)    (UINT32_C (1) << (Cap))
 #define CAP_NONE        UINT32_C (0)
-#define CAP_6502        UINT32_C (0)
-#define CAP_6502X       UINT32_C (0)
-#define CAP_6502DTV     UINT32_C (0)
+#define CAP_6502        CAP_NONE
+#define CAP_6502X       CAP_NONE
+#define CAP_6502DTV     CAP_NONE
 #define CAP_65SC02                              \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
-     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY)   |   \
-     (UINT32_C (1) << CAP_CPU_HAS_ZPIND)    |   \
-     (UINT32_C (1) << CAP_CPU_HAS_STZ))
+    (CAP_BIT (CAP_CPU_HAS_BITIMM)       |       \
+     CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA)          |       \
+     CAP_BIT (CAP_CPU_HAS_PUSHXY)       |       \
+     CAP_BIT (CAP_CPU_HAS_ZPIND)        |       \
+     CAP_BIT (CAP_CPU_HAS_STZ))
 #define CAP_65C02                               \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
-     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY)   |   \
-     (UINT32_C (1) << CAP_CPU_HAS_ZPIND)    |   \
-     (UINT32_C (1) << CAP_CPU_HAS_STZ))
+    (CAP_BIT (CAP_CPU_HAS_BITIMM)       |       \
+     CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA)          |       \
+     CAP_BIT (CAP_CPU_HAS_PUSHXY)       |       \
+     CAP_BIT (CAP_CPU_HAS_ZPIND)        |       \
+     CAP_BIT (CAP_CPU_HAS_STZ))
 #define CAP_65816                               \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
-     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY)   |   \
-     (UINT32_C (1) << CAP_CPU_HAS_ZPIND)    |   \
-     (UINT32_C (1) << CAP_CPU_HAS_STZ))
-#define CAP_SWEET16     UINT32_C (0)
+    (CAP_BIT (CAP_CPU_HAS_BITIMM)       |       \
+     CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA)          |       \
+     CAP_BIT (CAP_CPU_HAS_PUSHXY)       |       \
+     CAP_BIT (CAP_CPU_HAS_ZPIND)        |       \
+     CAP_BIT (CAP_CPU_HAS_STZ))
+#define CAP_SWEET16     CAP_NONE
 #define CAP_HUC6280                             \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
-     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY)   |   \
-     (UINT32_C (1) << CAP_CPU_HAS_ZPIND)    |   \
-     (UINT32_C (1) << CAP_CPU_HAS_STZ))
+    (CAP_BIT (CAP_CPU_HAS_BITIMM)       |       \
+     CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA)          |       \
+     CAP_BIT (CAP_CPU_HAS_PUSHXY)       |       \
+     CAP_BIT (CAP_CPU_HAS_ZPIND)        |       \
+     CAP_BIT (CAP_CPU_HAS_STZ))
 #define CAP_M740                                \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA))
+    (CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA))
 #define CAP_4510                                \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
-     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY))
+    (CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA)          |       \
+     CAP_BIT (CAP_CPU_HAS_PUSHXY))
 #define CAP_45GS02                              \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
-     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY))
+    (CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA)          |       \
+     CAP_BIT (CAP_CPU_HAS_PUSHXY))
 #define CAP_W65C02                              \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
-     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY))
+    (CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA)          |       \
+     CAP_BIT (CAP_CPU_HAS_PUSHXY))
 #define CAP_65CE02                              \
-    ((UINT32_C (1) << CAP_CPU_HAS_BRA8)     |   \
-     (UINT32_C (1) << CAP_CPU_HAS_INA)      |   \
-     (UINT32_C (1) << CAP_CPU_HAS_PUSHXY))
+    (CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+     CAP_BIT (CAP_CPU_HAS_INA)          |       \
+     CAP_BIT (CAP_CPU_HAS_PUSHXY))
 
 /* Table containing one capability entry per CPU */
 static const uint64_t CPUCaps[CPU_COUNT] = {

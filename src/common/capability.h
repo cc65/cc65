@@ -54,6 +54,7 @@ enum capability_t {
     CAP_CPU_HAS_PUSHXY      =  2,   /* CPU has PHX/PHY/PLX/PLY */
     CAP_CPU_HAS_ZPIND       =  3,   /* CPU has "(zp)" mode (no offset) */
     CAP_CPU_HAS_STZ         =  4,   /* CPU has "store zero" (!) instruction */
+    CAP_CPU_HAS_BITIMM      =  5,   /* CPU has "bit #imm" instruction */
 };
 typedef enum capability_t capability_t;
 

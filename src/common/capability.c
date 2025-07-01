@@ -50,6 +50,7 @@ struct Capability {
     capability_t        Cap;
 } Capabilities [] = {
 /* BEGIN SORTED.SH */
+    { "CPU_HAS_BITIMM",         CAP_CPU_HAS_BITIMM      },
     { "CPU_HAS_BRA8",           CAP_CPU_HAS_BRA8        },
     { "CPU_HAS_INA",            CAP_CPU_HAS_INA         },
     { "CPU_HAS_PUSHXY",         CAP_CPU_HAS_PUSHXY      },

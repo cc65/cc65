@@ -1609,6 +1609,9 @@ either a string or an expression value.
 
 <descrip>
 
+  <tag><tt>CPU_HAS_BITIMM</tt></tag>
+  Checks for the availability of the "bit #imm" instruction.
+
   <tag><tt>CPU_HAS_BRA8</tt></tag>
   Checks for the availability of a short (8 bit) branch.
 

@@ -80,6 +80,7 @@
     <ClInclude Include="common\assertion.h" />
     <ClInclude Include="common\attrib.h" />
     <ClInclude Include="common\bitops.h" />
+    <ClInclude Include="common\capability.h" />
     <ClInclude Include="common\cddefs.h" />
     <ClInclude Include="common\chartype.h" />
     <ClInclude Include="common\check.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="common\alignment.c" />
     <ClCompile Include="common\assertion.c" />
     <ClCompile Include="common\bitops.c" />
+    <ClCompile Include="common\capability.c" />
     <ClCompile Include="common\chartype.c" />
     <ClCompile Include="common\check.c" />
     <ClCompile Include="common\cmdline.c" />

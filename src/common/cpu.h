@@ -69,7 +69,7 @@ typedef enum {
     CPU_COUNT                   /* Number of different CPUs */
 } cpu_t;
 
-/* CPU instruction sets (make sure this matches asminc/cpu.mac) */
+/* CPU instruction sets */
 enum {
     CPU_ISET_NONE       = 1 << CPU_NONE,
     CPU_ISET_6502       = 1 << CPU_6502,

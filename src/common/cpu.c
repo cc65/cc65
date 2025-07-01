@@ -74,21 +74,33 @@ const char* CPUNames[CPU_COUNT] = {
  * NOTE: make sure to only combine the instruction sets that are 100% compatible
  */
 const unsigned CPUIsets[CPU_COUNT] = {
+    /* CPU_NONE */
     CPU_ISET_NONE,
+    /* CPU_6502 */
     CPU_ISET_6502,
+    /* CPU_6502X */
     CPU_ISET_6502X   | CPU_ISET_6502,
+    /* CPU_6502DTV */
     CPU_ISET_6502DTV | CPU_ISET_6502,
+    /* CPU_65SC02 */
     CPU_ISET_65SC02  | CPU_ISET_6502,
+    /* CPU_65C02 */
     CPU_ISET_65C02   | CPU_ISET_6502 | CPU_ISET_65SC02,
-    /* 65816 has wai/stp and NO bit manipulation */
+    /* CPU_65816. 65816 has wai/stp and NO bit manipulation. */
     CPU_ISET_65816   | CPU_ISET_6502 | CPU_ISET_65SC02,
+    /* CPU_SWEET16 */
     CPU_ISET_SWEET16,
+    /* CPU_HUC6280 */
     CPU_ISET_HUC6280 | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
+    /* CPU_M740 */
     CPU_ISET_M740    | CPU_ISET_6502,
-    /* 4510 does NOT have indirect-zp (without z), so we can not use 65SC02 */
+    /* CPU_4510. 4510 does NOT have indirect-zp (without z), so we can not use 65SC02 */
     CPU_ISET_4510    | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02,
+    /* CPU_45GS02 */
     CPU_ISET_45GS02  | CPU_ISET_6502                   | CPU_ISET_65C02 | CPU_ISET_65CE02 | CPU_ISET_4510,
+    /* CPU_W65C02 */
     CPU_ISET_W65C02  | CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
+    /* CPU_65CE02 */
     CPU_ISET_65CE02  | CPU_ISET_6502                   | CPU_ISET_65C02,
 };
 

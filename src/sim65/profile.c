@@ -157,9 +157,14 @@ static int ComparePC2Name(const void *a, const void *b) {
 }
 
 static void AddFunction(int pc, const char *name) {
+    if (!name) {
+        return;
+    }
+
     if (name[0] == '.') {
         name++;
     }
+
     pc2name = realloc(pc2name, sizeof(PC2Name) * (pc2nameCount + 1));
     pc2name[pc2nameCount].pc = pc;
     pc2name[pc2nameCount].name = strdup(name);

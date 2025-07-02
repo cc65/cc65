@@ -775,7 +775,7 @@ _DrawChar:      sty tempy
                 sta dest_hi
 
                 lda #0                              ; Get the address in font memory where this
-                sta src_hi                          ;  Petscii chracter lives (after conversion from
+                sta src_hi                          ;  Petscii character lives (after conversion from
                 lda tempa                           ;  ascii)
 
                 sty temp2

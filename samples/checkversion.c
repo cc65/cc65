@@ -4,7 +4,7 @@
  * macro was fixed some time after 2.19 to (VER_MAJOR * 0x100) + VER_MINOR.
  *
  * The following strategy can be used to still compare for less or greater versions,
- * should this really be necessary or wanted - it is not recommended afterall.
+ * should this really be necessary or wanted - it is not recommended after all.
  */
 
 #include <stdio.h>

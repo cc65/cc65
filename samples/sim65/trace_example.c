@@ -1,5 +1,5 @@
 /*
- * Sim65 trace functionailty example.
+ * Sim65 trace functionality example.
  *
  * Description
  * -----------

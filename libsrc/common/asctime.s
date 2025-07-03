@@ -9,8 +9,6 @@
         .importzp       ptr1
         .include        "time.inc"
 
-        .macpack        cpu
-
 ; ------------------------------------------------------------------------
 ; Special values
 
@@ -24,7 +22,7 @@ MAX_BUF_LEN = 38
 
 _asctime:
         ; Backup timep
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_PUSHXY)
         pha
         phx
         .else
@@ -48,7 +46,7 @@ _asctime:
         jsr     pushax
 
         ; Restore timep
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_PUSHXY)
         plx
         pla
         .else

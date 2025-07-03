@@ -1401,16 +1401,76 @@ writable.
   Reading this pseudo variable will give a constant integer value that
   tells which CPU is currently enabled. It can also tell which instruction
   set the CPU is able to translate. The value read from the pseudo variable
-  should be further examined by using one of the constants defined by the
-  "cpu" macro package (see <tt/<ref id=".MACPACK" name=".MACPACK">/).
+  should be further examined by using one of the following constants:
 
-  It may be used to replace the .IFPxx pseudo instructions or to construct
-  even more complex expressions.
+<tscreen><verb>
+    CPU_6502
+    CPU_65SC02
+    CPU_65C02
+    CPU_65816
+    CPU_SWEET16
+    CPU_HUC6280
+    CPU_4510
+    CPU_45GS02
+    CPU_6502DTV
+    CPU_M740
+</verb></tscreen>
+
+Above constants may be used to determine the exact type of the currently
+enabled CPU. In addition to that, for each CPU instruction set, another
+constant is defined:
+
+<tscreen><verb>
+    CPU_ISET_6502
+    CPU_ISET_65SC02
+    CPU_ISET_65C02
+    CPU_ISET_65816
+    CPU_ISET_SWEET16
+    CPU_ISET_HUC6280
+    CPU_ISET_4510
+    CPU_ISET_45GS02
+    CPU_ISET_6502DTV
+    CPU_ISET_M740
+</verb></tscreen>
+
+<!-- Sorry but explaining these with the changes from #2751 is too cringy for
+     me - must be done by someone else. The remainder is from the old
+     ".macpack cpu" section"
+
+The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
+be checked with <tt/<ref id="operators" name=".BITAND">/ to determine if the
+currently enabled CPU supports a specific instruction set. For example the
+65C02 supports all instructions of the 65SC02 CPU, so it has the
+<tt/CPU_ISET_65SC02/ bit set in addition to its native <tt/CPU_ISET_65C02/
+bit. Using
+
+<tscreen><verb>
+        .if (.cpu .bitand CPU_ISET_65SC02)
+                lda     (c_sp)
+        .else
+                ldy     #$00
+                lda     (c_sp),y
+        .endif
+</verb></tscreen>
+
+it is possible to determine if the
+
+<tscreen><verb>
+                lda     (c_sp)
+</verb></tscreen>
+
+instruction is supported, which is the case for the 65SC02, 65C02 and 65816
+CPUs (the latter two are upwards compatible to the 65SC02).
+
+see section <ref id="6502-mode" name="6502 format"> and following.
+-->
+
+  <tt/.CPU/ may be used to replace the .IFPxx pseudo instructions or to
+  construct even more complex expressions.
 
   Example:
 
   <tscreen><verb>
-        .macpack        cpu
         .if     (.cpu .bitand CPU_ISET_65816)
                 phx
                 phy
@@ -1421,6 +1481,9 @@ writable.
                 pha
         .endif
   </verb></tscreen>
+
+  See also: <tt><ref id=".CAP" name=".CAP"></tt>
+
 
 
 <sect1><tt>.ISIZE</tt><label id=".ISIZE"><p>
@@ -1591,6 +1654,61 @@ either a string or an expression value.
   <tscreen><verb>
         .if     .blank({arg})
   </verb></tscreen>
+
+
+
+<sect1><tt>.CAP, .CAPABILITY</tt><label id=".CAP"><p>
+
+  Builtin function. The function allows to check for capabilities of the
+  currently selected CPU or target system. It must be called with a comma
+  separated list of identifiers and returns non zero if all of the given
+  capabilities are available. Otherwise it returns zero.
+
+  Existing capabilities are:
+
+<descrip>
+
+  <tag><tt>CPU_HAS_BITIMM</tt></tag>
+  Checks for the availability of the "bit #imm" instruction.
+
+  <tag><tt>CPU_HAS_BRA8</tt></tag>
+  Checks for the availability of a short (8 bit) branch.
+
+  <tag><tt>CPU_HAS_INA</tt></tag>
+  Checks for the availability of accu inc/dec instructions.
+
+  <tag><tt>CPU_HAS_PUSHXY</tt></tag>
+  Checks for the capability to push and pop the X and Y registers.
+
+  <tag><tt>CPU_HAS_ZPIND</tt></tag>
+  Checks for the availability of the "zeropage indirect" addressing mode as it
+  is implemented in the 65SC02 CPU.
+
+  <tag><tt>CPU_HAS_STZ</tt></tag>
+  Checks for the availability of the "store zero" instruction as it is
+  implemented in the 65SC02 CPU.
+
+</descrip>
+
+  Case is ignored when checking the identifiers. The <tt/.cap/ function is
+  easier to use than checking <tt/.cpu/ and requires no intimate knowledge
+  of all instruction sets. For more detailed checking <tt/.cpu/ is still
+  available.
+
+  Example:
+
+  <tscreen><verb>
+        .if     .cap(CPU_HAS_BRA, CPU_HAS_PUSHXY)
+                phx
+                bra     L1
+        .else
+                txa
+                pha
+                jmp     L1
+        .endif
+  </verb></tscreen>
+
+  See also: <tt><ref id=".CPU" name=".CPU"></tt>
 
 
 
@@ -4984,69 +5102,6 @@ as argument and places this string into memory translated into screen codes.
 This macro package defines a macro named <tt/scrcode/. It takes a string
 as argument and places this string into memory translated into screen codes.
 
-
-<sect1><tt>.MACPACK cpu</tt><p>
-
-This macro package does not define any macros but constants used to examine
-the value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable. For
-each supported CPU a constant similar to
-
-<tscreen><verb>
-    CPU_6502
-    CPU_65SC02
-    CPU_65C02
-    CPU_65816
-    CPU_SWEET16
-    CPU_HUC6280
-    CPU_4510
-    CPU_45GS02
-    CPU_6502DTV
-    CPU_M740
-</verb></tscreen>
-
-is defined. These constants may be used to determine the exact type of the
-currently enabled CPU. In addition to that, for each CPU instruction set,
-another constant is defined:
-
-<tscreen><verb>
-    CPU_ISET_6502
-    CPU_ISET_65SC02
-    CPU_ISET_65C02
-    CPU_ISET_65816
-    CPU_ISET_SWEET16
-    CPU_ISET_HUC6280
-    CPU_ISET_4510
-    CPU_ISET_45GS02
-    CPU_ISET_6502DTV
-    CPU_ISET_M740
-</verb></tscreen>
-
-The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
-be checked with <tt/<ref id="operators" name=".BITAND">/ to determine if the
-currently enabled CPU supports a specific instruction set. For example the
-65C02 supports all instructions of the 65SC02 CPU, so it has the
-<tt/CPU_ISET_65SC02/ bit set in addition to its native <tt/CPU_ISET_65C02/
-bit. Using
-
-<tscreen><verb>
-        .if (.cpu .bitand CPU_ISET_65SC02)
-                lda     (c_sp)
-        .else
-                ldy     #$00
-                lda     (c_sp),y
-        .endif
-</verb></tscreen>
-
-it is possible to determine if the
-
-<tscreen><verb>
-                lda     (c_sp)
-</verb></tscreen>
-
-instruction is supported, which is the case for the 65SC02, 65C02 and 65816
-CPUs (the latter two are upwards compatible to the 65SC02).
-
-see section <ref id="6502-mode" name="6502 format"> and following.
 
 <sect1><tt>.MACPACK module</tt><p>
 

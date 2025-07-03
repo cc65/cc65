@@ -18,8 +18,6 @@
         .include        "zeropage.inc"
         .include        "apple2.inc"
 
-        .macpack        cpu
-
         .segment        "ONCE"
 
 initconio:

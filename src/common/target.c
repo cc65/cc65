@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "attrib.h"
 #include "chartype.h"
 #include "check.h"
 #include "target.h"
@@ -301,4 +302,13 @@ const char* GetTargetName (target_t Target)
 {
     /* Return the array entry */
     return GetTargetProperties (Target)->Name;
+}
+
+
+
+int TargetHasCap (capability_t Cap attribute((unused)))
+/* Check if the current target has the given capability */
+{
+    /* Currently unused */
+    return 0;
 }

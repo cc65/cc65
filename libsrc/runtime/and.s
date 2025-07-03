@@ -8,12 +8,10 @@
         .import         addysp1
         .importzp       c_sp, ptr4
 
-        .macpack        cpu
-
 tosanda0:
         ldx     #$00
 tosandax:
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         and     (c_sp)          ; 65SC02 version, saves 2 cycles and 1 byte
         ldy     #1
 .else

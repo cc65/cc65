@@ -10,8 +10,6 @@
         .import         screensize
         .importzp       ptr1, ptr2
 
-        .macpack        cpu
-
 .proc   _screensize
 
         sta     ptr2            ; Store the y pointer
@@ -20,7 +18,7 @@
         jsr     screensize      ; Get screensize into X/Y
         tya                     ; Get Y size into A
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sta     (ptr2)
         txa
         sta     (ptr1)

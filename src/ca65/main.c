@@ -192,6 +192,45 @@ static void CBMSystem (const char* Sys)
 
 
 
+static void DefineCpuSymbols (void)
+/* Define all the symbols to evaluate .cpu. These were previously in cpu.mac. */
+{
+    NewSymbol ("CPU_ISET_NONE", CPU_ISET_NONE);
+    NewSymbol ("CPU_ISET_6502", CPU_ISET_6502);
+    NewSymbol ("CPU_ISET_6502X", CPU_ISET_6502X);
+    NewSymbol ("CPU_ISET_6502DTV", CPU_ISET_6502DTV);
+    NewSymbol ("CPU_ISET_65SC02", CPU_ISET_65SC02);
+    NewSymbol ("CPU_ISET_65C02", CPU_ISET_65C02);
+    NewSymbol ("CPU_ISET_65816", CPU_ISET_65816);
+    NewSymbol ("CPU_ISET_SWEET16", CPU_ISET_SWEET16);
+    NewSymbol ("CPU_ISET_HUC6280", CPU_ISET_HUC6280);
+    NewSymbol ("CPU_ISET_M740", CPU_ISET_M740);
+    NewSymbol ("CPU_ISET_4510", CPU_ISET_4510);
+    NewSymbol ("CPU_ISET_45GS02", CPU_ISET_45GS02);
+    NewSymbol ("CPU_ISET_W65C02", CPU_ISET_W65C02);
+    NewSymbol ("CPU_ISET_65CE02", CPU_ISET_65CE02);
+
+    /* Additional ones from cpu.mac. Not sure how useful they are after the
+    ** changes from #2751.
+    */
+    NewSymbol ("CPU_NONE", CPUIsets[CPU_NONE]);
+    NewSymbol ("CPU_6502", CPUIsets[CPU_6502]);
+    NewSymbol ("CPU_6502X", CPUIsets[CPU_6502X]);
+    NewSymbol ("CPU_6502DTV", CPUIsets[CPU_6502DTV]);
+    NewSymbol ("CPU_65SC02", CPUIsets[CPU_65SC02]);
+    NewSymbol ("CPU_65C02", CPUIsets[CPU_65C02]);
+    NewSymbol ("CPU_65816", CPUIsets[CPU_65816]);
+    NewSymbol ("CPU_SWEET16", CPUIsets[CPU_SWEET16]);
+    NewSymbol ("CPU_HUC6280", CPUIsets[CPU_HUC6280]);
+    NewSymbol ("CPU_M740", CPUIsets[CPU_M740]);
+    NewSymbol ("CPU_4510", CPUIsets[CPU_4510]);
+    NewSymbol ("CPU_45GS02", CPUIsets[CPU_45GS02]);
+    NewSymbol ("CPU_W65C02", CPUIsets[CPU_W65C02]);
+    NewSymbol ("CPU_65CE02", CPUIsets[CPU_65CE02]);
+}
+
+
+
 static void SetSys (const char* Sys)
 /* Define a target system */
 {
@@ -362,6 +401,9 @@ static void SetSys (const char* Sys)
             AbEnd ("Invalid target name: '%s'", Sys);
 
     }
+
+    /* Define the symbols for evaluating .cpu */
+    DefineCpuSymbols ();
 
     /* Initialize the translation tables for the target system */
     TgtTranslateInit ();

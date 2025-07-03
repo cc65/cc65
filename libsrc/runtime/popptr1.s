@@ -8,14 +8,12 @@
         .import         incsp2
         .importzp       c_sp, ptr1
 
-        .macpack        cpu
-
 .proc   popptr1                 ; 14 bytes (four usages = at least 2 bytes saved)
         ldy     #1
         lda     (c_sp),y        ; get hi byte
         sta     ptr1+1          ; into ptr hi
         dey                     ; dey even for for 65C02 here to have Y=0 at exit!
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)          ; get lo byte
 .else
         lda     (c_sp),y        ; get lo byte

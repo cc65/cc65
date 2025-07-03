@@ -12,10 +12,8 @@
         .import         addysp1
         .importzp       c_sp, sreg, tmp1
 
-        .macpack        cpu
-
 tosrsub0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -26,7 +24,7 @@ tosrsub0ax:
 
 tosrsubeax:
         sec
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sbc     (c_sp)
         ldy     #1
 .else

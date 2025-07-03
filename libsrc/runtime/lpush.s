@@ -12,13 +12,11 @@
         .import         decsp4
         .importzp       c_sp, sreg
 
-        .macpack        cpu
-
 pushl0:
         lda     #0
         tax
 push0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -39,7 +37,7 @@ pusheax:
         txa
         sta     (c_sp),y
         pla
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sta     (c_sp)
 .else
         dey

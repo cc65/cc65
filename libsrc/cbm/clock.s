@@ -9,14 +9,13 @@
         .importzp       sreg
 
         .include        "cbm.inc"
-        .macpack        cpu
 
 
 .proc   _clock
 
 ; Some accelerator adaptors have CMOS ICs.
 
-.if (.cpu & ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg + 1
 .else
         lda     #$00            ; Byte 3 always is zero

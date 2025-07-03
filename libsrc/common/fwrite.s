@@ -16,8 +16,6 @@
         .include        "errno.inc"
         .include        "_file.inc"
 
-        .macpack        cpu
-
 ; ------------------------------------------------------------------------
 ; Code
 
@@ -34,7 +32,7 @@
 
         ldy     #_FILE::f_flags
         lda     (ptr1),y
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_BITIMM)
         bit     #_FOPEN
         .else
         and     #_FOPEN                 ; Is the file open?
@@ -50,7 +48,7 @@
 
 ; Check if the stream is in an error state
 
-@L2:    .if (.not .cpu .bitand ::CPU_ISET_65SC02)
+@L2:    .if .not .cap(CPU_HAS_BITIMM)
         lda     (ptr1),y                ; get file->f_flags again
         .endif
         and     #_FERROR

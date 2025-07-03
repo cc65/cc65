@@ -10,7 +10,6 @@
         .importzp       c_sp, ptr1, ptr2, ptr3, tmp1
 
         .macpack        generic
-        .macpack        cpu
 
 .data
 
@@ -74,7 +73,7 @@ out:    jsr     popax           ; count
 
 ; Loop outputting characters
 
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND, CPU_HAS_BRA8)
 
 @L1:    dec     outdesc+6
         beq     @L4

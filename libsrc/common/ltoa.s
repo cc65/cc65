@@ -10,8 +10,6 @@
         .import         __hextab, __longminstr
         .importzp       sreg, ptr1, ptr2, ptr3, tmp1
 
-        .macpack        cpu
-
 .code
 
 ;
@@ -64,7 +62,7 @@ L2:     txa                     ; get high byte
         bpl     ultoa
         lda     #'-'
 
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sta     (ptr2)
 .else
         ldy     #0

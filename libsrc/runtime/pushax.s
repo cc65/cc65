@@ -7,8 +7,6 @@
         .export         push0, pusha0, pushax
         .importzp       c_sp
 
-        .macpack        cpu
-
 push0:  lda     #0
 pusha0: ldx     #0
 
@@ -31,7 +29,7 @@ pusha0: ldx     #0
         sta     (c_sp),y        ; (27)
         pla                     ; (31)
         dey                     ; (33)
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sta     (c_sp)          ; (37)
 .else
         sta     (c_sp),y        ; (38)

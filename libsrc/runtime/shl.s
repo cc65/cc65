@@ -15,8 +15,6 @@
         .import          popax
         .importzp        tmp1
 
-        .macpack        cpu
-
 tosshlax:
 tosaslax:
         sta     tmp1            ; Save shift count
@@ -55,7 +53,7 @@ L2:     pla
 
 ; Shift count is exactly 8
 
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_PUSHXY)
 L3:     plx                     ; Low byte from stack into X
         rts                     ; A is already zero
 .else

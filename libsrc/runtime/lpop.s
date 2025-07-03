@@ -9,8 +9,6 @@
         .import         incsp4
         .importzp       c_sp, sreg
 
-        .macpack        cpu
-
 popeax: ldy     #3
         lda     (c_sp),y
         sta     sreg+1
@@ -20,7 +18,7 @@ popeax: ldy     #3
         dey
         lda     (c_sp),y
         tax
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)
 .else
         dey

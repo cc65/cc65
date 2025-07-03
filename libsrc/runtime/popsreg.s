@@ -8,14 +8,12 @@
         .import         incsp2
         .importzp       c_sp, sreg
 
-        .macpack        cpu
-
 popsreg:
         pha                     ; save A
         ldy     #1
         lda     (c_sp),y        ; get hi byte
         sta     sreg+1          ; store it
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)          ; get lo byte
 .else
         dey

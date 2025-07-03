@@ -7,8 +7,6 @@
         .export         popax, incsp2
         .importzp       c_sp
 
-        .macpack        cpu
-
 ; Pop a/x from stack. This function will run directly into incsp2
 
 .proc   popax
@@ -16,7 +14,7 @@
         ldy     #1
         lda     (c_sp),y        ; get hi byte
         tax                     ; into x
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)          ; get lo byte
 .else
         dey

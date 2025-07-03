@@ -68,6 +68,11 @@ struct IFile;
 void HandleSpecialMacro (Macro* M, const char* Name);
 /* Handle special "magic" macros that may change */
 
+void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
+/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
+** non-newline whitespace sequences.
+*/
+
 void Preprocess (void);
 /* Preprocess a line */
 

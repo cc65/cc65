@@ -6,27 +6,25 @@
 
         .export         tosint
         .import         incsp2
-        .importzp       sp
-
-        .macpack        cpu
+        .importzp       c_sp
 
 ; Convert TOS from long to int by cutting of the high 16bit
 
 .proc   tosint
 
         pha
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (sp)
+.if .cap(CPU_HAS_ZPIND)
+        lda     (c_sp)
 .else
         ldy     #0
-        lda     (sp),y          ; sp+1
+        lda     (c_sp),y        ; c_sp+1
 .endif
         ldy     #2
-        sta     (sp),y
+        sta     (c_sp),y
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         ldy     #3
-        sta     (sp),y
+        sta     (c_sp),y
         pla
         jmp     incsp2          ; Drop 16 bit
 

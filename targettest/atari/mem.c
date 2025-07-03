@@ -21,6 +21,8 @@ unsigned int *MEMTOP = (unsigned int *)741;
 unsigned int *MEMLO = (unsigned int *)743;
 void *allocmem;
 
+void code(void) { }
+
 int main(void)
 {
   allocmem = malloc(257);
@@ -35,11 +37,11 @@ int main(void)
   printf("  MEMLO  = $%04X (%u)\n", *MEMLO, *MEMLO);
 
   printf("  ----------------------\n");
-  printf("  main:            $%04X  (code)\n", &main);
+  printf("  code:            $%04X  (code)\n", &code);
   printf("  data:            $%04X  (data)\n", &data);
   printf("  _dos_type:       $%04X  (bss)\n", &_dos_type);
   printf("  allocmem:        $%04X  (dyn. data)\n", allocmem);
-  printf("  sp:              $%04X  (stack ptr)\n", getsp());
+  printf("  c_sp:            $%04X  (stack ptr)\n", getsp());
 
   if (allocmem) free(allocmem);
   if (doesclrscrafterexit()) cgetc();

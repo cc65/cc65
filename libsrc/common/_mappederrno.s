@@ -8,7 +8,6 @@
         .include        "errno.inc"
 
         .macpack        generic
-        .macpack        cpu
 
 ; ----------------------------------------------------------------------------
 ; int __fastcall__ __mappederrno (unsigned char code);
@@ -24,7 +23,7 @@ ___mappederrno:
         bze     ok                      ; Branch if no
         jsr     ___osmaperrno           ; Map OS error into errno code
         jsr     ___seterrno             ; Save in errno (returns with .A = 0)
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_INA)
         dec     a
 .else
         lda     #$FF                    ; Return -1 if error

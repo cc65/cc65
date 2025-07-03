@@ -65,18 +65,26 @@ enum typespec_t {
     TS_DEFAULT_TYPE_AUTO    = 0x02,     /* C23 type inference with auto */
 
     /* Whether to allow certain kinds of specifiers */
-    TS_STORAGE_CLASS_SPEC   = 0x04,    /* Allow storage storage class specifiers */
-    TS_FUNCTION_SPEC        = 0x08,    /* Allow function specifiers */
+    TS_STORAGE_CLASS_SPEC   = 0x04,     /* Allow storage class specifiers */
+    TS_FUNCTION_SPEC        = 0x08,     /* Allow function specifiers */
 };
 
 /* Masks for the Flags field in DeclSpec */
+#define DS_NONE                 0x0000U /* Nothing specified or used    */
 #define DS_DEF_STORAGE          0x0001U /* Default storage class used   */
-#define DS_NO_TYPE              0x0002U /* No type explicitly specified */
-#define DS_DEF_TYPE             0x0006U /* Default type used            */
-#define DS_EXTRA_TYPE           0x0008U /* Extra type declared          */
+#define DS_EXPLICIT_TYPE        0x0002U /* Type specified               */
+#define DS_DEF_TYPE             0x0004U /* Implicit type used           */
+#define DS_AUTO_TYPE            0x0006U /* C23 auto type used           */
+#define DS_TYPE_MASK            0x0006U /* Mask for type of spec decl   */
+#define DS_EXTRA_TYPE           0x0008U /* ESU type in declaration      */
 #define DS_NEW_TYPE_DECL        0x0010U /* New type declared            */
 #define DS_NEW_TYPE_DEF         0x0020U /* New type defined             */
 #define DS_NEW_TYPE             (DS_NEW_TYPE_DECL | DS_NEW_TYPE_DEF)
+#define DS_EXPLICIT_SIGNEDNESS  0x0040U /* Signedness specified         */
+#define DS_NO_EMPTY_DECL        0x0100U /* Disallow empty declaration   */
+#define DS_ALLOW_BITFIELD       0x0200U /* Allow anonymous bit-fields   */
+
+
 
 /* Result of ParseDeclSpec */
 typedef struct DeclSpec DeclSpec;
@@ -99,24 +107,22 @@ struct Declarator {
 };
 
 /* Modes for ParseDecl:
-**  - DM_NEED_IDENT means:
-**      we *must* have a type and a variable identifer.
+**  - DM_IDENT_OR_EMPTY means:
+**      we *may* have an identifier, or none. If it is the latter case,
+**      the type specifier must be used for an empty declaration,
+**      or it is an error.
 **  - DM_NO_IDENT means:
 **      we must have a type but no variable identifer
 **      (if there is one, it's not read).
-**  - DM_ACCEPT_IDENT means:
-**      we *may* have an identifier, or none. If it is the latter case,
-**      the type must be used as an empty declaration, or it is an error.
-**      Note: this is used for struct/union members.
-**  - DM_IGNORE_IDENT means:
+**      Note: this is used for type names.
+**  - DM_ACCEPT_PARAM_IDENT means:
 **      we *may* have an identifier. If there is an identifier,
 **      it is read, but it is no error, if there is none.
 **      Note: this is used for function parameter type lists.
 */
 typedef enum {
-    DM_NEED_IDENT,
+    DM_IDENT_OR_EMPTY,
     DM_NO_IDENT,
-    DM_ACCEPT_IDENT,
     DM_ACCEPT_PARAM_IDENT,
 } declmode_t;
 
@@ -128,18 +134,14 @@ typedef enum {
 
 
 
-int SmartErrorSkip (void);
-/* Try some smart error recovery. Skip tokens until either a comma or semicolon
-** that is not enclosed in an open parenthesis/bracket/curly brace, or until an
-** unpaired right parenthesis/bracket/curly brace is reached. Return 0 if it is
-** the former case, or -1 if it is the latter case. */
-
 Type* ParseType (Type* Type);
-/* Parse a complete type specification */
+/* Parse a complete type specification in parentheses */
 
-int ParseDecl (const DeclSpec* Spec, Declarator* D, declmode_t Mode);
+int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode);
 /* Parse a variable, type or function declarator. Return -1 if this stops at
-** an unpaired right parenthesis/bracket/curly brace.
+** an unpaired right parenthesis/bracket/curly brace. Return 0 if this stops
+** after consuming a semicolon or closing curly brace, or reaching an EOF.
+** Return 1 otherwise.
 */
 
 void ParseDeclSpec (DeclSpec* Spec, typespec_t TSFlags, unsigned DefStorage);

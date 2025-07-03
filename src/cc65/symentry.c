@@ -88,7 +88,7 @@ void FreeSymEntry (SymEntry* E)
     TypeFree (E->Type);
     xfree (E->AsmName);
 
-    if (E->Flags & SC_LABEL) {
+    if ((E->Flags & SC_TYPEMASK) == SC_LABEL) {
         for (i = 0; i < CollCount (E->V.L.DefsOrRefs); i++) {
             xfree (CollAt (E->V.L.DefsOrRefs, i));
         }
@@ -109,21 +109,17 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
         unsigned            Val;
     } SCFlagTable;
 
-    static SCFlagTable ESUTypes[] = {
-        { "SC_TYPEDEF",     SC_TYPEDEF          },
-        { "SC_UNION",       SC_UNION            },
-        { "SC_STRUCT",      SC_STRUCT           },
-        { "SC_ENUM",        SC_ENUM             },
-    };
-
     static SCFlagTable Types[] = {
-        { "SC_BITFIELD",    SC_BITFIELD         },
-        { "SC_STRUCTFIELD", SC_STRUCTFIELD      },
-        { "SC_ENUMERATOR",  SC_ENUMERATOR       },
-        { "SC_CONST",       SC_CONST            },
+        { "SC_NONE",        SC_NONE             },
+        { "SC_STRUCT",      SC_STRUCT           },
+        { "SC_UNION",       SC_UNION            },
+        { "SC_ENUM",        SC_ENUM             },
         { "SC_LABEL",       SC_LABEL            },
-        { "SC_PARAM",       SC_PARAM            },
+        { "SC_BITFIELD",    SC_BITFIELD         },
+        { "SC_TYPEDEF",     SC_TYPEDEF          },
+        { "SC_ENUMERATOR",  SC_ENUMERATOR       },
         { "SC_FUNC",        SC_FUNC             },
+        { "SC_ARRAY",       SC_ARRAY            },
     };
 
     static SCFlagTable Storages[] = {
@@ -131,11 +127,31 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
         { "SC_REGISTER",    SC_REGISTER         },
         { "SC_STATIC",      SC_STATIC           },
         { "SC_EXTERN",      SC_EXTERN           },
-        { "SC_STORAGE",     SC_STORAGE          },
+    };
+
+    static SCFlagTable Properties[] = {
+        { "SC_CONST",       SC_CONST            },
+        { "SC_STRUCTFIELD", SC_STRUCTFIELD      },
+        { "SC_PARAM",       SC_PARAM            },
+        { "SC_DEFTYPE",     SC_DEFTYPE          },
         { "SC_ZEROPAGE",    SC_ZEROPAGE         },
-        { "SC_DECL",        SC_DECL             },
+        { "SC_HAVEALIGN",   SC_HAVEALIGN        },
+        { "SC_HAVEATTR",    SC_HAVEATTR         },
+        { "SC_TU_STORAGE",  SC_TU_STORAGE       },
+        { "SC_ASSIGN_INIT", SC_ASSIGN_INIT      },
+        { "SC_ALIAS",       SC_ALIAS            },
+        { "SC_FICTITIOUS",  SC_FICTITIOUS       },
+        { "SC_HAVEFAM",     SC_HAVEFAM          },
+        { "SC_HAVECONST",   SC_HAVECONST        },
+    };
+
+    static SCFlagTable Status[] = {
         { "SC_DEF",         SC_DEF              },
         { "SC_REF",         SC_REF              },
+        { "SC_GOTO",        SC_GOTO             },
+        { "SC_GOTO_IND",    SC_GOTO_IND         },
+        { "SC_LOCALSCOPE",  SC_LOCALSCOPE       },
+        { "SC_NOINLINEDEF", SC_NOINLINEDEF      },
     };
 
     unsigned I;
@@ -152,28 +168,38 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     /* Print the flags */
     SymFlags = E->Flags;
     fprintf (F, "    Flags:");
-    /* Enum, struct, union and typedefs */
-    if ((SymFlags & SC_ESUTYPEMASK) != 0) {
-        for (I = 0; I < sizeof (ESUTypes) / sizeof (ESUTypes[0]); ++I) {
-            if ((SymFlags & SC_ESUTYPEMASK) == ESUTypes[I].Val) {
-                SymFlags &= ~SC_ESUTYPEMASK;
-                fprintf (F, " %s", ESUTypes[I].Name);
+    /* Symbol types */
+    if ((SymFlags & SC_TYPEMASK) != 0) {
+        for (I = 0; I < sizeof (Types) / sizeof (Types[0]); ++I) {
+            if ((SymFlags & SC_TYPEMASK) == Types[I].Val) {
+                SymFlags &= ~SC_TYPEMASK;
+                fprintf (F, " %s", Types[I].Name);
                 break;
             }
         }
     }
-    /* Other type flags */
-    for (I = 0; I < sizeof (Types) / sizeof (Types[0]) && SymFlags != 0; ++I) {
-        if ((SymFlags & Types[I].Val) == Types[I].Val) {
-            SymFlags &= ~Types[I].Val;
-            fprintf (F, " %s", Types[I].Name);
+    /* Storage classes */
+    if ((SymFlags & SC_STORAGEMASK) != 0) {
+        for (I = 0; I < sizeof (Storages) / sizeof (Storages[0]); ++I) {
+            if ((SymFlags & SC_STORAGEMASK) == Storages[I].Val) {
+                SymFlags &= ~SC_STORAGEMASK;
+                fprintf (F, " %s", Storages[I].Name);
+                break;
+            }
         }
     }
-    /* Storage flags */
-    for (I = 0; I < sizeof (Storages) / sizeof (Storages[0]) && SymFlags != 0; ++I) {
-        if ((SymFlags & Storages[I].Val) == Storages[I].Val) {
-            SymFlags &= ~Storages[I].Val;
-            fprintf (F, " %s", Storages[I].Name);
+    /* Special property flags */
+    for (I = 0; I < sizeof (Properties) / sizeof (Properties[0]) && SymFlags != 0; ++I) {
+        if ((SymFlags & Properties[I].Val) == Properties[I].Val) {
+            SymFlags &= ~Properties[I].Val;
+            fprintf (F, " %s", Properties[I].Name);
+        }
+    }
+    /* Status flags */
+    for (I = 0; I < sizeof (Status) / sizeof (Status[0]) && SymFlags != 0; ++I) {
+        if ((SymFlags & Status[I].Val) == Status[I].Val) {
+            SymFlags &= ~Status[I].Val;
+            fprintf (F, " %s", Status[I].Name);
         }
     }
     if (SymFlags != 0) {
@@ -199,9 +225,10 @@ int SymIsOutputFunc (const SymEntry* Sym)
     /* Symbol must be a function which is defined and either extern or
     ** static and referenced.
     */
-    return IsTypeFunc (Sym->Type)               &&
-           SymIsDef (Sym)                       &&
-           (Sym->Flags & (SC_REF | SC_EXTERN));
+    return IsTypeFunc (Sym->Type)                       &&
+           SymIsDef (Sym)                               &&
+           ((Sym->Flags & SC_REF) ||
+            (Sym->Flags & SC_STORAGEMASK) != SC_STATIC);
 }
 
 
@@ -272,7 +299,7 @@ void SymCvtRegVarToAuto (SymEntry* Sym)
 /* Convert a register variable to an auto variable */
 {
     /* Change the storage class */
-    Sym->Flags = (Sym->Flags & ~(SC_REGISTER | SC_STATIC | SC_EXTERN)) | SC_AUTO;
+    Sym->Flags = (Sym->Flags & ~SC_STORAGEMASK) | SC_AUTO;
 
     /* Transfer the stack offset from register save area to actual offset */
     Sym->V.Offs = Sym->V.R.SaveOffs;

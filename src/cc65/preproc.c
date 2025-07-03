@@ -93,6 +93,10 @@
 #define IFCOND_SKIP     0x01U
 #define IFCOND_ELSE     0x02U
 #define IFCOND_NEEDTERM 0x04U
+#define IFCOND_ISGUARD  0x08U
+
+/* Current input file */
+static IFile* CurInput = 0;
 
 /* Current PP if stack */
 static PPIfStack* PPStack;
@@ -153,11 +157,6 @@ struct HiddenMacro {
 
 
 
-static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
-/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
-** non-newline whitespace sequences.
-*/
-
 static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags);
 /* Preprocess a single line. Handle specified tokens and operators, remove
 ** whitespace and comments, then do macro replacement.
@@ -216,10 +215,12 @@ typedef enum {
 
 
 /* Preprocessor directive tokens mapping table */
+/* CAUTION: table must be sorted for bsearch */
 static const struct PPDType {
     const char*     Tok;        /* Token */
     ppdirective_t   Type;       /* Type */
 } PPDTypes[] = {
+/* BEGIN SORTED.SH */
     {   "define",       PPD_DEFINE      },
     {   "elif",         PPD_ELIF        },
     {   "else",         PPD_ELSE        },
@@ -233,6 +234,7 @@ static const struct PPDType {
     {   "pragma",       PPD_PRAGMA      },
     {   "undef",        PPD_UNDEF       },
     {   "warning",      PPD_WARNING     },
+/* END SORTED.SH */
 };
 
 /* Number of preprocessor directive types */
@@ -842,7 +844,7 @@ static void AddPreLine (StrBuf* Str)
             SB_AppendChar (Str, '\n');
         }
         SB_Printf (&Comment, "#line %u \"%s\"\n",
-                   GetCurrentLineNum () - ContinuedLines, GetCurrentFilename ());
+                   GetCurrentLineNum () - ContinuedLines, GetCurrentFileName ());
         SB_Append (Str, &Comment);
     } else {
         /* Output new lines */
@@ -2572,7 +2574,7 @@ static void DoDefine (void)
     CheckForBadIdent (Ident, Std, 0);
 
     /* Create a new macro definition */
-    M = NewMacro (Ident);
+    M = NewMacro (Ident, 0);
 
     /* Check if this is a function-like macro */
     if (CurC == '(') {
@@ -2640,6 +2642,19 @@ static void DoDefine (void)
             goto Error_Handler;
         }
         NextChar ();
+
+    } else {
+
+        /* Object like macro. Check ISO/IEC 9899:1999 (E) 6.10.3p3:
+        ** "There shall be white-space between the identifier and the
+        ** replacement list in the definition of an object-like macro."
+        ** Note: C89 doesn't have this constraint.
+        ** Note: if there is no replacement list, a space is not required.
+        */
+        if (Std == STD_C99 && !IsSpace (CurC) && CurC != 0) {
+            PPWarning ("ISO C99 requires whitespace after the macro name");
+        }
+
     }
 
     /* Remove whitespace and comments from the line, store the preprocessed
@@ -2685,7 +2700,7 @@ Error_Handler:
 
 
 
-static int PushIf (int Skip, int Invert, int Cond)
+static int PushIf (int Skip, int Invert, int Cond, unsigned Flags)
 /* Push a new if level onto the if stack */
 {
     /* Check for an overflow of the if stack */
@@ -2697,10 +2712,10 @@ static int PushIf (int Skip, int Invert, int Cond)
     /* Push the #if condition */
     ++PPStack->Index;
     if (Skip) {
-        PPStack->Stack[PPStack->Index] = IFCOND_SKIP | IFCOND_NEEDTERM;
+        PPStack->Stack[PPStack->Index] = IFCOND_SKIP | IFCOND_NEEDTERM | Flags;
         return 1;
     } else {
-        PPStack->Stack[PPStack->Index] = IFCOND_NONE | IFCOND_NEEDTERM;
+        PPStack->Stack[PPStack->Index] = IFCOND_NONE | IFCOND_NEEDTERM | Flags;
         return (Invert ^ Cond);
     }
 }
@@ -2778,29 +2793,40 @@ static int DoIf (int Skip)
     }
 
     /* Set the #if condition according to the expression result */
-    return PushIf (Skip, 1, Expr.IVal != 0);
+    return PushIf (Skip, 1, Expr.IVal != 0, IFCOND_NONE);
 }
 
 
 
-static int DoIfDef (int skip, int flag)
-/* Process #ifdef if flag == 1, or #ifndef if flag == 0. */
+static int DoIfDef (int Skip, int Flag)
+/* Process #ifdef if Flag == 1, or #ifndef if Flag == 0. */
 {
-    int Value = 0;
+    int IsDef = 0;
+    unsigned GuardFlag = IFCOND_NONE;
 
-    if (!skip) {
+    if (!Skip) {
         ident Ident;
 
         SkipWhitespace (0);
         if (MacName (Ident)) {
             CheckForBadIdent (Ident, IS_Get (&Standard), 0);
-            Value = IsMacro (Ident);
+            IsDef = IsMacro (Ident);
             /* Check for extra tokens */
-            CheckExtraTokens (flag ? "ifdef" : "ifndef");
+            CheckExtraTokens (Flag ? "ifdef" : "ifndef");
+            /* Check if this is an include guard. This is the case if we have
+            ** a #ifndef directive at the start of a new file and the macro
+            ** is not defined. If so, remember it.
+            */
+            if (Flag == 0 && (CurInput->GFlags & IG_NEWFILE) != 0 && !IsDef) {
+                CurInput->GFlags |= IG_ISGUARDED;
+                SB_CopyStr (&CurInput->GuardMacro, Ident);
+                SB_Terminate (&CurInput->GuardMacro);
+                GuardFlag = IFCOND_ISGUARD;
+            }
         }
     }
 
-    return PushIf (skip, flag, Value);
+    return PushIf (Skip, Flag, IsDef, GuardFlag);
 }
 
 
@@ -2812,11 +2838,30 @@ static void DoInclude (void)
     InputType   IT;
     StrBuf      Filename = AUTO_STRBUF_INITIALIZER;
 
-    /* Macro-replace a single line with special support for <filename> */
-    SB_Clear (MLine);
-    PreprocessDirective (Line, MLine, MSM_TOK_HEADER);
+    /* Skip whitespace so the input pointer points to the argument */
+    SkipWhitespace (0);
 
-    /* Read from the processed line */
+    /* We may have three forms of the #include directive:
+    **
+    ** - # include "q-char-sequence" new-line
+    ** - # include <h-char-sequence> new-line
+    ** - # include pp-tokens new-line
+    **
+    ** The former two are processed as is while the latter is preprocessed and
+    ** must then resemble one of the first two forms.
+    */
+    if (CurC == '"' || CurC == '<') {
+        /* Copy the argument part over to MLine */
+        unsigned Start = SB_GetIndex (Line);
+        unsigned Length = SB_GetLen (Line) - Start;
+        SB_Slice (MLine, Line, Start, Length);
+    } else {
+        /* Macro-replace a single line with special support for <filename> */
+        SB_Clear (MLine);
+        PreprocessDirective (Line, MLine, MSM_TOK_HEADER);
+    }
+
+    /* Read from the copied/preprocessed line */
     SB_Reset (MLine);
     MLine = InitLine (MLine);
 
@@ -2894,7 +2939,7 @@ static unsigned GetLineDirectiveNum (void)
 
     /* Ensure the buffer is terminated with a '\0' */
     SB_Terminate (&Buf);
-    if (SkipWhitespace (0) != 0 || CurC == '\0') {
+    if (SB_GetLen (&Buf) > 0) {
         const char* Str = SB_GetConstBuf (&Buf);
         if (Str[0] == '\0') {
             PPWarning ("#line directive interprets number as decimal, not octal");
@@ -2910,9 +2955,10 @@ static unsigned GetLineDirectiveNum (void)
             }
         }
     } else {
-        PPError ("#line directive requires a simple decimal digit sequence");
+        PPError ("#line directive requires a decimal digit sequence");
         ClearLine ();
     }
+    SkipWhitespace (0);
 
     /* Done with the buffer */
     SB_Done (&Buf);
@@ -2943,7 +2989,7 @@ static void DoLine (void)
             StrBuf Filename = AUTO_STRBUF_INITIALIZER;
             if (SB_GetString (Line, &Filename)) {
                 SB_Terminate (&Filename);
-                SetCurrentFilename (SB_GetConstBuf (&Filename));
+                SetCurrentFileName (SB_GetConstBuf (&Filename));
             } else {
                 PPError ("Invalid filename for #line directive");
                 LineNum = 0;
@@ -3034,18 +3080,31 @@ static int ParseDirectives (unsigned ModeFlags)
     int         PPSkip = 0;
     ident       Directive;
 
-    /* Skip white space at the beginning of the first line */
+    /* Skip white space at the beginning of the line */
     int Whitespace = SkipWhitespace (0);
 
     /* Check for stuff to skip */
     while (CurC == '\0' || CurC == '#' || PPSkip) {
 
+        /* If a #ifndef that was assumed to be an include guard was closed
+        ** recently, we may not have anything else following in the file
+        ** besides whitespace otherwise the assumption was false and we don't
+        ** actually have an include guard.
+        */
+        if (CurC != '\0' && (CurInput->GFlags & IG_COMPLETE) == IG_COMPLETE) {
+            CurInput->GFlags &= ~IG_ISGUARDED;
+        }
+
         /* Check for preprocessor lines lines */
         if (CurC == '#') {
+            unsigned IfCond;
+            /* Skip the hash and following white space */
             NextChar ();
             SkipWhitespace (0);
+
             if (CurC == '\0') {
                 /* Ignore the empty preprocessor directive */
+                CurInput->GFlags &= ~IG_NEWFILE;
                 continue;
             }
             if (!IsSym (Directive)) {
@@ -3053,151 +3112,190 @@ static int ParseDirectives (unsigned ModeFlags)
                     PPError ("Preprocessor directive expected");
                 }
                 ClearLine ();
-            } else {
-                switch (FindPPDirectiveType (Directive)) {
+                CurInput->GFlags &= ~IG_NEWFILE;
+                continue;
+            }
+            switch (FindPPDirectiveType (Directive)) {
 
-                    case PPD_DEFINE:
-                        if (!PPSkip) {
-                            DoDefine ();
-                        }
-                        break;
+                case PPD_DEFINE:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (!PPSkip) {
+                        DoDefine ();
+                    }
+                    break;
 
-                    case PPD_ELIF:
-                        if (PPStack->Index >= 0) {
-                            if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
-                                /* Handle as #else/#if combination */
-                                if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
-                                    PPSkip = !PPSkip;
-                                }
-                                PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
-                                PPSkip = DoIf (PPSkip);
+                case PPD_ELIF:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (PPStack->Index >= 0) {
+                        unsigned char PPCond = PPStack->Stack[PPStack->Index];
+                        if ((PPCond & IFCOND_ELSE) == 0) {
+                            /* Handle as #else/#if combination */
+                            if ((PPCond & IFCOND_SKIP) == 0) {
+                                PPSkip = !PPSkip;
+                            }
+                            PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
+                            PPSkip = DoIf (PPSkip);
 
-                                /* #elif doesn't need a terminator */
-                                PPStack->Stack[PPStack->Index] &= ~IFCOND_NEEDTERM;
-                            } else {
-                                PPError ("Duplicate #else/#elif");
+                            /* #elif doesn't need a terminator */
+                            PPStack->Stack[PPStack->Index] &= ~IFCOND_NEEDTERM;
+
+                            /* An include guard cannot have a #elif */
+                            if (PPCond & IFCOND_ISGUARD) {
+                                CurInput->GFlags &= ~IG_ISGUARDED;
                             }
                         } else {
-                            PPError ("Unexpected #elif");
+                            PPError ("Duplicate #else/#elif");
                         }
-                        break;
+                    } else {
+                        PPError ("Unexpected #elif");
+                    }
+                    break;
 
-                    case PPD_ELSE:
-                        if (PPStack->Index >= 0) {
-                            if ((PPStack->Stack[PPStack->Index] & IFCOND_ELSE) == 0) {
-                                if ((PPStack->Stack[PPStack->Index] & IFCOND_SKIP) == 0) {
-                                    PPSkip = !PPSkip;
-                                }
-                                PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
-
-                                /* Check for extra tokens */
-                                CheckExtraTokens ("else");
-                            } else {
-                                PPError ("Duplicate #else");
+                case PPD_ELSE:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (PPStack->Index >= 0) {
+                        unsigned char PPCond = PPStack->Stack[PPStack->Index];
+                        if ((PPCond & IFCOND_ELSE) == 0) {
+                            if ((PPCond & IFCOND_SKIP) == 0) {
+                                PPSkip = !PPSkip;
                             }
-                        } else {
-                            PPError ("Unexpected '#else'");
-                        }
-                        break;
+                            PPStack->Stack[PPStack->Index] |= IFCOND_ELSE;
 
-                    case PPD_ENDIF:
-                        if (PPStack->Index >= 0) {
-                            /* Remove any clauses on top of stack that do not
-                            ** need a terminating #endif.
-                            */
-                            while (PPStack->Index >= 0 &&
-                                   (PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) == 0) {
-                                --PPStack->Index;
+                            /* An include guard cannot have a #else */
+                            if (PPCond & IFCOND_ISGUARD) {
+                                CurInput->GFlags &= ~IG_ISGUARDED;
                             }
-
-                            /* Stack may not be empty here or something is wrong */
-                            CHECK (PPStack->Index >= 0);
-
-                            /* Remove the clause that needs a terminator */
-                            PPSkip = (PPStack->Stack[PPStack->Index--] & IFCOND_SKIP) != 0;
 
                             /* Check for extra tokens */
-                            CheckExtraTokens ("endif");
+                            CheckExtraTokens ("else");
                         } else {
-                            PPError ("Unexpected '#endif'");
+                            PPError ("Duplicate #else");
                         }
-                        break;
+                    } else {
+                        PPError ("Unexpected '#else'");
+                    }
+                    break;
 
-                    case PPD_ERROR:
-                        if (!PPSkip) {
-                            DoError ();
+                case PPD_ENDIF:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (PPStack->Index >= 0) {
+                        /* Remove any clauses on top of stack that do not
+                        ** need a terminating #endif.
+                        */
+                        while (PPStack->Index >= 0 &&
+                               (PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) == 0) {
+                            --PPStack->Index;
                         }
-                        break;
 
-                    case PPD_IF:
-                        PPSkip = DoIf (PPSkip);
-                        break;
+                        /* Stack may not be empty here or something is wrong */
+                        CHECK (PPStack->Index >= 0);
 
-                    case PPD_IFDEF:
-                        PPSkip = DoIfDef (PPSkip, 1);
-                        break;
-
-                    case PPD_IFNDEF:
-                        PPSkip = DoIfDef (PPSkip, 0);
-                        break;
-
-                    case PPD_INCLUDE:
-                        if (!PPSkip) {
-                            DoInclude ();
+                        /* Remove the clause that needs a terminator */
+                        IfCond = PPStack->Stack[PPStack->Index--];
+                        PPSkip = (IfCond & IFCOND_SKIP) != 0;
+                        if (IfCond & IFCOND_ISGUARD) {
+                            CurInput->GFlags |= IG_GUARDCLOSED;
                         }
-                        break;
 
-                    case PPD_LINE:
-                        if (!PPSkip) {
-                            DoLine ();
-                        }
-                        break;
+                        /* Check for extra tokens */
+                        CheckExtraTokens ("endif");
+                    } else {
+                        PPError ("Unexpected '#endif'");
+                    }
+                    break;
 
-                    case PPD_PRAGMA:
-                        if (!PPSkip) {
-                            if ((ModeFlags & MSM_IN_ARG_LIST) == 0) {
-                                DoPragma ();
-                                return Whitespace;
-                            } else {
-                                PPError ("Embedded #pragma directive within macro arguments is unsupported");
-                            }
-                        }
-                        break;
+                case PPD_ERROR:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (!PPSkip) {
+                        DoError ();
+                    }
+                    break;
 
-                    case PPD_UNDEF:
-                        if (!PPSkip) {
-                            DoUndef ();
-                        }
-                        break;
+                case PPD_IF:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    PPSkip = DoIf (PPSkip);
+                    break;
 
-                    case PPD_WARNING:
-                        /* #warning is a non standard extension */
-                        if (IS_Get (&Standard) > STD_C99) {
-                            if (!PPSkip) {
-                                DoWarning ();
-                            }
+                case PPD_IFDEF:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    PPSkip = DoIfDef (PPSkip, 1);
+                    break;
+
+                case PPD_IFNDEF:
+                    PPSkip = DoIfDef (PPSkip, 0);
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    break;
+
+                case PPD_INCLUDE:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (!PPSkip) {
+                        DoInclude ();
+                    }
+                    break;
+
+                case PPD_LINE:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (!PPSkip) {
+                        DoLine ();
+                    }
+                    break;
+
+                case PPD_PRAGMA:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (!PPSkip) {
+                        if ((ModeFlags & MSM_IN_ARG_LIST) == 0) {
+                            DoPragma ();
+                            return Whitespace;
                         } else {
-                            if (!PPSkip) {
-                                PPError ("Preprocessor directive expected");
-                            }
-                            ClearLine ();
+                            PPError ("Embedded #pragma directive within macro arguments is unsupported");
                         }
-                        break;
+                    }
+                    break;
 
-                    default:
+                case PPD_UNDEF:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (!PPSkip) {
+                        DoUndef ();
+                    }
+                    break;
+
+                case PPD_WARNING:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    /* #warning is a non standard extension */
+                    if (IS_Get (&Standard) > STD_C99) {
+                        if (!PPSkip) {
+                            DoWarning ();
+                        }
+                    } else {
                         if (!PPSkip) {
                             PPError ("Preprocessor directive expected");
                         }
                         ClearLine ();
-                }
-            }
+                    }
+                    break;
 
+                default:
+                    CurInput->GFlags &= ~IG_NEWFILE;
+                    if (!PPSkip) {
+                        PPError ("Preprocessor directive expected");
+                    }
+                    ClearLine ();
+            }
         }
         if (NextLine () == 0) {
             break;
         }
         ++PendingNewLines;
         Whitespace = SkipWhitespace (0) || Whitespace;
+    }
+
+    /* If a #ifndef that was assumed to be an include guard was closed
+    ** recently, we may not have anything else following in the file
+    ** besides whitespace otherwise the assumption was false and we don't
+    ** actually have an include guard.
+    */
+    if (CurC != '\0' && (CurInput->GFlags & IG_COMPLETE) == IG_COMPLETE) {
+        CurInput->GFlags &= ~IG_ISGUARDED;
     }
 
     return Whitespace;
@@ -3220,7 +3318,7 @@ void HandleSpecialMacro (Macro* M, const char* Name)
     } else if (strcmp (Name, "__FILE__") == 0) {
         /* Replace __FILE__ with the current filename */
         StrBuf B = AUTO_STRBUF_INITIALIZER;
-        SB_InitFromString (&B, GetCurrentFilename ());
+        SB_InitFromString (&B, GetCurrentFileName ());
         SB_Clear (&M->Replacement);
         Stringize (&B, &M->Replacement);
         SB_Done (&B);
@@ -3235,7 +3333,22 @@ void HandleSpecialMacro (Macro* M, const char* Name)
 
 
 
-static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
+static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
+/* Preprocess a single line. Handle specified tokens and operators, remove
+** whitespace and comments, then do macro replacement.
+*/
+{
+    MacroExp    E;
+
+    SkipWhitespace (0);
+    InitMacroExp (&E);
+    ReplaceMacros (Source, Target, &E, ModeFlags | MSM_IN_DIRECTIVE);
+    DoneMacroExp (&E);
+}
+
+
+
+void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
 /* Mimic Translation Phase 3. Handle old and new style comments. Collapse
 ** non-newline whitespace sequences.
 */
@@ -3281,21 +3394,6 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
 
 
 
-static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
-/* Preprocess a single line. Handle specified tokens and operators, remove
-** whitespace and comments, then do macro replacement.
-*/
-{
-    MacroExp    E;
-
-    SkipWhitespace (0);
-    InitMacroExp (&E);
-    ReplaceMacros (Source, Target, &E, ModeFlags | MSM_IN_DIRECTIVE);
-    DoneMacroExp (&E);
-}
-
-
-
 void Preprocess (void)
 /* Preprocess lines count of which is affected by directives */
 {
@@ -3310,6 +3408,7 @@ void Preprocess (void)
     OLine = PLine;
     ParseDirectives (MSM_MULTILINE);
     OLine = 0;
+    CurInput->GFlags &= ~IG_NEWFILE;
 
     /* Add the source info to preprocessor output if needed */
     AddPreLine (PLine);
@@ -3332,7 +3431,7 @@ void Preprocess (void)
     PLine = InitLine (PLine);
 
     if (Verbosity > 1 && SB_NotEmpty (Line)) {
-        printf ("%s:%u: %.*s\n", GetCurrentFilename (), GetCurrentLineNum (),
+        printf ("%s:%u: %.*s\n", GetCurrentFileName (), GetCurrentLineNum (),
                 (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 
@@ -3378,9 +3477,13 @@ void ContinueLine (void)
 
 
 
-void PreprocessBegin (void)
-/* Initialize preprocessor with current file */
+void PreprocessBegin (IFile* Input)
+/* Initialize the preprocessor for a new input file */
 {
+    /* Remember the new input file and flag it as new */
+    CurInput = Input;
+    CurInput->GFlags |= IG_NEWFILE;
+
     /* Reset #if depth */
     PPStack->Index = -1;
 
@@ -3393,9 +3496,14 @@ void PreprocessBegin (void)
 
 
 
-void PreprocessEnd (void)
-/* Preprocessor done with current file */
+void PreprocessEnd (IFile* Input)
+/* Preprocessor done with current file. The parameter is the file we're
+** switching back to.
+*/
 {
+    /* Switch back to the old input file */
+    CurInput = Input;
+
     /* Check for missing #endif */
     while (PPStack->Index >= 0) {
         if ((PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) != 0) {

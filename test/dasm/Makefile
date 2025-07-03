@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 # Makefile for the disassembler regression tests
 
 ifneq ($(shell echo),)
@@ -8,14 +14,25 @@ ifdef CMD_EXE
   EXE = .exe
   MKDIR = mkdir $(subst /,\,$1)
   RMDIR = -rmdir /q /s $(subst /,\,$1)
+  NULLDEV = nul:
 else
   EXE =
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
+  NULLDEV = /dev/null
+endif
+
+ifeq ($(SILENT),s)
+    QUIET = 1
 endif
 
 ifdef QUIET
   .SILENT:
+  NULLOUT = >$(NULLDEV)
+  NULLERR = 2>$(NULLDEV)
+ifndef CMD_EXE
+  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+endif
 endif
 
 CL65 := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)

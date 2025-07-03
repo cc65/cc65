@@ -38,16 +38,20 @@
 
 
 
+#include <stdint.h>
+
+
+
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-extern unsigned char CodeBuf [0x10000];         /* Code buffer */
-extern unsigned long CodeStart;                 /* Start address */
-extern unsigned long CodeEnd;                   /* End address */
-extern unsigned long PC;                        /* Current PC */
+extern uint8_t CodeBuf[0x10000];        /* Code buffer */
+extern uint32_t CodeStart;              /* Start address */
+extern uint32_t CodeEnd;                /* End address */
+extern uint32_t PC;                     /* Current PC */
 
 
 
@@ -60,22 +64,22 @@ extern unsigned long PC;                        /* Current PC */
 void LoadCode (void);
 /* Load the code from the given file */
 
-unsigned char GetCodeByte (unsigned Addr);
+uint8_t GetCodeByte (uint32_t Addr);
 /* Get a byte from the given address */
 
-unsigned GetCodeDByte (unsigned Addr);
+uint16_t GetCodeDByte (uint32_t Addr);
 /* Get a dbyte from the given address */
 
-unsigned GetCodeWord (unsigned Addr);
+uint16_t GetCodeWord (uint32_t Addr);
 /* Get a word from the given address */
 
-unsigned long GetCodeDWord (unsigned Addr);
+uint32_t GetCodeDWord (uint32_t Addr);
 /* Get a dword from the given address */
 
-unsigned GetCodeLongAddr (unsigned Addr);
+uint32_t GetCodeLongAddr (uint32_t Addr);
 /* Get a 24-bit address from the given address */
 
-unsigned GetRemainingBytes (void);
+uint32_t GetRemainingBytes (void);
 /* Return the number of remaining code bytes */
 
 int CodeLeft (void);

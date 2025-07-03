@@ -8,14 +8,13 @@
         .export         _strchr
         .import         popax
         .importzp       ptr1, tmp1
-        .macpack        cpu
 
 _strchr:
         sta tmp1        ; Save c
         jsr popax       ; get s
         tay             ; low byte of pointer to y
         stx ptr1+1
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz ptr1
 .else
         lda #0

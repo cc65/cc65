@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 # top-level Makefile for the regression tests
 
 ifneq ($(shell echo),)
@@ -10,25 +16,36 @@ else
   RMDIR = $(RM) -r $1
 endif
 
-WORKDIR = ../testwrk/asm
+ifeq ($(SILENT),s)
+    QUIET := 1
+endif
 
-SUBDIRS = cpudetect opcodes listing val err misc
+ifdef QUIET
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+endif
+
+WORKDIR = ../testwrk/asm
 
 .PHONY: all continue mostlyclean clean
 
 all: mostlyclean continue
 
-define CALL_template
+continue: mostlyclean
+	@$(MAKE) $(PD) -C cpudetect all $(PQ)
+	@$(MAKE) $(PD) -C opcodes all $(PQ)
+	@$(MAKE) $(PD) -C listing all $(PQ)
+	@$(MAKE) $(PD) -C val all $(PQ)
+	@$(MAKE) $(PD) -C err all $(PQ)
+	@$(MAKE) $(PD) -C misc all $(PQ)
 
-continue::
-	@$(MAKE) -C $1 all
-
-mostlyclean::
-	@$(MAKE) -C $1 clean
-
-endef
-
-$(foreach subdir,$(SUBDIRS),$(eval $(call CALL_template,$(subdir))))
+mostlyclean:
+	@$(MAKE) $(PD) -C cpudetect clean $(PQ)
+	@$(MAKE) $(PD) -C opcodes clean $(PQ)
+	@$(MAKE) $(PD) -C listing clean $(PQ)
+	@$(MAKE) $(PD) -C val clean $(PQ)
+	@$(MAKE) $(PD) -C err clean $(PQ)
+	@$(MAKE) $(PD) -C misc clean $(PQ)
 
 clean: mostlyclean
 	@$(call RMDIR,$(WORKDIR))

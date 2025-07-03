@@ -1,85 +1,60 @@
 ;
 ; Ullrich von Bassewitz, 18.07.2000
+; Colin Leroy-Mira, 05.01.2024
 ;
 ; char* __fastcall__ strdup (const char* S);
 ;
-; Note: The code knowns which zero page locations are used by malloc.
+; Note: The code knowns which zero page locations are used by malloc,
+; memcpy and strlen.
 ;
 
-        .importzp       sp, tmp1, ptr4
-        .import         pushax, decsp4, incsp4
-        .import         _strlen, _malloc, _memcpy
+        .importzp       ptr2, ptr3, ptr4, tmp1, tmp2, tmp3
+        .import         _strlen_ptr4, _malloc, _memcpy, pushax
         .export         _strdup
 
-        .macpack        cpu
-        .macpack        generic
-
 _strdup:
+        ; Get length (and store source in ptr4)
+        sta     ptr4
+        stx     ptr4+1
+        stx     tmp1            ; Backup high byte, which
+        jsr     _strlen_ptr4    ; strlen may increment
 
-; Since we need some place to store the intermediate results, allocate a
-; stack frame. To make this somewhat more efficient, create the stackframe
-; as needed for the final call to the memcpy function.
-
-        pha                     ; decsp will destroy A (but not X)
-        jsr     decsp4          ; Target/source
-
-; Store the pointer into the source slot
-
-        ldy     #1
-        txa
-        sta     (sp),y
-        pla
-.if (.cpu .bitand CPU_ISET_65SC02)
-        sta     (sp)
+        ; Add null byte for terminator
+.if .cap(CPU_HAS_INA)
+        inc     a
 .else
-        dey
-        sta     (sp),y
+        clc
+        adc     #1
 .endif
-
-; Get length of S (which is still in a/x)
-
-        jsr     _strlen
-
-; Calculate strlen(S)+1 (the space needed)
-
-        add     #1
-        bcc     @L1
+        bne     :+
         inx
 
-; Save the space we're about to allocate in ptr4
+        ; Store length
+:       sta     tmp2
+        stx     tmp3
 
-@L1:    sta     ptr4
-        stx     ptr4+1
-
-; Allocate memory. _malloc will not use ptr4
-
+        ; Allocate memory
         jsr     _malloc
 
-; Store the result into the target stack slot
-
-        ldy     #2
-        sta     (sp),y          ; Store low byte
-        sta     tmp1
-        txa                     ; Get high byte
-        iny
-        sta     (sp),y          ; Store high byte
-
-; Check for a NULL pointer
-
-        ora     tmp1
+        ; Check for NULL
+        bne     :+
+        cpx     #$00
         beq     OutOfMemory
 
-; Copy the string. memcpy will return the target string which is exactly
-; what we need here. It will also drop the allocated stack frame.
+        ; Push dest
+:       jsr    pushax
 
+        ; Push source
         lda     ptr4
-        ldx     ptr4+1          ; Load size
-        jmp     _memcpy         ; Copy string, drop stackframe
+        ldx     tmp1
+        jsr     pushax
 
-; Out of memory, return NULL (A = 0)
+        ; Push length
+        lda     tmp2
+        ldx     tmp3
+
+        ; Copy and return the dest pointer
+        jmp     _memcpy
 
 OutOfMemory:
-        tax
-        jmp     incsp4          ; Drop stack frame
-
-
+        rts

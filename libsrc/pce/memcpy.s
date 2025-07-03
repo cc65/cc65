@@ -18,7 +18,7 @@
         .export         memcpy_increment, memcpy_transfer, memcpy_getparams
 
         .import         incsp2, popax, popptr1
-        .importzp       sp, ptr1, ptr2, ptr3
+        .importzp       c_sp, ptr1, ptr2, ptr3
 
 
 ; The structure of the transfer instructions
@@ -86,9 +86,9 @@ memcpy_getparams:
 ; (Direct stack access is six cycles faster [total cycle count].)
 
         iny                             ; (Y=0 by popptr1, need '1' here) save dest
-        lda     (sp),y                  ; get high byte
+        lda     (c_sp),y                ; get high byte
         tax
-        lda     (sp)                    ; get low byte
+        lda     (c_sp)                  ; get low byte
         sta     ptr2
         stx     ptr2+1
         rts                             ; return dest address (for memmove)

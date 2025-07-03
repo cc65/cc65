@@ -9,10 +9,8 @@
         .import         getlop, udiv32
         .importzp       sreg, tmp3, tmp4, ptr2
 
-        .macpack        cpu
-
 tosumod0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -22,7 +20,7 @@ tosumod0ax:
 .endif
 
 tosumodeax:
-        jsr     getlop          ; Get the paramameters
+        jsr     getlop          ; Get the parameters
         jsr     udiv32          ; Do the division
         lda     tmp3            ; Remainder is in ptr2:tmp3:tmp4
         sta     sreg

@@ -328,7 +328,7 @@ INLINE TypeCode GetQualifier (const Type* T)
 #  define GetQualifier(T)       ((T)->C & T_MASK_QUAL)
 #endif
 
-TypeCode GetUnqualTypeCode (const Type* Type);
+TypeCode GetUnderlyingTypeCode (const Type* Type);
 /* Get the type code of the unqualified underlying type of Type.
 ** Return GetUnqualRawTypeCode (Type) if Type is not scalar.
 */
@@ -359,30 +359,30 @@ INLINE TypeCode GetTypeClass (const Type* T)
 INLINE TypeCode GetTypeRank (const Type* T)
 /* Get the type rank of a type */
 {
-    return (GetUnqualTypeCode (T) & T_MASK_RANK);
+    return (GetUnderlyingTypeCode (T) & T_MASK_RANK);
 }
 #else
-#  define GetTypeRank(T)        (GetUnqualTypeCode (T) & T_MASK_RANK)
+#  define GetTypeRank(T)        (GetUnderlyingTypeCode (T) & T_MASK_RANK)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetSignedness (const Type* T)
 /* Get the signedness of a type */
 {
-    return (GetUnqualTypeCode (T) & T_MASK_SIGN);
+    return (GetUnderlyingTypeCode (T) & T_MASK_SIGN);
 }
 #else
-#  define GetSignedness(T)      (GetUnqualTypeCode (T) & T_MASK_SIGN)
+#  define GetSignedness(T)      (GetUnderlyingTypeCode (T) & T_MASK_SIGN)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetSizeModifier (const Type* T)
 /* Get the size modifier of a type */
 {
-    return (GetUnqualTypeCode (T) & T_MASK_SIZE);
+    return (GetUnderlyingTypeCode (T) & T_MASK_SIZE);
 }
 #else
-#  define GetSizeModifier(T)    (GetUnqualTypeCode (T) & T_MASK_SIZE)
+#  define GetSizeModifier(T)    (GetUnderlyingTypeCode (T) & T_MASK_SIZE)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -435,8 +435,8 @@ Type* NewPointerTo (const Type* T);
 */
 
 Type* NewBitFieldOf (const Type* T, unsigned BitOffs, unsigned BitWidth);
-/* Return a type string that is "T : BitWidth" aligned on BitOffs. The type
-** string is allocated on the heap and may be freed after use.
+/* Return a type string that is "unqualified T : BitWidth" aligned on BitOffs.
+** The type string is allocated on the heap and may be freed after use.
 */
 
 const Type* AddressOf (const Type* T);
@@ -791,6 +791,12 @@ int IsESUType (const Type* T);
 
 int IsIncompleteESUType (const Type* T);
 /* Return true if this is an incomplete ESU type */
+
+int IsAnonESUType (const Type* T);
+/* Return true if this is an anonymous ESU type */
+
+int IsAnonStructClass (const Type* T);
+/* Return true if this is an anonymous struct or union type */
 
 int IsPassByRefType (const Type* T);
 /* Return true if this is a large struct/union type that doesn't fit in the

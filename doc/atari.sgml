@@ -412,8 +412,9 @@ Please mind that ANTIC has memory alignment requirements for "player
 missile graphics"-data, font data, display lists and screen memory. Creation
 of a special linker configuration with appropriate aligned segments and
 switching to that segment in the c-code is usually necessary. A more memory
-hungry solution consists in using the "<tt/posix_memalign()/" function in
-conjunction with copying your data to the allocated memory.
+hungry solution consists in using the <url url="funcref.html#posix_memalign"
+name="posix_memalign()"> function in conjunction with copying your data to the
+allocated memory.
 
 <sect1>Character mapping<p>
 
@@ -1120,7 +1121,7 @@ If BSS and/or the stack shouldn't stay at the end of the program,
 some parts of the cc65 runtime lib need to be replaced/modified.
 
 common/_heap.s defines the location of the heap and atari/crt0.s
-defines the location of the stack by initializing sp.
+defines the location of the stack by initializing c_sp.
 
 
 <sect1>Upgrading from an older cc65 version<p>

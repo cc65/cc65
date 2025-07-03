@@ -7,12 +7,10 @@
 
         .export         tosor0ax, tosoreax
         .import         addysp1
-        .importzp       sp, sreg, tmp1
-
-        .macpack        cpu
+        .importzp       c_sp, sreg, tmp1
 
 tosor0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -22,25 +20,25 @@ tosor0ax:
 .endif
 
 tosoreax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-        ora     (sp)
+.if .cap(CPU_HAS_ZPIND)
+        ora     (c_sp)
         ldy     #1
 .else
         ldy     #0
-        ora     (sp),y          ; byte 0
+        ora     (c_sp),y        ; byte 0
         iny
 .endif
         sta     tmp1
         txa
-        ora     (sp),y          ; byte 1
+        ora     (c_sp),y        ; byte 1
         tax
         iny
         lda     sreg
-        ora     (sp),y          ; byte 2
+        ora     (c_sp),y        ; byte 2
         sta     sreg
         iny
         lda     sreg+1
-        ora     (sp),y          ; byte 3
+        ora     (c_sp),y        ; byte 3
         sta     sreg+1
 
         lda     tmp1

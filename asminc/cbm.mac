@@ -40,6 +40,12 @@
                 ; Just output the character
                 _scrcode        arg1
 
+        ; Check for an identifier
+        .elseif .match (.left (1, {arg1}), identifier)
+
+                ; Just output the identifier
+                _scrcode        arg1
+
         ; Anything else is an error
         .else
                 .error  "scrcode: invalid argument type"

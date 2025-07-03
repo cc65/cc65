@@ -4,7 +4,8 @@
 ; int __fastcall__ clock_gettime (clockid_t clk_id, struct timespec *tp);
 ;
 
-        .import         pushax, steaxspidx, incsp1, incsp3, return0
+        .import         pushax, incsp1, incsp3, steaxspidx, return0
+        .import         _mktime_dt
 
         .include        "time.inc"
         .include        "zeropage.inc"
@@ -29,42 +30,12 @@ _clock_gettime:
         jsr     callmli
         bcs     oserr
 
-        ; Get date
-        lda     DATELO+1
-        lsr
-        php                     ; Save month msb
-        cmp     #70             ; Year < 70?
-        bcs     :+              ; No, leave alone
-        adc     #100            ; Move 19xx to 20xx
-:       sta     TM + tm::tm_year
-        lda     DATELO
-        tax                     ; Save day
-        plp                     ; Restore month msb
-        ror
-        lsr
-        lsr
-        lsr
-        lsr
-        beq     erange          ; [1..12] allows for validity check
-        tay
-        dey                     ; Move [1..12] to [0..11]
-        sty     TM + tm::tm_mon
-        txa                     ; Restore day
-        and     #%00011111
-        sta     TM + tm::tm_mday
+        ; Convert DATELO/TIMELO to time_t
+        lda     #<DATELO
+        ldx     #>DATELO
+        jsr     _mktime_dt
 
-        ; Get time
-        lda     TIMELO+1
-        sta     TM + tm::tm_hour
-        lda     TIMELO
-        sta     TM + tm::tm_min
-
-        ; Make time_t
-        lda     #<TM
-        ldx     #>TM
-        jsr     _mktime
-
-        ; Store tv_sec
+        ; Store
         ldy     #timespec::tv_sec
         jsr     steaxspidx
 
@@ -74,21 +45,8 @@ _clock_gettime:
         ; Return success
         jmp     return0
 
-        ; Load errno code
-erange: lda     #ERANGE
-
-        ; Cleanup stack
-        jsr     incsp3          ; Preserves A
-
-        ; Set __errno
-        jmp     ___directerrno
-
         ; Cleanup stack
 oserr:  jsr     incsp3          ; Preserves A
 
         ; Set ___oserror
         jmp     ___mappederrno
-
-        .bss
-
-TM:     .tag    tm

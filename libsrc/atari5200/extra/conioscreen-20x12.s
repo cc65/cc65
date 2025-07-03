@@ -7,6 +7,7 @@
 SCREEN_BUF_SIZE =       20 * 12
 SCREEN_BUF      =       $4000 - SCREEN_BUF_SIZE
 
+                .import _clrscr
                 .export screen_setup
                 .export screen_width, screen_height
                 .export conio_color
@@ -26,24 +27,10 @@ screen_setup:
                 lda     #>SCREEN_BUF
                 sta     SAVMSC+1
 
-                ; initialize cursor position
-                lda     #0
-                sta     COLCRS_5200
-                sta     ROWCRS_5200
-
                 ; clear screen buffer
-                ldy     #<(SCREEN_BUF_SIZE-1)
-                ldx     #>(SCREEN_BUF_SIZE-1)
-clrscr:         sta     (SAVMSC),y
-                dey
-                cpy     #$FF
-                bne     clrscr
-                dex
-                cpx     #$FF
-                bne     clrscr
+                jsr     _clrscr
 
                 ; set default colors
-
                 lda     #GTIA_COLOR_WHITE
                 sta     COLOR0
                 lda     #GTIA_COLOR_LIGHTRED
@@ -55,7 +42,6 @@ clrscr:         sta     (SAVMSC),y
                 sta     COLOR4          ; background
 
                 ; set display list
-
                 lda     #<dlist
                 sta     SDLSTL
                 lda     #>dlist
@@ -82,7 +68,7 @@ dlist:          .repeat 3
                 .byte   DL_CHR20x16x2
                 .endrepeat
 
-                .byte  DL_JVB
+                .byte   DL_JVB
                 .word   dlist
 
 ; end of display list

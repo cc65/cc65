@@ -2445,6 +2445,24 @@ static char* RegContentDesc (const RegContents* RC, char* Buf)
         sprintf (B, "Y:%02X ", RC->RegY);
     }
     B += 5;
+    if (RegValIsUnknown (RC->Ptr1Lo)) {
+        strcpy (B, "P1L:XX ");
+    } else {
+        sprintf (B, "P1L:%02X ", RC->Ptr1Lo);
+    }
+    B += 7;
+    if (RegValIsUnknown (RC->Ptr1Hi)) {
+        strcpy (B, "P1H:XX ");
+    } else {
+        sprintf (B, "P1H:%02X ", RC->Ptr1Hi);
+    }
+    B += 7;
+    if (RegValIsUnknown (RC->Tmp1)) {
+        strcpy (B, "T1:XX ");
+    } else {
+        sprintf (B, "T1:%02X ", RC->Tmp1);
+    }
+    B += 6;
     if (PStatesAreUnknown (RC->PFlags, PSTATE_C)) {
         strcpy (B, "~");
     } else {

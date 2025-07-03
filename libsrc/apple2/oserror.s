@@ -23,7 +23,7 @@ ___osmaperrno:
 
         ; Found the code
 :       lda     ErrTab-1,x
-        ldx     #$00            ; High byte always zero
+        ldx     #>$0000
         rts
 
         .rodata

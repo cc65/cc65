@@ -53,10 +53,10 @@
 
 
 
-unsigned char CodeBuf [0x10000];        /* Code buffer */
-unsigned long CodeStart;                /* Start address */
-unsigned long CodeEnd;                  /* End address */
-unsigned long PC;                       /* Current PC */
+uint8_t CodeBuf[0x10000];               /* Code buffer */
+uint32_t CodeStart;                     /* Start address */
+uint32_t CodeEnd;                       /* End address */
+uint32_t PC;                            /* Current PC */
 
 
 
@@ -117,12 +117,13 @@ void LoadCode (void)
     ** 0x10000 - Size. This is a reasonable default assuming that the file
     ** is a ROM that contains the hardware vectors at $FFFA.
     */
-    if (StartAddr < 0) {
+    if (!HaveStartAddr) {
         if (Size > 0x10000) {
             StartAddr = 0;
         } else {
             StartAddr = 0x10000 - Size;
         }
+        HaveStartAddr = 1;
     }
 
     /* Calculate the maximum code size */
@@ -155,7 +156,7 @@ void LoadCode (void)
 
 
 
-unsigned char GetCodeByte (unsigned Addr)
+uint8_t GetCodeByte (uint32_t Addr)
 /* Get a byte from the given address */
 {
     PRECONDITION (Addr <= CodeEnd);
@@ -164,48 +165,48 @@ unsigned char GetCodeByte (unsigned Addr)
 
 
 
-unsigned GetCodeDByte (unsigned Addr)
+uint16_t GetCodeDByte (uint32_t Addr)
 /* Get a dbyte from the given address */
 {
-    unsigned Lo = GetCodeByte (Addr);
-    unsigned Hi = GetCodeByte (Addr+1);
+    uint16_t Lo = GetCodeByte (Addr);
+    uint16_t Hi = GetCodeByte (Addr+1);
     return (Lo <<8) | Hi;
 }
 
 
 
-unsigned GetCodeWord (unsigned Addr)
+uint16_t GetCodeWord (uint32_t Addr)
 /* Get a word from the given address */
 {
-    unsigned Lo = GetCodeByte (Addr);
-    unsigned Hi = GetCodeByte (Addr+1);
+    uint16_t Lo = GetCodeByte (Addr);
+    uint16_t Hi = GetCodeByte (Addr+1);
     return Lo | (Hi << 8);
 }
 
 
 
-unsigned long GetCodeDWord (unsigned Addr)
+uint32_t GetCodeDWord (uint32_t Addr)
 /* Get a dword from the given address */
 {
-    unsigned long Lo = GetCodeWord (Addr);
-    unsigned long Hi = GetCodeWord (Addr+2);
+    uint32_t Lo = GetCodeWord (Addr);
+    uint32_t Hi = GetCodeWord (Addr+2);
     return Lo | (Hi << 16);
 }
 
 
 
-unsigned GetCodeLongAddr (unsigned Addr)
+uint32_t GetCodeLongAddr (uint32_t Addr)
 /* Get a word from the given address */
 {
-    unsigned Lo = GetCodeByte (Addr);
-    unsigned Mid = GetCodeByte (Addr+1);
-    unsigned Hi = GetCodeByte (Addr+2);
+    uint32_t Lo = GetCodeByte (Addr);
+    uint32_t Mid = GetCodeByte (Addr+1);
+    uint32_t Hi = GetCodeByte (Addr+2);
     return Lo | (Mid << 8) | (Hi << 16);
 }
 
 
 
-unsigned GetRemainingBytes (void)
+uint32_t GetRemainingBytes (void)
 /* Return the number of remaining code bytes */
 {
     if (CodeEnd >= PC) {

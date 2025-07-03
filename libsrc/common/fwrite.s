@@ -8,14 +8,13 @@
         .export         _fwrite
 
         .import         _write
-        .import         pushax, incsp6, addysp, ldaxysp, pushwysp, return0
+        .import         pushax, pusha0, incsp6, addysp, ldaxysp, pushwysp, return0
         .import         tosumulax, tosudivax
 
         .importzp       ptr1
 
         .include        "errno.inc"
         .include        "_file.inc"
-
 
 ; ------------------------------------------------------------------------
 ; Code
@@ -33,7 +32,11 @@
 
         ldy     #_FILE::f_flags
         lda     (ptr1),y
+        .if .cap(CPU_HAS_BITIMM)
+        bit     #_FOPEN
+        .else
         and     #_FOPEN                 ; Is the file open?
+        .endif
         bne     @L2                     ; Branch if yes
 
 ; File not open
@@ -45,7 +48,9 @@
 
 ; Check if the stream is in an error state
 
-@L2:    lda     (ptr1),y                ; get file->f_flags again
+@L2:    .if .not .cap(CPU_HAS_BITIMM)
+        lda     (ptr1),y                ; get file->f_flags again
+        .endif
         and     #_FERROR
         bne     @L1
 
@@ -53,8 +58,7 @@
 
         ldy     #_FILE::f_fd
         lda     (ptr1),y
-        ldx     #$00
-        jsr     pushax                  ; file->f_fd
+        jsr     pusha0                  ; file->f_fd
 
         ldy     #9
         jsr     pushwysp                ; buf
@@ -123,4 +127,3 @@
 
 .bss
 file:   .res    2
-

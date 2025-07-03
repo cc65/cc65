@@ -148,7 +148,7 @@ static void AddNotifications (const Collection* LineInfos)
                 break;
 
             case LI_TYPE_MACRO:
-                Msg = "Macro was defined here";
+                Msg = "Expanded from macro here";
                 break;
 
             case LI_TYPE_MACPARAM:

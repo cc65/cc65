@@ -11,8 +11,6 @@
         .export         lsubeq1, lsubeqa, lsubeq
         .importzp       sreg, ptr1
 
-        .macpack        cpu
-
 lsubeq1:
         lda     #$01
 
@@ -25,7 +23,7 @@ lsubeq: sty     ptr1+1                  ; Store high byte of address
 
         sec
         eor     #$FF
- .if (.cpu .bitand ::CPU_ISET_65SC02)
+ .if .cap(CPU_HAS_ZPIND)
         adc     (ptr1)                  ; Subtract byte 0
         sta     (ptr1)
         ldy     #$01                    ; Address byte 1

@@ -24,7 +24,7 @@
 ;         /* the kernal routine BASIN sets ST to EOF if the end of file
 ;         ** is reached the first time, then we have store tmp.
 ;         ** every subsequent call returns EOF and READ ERROR in ST, then
-;         ** we have to exit the loop here immediatly.
+;         ** we have to exit the loop here immediately.
 ;         */
 ;         if (cbm_k_readst() & 0xBF) break;
 ;
@@ -40,7 +40,7 @@
 
         .export         _cbm_read
         .importzp       ptr1, ptr2, ptr3, tmp1
-        .import         popax, popa
+        .import         popax, popa, returnFFFF
         .import         ___oserror
 
 
@@ -107,7 +107,4 @@ _cbm_read:
 ; CHKIN failed
 
 @E1:    sta     ___oserror
-        lda     #$FF
-        tax
-        rts                     ; return -1
-
+        jmp     returnFFFF

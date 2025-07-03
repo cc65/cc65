@@ -159,12 +159,14 @@ static void Pause(void) {
 #endif
         }
 
+static void Nil() { }
+
 int main(void) {
         long n0;
         unsigned t;
         int c, n1 = 12345, n2, n3;
         char s1[80], s2[80];
-        void *p1 = main, *p2 = main, *p3 = main, *p4 = main;
+        void *p1 = Nil, *p2 = Nil, *p3 = Nil, *p4 = Nil;
 
 #ifndef USE_STDIO
         clrscr();

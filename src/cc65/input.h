@@ -52,6 +52,10 @@
 
 
 
+/* Forwards */
+struct IFile;
+struct LineInfo;
+
 /* An enum that describes different types of input files. The members are
 ** choosen so that it is possible to combine them to bitsets
 */
@@ -61,8 +65,27 @@ typedef enum {
     IT_USRINC = 0x04,           /* User include file (using "") */
 } InputType;
 
-/* Forward for an IFile structure */
-struct IFile;
+/* A bitmapped set of flags for include guard processing in the preprocessor */
+typedef enum {
+    IG_NONE         = 0x00,
+    IG_NEWFILE      = 0x01,     /* File processing started */
+    IG_ISGUARDED    = 0x02,     /* File contains an include guard */
+    IG_GUARDCLOSED  = 0x04,     /* Include guard was closed */
+    IG_COMPLETE     = IG_ISGUARDED | IG_GUARDCLOSED,
+} GuardFlags;
+
+/* Struct that describes an input file */
+typedef struct IFile IFile;
+struct IFile {
+    unsigned        Index;      /* File index */
+    unsigned        Usage;      /* Usage counter */
+    unsigned long   Size;       /* File size */
+    unsigned long   MTime;      /* Time of last modification */
+    InputType       Type;       /* Type of input file */
+    GuardFlags      GFlags;     /* Flags for include guard processing */
+    StrBuf          GuardMacro; /* Include guard macro name */
+    char            Name[1];    /* Name of file (dynamically allocated) */
+};
 
 /* The current input line */
 extern StrBuf* Line;
@@ -125,10 +148,19 @@ int PreprocessNextLine (void);
 ** main file.
 */
 
-const char* GetInputFile (const struct IFile* IF);
-/* Return a filename from an IFile struct */
+void GetFileInclusionInfo (struct LineInfo* LI);
+/* Get info about source file inclusion for LineInfo struct */
 
-const char* GetCurrentFilename (void);
+void FreeFileInclusionInfo (struct LineInfo* LI);
+/* Free info about source file inclusion for LineInfo struct */
+
+int HasFileInclusionChanged (const struct LineInfo* LI);
+/* Return true if file inclusion has changed from last time */
+
+const char* GetInputFileName (const struct IFile* IF);
+/* Return the name of the file from an IFile struct */
+
+const char* GetCurrentFileName (void);
 /* Return the name of the current input file */
 
 unsigned GetCurrentLineNum (void);
@@ -137,7 +169,7 @@ unsigned GetCurrentLineNum (void);
 void SetCurrentLineNum (unsigned LineNum);
 /* Set the line number in the current input file */
 
-void SetCurrentFilename (const char* Name);
+void SetCurrentFileName (const char* Name);
 /* Set the presumed name of the current input file */
 
 unsigned GetCurrentCounter (void);

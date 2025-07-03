@@ -92,7 +92,7 @@ static Collection       LPStack  = STATIC_COLLECTION_INITIALIZER;
 
 
 
-static Literal* NewLiteral (const void* Buf, unsigned Len)
+static Literal* NewLiteral (const StrBuf* S)
 /* Create a new literal and return it */
 {
     /* Allocate memory */
@@ -103,7 +103,7 @@ static Literal* NewLiteral (const void* Buf, unsigned Len)
     L->RefCount = 0;
     L->Output   = 0;
     SB_Init (&L->Data);
-    SB_AppendBuf (&L->Data, Buf, Len);
+    SB_Append (&L->Data, S);
 
     /* Return the new literal */
     return L;
@@ -162,7 +162,7 @@ void ReleaseLiteral (Literal* L)
 void TranslateLiteral (Literal* L)
 /* Translate a literal into the target charset */
 {
-    TgtTranslateBuf (SB_GetBuf (&L->Data), SB_GetLen (&L->Data));
+    TgtTranslateStrBuf (&L->Data);
 }
 
 
@@ -468,18 +468,18 @@ void OutputGlobalLiteralPool (void)
 Literal* AddLiteral (const char* S)
 /* Add a literal string to the literal pool. Return the literal. */
 {
-    return AddLiteralBuf (S, strlen (S) + 1);
+    StrBuf SB;
+    SB_InitFromString(&SB, S);
+    return AddLiteralStr(&SB);
 }
 
 
 
-Literal* AddLiteralBuf (const void* Buf, unsigned Len)
-/* Add a buffer containing a literal string to the literal pool. Return the
-** literal.
-*/
+Literal* AddLiteralStr (const StrBuf* S)
+/* Add a literal string to the literal pool. Return the literal. */
 {
     /* Create a new literal */
-    Literal* L = NewLiteral (Buf, Len);
+    Literal* L = NewLiteral (S);
 
     /* Add the literal to the correct pool */
     if (IS_Get (&WritableStrings)) {
@@ -490,12 +490,4 @@ Literal* AddLiteralBuf (const void* Buf, unsigned Len)
 
     /* Return the new literal */
     return L;
-}
-
-
-
-Literal* AddLiteralStr (const StrBuf* S)
-/* Add a literal string to the literal pool. Return the literal. */
-{
-    return AddLiteralBuf (SB_GetConstBuf (S), SB_GetLen (S));
 }

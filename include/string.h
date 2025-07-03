@@ -81,6 +81,7 @@ void __fastcall__ bzero (void* ptr, size_t n);                /* BSD */
 char* __fastcall__ strdup (const char* s);                    /* SYSV/BSD */
 int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */
+char* __fastcall__ strcasestr (const char* str, const char* substr);
 int __fastcall__ strnicmp (const char* s1, const char* s2, size_t count);     /* DOS/Windows */
 int __fastcall__ strncasecmp (const char* s1, const char* s2, size_t count);  /* Same for Unix */
 size_t __fastcall__ strnlen (const char* s, size_t maxlen);     /* POSIX.1-2008 */
@@ -89,6 +90,7 @@ char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);
 char* __fastcall__ strupper (char* s);
 char* __fastcall__ strqtok (char* s1, const char* s2);
+char* __fastcall__ stpcpy (char* dest, const char* src);
 #endif
 
 const char* __fastcall__ __stroserror (unsigned char errcode);

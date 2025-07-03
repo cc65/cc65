@@ -67,6 +67,10 @@
 #  include <pet.h>
 #elif defined(__CX16__)   && !defined(_CX16_H)
 #  include <cx16.h>
+#elif defined(__C65__)   && !defined(_C65_H)
+#  include <c65.h>
+#elif defined(__MEGA65__)   && !defined(_MEGA65_H)
+#  include <mega65.h>
 #endif
 
 /* Include definitions for CBM file types */

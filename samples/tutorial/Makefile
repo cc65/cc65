@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
@@ -31,10 +37,21 @@ else
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
 endif
 
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
+
 EXELIST_atari2600 = \
 	notavailable
 
 EXELIST_atari5200 = \
+	notavailable
+
+EXELIST_atari7800 = \
 	notavailable
 
 EXELIST_bbc = \
@@ -77,9 +94,12 @@ ifndef EXELIST_$(SYS)
 EXELIST_$(SYS) := ${patsubst %.c,%,$(wildcard *.c)}
 endif
 
+all: samples
+
 samples: $(EXELIST_$(SYS))
 
 hello: hello.c text.s
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -o hello hello.c text.s
 
 # empty target used to skip systems that will not work with any program in this dir

@@ -40,6 +40,7 @@
 /* common */
 #include "check.h"
 #include "coll.h"
+#include "debugflag.h"
 #include "filestat.h"
 #include "fname.h"
 #include "print.h"
@@ -77,24 +78,14 @@ char NextC = '\0';
 /* Maximum count of nested includes */
 #define MAX_INC_NESTING         16
 
-/* Struct that describes an input file */
-typedef struct IFile IFile;
-struct IFile {
-    unsigned        Index;      /* File index */
-    unsigned        Usage;      /* Usage counter */
-    unsigned long   Size;       /* File size */
-    unsigned long   MTime;      /* Time of last modification */
-    InputType       Type;       /* Type of input file */
-    char            Name[1];    /* Name of file (dynamically allocated) */
-};
-
 /* Struct that describes an active input file */
 typedef struct AFile AFile;
 struct AFile {
-    unsigned    Line;           /* Line number for this file */
+    unsigned    LineNum;        /* Actual line number for this file */
     FILE*       F;              /* Input file stream */
     IFile*      Input;          /* Points to corresponding IFile */
     int         SearchPath;     /* True if we've added a path for this file */
+    unsigned    LineOffs;       /* Offset to presumed line number for this file */
     char*       PName;          /* Presumed name of the file */
     PPIfStack   IfStack;        /* PP #if stack */
     int         MissingNL;      /* Last input line was missing a newline */
@@ -111,6 +102,7 @@ static Collection* CurrentInputStack;
 
 /* Counter for the __COUNTER__ macro */
 static unsigned MainFileCounter;
+LineInfo* PrevDiagnosticLI;
 
 
 
@@ -130,11 +122,13 @@ static IFile* NewIFile (const char* Name, InputType Type)
     IFile* IF = (IFile*) xmalloc (sizeof (IFile) + Len);
 
     /* Initialize the fields */
-    IF->Index = CollCount (&IFiles) + 1;
-    IF->Usage = 0;
-    IF->Size  = 0;
-    IF->MTime = 0;
-    IF->Type  = Type;
+    IF->Index   = CollCount (&IFiles) + 1;
+    IF->Usage   = 0;
+    IF->Size    = 0;
+    IF->MTime   = 0;
+    IF->Type    = Type;
+    IF->GFlags  = IG_NONE;
+    SB_Init (&IF->GuardMacro);
     memcpy (IF->Name, Name, Len+1);
 
     /* Insert the new structure into the IFile collection */
@@ -163,10 +157,11 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     AFile* AF = (AFile*) xmalloc (sizeof (AFile));
 
     /* Initialize the fields */
-    AF->Line  = 0;
-    AF->F     = F;
-    AF->Input = IF;
-    AF->PName = 0;
+    AF->LineNum   = 0;
+    AF->F         = F;
+    AF->Input     = IF;
+    AF->LineOffs  = 0;
+    AF->PName     = 0;
     AF->IfStack.Index = -1;
     AF->MissingNL = 0;
 
@@ -277,7 +272,7 @@ void OpenMainFile (const char* Name)
     SetPPIfStack (&MainFile->IfStack);
 
     /* Begin PP for this file */
-    PreprocessBegin ();
+    PreprocessBegin (IF);
 
     /* Allocate the input line buffer */
     Line = NewStrBuf ();
@@ -285,7 +280,7 @@ void OpenMainFile (const char* Name)
     /* Update the line infos, so we have a valid line info even at start of
     ** the main file before the first line is read.
     */
-    UpdateLineInfo (MainFile->Input, MainFile->Line, Line);
+    UpdateCurrentLineInfo (Line);
 
     /* Initialize the __COUNTER__ counter */
     MainFileCounter = 0;
@@ -315,11 +310,21 @@ void OpenIncludeFile (const char* Name, InputType IT)
     }
 
     /* Search the list of all input files for this file. If we don't find
-    ** it, create a new IFile object.
+    ** it, create a new IFile object. If we do already know the file and it
+    ** has an include guard, check for the include guard before opening the
+    ** file.
     */
     IF = FindFile (N);
     if (IF == 0) {
         IF = NewIFile (N, IT);
+    } else if ((IF->GFlags & IG_ISGUARDED) != 0 &&
+              IsMacro (SB_GetConstBuf (&IF->GuardMacro))) {
+        if (Debug) {
+            printf ("Include guard %s found for \"%s\" - won't include it again\n",
+                    SB_GetConstBuf (&IF->GuardMacro),
+                    Name);
+        }
+        return;
     }
 
     /* We don't need N any longer, since we may now use IF->Name */
@@ -343,7 +348,7 @@ void OpenIncludeFile (const char* Name, InputType IT)
     SetPPIfStack (&AF->IfStack);
 
     /* Begin PP for this file */
-    PreprocessBegin ();
+    PreprocessBegin (IF);
 }
 
 
@@ -353,26 +358,23 @@ void CloseIncludeFile (void)
 ** NULL if this was the main file.
 */
 {
-    AFile* Input;
+    /* Get the currently active input file and remove it from set of active
+    ** files. CollPop will FAIL if the collection is empty so no need to
+    ** check this here.
+    */
+    AFile* Input = CollPop (&AFiles);
 
-    /* Get the number of active input files */
-    unsigned AFileCount = CollCount (&AFiles);
+    /* Determine the file that is active after closing this one. We never
+    ** actually close the main file, since it is needed for errors found after
+    ** compilation is completed.
+    */
+    AFile* NextInput = (CollCount (&AFiles) > 0)? CollLast (&AFiles) : Input;
 
-    /* Must have an input file when called */
-    PRECONDITION (AFileCount > 0);
-
-    /* End preprocessor in this file */
-    PreprocessEnd ();
-
-    /* Get the current active input file */
-    Input = CollLast (&AFiles);
+    /* End preprocessing for the current input file */
+    PreprocessEnd (NextInput->Input);
 
     /* Close the current input file (we're just reading so no error check) */
     fclose (Input->F);
-
-    /* Delete the last active file from the active file collection */
-    --AFileCount;
-    CollDelete (&AFiles, AFileCount);
 
     /* If we had added an extra search path for this AFile, remove it */
     if (Input->SearchPath) {
@@ -382,10 +384,9 @@ void CloseIncludeFile (void)
     /* Delete the active file structure */
     FreeAFile (Input);
 
-    /* Use previous file with PP if it is not the main file */
-    if (AFileCount > 0) {
-        Input = CollLast (&AFiles);
-        SetPPIfStack (&Input->IfStack);
+    /* If we've switched files, use the if stack from the previous file */
+    if (Input != NextInput) {
+        SetPPIfStack (&NextInput->IfStack);
     }
 }
 
@@ -553,7 +554,7 @@ int NextLine (void)
             if (!Input->MissingNL || SB_NotEmpty (Line)) {
 
                 /* Accept files without a newline at the end */
-                ++Input->Line;
+                ++Input->LineNum;
 
                 /* Assume no new line */
                 Input->MissingNL = 1;
@@ -569,7 +570,7 @@ int NextLine (void)
         if (C == '\n') {
 
             /* We got a new line */
-            ++Input->Line;
+            ++Input->LineNum;
 
             /* If the \n is preceeded by a \r, remove the \r, so we can read
             ** DOS/Windows files under *nix.
@@ -605,7 +606,7 @@ int NextLine (void)
     InitLine (Line);
 
     /* Create line information for this line */
-    UpdateLineInfo (Input->Input, Input->Line, Line);
+    UpdateCurrentLineInfo (Line);
 
     /* Done */
     return C != EOF || SB_NotEmpty (Line);
@@ -645,15 +646,145 @@ int PreprocessNextLine (void)
 
 
 
-const char* GetInputFile (const struct IFile* IF)
-/* Return a filename from an IFile struct */
+static LineInfoFile* NewLineInfoFile (const AFile* AF)
+{
+    const char* Name = AF->PName == 0 ? AF->Input->Name : AF->PName;
+    unsigned    Len  = strlen (Name);
+
+    /* Allocate memory for the file info and the file name */
+    LineInfoFile* LIF = xmalloc (sizeof (LineInfoFile) + Len);
+
+    /* Copy info */
+    LIF->InputFile = AF->Input;
+    LIF->LineNum   = AF->LineNum + AF->LineOffs;
+    memcpy (LIF->Name, Name, Len + 1);
+
+    return LIF;
+}
+
+
+
+void GetFileInclusionInfo (struct LineInfo* LI)
+/* Get info about source file inclusion for LineInfo struct */
+{
+    unsigned        FileCount = CollCount (&AFiles);
+
+    CHECK (FileCount > 0);
+
+    /* Get the correct index */
+    --FileCount;
+
+    if (LI->IncFiles != 0) {
+        FreeFileInclusionInfo (LI);
+    }
+    LI->IncFiles = 0;
+
+    if (LI->File != 0) {
+        xfree (LI->File);
+    }
+
+    /* Copy info from the AFile */
+    LI->File = NewLineInfoFile (CollAtUnchecked (&AFiles, FileCount));
+
+    /* Remember the actual line number */
+    LI->ActualLineNum = ((AFile*)CollAtUnchecked (&AFiles, FileCount))->LineNum;
+
+    if (FileCount > 0) {
+        /* The file is included from another */
+
+        /* Always use a new collection */
+        LI->IncFiles = NewCollection ();
+
+        while (FileCount-- > 0) {
+            /* Copy info from the AFile */
+            LineInfoFile* LIF = NewLineInfoFile (CollAtUnchecked (&AFiles, FileCount));
+
+            /* Add this file */
+            CollAppend (LI->IncFiles, LIF);
+        }
+    }
+}
+
+
+
+void FreeFileInclusionInfo (struct LineInfo* LI)
+/* Free info about source file inclusion for LineInfo struct */
+{
+    if (LI->File != 0) {
+        xfree (LI->File);
+        LI->File = 0;
+    }
+
+    if (LI->IncFiles != 0) {
+        unsigned I;
+        for (I = 0; I < CollCount (LI->IncFiles); ++I) {
+            CollAtUnchecked (LI->IncFiles, I);
+        }
+        FreeCollection (LI->IncFiles);
+        LI->IncFiles = 0;
+    }
+}
+
+
+
+static int IsDifferentLineInfoFile (const LineInfoFile* Lhs, const LineInfoFile* Rhs)
+/* Return true if the two files are different */
+{
+    /* If the input files are the same but their presumed names are different,
+    ** we still consider the files same.
+    */
+    return Lhs->InputFile != Rhs->InputFile || Lhs->LineNum != Rhs->LineNum;
+}
+
+
+
+int HasFileInclusionChanged (const struct LineInfo* LI)
+/* Return true if file inclusion has changed from last time */
+{
+    if (LI->File != 0) {
+        LineInfo* PrevLI = GetPrevCheckedLI ();
+
+        if (LI == PrevLI) {
+            return 0;
+        }
+
+        if (PrevLI == 0) {
+            return 1;
+        }
+
+        if (LI->IncFiles != 0) {
+            unsigned I;
+
+            if (PrevLI->IncFiles == 0 ||
+                CollCount (LI->IncFiles) != CollCount (PrevLI->IncFiles)) {
+                return 1;
+            }
+
+            for (I = 0; I < CollCount (LI->IncFiles); ++I) {
+                /* If this refers to a different file, then the inclusion has changed */
+                if (IsDifferentLineInfoFile (CollAtUnchecked (LI->IncFiles, I),
+                                             CollAtUnchecked (PrevLI->IncFiles, I))) {
+                    return 1;
+                }
+            }
+        }
+    }
+
+    /* Unchanged */
+    return 0;
+}
+
+
+
+const char* GetInputFileName (const struct IFile* IF)
+/* Return the name of the file from an IFile struct */
 {
     return IF->Name;
 }
 
 
 
-const char* GetCurrentFilename (void)
+const char* GetCurrentFileName (void)
 /* Return the name of the current input file */
 {
     unsigned AFileCount = CollCount (&AFiles);
@@ -674,7 +805,7 @@ unsigned GetCurrentLineNum (void)
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
         const AFile* AF = CollLast (&AFiles);
-        return AF->Line;
+        return AF->LineNum + AF->LineOffs;
     } else {
         /* No open file */
         return 0;
@@ -684,18 +815,18 @@ unsigned GetCurrentLineNum (void)
 
 
 void SetCurrentLineNum (unsigned LineNum)
-/* Set the line number in the current input file */
+/* Set the presumed line number in the current input file */
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
         AFile* AF = CollLast (&AFiles);
-        AF->Line = LineNum;
+        AF->LineOffs = LineNum - AF->LineNum;
     }
 }
 
 
 
-void SetCurrentFilename (const char* Name)
+void SetCurrentFileName (const char* Name)
 /* Set the presumed name of the current input file */
 {
     unsigned AFileCount = CollCount (&AFiles);

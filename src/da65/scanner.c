@@ -600,11 +600,11 @@ void InfoAssureIdent (void)
 
 
 
-void InfoRangeCheck (long Lo, long Hi)
+void InfoRangeCheck (const char* Attr, long Lo, long Hi)
 /* Check the range of InfoIVal */
 {
     if (InfoIVal < Lo || InfoIVal > Hi) {
-        InfoError ("Range error");
+        InfoError ("Range error for attribute %s", Attr);
     }
 }
 
@@ -671,8 +671,8 @@ void InfoSetName (const char* Name)
 /* Set a name for a config file */
 {
     InfoFile = Name;
-    xfree(InputSrcName);
-    InputSrcName = xstrdup(Name);
+    xfree (InputSrcName);
+    InputSrcName = xstrdup (Name);
 }
 
 

@@ -26,7 +26,6 @@
         .include        "ser-error.inc"
 
         .macpack        module
-        .macpack        cpu
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -121,7 +120,7 @@ BaudTable:                      ; Table used to translate RS232 baudrate param
         .byte   $0F             ; SER_BAUD_19200
         .byte   $FF             ; SER_BAUD_38400
         .byte   $FF             ; SER_BAUD_57600
-        .byte   $FF             ; SER_BAUD_115200
+        .byte   $00             ; SER_BAUD_115200
         .byte   $FF             ; SER_BAUD_230400
 
 BitTable:                       ; Table used to translate RS232 databits param
@@ -302,6 +301,7 @@ HandshakeOK:
         lda     (ptr1),y        ; Baudrate index
         tay
         lda     BaudTable,y     ; Get 6551 value
+        sta     tmp2            ; Backup for IRQ setting
         bpl     BaudOK          ; Check that baudrate is supported
 
         lda     #SER_ERR_BAUD_UNAVAIL
@@ -332,14 +332,19 @@ BaudOK: sta     tmp1
 
         ora     #%00000001      ; Set DTR active
         sta     RtsOff          ; Store value to easily handle flow control later
-        ora     #%00001000      ; Enable receive interrupts (RTS low)
-        sta     ACIA_CMD,x
+
+        ora     #%00001010      ; Disable interrupts and set RTS low
+
+        ldy     tmp2            ; Don't enable IRQs if 115200bps
+        beq     :+
+        and     #%11111101      ; Enable receive IRQs
+:       sta     ACIA_CMD,x
 
         ; Done
         stx     Index           ; Mark port as open
         lda     #SER_ERR_OK
 Out:
-        ldx     #$00            ; Promote char return value
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------
@@ -354,7 +359,7 @@ SER_GET:
         cmp     #$FF
         bne     :+
         lda     #SER_ERR_NO_DATA
-        ldx     #$00            ; Promote char return value
+        ldx     #>$0000
         rts
 
 :       ldy     Stopped         ; Check for flow stopped
@@ -402,7 +407,7 @@ SER_PUT:
         ldy     SendFreeCnt     ; Reload SendFreeCnt after TryToSend
         bne     :+
         lda     #SER_ERR_OVERFLOW
-        ldx     #$00            ; Promote char return value
+        ldx     #>$0000
         rts
 
 :       ldy     SendTail        ; Put byte into send buffer
@@ -450,7 +455,7 @@ SER_IOCTL:
         rts
 
 :       lda     #SER_ERR_INV_IOCTL
-        ldx     #$00            ; Promote char return value
+        ldx     #>$0000
         rts
 
 ;----------------------------------------------------------------------------

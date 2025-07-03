@@ -32,10 +32,11 @@
 /*****************************************************************************/
 
 
-
 #ifndef PARAVIRT_H
 #define PARAVIRT_H
 
+
+#include "6502.h"
 
 
 /*****************************************************************************/
@@ -44,11 +45,11 @@
 
 
 
-#define PARAVIRT_BASE        0xFFF4
+#define PARAVIRT_BASE        0xFFF1
 /* Lowest address used by a paravirtualization hook */
 
-#define PVOPEN_PATH_SIZE       1024
-/* Maximum path size supported by PVOpen */
+#define PV_PATH_SIZE         1024
+/* Maximum path size supported by PVOpen/PVSysRemove */
 
 
 

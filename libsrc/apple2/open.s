@@ -18,6 +18,7 @@
         .include        "fcntl.inc"
         .include        "mli.inc"
         .include        "filedes.inc"
+        .include        "time.inc"
 
         .segment        "ONCE"
 
@@ -100,8 +101,8 @@ found:  tya
         bne     oserr1
 
         ; Set pushed name
-        lda     sp
-        ldx     sp+1
+        lda     c_sp
+        ldx     c_sp+1
         sta     mliparam + MLI::OPEN::PATHNAME
         stx     mliparam + MLI::OPEN::PATHNAME+1
 
@@ -208,7 +209,7 @@ done:   lda     tmp1            ; Restore fd
         jsr     popname         ; Preserves A
 
         ; Return success
-        ldx     #$00
+        ldx     #>$0000
         stx     ___oserror
         rts
 

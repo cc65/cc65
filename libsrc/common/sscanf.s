@@ -6,7 +6,7 @@
 
         .export         _sscanf
         .import         addysp, decsp4, _vsscanf
-        .importzp       sp, ptr1
+        .importzp       c_sp, ptr1
 
         .macpack        generic
 
@@ -51,9 +51,9 @@ _sscanf:
 ; Calculate a pointer to the fixed parameters
 
         lda     ParamSize
-        add     sp
+        add     c_sp
         sta     ptr1
-        ldx     sp+1
+        ldx     c_sp+1
         bcc     @L1
         inx
 @L1:    stx     ptr1+1
@@ -62,7 +62,7 @@ _sscanf:
 
         ldy     #4-1
 @L2:    lda     (ptr1),y
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         bpl     @L2
 

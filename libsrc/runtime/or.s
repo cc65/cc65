@@ -7,24 +7,22 @@
 
         .export         tosora0, tosorax
         .import         addysp1
-        .importzp       sp, tmp1
-
-        .macpack        cpu
+        .importzp       c_sp, tmp1
 
 tosora0:
         ldx     #$00
 tosorax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-        ora     (sp)
+.if .cap(CPU_HAS_ZPIND)
+        ora     (c_sp)
         ldy     #1
 .else
         ldy     #0
-        ora     (sp),y
+        ora     (c_sp),y
         iny
 .endif
         sta     tmp1
         txa
-        ora     (sp),y
+        ora     (c_sp),y
         tax
         lda     tmp1
         jmp     addysp1         ; drop TOS, set condition codes

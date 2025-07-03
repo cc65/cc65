@@ -219,7 +219,7 @@ static void GlobalSection (void)
             case INFOTOK_ARGUMENT_COLUMN:
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (MIN_ACOL, MAX_ACOL);
+                InfoRangeCheck ("ARGUMENTCOLUMN", MIN_ACOL, MAX_ACOL);
                 ACol = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -227,7 +227,7 @@ static void GlobalSection (void)
             case INFOTOK_COMMENT_COLUMN:
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (MIN_CCOL, MAX_CCOL);
+                InfoRangeCheck ("COMMENTCOLUMN", MIN_CCOL, MAX_CCOL);
                 CCol = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -235,7 +235,7 @@ static void GlobalSection (void)
             case INFOTOK_COMMENTS:
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (MIN_COMMENTS, MAX_COMMENTS);
+                InfoRangeCheck ("COMMENTS", MIN_COMMENTS, MAX_COMMENTS);
                 Comments = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -281,7 +281,7 @@ static void GlobalSection (void)
             case INFOTOK_INPUTSIZE:
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (1, 0x10000);
+                InfoRangeCheck ("INPUTSIZE", 1, 0x10000);
                 InputSize = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -289,7 +289,7 @@ static void GlobalSection (void)
             case INFOTOK_LABELBREAK:
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (0, UCHAR_MAX);
+                InfoRangeCheck ("LABELBREAK", 0, UCHAR_MAX);
                 LBreak = (unsigned char) InfoIVal;
                 InfoNextTok ();
                 break;
@@ -297,7 +297,7 @@ static void GlobalSection (void)
             case INFOTOK_MNEMONIC_COLUMN:
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (MIN_MCOL, MAX_MCOL);
+                InfoRangeCheck ("MNEMONICCOLUMN", MIN_MCOL, MAX_MCOL);
                 MCol = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -336,7 +336,7 @@ static void GlobalSection (void)
                 InfoNextTok ();
                 InfoAssureInt ();
                 if (InfoIVal != 0) {
-                    InfoRangeCheck (MIN_PAGE_LEN, MAX_PAGE_LEN);
+                    InfoRangeCheck ("PAGELENGTH", MIN_PAGE_LEN, MAX_PAGE_LEN);
                 }
                 PageLength = InfoIVal;
                 InfoNextTok ();
@@ -345,15 +345,16 @@ static void GlobalSection (void)
             case INFOTOK_STARTADDR:
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (0x0000, 0xFFFF);
+                InfoRangeCheck ("STARTADDR", 0x0000, 0xFFFF);
                 StartAddr = InfoIVal;
+                HaveStartAddr = 1;
                 InfoNextTok ();
                 break;
 
             case INFOTOK_TEXT_COLUMN:
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (MIN_TCOL, MAX_TCOL);
+                InfoRangeCheck ("TEXTCOLUMN", MIN_TCOL, MAX_TCOL);
                 TCol = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -413,7 +414,7 @@ static void LabelSection (void)
                     InfoError ("Value already given");
                 }
                 InfoAssureInt ();
-                InfoRangeCheck (0, 0xFFFF);
+                InfoRangeCheck ("ADDR", 0, 0xFFFF);
                 Value = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -447,7 +448,7 @@ static void LabelSection (void)
                     InfoError ("Size already given");
                 }
                 InfoAssureInt ();
-                InfoRangeCheck (1, 0x10000);
+                InfoRangeCheck ("SIZE", 1, 0x10000);
                 Size = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -458,7 +459,7 @@ static void LabelSection (void)
                     InfoError ("ParamSize already given");
                 }
                 InfoAssureInt ();
-                InfoRangeCheck (1, 0x10000);
+                InfoRangeCheck ("PARAMSIZE", 1, 0x10000);
                 ParamSize = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -554,13 +555,13 @@ static void RangeSection (void)
         tComment  = 0x10,
         tAddrMode = 0x20,
         tUnit     = 0x40,
-        tNeeded = (tStart | tEnd | tType)
+        tNeeded   = (tStart | tEnd | tType)
     };
     unsigned Attributes = tNone;
 
     /* Locals - initialize to avoid gcc warnings */
-    unsigned Start      = 0;
-    unsigned End        = 0;
+    uint32_t Start      = 0;
+    uint32_t End        = 0;
     unsigned char Type  = 0;
     unsigned AddrMode   = 0;
     char* Name          = 0;
@@ -599,17 +600,18 @@ static void RangeSection (void)
             case INFOTOK_END:
                 AddAttr ("END", &Attributes, tEnd);
                 InfoNextTok ();
-
                 if (InfoTok == INFOTOK_OFFSET_INTCON) {
-                    InfoRangeCheck (0x0000, 0xFFFF);
-                    if (!(Attributes & tStart))
+                    InfoRangeCheck ("END", 0x0000, 0xFFFF);
+                    if ((Attributes & tStart) == 0) {
                         InfoError ("When using End with an offset, Start must be specified before");
+                    }
                     End = Start + InfoIVal - 1;
-                    if (End > 0xFFFF)
+                    if (End > 0xFFFF) {
                         InfoError ("Range error");
+                    }
                 } else {
                     InfoAssureInt ();
-                    InfoRangeCheck (0x0000, 0xFFFF);
+                    InfoRangeCheck ("END", 0x0000, 0xFFFF);
                     End = InfoIVal;
                 }
                 InfoNextTok ();
@@ -631,7 +633,7 @@ static void RangeSection (void)
                 AddAttr ("START", &Attributes, tStart);
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (0x0000, 0xFFFF);
+                InfoRangeCheck ("START", 0x0000, 0xFFFF);
                 Start = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -664,7 +666,7 @@ static void RangeSection (void)
                 if (InfoSVal[1] == '\0') {
                     InfoError ("AddrMode must be two characters long");
                 }
-                if (tolower(InfoSVal[0]) == 'm') {
+                if (tolower (InfoSVal[0]) == 'm') {
                     if (InfoSVal[0] == 'm') {
                         AddrMode = atMem16;
                     } else {
@@ -673,7 +675,7 @@ static void RangeSection (void)
                 } else {
                     InfoError ("AddrMode syntax: mx");
                 }
-                if (tolower(InfoSVal[1]) == 'x') {
+                if (tolower (InfoSVal[1]) == 'x') {
                     if (InfoSVal[1] == 'x') {
                         AddrMode |= atIdx16;
                     } else {
@@ -689,7 +691,7 @@ static void RangeSection (void)
                 AddAttr ("UNIT", &Attributes, tUnit);
                 InfoNextTok ();
                 InfoAssureInt ();
-                InfoRangeCheck (0x0002, 0xFFFF);
+                InfoRangeCheck ("UNIT", 0x0002, 0xFFFF);
                 Unit = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -733,7 +735,7 @@ static void RangeSection (void)
     if (Attributes & tUnit) {
         unsigned i;
         for (i = Start; i < End; i += Unit) {
-            MarkAddr(i, atTableUnit);
+            MarkAddr (i, atTableUnit);
         }
     }
 
@@ -807,7 +809,7 @@ static void SegmentSection (void)
                     InfoError ("Value already given");
                 }
                 InfoAssureInt ();
-                InfoRangeCheck (0, 0xFFFF);
+                InfoRangeCheck ("END", 0, 0xFFFF);
                 End = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -828,7 +830,7 @@ static void SegmentSection (void)
                     InfoError ("Value already given");
                 }
                 InfoAssureInt ();
-                InfoRangeCheck (0, 0xFFFF);
+                InfoRangeCheck ("START", 0, 0xFFFF);
                 Start = InfoIVal;
                 InfoNextTok ();
                 break;
@@ -926,7 +928,7 @@ void ReadInfoFile (void)
 /* Read the info file */
 {
     /* Check if we have a info file given */
-    if (InfoAvail()) {
+    if (InfoAvail ()) {
         /* Open the config file */
         InfoOpenInput ();
 

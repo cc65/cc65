@@ -55,9 +55,12 @@
 
 
 /* Opcode description table */
+/* CAUTION: table must be sorted by mnemonic for bsearch */
 const OPCDesc OPCTable[OP65_COUNT] = {
 
     /* 65XX opcodes */
+
+/* BEGIN SORTED_OPCODES.SH */
     {   OP65_ADC,                               /* opcode */
         "adc",                                  /* mnemonic */
         0,                                      /* size */
@@ -586,6 +589,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
         REG_Y,                                  /* use */
         REG_A | PSTATE_ZN                       /* chg */
     },
+/* END SORTED_OPCODES.SH */
 };
 
 

@@ -87,11 +87,13 @@ enum {
 };
 
 /* Token table */
+/* CAUTION: table must be sorted for bsearch */
 static const struct Keyword {
     char*           Key;        /* Keyword name */
     unsigned char   Tok;        /* The token */
     unsigned char   Std;        /* Token supported in which standards? */
 } Keywords [] = {
+/* BEGIN SORTED.SH */
     { "_Pragma",        TOK_PRAGMA,     TT_C89 | TT_C99 | TT_CC65  },   /* !! */
     { "_Static_assert", TOK_STATIC_ASSERT,                TT_CC65  },   /* C11 */
     { "__AX__",         TOK_AX,         TT_C89 | TT_C99 | TT_CC65  },
@@ -145,6 +147,7 @@ static const struct Keyword {
     { "void",           TOK_VOID,       TT_C89 | TT_C99 | TT_CC65  },
     { "volatile",       TOK_VOLATILE,   TT_C89 | TT_C99 | TT_CC65  },
     { "while",          TOK_WHILE,      TT_C89 | TT_C99 | TT_CC65  },
+/* END SORTED.SH */
 };
 #define KEY_COUNT       (sizeof (Keywords) / sizeof (Keywords [0]))
 
@@ -162,6 +165,12 @@ static const struct Keyword {
 */
 typedef uint32_t scan_t;
 
+
+/* ParseChar return values */
+typedef struct {
+    int Val;
+    int Cooked;
+} parsedchar_t;
 
 /*****************************************************************************/
 /*                                   code                                    */
@@ -326,12 +335,15 @@ static void SetTok (int tok)
 
 
 
-static int ParseChar (void)
+static parsedchar_t ParseChar (void)
 /* Parse a character token. Converts escape chars into character codes. */
 {
+    parsedchar_t Result;
     int C;
     int HadError;
     int Count;
+
+    Result.Cooked = 1;
 
     /* Check for escape chars */
     if (CurC == '\\') {
@@ -345,6 +357,14 @@ static int ParseChar (void)
                 break;
             case 'b':
                 C = '\b';
+                break;
+            case 'e':
+                if (IS_Get(&Standard) != STD_CC65) {
+                    goto IllegalEscape;
+                }
+                /* we'd like to use \e here, but */
+                /* not all build systems support it */
+                C = '\x1B';
                 break;
             case 'f':
                 C = '\f';
@@ -373,6 +393,7 @@ static int ParseChar (void)
             case 'x':
             case 'X':
                 /* Hex character constant */
+                Result.Cooked = 0;
                 if (!IsXDigit (NextC)) {
                     Error ("\\x used with no following hex digits");
                     C = ' ';
@@ -401,6 +422,7 @@ static int ParseChar (void)
             case '6':
             case '7':
                 /* Octal constant */
+                Result.Cooked = 0;
                 Count = 1;
                 C = HexVal (CurC);
                 while (IsODigit (NextC) && Count++ < 3) {
@@ -411,6 +433,7 @@ static int ParseChar (void)
                     Error ("Octal character constant out of range");
                 break;
             default:
+IllegalEscape:
                 C = CurC;
                 Error ("Illegal escaped character: 0x%02X", CurC);
                 break;
@@ -423,7 +446,12 @@ static int ParseChar (void)
     NextChar ();
 
     /* Do correct sign extension */
-    return SignExtendChar (C);
+    Result.Val = SignExtendChar(C);
+    if (Result.Cooked) {
+        Result.Cooked = Result.Val;
+    }
+
+    return Result;
 }
 
 
@@ -431,7 +459,7 @@ static int ParseChar (void)
 static void CharConst (void)
 /* Parse a character constant token */
 {
-    int C;
+    parsedchar_t C;
 
     if (CurC == 'L') {
         /* Wide character constant */
@@ -457,7 +485,8 @@ static void CharConst (void)
     }
 
     /* Translate into target charset */
-    NextTok.IVal = SignExtendChar (C);
+    NextTok.IVal = SignExtendChar (C.Val);
+    NextTok.Cooked = C.Cooked;
 
     /* Character constants have type int */
     NextTok.Type = type_int;
@@ -468,6 +497,9 @@ static void CharConst (void)
 static void StringConst (void)
 /* Parse a quoted string token */
 {
+    /* result from ParseChar */
+    parsedchar_t ParsedChar;
+
     /* String buffer */
     StrBuf S = AUTO_STRBUF_INITIALIZER;
 
@@ -494,7 +526,8 @@ static void StringConst (void)
             Error ("Unexpected newline");
             break;
         }
-        SB_AppendChar (&S, ParseChar ());
+        ParsedChar = ParseChar ();
+        SB_AppendCharCooked(&S, ParsedChar.Val, ParsedChar.Cooked);
     }
 
     /* Skip closing quote char if there was one */
@@ -689,6 +722,7 @@ static void NumericConst (void)
 
         /* Set the value and the token */
         NextTok.IVal = IVal;
+        NextTok.Cooked = 0;
         NextTok.Tok  = TOK_ICONST;
 
     } else {
@@ -805,7 +839,12 @@ static void GetNextInputToken (void)
         if (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST) {
             TranslateLiteral (NextTok.SVal);
         } else if (NextTok.Tok == TOK_CCONST || NextTok.Tok == TOK_WCCONST) {
-            NextTok.IVal = SignExtendChar (TgtTranslateChar (NextTok.IVal));
+            if (NextTok.Cooked) {
+                NextTok.IVal = SignExtendChar (TgtTranslateChar (NextTok.IVal));
+            }
+            else {
+                NextTok.IVal = SignExtendChar (NextTok.IVal);
+            }
         }
     }
 
@@ -1231,6 +1270,212 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
         NextToken ();
 
     }
+}
+
+
+
+static void OpenBrace (Collection* C, token_t Tok)
+/* Consume an opening parenthesis/bracket/curly brace and remember that */
+{
+    switch (Tok) {
+        case TOK_LPAREN: Tok = TOK_RPAREN; break;
+        case TOK_LBRACK: Tok = TOK_RBRACK; break;
+        case TOK_LCURLY: Tok = TOK_RCURLY; break;
+        default:         Internal ("Unexpected opening token: %02X", (unsigned)Tok);
+    }
+    CollAppend (C, (void*)Tok);
+    NextToken ();
+}
+
+
+
+static void PopBrace (Collection* C)
+/* Close the latest open parenthesis/bracket/curly brace */
+{
+    if (CollCount (C) > 0) {
+        CollPop (C);
+    }
+}
+
+
+
+static int CloseBrace (Collection* C, token_t Tok)
+/* Consume a closing parenthesis/bracket/curly brace if it is matched with an
+** opening one to close and return 0, or bail out and return -1 if it is not
+** matched.
+*/
+{
+    if (CollCount (C) > 0) {
+        token_t LastTok = (token_t)(intptr_t)CollLast (C);
+        if (LastTok == Tok) {
+            CollPop (C);
+            NextToken ();
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+
+
+int SmartErrorSkip (int TillEnd)
+/* Try some smart error recovery.
+**
+** - If TillEnd == 0:
+**   Skip tokens until a comma or closing curly brace that is not enclosed in
+**   an open parenthesis/bracket/curly brace, or until a semicolon, EOF or
+**   unpaired right parenthesis/bracket/curly brace is reached. The closing
+**   curly brace is consumed in the former case.
+**
+** - If TillEnd != 0:
+**   Skip tokens until a right curly brace or semicolon is reached and consumed
+**   while there are no open parentheses/brackets/curly braces, or until an EOF
+**   is reached anytime. Any open parenthesis/bracket/curly brace is considered
+**   to be closed by consuming a right parenthesis/bracket/curly brace even if
+**   they didn't match.
+**
+** - Return -1:
+**   If this exits at a semicolon or unpaired right parenthesis/bracket/curly
+**   brace while there are still open parentheses/brackets/curly braces.
+**
+** - Return 0:
+**   If this exits as soon as it reaches an EOF;
+**   Or if this exits right after consuming a semicolon or right curly brace
+**   while there are no open parentheses/brackets/curly braces.
+**
+** - Return 1:
+**   If this exits at a non-EOF without consuming it.
+*/
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = { TOK_COMMA, TOK_SEMI,
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!TillEnd) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    PopBrace (&C);
+                    NextToken ();
+                }
+                break;
+
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    if (!TillEnd) {
+                        Res = -1;
+                        goto ExitPoint;
+                    }
+                    PopBrace (&C);
+                    NextToken ();
+                }
+                if (CollCount (&C) == 0) {
+                    /* We consider this as a terminator as well */
+                    Res = 0;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_COMMA:
+                if (CollCount (&C) == 0 && !TillEnd) {
+                    Res = 1;
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_SEMI:
+                if (CollCount (&C) == 0) {
+                    if (TillEnd) {
+                        NextToken ();
+                        Res = 0;
+                    } else {
+                        Res = 1;
+                    }
+                    goto ExitPoint;
+                }
+                NextToken ();
+                break;
+
+            case TOK_CEOF:
+                /* We cannot consume this */
+                Res = 0;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
+}
+
+
+
+int SimpleErrorSkip (void)
+/* Skip tokens until an EOF or unpaired right parenthesis/bracket/curly brace
+** is reached. Return 0 If this exits at an EOF. Otherwise return -1.
+*/
+{
+    Collection C = AUTO_COLLECTION_INITIALIZER;
+    int Res = 0;
+
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = {
+        TOK_LPAREN, TOK_RPAREN, TOK_LBRACK, TOK_RBRACK, TOK_LCURLY, TOK_RCURLY };
+
+    while (CurTok.Tok != TOK_CEOF) {
+        SkipTokens (TokenList, sizeof (TokenList) / sizeof (TokenList[0]));
+
+        switch (CurTok.Tok) {
+            case TOK_LPAREN:
+            case TOK_LBRACK:
+            case TOK_LCURLY:
+                OpenBrace (&C, CurTok.Tok);
+                break;
+
+            case TOK_RPAREN:
+            case TOK_RBRACK:
+            case TOK_RCURLY:
+                if (CloseBrace (&C, CurTok.Tok) < 0) {
+                    /* Found a terminator */
+                    Res = -1;
+                    goto ExitPoint;
+                }
+                break;
+
+            case TOK_CEOF:
+                /* We cannot go any farther */
+                Res = 0;
+                goto ExitPoint;
+
+            default:
+                Internal ("Unexpected token: %02X", (unsigned)CurTok.Tok);
+        }
+    }
+
+ExitPoint:
+    DoneCollection (&C);
+    return Res;
 }
 
 

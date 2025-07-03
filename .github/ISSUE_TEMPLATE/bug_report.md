@@ -6,6 +6,8 @@ labels: bug
 assignees: ''
 
 ---
+**Compiler and OS**
+It is important to know what version of the compiler/assembler you used (call it with --version to get this info). Sometimes we also need to know what OS you are using.
 
 **Describe the bug**
 Please tell us what you did, what happened, and what you expected to happen instead.

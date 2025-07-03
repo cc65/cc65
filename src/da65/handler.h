@@ -38,6 +38,8 @@
 
 
 
+#include <stdint.h>
+
 /* common */
 #include "attrib.h"
 
@@ -78,6 +80,7 @@ void OH_DirectXIndirect (const OpcDesc*);
 void OH_AbsoluteIndirect (const OpcDesc*);
 
 void OH_BitBranch (const OpcDesc*);
+void OH_BitBranch_m740 (const OpcDesc*);
 
 void OH_ImmediateDirect (const OpcDesc*);
 void OH_ImmediateDirectX (const OpcDesc*);
@@ -102,6 +105,15 @@ void OH_AccumulatorBitBranch (const OpcDesc*);
 void OH_JmpDirectIndirect (const OpcDesc* D);
 void OH_SpecialPage (const OpcDesc*);
 
+/* 45GS02 */
+void OH_Direct_Q (const OpcDesc*);
+void OH_DirectIndirectZ_Q (const OpcDesc* D);
+void OH_Absolute_Q (const OpcDesc* D);
+void OH_AbsoluteX_Q (const OpcDesc* D);
+void OH_DirectX_Q (const OpcDesc* D);
+void OH_Implicit_ea_45GS02 (const OpcDesc* D);
+void OH_Implicit_42_45GS02 (const OpcDesc* D);
+
 /* Handlers for special instructions */
 void OH_Rts (const OpcDesc*);
 void OH_JmpAbsolute (const OpcDesc*);
@@ -109,7 +121,7 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D);
 void OH_JmpAbsoluteXIndirect (const OpcDesc* D);
 void OH_JsrAbsolute (const OpcDesc*);
 
-void SetSubroutineParamSize (unsigned Addr, unsigned Size);
+void SetSubroutineParamSize (uint32_t Addr, unsigned Size);
 
 
 /* End of handler.h */

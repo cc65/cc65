@@ -24,13 +24,13 @@ utsdata:
         .asciiz         ""
 
         ; release
-        .byte           ((.VERSION >> 8) & $0F) + '0'
+        .byte           .string (>.version)
         .byte           '.'
-        .byte           ((.VERSION >> 4) & $0F) + '0'
+        .byte           .string (<.version)
         .byte           $00
 
         ; version
-        .byte           (.VERSION & $0F) + '0'
+        .byte           '0'     ; unused
         .byte           $00
 
         ; machine

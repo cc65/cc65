@@ -63,6 +63,8 @@ Short options:
   -V                            Print the compiler version number
   -W [-+]warning[,...]          Control warnings ('-' disables, '+' enables)
   -d                            Debug mode
+  -dM                           Output all user macros (needs -E)
+  -dP                           Output all predefined macros (needs -E)
   -g                            Add debug info to object file
   -h                            Help (this text)
   -j                            Default characters are signed
@@ -197,6 +199,28 @@ Here is a description of all the command line options:
   <tag><tt>-d, --debug</tt></tag>
 
   Enables debug mode, for debugging the behavior of cc65.
+
+
+
+  <label id="option-dM">
+  <tag><tt>-dM</tt></tag>
+
+  When used with -E, will output <tt>#define</tt> directives for all the user
+  macros defined during execution of the preprocessor. This does not include
+  macros defined by the compiler.
+
+  Note: Can be combined with <tt/<ref id="option-dP" name="-dP">/ by using
+  <tt/-dMP/.
+
+
+  <label id="option-dP">
+  <tag><tt>-dP</tt></tag>
+
+  When used with -E, will output <tt>#define</tt> directives for all the macros
+  defined by the compiler itself. This does not include any user defined macros.
+
+  Note: Can be combined with <tt/<ref id="option-dM" name="-dM">/ by using
+  <tt/-dMP/.
 
 
   <tag><tt>--debug-tables name</tt></tag>
@@ -586,27 +610,42 @@ Here is a description of all the command line options:
 
   <itemize>
   <item>none
+  <item>agat (a russian apple2 like computer)
   <item>apple2
   <item>apple2enh
   <item>atari
+  <item>atari2600
+  <item>atari5200
+  <item>atari7800
   <item>atarixl
   <item>atmos
+  <item>bbc
   <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
+  <item>c65
   <item>c128
   <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM-II II computers with 80 column video)
+  <item>creativision
+  <item>cx16
+  <item>gamate
   <item>geos-apple
   <item>geos-cbm
+  <item>geos (alias for geos-cbm)
+  <item>kim1
   <item>lunix
   <item>lynx
+  <item>mega65
   <item>nes
   <item>osic1p
+  <item>pce (PC engine)
   <item>pet (all CBM PET systems except the 2001)
   <item>plus4
+  <item>p6502
   <item>sim6502
   <item>sim65c02
   <item>supervision
+  <item>sym1
   <item>telestrat
   <item>vic20
   </itemize>
@@ -1173,6 +1212,14 @@ The compiler defines several macros at startup:
   given, but can be changed using the <tt/<ref id="option--cpu" name="--cpu">/
   command line option.
 
+  <tag><tt>__CPU_4510__</tt></tag>
+
+  This macro is defined if the code is compiled for a 4510 CPU.
+
+  <tag><tt>__CPU_45GS02__</tt></tag>
+
+  This macro is defined if the code is compiled for a 45GS02 CPU.
+
   <tag><tt>__CPU_6502__</tt></tag>
 
   This macro is defined if the code is compiled for a 6502 CPU.
@@ -1194,6 +1241,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the code is compiled for a 65C02 CPU.
 
+  <tag><tt>__CPU_65CE02__</tt></tag>
+
+  This macro is defined if the code is compiled for a 65CE02 CPU.
+
   <tag><tt>__CPU_65816__</tt></tag>
 
   This macro is defined if the code is compiled for a 65816 CPU.
@@ -1201,6 +1252,14 @@ The compiler defines several macros at startup:
   <tag><tt>__CPU_HUC6280__</tt></tag>
 
   This macro is defined if the code is compiled for a HUC6280 CPU.
+
+  <tag><tt>__CPU_M740__</tt></tag>
+
+  This macro is defined if the code is compiled for a M740 CPU.
+
+  <tag><tt>__CPU_W65C02__</tt></tag>
+
+  This macro is defined if the code is compiled for a W65C02 CPU.
 
   <tag><tt>__CPU_ISET_6502__</tt></tag>
 
@@ -1232,6 +1291,12 @@ The compiler defines several macros at startup:
   <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
   of the 65C02 CPU.
 
+  <tag><tt>__CPU_ISET_65CE02__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the 65CE02 CPU.
+
   <tag><tt>__CPU_ISET_65816__</tt></tag>
 
   This macro expands to a numeric constant that can be used to check the
@@ -1243,6 +1308,18 @@ The compiler defines several macros at startup:
   This macro expands to a numeric constant that can be used to check the
   <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
   of the HUC6280 CPU.
+
+  <tag><tt>__CPU_ISET_M740__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the M740 CPU.
+
+  <tag><tt>__CPU_ISET_W65C02__</tt></tag>
+
+  This macro expands to a numeric constant that can be used to check the
+  <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
+  of the W65C02 CPU.
 
   <tag><tt>__CX16__</tt></tag>
 

@@ -54,7 +54,7 @@ exit:   ldx     #$02
         ; Copy back the zero-page stuff.
         ldx     #zpspace-1
 :       lda     zpsave,x
-        sta     sp,x
+        sta     c_sp,x
         dex
         bpl     :-
 

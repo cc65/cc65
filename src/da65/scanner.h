@@ -191,7 +191,7 @@ void InfoAssureChar (void);
 void InfoAssureIdent (void);
 /* Make sure the next token is an identifier */
 
-void InfoRangeCheck (long Lo, long Hi);
+void InfoRangeCheck (const char* Attr, long Lo, long Hi);
 /* Check the range of InfoIVal */
 
 void InfoSpecialToken (const IdentTok* Table, unsigned Size, const char* Name);

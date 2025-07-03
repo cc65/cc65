@@ -5,21 +5,21 @@
 ;
 
         .export         subeq0sp, subeqysp
-        .importzp       sp
+        .importzp       c_sp
 
 subeq0sp:
         ldy     #0
 subeqysp:
         sec
         eor     #$FF
-        adc     (sp),y
-        sta     (sp),y
+        adc     (c_sp),y
+        sta     (c_sp),y
         pha                     ; Save low byte
         iny
         txa
         eor     #$FF
-        adc     (sp),y
-        sta     (sp),y
+        adc     (c_sp),y
+        sta     (c_sp),y
         tax
         pla                     ; Restore low byte
         rts

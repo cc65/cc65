@@ -40,6 +40,7 @@
 /* common */
 #include "check.h"
 #include "coll.h"
+#include "debugflag.h"
 #include "filestat.h"
 #include "fname.h"
 #include "print.h"
@@ -76,17 +77,6 @@ char NextC = '\0';
 
 /* Maximum count of nested includes */
 #define MAX_INC_NESTING         16
-
-/* Struct that describes an input file */
-typedef struct IFile IFile;
-struct IFile {
-    unsigned        Index;      /* File index */
-    unsigned        Usage;      /* Usage counter */
-    unsigned long   Size;       /* File size */
-    unsigned long   MTime;      /* Time of last modification */
-    InputType       Type;       /* Type of input file */
-    char            Name[1];    /* Name of file (dynamically allocated) */
-};
 
 /* Struct that describes an active input file */
 typedef struct AFile AFile;
@@ -132,11 +122,13 @@ static IFile* NewIFile (const char* Name, InputType Type)
     IFile* IF = (IFile*) xmalloc (sizeof (IFile) + Len);
 
     /* Initialize the fields */
-    IF->Index = CollCount (&IFiles) + 1;
-    IF->Usage = 0;
-    IF->Size  = 0;
-    IF->MTime = 0;
-    IF->Type  = Type;
+    IF->Index   = CollCount (&IFiles) + 1;
+    IF->Usage   = 0;
+    IF->Size    = 0;
+    IF->MTime   = 0;
+    IF->Type    = Type;
+    IF->GFlags  = IG_NONE;
+    SB_Init (&IF->GuardMacro);
     memcpy (IF->Name, Name, Len+1);
 
     /* Insert the new structure into the IFile collection */
@@ -280,7 +272,7 @@ void OpenMainFile (const char* Name)
     SetPPIfStack (&MainFile->IfStack);
 
     /* Begin PP for this file */
-    PreprocessBegin ();
+    PreprocessBegin (IF);
 
     /* Allocate the input line buffer */
     Line = NewStrBuf ();
@@ -318,11 +310,21 @@ void OpenIncludeFile (const char* Name, InputType IT)
     }
 
     /* Search the list of all input files for this file. If we don't find
-    ** it, create a new IFile object.
+    ** it, create a new IFile object. If we do already know the file and it
+    ** has an include guard, check for the include guard before opening the
+    ** file.
     */
     IF = FindFile (N);
     if (IF == 0) {
         IF = NewIFile (N, IT);
+    } else if ((IF->GFlags & IG_ISGUARDED) != 0 &&
+              IsMacro (SB_GetConstBuf (&IF->GuardMacro))) {
+        if (Debug) {
+            printf ("Include guard %s found for \"%s\" - won't include it again\n",
+                    SB_GetConstBuf (&IF->GuardMacro),
+                    Name);
+        }
+        return;
     }
 
     /* We don't need N any longer, since we may now use IF->Name */
@@ -346,7 +348,7 @@ void OpenIncludeFile (const char* Name, InputType IT)
     SetPPIfStack (&AF->IfStack);
 
     /* Begin PP for this file */
-    PreprocessBegin ();
+    PreprocessBegin (IF);
 }
 
 
@@ -356,26 +358,23 @@ void CloseIncludeFile (void)
 ** NULL if this was the main file.
 */
 {
-    AFile* Input;
+    /* Get the currently active input file and remove it from set of active
+    ** files. CollPop will FAIL if the collection is empty so no need to
+    ** check this here.
+    */
+    AFile* Input = CollPop (&AFiles);
 
-    /* Get the number of active input files */
-    unsigned AFileCount = CollCount (&AFiles);
+    /* Determine the file that is active after closing this one. We never
+    ** actually close the main file, since it is needed for errors found after
+    ** compilation is completed.
+    */
+    AFile* NextInput = (CollCount (&AFiles) > 0)? CollLast (&AFiles) : Input;
 
-    /* Must have an input file when called */
-    PRECONDITION (AFileCount > 0);
-
-    /* End preprocessor in this file */
-    PreprocessEnd ();
-
-    /* Get the current active input file */
-    Input = CollLast (&AFiles);
+    /* End preprocessing for the current input file */
+    PreprocessEnd (NextInput->Input);
 
     /* Close the current input file (we're just reading so no error check) */
     fclose (Input->F);
-
-    /* Delete the last active file from the active file collection */
-    --AFileCount;
-    CollDelete (&AFiles, AFileCount);
 
     /* If we had added an extra search path for this AFile, remove it */
     if (Input->SearchPath) {
@@ -385,10 +384,9 @@ void CloseIncludeFile (void)
     /* Delete the active file structure */
     FreeAFile (Input);
 
-    /* Use previous file with PP if it is not the main file */
-    if (AFileCount > 0) {
-        Input = CollLast (&AFiles);
-        SetPPIfStack (&Input->IfStack);
+    /* If we've switched files, use the if stack from the previous file */
+    if (Input != NextInput) {
+        SetPPIfStack (&NextInput->IfStack);
     }
 }
 

@@ -60,19 +60,19 @@ jobs:
       - name: Build utils (MinGW)
         if: steps.check-sha.outputs.cache-hit != 'true'
         shell: cmd
-        run: make -j2 util SHELL=cmd
+        run: make -j2 util SHELL=cmd QUIET=1
 
       - name: Build the platform libraries (make lib)
         if: steps.check-sha.outputs.cache-hit != 'true'
         shell: cmd
-        run: make -j2 lib QUIET=1 SHELL=cmd
+        run: make -j2 lib QUIET=1 SHELL=cmd QUIET=1
 
       - name: Run the regression tests (make test)
         if: steps.check-sha.outputs.cache-hit != 'true'
         shell: cmd
-        run: make -j2 test QUIET=1 SHELL=cmd
+        run: make -j2 test QUIET=1 SHELL=cmd QUIET=1
 
       - name: Test that the samples can be built (make samples)
         if: steps.check-sha.outputs.cache-hit != 'true'
         shell: cmd
-        run: make -j2 samples SHELL=cmd
+        run: make -j2 samples SHELL=cmd QUIET=1

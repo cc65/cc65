@@ -14,13 +14,12 @@
         .import         pushwysp
         .import         tosumulax, tosudivax
 
-        .importzp       ptr1, sp
+        .importzp       ptr1, c_sp
 
         .include        "errno.inc"
         .include        "_file.inc"
 
         .macpack        generic
-        .macpack        cpu
 
 ; ------------------------------------------------------------------------
 ; Code
@@ -48,7 +47,7 @@
 
         ldy     #_FILE::f_flags
         lda     (file),y
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_BITIMM)
         bit     #_FOPEN                 ; Is the file open?
         .else
         and     #_FOPEN                 ; Is the file open?
@@ -57,7 +56,7 @@
 
 ; Check if the stream is in an error state
 
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_BITIMM)
         bit     #_FERROR
         .else
         lda     (file),y                ; get file->f_flags again
@@ -74,17 +73,15 @@
 
 ; Remember if we have a pushed back character and reset the flag.
 
-@L2:    .if (.cpu .bitand ::CPU_ISET_65SC02)
+@L2:    .if .cap(CPU_HAS_BITIMM)
         ldx     #$00
         bit     #_FPUSHBACK
+        beq     @L3
         .else
         tax                             ; X = 0
         lda     (file),y
         and     #_FPUSHBACK
-        .endif
         beq     @L3
-
-        .if (.not .cpu .bitand ::CPU_ISET_65SC02)
         lda     (file),y
         .endif
         and     #<~_FPUSHBACK
@@ -135,31 +132,31 @@
 ; Copy the buffer pointer into ptr1, and increment the pointer value passed
 ; to read() by one, so read() starts to store data at buf+1.
 
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (sp)
+        .if .cap(CPU_HAS_ZPIND)
+        lda     (c_sp)
         sta     ptr1
         add     #1
-        sta     (sp)
+        sta     (c_sp)
         ldy     #1
         .else
         ldy     #0
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1
         add     #1
-        sta     (sp),y
+        sta     (c_sp),y
         iny
         .endif
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1+1
         adc     #0
-        sta     (sp),y                  ; ptr1 = buf++;
+        sta     (c_sp),y                ; ptr1 = buf++;
 
 ; Get the buffered character and place it as first character into the read
 ; buffer.
 
         ldy     #_FILE::f_pushback
         lda     (file),y
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_ZPIND)
         sta     (ptr1)                  ; *buf = file->f_pushback;
         .else
         ldy     #0

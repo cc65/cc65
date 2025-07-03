@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
@@ -11,11 +17,15 @@ C1541 ?= c1541
 ifeq ($(origin SYS),command line)
   ifeq ($(SYS),c64)
     override SYS = geos-cbm
-    $(info GEOS: c64 -> geos-cbm)
+    ifneq ($(SILENT),s)
+      $(info GEOS: c64 -> geos-cbm)
+    endif
   endif
   ifeq ($(SYS),apple2enh)
     override SYS = geos-apple
-    $(info GEOS: apple2enh -> geos-apple)
+    ifneq ($(SILENT),s)
+      $(info GEOS: apple2enh -> geos-apple)
+    endif
   endif
 endif
 
@@ -47,6 +57,14 @@ else
   CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
   SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
+endif
+
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
 endif
 
 DIRLIST = grc
@@ -105,36 +123,47 @@ bitmap.c: logo.pcx
 	$(SP) -r logo.pcx -c geos-bitmap -w bitmap.c,ident=bitmap
 
 bitmap-demo.cvt: bitmap.c bitmap-demores.grc bitmap-demo.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m bitmap-demo.map bitmap-demores.grc bitmap-demo.c
 
 filesel.cvt: fileselres.grc filesel.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m filesel.map fileselres.grc filesel.c
 
 geosconio.cvt: geosconiores.grc geosconio.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m geosconio.map geosconiores.grc geosconio.c
 
 geosver.cvt: geosverres.grc geosver.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m geosver.map geosverres.grc geosver.c
 
 getid.cvt: getidres.grc getid.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m getid.map getidres.grc getid.c
 
 hello1.cvt: hello1res.grc hello1.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m hello1.map hello1res.grc hello1.c
 
 hello2.cvt: hello2res.grc hello2.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m hello2.map hello2res.grc hello2.c
 
 overlay-demo.cvt: overlay-demores.grc overlay-demo.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m overlay-demo.map overlay-demores.grc overlay-demo.c
 
 rmvprot.cvt: rmvprotres.grc rmvprot.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m rmvprot.map rmvprotres.grc rmvprot.c
 
 vector-demo.cvt: vector-demores.grc vector-demo.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m vector-demo.map vector-demores.grc vector-demo.c
 
 yesno.cvt: yesnores.grc yesno.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m yesno.map yesnores.grc yesno.c
 
 

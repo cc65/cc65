@@ -211,6 +211,8 @@ static void SymReplaceExprRefs (SymEntry* S)
 void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags)
 /* Define a new symbol */
 {
+    int Redef = 0;      /* Flag for symbol redefinition */
+
     if (S->Flags & SF_IMPORT) {
         /* Defined symbol is marked as imported external symbol */
         Error ("Symbol '%m%p' is already an import", GetSymName (S));
@@ -238,6 +240,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
             */
             FreeExpr (S->Expr);
             S->Expr = 0;
+            Redef = 1;
         }
     }
 
@@ -291,8 +294,10 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
         }
     }
 
-    /* If this is not a local symbol, remember it as the last global one */
-    if ((S->Flags & SF_LOCAL) == 0) {
+    /* If this is not a local symbol and not a redefinition for a variable
+    ** symbol, remember it as the last global one.
+    */
+    if ((S->Flags & SF_LOCAL) == 0 && !Redef) {
         SymLast = S;
     }
 }

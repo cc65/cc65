@@ -610,12 +610,13 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
                 DumpExpr (Expr, SymResolve);
             }
 
-            /* If the symbol has an explicit address size, use it. This may
-            ** lead to range errors later (maybe even in the linker stage), if
-            ** the user lied about the address size, but for now we trust him.
+            /* If the symbol has an explicit address size that is smaller than
+            ** the one found, use it. This may lead to range errors later
+            ** (maybe even in the linker stage) if the user lied about the
+            ** address size, but for now we trust him.
             */
             AddrSize = GetSymAddrSize (Sym);
-            if (AddrSize != ADDR_SIZE_DEFAULT) {
+            if (AddrSize != ADDR_SIZE_DEFAULT && AddrSize < D->AddrSize) {
                 D->AddrSize = AddrSize;
             }
         }

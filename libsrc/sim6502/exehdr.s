@@ -5,11 +5,9 @@
 ;
 
         .export         __EXEHDR__ : absolute = 1       ; Linker referenced
-        .importzp       sp
+        .importzp       c_sp
         .import         __MAIN_START__
         .import         startup
-
-        .macpack        cpu
 
         .segment        "EXEHDR"
 
@@ -24,6 +22,6 @@
 .else
         .error Unknown CPU type.
 .endif
-        .byte   sp                             ; sp address
+        .byte   c_sp                           ; c_sp address
         .addr   __MAIN_START__                 ; load address
         .addr   startup                        ; reset address

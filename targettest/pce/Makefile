@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
@@ -29,6 +35,14 @@ else
   CC := $(if $(wildcard ../../bin/cc65*),../../bin/cc65,cc65)
   CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
+endif
+
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
 endif
 
 .PHONY: all clean test
@@ -65,8 +79,11 @@ else
 endif
 
 %.bin: %.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t pce $< -Wl -D__CARTSIZE__=${CARTSIZE} -m $*.map -o $@
+ifndef QUIET
 	@echo "use 'make conio.pce' to produce a .pce file using dd"
+endif
 
 %.pce: %.bin
 	dd if=$< bs=8K skip=${COUNT} > $@

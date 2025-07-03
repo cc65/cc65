@@ -1715,10 +1715,14 @@ int main (int argc, char* argv [])
 
     /* Link the given files if requested and if we have any */
     if (DoLink && LD65.FileCount > 0) {
+        /*
+        ** Link() may not return if there's an error, so we install
+        ** RemoveTempFiles() as an atexit() handler.
+        */
+        atexit (RemoveTempFiles);
         Link ();
     }
 
-    RemoveTempFiles ();
     if (OutputDirectory != NULL) {
       xfree(OutputDirectory);
     }

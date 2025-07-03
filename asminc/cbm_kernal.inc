@@ -63,6 +63,43 @@
   MOUSE_GET                     := $FF6B
 .endif
 
+.if .def (__MEGA65__)
+  ; extended C65 jump table
+
+; memory before $ff3b is all $ff in mega65 ROM?
+;  VERSIONQ     := $FF2F
+;  RESET_RUN    := $FF32
+;  CURSOR       := $FF35
+
+  SAVEFL       := $FF3B
+  GETIO        := $FF41
+  GETLFS       := $FF44
+  KEYLOCKS     := $FF47
+  ADDKEY       := $FF4A
+.endif
+
+.if .def(__C65__) || .def (__MEGA65__)
+  CURSOR       := $E030     ; in editor ROM
+
+  SPIN_SPOUT   := $FF4D
+  CLSALL       := $FF50
+  C64MODE      := $FF53
+  MonitorCall  := $FF56
+  BOOT_SYS     := $FF59
+  PHOENIX      := $FF5C
+  LKUPLA       := $FF5F
+  LKUPSA       := $FF62
+  SWAPPER      := $FF65
+  PFKEY        := $FF68
+  SETBNK       := $FF6B
+  JSRFAR       := $FF6E
+  JMPFAR       := $FF71
+  LDA_FAR      := $FF74
+  STA_FAR      := $FF77
+  CMP_FAR      := $FF7A
+  PRIMM        := $FF7D
+.endif
+
 .if .def(__C128__)
   ; C128 extended jump table
   C64MODE      := $FF4D
@@ -83,7 +120,7 @@
   PRIMM        := $FF7D
 .endif
 
-.if .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__)
+.if .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__) || .def(__C65__) || .def (__MEGA65__)
   CINT         := $FF81
   IOINIT       := $FF84
   RAMTAS       := $FF87
@@ -96,7 +133,7 @@
   CINT         := $FF7E
 .endif
 
-.if .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__)
+.if .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__) || .def(__C65__) || .def (__MEGA65__)
   RESTOR       := $FF8A
   VECTOR       := $FF8D
 .elseif .def(__CBM510__) || .def(__CBM610__)
@@ -112,6 +149,17 @@
   MEMBOT       := $FF9C
   SCNKEY       := $FF9F
   SETTMO       := $FFA2
+.elseif .def(__C65__) || .def (__MEGA65__)
+  SETMSG       := $FF90
+  SECOND       := $FF93
+  TKSA         := $FF96
+  MEMTOP       := $FF99
+  MEMBOT       := $FF9C
+  SCNKEY       := $FF9F
+  MONEXIT      := $FFA2
+.endif
+
+.if .def(__CBM510__) || .def(__CBM610__) || .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__) || .def(__C65__) || .def(__MEGA65__)
   ACPTR        := $FFA5
   CIOUT        := $FFA8
   UNTLK        := $FFAB
@@ -136,7 +184,7 @@ CHRIN          := $FFCF
 BSOUT          := $FFD2
 CHROUT         := $FFD2
 
-.if .def(__CBM510__) || .def(__CBM610__) || .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__)
+.if .def(__CBM510__) || .def(__CBM610__) || .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__) || .def(__C65__) || .def(__MEGA65__)
   LOAD         := $FFD5
   SAVE         := $FFD8
   SETTIM       := $FFDB
@@ -147,9 +195,14 @@ CHROUT         := $FFD2
 STOP           := $FFE1
 GETIN          := $FFE4
 CLALL          := $FFE7
-UDTIM          := $FFEA
 
-.if .def(__CBM510__) || .def(__CBM610__) || .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__)
+.if .def(__C65__) || .def(__MEGA65__)
+ScanStopKey    := $FFEA
+.else
+UDTIM          := $FFEA
+.endif
+
+.if .def(__CBM510__) || .def(__CBM610__) || .def(__VIC20__) || .def(__C64__) || .def(__C128__) || .def(__C16__) || .def(__CX16__) || .def(__C65__) || .def(__MEGA65__)
   SCREEN       := $FFED
   PLOT         := $FFF0
   IOBASE       := $FFF3
@@ -173,10 +226,10 @@ UDTIM          := $FFEA
   KBDREAD      := $E5CF
   UPDCRAMPTR   := $EAB2
 .elseif .def(__C64__)
-  CLRSCR       := $E544
-  KBDREAD      := $E5B4
+  CLRSCR       := $E544     ; Clear the screen
+  KBDREAD      := $E5B4     ; Get Character From Keyboard Buffer
   NMIEXIT      := $FEBC
-  UPDCRAMPTR   := $EA24
+  UPDCRAMPTR   := $EA24     ; Update color ram pointer
 .elseif .def(__C128__)
   CLRSCR       := $C142
   KBDREAD      := $C006
@@ -189,4 +242,7 @@ UDTIM          := $FFEA
 .elseif .def(__C16__)
   CLRSCR       := $D88B
   KBDREAD      := $D8C1
+.elseif .def(__C65__) ||  .def(__MEGA65__)
+;  CLRSCR       := $E0EC ; ???
+  KBDREAD      := $E006
 .endif

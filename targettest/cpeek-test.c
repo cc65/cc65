@@ -24,6 +24,10 @@
 #  define SCREEN_RAM ((unsigned char*)0x8000)
 #elif defined(__VIC20__)
 #  define SCREEN_RAM ((unsigned char*)0x1000)
+#elif defined(__C65__)
+#  define SCREEN_RAM ((unsigned char*)0x0800)
+#elif defined(__MEGA65__)
+#  define SCREEN_RAM ((unsigned char*)0x0800)
 #else
 #  error This program cannot test that target.
 #  define SCREEN_RAM ((unsigned char*)0)

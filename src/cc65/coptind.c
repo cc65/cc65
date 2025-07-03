@@ -590,6 +590,49 @@ unsigned OptStoreLoad (CodeSeg* S)
 
 
 
+unsigned OptLoadStore1 (CodeSeg* S)
+/* Remove an 8 bit load followed by a store into the same location. */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check if it is a load instruction followed by a store into the
+        ** same address.
+        */
+        if ((E->Info & OF_LOAD) != 0                        &&
+            (N = CS_GetNextEntry (S, I)) != 0               &&
+            !CE_HasLabel (N)                                &&
+            E->AM == N->AM                                  &&
+            ((E->OPC == OP65_LDA && N->OPC == OP65_STA) ||
+             (E->OPC == OP65_LDX && N->OPC == OP65_STX) ||
+             (E->OPC == OP65_LDY && N->OPC == OP65_STY))    &&
+            strcmp (E->Arg, N->Arg) == 0) {
+
+            /* Memory cell has already the correct value, remove the store */
+            CS_DelEntry (S, I+1);
+
+            /* Remember, we had changes */
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 unsigned OptLoadStoreLoad (CodeSeg* S)
 /* Search for the sequence
 **
@@ -626,7 +669,7 @@ unsigned OptLoadStoreLoad (CodeSeg* S)
             strcmp (L[0]->Arg, L[2]->Arg) == 0) {
 
             /* Remove the second load */
-            CS_DelEntries (S, I+2, 1);
+            CS_DelEntry (S, I+2);
 
             /* Remember, we had changes */
             ++Changes;

@@ -48,6 +48,7 @@
 #include "error.h"
 #include "global.h"
 #include "litpool.h"
+#include "preproc.h"
 #include "scanner.h"
 #include "scanstrbuf.h"
 #include "symtab.h"
@@ -94,6 +95,7 @@ static const struct Pragma {
     const char* Key;            /* Keyword */
     pragma_t    Tok;            /* Token */
 } Pragmas[] = {
+/* BEGIN SORTED.SH */
     { "align",                  PRAGMA_ALIGN              },
     { "allow-eager-inline",     PRAGMA_ALLOW_EAGER_INLINE },
     { "allow_eager_inline",     PRAGMA_ALLOW_EAGER_INLINE },
@@ -128,6 +130,7 @@ static const struct Pragma {
     { "writable-strings",       PRAGMA_WRITABLE_STRINGS   },
     { "writable_strings",       PRAGMA_WRITABLE_STRINGS   },
     { "zpsym",                  PRAGMA_ZPSYM              },
+/* END SORTED.SH */
 };
 #define PRAGMA_COUNT    (sizeof (Pragmas) / sizeof (Pragmas[0]))
 
@@ -864,24 +867,18 @@ static void NoteMessagePragma (const char* Message)
 
 
 
-static void ParsePragmaString (void)
+static void ParsePragmaString (StrBuf* B)
 /* Parse the contents of _Pragma */
 {
     pragma_t Pragma;
     StrBuf   Ident = AUTO_STRBUF_INITIALIZER;
 
-    /* Create a string buffer from the string literal */
-    StrBuf B = AUTO_STRBUF_INITIALIZER;
-
-
-    SB_Append (&B, GetLiteralStrBuf (CurTok.SVal));
-
     /* Skip the string token */
     NextToken ();
 
     /* Get the pragma name from the string */
-    SB_SkipWhite (&B);
-    if (!SB_GetSym (&B, &Ident, "-")) {
+    SB_SkipWhite (B);
+    if (!SB_GetSym (B, &Ident, "-")) {
         Error ("Invalid pragma");
         goto ExitPoint;
     }
@@ -901,119 +898,119 @@ static void ParsePragmaString (void)
     }
 
     /* Check for an open paren */
-    SB_SkipWhite (&B);
-    if (SB_Get (&B) != '(') {
+    SB_SkipWhite (B);
+    if (SB_Get (B) != '(') {
         Error ("'(' expected");
         goto ExitPoint;
     }
 
     /* Skip white space before the argument */
-    SB_SkipWhite (&B);
+    SB_SkipWhite (B);
 
     /* Switch for the different pragmas */
     switch (Pragma) {
 
         case PRAGMA_ALIGN:
             /* TODO: PES_EXPR (PES_DECL) */
-            IntPragma (PES_STMT, Pragma, &B, &DataAlignment, 1, 4096);
+            IntPragma (PES_STMT, Pragma, B, &DataAlignment, 1, 4096);
             break;
 
         case PRAGMA_ALLOW_EAGER_INLINE:
-            FlagPragma (PES_STMT, Pragma, &B, &EagerlyInlineFuncs);
+            FlagPragma (PES_STMT, Pragma, B, &EagerlyInlineFuncs);
             break;
 
         case PRAGMA_BSS_NAME:
             /* TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe? */
-            SegNamePragma (PES_FUNC, PRAGMA_BSS_NAME, &B);
+            SegNamePragma (PES_FUNC, PRAGMA_BSS_NAME, B);
             break;
 
         case PRAGMA_CHARMAP:
-            CharMapPragma (PES_IMM, &B);
+            CharMapPragma (PES_IMM, B);
             break;
 
         case PRAGMA_CHECK_STACK:
             /* TODO: PES_SCOPE maybe? */
-            FlagPragma (PES_FUNC, Pragma, &B, &CheckStack);
+            FlagPragma (PES_FUNC, Pragma, B, &CheckStack);
             break;
 
         case PRAGMA_CODE_NAME:
             /* PES_FUNC is the only sensible option so far */
-            SegNamePragma (PES_FUNC, PRAGMA_CODE_NAME, &B);
+            SegNamePragma (PES_FUNC, PRAGMA_CODE_NAME, B);
             break;
 
         case PRAGMA_CODESIZE:
             /* PES_EXPR would be optimization nightmare */
-            IntPragma (PES_STMT, Pragma, &B, &CodeSizeFactor, 10, 1000);
+            IntPragma (PES_STMT, Pragma, B, &CodeSizeFactor, 10, 1000);
             break;
 
         case PRAGMA_DATA_NAME:
             /* TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe? */
-            SegNamePragma (PES_FUNC, PRAGMA_DATA_NAME, &B);
+            SegNamePragma (PES_FUNC, PRAGMA_DATA_NAME, B);
             break;
 
         case PRAGMA_INLINE_STDFUNCS:
             /* TODO: PES_EXPR maybe? */
-            FlagPragma (PES_STMT, Pragma, &B, &InlineStdFuncs);
+            FlagPragma (PES_STMT, Pragma, B, &InlineStdFuncs);
             break;
 
         case PRAGMA_LOCAL_STRINGS:
             /* TODO: PES_STMT or even PES_EXPR */
-            FlagPragma (PES_FUNC, Pragma, &B, &LocalStrings);
+            FlagPragma (PES_FUNC, Pragma, B, &LocalStrings);
             break;
 
         case PRAGMA_MESSAGE:
             /* PES_IMM is the only sensible option */
-            StringPragma (PES_IMM, &B, NoteMessagePragma);
+            StringPragma (PES_IMM, B, NoteMessagePragma);
             break;
 
         case PRAGMA_OPTIMIZE:
             /* TODO: PES_STMT or even PES_EXPR maybe? */
-            FlagPragma (PES_STMT, Pragma, &B, &Optimize);
+            FlagPragma (PES_STMT, Pragma, B, &Optimize);
             break;
 
         case PRAGMA_REGVARADDR:
             /* TODO: PES_STMT or even PES_EXPR maybe? */
-            FlagPragma (PES_FUNC, Pragma, &B, &AllowRegVarAddr);
+            FlagPragma (PES_FUNC, Pragma, B, &AllowRegVarAddr);
             break;
 
         case PRAGMA_REGISTER_VARS:
             /* TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe? */
-            FlagPragma (PES_FUNC, Pragma, &B, &EnableRegVars);
+            FlagPragma (PES_FUNC, Pragma, B, &EnableRegVars);
             break;
 
         case PRAGMA_RODATA_NAME:
             /* TODO: PES_STMT or even PES_EXPR maybe? */
-            SegNamePragma (PES_FUNC, PRAGMA_RODATA_NAME, &B);
+            SegNamePragma (PES_FUNC, PRAGMA_RODATA_NAME, B);
             break;
 
         case PRAGMA_SIGNED_CHARS:
             /* TODO: PES_STMT or even PES_EXPR maybe? */
-            FlagPragma (PES_FUNC, Pragma, &B, &SignedChars);
+            FlagPragma (PES_FUNC, Pragma, B, &SignedChars);
             break;
 
         case PRAGMA_STATIC_LOCALS:
             /* TODO: PES_STMT or even PES_EXPR (PES_DECL) maybe? */
-            FlagPragma (PES_FUNC, Pragma, &B, &StaticLocals);
+            FlagPragma (PES_FUNC, Pragma, B, &StaticLocals);
             break;
 
         case PRAGMA_WRAPPED_CALL:
             /* PES_IMM is the only sensible option */
-            WrappedCallPragma (PES_IMM, &B);
+            WrappedCallPragma (PES_IMM, B);
             break;
 
         case PRAGMA_WARN:
             /* PES_IMM is the only sensible option */
-            WarnPragma (PES_IMM, &B);
+            WarnPragma (PES_IMM, B);
             break;
 
         case PRAGMA_WRITABLE_STRINGS:
             /* TODO: PES_STMT or even PES_EXPR maybe? */
-            FlagPragma (PES_FUNC, Pragma, &B, &WritableStrings);
+            FlagPragma (PES_FUNC, Pragma, B, &WritableStrings);
             break;
 
         case PRAGMA_ZPSYM:
             /* PES_IMM is the only sensible option */
-            StringPragma (PES_IMM, &B, MakeZPSym);
+            StringPragma (PES_IMM, B, MakeZPSym);
             break;
 
         default:
@@ -1021,27 +1018,26 @@ static void ParsePragmaString (void)
     }
 
     /* Closing paren expected */
-    SB_SkipWhite (&B);
-    if (SB_Get (&B) != ')') {
+    SB_SkipWhite (B);
+    if (SB_Get (B) != ')') {
         Error ("')' expected");
         goto ExitPoint;
     }
-    SB_SkipWhite (&B);
+    SB_SkipWhite (B);
 
     /* Allow an optional semicolon to be compatible with the old syntax */
-    if (SB_Peek (&B) == ';') {
-        SB_Skip (&B);
-        SB_SkipWhite (&B);
+    if (SB_Peek (B) == ';') {
+        SB_Skip (B);
+        SB_SkipWhite (B);
     }
 
     /* Make sure nothing follows */
-    if (SB_Peek (&B) != '\0') {
+    if (SB_Peek (B) != '\0') {
         Error ("Unexpected input following pragma directive");
     }
 
 ExitPoint:
     /* Release the string buffers */
-    SB_Done (&B);
     SB_Done (&Ident);
 }
 
@@ -1080,8 +1076,24 @@ void ConsumePragma (void)
         */
         PragmaErrorSkip ();
     } else {
+        /* Pragmas that have the C99 _Pragma operator in the source code
+        ** (instead of #pragma that was converted to _Pragma by the
+        ** preprocessor) have the argument not preprocessed. We need to do
+        ** that here, since it may contain comments. Weird but legal C. Pragmas
+        ** that were converted from #pragma are already preprocessed but doing
+        ** it twice won't harm.
+        */
+        StrBuf In  = AUTO_STRBUF_INITIALIZER;
+        StrBuf Out = AUTO_STRBUF_INITIALIZER;
+        SB_Append (&In, GetLiteralStrBuf (CurTok.SVal));
+        TranslationPhase3 (&In, &Out);
+        SB_Done (&In);
+
         /* Parse the pragma */
-        ParsePragmaString ();
+        ParsePragmaString (&Out);
+
+        /* Free the string buffer */
+        SB_Done (&Out);
     }
 
     --InPragmaParser;

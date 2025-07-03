@@ -87,7 +87,7 @@ several useful settings:
   exit then a plain vanilla ProDOS 8 doesn't make use of the Language Card bank
   2 at all.
 
-  <tag>LC address: &dollar;D000, LC size: &dollar;3000</tag>
+  <tag>LC address: &dollar;D000, LC size: &dollar;2FFC</tag>
   For plain vanilla DOS 3.3 which doesn't make use of the Language Card at all.
 
 </descrip><p>

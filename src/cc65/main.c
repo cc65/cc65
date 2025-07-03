@@ -93,6 +93,8 @@ static void Usage (void)
             "  -V\t\t\t\tPrint the compiler version number\n"
             "  -W [-+]warning[,...]\t\tControl warnings ('-' disables, '+' enables)\n"
             "  -d\t\t\t\tDebug mode\n"
+            "  -dM\t\t\t\tOutput all user macros (needs -E)\n"
+            "  -dP\t\t\t\tOutput all predefined macros (needs -E)\n"
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"
             "  -j\t\t\t\tDefault characters are signed\n"
@@ -299,12 +301,24 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SYM1__", 1);
             break;
 
+        case TGT_C65:
+            cbmsys ("__C65__");
+            break;
+
+        case TGT_MEGA65:
+            cbmsys ("__MEGA65__");
+            break;
+
         case TGT_KIM1:
             DefineNumericMacro ("__KIM1__", 1);
             break;
 
         case TGT_RP6502:
             DefineNumericMacro ("__RP6502__", 1);
+            break;
+
+        case TGT_AGAT:
+            DefineNumericMacro ("__AGAT__", 1);
             break;
 
         default:
@@ -334,7 +348,6 @@ static void DefineCpuMacros (void)
         case CPU_NONE:
         case CPU_SWEET16:
         case CPU_M740:
-        case CPU_4510:
         case CPU_UNKNOWN:
             CPUName = (CPU == CPU_UNKNOWN)? "unknown" : CPUNames[CPU];
             Internal ("Invalid CPU \"%s\"", CPUName);
@@ -360,12 +373,28 @@ static void DefineCpuMacros (void)
             DefineNumericMacro ("__CPU_65C02__", 1);
             break;
 
+        case CPU_65CE02:
+            DefineNumericMacro ("__CPU_65CE02__", 1);
+            break;
+
         case CPU_65816:
             DefineNumericMacro ("__CPU_65816__", 1);
             break;
 
+        case CPU_W65C02:
+            DefineNumericMacro ("__CPU_W65C02__", 1);
+            break;
+
         case CPU_HUC6280:
             DefineNumericMacro ("__CPU_HUC6280__", 1);
+            break;
+
+        case CPU_4510:
+            DefineNumericMacro ("__CPU_4510__", 1);
+            break;
+
+        case CPU_45GS02:
+            DefineNumericMacro ("__CPU_45GS02__", 1);
             break;
 
         default:
@@ -381,8 +410,12 @@ static void DefineCpuMacros (void)
     DefineNumericMacro ("__CPU_ISET_6502DTV__", CPU_ISET_6502DTV);
     DefineNumericMacro ("__CPU_ISET_65SC02__", CPU_ISET_65SC02);
     DefineNumericMacro ("__CPU_ISET_65C02__", CPU_ISET_65C02);
+    DefineNumericMacro ("__CPU_ISET_W65C02__", CPU_ISET_W65C02);
+    DefineNumericMacro ("__CPU_ISET_65CE02__", CPU_ISET_65CE02);
     DefineNumericMacro ("__CPU_ISET_65816__", CPU_ISET_65816);
     DefineNumericMacro ("__CPU_ISET_HUC6280__", CPU_ISET_HUC6280);
+    DefineNumericMacro ("__CPU_ISET_4510__", CPU_ISET_4510);
+    DefineNumericMacro ("__CPU_ISET_45GS02__", CPU_ISET_45GS02);
 
     /* Now define the macro that contains the bit set with the available
     ** cpu instructions.
@@ -1022,7 +1055,25 @@ int main (int argc, char* argv[])
                     break;
 
                 case 'd':
-                    OptDebug (Arg, 0);
+                    P = Arg + 2;
+                    if (*P == '\0') {
+                        OptDebug (Arg, 0);
+                    } else {
+                        while (*P) {
+                            switch (*P) {
+                                case 'M':
+                                    DumpUserMacros = 1;
+                                    break;
+                                case 'P':
+                                    DumpPredefMacros = 1;
+                                    break;
+                                default:
+                                    UnknownOption (Arg);
+                                    break;
+                            }
+                            ++P;
+                        }
+                    }
                     break;
 
                 case 'h':
@@ -1132,6 +1183,11 @@ int main (int argc, char* argv[])
     /* Did we have a file spec on the command line? */
     if (InputFile == 0) {
         AbEnd ("No input files");
+    }
+
+    /* The options to output macros can only be used with -E */
+    if ((DumpPredefMacros || DumpUserMacros) && !PreprocessOnly) {
+        AbEnd ("Preprocessor macro output can only be used together with -E");
     }
 
     /* Add the default include search paths. */

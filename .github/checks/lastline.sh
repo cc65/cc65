@@ -23,3 +23,4 @@ if [ x"$FILES"x != xx ]; then
     done
     exit -1
 fi
+exit 0

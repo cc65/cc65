@@ -24,28 +24,34 @@ jobs:
       - name: Do some simple style checks
         shell: bash
         run: make -j2 checkstyle
+      - name: Check bsearch tables
+        shell: bash
+        run: make -j2 sorted
       - name: Build the tools.
         shell: bash
-        run: make -j2 bin USER_CFLAGS=-Werror
+        run: make -j2 bin USER_CFLAGS=-Werror QUIET=1
       - name: Build the dbginfo example
         shell: bash
-        run: make -j2 -C src test
+        run: make -j2 -C src test QUIET=1
       - name: Build the utilities.
         shell: bash
-        run: make -j2 util
+        run: make -j2 util QUIET=1
       - name: Build the platform libraries.
         shell: bash
         run: make -j2 lib QUIET=1
+      - name: check test that no modules use sp
+        shell: bash
+        run: make -j2 checksp QUIET=1
       - name: Run the regression tests.
         shell: bash
         run: make -j2 test QUIET=1
       - name: Test that the samples can be built.
-        run: make -C samples platforms
+        run: make -C samples platforms QUIET=1
       - name: Test that the targettest programs can be built.
-        run: make -C targettest platforms
+        run: make -C targettest platforms QUIET=1
       - name: Build the document files.
         shell: bash
-        run: make -j2 doc
+        run: make -j2 doc QUIET=1
       - name: Upload a documents snapshot.
         uses: actions/upload-artifact@v4
         with:
@@ -53,8 +59,8 @@ jobs:
           path: ./html
       - name: Build 64-bit Windows versions of the tools.
         run: |
-          make -C src clean
-          make -j2 bin USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
+          make -C src clean QUIET=1
+          make -j2 bin QUIET=1 USER_CFLAGS=-Werror CROSS_COMPILE=x86_64-w64-mingw32-
 
   build_windows:
     name: Build and Test (Windows)
@@ -84,7 +90,7 @@ jobs:
 
       - name: Build utils (MinGW)
         shell: cmd
-        run: make -j2 util SHELL=cmd
+        run: make -j2 util QUIET=1 SHELL=cmd
 
       - name: Build the platform libraries (make lib)
         shell: cmd

@@ -853,25 +853,22 @@ static void OneLine (void)
             Seg = ActiveSeg;
             PC  = GetPC ();
 
-            /* Define the label */
-            SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
-
             /* Skip the colon. If NoColonLabels is enabled, allow labels
             ** without a colon if there is no whitespace before the
             ** identifier.
             */
             if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
-                    Error ("Expected ':' after identifier to form a label");
-                    /* Try some smart error recovery */
-                    if (CurTok.Tok == TOK_NAMESPACE) {
-                        NextTok ();
-                    }
+                    ErrorSkip ("Expected ':' after identifier to form a label");
+                    goto Done;
                 }
             } else {
                 /* Skip the colon */
                 NextTok ();
             }
+
+            /* Define the label */
+            SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
 
             /* If we come here, a new identifier may be waiting, which may
             ** be a macro or instruction.
@@ -907,8 +904,8 @@ static void OneLine (void)
     } else if (PCAssignment && (CurTok.Tok == TOK_STAR || CurTok.Tok == TOK_PC)) {
         NextTok ();
         if (CurTok.Tok != TOK_EQ) {
-            Error ("'=' expected");
-            SkipUntilSep ();
+            ErrorSkip ("'=' expected");
+            goto Done;
         } else {
             /* Skip the equal sign */
             NextTok ();
@@ -938,6 +935,7 @@ static void OneLine (void)
         }
     }
 
+Done:
     /* Line separator must come here */
     ConsumeSep ();
 }

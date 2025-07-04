@@ -64,6 +64,15 @@ L1:     lda     c_sp,x
 
         jsr     initlib
 
+; Disable the BASIC part of the IRQ handler. It would usually (once per frame)
+; copy the VIC shadow register, move sprites, play music. This would only get
+; in the way, so we turn it off.
+
+        lda     INIT_STATUS
+        sta     initsave
+        and     #$fe
+        sta     INIT_STATUS
+
 ; Set the bank for the file name to our execution bank. We must do this
 ; *after* calling the constructors because some of them might depend on
 ; the original value of this register.
@@ -87,6 +96,11 @@ L2:     lda     zpsave,x
         sta     c_sp,x
         dex
         bpl     L2
+
+; Enable the BASIC interrupt again
+
+        lda     initsave
+        sta     INIT_STATUS
 
 ; Place the program return code into BASIC's status variable.
 
@@ -115,5 +129,6 @@ zpsave: .res    zpspace
 
 .bss
 
-spsave: .res    1
-mmusave:.res    1
+spsave:   .res    1
+mmusave:  .res    1
+initsave: .res    1

@@ -145,7 +145,7 @@ static void SetOptions (void)
     OptTranslator (&Buf);
 
     /* Set date and time */
-    OptDateTime ((unsigned long) time(0));
+    OptDateTime ((unsigned long) time (0));
 
     /* Release memory for the string */
     SB_Done (&Buf);
@@ -708,7 +708,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-    exit(EXIT_SUCCESS);
+    exit (EXIT_SUCCESS);
 }
 
 
@@ -727,7 +727,7 @@ static void DoPCAssign (void)
 {
     long PC = ConstExpression ();
     if (PC < 0 || PC > 0xFFFFFF) {
-        Error ("Range error");
+        Error ("Program counter value is out of valid range");
     } else {
         EnterAbsoluteMode (PC);
     }
@@ -820,11 +820,10 @@ static void OneLine (void)
             NextTok ();
 
             /* Define the symbol with the expression following the '=' */
-            SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
+            SymDef (Sym, Expression (), ADDR_SIZE_DEFAULT, Flags);
 
             /* Don't allow anything after a symbol definition */
-            ConsumeSep ();
-            return;
+            goto Done;
 
         } else if (CurTok.Tok == TOK_SET) {
 
@@ -842,8 +841,7 @@ static void OneLine (void)
             SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_VAR);
 
             /* Don't allow anything after a symbol definition */
-            ConsumeSep ();
-            return;
+            goto Done;
 
         } else {
 
@@ -859,7 +857,8 @@ static void OneLine (void)
             */
             if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
-                    ErrorSkip ("Expected ':' after identifier to form a label");
+                    ErrorExpect ("Expected ':' after identifier to form a label");
+                    SkipUntilSep ();
                     goto Done;
                 }
             } else {
@@ -903,16 +902,22 @@ static void OneLine (void)
         HandleInstruction (Instr);
     } else if (PCAssignment && (CurTok.Tok == TOK_STAR || CurTok.Tok == TOK_PC)) {
         NextTok ();
-        if (CurTok.Tok != TOK_EQ) {
-            ErrorSkip ("'=' expected");
+        if (!ExpectSkip (TOK_EQ, "Expected '='")) {
             goto Done;
-        } else {
-            /* Skip the equal sign */
-            NextTok ();
-            /* Enter absolute mode */
-            DoPCAssign ();
         }
+        /* Skip the equal sign */
+        NextTok ();
+        /* Enter absolute mode */
+        DoPCAssign ();
+    } else if ((CurTok.Tok >= TOK_FIRSTOP && CurTok.Tok <= TOK_LASTOP) ||
+               (CurTok.Tok >= TOK_FIRSTREG && CurTok.Tok <= TOK_LASTREG) ||
+               CurTok.Tok == TOK_INTCON || CurTok.Tok == TOK_CHARCON ||
+               CurTok.Tok == TOK_STRCON) {
+        ErrorExpect ("Expected a mnemonic");
+        SkipUntilSep ();
+        goto Done;
     }
+
 
     /* If we have defined a label, remember its size. Sym is also set by
     ** a symbol assignment, but in this case Done is false, so we don't
@@ -1233,7 +1238,7 @@ int main (int argc, char* argv [])
     }
 
     if (WarningCount > 0 && WarningsAsErrors) {
-        Error("Warnings as errors");
+        Error ("Warnings as errors");
     }
 
     /* If we didn't have an errors, finish off the line infos */

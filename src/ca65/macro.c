@@ -406,11 +406,11 @@ void MacDef (unsigned Style)
     Pos = CurTok.Pos;
 
     /* We expect a macro name here */
-    if (CurTok.Tok != TOK_IDENT) {
-        Error ("Identifier expected");
+    if (!Expect (TOK_IDENT, "Expected an identifier")) {
         MacSkipDef (Style);
         return;
-    } else if (!UbiquitousIdents && FindInstruction (&CurTok.SVal) >= 0) {
+    }
+    if (!UbiquitousIdents && FindInstruction (&CurTok.SVal) >= 0) {
         /* The identifier is a name of a 6502 instruction, which is not
         ** allowed if not explicitly enabled.
         */
@@ -439,7 +439,7 @@ void MacDef (unsigned Style)
     ** otherwise, we may have parameters without parentheses.
     */
     if (Style == MAC_STYLE_CLASSIC) {
-        HaveParams = 1;
+        HaveParams = (CurTok.Tok != TOK_SEP);
     } else {
         if (CurTok.Tok == TOK_LPAREN) {
             HaveParams = 1;
@@ -451,7 +451,7 @@ void MacDef (unsigned Style)
 
     /* Parse the parameter list */
     if (HaveParams) {
-        while (CurTok.Tok == TOK_IDENT) {
+        while (Expect (TOK_IDENT, "Expected a parameter name")) {
             /* Create a struct holding the identifier */
             IdDesc* I = NewIdDesc (&CurTok.SVal);
 
@@ -533,7 +533,7 @@ void MacDef (unsigned Style)
 
                 /* Need an identifer */
                 if (CurTok.Tok != TOK_IDENT && CurTok.Tok != TOK_LOCAL_IDENT) {
-                    Error ("Identifier expected");
+                    ErrorExpect ("Expected an identifier");
                     SkipUntilSep ();
                     break;
                 }
@@ -591,7 +591,7 @@ void MacDef (unsigned Style)
         /* Save if last token was a separator to know if .endmacro is at
         ** the start of a line
         */
-        LastTokWasSep = TokIsSep(CurTok.Tok);
+        LastTokWasSep = TokIsSep (CurTok.Tok);
 
         /* Read the next token */
         NextTok ();
@@ -938,10 +938,8 @@ static void StartExpDefine (MacExp* E)
 
         /* Check for a comma */
         if (Count > 0) {
-            if (CurTok.Tok == TOK_COMMA) {
+            if (Expect (TOK_COMMA, "Expected ','")) {
                 NextTok ();
-            } else {
-                Error ("',' expected");
             }
         }
     }

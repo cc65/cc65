@@ -73,7 +73,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         /* Start from the root scope */
         Scope = RootScope;
 
-    } else if (CurTok.Tok == TOK_IDENT) {
+    } else if (Expect (TOK_IDENT, "Expected an identifier")) {
 
         /* Remember the name and skip it */
         SB_Copy (Name, &CurTok.SVal);
@@ -115,8 +115,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
     while (1) {
 
         /* Next token must be an identifier. */
-        if (CurTok.Tok != TOK_IDENT) {
-            Error ("Identifier expected");
+        if (!Expect (TOK_IDENT, "Expected an identifier")) {
             return 0;
         }
 

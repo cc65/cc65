@@ -725,52 +725,118 @@ void NextTok (void)
 
 
 
-void Consume (token_t Expected, const char* ErrMsg)
-/* Consume Expected, print an error if we don't find it */
+void ErrorExpect (const char* Msg)
+/* Output an error message about some expected token using Msg and the
+ * description of the following token. This means that Msg should contain
+ * something like "xyz expected". The actual error message would the be
+ * "xyz expected but found zyx".
+ */
+{
+    StrBuf S = AUTO_STRBUF_INITIALIZER;
+    TokenDesc (&CurTok, &S);
+    Error ("%s but found '%s'", Msg, SB_GetConstBuf (&S));
+    SB_Done (&S);
+}
+
+
+
+int Expect (token_t Expected, const char* Msg)
+/* Check if the next token is the expected one. If not, print Msg plus some
+ * information about the token that was actually found. This means that Msg
+ * should contain something like "xyz expected". The actual error message would
+ * the be "xyz expected but found zyx".
+ * Returns true if the token was found, otherwise false.
+ */
 {
     if (CurTok.Tok == Expected) {
+        return 1;
+    }
+
+    ErrorExpect (Msg);
+    return 0;
+}
+
+
+
+int ExpectSkip (token_t Expected, const char* Msg)
+/* Check if the next token is the expected one. If not, print Msg plus some
+ * information about the token that was actually found and skip the remainder
+ * of the line. This means that Msg should contain something like "xyz
+ * expected". The actual error message would the be "xyz expected but found
+ * zyx".
+ * Returns true if the token was found, otherwise false.
+ */
+{
+    if (CurTok.Tok == Expected) {
+        return 1;
+    }
+
+    ErrorExpect (Msg);
+    SkipUntilSep ();
+    return 0;
+}
+
+
+
+int Consume (token_t Expected, const char* ErrMsg)
+/* Consume Token, print an error if we don't find it. Return true if the token
+** was found and false otherwise.
+*/
+{
+    if (Expect (Expected, ErrMsg)) {
         NextTok ();
+        return 1;
     } else {
-        Error ("%s", ErrMsg);
+        return 0;
     }
 }
 
 
 
-void ConsumeSep (void)
-/* Consume a separator token */
+int ConsumeSep (void)
+/* Consume a separator token. Return true if the token was found and false
+ * otherwise.
+ */
 {
     /* We expect a separator token */
-    ExpectSep ();
+    int Found = ExpectSep ();
 
     /* If we are at end of line, skip it */
     if (CurTok.Tok == TOK_SEP) {
         NextTok ();
     }
+
+    return Found;
 }
 
 
 
-void ConsumeLParen (void)
-/* Consume a left paren */
+int ConsumeLParen (void)
+/* Consume a left paren. Return true if the token was found and false
+** otherwise.
+*/
 {
-    Consume (TOK_LPAREN, "'(' expected");
+    return Consume (TOK_LPAREN, "Expected '('");
 }
 
 
 
-void ConsumeRParen (void)
-/* Consume a right paren */
+int ConsumeRParen (void)
+/* Consume a right paren. Return true if the token was found and false
+** otherwise.
+*/
 {
-    Consume (TOK_RPAREN, "')' expected");
+    return Consume (TOK_RPAREN, "Expected ')'");
 }
 
 
 
-void ConsumeComma (void)
-/* Consume a comma */
+int ConsumeComma (void)
+/* Consume a comma. Return true if the token was found and false
+** otherwise.
+*/
 {
-    Consume (TOK_COMMA, "',' expected");
+    return Consume (TOK_COMMA, "Expected ','");
 }
 
 
@@ -785,13 +851,21 @@ void SkipUntilSep (void)
 
 
 
-void ExpectSep (void)
-/* Check if we've reached a line separator, and output an error if not. Do
-** not skip the line separator.
+int ExpectSep (void)
+/* Check if we've reached a line separator. If so, return true. If not, output
+** an error and skip all tokens until the line separator is reached. Then
+** return false.
 */
 {
     if (!TokIsSep (CurTok.Tok)) {
-        ErrorSkip ("Unexpected trailing garbage characters");
+        /* Try to be helpful by giving information about the token that was
+         * unexpected.
+         */
+        ErrorExpect ("Expected 'end-of-line'");
+        SkipUntilSep ();
+        return 0;
+    } else {
+        return 1;
     }
 }
 

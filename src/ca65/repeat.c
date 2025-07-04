@@ -120,7 +120,7 @@ void ParseRepeat (void)
     /* Repeat count follows */
     long RepCount = ConstExpression ();
     if (RepCount < 0) {
-        Error ("Range error");
+        Error ("Repeat count must be positive or zero");
         RepCount = 0;
     }
 
@@ -132,9 +132,7 @@ void ParseRepeat (void)
         NextTok ();
 
         /* Check for an identifier */
-        if (CurTok.Tok != TOK_IDENT) {
-            ErrorSkip ("Identifier expected");
-        } else {
+        if (ExpectSkip (TOK_IDENT, "Expected an identifier")) {
             /* Remember the name and skip it */
             SB_Terminate (&CurTok.SVal);
             Name = xstrdup (SB_GetConstBuf (&CurTok.SVal));

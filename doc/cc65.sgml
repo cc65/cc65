@@ -641,7 +641,7 @@ Here is a description of all the command line options:
   <item>pce (PC engine)
   <item>pet (all CBM PET systems except the 2001)
   <item>plus4
-  <item>p6502
+  <item>rp6502
   <item>sim6502
   <item>sim65c02
   <item>supervision
@@ -1112,6 +1112,10 @@ This cc65 version has some extensions to the ISO C standard.
 The compiler defines several macros at startup:
 
 <descrip>
+  <tag><tt>__AGAT__</tt></tag>
+
+  This macro is defined if the target is the Agat (-t agat).
+
   <tag><tt>__APPLE2__</tt></tag>
 
   This macro is defined if the target is the Apple ][ (-t apple2) or the enhanced Apple //e (-t apple2enh).
@@ -1122,11 +1126,15 @@ The compiler defines several macros at startup:
 
   <tag><tt>__ATARI2600__</tt></tag>
 
-  This macro is defined if the target is the Atari 2600 game console.
+  This macro is defined if the target is the Atari 2600 game console (-t atari2600).
 
   <tag><tt>__ATARI5200__</tt></tag>
 
-  This macro is defined if the target is the Atari 5200 game console.
+  This macro is defined if the target is the Atari 5200 game console (-t atari5200).
+
+  <tag><tt>__ATARI7800__</tt></tag>
+
+  This macro is defined if the target is the Atari 7800 game console (-t atari7800).
 
   <tag><tt>__ATARI__</tt></tag>
 
@@ -1140,6 +1148,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Oric Atmos (-t atmos).
 
+  <tag><tt>__BBC__</tt></tag>
+
+  This macro is defined if the target is the BBC (-t bbc).
+
   <tag><tt>__C128__</tt></tag>
 
   This macro is defined if the target is the Commodore 128 (-t c128).
@@ -1151,6 +1163,10 @@ The compiler defines several macros at startup:
   <tag><tt>__C64__</tt></tag>
 
   This macro is defined if the target is the Commodore 64 (-t c64).
+
+  <tag><tt>__C65__</tt></tag>
+
+  This macro is defined if the target is the Commodore 65 (-t c65).
 
   <tag><tt>__CBM__</tt></tag>
 
@@ -1321,6 +1337,10 @@ The compiler defines several macros at startup:
   <tt/<ref id="macro-CPU" name="__CPU__">/ macro for the instruction set
   of the W65C02 CPU.
 
+  <tag><tt>__CREATIVISION__</tt></tag>
+
+  This macro is defined if the target is the VTech Creativision game console (-t creativision).
+
   <tag><tt>__CX16__</tt></tag>
 
   This macro is defined if the target is the Commander X16 (-t cx16).
@@ -1339,6 +1359,10 @@ The compiler defines several macros at startup:
 
   This macro expands to a string containing the name of the C source file.
 
+  <tag><tt>__GAMATE__</tt></tag>
+
+  This macro is defined if the target is the Gamate handheld (-t gamate).
+
   <tag><tt>__GEOS__</tt></tag>
 
   This macro is defined if you are compiling for one of the GEOS systems.
@@ -1351,6 +1375,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if you are compiling for the GEOS 64/128 system (-t geos-cbm).
 
+  <tag><tt>__KIM1__</tt></tag>
+
+  This macro is defined if the target is the KIM-1 (-t kmi1).
+
   <tag><tt>__LINE__</tt></tag>
 
   This macro expands to the current line number.
@@ -1362,6 +1390,10 @@ The compiler defines several macros at startup:
   <tag><tt>__LYNX__</tt></tag>
 
   This macro is defined if the target is the Atari Lynx (-t lynx).
+
+  <tag><tt>__MEGA65__</tt></tag>
+
+  This macro is defined if the target is the Mega 65 (-t mega65).
 
   <tag><tt>__NES__</tt></tag>
 
@@ -1388,6 +1420,10 @@ The compiler defines several macros at startup:
   This macro is defined if the target is the Ohio Scientific Challenger 1P
   (-t osic1p).
 
+  <tag><tt>__PCE__</tt></tag>
+
+  This macro is defined if the target is the PC Engine game console (-t pce).
+
   <tag><tt>__PET__</tt></tag>
 
   This macro is defined if the target is the PET family of computers (-t pet).
@@ -1395,6 +1431,10 @@ The compiler defines several macros at startup:
   <tag><tt>__PLUS4__</tt></tag>
 
   This macro is defined if the target is the Commodore Plus/4 (-t plus4).
+
+  <tag><tt>__RP6502__</tt></tag>
+
+  This macro is defined if the target is the Picocomputer 6502 (-t rp6502).
 
   <tag><tt>__SIM6502__</tt></tag>
 

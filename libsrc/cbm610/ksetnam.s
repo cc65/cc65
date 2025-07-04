@@ -22,7 +22,7 @@
         sty     ktmp
 
         txa
-        ldy     #$90                    ; FNAM
+        ldy     #FNAM
         sta     (sysp0),y
 
         lda     ktmp
@@ -30,14 +30,13 @@
         sta     (sysp0),y
 
         lda     ExecReg                 ; Assume name is always in this segment
-        ldy     #$92                    ; FNAM_SEG
+        ldy     #FNAM_SEG
         sta     (sysp0),y
 
-        ldy     #$9D                    ; FNAM_LEN
+        ldy     #FNAM_LEN
         pla
         sta     (sysp0),y
         ldy     ktmp
         jmp     restore_bank
 
 .endproc
-

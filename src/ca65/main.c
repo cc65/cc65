@@ -862,7 +862,7 @@ static void OneLine (void)
             */
             if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
-                    Error ("':' expected");
+                    Error ("Expected ':' after identifier to form a label");
                     /* Try some smart error recovery */
                     if (CurTok.Tok == TOK_NAMESPACE) {
                         NextTok ();

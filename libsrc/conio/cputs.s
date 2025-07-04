@@ -22,6 +22,10 @@ _cputsxy:
 _cputs: sta     ptr1            ; Save s
         stx     ptr1+1
 
+; Important note: The implementation below relies on the _cputc() function not
+; clobbering ptr1. This might not be the case when rewriting this function so
+; beware!
+
 L0:
 .if .cap(CPU_HAS_ZPIND)
         lda     (ptr1)          ; (5)

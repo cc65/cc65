@@ -1,4 +1,5 @@
 #include <string.h>
+#include <errno.h>
 #include "unittest.h"
 
 #define SHORT_STR "abcdefghijklmnopqrstuvwxyz"
@@ -56,5 +57,17 @@ TEST
       free(dst);
     }
 
+    src = malloc(LONG_STR_LEN+1);
+    ASSERT_IsTrue(src != NULL, "Could not allocate source string");
+    memset(src, 'a', LONG_STR_LEN);
+    src[LONG_STR_LEN] = '\0';
+
+    dst = strndup(src, 30);
+    ASSERT_IsTrue(dst != NULL, "strndup returned NULL");
+    free(dst);
+
+    dst = strndup(src, LONG_STR_LEN);
+    ASSERT_IsTrue(errno == ENOMEM, "error is not ENOMEM");
+    ASSERT_IsTrue(dst == NULL, "strndup did not return NULL");
 }
 ENDTEST

@@ -4,53 +4,50 @@
 ; char* __fastcall__ strndup (const char* S, size_t maxlen);
 ;
 
-        .importzp       ptr4, c_sp
-        .import         _strdup, _strlen, pushax, popax, _realloc
+        .importzp       tmp1, tmp2, ptr2
+        .import         _strncpy, _strlen, _malloc
+        .import         pushax, popax, incsp2, incax1, swapstk
+        .import         ___errno
 
         .export         _strndup
 
-_strndup:
-        sta     maxlen        ; Remember maxlen
-        stx     maxlen+1
+        .include        "errno.inc"
 
-        jsr     popax         ; Duplicate string
-        jsr     _strdup
-        jsr     pushax        ; Remember result
+.proc _strndup
+        sta     tmp1          ; Remember maxlen
+        stx     tmp1+1
 
-        jsr     _strlen       ; Check length,
-        cpx     maxlen+1
-        bcc     out           ; Return directly if < maxlen
+        jsr     popax         ; Get string
+        jsr     pushax        ; Keep it in TOS
+
+        jsr     _strlen       ; Get string length,
+        cpx     tmp1+1        ; Compare to max,
+        bcc     alloc
         bne     :+
-        cmp     maxlen
-        bcc     out
+        cmp     tmp1
+        bcc     alloc
 
-:       ldy     #$00          ; Otherwise, point to end of string,
-        lda     maxlen
-        clc
-        adc     (c_sp),y
-        sta     ptr4
-        lda     maxlen+1
-        iny
-        adc     (c_sp),y
-        sta     ptr4+1
+:       lda     tmp1          ; Use maxlen if shorter
+        ldx     tmp1+1
 
-        dey                   ; Cut it short,
-        tya
-        sta     (ptr4),y
+alloc:  jsr     incax1        ; Add 1 for terminator
+        jsr     _malloc       ; Allocate output
+        cpx     #$00          ; Check allocation
+        beq     errmem
 
-        ldx     maxlen+1      ; And finally, realloc to maxlen+1
-        ldy     maxlen
-        iny
-        tya
-        bne     :+
-        inx
-:       jsr     _realloc      ; TOS still contains result
-                              ; We consider realloc will not fail,
-                              ; as the block shrinks.
-        jsr     pushax        ; push/pop for size optimisation
-out:
-        jmp     popax
+        jsr     swapstk       ; Put dest in TOS and get string back
+        jsr     pushax        ; Put src in TOS
+        lda     tmp1          ; Get length for strncpy
+        ldx     tmp1+1
 
-        .bss
+        jsr     _strncpy      ; Copy
+        pha                   ; Terminate
+        lda     #$00
+        sta     (ptr2),y
+        pla
+        rts
 
-maxlen: .res 2
+errmem: ldy     #ENOMEM
+        sty     ___errno
+        jmp     incsp2        ; Pop string and return
+.endproc

@@ -3803,7 +3803,6 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tscreen><verb>
         atari           Defines the scrcode macro.
         cbm             Defines the scrcode macro.
-        cpu             Defines constants for the .CPU variable.
         generic         Defines generic macros like add, sub, and blt.
         longbranch      Defines conditional long-jump macros.
   </verb></tscreen>
@@ -5117,6 +5116,7 @@ For better orthogonality, the assembler defines similar symbols as the
 compiler, depending on the target system selected:
 
 <itemize>
+<item><tt/__AGAT__/ - Target system is <tt/agat/
 <item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
 <item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
@@ -5129,23 +5129,31 @@ compiler, depending on the target system selected:
 <item><tt/__C128__/ - Target system is <tt/c128/
 <item><tt/__C16__/ - Target system is <tt/c16/ or <tt/plus4/
 <item><tt/__C64__/ - Target system is <tt/c64/
+<item><tt/__C65__/ - Target system is <tt/c65/
 <item><tt/__CBM__/ - Target is a Commodore or Commodore-alike system
 <item><tt/__CBM510__/ - Target system is <tt/cbm510/
 <item><tt/__CBM610__/ - Target system is <tt/cbm610/
+<item><tt/__CREATIVISION__/ - Target system is <tt/creativision/
 <item><tt/__CX16__/ - Target system is <tt/cx16/
+<item><tt/__GAMATE__/ - Target system is <tt/gamate/
 <item><tt/__GEOS__/ - Target is a GEOS system
 <item><tt/__GEOS_APPLE__/ - Target system is <tt/geos-apple/
 <item><tt/__GEOS_CBM__/ - Target system is <tt/geos-cbm/
+<item><tt/__KIM1__/ - Target system is <tt/kim1/
 <item><tt/__LUNIX__/ - Target system is <tt/lunix/
 <item><tt/__LYNX__/ - Target system is <tt/lynx/
+<item><tt/__MEGA65__/ - Target system is <tt/mega65/
 <item><tt/__NES__/ - Target system is <tt/nes/
 <item><tt/__OSIC1P__/ - Target system is <tt/osic1p/
+<item><tt/__PCE__/ - Target system is <tt/pce/
 <item><tt/__PET__/ - Target system is <tt/pet/
 <item><tt/__PLUS4__/ - Target system is <tt/plus4/
+<item><tt/__RP6502__/ - Target system is <tt/rp6502/
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/
 <item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
 <item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
 <item><tt/__SYM1__/ - Target system is <tt/sym1/
+<item><tt/__TELESTRAT__/ - Target system is <tt/telestrat/
 <item><tt/__VIC20__/ - Target system is <tt/vic20/
 </itemize>
 

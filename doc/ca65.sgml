@@ -1433,38 +1433,6 @@ constant is defined:
     CPU_ISET_M740
 </verb></tscreen>
 
-<!-- Sorry but explaining these with the changes from #2751 is too cringy for
-     me - must be done by someone else. The remainder is from the old
-     ".macpack cpu" section"
-
-The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
-be checked with <tt/<ref id="operators" name=".BITAND">/ to determine if the
-currently enabled CPU supports a specific instruction set. For example the
-65C02 supports all instructions of the 65SC02 CPU, so it has the
-<tt/CPU_ISET_65SC02/ bit set in addition to its native <tt/CPU_ISET_65C02/
-bit. Using
-
-<tscreen><verb>
-        .if (.cpu .bitand CPU_ISET_65SC02)
-                lda     (c_sp)
-        .else
-                ldy     #$00
-                lda     (c_sp),y
-        .endif
-</verb></tscreen>
-
-it is possible to determine if the
-
-<tscreen><verb>
-                lda     (c_sp)
-</verb></tscreen>
-
-instruction is supported, which is the case for the 65SC02, 65C02 and 65816
-CPUs (the latter two are upwards compatible to the 65SC02).
-
-see section <ref id="6502-mode" name="6502 format"> and following.
--->
-
   <tt/.CPU/ may be used to replace the .IFPxx pseudo instructions or to
   construct even more complex expressions.
 
@@ -1482,8 +1450,43 @@ see section <ref id="6502-mode" name="6502 format"> and following.
         .endif
   </verb></tscreen>
 
-  See also: <tt><ref id=".CAP" name=".CAP"></tt>
+<bf>The dilemma:</bf>
 
+The original design of this feature was made under the assumption, that any
+"higher" CPU will support the entire instruction set of the "lower" CPU. For
+example: the WDC W65C02 supports all instructions of the 65C02, which again
+support all instructions of the 65SC02. Unfortunately this is not true for all
+CMOS CPUs - when the 65CE02 was made, some instructions were changed, and a new
+addressingmode was added. As a result all CPUS after (and including) 65CE02
+are no more (source code) compatible with all instructions originally introduced
+by the 65SC02.
+
+Because of this, the .CPU function and the ISET* macros were repurposed to
+indicate <em>groups of instructions</em> only, ie only the set of instructions
+that was added by that particular CPU. In the value returned by .CPU only the
+bits will be set, that refer to the groups of instructions that are completely
+supported by that CPU.
+
+The advantage of this is, that the mechanism keeps working for all new CPUs
+added. The inevitable disadvantage is that you now have to know exactly which
+CPU added which instructions (look <htmlurl url="cpus.html" name="here"> for reference).
+
+<tscreen><verb>
+        .if (.cpu .bitand CPU_ISET_65SC02)
+                ; This will be assembled for the W65C02, 65C02, 65SC02, 65816, HUC6820
+                lda     (c_sp)
+        .elseif (.cpu .bitand CPU_ISET_65CE02)
+                ; This will be assembled for the 65CE02, 4510, 45GS02
+                ldz     #$00
+                lda     (c_sp),z
+        .else
+                ldy     #$00
+                lda     (c_sp),y
+        .endif
+</verb></tscreen>
+
+  See also: <tt><ref id=".CAP" name=".CAP"></tt>, which is a similar mechanism,
+  but without the problem outlined above.
 
 
 <sect1><tt>.ISIZE</tt><label id=".ISIZE"><p>

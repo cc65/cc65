@@ -1212,10 +1212,8 @@ The compiler defines several macros at startup:
   <label id="macro-CPU">
   <tag><tt>__CPU__</tt></tag>
 
-  This macro contains a bitset that allows to check if a specific instruction
-  set is supported. For example, the 65C02 CPU supports all instructions of the
-  65SC02. So testing for the instruction set of the 65SC02 using the following
-  check will succeed for both CPUs (and also for the 65816 and HUC6280).
+  This macro contains a bitset that allows to check if a specific group of
+  instructions is supported.
 
   <tscreen><verb>
   #if (__CPU__ & __CPU_ISET_65SC02__)
@@ -1227,6 +1225,13 @@ The compiler defines several macros at startup:
   checks. The <tt/__CPU__/ variable is usually derived from the target system
   given, but can be changed using the <tt/<ref id="option--cpu" name="--cpu">/
   command line option.
+
+  Note that, since the different CMOS instruction sets are not orthogonal, the
+  following test macros only test for the group of instructions <bf>added</bf>
+  by this particular CPU.
+
+  see <htmlurl url="ca65.html#.CPU" name=".CPU"> for details on the ISET*
+  dilemma.
 
   <tag><tt>__CPU_4510__</tt></tag>
 

@@ -373,20 +373,22 @@ static void MacSkipDef (unsigned Style, const FilePos* StartPos)
 /* Skip a macro definition */
 {
     if (Style == MAC_STYLE_CLASSIC) {
-        /* Skip tokens until we reach the final .endmacro. Be liberal about
-        ** .endmacro here since we had errors anyway when this function is
-        ** called.
+        /* Skip tokens until we reach the final .endmacro. Implement the same
+        ** behavior as when parsing the macro regularily: .endmacro needs to
+        ** be at the start of the line to end the macro definition.
         */
+        int LastWasSep = 0;
         while (1) {
             if (CurTok.Tok == TOK_EOF) {
                 ErrorExpect ("Expected '.ENDMACRO'");
                 PNotification (StartPos, "Macro definition started here");
                 break;
             }
-            if (CurTok.Tok == TOK_ENDMACRO) {
+            if (CurTok.Tok == TOK_ENDMACRO && LastWasSep) {
                 NextTok ();
                 break;
             }
+            LastWasSep = (CurTok.Tok == TOK_SEP);
             NextTok ();
         }
     } else {

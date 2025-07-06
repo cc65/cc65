@@ -907,6 +907,11 @@ static unsigned RunOptGroup7 (CodeSeg* S)
        between branches */
     C += RunOptFunc (S, &DOptBranchDist, 3);
 
+    /* Re-optimize inc/decsp that may now be grouped */
+    C += RunOptFunc (S, &DOptStackPtrOps, 5);
+    /* Re-optimize JSR/RTS that may now be grouped */
+    C += RunOptFunc (S, &DOptRTS, 1);
+
     Changes += C;
     /* If we had changes, we must run dead code elimination again,
     ** since the changes may have introduced dead code.

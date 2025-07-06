@@ -54,7 +54,7 @@ void NextTok (void);
 void ErrorExpect (const char* Msg);
 /* Output an error message about some expected token using Msg and the
  * description of the following token. This means that Msg should contain
- * something like "xyz expected". The actual error message would the be
+ * something like "xyz expected". The actual error message would then be
  * "xyz expected but found zyx".
  */
 
@@ -62,7 +62,7 @@ int Expect (token_t Expected, const char* Msg);
 /* Check if the next token is the expected one. If not, print Msg plus some
  * information about the token that was actually found. This means that Msg
  * should contain something like "xyz expected". The actual error message would
- * the be "xyz expected but found zyx".
+ * then be "xyz expected but found zyx".
  * Returns true if the token was found, otherwise false.
  */
 
@@ -70,7 +70,7 @@ int ExpectSkip (token_t Expected, const char* Msg);
 /* Check if the next token is the expected one. If not, print Msg plus some
  * information about the token that was actually found and skip the remainder
  * of the line. This means that Msg should contain something like "xyz
- * expected". The actual error message would the be "xyz expected but found
+ * expected". The actual error message would then be "xyz expected but found
  * zyx".
  * Returns true if the token was found, otherwise false.
  */

@@ -2235,7 +2235,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnexpected    },      /* .REF, .REFERENCED */
     { ccNone,           DoReferTo       },      /* .REFTO, .REFERTO */
     { ccNone,           DoReloc         },      /* .RELOC */
-    { ccNone,           DoRepeat        },      /* .REPEAT */
+    { ccKeepToken,      DoRepeat        },      /* .REPEAT */
     { ccNone,           DoRes           },      /* .RES */
     { ccNone,           DoInvalid       },      /* .RIGHT */
     { ccNone,           DoROData        },      /* .RODATA */

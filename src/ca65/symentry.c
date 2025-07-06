@@ -216,6 +216,10 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     if (S->Flags & SF_IMPORT) {
         /* Defined symbol is marked as imported external symbol */
         Error ("Symbol '%m%p' is already an import", GetSymName (S));
+        if (CollCount (&S->DefLines) > 0) {
+            PNotification (GetSourcePos (CollAt(&S->DefLines, 0)),
+                           "The symbol was previously imported here");
+        }
         return;
     }
     if ((Flags & SF_VAR) != 0 && (S->Flags & (SF_EXPORT | SF_GLOBAL))) {
@@ -227,6 +231,10 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
         /* Multiple definition. In case of a variable, this is legal. */
         if ((S->Flags & SF_VAR) == 0) {
             Error ("Symbol '%m%p' is already defined", GetSymName (S));
+            if (CollCount (&S->DefLines) > 0) {
+                PNotification (GetSourcePos (CollAt(&S->DefLines, 0)),
+                               "The symbol was previously defined here");
+            }
             S->Flags |= SF_MULTDEF;
             return;
         } else {

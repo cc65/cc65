@@ -72,6 +72,9 @@ extern unsigned WarningCount;
 
 
 
+void PNotification (const FilePos* Pos, const char* Format, ...) attribute ((format (printf, 2, 3)));
+/* Print a notification message. */
+
 void Warning (unsigned Level, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* Print warning message. */
 

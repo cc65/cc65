@@ -1,2 +1,0 @@
-134-errormsg.s:3: Error: Symbol 'foo' is already an import
-134-errormsg.s:1: Note: The symbol was previously imported here

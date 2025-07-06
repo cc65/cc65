@@ -1,3 +1,0 @@
-137-errormsg.s:1: Error: Cannot use an instruction as macro name
-137-errormsg.s:5: Error: Expected '.ENDMACRO' but found 'end-of-file'
-137-errormsg.s:1: Note: Macro definition started here

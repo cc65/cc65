@@ -1,3 +1,0 @@
-138-errormsg.s:2: Error: Expected an identifier but found '.ENDMACRO'
-138-errormsg.s:4: Error: Macro 'mac' contains errors and cannot be expanded
-138-errormsg.s:1: Note: Definition of macro 'mac' was here

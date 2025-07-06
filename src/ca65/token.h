@@ -329,7 +329,7 @@ INLINE int TokHasSVal (token_t Tok)
     return (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT || Tok == TOK_STRCON);
 }
 #else
-#  define TokHasIVal(T)   \
+#  define TokHasSVal(T)   \
     ((T) == TOK_IDENT || (T) == TOK_LOCAL_IDENT || (T) == TOK_STRCON)
 #endif
 

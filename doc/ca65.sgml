@@ -106,6 +106,7 @@ Short options:
 Long options:
   --auto-import                 Mark unresolved symbols as import
   --bin-include-dir dir         Set a search path for binary includes
+  --color [on|auto|off]         Color diagnostics (default: auto)
   --cpu type                    Set cpu type
   --create-dep name             Create a make dependency file
   --create-full-dep name        Create a full make dependency file
@@ -120,7 +121,7 @@ Long options:
   --list-bytes n                Maximum number of bytes per listing line
   --memory-model model          Set the memory model
   --pagelength n                Set the page length for the listing
-  --relax-checks                Disables some error checks
+  --relax-checks                Relax some checks (see docs)
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity
@@ -144,6 +145,14 @@ Here is a description of all the command line options:
   current directory is always searched first before considering any
   additional directories. See also the section about <ref id="search-paths"
   name="search paths">.
+
+
+  <label id="option-color">
+  <tag><tt>--color</tt></tag>
+
+  This option controls if the assembler will use colors when printing
+  diagnostics. The default is "auto" which will enable colors if the output
+  goes to a terminal (not to a file).
 
 
   <label id="option--cpu">
@@ -184,12 +193,6 @@ Here is a description of all the command line options:
   the assembled module in makefile syntax. The output is written to a file
   with the given name. The output does include files passed via debug
   information to the assembler.
-
-
-  <tag><tt>-d, --debug</tt></tag>
-
-  Enables debug mode, something that should not be needed for mere
-  mortals:-)
 
 
   <label id="option--feature">

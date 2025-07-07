@@ -42,6 +42,7 @@
 #include "addrsize.h"
 #include "chartype.h"
 #include "cmdline.h"
+#include "consprop.h"
 #include "debugflag.h"
 #include "mmodel.h"
 #include "print.h"
@@ -111,6 +112,7 @@ static void Usage (void)
             "Long options:\n"
             "  --auto-import\t\t\tMark unresolved symbols as import\n"
             "  --bin-include-dir dir\t\tSet a search path for binary includes\n"
+            "  --color [on|auto|off]\t\tColor diagnostics (default: auto)\n"
             "  --cpu type\t\t\tSet cpu type\n"
             "  --create-dep name\t\tCreate a make dependency file\n"
             "  --create-full-dep name\tCreate a full make dependency file\n"
@@ -129,7 +131,8 @@ static void Usage (void)
             "  --smart\t\t\tEnable smart mode\n"
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
-            "  --version\t\t\tPrint the assembler version\n",
+            "  --version\t\t\tPrint the assembler version\n"
+            "  --warnings-as-errors\t\tTreat warnings as errors\n",
             ProgName);
 }
 
@@ -488,6 +491,22 @@ static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* 
 /* Add an include search path for binaries */
 {
     AddSearchPath (BinSearchPath, Arg);
+}
+
+
+
+static void OptColor(const char* Opt, const char* Arg)
+/* Handle the --color option */
+{
+    if (strcmp (Arg, "off") == 0 || strcmp (Arg, "false") == 0) {
+        CP_SetColorMode (CM_OFF);
+    } else if (strcmp (Arg, "auto") == 0) {
+        CP_SetColorMode (CM_AUTO);
+    } else if (strcmp (Arg, "on") == 0 || strcmp (Arg, "true") == 0) {
+        CP_SetColorMode (CM_ON);
+    } else {
+        AbEnd ("Invalid argument to %s: %s", Opt, Arg);
+    }
 }
 
 
@@ -1013,6 +1032,7 @@ int main (int argc, char* argv [])
     static const LongOpt OptTab[] = {
         { "--auto-import",         0,      OptAutoImport           },
         { "--bin-include-dir",     1,      OptBinIncludeDir        },
+        { "--color",               1,      OptColor                },
         { "--cpu",                 1,      OptCPU                  },
         { "--create-dep",          1,      OptCreateDep            },
         { "--create-full-dep",     1,      OptCreateFullDep        },
@@ -1039,6 +1059,9 @@ int main (int argc, char* argv [])
     static const StrBuf GlobalNameSpace = STATIC_STRBUF_INITIALIZER;
 
     unsigned I;
+
+    /* Initialize console output */
+    CP_Init ();
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ca65");

@@ -38,6 +38,8 @@
 #include <stdarg.h>
 
 /* common */
+#include "cmdline.h"
+#include "consprop.h"
 #include "strbuf.h"
 
 /* ca65 */
@@ -45,6 +47,7 @@
 #include "filetab.h"
 #include "lineinfo.h"
 #include "nexttok.h"
+#include "spool.h"
 
 
 
@@ -64,6 +67,14 @@ unsigned WarningCount   = 0;
 /* Maximum number of additional notifications */
 #define MAX_NOTES       8
 
+/* Diagnostic category */
+typedef enum { DC_NOTE, DC_WARN, DC_ERR, DC_FATAL, DC_COUNT } DiagCat;
+
+/* Descriptions for diagnostic categories */
+const char* DiagCatDesc[DC_COUNT] = {
+    "Note", "Warning", "Error", "Fatal error"
+};
+
 
 
 /*****************************************************************************/
@@ -72,27 +83,53 @@ unsigned WarningCount   = 0;
 
 
 
-static void VPrintMsg (const FilePos* Pos, const char* Desc,
-                       const char* Format, va_list ap)
+static void VPrintMsg (const FilePos* Pos, DiagCat Cat, const char* Format,
+                       va_list ap)
 /* Format and output an error/warning message. */
 {
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
+    StrBuf S   = AUTO_STRBUF_INITIALIZER;
+    StrBuf Msg = AUTO_STRBUF_INITIALIZER;
+    StrBuf Loc = AUTO_STRBUF_INITIALIZER;
+
+    /* Determine the description for the category and its color */
+    const char* Desc = DiagCatDesc[Cat];
+    const char* Color;
+    switch (Cat) {
+        case DC_NOTE:   Color = CP_Cyan ();             break;
+        case DC_WARN:   Color = CP_Yellow ();           break;
+        case DC_ERR:    Color = CP_BrightRed ();        break;
+        case DC_FATAL:  Color = CP_BrightRed ();        break;
+        default:        FAIL ("Unexpected Cat value");  break;
+    }
 
     /* Format the actual message */
-    StrBuf Msg = STATIC_STRBUF_INITIALIZER;
     SB_VPrintf (&Msg, Format, ap);
     SB_Terminate (&Msg);
 
-    /* Format the message header */
-    SB_Printf (&S, "%s:%u: %s: ",
-               SB_GetConstBuf (GetFileName (Pos->Name)),
-               Pos->Line,
-               Desc);
+    /* Format the location. If the file position is valid, we use the file
+    ** position, otherwise the program name. This allows to print fatal
+    ** errors in the startup phase.
+    */
+    if (Pos->Name == EMPTY_STRING_ID) {
+        SB_CopyStr (&Loc, ProgName);
+    } else {
+        SB_Printf (&Loc, "%s:%u", SB_GetConstBuf (GetFileName (Pos->Name)),
+                   Pos->Line);
+    }
+    SB_Terminate (&Loc);
 
-    /* Append the message to the message header */
-    SB_Append (&S, &Msg);
+    /* Format the full message */
+    SB_Printf (&S, "%s%s: %s%s:%s %s%s",
+               CP_White (),
+               SB_GetConstBuf (&Loc),
+               Color,
+               Desc,
+               CP_White (),
+               SB_GetConstBuf (&Msg),
+               CP_Reset ());
 
-    /* Delete the formatted message */
+    /* Delete the formatted message and the location string */
+    SB_Done (&Loc);
     SB_Done (&Msg);
 
     /* Add a new line and terminate the generated full message */
@@ -183,7 +220,7 @@ void PNotification (const FilePos* Pos, const char* Format, ...)
     /* Output the message */
     va_list ap;
     va_start (ap, Format);
-    VPrintMsg (Pos, "Note", Format, ap);
+    VPrintMsg (Pos, DC_NOTE, Format, ap);
     va_end (ap);
 }
 
@@ -202,7 +239,7 @@ static void WarningMsg (const Collection* LineInfos, const char* Format, va_list
     const LineInfo* LI = CollConstAt (LineInfos, 0);
 
     /* Output a warning for this position */
-    VPrintMsg (GetSourcePos (LI), "Warning", Format, ap);
+    VPrintMsg (GetSourcePos (LI), DC_WARN, Format, ap);
 
     /* Add additional notifications if necessary */
     AddNotifications (LineInfos);
@@ -243,7 +280,7 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...)
     if (Level <= WarnLevel) {
         va_list ap;
         va_start (ap, Format);
-        VPrintMsg (Pos, "Warning", Format, ap);
+        VPrintMsg (Pos, DC_WARN, Format, ap);
         va_end (ap);
 
         /* Count warnings */
@@ -280,7 +317,7 @@ void ErrorMsg (const Collection* LineInfos, const char* Format, va_list ap)
     const LineInfo* LI = CollConstAt (LineInfos, 0);
 
     /* Output an error for this position */
-    VPrintMsg (GetSourcePos (LI), "Error", Format, ap);
+    VPrintMsg (GetSourcePos (LI), DC_ERR, Format, ap);
 
     /* Add additional notifications if necessary */
     AddNotifications (LineInfos);
@@ -317,7 +354,7 @@ void PError (const FilePos* Pos, const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    VPrintMsg (Pos, "Error", Format, ap);
+    VPrintMsg (Pos, DC_ERR, Format, ap);
     va_end (ap);
 
     /* Count errors */
@@ -371,17 +408,11 @@ void ErrorSkip (const char* Format, ...)
 void Fatal (const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
+    /* Output the message ... */
     va_list ap;
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
-
     va_start (ap, Format);
-    SB_VPrintf (&S, Format, ap);
-    SB_Terminate (&S);
+    VPrintMsg (&CurTok.Pos, DC_FATAL, Format, ap);
     va_end (ap);
-
-    fprintf (stderr, "Fatal error: %s\n", SB_GetConstBuf (&S));
-
-    SB_Done (&S);
 
     /* And die... */
     exit (EXIT_FAILURE);

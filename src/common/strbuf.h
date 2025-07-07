@@ -334,7 +334,7 @@ void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char *Cooked, unsi
 INLINE void SB_CopyStr (StrBuf* Target, const char* S)
 /* Copy S to Target, discarding the old contents of Target */
 {
-    SB_CopyBuf (Target, S, strlen (S));
+    SB_CopyBuf (Target, S, (unsigned) strlen (S));
 }
 #else
 void SB_CopyStr (StrBuf* Target, const char* S);
@@ -361,12 +361,12 @@ void SB_AppendCharCooked (StrBuf* B, int C, int Cooked);
 
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size);
 /* Append a character buffer to the end of the string buffer */
-
+				   
 #if defined(HAVE_INLINE)
 INLINE void SB_AppendStr (StrBuf* B, const char* S)
 /* Append a string to the end of the string buffer */
 {
-    SB_AppendBuf (B, S, strlen (S));
+    SB_AppendBuf (B, S, (unsigned) strlen (S));
 }
 #else
 void SB_AppendStr (StrBuf* B, const char* S);

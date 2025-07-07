@@ -41,7 +41,6 @@
 /* common */
 #include "coll.h"
 #include "fragdefs.h"
-#include "inline.h"
 
 /* ca65 */
 #include "fragment.h"
@@ -99,35 +98,23 @@ Fragment* GenFragment (unsigned char Type, unsigned short Len);
 void UseSeg (const SegDef* D);
 /* Use the given segment */
 
-#if defined(HAVE_INLINE)
-INLINE const SegDef* GetCurrentSegDef (void)
+static inline const SegDef* GetCurrentSegDef (void)
 /* Get a pointer to the segment defininition of the current segment */
 {
     return ActiveSeg->Def;
 }
-#else
-#  define GetCurrentSegDef()    (ActiveSeg->Def)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetCurrentSegNum (void)
+static inline unsigned GetCurrentSegNum (void)
 /* Get the number of the current segment */
 {
     return ActiveSeg->Num;
 }
-#else
-#  define GetCurrentSegNum()    (ActiveSeg->Num)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned char GetCurrentSegAddrSize (void)
+static inline unsigned char GetCurrentSegAddrSize (void)
 /* Get the address size of the current segment */
 {
     return ActiveSeg->Def->AddrSize;
 }
-#else
-#  define GetCurrentSegAddrSize()    (ActiveSeg->Def->AddrSize)
-#endif
 
 void SegAlign (unsigned long Alignment, int FillVal);
 /* Align the PC segment to Alignment. If FillVal is -1, emit fill fragments

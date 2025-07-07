@@ -878,16 +878,6 @@ int IsTypeFragBitField (const Type* T)
 
 
 
-#if !defined(HAVE_INLINE)
-int IsTypeFuncLike (const Type* T)
-/* Return true if this is a function or a function pointer */
-{
-    return IsTypeFunc (T) || IsTypeFuncPtr (T);
-}
-#endif
-
-
-
 int IsObjectType (const Type* T)
 /* Return true if this is a fully described object type */
 {

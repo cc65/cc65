@@ -62,17 +62,6 @@ const StrBuf EmptyStrBuf = STATIC_STRBUF_INITIALIZER;
 
 
 
-#if !defined(HAVE_INLINE)
-StrBuf* SB_Init (StrBuf* B)
-/* Initialize a string buffer */
-{
-    *B = EmptyStrBuf;
-    return B;
-}
-#endif
-
-
-
 StrBuf* SB_InitFromString (StrBuf* B, const char* S)
 /* Initialize a string buffer from a literal string. Beware: The buffer won't
 ** store a copy but a pointer to the actual string.
@@ -195,17 +184,6 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
 
 
 
-#if !defined(HAVE_INLINE)
-char SB_At (const StrBuf* B, unsigned Index)
-/* Get a character from the buffer */
-{
-    PRECONDITION (Index < B->Len);
-    return B->Buf[Index];
-}
-#endif
-
-
-
 void SB_Drop (StrBuf* B, unsigned Count)
 /* Drop characters from the end of the string. */
 {
@@ -263,27 +241,6 @@ void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char* Cooked, unsi
 
 
 
-#if !defined(HAVE_INLINE)
-void SB_CopyStr (StrBuf* Target, const char* S)
-/* Copy S to Target, discarding the old contents of Target */
-{
-    SB_CopyBuf (Target, S, strlen (S));
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void SB_Copy (StrBuf* Target, const StrBuf* Source)
-/* Copy Source to Target, discarding the old contents of Target */
-{
-    SB_CopyBufCooked (Target, Source->Buf, Source->Cooked, Source->Len);
-    Target->Index = Source->Index;
-}
-#endif
-
-
-
 void SB_AppendChar (StrBuf* B, int C)
 /* Append a character to a string buffer */
 {
@@ -323,46 +280,6 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
     memcpy (B->Cooked + B->Len, S, Size);
     B->Len = NewLen;
 }
-
-
-
-#if !defined(HAVE_INLINE)
-void SB_AppendStr (StrBuf* B, const char* S)
-/* Append a string to the end of the string buffer */
-{
-    SB_AppendBuf (B, S, strlen (S));
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void SB_Append (StrBuf* Target, const StrBuf* Source)
-/* Append the contents of Source to Target */
-{
-    unsigned NewLen = Target->Len + Source->Len;
-    if (NewLen > Target->Allocated) {
-        SB_Realloc (Target, NewLen);
-    }
-    memcpy (Target->Buf + Target->Len, Source->Buf, Source->Len);
-    memcpy (Target->Cooked + Target->Len, Source->Cooked, Source->Len);
-    Target->Len = NewLen;
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void SB_Cut (StrBuf* B, unsigned Len)
-/* Cut the contents of B at the given length. If the current length of the
-** buffer is smaller than Len, nothing will happen.
-*/
-{
-    if (Len < B->Len) {
-        B->Len = Len;
-    }
-}
-#endif
 
 
 

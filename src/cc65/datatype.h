@@ -42,7 +42,6 @@
 
 /* common */
 #include "attrib.h"
-#include "inline.h"
 #include "mmodel.h"
 
 /* cc65 */
@@ -258,15 +257,11 @@ Type* TypeAlloc (unsigned Len);
 void TypeFree (Type* T);
 /* Free a type string */
 
-#if defined(HAVE_INLINE)
-INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
+static inline void CopyTypeAttr (const Type* Src, Type* Dest)
 /* Copy attribute data from Src to Dest */
 {
     Dest->A = Src->A;
 }
-#else
-#  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
-#endif
 
 
 
@@ -316,104 +311,68 @@ unsigned CheckedPSizeOf (const Type* T);
 ** the rest of the compiler doesn't have to work with invalid sizes).
 */
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetQualifier (const Type* T)
+static inline TypeCode GetQualifier (const Type* T)
 /* Get the qualifier from the given type. This doesn't have a "raw" version
 ** since an underlying type can never be qualified.
 */
 {
     return (T->C & T_MASK_QUAL);
 }
-#else
-#  define GetQualifier(T)       ((T)->C & T_MASK_QUAL)
-#endif
 
 TypeCode GetUnderlyingTypeCode (const Type* Type);
 /* Get the type code of the unqualified underlying type of Type.
 ** Return GetUnqualRawTypeCode (Type) if Type is not scalar.
 */
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetUnqualRawTypeCode (const Type* T)
+static inline TypeCode GetUnqualRawTypeCode (const Type* T)
 /* Return the unqualified raw type code */
 {
     return (T->C & ~T_MASK_QUAL);
 }
-#else
-#  define GetUnqualRawTypeCode(T)   ((T)->C & ~T_MASK_QUAL)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetTypeClass (const Type* T)
+static inline TypeCode GetTypeClass (const Type* T)
 /* Get the class of a type. This doesn't have a "raw" version since an
 ** underlying type can never be in a different class.
 */
 {
     return (T->C & T_MASK_CLASS);
 }
-#else
-#  define GetTypeClass(T)       ((T)->C & T_MASK_CLASS)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetTypeRank (const Type* T)
+static inline TypeCode GetTypeRank (const Type* T)
 /* Get the type rank of a type */
 {
     return (GetUnderlyingTypeCode (T) & T_MASK_RANK);
 }
-#else
-#  define GetTypeRank(T)        (GetUnderlyingTypeCode (T) & T_MASK_RANK)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetSignedness (const Type* T)
+static inline TypeCode GetSignedness (const Type* T)
 /* Get the signedness of a type */
 {
     return (GetUnderlyingTypeCode (T) & T_MASK_SIGN);
 }
-#else
-#  define GetSignedness(T)      (GetUnderlyingTypeCode (T) & T_MASK_SIGN)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetSizeModifier (const Type* T)
+static inline TypeCode GetSizeModifier (const Type* T)
 /* Get the size modifier of a type */
 {
     return (GetUnderlyingTypeCode (T) & T_MASK_SIZE);
 }
-#else
-#  define GetSizeModifier(T)    (GetUnderlyingTypeCode (T) & T_MASK_SIZE)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetRawTypeRank (const Type* T)
+static inline TypeCode GetRawTypeRank (const Type* T)
 /* Get the raw type rank of a type */
 {
     return (T->C & T_MASK_RANK);
 }
-#else
-#  define GetRawTypeRank(T)     ((T)->C & T_MASK_RANK)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetRawSignedness (const Type* T)
+static inline TypeCode GetRawSignedness (const Type* T)
 /* Get the raw signedness of a type */
 {
     return (T->C & T_MASK_SIGN);
 }
-#else
-#  define GetRawSignedness(T)   ((T)->C & T_MASK_SIGN)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode GetRawSizeModifier (const Type* T)
+static inline TypeCode GetRawSizeModifier (const Type* T)
 /* Get the raw size modifier of a type */
 {
     return (T->C & T_MASK_SIZE);
 }
-#else
-#  define GetRawSizeModifier(T) ((T)->C & T_MASK_SIZE)
-#endif
 
 
 
@@ -498,263 +457,162 @@ const Type* GetBitFieldChunkType (const Type* Type);
 
 
 
-#if defined(HAVE_INLINE)
-INLINE int IsRankChar (const Type* T)
+static inline int IsRankChar (const Type* T)
 /* Return true if this is a character type */
 {
     return (GetTypeRank (T) == T_RANK_CHAR);
 }
-#else
-#  define IsRankChar(T)         (GetTypeRank (T) == T_RANK_CHAR)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsRankShort (const Type* T)
+static inline int IsRankShort (const Type* T)
 /* Return true if this is a short type (signed or unsigned) */
 {
     return (GetTypeRank (T) == T_RANK_SHORT);
 }
-#else
-#  define IsRankShort(T)        (GetTypeRank (T) == T_RANK_SHORT)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsRankInt (const Type* T)
+static inline int IsRankInt (const Type* T)
 /* Return true if this is an int type (signed or unsigned) */
 {
     return (GetTypeRank (T) == T_RANK_INT);
 }
-#else
-#  define IsRankInt(T)          (GetTypeRank (T) == T_RANK_INT)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsRankLong (const Type* T)
+static inline int IsRankLong (const Type* T)
 /* Return true if this is a long int type (signed or unsigned) */
 {
     return (GetTypeRank (T) == T_RANK_LONG);
 }
-#else
-#  define IsRankLong(T)         (GetTypeRank (T) == T_RANK_LONG)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsDeclTypeChar (const Type* T)
+static inline int IsDeclTypeChar (const Type* T)
 /* Return true if this is declared as a char type (without signed/unsigned).
 ** This function is to exclude enums whose underlying type is char.
 */
 {
     return (GetUnqualRawTypeCode (T) == T_CHAR);
 }
-#else
-#  define IsDeclTypeChar(T)     (GetUnqualRawTypeCode (T) == T_CHAR)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsDeclRankChar (const Type* T)
+static inline int IsDeclRankChar (const Type* T)
 /* Return true if this is declared as a character type (including signed/unsigned).
 ** This function is to exclude enums whose underlying types are character types.
 */
 {
     return (GetRawTypeRank (T) == T_RANK_CHAR);
 }
-#else
-#  define IsDeclRankChar(T)     (GetRawTypeRank (T) == T_RANK_CHAR)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeFloat (const Type* T)
+static inline int IsTypeFloat (const Type* T)
 /* Return true if this is a float type */
 {
     return (GetRawTypeRank (T) == T_RANK_FLOAT);
 }
-#else
-#  define IsTypeFloat(T)        (GetRawTypeRank (T) == T_RANK_FLOAT)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeDouble (const Type* T)
+static inline int IsTypeDouble (const Type* T)
 /* Return true if this is a double type */
 {
     return (GetRawTypeRank (T) == T_RANK_DOUBLE);
 }
-#else
-#  define IsTypeDouble(T)       (GetRawTypeRank (T) == T_RANK_DOUBLE)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypePtr (const Type* T)
+static inline int IsTypePtr (const Type* T)
 /* Return true if this is a pointer type */
 {
     return (GetRawTypeRank (T) == T_RANK_PTR);
 }
-#else
-#  define IsTypePtr(T)          (GetRawTypeRank (T) == T_RANK_PTR)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeEnum (const Type* T)
+static inline int IsTypeEnum (const Type* T)
 /* Return true if this is an enum type */
 {
     return (GetRawTypeRank (T) == T_RANK_ENUM);
 }
-#else
-#  define IsTypeEnum(T)         (GetRawTypeRank (T) == T_RANK_ENUM)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeSignedBitField (const Type* T)
+static inline int IsTypeSignedBitField (const Type* T)
 /* Return true if this is a signed bit-field */
 {
     return (GetUnqualRawTypeCode (T) == T_SBITFIELD);
 }
-#else
-#  define IsTypeSignedBitField(T)   (GetUnqualRawTypeCode (T) == T_SBITFIELD)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeUnsignedBitField (const Type* T)
+static inline int IsTypeUnsignedBitField (const Type* T)
 /* Return true if this is an unsigned bit-field */
 {
     return (GetUnqualRawTypeCode (T) == T_UBITFIELD);
 }
-#else
-#  define IsTypeUnsignedBitField(T) (GetUnqualRawTypeCode (T) == T_UBITFIELD)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeBitField (const Type* T)
+static inline int IsTypeBitField (const Type* T)
 /* Return true if this is a bit-field (either signed or unsigned) */
 {
     return IsTypeSignedBitField (T) || IsTypeUnsignedBitField (T);
 }
-#else
-#  define IsTypeBitField(T)     (IsTypeSignedBitField (T) || IsTypeUnsignedBitField (T))
-#endif
 
 int IsTypeFragBitField (const Type* T);
 /* Return true if this is a bit-field that shares byte space with other fields */
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeStruct (const Type* T)
+static inline int IsTypeStruct (const Type* T)
 /* Return true if this is a struct type */
 {
     return (GetRawTypeRank (T) == T_RANK_STRUCT);
 }
-#else
-#  define IsTypeStruct(T)       (GetRawTypeRank (T) == T_RANK_STRUCT)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeUnion (const Type* T)
+static inline int IsTypeUnion (const Type* T)
 /* Return true if this is a union type */
 {
     return (GetRawTypeRank (T) == T_RANK_UNION);
 }
-#else
-#  define IsTypeUnion(T)        (GetRawTypeRank (T) == T_RANK_UNION)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeArray (const Type* T)
+static inline int IsTypeArray (const Type* T)
 /* Return true if this is an array type */
 {
     return (GetRawTypeRank (T) == T_RANK_ARRAY);
 }
-#else
-#  define IsTypeArray(T)        (GetRawTypeRank (T) == T_RANK_ARRAY)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeVoid (const Type* T)
+static inline int IsTypeVoid (const Type* T)
 /* Return true if this is a void type */
 {
     return (GetRawTypeRank (T) == T_RANK_VOID);
 }
-#else
-#  define IsTypeVoid(T)         (GetRawTypeRank (T) == T_RANK_VOID)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeFunc (const Type* T)
+static inline int IsTypeFunc (const Type* T)
 /* Return true if this is a function type */
 {
     return (GetRawTypeRank (T) == T_RANK_FUNC);
 }
-#else
-#  define IsTypeFunc(T)         (GetRawTypeRank (T) == T_RANK_FUNC)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeFuncPtr (const Type* T)
+static inline int IsTypeFuncPtr (const Type* T)
 /* Return true if this is a function pointer type */
 {
     return (IsTypePtr (T) && IsTypeFunc (T+1));
 }
-#else
-#  define IsTypeFuncPtr(T)      (IsTypePtr (T) && IsTypeFunc (T+1))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsTypeFuncLike (const Type* T)
+static inline int IsTypeFuncLike (const Type* T)
 /* Return true if this is a function or a function pointer */
 {
     return IsTypeFunc (T) || IsTypeFuncPtr (T);
 }
-#else
-int IsTypeFuncLike (const Type* T);
-/* Return true if this is a function or a function pointer */
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsClassInt (const Type* T)
+static inline int IsClassInt (const Type* T)
 /* Return true if this is an integer type */
 {
     return (GetTypeClass (T) == T_CLASS_INT);
 }
-#else
-#  define IsClassInt(T)         (GetTypeClass (T) == T_CLASS_INT)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsClassFloat (const Type* T)
+static inline int IsClassFloat (const Type* T)
 /* Return true if this is a floating type */
 {
     return (GetTypeClass (T) == T_CLASS_FLOAT);
 }
-#else
-#  define IsClassFloat(T)       (GetTypeClass (T) == T_CLASS_FLOAT)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsClassPtr (const Type* T)
+static inline int IsClassPtr (const Type* T)
 /* Return true if this is a pointer or array type */
 {
     return (GetTypeClass (T) == T_CLASS_PTR);
 }
-#else
-#  define IsClassPtr(T)         (GetTypeClass (T) == T_CLASS_PTR)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsClassStruct (const Type* T)
+static inline int IsClassStruct (const Type* T)
 /* Return true if this is a struct or union type */
 {
     return (GetTypeClass (T) == T_CLASS_STRUCT);
 }
-#else
-#  define IsClassStruct(T)      (GetTypeClass (T) == T_CLASS_STRUCT)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsClassFunc (const Type* T)
+static inline int IsClassFunc (const Type* T)
 /* Return true if this is a function type */
 {
     return (GetTypeClass (T) == T_CLASS_FUNC);
 }
-#else
-#  define IsClassFunc(T)        (GetTypeClass (T) == T_CLASS_FUNC)
-#endif
 
 int IsObjectType (const Type* T);
 /* Return true if this is a fully described object type */
@@ -813,45 +671,29 @@ int HasUnknownSize (const Type* T);
 int TypeHasAttrData (const Type* T);
 /* Return true if the given type has attribute data */
 
-#if defined(HAVE_INLINE)
-INLINE int IsRawSignUnsigned (const Type* T)
+static inline int IsRawSignUnsigned (const Type* T)
 /* Return true if this is an unsigned raw type */
 {
     return (GetRawSignedness (T) == T_SIGN_UNSIGNED);
 }
-#else
-#  define IsRawSignUnsigned(T)  (GetRawSignedness (T) == T_SIGN_UNSIGNED)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsSignUnsigned (const Type* T)
+static inline int IsSignUnsigned (const Type* T)
 /* Return true if this is an unsigned type */
 {
     return (GetSignedness (T) == T_SIGN_UNSIGNED);
 }
-#else
-#  define IsSignUnsigned(T)     (GetSignedness (T) == T_SIGN_UNSIGNED)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsRawSignSigned (const Type* T)
+static inline int IsRawSignSigned (const Type* T)
 /* Return true if this is a signed raw type */
 {
     return (GetRawSignedness (T) == T_SIGN_SIGNED);
 }
-#else
-#  define IsRawSignSigned(T)    (GetRawSignedness (T) == T_SIGN_SIGNED)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsSignSigned (const Type* T)
+static inline int IsSignSigned (const Type* T)
 /* Return true if this is a signed type */
 {
     return (GetSignedness (T) == T_SIGN_SIGNED);
 }
-#else
-#  define IsSignSigned(T)       (GetSignedness (T) == T_SIGN_SIGNED)
-#endif
 
 
 
@@ -861,108 +703,68 @@ INLINE int IsSignSigned (const Type* T)
 
 
 
-#if defined(HAVE_INLINE)
-INLINE int IsQualConst (const Type* T)
+static inline int IsQualConst (const Type* T)
 /* Return true if the given type has a const memory image */
 {
     return (T->C & T_QUAL_CONST) != 0;
 }
-#else
-#  define IsQualConst(T)        (((T)->C & T_QUAL_CONST) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsQualVolatile (const Type* T)
+static inline int IsQualVolatile (const Type* T)
 /* Return true if the given type has a volatile type qualifier */
 {
     return (T->C & T_QUAL_VOLATILE) != 0;
 }
-#else
-#  define IsQualVolatile(T)     (((T)->C & T_QUAL_VOLATILE) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsQualRestrict (const Type* T)
+static inline int IsQualRestrict (const Type* T)
 /* Return true if the given type has a restrict qualifier */
 {
     return (T->C & T_QUAL_RESTRICT) != 0;
 }
-#else
-#  define IsQualRestrict(T)     (((T)->C & T_QUAL_RESTRICT) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsQualNear (const Type* T)
+static inline int IsQualNear (const Type* T)
 /* Return true if the given type has a near qualifier */
 {
     return (T->C & T_QUAL_NEAR) != 0;
 }
-#else
-#  define IsQualNear(T)         (((T)->C & T_QUAL_NEAR) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsQualFar (const Type* T)
+static inline int IsQualFar (const Type* T)
 /* Return true if the given type has a far qualifier */
 {
     return (T->C & T_QUAL_FAR) != 0;
 }
-#else
-#  define IsQualFar(T)          (((T)->C & T_QUAL_FAR) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsQualFastcall (const Type* T)
+static inline int IsQualFastcall (const Type* T)
 /* Return true if the given type has a fastcall qualifier */
 {
     return (T->C & T_QUAL_FASTCALL) != 0;
 }
-#else
-#  define IsQualFastcall(T)     (((T)->C & T_QUAL_FASTCALL) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsQualCDecl (const Type* T)
+static inline int IsQualCDecl (const Type* T)
 /* Return true if the given type has a cdecl qualifier */
 {
     return (T->C & T_QUAL_CDECL) != 0;
 }
-#else
-#  define IsQualCDecl(T)        (((T)->C & T_QUAL_CDECL) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IsQualCConv (const Type* T)
+static inline int IsQualCConv (const Type* T)
 /* Return true if the given type has a calling convention qualifier */
 {
     return (T->C & T_QUAL_CCONV) != 0;
 }
-#else
-#  define IsQualCConv(T)        (((T)->C & T_QUAL_CCONV) != 0)
-#endif
 
 TypeCode AddrSizeQualifier (unsigned AddrSize);
 /* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode CodeAddrSizeQualifier (void)
+static inline TypeCode CodeAddrSizeQualifier (void)
 /* Return T_QUAL_NEAR or T_QUAL_FAR depending on the code address size */
 {
     return AddrSizeQualifier (CodeAddrSize);
 }
-#else
-#  define CodeAddrSizeQualifier()      (AddrSizeQualifier (CodeAddrSize))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE TypeCode DataAddrSizeQualifier (void)
+static inline TypeCode DataAddrSizeQualifier (void)
 /* Return T_QUAL_NEAR or T_QUAL_FAR depending on the data address size */
 {
     return AddrSizeQualifier (DataAddrSize);
 }
-#else
-#  define DataAddrSizeQualifier()      (AddrSizeQualifier (DataAddrSize))
-#endif
 
 
 

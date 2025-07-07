@@ -87,25 +87,17 @@ struct Fragment {
 Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
 /* Create a new fragment and insert it into the section S */
 
-#if defined(HAVE_INLINE)
-INLINE const char* GetFragmentSourceName (const Fragment* F)
+static inline const char* GetFragmentSourceName (const Fragment* F)
 /* Return the name of the source file for this fragment */
 {
     return GetSourceNameFromList (&F->LineInfos);
 }
-#else
-#  define GetFragmentSourceName(F)      GetSourceNameFromList (&(F)->LineInfos)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetFragmentSourceLine (const Fragment* F)
+static inline unsigned GetFragmentSourceLine (const Fragment* F)
 /* Return the source file line for this fragment */
 {
     return GetSourceLineFromList (&F->LineInfos);
 }
-#else
-#  define GetFragmentSourceLine(F)      GetSourceLineFromList (&(F)->LineInfos)
-#endif
 
 
 

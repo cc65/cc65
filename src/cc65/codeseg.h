@@ -43,7 +43,6 @@
 /* common */
 #include "attrib.h"
 #include "coll.h"
-#include "inline.h"
 
 /* cc65 */
 #include "codelab.h"
@@ -106,15 +105,11 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap) attr
 void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, ...) attribute ((format(printf,3,4)));
 /* Add a line to the given code segment */
 
-#if defined(HAVE_INLINE)
-INLINE unsigned CS_GetEntryCount (const CodeSeg* S)
+static inline unsigned CS_GetEntryCount (const CodeSeg* S)
 /* Return the number of entries for the given code segment */
 {
     return CollCount (&S->Entries);
 }
-#else
-#  define CS_GetEntryCount(S)   CollCount (&(S)->Entries)
-#endif
 
 void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index);
 /* Insert the code entry at the index given. Following code entries will be
@@ -145,27 +140,19 @@ void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos
 ** current code end)
 */
 
-#if defined(HAVE_INLINE)
-INLINE void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
+static inline void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
 /* Move an entry from one position to another. OldPos is the current position
 ** of the entry, NewPos is the new position of the entry.
 */
 {
     CollMove (&S->Entries, OldPos, NewPos);
 }
-#else
-#  define CS_MoveEntry(S, OldPos, NewPos)       CollMove (&(S)->Entries, OldPos, NewPos)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE struct CodeEntry* CS_GetEntry (CodeSeg* S, unsigned Index)
+static inline struct CodeEntry* CS_GetEntry (CodeSeg* S, unsigned Index)
 /* Get an entry from the given code segment */
 {
     return CollAt (&S->Entries, Index);
 }
-#else
-#  define CS_GetEntry(S, Index) ((struct CodeEntry*) CollAt(&(S)->Entries, (Index)))
-#endif
 
 struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index);
 /* Get the code entry preceeding the one with the index Index. If there is no
@@ -192,17 +179,13 @@ int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count);
 ** possible span instead.
 */
 
-#if defined(HAVE_INLINE)
-INLINE int CS_HavePendingLabel (const CodeSeg* S)
+static inline int CS_HavePendingLabel (const CodeSeg* S)
 /* Return true if there are open labels that will get attached to the next
 ** instruction that is added.
 */
 {
     return (CollCount (&S->Labels) > 0);
 }
-#else
-#  define CS_HavePendingLabel(S)        (CollCount (&(S)->Labels) > 0)
-#endif
 
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name);
 /* Add a code label for the next instruction to follow */
@@ -253,18 +236,13 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last);
 void CS_ResetMarks (CodeSeg* S, unsigned First, unsigned Last);
 /* Remove all user marks from the entries in the given range */
 
-#if defined(HAVE_INLINE)
-INLINE void CS_ResetAllMarks (CodeSeg* S)
+static inline void CS_ResetAllMarks (CodeSeg* S)
 /* Remove all user marks from the code segment */
 {
     if (CS_GetEntryCount (S) > 0) {
         CS_ResetMarks (S, 0, CS_GetEntryCount (S));
     }
 }
-#else
-#  define CS_ResetAllMarks(S) \
-        ((CS_GetEntryCount (S) > 0)? CS_ResetMarks (S, 0, CS_GetEntryCount (S)) : (void) 0)
-#endif
 
 int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last);
 /* Check if the given code segment range is a basic block. That is, check if

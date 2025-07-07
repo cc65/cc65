@@ -70,45 +70,29 @@ CaseNode* NewCaseNode (unsigned char Value);
 void FreeCaseNode (CaseNode* N);
 /* Delete a case node plus all sub nodes */
 
-#if defined(HAVE_INLINE)
-INLINE CaseNode* CN_GetSubNode (CaseNode* N, unsigned Index)
+static inline CaseNode* CN_GetSubNode (CaseNode* N, unsigned Index)
 /* Get a sub node of the given node */
 {
     return CollAt (N->Nodes, Index);
 }
-#else
-#  define CN_GetSubNode(N, Index) CollAt (&(N)->Nodes, Index)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned char CN_GetValue (const CaseNode* N)
+static inline unsigned char CN_GetValue (const CaseNode* N)
 /* Return the value for a case node */
 {
     return N->Value;
 }
-#else
-#  define CN_GetValue(N)  ((N)->Value)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned CN_GetLabel (const CaseNode* N)
+static inline unsigned CN_GetLabel (const CaseNode* N)
 /* Return the label for a case node */
 {
     return N->Label;
 }
-#else
-#  define CN_GetLabel(N)  ((N)->Label)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int CN_IsLeafNode (const CaseNode* N)
+static inline int CN_IsLeafNode (const CaseNode* N)
 /* Return true if this is a leaf node */
 {
     return (N->Nodes == 0);
 }
-#else
-#  define CN_IsLeafNode(N)  ((N)->Nodes == 0)
-#endif
 
 void FreeCaseNodeColl (Collection* Nodes);
 /* Free a collection of case nodes */

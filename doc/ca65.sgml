@@ -918,6 +918,7 @@ See the description of the <tt><ref id=".PROC" name=".PROC"></tt>
 directive for more information.
 
 
+<label id=cheap-locals>
 <sect1>Cheap local labels<p>
 
 Cheap local labels are defined like standard labels, but the name of the
@@ -3751,20 +3752,23 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.LOCAL</tt><label id=".LOCAL"><p>
 
-  This command may only be used inside a macro definition. It declares a
-  list of identifiers as local to the macro expansion.
+  This command may only be used inside a macro definition. It declares a list
+  of identifiers as local to the macro expansion. The identifers may be
+  standard identifiers or cheap local identifiers depending on the planed use.
 
   A problem when using macros are labels: Since they don't change their name,
   you get a "duplicate symbol" error if the macro is expanded the second time.
   Labels declared with <tt><ref id=".LOCAL" name=".LOCAL"></tt> have their
-  name mapped to an internal unique name (<tt/___ABCD__/) with each macro
+  name replaced by an internally generated unique name for each macro
   invocation.
 
-  Some other assemblers start a new lexical block inside a macro expansion.
-  This has some drawbacks however, since that will not allow <em/any/ symbol
-  to be visible outside a macro, a feature that is sometimes useful. The
-  <tt><ref id=".LOCAL" name=".LOCAL"></tt> command is in my eyes a better way
-  to address the problem.
+  Please note that while the generated names are unique and guaranteed to not
+  clash with any user generated names, they are still regular symbols and
+  added to the current scope. This means that a local macro label will start a
+  new scope for cheap locals whenever the macro is expanded. To avoid that,
+  you may also use a <ref id="cheap-locals" name="cheap local symbol"> for the
+  name. In this case the assembler will generate unique cheap local
+  identifiers instead of standard ones.
 
   You get an error when using <tt><ref id=".LOCAL" name=".LOCAL"></tt> outside
   a macro.

@@ -44,10 +44,8 @@
 
 
 
-#if defined(__GNUC__) && !defined(DISABLE_INLINE)
-#  define HAVE_INLINE   1
-#  define INLINE        static __inline__
-#endif
+#define HAVE_INLINE   1
+#define INLINE        static inline
 
 
 

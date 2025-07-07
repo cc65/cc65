@@ -60,6 +60,7 @@
 #include "dbginfo.h"
 #include "enum.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "feature.h"
 #include "filetab.h"
@@ -1038,13 +1039,13 @@ static void DoFeature (void)
         Feature = FindFeature (&CurTok.SVal);
         if (Feature == FEAT_UNKNOWN) {
             /* Not found */
-            ErrorSkip ("Invalid feature: '%m%p'", &CurTok.SVal);
+            ErrorSkip ("Invalid feature: `%m%p'", &CurTok.SVal);
             return;
         }
 
         if (Feature == FEAT_ADDRSIZE) {
-            Warning (1, "Deprecated feature: '.feature addrsize'. "
-                     "Pseudo function .addrsize is always available.");
+            Warning (1, "Deprecated feature `addrsize'");
+            Notification ("Pseudo function `.addrsize' is always available");
         }
 
         NextTok ();
@@ -1270,7 +1271,7 @@ static void DoIncBin (void)
         char* PathName = SearchFile (BinSearchPath, SB_GetConstBuf (&Name));
         if (PathName == 0 || (F = fopen (PathName, "rb")) == 0) {
             /* Not found or cannot open, print an error and bail out */
-            ErrorSkip ("Cannot open include file '%m%p': %s", &Name, strerror (errno));
+            ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
             xfree (PathName);
             goto ExitPoint;
         }
@@ -1296,7 +1297,7 @@ static void DoIncBin (void)
     */
     SB_Terminate (&Name);
     if (FileStat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
-        Fatal ("Cannot stat input file '%m%p': %s", &Name, strerror (errno));
+        Fatal ("Cannot stat input file `%m%p': %s", &Name, strerror (errno));
     }
 
     /* Add the file to the input file table */
@@ -1336,7 +1337,7 @@ static void DoIncBin (void)
         size_t BytesRead = fread (Buf, 1, BytesToRead, F);
         if (BytesToRead != BytesRead) {
             /* Some sort of error */
-            ErrorSkip ("Cannot read from include file '%m%p': %s",
+            ErrorSkip ("Cannot read from include file `%m%p': %s",
                        &Name, strerror (errno));
             break;
         }
@@ -2019,7 +2020,7 @@ static void DoUnDef (void)
 static void DoUnexpected (void)
 /* Got an unexpected keyword */
 {
-    Error ("Unexpected '%m%p'", &Keyword);
+    Error ("Unexpected `%m%p'", &Keyword);
     SkipUntilSep ();
 }
 

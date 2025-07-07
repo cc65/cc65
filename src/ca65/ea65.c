@@ -37,6 +37,7 @@
 #include "ea.h"
 #include "ea65.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "instr.h"
 #include "nexttok.h"
@@ -62,11 +63,11 @@ void GetEA (EffAddr* A)
     if (BracketAsIndirect) {
         IndirectEnter = TOK_LBRACK;
         IndirectLeave = TOK_RBRACK;
-        IndirectExpect = "Expected ']'";
+        IndirectExpect = "Expected `]'";
     } else {
         IndirectEnter = TOK_LPAREN;
         IndirectLeave = TOK_RPAREN;
-        IndirectExpect = "Expected ')'";
+        IndirectExpect = "Expected `)'";
     }
 
     /* Clear the output struct */
@@ -145,12 +146,12 @@ void GetEA (EffAddr* A)
                 A->AddrModeSet = AM65_STACK_REL_IND_Y;
                 if (!Consume (IndirectLeave, IndirectExpect) ||
                     !ConsumeComma ()                         ||
-                    !Consume (TOK_Y, "Expected 'Y'")) {
+                    !Consume (TOK_Y, "Expected `Y'")) {
                     /* In case of errors skip anything else on the line */
                     SkipUntilSep ();
                 }
             } else {
-                ErrorExpect ("Expected 'X' or 'S'");
+                ErrorExpect ("Expected `X' or `S'");
                 SkipUntilSep ();
             }
 
@@ -168,7 +169,7 @@ void GetEA (EffAddr* A)
                     A->AddrModeSet = AM65_DIR_IND;
                     break;
                 default:
-                    if (!Consume (TOK_Y, "Expected 'Y'")) {
+                    if (!Consume (TOK_Y, "Expected `Y'")) {
                         SkipUntilSep ();
                     }
                     A->AddrModeSet = AM65_DIR_IND_Y;
@@ -198,20 +199,20 @@ void GetEA (EffAddr* A)
         /* [dir] or [dir],y */
         NextTok ();
         A->Expr = Expression ();
-        if (!Consume (TOK_RBRACK, "Expected ']'")) {
+        if (!Consume (TOK_RBRACK, "Expected `]'")) {
             SkipUntilSep ();
         }
         if (CurTok.Tok == TOK_COMMA) {
             /* [dir],y */
             NextTok ();
             if (GetCPU () == CPU_45GS02) {
-                if (!Consume (TOK_Z, "Expected 'Z'")) {
+                if (!Consume (TOK_Z, "Expected `Z'")) {
                     SkipUntilSep ();
                 }
                 A->AddrModeSet = AM65_32BIT_BASE_IND_Z;
             }
             else {
-                if (!Consume (TOK_Y, "Expected 'Y'")) {
+                if (!Consume (TOK_Y, "Expected `Y'")) {
                     SkipUntilSep ();
                 }
                 A->AddrModeSet = AM65_DIR_IND_LONG_Y;

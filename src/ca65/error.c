@@ -83,6 +83,82 @@ const char* DiagCatDesc[DC_COUNT] = {
 
 
 
+static void ReplaceQuotes (StrBuf* Msg)
+/* Replace opening and closing single quotes in Msg by their typographically
+** correct UTF-8 counterparts for better readbility. A closing quote will
+** only get replaced if an opening quote has been seen before.
+** To handle some special cases, the function will also treat \xF0 as
+** opening and \xF1 as closing quote. These are replaced without the need for
+** correct ordering (open/close).
+** The function will change the quotes in place, so after the call Msg will
+** contain the changed string. If UTF-8 is not available, the function will
+** replace '`' by '\'' since that was the default behavior before. It will
+** also replace \xF0 and \xF1 by '\''.
+**/
+{
+    /* UTF-8 characters for single quotes */
+    static const char QuoteStart[] = "\xE2\x80\x98";
+    static const char QuoteEnd[]   = "\xE2\x80\x99";
+
+    /* Remember a few things */
+    int IsUTF8 = CP_IsUTF8 ();
+
+    /* We create a new string in T and will later copy it back to Msg */
+    StrBuf T = AUTO_STRBUF_INITIALIZER;
+
+    /* Parse the string and create a modified copy */
+    SB_Reset (Msg);
+    int InQuote = 0;
+    while (1) {
+        char C = SB_Get (Msg);
+        switch (C) {
+            case '`':
+                if (!InQuote && IsUTF8) {
+                    SB_AppendStr (&T, QuoteStart);
+                    InQuote = 1;
+                } else {
+                    /* ca65 uses \' for opening and closing quotes */
+                    SB_AppendChar (&T, '\'');
+                }
+                break;
+            case '\'':
+                if (InQuote && IsUTF8) {
+                    SB_AppendStr (&T, QuoteEnd);
+                    InQuote = 0;
+                } else {
+                    SB_AppendChar (&T, C);
+                }
+                break;
+            case '\xF0':
+                if (IsUTF8) {
+                    SB_AppendStr (&T, QuoteStart);
+                } else {
+                    SB_AppendChar (&T, '\'');
+                }
+                break;
+            case '\xF1':
+                if (IsUTF8) {
+                    SB_AppendStr (&T, QuoteEnd);
+                } else {
+                    SB_AppendChar (&T, '\'');
+                }
+                break;
+            case '\0':
+                goto Done;
+            default:
+                SB_AppendChar (&T, C);
+                break;
+        }
+    }
+
+Done:
+    /* Copy the string back, then terminate it */
+    SB_Move (Msg, &T);
+    SB_Terminate (Msg);
+}
+
+
+
 static void VPrintMsg (const FilePos* Pos, DiagCat Cat, const char* Format,
                        va_list ap)
 /* Format and output an error/warning message. */
@@ -102,9 +178,9 @@ static void VPrintMsg (const FilePos* Pos, DiagCat Cat, const char* Format,
         default:        FAIL ("Unexpected Cat value");  break;
     }
 
-    /* Format the actual message */
+    /* Format the actual message, then replace quotes */
     SB_VPrintf (&Msg, Format, ap);
-    SB_Terminate (&Msg);
+    ReplaceQuotes (&Msg);
 
     /* Format the location. If the file position is valid, we use the file
     ** position, otherwise the program name. This allows to print fatal
@@ -211,6 +287,18 @@ static void AddNotifications (const Collection* LineInfos)
 /*****************************************************************************/
 /*                               Notifications                               */
 /*****************************************************************************/
+
+
+
+void Notification (const char* Format, ...)
+/* Print a notification message. */
+{
+    /* Output the message */
+    va_list ap;
+    va_start (ap, Format);
+    VPrintMsg (&CurTok.Pos, DC_NOTE, Format, ap);
+    va_end (ap);
+}
 
 
 

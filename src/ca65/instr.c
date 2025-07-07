@@ -1961,7 +1961,7 @@ static void PutLDM_m740 (const InsDesc* Ins)
     }
     Emit0 (Ins->BaseCode);
     EmitByte (A.Expr);
-    Consume (TOK_HASH, "'#' expected");
+    Consume (TOK_HASH, "`#' expected");
     EmitByte (Expression ());
 }
 

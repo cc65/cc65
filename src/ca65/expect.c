@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 nexttok.h                                 */
+/*                                 expect.c                                  */
 /*                                                                           */
-/*              Get next token and handle token level functions              */
+/*                      Print errors about expected tokens                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2025,      Kugelfuhr                                                  */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,11 +30,10 @@
 
 
 
-#ifndef NEXTTOK_H
-#define NEXTTOK_H
-
-
-
+/* ca65 */
+#include "error.h"
+#include "expect.h"
+#include "nexttok.h"
 #include "scanner.h"
 
 
@@ -48,50 +44,73 @@
 
 
 
-void NextTok (void);
-/* Get next token and handle token level functions */
-
-int Consume (token_t Expected, const char* ErrMsg);
-/* Consume Token, print an error if we don't find it. Return true if the token
-** was found and false otherwise.
-*/
-
-int ConsumeSep (void);
-/* Consume a separator token. Return true if the token was found and false
- * otherwise.
+void ErrorExpect (const char* Msg)
+/* Output an error message about some expected token using Msg and the
+ * description of the following token. This means that Msg should contain
+ * something like "xyz expected". The actual error message would then be
+ * "xyz expected but found zyx".
  */
+{
+    StrBuf S = AUTO_STRBUF_INITIALIZER;
+    TokenDesc (&CurTok, &S);
+    Error ("%s but found `%s'", Msg, SB_GetConstBuf (&S));
+    SB_Done (&S);
+}
 
-int ConsumeLParen (void);
-/* Consume a left paren. Return true if the token was found and false
-** otherwise.
+
+
+int Expect (token_t Expected, const char* Msg)
+/* Check if the next token is the expected one. If not, print Msg plus some
+ * information about the token that was actually found. This means that Msg
+ * should contain something like "xyz expected". The actual error message would
+ * then be "xyz expected but found zyx".
+ * Returns true if the token was found, otherwise false.
+ */
+{
+    if (CurTok.Tok == Expected) {
+        return 1;
+    }
+
+    ErrorExpect (Msg);
+    return 0;
+}
+
+
+
+int ExpectSkip (token_t Expected, const char* Msg)
+/* Check if the next token is the expected one. If not, print Msg plus some
+ * information about the token that was actually found and skip the remainder
+ * of the line. This means that Msg should contain something like "xyz
+ * expected". The actual error message would then be "xyz expected but found
+ * zyx".
+ * Returns true if the token was found, otherwise false.
+ */
+{
+    if (CurTok.Tok == Expected) {
+        return 1;
+    }
+
+    ErrorExpect (Msg);
+    SkipUntilSep ();
+    return 0;
+}
+
+
+
+int ExpectSep (void)
+/* Check if we've reached a line separator. If so, return true. If not, output
+** an error and skip all tokens until the line separator is reached. Then
+** return false.
 */
-
-int ConsumeRParen (void);
-/* Consume a right paren. Return true if the token was found and false
-** otherwise.
-*/
-
-int ConsumeComma (void);
-/* Consume a comma. Return true if the token was found and false
-** otherwise.
-*/
-
-void SkipUntilSep (void);
-/* Skip tokens until we reach a line separator or end of file */
-
-void EnterRawTokenMode (void);
-/* Enter raw token mode. In raw mode, token handling functions are not
-** executed, but the function tokens are passed untouched to the upper
-** layer. Raw token mode is used when storing macro tokens for later
-** use.
-** Calls to EnterRawTokenMode and LeaveRawTokenMode may be nested.
-*/
-
-void LeaveRawTokenMode (void);
-/* Leave raw token mode. */
-
-
-
-/* End of nexttok.h */
-
-#endif
+{
+    if (!TokIsSep (CurTok.Tok)) {
+        /* Try to be helpful by giving information about the token that was
+         * unexpected.
+         */
+        ErrorExpect ("Expected `end-of-line'");
+        SkipUntilSep ();
+        return 0;
+    } else {
+        return 1;
+    }
+}

@@ -39,6 +39,7 @@
 /* ca65 */
 #include "condasm.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "macro.h"
 #include "nexttok.h"
@@ -287,9 +288,9 @@ static long DoStructInternal (long Offs, unsigned Type)
 
     /* End of struct/union definition */
     if (Type == STRUCT) {
-        Consume (TOK_ENDSTRUCT, "Expected '.ENDSTRUCT'");
+        Consume (TOK_ENDSTRUCT, "Expected `.ENDSTRUCT'");
     } else {
-        Consume (TOK_ENDUNION, "Expected '.ENDUNION'");
+        Consume (TOK_ENDUNION, "Expected `.ENDUNION'");
     }
 
     /* Return the size of the struct */

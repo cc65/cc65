@@ -46,6 +46,7 @@
 /* ca65 */
 #include "dbginfo.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "filetab.h"
 #include "global.h"
@@ -462,7 +463,7 @@ void DbgInfoCheck (void)
         /* Search for the symbol name */
         S->Sym = SymFindAny (S->Scope, GetStrBuf (S->AsmName));
         if (S->Sym == 0) {
-            PError (&S->Pos, "Assembler symbol '%s' not found",
+            PError (&S->Pos, "Assembler symbol `%s' not found",
                     GetString (S->AsmName));
         } else {
             /* Set the backlink */

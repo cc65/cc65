@@ -44,6 +44,7 @@
 /* ca65 */
 #include "condasm.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "global.h"
 #include "scanner.h"
@@ -179,7 +180,7 @@ static void FuncConcat (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("')' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -253,7 +254,7 @@ static void FuncIdent (void)
     SB_Copy (&Buf, &CurTok.SVal);
     NextTok ();
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("')' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = Id;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -600,7 +601,7 @@ static void FuncSPrintF (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("')' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &R);
@@ -660,7 +661,7 @@ static void FuncString (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("')' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -725,59 +726,6 @@ void NextTok (void)
 
 
 
-void ErrorExpect (const char* Msg)
-/* Output an error message about some expected token using Msg and the
- * description of the following token. This means that Msg should contain
- * something like "xyz expected". The actual error message would then be
- * "xyz expected but found zyx".
- */
-{
-    StrBuf S = AUTO_STRBUF_INITIALIZER;
-    TokenDesc (&CurTok, &S);
-    Error ("%s but found '%s'", Msg, SB_GetConstBuf (&S));
-    SB_Done (&S);
-}
-
-
-
-int Expect (token_t Expected, const char* Msg)
-/* Check if the next token is the expected one. If not, print Msg plus some
- * information about the token that was actually found. This means that Msg
- * should contain something like "xyz expected". The actual error message would
- * then be "xyz expected but found zyx".
- * Returns true if the token was found, otherwise false.
- */
-{
-    if (CurTok.Tok == Expected) {
-        return 1;
-    }
-
-    ErrorExpect (Msg);
-    return 0;
-}
-
-
-
-int ExpectSkip (token_t Expected, const char* Msg)
-/* Check if the next token is the expected one. If not, print Msg plus some
- * information about the token that was actually found and skip the remainder
- * of the line. This means that Msg should contain something like "xyz
- * expected". The actual error message would then be "xyz expected but found
- * zyx".
- * Returns true if the token was found, otherwise false.
- */
-{
-    if (CurTok.Tok == Expected) {
-        return 1;
-    }
-
-    ErrorExpect (Msg);
-    SkipUntilSep ();
-    return 0;
-}
-
-
-
 int Consume (token_t Expected, const char* ErrMsg)
 /* Consume Token, print an error if we don't find it. Return true if the token
 ** was found and false otherwise.
@@ -816,7 +764,7 @@ int ConsumeLParen (void)
 ** otherwise.
 */
 {
-    return Consume (TOK_LPAREN, "Expected '('");
+    return Consume (TOK_LPAREN, "Expected `('");
 }
 
 
@@ -826,7 +774,7 @@ int ConsumeRParen (void)
 ** otherwise.
 */
 {
-    return Consume (TOK_RPAREN, "Expected ')'");
+    return Consume (TOK_RPAREN, "Expected `)'");
 }
 
 
@@ -836,7 +784,7 @@ int ConsumeComma (void)
 ** otherwise.
 */
 {
-    return Consume (TOK_COMMA, "Expected ','");
+    return Consume (TOK_COMMA, "Expected `,'");
 }
 
 
@@ -846,26 +794,6 @@ void SkipUntilSep (void)
 {
     while (!TokIsSep (CurTok.Tok)) {
         NextTok ();
-    }
-}
-
-
-
-int ExpectSep (void)
-/* Check if we've reached a line separator. If so, return true. If not, output
-** an error and skip all tokens until the line separator is reached. Then
-** return false.
-*/
-{
-    if (!TokIsSep (CurTok.Tok)) {
-        /* Try to be helpful by giving information about the token that was
-         * unexpected.
-         */
-        ErrorExpect ("Expected 'end-of-line'");
-        SkipUntilSep ();
-        return 0;
-    } else {
-        return 1;
     }
 }
 

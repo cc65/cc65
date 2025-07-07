@@ -57,6 +57,7 @@
 #include "asserts.h"
 #include "dbginfo.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "feature.h"
 #include "filetab.h"
@@ -126,6 +127,7 @@ static void Usage (void)
             "  --listing name\t\tCreate a listing file if assembly was ok\n"
             "  --list-bytes n\t\tMaximum number of bytes per listing line\n"
             "  --memory-model model\t\tSet the memory model\n"
+            "  --no-utf8\t\t\tDisable use of UTF-8 in diagnostics\n"
             "  --pagelength n\t\tSet the page length for the listing\n"
             "  --relax-checks\t\tRelax some checks (see docs)\n"
             "  --smart\t\t\tEnable smart mode\n"
@@ -641,7 +643,7 @@ static void OptListing (const char* Opt, const char* Arg)
     ** the filename is empty or begins with the option char.
     */
     if (Arg == 0 || *Arg == '\0' || *Arg == '-') {
-        Fatal ("The meaning of '%s' has changed. It does now "
+        Fatal ("The meaning of `%s' has changed. It does now "
                "expect a file name as argument.", Opt);
     }
 
@@ -671,6 +673,15 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
 
     /* Set the memory model */
     SetMemoryModel (M);
+}
+
+
+
+static void OptNoUtf8 (const char* Opt attribute ((unused)),
+                       const char* Arg attribute ((unused)))
+/* Handle the --no-utf8 option */
+{
+    CP_DisableUTF8 ();
 }
 
 
@@ -790,7 +801,7 @@ static void OneLine (void)
         if (CurTok.Tok == TOK_COLON) {
             NextTok ();
         } else if (CurTok.WS || !NoColonLabels) {
-            Error ("':' expected");
+            Error ("`:' expected");
         }
     }
 
@@ -876,7 +887,7 @@ static void OneLine (void)
             */
             if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
-                    ErrorExpect ("Expected ':' after identifier to form a label");
+                    ErrorExpect ("Expected `:' after identifier to form a label");
                     SkipUntilSep ();
                     goto Done;
                 }
@@ -921,7 +932,7 @@ static void OneLine (void)
         HandleInstruction (Instr);
     } else if (PCAssignment && (CurTok.Tok == TOK_STAR || CurTok.Tok == TOK_PC)) {
         NextTok ();
-        if (!ExpectSkip (TOK_EQ, "Expected '='")) {
+        if (!ExpectSkip (TOK_EQ, "Expected `='")) {
             goto Done;
         }
         /* Skip the equal sign */
@@ -1046,6 +1057,7 @@ int main (int argc, char* argv [])
         { "--list-bytes",          1,      OptListBytes            },
         { "--listing",             1,      OptListing              },
         { "--memory-model",        1,      OptMemoryModel          },
+        { "--no-utf8",             0,      OptNoUtf8               },
         { "--pagelength",          1,      OptPageLength           },
         { "--relax-checks",        0,      OptRelaxChecks          },
         { "--smart",               0,      OptSmart                },

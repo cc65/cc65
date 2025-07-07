@@ -40,6 +40,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "nexttok.h"
 #include "toklist.h"
@@ -67,8 +68,8 @@ static TokList* CollectRepeatTokens (const FilePos* StartPos)
 
         /* Check for end of input */
         if (CurTok.Tok == TOK_EOF) {
-            ErrorExpect ("Expected '.ENDREPEAT'");
-            PNotification (StartPos, "For this '.REPEAT' command");
+            ErrorExpect ("Expected `.ENDREPEAT'");
+            PNotification (StartPos, "For this `.REPEAT' command");
             FreeTokList (List);
             return 0;
         }

@@ -40,6 +40,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "nexttok.h"
 #include "scanner.h"
 #include "symbol.h"
@@ -95,7 +96,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         if (Scope == 0) {
             /* Scope not found */
             SB_Terminate (FullName);
-            Error ("No such scope: '%m%p'", FullName);
+            Error ("No such scope: `%m%p'", FullName);
             return 0;
         }
 
@@ -138,7 +139,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         Scope = SymFindScope (Scope, Name, SYM_FIND_EXISTING);
         if (Scope == 0) {
             /* Scope not found */
-            Error ("No such scope: '%m%p'", FullName);
+            Error ("No such scope: `%m%p'", FullName);
             return 0;
         }
 

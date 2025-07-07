@@ -51,6 +51,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "global.h"
 #include "instr.h"
@@ -778,7 +779,7 @@ static ExprNode* FuncAddrSize (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
         } else {
             AddrSize = Sym->AddrSize;
         }
@@ -818,13 +819,13 @@ static ExprNode* FuncAddrSize (void)
         if (Sym) {
             AddrSize = Sym->AddrSize;
         } else {
-            Error ("Unknown symbol or scope: '%m%p%m%p'", &ScopeName, &Name);
+            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
         }
 
     }
 
     if (AddrSize == 0) {
-        Warning (1, "Unknown address size: '%m%p%m%p'", &ScopeName, &Name);
+        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
     }
 
     /* Free the string buffers */
@@ -859,7 +860,7 @@ static ExprNode* FuncSizeOf (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
@@ -911,7 +912,7 @@ static ExprNode* FuncSizeOf (void)
             if (Sym) {
                 SizeSym = GetSizeOfSymbol (Sym);
             } else {
-                Error ("Unknown symbol or scope: '%m%p%m%p'",
+                Error ("Unknown symbol or scope: `%m%p%m%p'",
                        &ScopeName, &Name);
             }
         }
@@ -919,7 +920,7 @@ static ExprNode* FuncSizeOf (void)
 
     /* Check if we have a size */
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
-        Error ("Size of '%m%p%m%p' is unknown", &ScopeName, &Name);
+        Error ("Size of `%m%p%m%p' is unknown", &ScopeName, &Name);
         Size = 0;
     }
 
@@ -1059,7 +1060,7 @@ static ExprNode* Function (ExprNode* (*F) (void))
     NextTok ();
 
     /* Expression must be enclosed in braces */
-    if (!ExpectSkip (TOK_LPAREN, "Expected '('")) {
+    if (!ExpectSkip (TOK_LPAREN, "Expected `('")) {
         return GenLiteral0 ();
     }
     NextTok ();

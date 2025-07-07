@@ -45,6 +45,7 @@
 /* ca65 */
 #include "condasm.h"
 #include "error.h"
+#include "expect.h"
 #include "global.h"
 #include "instr.h"
 #include "istack.h"
@@ -380,7 +381,7 @@ static void MacSkipDef (unsigned Style, const FilePos* StartPos)
         int LastWasSep = 0;
         while (1) {
             if (CurTok.Tok == TOK_EOF) {
-                ErrorExpect ("Expected '.ENDMACRO'");
+                ErrorExpect ("Expected `.ENDMACRO'");
                 PNotification (StartPos, "Macro definition started here");
                 break;
             }
@@ -434,9 +435,9 @@ void MacDef (unsigned Style)
     Existing = HT_Find (&MacroTab, &CurTok.SVal);
     if (Existing != 0) {
         /* Macro is already defined */
-        Error ("A macro named '%m%p' is already defined", &CurTok.SVal);
+        Error ("A macro named `%m%p' is already defined", &CurTok.SVal);
         PNotification (&Existing->DefPos,
-                       "Previous definition of macro '%s' was here",
+                       "Previous definition of macro `%s' was here",
                        SB_GetConstBuf (&Existing->Name));
         /* Skip tokens until we reach the final .endmacro */
         MacSkipDef (Style, &StartPos);
@@ -478,7 +479,7 @@ void MacDef (unsigned Style)
 
                 while (1) {
                     if (SB_Compare (&List->Id, &CurTok.SVal) == 0) {
-                        Error ("Duplicate macro parameter '%m%p'", &CurTok.SVal);
+                        Error ("Duplicate macro parameter `%m%p'", &CurTok.SVal);
                         M->HasError = 1;
                     }
                     if (List->Next == 0) {
@@ -529,7 +530,7 @@ void MacDef (unsigned Style)
             }
             /* May not have end of file in a macro definition */
             if (CurTok.Tok == TOK_EOF) {
-                Error ("Missing '.ENDMACRO' for definition of macro '%s'",
+                Error ("Missing `.ENDMACRO' for definition of macro `%s'",
                        SB_GetConstBuf (&M->Name));
                 PNotification (&StartPos, "Macro definition started here");
                 M->HasError = 1;
@@ -645,11 +646,11 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
 
     /* Don't let the user kid with us */
     if (M == 0 || M->Style != Style) {
-        Error ("No such macro: %m%p", Name);
+        Error ("No such macro: `%m%p'", Name);
         return;
     }
     if (M->Expansions > 0) {
-        Error ("Cannot delete macro '%s' which is currently expanded",
+        Error ("Cannot delete macro `%s' which is currently expanded",
                SB_GetConstBuf (&M->Name));
         return;
     }
@@ -837,10 +838,10 @@ static void StartExpClassic (MacExp* E)
 
             /* Check for maximum parameter count */
             if (E->ParamCount >= E->M->ParamCount) {
-                ErrorSkip ("Too many parameters for macro '%s'",
+                ErrorSkip ("Too many parameters for macro `%s'",
                            SB_GetConstBuf (&E->M->Name));
                 PNotification (&E->M->DefPos,
-                               "See definition of macro '%s' which was here",
+                               "See definition of macro `%s' which was here",
                                SB_GetConstBuf (&E->M->Name));
                 break;
             }
@@ -966,7 +967,7 @@ static void StartExpDefine (MacExp* E)
 
         /* Check for a comma */
         if (Count > 0) {
-            if (Expect (TOK_COMMA, "Expected ','")) {
+            if (Expect (TOK_COMMA, "Expected `,'")) {
                 NextTok ();
             }
         }
@@ -1000,18 +1001,18 @@ void MacExpandStart (Macro* M)
 
     /* We cannot expand a macro with errors */
     if (M->HasError) {
-        PError (&Pos, "Macro '%s' contains errors and cannot be expanded",
+        PError (&Pos, "Macro `%s' contains errors and cannot be expanded",
                 SB_GetConstBuf (&M->Name));
-        PNotification (&M->DefPos, "Definition of macro '%s' was here",
+        PNotification (&M->DefPos, "Definition of macro `%s' was here",
                        SB_GetConstBuf (&M->Name));
         return;
     }
 
     /* We cannot expand an incomplete macro */
     if (M->Incomplete) {
-        PError (&Pos, "Macro '%s' is incomplete and cannot be expanded",
+        PError (&Pos, "Macro `%s' is incomplete and cannot be expanded",
                 SB_GetConstBuf (&M->Name));
-        PNotification (&M->DefPos, "Definition of macro '%s' was here",
+        PNotification (&M->DefPos, "Definition of macro `%s' was here",
                        SB_GetConstBuf (&M->Name));
         return;
     }
@@ -1020,7 +1021,7 @@ void MacExpandStart (Macro* M)
     ** to force an endless loop and assembler crash.
     */
     if (MacExpansions >= MAX_MACEXPANSIONS) {
-        PError (&Pos, "Too many nested macro expansions for macro '%s'",
+        PError (&Pos, "Too many nested macro expansions for macro `%s'",
                 SB_GetConstBuf (&M->Name));
         return;
     }

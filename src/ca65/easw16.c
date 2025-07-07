@@ -37,6 +37,7 @@
 #include "ea.h"
 #include "ea65.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "instr.h"
 #include "nexttok.h"

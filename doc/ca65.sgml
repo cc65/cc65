@@ -1434,38 +1434,6 @@ constant is defined:
     CPU_ISET_M740
 </verb></tscreen>
 
-<!-- Sorry but explaining these with the changes from #2751 is too cringy for
-     me - must be done by someone else. The remainder is from the old
-     ".macpack cpu" section"
-
-The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
-be checked with <tt/<ref id="operators" name=".BITAND">/ to determine if the
-currently enabled CPU supports a specific instruction set. For example the
-65C02 supports all instructions of the 65SC02 CPU, so it has the
-<tt/CPU_ISET_65SC02/ bit set in addition to its native <tt/CPU_ISET_65C02/
-bit. Using
-
-<tscreen><verb>
-        .if (.cpu .bitand CPU_ISET_65SC02)
-                lda     (c_sp)
-        .else
-                ldy     #$00
-                lda     (c_sp),y
-        .endif
-</verb></tscreen>
-
-it is possible to determine if the
-
-<tscreen><verb>
-                lda     (c_sp)
-</verb></tscreen>
-
-instruction is supported, which is the case for the 65SC02, 65C02 and 65816
-CPUs (the latter two are upwards compatible to the 65SC02).
-
-see section <ref id="6502-mode" name="6502 format"> and following.
--->
-
   <tt/.CPU/ may be used to replace the .IFPxx pseudo instructions or to
   construct even more complex expressions.
 
@@ -1483,8 +1451,43 @@ see section <ref id="6502-mode" name="6502 format"> and following.
         .endif
   </verb></tscreen>
 
-  See also: <tt><ref id=".CAP" name=".CAP"></tt>
+<bf>The dilemma:</bf>
 
+The original design of this feature was made under the assumption, that any
+"higher" CPU will support the entire instruction set of the "lower" CPU. For
+example: the WDC W65C02 supports all instructions of the 65C02, which again
+support all instructions of the 65SC02. Unfortunately this is not true for all
+CMOS CPUs - when the 65CE02 was made, some instructions were changed, and a new
+addressingmode was added. As a result all CPUS after (and including) 65CE02
+are no more (source code) compatible with all instructions originally introduced
+by the 65SC02.
+
+Because of this, the .CPU function and the ISET* macros were repurposed to
+indicate <em>groups of instructions</em> only, ie only the set of instructions
+that was added by that particular CPU. In the value returned by .CPU only the
+bits will be set, that refer to the groups of instructions that are completely
+supported by that CPU.
+
+The advantage of this is, that the mechanism keeps working for all new CPUs
+added. The inevitable disadvantage is that you now have to know exactly which
+CPU added which instructions (look <htmlurl url="cpus.html" name="here"> for reference).
+
+<tscreen><verb>
+        .if (.cpu .bitand CPU_ISET_65SC02)
+                ; This will be assembled for the W65C02, 65C02, 65SC02, 65816, HUC6820
+                lda     (c_sp)
+        .elseif (.cpu .bitand CPU_ISET_65CE02)
+                ; This will be assembled for the 65CE02, 4510, 45GS02
+                ldz     #$00
+                lda     (c_sp),z
+        .else
+                ldy     #$00
+                lda     (c_sp),y
+        .endif
+</verb></tscreen>
+
+  See also: <tt><ref id=".CAP" name=".CAP"></tt>, which is a similar mechanism,
+  but without the problem outlined above.
 
 
 <sect1><tt>.ISIZE</tt><label id=".ISIZE"><p>
@@ -3807,7 +3810,6 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tscreen><verb>
         atari           Defines the scrcode macro.
         cbm             Defines the scrcode macro.
-        cpu             Defines constants for the .CPU variable.
         generic         Defines generic macros like add, sub, and blt.
         longbranch      Defines conditional long-jump macros.
   </verb></tscreen>
@@ -5121,6 +5123,7 @@ For better orthogonality, the assembler defines similar symbols as the
 compiler, depending on the target system selected:
 
 <itemize>
+<item><tt/__AGAT__/ - Target system is <tt/agat/
 <item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
 <item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
@@ -5133,23 +5136,31 @@ compiler, depending on the target system selected:
 <item><tt/__C128__/ - Target system is <tt/c128/
 <item><tt/__C16__/ - Target system is <tt/c16/ or <tt/plus4/
 <item><tt/__C64__/ - Target system is <tt/c64/
+<item><tt/__C65__/ - Target system is <tt/c65/
 <item><tt/__CBM__/ - Target is a Commodore or Commodore-alike system
 <item><tt/__CBM510__/ - Target system is <tt/cbm510/
 <item><tt/__CBM610__/ - Target system is <tt/cbm610/
+<item><tt/__CREATIVISION__/ - Target system is <tt/creativision/
 <item><tt/__CX16__/ - Target system is <tt/cx16/
+<item><tt/__GAMATE__/ - Target system is <tt/gamate/
 <item><tt/__GEOS__/ - Target is a GEOS system
 <item><tt/__GEOS_APPLE__/ - Target system is <tt/geos-apple/
 <item><tt/__GEOS_CBM__/ - Target system is <tt/geos-cbm/
+<item><tt/__KIM1__/ - Target system is <tt/kim1/
 <item><tt/__LUNIX__/ - Target system is <tt/lunix/
 <item><tt/__LYNX__/ - Target system is <tt/lynx/
+<item><tt/__MEGA65__/ - Target system is <tt/mega65/
 <item><tt/__NES__/ - Target system is <tt/nes/
 <item><tt/__OSIC1P__/ - Target system is <tt/osic1p/
+<item><tt/__PCE__/ - Target system is <tt/pce/
 <item><tt/__PET__/ - Target system is <tt/pet/
 <item><tt/__PLUS4__/ - Target system is <tt/plus4/
+<item><tt/__RP6502__/ - Target system is <tt/rp6502/
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/
 <item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
 <item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
 <item><tt/__SYM1__/ - Target system is <tt/sym1/
+<item><tt/__TELESTRAT__/ - Target system is <tt/telestrat/
 <item><tt/__VIC20__/ - Target system is <tt/vic20/
 </itemize>
 

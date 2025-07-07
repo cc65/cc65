@@ -361,7 +361,7 @@ void SB_AppendCharCooked (StrBuf* B, int C, int Cooked);
 
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size);
 /* Append a character buffer to the end of the string buffer */
-				   
+                                   
 #if defined(HAVE_INLINE)
 INLINE void SB_AppendStr (StrBuf* B, const char* S)
 /* Append a string to the end of the string buffer */

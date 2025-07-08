@@ -196,6 +196,12 @@ Here is a description of all the command line options:
   information to the assembler.
 
 
+  <tag><tt>-d, --debug</tt></tag>
+
+  Enables debug mode, something that should not be needed for mere
+  mortals:-)
+
+
   <label id="option--feature">
   <tag><tt>--feature name</tt></tag>
 

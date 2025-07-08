@@ -100,6 +100,10 @@ static void ReplaceQuotes (StrBuf* Msg)
     static const char QuoteStart[] = "\xE2\x80\x98";
     static const char QuoteEnd[]   = "\xE2\x80\x99";
 
+    /* ANSI color sequences */
+    const char* ColorStart = CP_BrightGreen ();
+    const char* ColorEnd   = CP_White ();
+
     /* Remember a few things */
     int IsUTF8 = CP_IsUTF8 ();
 
@@ -113,18 +117,29 @@ static void ReplaceQuotes (StrBuf* Msg)
         char C = SB_Get (Msg);
         switch (C) {
             case '`':
-                if (!InQuote && IsUTF8) {
-                    SB_AppendStr (&T, QuoteStart);
+                if (!InQuote) {
                     InQuote = 1;
+                    if (IsUTF8) {
+                        SB_AppendStr (&T, QuoteStart);
+                    } else {
+                        /* ca65 uses \' for opening and closing quotes */
+                        SB_AppendChar (&T, '\'');
+                    }
+                    SB_AppendStr (&T, ColorStart);
                 } else {
-                    /* ca65 uses \' for opening and closing quotes */
-                    SB_AppendChar (&T, '\'');
+                    /* Found two ` without closing quote - don't replace */
+                    SB_AppendChar (&T, '`');
                 }
                 break;
             case '\'':
-                if (InQuote && IsUTF8) {
-                    SB_AppendStr (&T, QuoteEnd);
+                if (InQuote) {
                     InQuote = 0;
+                    SB_AppendStr (&T, ColorEnd);
+                    if (IsUTF8) {
+                        SB_AppendStr (&T, QuoteEnd);
+                    } else {
+                        SB_AppendChar (&T, C);
+                    }
                 } else {
                     SB_AppendChar (&T, C);
                 }

@@ -31,7 +31,7 @@
 
 
 #include <stdlib.h>
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #  include <unistd.h>
 #else
 #  include <windows.h>

@@ -128,8 +128,8 @@ void CP_Init (void)
     if (IsTTY) {
         CodePage = GetConsoleOutputCP ();
         IsUTF8 = (int) SetConsoleOutputCP (CP_UTF8);
-	if (IsUTF8) {
-	    /* Switch the code page back on exit */
+        if (IsUTF8) {
+            /* Switch the code page back on exit */
             atexit (Cleanup);
         }
         if (Color) {

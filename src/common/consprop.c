@@ -31,10 +31,12 @@
 
 
 #include <stdlib.h>
-#include <unistd.h>
-#ifdef _WIN32
-#include <windows.h>
-#define isatty _isatty
+#if !defined(WIN32)
+#  include <unistd.h>
+#else
+#  include <windows.h>
+#  include <io.h>
+#  define isatty _isatty
 #endif
 
 /* common */

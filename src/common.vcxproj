@@ -86,6 +86,7 @@
     <ClInclude Include="common\check.h" />
     <ClInclude Include="common\cmdline.h" />
     <ClInclude Include="common\coll.h" />
+    <ClInclude Include="common\consprop.h" />
     <ClInclude Include="common\cpu.h" />
     <ClInclude Include="common\debugflag.h" />
     <ClInclude Include="common\exprdefs.h" />
@@ -139,6 +140,7 @@
     <ClCompile Include="common\check.c" />
     <ClCompile Include="common\cmdline.c" />
     <ClCompile Include="common\coll.c" />
+    <ClCompile Include="common\consprop.c" />
     <ClCompile Include="common\cpu.c" />
     <ClCompile Include="common\debugflag.c" />
     <ClCompile Include="common\exprdefs.c" />

@@ -54,6 +54,7 @@
 #include "asserts.h"
 #include "binfmt.h"
 #include "condes.h"
+#include "consprop.h"
 #include "config.h"
 #include "dbgfile.h"
 #include "error.h"
@@ -130,6 +131,7 @@ static void Usage (void)
             "Long options:\n"
             "  --allow-multiple-definition\tAllow multiple definitions\n"
             "  --cfg-path path\t\tSpecify a config file search path\n"
+            "  --color [on|auto|off]\t\tColor diagnostics (default: auto)\n"
             "  --config name\t\t\tUse linker config file\n"
             "  --dbgfile name\t\tGenerate debug information\n"
             "  --define sym=val\t\tDefine a symbol\n"
@@ -141,6 +143,7 @@ static void Usage (void)
             "  --lib-path path\t\tSpecify a library search path\n"
             "  --mapfile name\t\tCreate a map file\n"
             "  --module-id id\t\tSpecify a module id\n"
+            "  --no-utf8\t\t\tDisable use of UTF-8 in diagnostics\n"
             "  --obj file\t\t\tLink this object file\n"
             "  --obj-path path\t\tSpecify an object file search path\n"
             "  --start-addr addr\t\tSet the default start address\n"
@@ -310,6 +313,19 @@ static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptColor(const char* Opt, const char* Arg)
+/* Handle the --color option */
+{
+    ColorMode Mode = CP_Parse (Arg);
+    if (Mode == CM_INVALID) {
+        Error ("Invalid argument to %s: %s", Opt, Arg);
+    } else {
+        CP_SetColorMode (Mode);
+    }
+}
+
+
+
 static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 /* Define the config file */
 {
@@ -453,6 +469,15 @@ static void OptModuleId (const char* Opt, const char* Arg)
         Error ("Range error in module id");
     }
     ModuleId = (unsigned) Id;
+}
+
+
+
+static void OptNoUtf8 (const char* Opt attribute ((unused)),
+                       const char* Arg attribute ((unused)))
+/* Handle the --no-utf8 option */
+{
+    CP_DisableUTF8 ();
 }
 
 
@@ -629,6 +654,7 @@ static void ParseCommandLine(void)
     static const LongOpt OptTab[] = {
         { "--allow-multiple-definition", 0,      OptMultDef              },
         { "--cfg-path",                  1,      OptCfgPath              },
+        { "--color",                     1,      OptColor                },
         { "--config",                    1,      CmdlOptConfig           },
         { "--dbgfile",                   1,      OptDbgFile              },
         { "--define",                    1,      OptDefine               },
@@ -640,6 +666,7 @@ static void ParseCommandLine(void)
         { "--lib-path",                  1,      OptLibPath              },
         { "--mapfile",                   1,      OptMapFile              },
         { "--module-id",                 1,      OptModuleId             },
+        { "--no-utf8",                   0,      OptNoUtf8               },
         { "--obj",                       1,      OptObj                  },
         { "--obj-path",                  1,      OptObjPath              },
         { "--start-addr",                1,      OptStartAddr            },
@@ -799,6 +826,9 @@ int main (int argc, char* argv [])
 /* Linker main program */
 {
     unsigned MemoryAreaOverflows;
+
+    /* Initialize console output */
+    CP_Init ();
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ld65");

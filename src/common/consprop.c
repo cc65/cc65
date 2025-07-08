@@ -105,7 +105,7 @@ const char CP_BoxDrawingSeq[BD_COUNT][2][4] = {
 
 
 #ifdef _WIN32
-static void Cleanup()
+static void Cleanup (void)
 /* Cleanup on program exit */
 {
     SetConsoleOutputCP (CodePage);

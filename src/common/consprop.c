@@ -37,6 +37,8 @@
 #  include <windows.h>
 #  include <io.h>
 #  define isatty _isatty
+#  define STDOUT_FILENO  1
+#  define STDERR_FILENO  2
 #endif
 
 /* common */

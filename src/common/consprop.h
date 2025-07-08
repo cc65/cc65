@@ -48,7 +48,7 @@
 
 
 /* Color mode for the program */
-enum ColorMode { CM_OFF, CM_AUTO, CM_ON };
+enum ColorMode { CM_INVALID = -1, CM_OFF, CM_AUTO, CM_ON };
 typedef enum ColorMode ColorMode;
 
 /* Colors */
@@ -95,6 +95,11 @@ void CP_Init (void);
 /* Init console properties. Must be called before using any other function or
 ** data from this module.
 **/
+
+ColorMode CP_Parse (const char* Mode);
+/* Parse the given string which is assumed to be one of the color modes.
+** Return the matching enum or CM_INVALID if there was no match.
+*/
 
 int CP_IsTTY (void);
 /* Return true if console output goes to a tty */

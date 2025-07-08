@@ -127,8 +127,9 @@ void CP_Init (void)
 #ifdef _WIN32
     if (IsTTY) {
         CodePage = GetConsoleOutputCP ();
-        if (SetConsoleOutputCP (CP_UTF8)) {
-            IsUTF8 = 1;
+        IsUTF8 = (int) SetConsoleOutputCP (CP_UTF8);
+	if (IsUTF8) {
+	    /* Switch the code page back on exit */
             atexit (Cleanup);
         }
         if (Color) {

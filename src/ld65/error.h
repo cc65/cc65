@@ -40,6 +40,7 @@
 
 /* common */
 #include "attrib.h"
+#include "filepos.h"
 
 
 
@@ -68,6 +69,12 @@ void Error (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an internal error message and die */
+
+void CfgWarning (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
+/* Print a warning message adding file name and line number of the config file */
+
+void CfgError (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
+/* Print an error message adding file name and line number of a given file */
 
 
 

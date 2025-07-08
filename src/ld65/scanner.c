@@ -77,49 +77,6 @@ static FILE*            InputFile       = 0;
 
 
 /*****************************************************************************/
-/*                              Error handling                               */
-/*****************************************************************************/
-
-
-
-void CfgWarning (const FilePos* Pos, const char* Format, ...)
-/* Print a warning message adding file name and line number of a given file */
-{
-    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
-    va_list ap;
-
-    va_start (ap, Format);
-    SB_VPrintf (&Buf, Format, ap);
-    va_end (ap);
-
-    Warning ("%s:%u: %s",
-             GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
-    SB_Done (&Buf);
-
-    /* Count warnings */
-    ++WarningCount;
-}
-
-
-
-void CfgError (const FilePos* Pos, const char* Format, ...)
-/* Print an error message adding file name and line number of a given file */
-{
-    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
-    va_list ap;
-
-    va_start (ap, Format);
-    SB_VPrintf (&Buf, Format, ap);
-    va_end (ap);
-
-    Error ("%s:%u: %s",
-           GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
-    SB_Done (&Buf);
-}
-
-
-
-/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 

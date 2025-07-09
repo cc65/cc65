@@ -56,7 +56,7 @@ ifdef QUIET
     PQ = "QUIET=1"
     PD = --no-print-directory
 ifndef CMD_EXE
-  CATERR = 2> $$@.errlog || (cat $$@.errlog && false)
+  CATERR = 2> $@.errlog || (cat $@.errlog && false)
 endif
 endif
 
@@ -967,7 +967,7 @@ testcode.atr: testcode
 # Clean-up rules
 
 mostlyclean:
-	@$(DEL) .errlog *.lbl *.map *.o 2>$(NULLDEV)
+	@$(DEL) *.errlog *.lbl *.map *.o 2>$(NULLDEV)
 # we cant use .s since we have asm files in the directory that we want to keep
 	@$(DEL) ${patsubst %.c,%.s,$(wildcard *.c)} 2>$(NULLDEV)
 

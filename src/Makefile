@@ -57,7 +57,7 @@ ifdef QUIET
     PQ = "QUIET=1"
     PD = --no-print-directory
 ifndef CMD_EXE
-    CATERR = 2> ../wrk/common/$$@.errlog || (cat ../wrk/common/$$@.errlog && false)
+    CATERR = 2> $@.errlog || (cat $@.errlog && false)
 endif
 endif
 

@@ -70,6 +70,7 @@
 /* common */
 #include "attrib.h"
 #include "cmdline.h"
+#include "consprop.h"
 #include "filetype.h"
 #include "fname.h"
 #include "mmodel.h"
@@ -858,6 +859,7 @@ static void Usage (void)
             "  --code-label name\t\tDefine and export a CODE segment label\n"
             "  --code-name seg\t\tSet the name of the CODE segment\n"
             "  --codesize x\t\t\tAccept larger code by factor x\n"
+            "  --color [on|auto|off]\t\tColor diagnostics (default: auto)\n"
             "  --config name\t\t\tUse linker config file\n"
             "  --cpu type\t\t\tSet CPU type\n"
             "  --create-dep name\t\tCreate a make dependency file\n"
@@ -880,6 +882,7 @@ static void Usage (void)
             "  --module\t\t\tLink as a module\n"
             "  --module-id id\t\tSpecify a module ID for the linker\n"
             "  --no-target-lib\t\tDon't link the target library\n"
+            "  --no-utf8\t\t\tDisable use of UTF-8 in diagnostics\n"
             "  --o65-model model\t\tOverride the o65 model\n"
             "  --obj file\t\t\tLink this object file\n"
             "  --obj-path path\t\tSpecify an object file search path\n"
@@ -1024,6 +1027,20 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
         Error ("Cannot specify -C/--config twice");
     }
     LinkerConfig = Arg;
+}
+
+
+
+static void OptColor(const char* Opt, const char* Arg)
+/* Handle the --color option */
+{
+    ColorMode Mode = CP_Parse (Arg);
+    if (Mode == CM_INVALID) {
+        Error ("Invalid argument to %s: %s", Opt, Arg);
+    } else {
+        CmdAddArg2 (&CA65, "--color", Arg);
+        CmdAddArg2 (&LD65, "--color", Arg);
+    }
 }
 
 
@@ -1236,6 +1253,16 @@ static void OptNoTargetLib (const char* Opt attribute ((unused)),
 
 
 
+static void OptNoUtf8 (const char* Opt attribute ((unused)),
+                       const char* Arg attribute ((unused)))
+/* Handle the --no-utf8 option */
+{
+    CmdAddArg (&CA65, "--no-utf8");
+    CmdAddArg (&LD65, "--no-utf8");
+}
+
+
+
 static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --o65-model option */
 {
@@ -1428,6 +1455,7 @@ int main (int argc, char* argv [])
         { "--code-label",        1, OptCodeLabel      },
         { "--code-name",         1, OptCodeName       },
         { "--codesize",          1, OptCodeSize       },
+        { "--color",             1, OptColor          },
         { "--config",            1, OptConfig         },
         { "--cpu",               1, OptCPU            },
         { "--create-dep",        1, OptCreateDep      },
@@ -1450,6 +1478,7 @@ int main (int argc, char* argv [])
         { "--module",            0, OptModule         },
         { "--module-id",         1, OptModuleId       },
         { "--no-target-lib",     0, OptNoTargetLib    },
+        { "--no-utf8",           0, OptNoUtf8         },
         { "--o65-model",         1, OptO65Model       },
         { "--obj",               1, OptObj            },
         { "--obj-path",          1, OptObjPath        },

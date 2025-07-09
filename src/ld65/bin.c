@@ -301,11 +301,11 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     /* Open the file */
     D->F = fopen (D->Filename, "wb");
     if (D->F == 0) {
-        Error ("Cannot open '%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Keep the user happy */
-    Print (stdout, 1, "Opened '%s'...\n", D->Filename);
+    Print (stdout, 1, "Opened `%s'...\n", D->Filename);
 
     /* Dump all memory areas */
     for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
@@ -317,7 +317,7 @@ void BinWriteTarget (BinDesc* D, struct File* F)
 
     /* Close the file */
     if (fclose (D->F) != 0) {
-        Error ("Cannot write to '%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Reset the file and filename */

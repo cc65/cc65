@@ -137,7 +137,7 @@ static void StrVal (void)
                     case EOF:
                     case '\n':
                     case '\"':
-                        CfgError (&CfgErrorPos, "Unterminated '%%' escape sequence");
+                        CfgError (&CfgErrorPos, "Unterminated `%%' escape sequence");
                         break;
 
                     case '%':
@@ -156,7 +156,7 @@ static void StrVal (void)
 
                     default:
                         CfgWarning (&CfgErrorPos,
-                                    "Unknown escape sequence '%%%c'", C);
+                                    "Unknown escape sequence `%%%c'", C);
                         SB_AppendChar (&CfgSVal, '%');
                         SB_AppendChar (&CfgSVal, C);
                         NextChar ();
@@ -349,7 +349,7 @@ Again:
             break;
 
         default:
-            CfgError (&CfgErrorPos, "Invalid character '%c'", C);
+            CfgError (&CfgErrorPos, "Invalid character `%c'", C);
 
     }
 }
@@ -370,7 +370,7 @@ void CfgConsume (cfgtok_t T, const char* Msg)
 void CfgConsumeSemi (void)
 /* Consume a semicolon */
 {
-    CfgConsume (CFGTOK_SEMI, "';' expected");
+    CfgConsume (CFGTOK_SEMI, "`;' expected");
 }
 
 
@@ -378,7 +378,7 @@ void CfgConsumeSemi (void)
 void CfgConsumeColon (void)
 /* Consume a colon */
 {
-    CfgConsume (CFGTOK_COLON, "':' expected");
+    CfgConsume (CFGTOK_COLON, "`:' expected");
 }
 
 
@@ -462,7 +462,7 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
         }
 
         /* Not found */
-        CfgError (&CfgErrorPos, "%s expected, got '%s'", Name, SB_GetConstBuf(&CfgSVal));
+        CfgError (&CfgErrorPos, "%s expected, got `%s'", Name, SB_GetConstBuf(&CfgSVal));
         return;
     }
 
@@ -518,7 +518,7 @@ void CfgOpenInput (void)
     /* Open the file */
     InputFile = fopen (CfgName, "r");
     if (InputFile == 0) {
-        Error ("Cannot open '%s': %s", CfgName, strerror (errno));
+        Error ("Cannot open `%s': %s", CfgName, strerror (errno));
     }
 
     /* Initialize variables */

@@ -184,7 +184,7 @@ unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
 /* Convert a local string id into a global one and return it. */
 {
     if (Index >= O->StringCount) {
-        Error ("Invalid string index (%u) in module '%s'",
+        Error ("Invalid string index (%u) in module `%s'",
                Index, GetObjFileName (O));
     }
     return O->Strings[Index];
@@ -214,7 +214,7 @@ struct Section* GetObjSection (const ObjData* O, unsigned Id)
 /* Get a section from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->Sections)) {
-        Error ("Invalid section index (%u) in module '%s'",
+        Error ("Invalid section index (%u) in module `%s'",
                Id, GetObjFileName (O));
     }
     return CollAtUnchecked (&O->Sections, Id);
@@ -226,7 +226,7 @@ struct Import* GetObjImport (const ObjData* O, unsigned Id)
 /* Get an import from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->Imports)) {
-        Error ("Invalid import index (%u) in module '%s'",
+        Error ("Invalid import index (%u) in module `%s'",
                Id, GetObjFileName (O));
     }
     return CollAtUnchecked (&O->Imports, Id);
@@ -238,7 +238,7 @@ struct Export* GetObjExport (const ObjData* O, unsigned Id)
 /* Get an export from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->Exports)) {
-        Error ("Invalid export index (%u) in module '%s'",
+        Error ("Invalid export index (%u) in module `%s'",
                Id, GetObjFileName (O));
     }
     return CollAtUnchecked (&O->Exports, Id);
@@ -250,7 +250,7 @@ struct DbgSym* GetObjDbgSym (const ObjData* O, unsigned Id)
 /* Get a debug symbol from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->DbgSyms)) {
-        Error ("Invalid debug symbol index (%u) in module '%s'",
+        Error ("Invalid debug symbol index (%u) in module `%s'",
                Id, GetObjFileName (O));
     }
     return CollAtUnchecked (&O->DbgSyms, Id);
@@ -262,7 +262,7 @@ struct Scope* GetObjScope (const ObjData* O, unsigned Id)
 /* Get a scope from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->Scopes)) {
-        Error ("Invalid scope index (%u) in module '%s'",
+        Error ("Invalid scope index (%u) in module `%s'",
                Id, GetObjFileName (O));
     }
     return CollAtUnchecked (&O->Scopes, Id);

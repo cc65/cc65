@@ -219,13 +219,13 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
     /* We must have a valid name now */
     if (PathName == 0) {
-        Error ("Input file '%s' not found", Name);
+        Error ("Input file `%s' not found", Name);
     }
 
     /* Try to open the file */
     F = fopen (PathName, "rb");
     if (F == 0) {
-        Error ("Cannot open '%s': %s", PathName, strerror (errno));
+        Error ("Cannot open `%s': %s", PathName, strerror (errno));
     }
 
     /* Read the magic word */
@@ -251,7 +251,7 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
         default:
             fclose (F);
-            Error ("File '%s' has unknown type", PathName);
+            Error ("File `%s' has unknown type", PathName);
 
     }
 
@@ -340,7 +340,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
         PathName = SearchFile (CfgDefaultPath, Arg);
     }
     if (PathName == 0) {
-        Error ("Cannot find config file '%s'", Arg);
+        Error ("Cannot find config file `%s'", Arg);
     }
 
     /* Read the config */
@@ -394,7 +394,7 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
         /* Get the address size and check it */
         unsigned char AddrSize = AddrSizeFromStr (ColPos+1);
         if (AddrSize == ADDR_SIZE_INVALID) {
-            Error ("Invalid address size '%s'", ColPos+1);
+            Error ("Invalid address size `%s'", ColPos+1);
         }
 
         /* Create a copy of the argument */
@@ -544,7 +544,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     /* Map the target name to a target id */
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
-        Error ("Invalid target name: '%s'", Arg);
+        Error ("Invalid target name: `%s'", Arg);
     }
 
     /* Set the target binary format */
@@ -561,7 +561,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
         PathName = SearchFile (CfgDefaultPath, SB_GetBuf (&FileName));
     }
     if (PathName == 0) {
-        Error ("Cannot find config file '%s'", SB_GetBuf (&FileName));
+        Error ("Cannot find config file `%s'", SB_GetBuf (&FileName));
     }
 
     /* Free file name memory */

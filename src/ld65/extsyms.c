@@ -89,7 +89,7 @@ ExtSym* NewExtSym (ExtSymTab* Tab, unsigned Name)
     ExtSym* E = GetExtSym (Tab, Name);
     if (E != 0) {
         /* We do already have a symbol with this name */
-        Error ("Duplicate external symbol '%s'", GetString (Name));
+        Error ("Duplicate external symbol `%s'", GetString (Name));
     }
 
     /* Allocate memory for the structure */

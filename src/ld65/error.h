@@ -61,6 +61,12 @@ extern unsigned WarningCount;
 
 
 
+void AddNote (const char* Format, ...) attribute((format(printf,1,2)));
+/* Add a notification message that will be output after the next error or
+** warning. There cannot be a Notification() function since Error() will
+** always terminate.
+*/
+
 void Warning (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print a warning message */
 
@@ -69,6 +75,11 @@ void Error (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an internal error message and die */
+
+void AddCfgNote (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
+/* Add a notifcation message using file name and line number of the config file.
+** See comment for AddNote() above.
+*/
 
 void CfgWarning (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
 /* Print a warning message adding file name and line number of the config file */

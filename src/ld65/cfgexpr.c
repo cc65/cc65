@@ -105,7 +105,7 @@ static ExprNode* Factor (void)
             /* Left parenthesis */
             CfgNextTok ();
             N = CfgExpr ();
-            CfgConsume (CFGTOK_RPAR, "')' expected");
+            CfgConsume (CFGTOK_RPAR, "`)' expected");
             break;
 
         default:

@@ -287,7 +287,7 @@ static unsigned long XexWriteMem (XexDesc* D, MemoryArea* M)
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
                     /* "overwrite" segments are not supported */
                     if (S->Flags & SF_OVERWRITE) {
-                        Error ("ATARI file format does not support overwrite for segment '%s'.",
+                        Error ("ATARI file format does not support overwrite for segment `%s'.",
                                GetString (S->Name));
                     } else {
                         XexStartSegment (D, Addr, NewAddr - Addr);

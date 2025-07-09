@@ -109,6 +109,7 @@ void CheckAssertions (void)
     for (I = 0; I < CollCount (&Assertions); ++I) {
 
         const LineInfo* LI;
+        const FilePos* Pos;
         const char* Module;
         unsigned Line;
 
@@ -123,9 +124,12 @@ void CheckAssertions (void)
         /* Retrieve the relevant line info for this assertion */
         LI = CollConstAt (&A->LineInfos, 0);
 
-        /* Get file name and line number from the source */
-        Module = GetSourceName (LI);
+        /* Get the source file position of the assertion plus file and line
+        ** number.
+        */
+        Pos    = GetSourcePos (LI);
         Line   = GetSourceLine (LI);
+        Module = GetSourceName (LI);
 
         /* If the expression is not constant, we're not able to handle it */
         if (!IsConstExpr (A->Expr)) {
@@ -140,12 +144,12 @@ void CheckAssertions (void)
 
                 case ASSERT_ACT_WARN:
                 case ASSERT_ACT_LDWARN:
-                    Warning ("%s:%u: %s", Module, Line, Message);
+                    CfgWarning (Pos, "Assertion failed: %s", Message);
                     break;
 
                 case ASSERT_ACT_ERROR:
                 case ASSERT_ACT_LDERROR:
-                    Error ("%s:%u: %s", Module, Line, Message);
+                    CfgError (Pos, "Assertion failed: %s", Message);
                     break;
 
                 default:

@@ -61,8 +61,8 @@ define OPCODE_template
 
 $(WORKDIR)/$1-opcodes.bin: $1-opcodes.s $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1-opcodes.bin)
-	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$<
-	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
+	$(CA65) --no-utf8 -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$<
+	$(LD65) --no-utf8 -t none -o $$@ $$(@:.bin=.o) none.lib
 	$(ISEQUAL) $1-opcodes.ref $$@
 
 endef # OPCODE_template
@@ -70,7 +70,7 @@ endef # OPCODE_template
 $(foreach cpu,$(OPCODE_CPUS),$(eval $(call OPCODE_template,$(cpu))))
 
 $(WORKDIR)/%.o: %.s | $(WORKDIR)
-	$(CA65) -l $(@:.o=.lst) -o $@ $<
+	$(CA65) --no-utf8 -l $(@:.o=.lst) -o $@ $<
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

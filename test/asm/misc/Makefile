@@ -63,15 +63,15 @@ define PRG_template
 # sim65 ensure 64-bit wait time does not timeout
 $(WORKDIR)/sim65-timein.$1.prg: sim65-timein.s | $(WORKDIR)
 	$(if $(QUIET),echo misc/sim65-timein.$1.prg)
-	$(CA65) -t sim$1 -o $$(@:.prg=.o) $$< $(NULLERR)
-	$(LD65) -t sim$1 -o $$@ $$(@:.prg=.o) sim$1.lib $(NULLERR)
+	$(CA65) --no-utf8 -t sim$1 -o $$(@:.prg=.o) $$< $(NULLERR)
+	$(LD65) --no-utf8 -t sim$1 -o $$@ $$(@:.prg=.o) sim$1.lib $(NULLERR)
 	$(SIM65) -x 4400000000 -c $$@ $(NULLOUT) $(NULLERR)
 
 # sim65 ensure 64-bit wait time does timeout
 $(WORKDIR)/sim65-timeout.$1.prg: sim65-timeout.s | $(WORKDIR)
 	$(if $(QUIET),echo misc/sim65-timeout.$1.prg)
-	$(CA65) -t sim$1 -o $$(@:.prg=.o) $$< $(NULLERR)
-	$(LD65) -t sim$1 -o $$@ $$(@:.prg=.o) sim$1.lib $(NULLERR)
+	$(CA65) --no-utf8 -t sim$1 -o $$(@:.prg=.o) $$< $(NULLERR)
+	$(LD65) --no-utf8 -t sim$1 -o $$@ $$(@:.prg=.o) sim$1.lib $(NULLERR)
 	$(NOT) $(SIM65) -x 4400000000 -c $$@ $(NULLOUT) $(NULLERR)
 
 endef # PRG_template

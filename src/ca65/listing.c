@@ -289,13 +289,12 @@ static char* MakeLineHeader (char* H, const ListLine* L)
     if (!SegList) {
         Offset = 9;
         sprintf (H, "%06lX%c %c", L->PC, Mode, Depth);
-    }else if (L->Reloc){
+    } else if (L->Reloc) {
         Offset = 12;
         sprintf (H, "%02X.%06lX%c %c",L->Seg, L->PC, Mode, Depth);
     } else {
         Offset = 12;
         sprintf (H, "   %06lX%c %c", L->PC, Mode, Depth);
-
     }
     memset (H + Offset, ' ', LINE_HEADER_LEN - Offset - (SegList?0:3));
 
@@ -463,8 +462,9 @@ void CreateListing (void)
         L = L->Next;
 
     }
-    if (SegList)
+    if (SegList) {
         ListSegments (F);
+    }
     /* Close the listing file */
     (void) fclose (F);
 }

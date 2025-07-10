@@ -155,18 +155,6 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
 
 
 
-#if !defined(HAVE_INLINE)
-int ED_IsLocQuasiConst (const ExprDesc* Expr)
-/* Return true if the expression is a constant location of some sort or on the
-** stack.
-*/
-{
-    return ED_IsLocConst (Expr) || ED_IsLocStack (Expr);
-}
-#endif
-
-
-
 int ED_IsLocZP (const ExprDesc* Expr)
 /* Return true if the expression is in a location on a zeropage */
 {
@@ -178,27 +166,6 @@ int ED_IsLocZP (const ExprDesc* Expr)
 
 
 
-#if !defined(HAVE_INLINE)
-int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
-/* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
-{
-    return ED_IsLocPrimary (Expr) || ED_IsLocExpr (Expr);
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-int ED_IsIndExpr (const ExprDesc* Expr)
-/* Check if the expression is a reference to its value */
-{
-    return (Expr->Flags & E_ADDRESS_OF) == 0 &&
-           !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
-}
-#endif
-
-
-
 int ED_YetToLoad (const ExprDesc* Expr)
 /* Check if the expression needs to be loaded somehow. */
 {
@@ -206,29 +173,6 @@ int ED_YetToLoad (const ExprDesc* Expr)
            ED_YetToTest (Expr)      ||
            (ED_IsLVal (Expr) && IsQualVolatile (Expr->Type));
 }
-
-
-
-#if !defined(HAVE_INLINE)
-int ED_IsAbs (const ExprDesc* Expr)
-/* Return true if the expression denotes a numeric value or address. */
-{
-    return (Expr->Flags & (E_MASK_LOC)) == (E_LOC_NONE) ||
-           (Expr->Flags & (E_MASK_LOC|E_ADDRESS_OF)) == (E_LOC_ABS|E_ADDRESS_OF);
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-int ED_IsConstAbs (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant absolute value. This can be
-** a numeric constant, cast to any type.
-*/
-{
-    return ED_IsRVal (Expr) && ED_IsAbs (Expr);
-}
-#endif
 
 
 

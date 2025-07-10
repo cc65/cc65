@@ -134,7 +134,7 @@ static Segment* NewSegment (const char* Name, unsigned char AddrSize)
 
     /* Check the segment name for invalid names */
     if (!ValidSegName (Name)) {
-        Error ("Illegal segment name: '%s'", Name);
+        Error ("Illegal segment name: `%s'", Name);
     }
 
     /* Create a new segment and return it */

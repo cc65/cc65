@@ -111,7 +111,7 @@ ExprNode* ULabRef (int Which)
     if (Which == 0) {
         Error ("Invalid unnamed label reference");
         /* We must return something valid */
-        return GenCurrentPC();
+        return GenCurrentPC ();
     }
 
     /* Get the index of the referenced label */
@@ -125,7 +125,7 @@ ExprNode* ULabRef (int Which)
         /* Label does not exist */
         Error ("Undefined label");
         /* We must return something valid */
-        return GenCurrentPC();
+        return GenCurrentPC ();
     }
 
     /* Check if the label exists. If not, generate enough forward labels. */

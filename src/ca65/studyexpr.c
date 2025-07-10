@@ -593,7 +593,7 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
 
         if (SymHasUserMark (Sym)) {
             LIError (&Sym->DefLines,
-                     "Circular reference in definition of symbol '%m%p'",
+                     "Circular reference in definition of symbol `%m%p'",
                      GetSymName (Sym));
             ED_SetError (D);
         } else {
@@ -1359,8 +1359,7 @@ static void StudyNearAddr (ExprNode* Expr, ExprDesc* D)
     }
 
     /* Promote to absolute if smaller. */
-    if (D->AddrSize < ADDR_SIZE_ABS)
-    {
+    if (D->AddrSize < ADDR_SIZE_ABS) {
         D->AddrSize = ADDR_SIZE_ABS;
     }
 }

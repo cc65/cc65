@@ -38,6 +38,8 @@
 #include <stdarg.h>
 
 /* common */
+#include "cmdline.h"
+#include "consprop.h"
 #include "strbuf.h"
 
 /* ca65 */
@@ -45,6 +47,7 @@
 #include "filetab.h"
 #include "lineinfo.h"
 #include "nexttok.h"
+#include "spool.h"
 
 
 
@@ -64,6 +67,14 @@ unsigned WarningCount   = 0;
 /* Maximum number of additional notifications */
 #define MAX_NOTES       8
 
+/* Diagnostic category */
+typedef enum { DC_NOTE, DC_WARN, DC_ERR, DC_FATAL, DC_COUNT } DiagCat;
+
+/* Descriptions for diagnostic categories */
+const char* DiagCatDesc[DC_COUNT] = {
+    "Note", "Warning", "Error", "Fatal error"
+};
+
 
 
 /*****************************************************************************/
@@ -72,27 +83,144 @@ unsigned WarningCount   = 0;
 
 
 
-static void VPrintMsg (const FilePos* Pos, const char* Desc,
-                       const char* Format, va_list ap)
+static void ReplaceQuotes (StrBuf* Msg)
+/* Replace opening and closing single quotes in Msg by their typographically
+** correct UTF-8 counterparts for better readbility. A closing quote will
+** only get replaced if an opening quote has been seen before.
+** To handle some special cases, the function will also treat \xF0 as
+** opening and \xF1 as closing quote. These are replaced without the need for
+** correct ordering (open/close).
+** The function will change the quotes in place, so after the call Msg will
+** contain the changed string. If UTF-8 is not available, the function will
+** replace '`' by '\'' since that was the default behavior before. It will
+** also replace \xF0 and \xF1 by '\''.
+**/
+{
+    /* UTF-8 characters for single quotes */
+    static const char QuoteStart[] = "\xE2\x80\x98";
+    static const char QuoteEnd[]   = "\xE2\x80\x99";
+
+    /* ANSI color sequences */
+    const char* ColorStart = CP_BrightGreen ();
+    const char* ColorEnd   = CP_White ();
+
+    /* Remember a few things */
+    int IsUTF8 = CP_IsUTF8 ();
+
+    /* We create a new string in T and will later copy it back to Msg */
+    StrBuf T = AUTO_STRBUF_INITIALIZER;
+
+    /* Parse the string and create a modified copy */
+    SB_Reset (Msg);
+    int InQuote = 0;
+    while (1) {
+        char C = SB_Get (Msg);
+        switch (C) {
+            case '`':
+                if (!InQuote) {
+                    InQuote = 1;
+                    if (IsUTF8) {
+                        SB_AppendStr (&T, QuoteStart);
+                    } else {
+                        /* ca65 uses \' for opening and closing quotes */
+                        SB_AppendChar (&T, '\'');
+                    }
+                    SB_AppendStr (&T, ColorStart);
+                } else {
+                    /* Found two ` without closing quote - don't replace */
+                    SB_AppendChar (&T, '`');
+                }
+                break;
+            case '\'':
+                if (InQuote) {
+                    InQuote = 0;
+                    SB_AppendStr (&T, ColorEnd);
+                    if (IsUTF8) {
+                        SB_AppendStr (&T, QuoteEnd);
+                    } else {
+                        SB_AppendChar (&T, C);
+                    }
+                } else {
+                    SB_AppendChar (&T, C);
+                }
+                break;
+            case '\xF0':
+                if (IsUTF8) {
+                    SB_AppendStr (&T, QuoteStart);
+                } else {
+                    SB_AppendChar (&T, '\'');
+                }
+                break;
+            case '\xF1':
+                if (IsUTF8) {
+                    SB_AppendStr (&T, QuoteEnd);
+                } else {
+                    SB_AppendChar (&T, '\'');
+                }
+                break;
+            case '\0':
+                goto Done;
+            default:
+                SB_AppendChar (&T, C);
+                break;
+        }
+    }
+
+Done:
+    /* Copy the string back, then terminate it */
+    SB_Move (Msg, &T);
+    SB_Terminate (Msg);
+}
+
+
+
+static void VPrintMsg (const FilePos* Pos, DiagCat Cat, const char* Format,
+                       va_list ap)
 /* Format and output an error/warning message. */
 {
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
+    StrBuf S   = AUTO_STRBUF_INITIALIZER;
+    StrBuf Msg = AUTO_STRBUF_INITIALIZER;
+    StrBuf Loc = AUTO_STRBUF_INITIALIZER;
 
-    /* Format the actual message */
-    StrBuf Msg = STATIC_STRBUF_INITIALIZER;
+    /* Determine the description for the category and its color */
+    const char* Desc = DiagCatDesc[Cat];
+    const char* Color;
+    switch (Cat) {
+        case DC_NOTE:   Color = CP_Cyan ();             break;
+        case DC_WARN:   Color = CP_Yellow ();           break;
+        case DC_ERR:    Color = CP_BrightRed ();        break;
+        case DC_FATAL:  Color = CP_BrightRed ();        break;
+        default:        FAIL ("Unexpected Cat value");  break;
+    }
+
+    /* Format the actual message, then replace quotes */
     SB_VPrintf (&Msg, Format, ap);
-    SB_Terminate (&Msg);
+    ReplaceQuotes (&Msg);
 
-    /* Format the message header */
-    SB_Printf (&S, "%s:%u: %s: ",
-               SB_GetConstBuf (GetFileName (Pos->Name)),
-               Pos->Line,
-               Desc);
+    /* Format the location. If the file position is valid, we use the file
+    ** position, otherwise the program name. This allows to print fatal
+    ** errors in the startup phase.
+    */
+    if (Pos->Name == EMPTY_STRING_ID) {
+        SB_CopyStr (&Loc, ProgName);
+    } else {
+        SB_Printf (&Loc, "%s:%u", SB_GetConstBuf (GetFileName (Pos->Name)),
+                   Pos->Line);
+    }
+    SB_Terminate (&Loc);
 
-    /* Append the message to the message header */
-    SB_Append (&S, &Msg);
+    /* Format the full message */
+    SB_Printf (&S, "%s%s: %s%s:%s %s%s",
+               CP_White (),
+               SB_GetConstBuf (&Loc),
+               Color,
+               Desc,
+               CP_White (),
+               SB_GetConstBuf (&Msg),
+               CP_Reset ());
 
-    /* Delete the formatted message */
+    /* Delete the formatted message and the location string */
+    SB_Done (&Loc);
     SB_Done (&Msg);
 
     /* Add a new line and terminate the generated full message */
@@ -104,18 +232,6 @@ static void VPrintMsg (const FilePos* Pos, const char* Desc,
 
     /* Delete the buffer for the full message */
     SB_Done (&S);
-}
-
-
-
-static void PrintMsg (const FilePos* Pos, const char* Desc,
-                      const char* Format, ...)
-/* Format and output an error/warning message. */
-{
-    va_list ap;
-    va_start (ap, Format);
-    VPrintMsg (Pos, Desc, Format, ap);
-    va_end (ap);
 }
 
 
@@ -165,7 +281,7 @@ static void AddNotifications (const Collection* LineInfos)
         /* Output until an upper limit of messages is reached */
         if (Msg) {
             if (Output < MAX_NOTES) {
-                PrintMsg (GetSourcePos (LI), "Note", "%s", Msg);
+                PNotification (GetSourcePos (LI), "%s", Msg);
                 ++Output;
             } else {
                 ++Skipped;
@@ -176,9 +292,39 @@ static void AddNotifications (const Collection* LineInfos)
     /* Add a note if we have more stuff that we won't output */
     if (Skipped > 0) {
         const LineInfo* LI = CollConstAt (LineInfos, 0);
-        PrintMsg (GetSourcePos (LI), "Note",
-                  "Dropping %u additional line infos", Skipped);
+        PNotification (GetSourcePos (LI), "Dropping %u additional line infos",
+                       Skipped);
     }
+}
+
+
+
+/*****************************************************************************/
+/*                               Notifications                               */
+/*****************************************************************************/
+
+
+
+void Notification (const char* Format, ...)
+/* Print a notification message. */
+{
+    /* Output the message */
+    va_list ap;
+    va_start (ap, Format);
+    VPrintMsg (&CurTok.Pos, DC_NOTE, Format, ap);
+    va_end (ap);
+}
+
+
+
+void PNotification (const FilePos* Pos, const char* Format, ...)
+/* Print a notification message. */
+{
+    /* Output the message */
+    va_list ap;
+    va_start (ap, Format);
+    VPrintMsg (Pos, DC_NOTE, Format, ap);
+    va_end (ap);
 }
 
 
@@ -196,7 +342,7 @@ static void WarningMsg (const Collection* LineInfos, const char* Format, va_list
     const LineInfo* LI = CollConstAt (LineInfos, 0);
 
     /* Output a warning for this position */
-    VPrintMsg (GetSourcePos (LI), "Warning", Format, ap);
+    VPrintMsg (GetSourcePos (LI), DC_WARN, Format, ap);
 
     /* Add additional notifications if necessary */
     AddNotifications (LineInfos);
@@ -237,7 +383,7 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...)
     if (Level <= WarnLevel) {
         va_list ap;
         va_start (ap, Format);
-        VPrintMsg (Pos, "Warning", Format, ap);
+        VPrintMsg (Pos, DC_WARN, Format, ap);
         va_end (ap);
 
         /* Count warnings */
@@ -274,7 +420,7 @@ void ErrorMsg (const Collection* LineInfos, const char* Format, va_list ap)
     const LineInfo* LI = CollConstAt (LineInfos, 0);
 
     /* Output an error for this position */
-    VPrintMsg (GetSourcePos (LI), "Error", Format, ap);
+    VPrintMsg (GetSourcePos (LI), DC_ERR, Format, ap);
 
     /* Add additional notifications if necessary */
     AddNotifications (LineInfos);
@@ -311,7 +457,7 @@ void PError (const FilePos* Pos, const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    VPrintMsg (Pos, "Error", Format, ap);
+    VPrintMsg (Pos, DC_ERR, Format, ap);
     va_end (ap);
 
     /* Count errors */
@@ -365,17 +511,11 @@ void ErrorSkip (const char* Format, ...)
 void Fatal (const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
+    /* Output the message ... */
     va_list ap;
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
-
     va_start (ap, Format);
-    SB_VPrintf (&S, Format, ap);
-    SB_Terminate (&S);
+    VPrintMsg (&CurTok.Pos, DC_FATAL, Format, ap);
     va_end (ap);
-
-    fprintf (stderr, "Fatal error: %s\n", SB_GetConstBuf (&S));
-
-    SB_Done (&S);
 
     /* And die... */
     exit (EXIT_FAILURE);

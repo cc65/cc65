@@ -41,7 +41,6 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
-#include "inline.h"
 #include "print.h"
 #include "xmalloc.h"
 

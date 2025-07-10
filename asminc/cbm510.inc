@@ -15,6 +15,8 @@ IndReg          := $01          ; Controls indirect indexed load-store bank
 
 TXTPTR          := $85          ; Far pointer into BASIC source code
 FNAM            := $90          ; Far pointer to LOAD/SAVE file-name
+FNAM_SEG        := $92
+STATUS          := $9C          ; Kernal I/O completion status
 FNAM_LEN        := $9D          ; Holds length of file-name
 
 ; ---------------------------------------------------------------------------

@@ -1,8 +1,10 @@
 ; 2018-04-13, Jede (jede@oric.org)
 ;
-
+;
 ; void cputc (char c);
 ;
+; Important note: The implementation of cputs() relies on the cputc() function
+; not clobbering ptr1. Beware when rewriting or changing this function!
 
         .export         _cputc, _cputcxy, cputdirect, display_conio
         .export         CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR

@@ -40,6 +40,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "nexttok.h"
 #include "scanner.h"
 #include "symbol.h"
@@ -73,7 +74,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         /* Start from the root scope */
         Scope = RootScope;
 
-    } else if (CurTok.Tok == TOK_IDENT) {
+    } else if (Expect (TOK_IDENT, "Expected an identifier")) {
 
         /* Remember the name and skip it */
         SB_Copy (Name, &CurTok.SVal);
@@ -95,7 +96,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         if (Scope == 0) {
             /* Scope not found */
             SB_Terminate (FullName);
-            Error ("No such scope: '%m%p'", FullName);
+            Error ("No such scope: `%m%p'", FullName);
             return 0;
         }
 
@@ -115,8 +116,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
     while (1) {
 
         /* Next token must be an identifier. */
-        if (CurTok.Tok != TOK_IDENT) {
-            Error ("Identifier expected");
+        if (!Expect (TOK_IDENT, "Expected an identifier")) {
             return 0;
         }
 
@@ -139,7 +139,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         Scope = SymFindScope (Scope, Name, SYM_FIND_EXISTING);
         if (Scope == 0) {
             /* Scope not found */
-            Error ("No such scope: '%m%p'", FullName);
+            Error ("No such scope: `%m%p'", FullName);
             return 0;
         }
 

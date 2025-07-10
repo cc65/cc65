@@ -22,7 +22,7 @@
         sty     ktmp
 
         txa
-        ldy     #$90                    ; FNAM
+        ldy     #FNAM
         sta     (sysp0),y
 
         lda     ktmp
@@ -33,13 +33,10 @@
         ldy     #$92                    ; FNAM_SEG
         sta     (sysp0),y
 
-        ldy     #$9D                    ; FNAM_LEN
+        ldy     #FNAM_LEN
         pla
         sta     (sysp0),y
         ldy     ktmp
         jmp     restore_bank
 
 .endproc
-
-
-

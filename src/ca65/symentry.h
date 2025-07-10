@@ -42,7 +42,6 @@
 #include "cddefs.h"
 #include "coll.h"
 #include "filepos.h"
-#include "inline.h"
 #include "strbuf.h"
 
 /* ca65 */
@@ -137,25 +136,17 @@ int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E);
 ** inserted on the right side.
 */
 
-#if defined(HAVE_INLINE)
-INLINE void SymAddExprRef (SymEntry* Sym, struct ExprNode* Expr)
+static inline void SymAddExprRef (SymEntry* Sym, struct ExprNode* Expr)
 /* Add an expression reference to this symbol */
 {
     CollAppend (&Sym->ExprRefs, Expr);
 }
-#else
-#define SymAddExprRef(Sym,Expr)     CollAppend (&(Sym)->ExprRefs, Expr)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SymDelExprRef (SymEntry* Sym, struct ExprNode* Expr)
+static inline void SymDelExprRef (SymEntry* Sym, struct ExprNode* Expr)
 /* Delete an expression reference to this symbol */
 {
     CollDeleteItem (&Sym->ExprRefs, Expr);
 }
-#else
-#define SymDelExprRef(Sym,Expr)     CollDeleteItem (&(Sym)->ExprRefs, Expr)
-#endif
 
 void SymTransferExprRefs (SymEntry* From, SymEntry* To);
 /* Transfer all expression references from one symbol to another. */
@@ -199,107 +190,71 @@ void SymImportFromGlobal (SymEntry* S);
 ** into an import.
 */
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsDef (const SymEntry* S)
+static inline int SymIsDef (const SymEntry* S)
 /* Return true if the given symbol is already defined */
 {
     return (S->Flags & SF_DEFINED) != 0;
 }
-#else
-#  define SymIsDef(S)   (((S)->Flags & SF_DEFINED) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsRef (const SymEntry* S)
+static inline int SymIsRef (const SymEntry* S)
 /* Return true if the given symbol has been referenced */
 {
     return (S->Flags & SF_REFERENCED) != 0;
 }
-#else
-#  define SymIsRef(S)   (((S)->Flags & SF_REFERENCED) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsImport (const SymEntry* S)
+static inline int SymIsImport (const SymEntry* S)
 /* Return true if the given symbol is marked as import */
 {
     /* Check the import flag */
     return (S->Flags & SF_IMPORT) != 0;
 }
-#else
-#  define SymIsImport(S)  (((S)->Flags & SF_IMPORT) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsExport (const SymEntry* S)
+static inline int SymIsExport (const SymEntry* S)
 /* Return true if the given symbol is marked as export */
 {
     /* Check the export flag */
     return (S->Flags & SF_EXPORT) != 0;
 }
-#else
-#  define SymIsExport(S)  (((S)->Flags & SF_EXPORT) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsVar (const SymEntry* S)
+static inline int SymIsVar (const SymEntry* S)
 /* Return true if the given symbol is marked as variable */
 {
     /* Check the variable flag */
     return (S->Flags & SF_VAR) != 0;
 }
-#else
-#  define SymIsVar(S)   (((S)->Flags & SF_VAR) != 0)
-#endif
 
 int SymIsConst (const SymEntry* Sym, long* Val);
 /* Return true if the given symbol has a constant value. If Val is not NULL
 ** and the symbol has a constant value, store it's value there.
 */
 
-#if defined(HAVE_INLINE)
-INLINE int SymHasExpr (const SymEntry* S)
+static inline int SymHasExpr (const SymEntry* S)
 /* Return true if the given symbol has an associated expression */
 {
     /* Check the expression */
     return ((S->Flags & (SF_DEFINED|SF_IMPORT)) == SF_DEFINED);
 }
-#else
-#  define SymHasExpr(S)   (((S)->Flags & (SF_DEFINED|SF_IMPORT)) == SF_DEFINED)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SymMarkUser (SymEntry* S)
+static inline void SymMarkUser (SymEntry* S)
 /* Set a user mark on the specified symbol */
 {
     /* Set the bit */
     S->Flags |= SF_USER;
 }
-#else
-#  define SymMarkUser(S)   ((S)->Flags |= SF_USER)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SymUnmarkUser (SymEntry* S)
+static inline void SymUnmarkUser (SymEntry* S)
 /* Remove a user mark from the specified symbol */
 {
     /* Reset the bit */
     S->Flags &= ~SF_USER;
 }
-#else
-#  define SymUnmarkUser(S)   ((S)->Flags &= ~SF_USER)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymHasUserMark (SymEntry* S)
+static inline int SymHasUserMark (SymEntry* S)
 /* Return the state of the user mark for the specified symbol */
 {
     /* Check the bit */
     return (S->Flags & SF_USER) != 0;
 }
-#else
-#  define SymHasUserMark(S) (((S)->Flags & SF_USER) != 0)
-#endif
 
 struct SymTable* GetSymParentScope (SymEntry* S);
 /* Get the parent scope of the symbol (not the one it is defined in). Return
@@ -314,27 +269,19 @@ const struct ExprNode* SymResolve (const SymEntry* Sym);
 ** NULL. Do not call in other contexts!
 */
 
-#if defined(HAVE_INLINE)
-INLINE const StrBuf* GetSymName (const SymEntry* S)
+static inline const StrBuf* GetSymName (const SymEntry* S)
 /* Return the name of the symbol */
 {
     return GetStrBuf (S->Name);
 }
-#else
-#  define GetSymName(S)   GetStrBuf ((S)->Name)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned char GetSymAddrSize (const SymEntry* S)
+static inline unsigned char GetSymAddrSize (const SymEntry* S)
 /* Return the address size of the symbol. Beware: This function will just
 ** return the AddrSize member, it will not look at the expression!
 */
 {
     return S->AddrSize;
 }
-#else
-#  define GetSymAddrSize(S)   ((S)->AddrSize)
-#endif
 
 long GetSymVal (SymEntry* Sym);
 /* Return the value of a symbol assuming it's constant. FAIL will be called

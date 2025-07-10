@@ -235,47 +235,29 @@ extern unsigned InPragmaParser;     /* Depth of pragma parser calling */
 
 
 
-#if defined(HAVE_INLINE)
-INLINE int TokIsPunc (const Token* T)
+static inline int TokIsPunc (const Token* T)
 /* Return true if the token is a punctuator */
 {
     return (T->Tok >= TOK_FIRST_PUNC && T->Tok <= TOK_LAST_PUNC);
 }
-#else
-#  define TokIsPunc(T)  \
-        ((T)->Tok >= TOK_FIRST_PUNC && (T)->Tok <= TOK_LAST_PUNC)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int TokIsStorageClass (const Token* T)
+static inline int TokIsStorageClass (const Token* T)
 /* Return true if the token is a storage class specifier */
 {
     return (T->Tok >= TOK_FIRST_STORAGE_CLASS && T->Tok <= TOK_LAST_STORAGE_CLASS);
 }
-#else
-#  define TokIsStorageClass(T)  \
-        ((T)->Tok >= TOK_FIRST_STORAGE_CLASS && (T)->Tok <= TOK_LAST_STORAGE_CLASS)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int TokIsType (const Token* T)
+static inline int TokIsType (const Token* T)
 /* Return true if the token is a type */
 {
     return (T->Tok >= TOK_FIRST_TYPE && T->Tok <= TOK_LAST_TYPE);
 }
-#else
-#  define TokIsType(T)  ((T)->Tok >= TOK_FIRST_TYPE && (T)->Tok <= TOK_LAST_TYPE)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int TokIsTypeQual (const Token* T)
+static inline int TokIsTypeQual (const Token* T)
 /* Return true if the token is a type qualifier */
 {
     return (T->Tok >= TOK_FIRST_TYPEQUAL && T->Tok <= TOK_LAST_TYPEQUAL);
 }
-#else
-#  define TokIsTypeQual(T)  ((T)->Tok >= TOK_FIRST_TYPEQUAL && (T)->Tok <= TOK_LAST_TYPEQUAL)
-#endif
 
 int TokIsFuncSpec (const Token* T);
 /* Return true if the token is a function specifier */

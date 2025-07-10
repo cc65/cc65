@@ -51,6 +51,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "global.h"
 #include "instr.h"
@@ -421,8 +422,7 @@ static ExprNode* FuncCapability (void)
         capability_t Cap;
 
         /* We must have an identifier */
-        if (CurTok.Tok != TOK_IDENT) {
-            Error ("Arguments to .CAPABILITY must be identifiers");
+        if (!Expect (TOK_IDENT, "Expected a capability name")) {
             /* Skip tokens until closing paren or end of line */
             while (CurTok.Tok != TOK_RPAREN && !TokIsSep (CurTok.Tok)) {
                 NextTok ();
@@ -779,7 +779,7 @@ static ExprNode* FuncAddrSize (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
         } else {
             AddrSize = Sym->AddrSize;
         }
@@ -819,13 +819,13 @@ static ExprNode* FuncAddrSize (void)
         if (Sym) {
             AddrSize = Sym->AddrSize;
         } else {
-            Error ("Unknown symbol or scope: '%m%p%m%p'", &ScopeName, &Name);
+            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
         }
 
     }
 
     if (AddrSize == 0) {
-        Warning (1, "Unknown address size: '%m%p%m%p'", &ScopeName, &Name);
+        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
     }
 
     /* Free the string buffers */
@@ -860,7 +860,7 @@ static ExprNode* FuncSizeOf (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
@@ -912,7 +912,7 @@ static ExprNode* FuncSizeOf (void)
             if (Sym) {
                 SizeSym = GetSizeOfSymbol (Sym);
             } else {
-                Error ("Unknown symbol or scope: '%m%p%m%p'",
+                Error ("Unknown symbol or scope: `%m%p%m%p'",
                        &ScopeName, &Name);
             }
         }
@@ -920,7 +920,7 @@ static ExprNode* FuncSizeOf (void)
 
     /* Check if we have a size */
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
-        Error ("Size of '%m%p%m%p' is unknown", &ScopeName, &Name);
+        Error ("Size of `%m%p%m%p' is unknown", &ScopeName, &Name);
         Size = 0;
     }
 
@@ -942,8 +942,7 @@ static ExprNode* FuncStrAt (void)
     unsigned char C = 0;
 
     /* String constant expected */
-    if (CurTok.Tok != TOK_STRCON) {
-        Error ("String constant expected");
+    if (!Expect (TOK_STRCON, "Expected a string constant")) {
         NextTok ();
         goto ExitPoint;
     }
@@ -985,9 +984,8 @@ static ExprNode* FuncStrLen (void)
     int Len;
 
     /* String constant expected */
-    if (CurTok.Tok != TOK_STRCON) {
+    if (!Expect (TOK_STRCON, "Expected a string constant")) {
 
-        Error ("String constant expected");
         /* Smart error recovery */
         if (CurTok.Tok != TOK_RPAREN) {
             NextTok ();
@@ -1062,9 +1060,7 @@ static ExprNode* Function (ExprNode* (*F) (void))
     NextTok ();
 
     /* Expression must be enclosed in braces */
-    if (CurTok.Tok != TOK_LPAREN) {
-        Error ("'(' expected");
-        SkipUntilSep ();
+    if (!ExpectSkip (TOK_LPAREN, "Expected `('")) {
         return GenLiteral0 ();
     }
     NextTok ();
@@ -1296,7 +1292,7 @@ static ExprNode* Factor (void)
                 NextTok ();
             } else {
                 N = GenLiteral0 ();     /* Dummy */
-                Error ("Syntax error");
+                ErrorExpect ("Expected an expression");
             }
             break;
     }
@@ -1957,9 +1953,8 @@ ExprNode* GenNearAddrExpr (ExprNode* Expr)
     if (IsEasyConst (Expr, &Val)) {
         FreeExpr (Expr);
         Expr = GenLiteralExpr (Val & 0xFFFF);
-        if (Val > 0xFFFF)
-        {
-            Error("Range error: constant too large for assumed near address.");
+        if (Val > 0xFFFF) {
+            Error ("Range error: constant too large for assumed near address.");
         }
     } else {
         ExprNode* Operand = Expr;

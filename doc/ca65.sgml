@@ -102,6 +102,7 @@ Short options:
   -mm model                     Set the memory model
   -o name                       Name the output file
   -s                            Enable smart mode
+  -S                            Generate segment offsets in listing
   -t sys                        Set the target system
   -v                            Increase verbosity
 
@@ -127,6 +128,7 @@ Long options:
   --no-utf8                     Disable use of UTF-8 in diagnostics
   --pagelength n                Set the page length for the listing
   --relax-checks                Relax some checks (see docs)
+  --segment-list                Generate segment offsets in listing
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity

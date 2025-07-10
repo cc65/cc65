@@ -107,6 +107,7 @@ static void Usage (void)
             "  -mm model\t\t\tSet the memory model\n"
             "  -o name\t\t\tName the output file\n"
             "  -s\t\t\t\tEnable smart mode\n"
+            "  -S\t\t\t\tEnable segment offset listing\n"
             "  -t sys\t\t\tSet the target system\n"
             "  -v\t\t\t\tIncrease verbosity\n"
             "  -x\t\t\t\tExpand macros\n"
@@ -132,6 +133,7 @@ static void Usage (void)
             "  --no-utf8\t\t\tDisable use of UTF-8 in diagnostics\n"
             "  --pagelength n\t\tSet the page length for the listing\n"
             "  --relax-checks\t\tRelax some checks (see docs)\n"
+            "  --segment-list\t\tEnable segment offset listing\n"
             "  --smart\t\t\tEnable smart mode\n"
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
@@ -743,7 +745,12 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
-
+static void OptSeglist (const char* Opt attribute ((unused)),
+    const char* Arg attribute ((unused)))
+    /* Enable segment listing */
+{
+    SegList = 1;
+}
 
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
@@ -1074,6 +1081,7 @@ int main (int argc, char* argv [])
         { "--no-utf8",             0,      OptNoUtf8               },
         { "--pagelength",          1,      OptPageLength           },
         { "--relax-checks",        0,      OptRelaxChecks          },
+        { "--segment-list",        0,      OptSeglist              },
         { "--smart",               0,      OptSmart                },
         { "--target",              1,      OptTarget               },
         { "--verbose",             0,      OptVerbose              },
@@ -1160,6 +1168,10 @@ int main (int argc, char* argv [])
 
                 case 's':
                     OptSmart (Arg, 0);
+                    break;
+
+                case 'S':
+                    OptSeglist (Arg, 0);
                     break;
 
                 case 't':

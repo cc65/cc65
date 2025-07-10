@@ -483,8 +483,9 @@ void ListSegments (FILE* destination)
     fprintf (destination, "\nSegment summary\n\n");
     for (I = 0; I < CollCount (&SegmentList); ++I) {
         Segment* S = CollAtUnchecked (&SegmentList, I);
-        if(S->FragCount)
+        if(S->FragCount) {
             fprintf (destination, "Segment: %02X = %s\n", S->Num, S->Def->Name);
+        }
     }
 }
 

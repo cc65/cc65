@@ -40,7 +40,6 @@
 
 /* common */
 #include "coll.h"
-#include "inline.h"
 #include "strbuf.h"
 
 
@@ -109,15 +108,11 @@ void FreeUndefinedMacros (void);
 Macro* FindMacro (const char* Name);
 /* Find a macro with the given name. Return the macro definition or NULL */
 
-#if defined(HAVE_INLINE)
-INLINE int IsMacro (const char* Name)
+static inline int IsMacro (const char* Name)
 /* Return true if the given name is the name of a macro, return false otherwise */
 {
     return FindMacro (Name) != 0;
 }
-#else
-#  define IsMacro(Name)         (FindMacro (Name) != 0)
-#endif
 
 int FindMacroParam (const Macro* M, const char* Param);
 /* Search for a macro parameter. If found, return the index of the parameter.

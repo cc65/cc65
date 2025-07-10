@@ -40,6 +40,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "nexttok.h"
 #include "toklist.h"
@@ -53,7 +54,7 @@
 
 
 
-static TokList* CollectRepeatTokens (void)
+static TokList* CollectRepeatTokens (const FilePos* StartPos)
 /* Collect all tokens inside the .REPEAT body in a token list and return
 ** this list. In case of errors, NULL is returned.
 */
@@ -67,7 +68,8 @@ static TokList* CollectRepeatTokens (void)
 
         /* Check for end of input */
         if (CurTok.Tok == TOK_EOF) {
-            Error ("Unexpected end of file");
+            ErrorExpect ("Expected `.ENDREPEAT'");
+            PNotification (StartPos, "For this `.REPEAT' command");
             FreeTokList (List);
             return 0;
         }
@@ -117,10 +119,14 @@ void ParseRepeat (void)
     char* Name;
     TokList* List;
 
+    /* Remember the position of the .REPEAT token, then skip it */
+    FilePos StartPos = CurTok.Pos;
+    NextTok ();
+
     /* Repeat count follows */
     long RepCount = ConstExpression ();
     if (RepCount < 0) {
-        Error ("Range error");
+        Error ("Repeat count must be positive or zero");
         RepCount = 0;
     }
 
@@ -132,9 +138,7 @@ void ParseRepeat (void)
         NextTok ();
 
         /* Check for an identifier */
-        if (CurTok.Tok != TOK_IDENT) {
-            ErrorSkip ("Identifier expected");
-        } else {
+        if (ExpectSkip (TOK_IDENT, "Expected an identifier")) {
             /* Remember the name and skip it */
             SB_Terminate (&CurTok.SVal);
             Name = xstrdup (SB_GetConstBuf (&CurTok.SVal));
@@ -147,7 +151,7 @@ void ParseRepeat (void)
     ConsumeSep ();
 
     /* Read the token list */
-    List = CollectRepeatTokens ();
+    List = CollectRepeatTokens (&StartPos);
 
     /* If we had an error, bail out */
     if (List == 0) {

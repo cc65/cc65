@@ -35,6 +35,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "instr.h"
 #include "lineinfo.h"
@@ -194,7 +195,7 @@ static void FreeIf (void)
 {
     int Done;
     do {
-        IfDesc* ID = GetCurrentIf();
+        IfDesc* ID = GetCurrentIf ();
         if (ID == 0) {
             Error (" Unexpected .ENDIF");
             Done = 1;
@@ -318,7 +319,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFCONST", 1);
                 NextTok ();
                 if (IfCond) {
-                    ExprNode* Expr = Expression();
+                    ExprNode* Expr = Expression ();
                     SetIfCond (D, IsConstExpr (Expr, 0));
                     FreeExpr (Expr);
                     ExpectSep ();
@@ -354,7 +355,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFNCONST", 1);
                 NextTok ();
                 if (IfCond) {
-                    ExprNode* Expr = Expression();
+                    ExprNode* Expr = Expression ();
                     SetIfCond (D, !IsConstExpr (Expr, 0));
                     FreeExpr (Expr);
                     ExpectSep ();
@@ -388,7 +389,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFP02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_6502);
+                    SetIfCond (D, GetCPU () == CPU_6502);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -398,7 +399,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFP02X", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_6502X);
+                    SetIfCond (D, GetCPU () == CPU_6502X);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -408,7 +409,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFP4510", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_4510);
+                    SetIfCond (D, GetCPU () == CPU_4510);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -418,7 +419,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFP45GS02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_45GS02);
+                    SetIfCond (D, GetCPU () == CPU_45GS02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -428,7 +429,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFP6280", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_HUC6280);
+                    SetIfCond (D, GetCPU () == CPU_HUC6280);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -438,7 +439,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFP816", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_65816);
+                    SetIfCond (D, GetCPU () == CPU_65816);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -448,7 +449,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFPC02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_65C02);
+                    SetIfCond (D, GetCPU () == CPU_65C02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -458,7 +459,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFPCE02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_65CE02);
+                    SetIfCond (D, GetCPU () == CPU_65CE02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -468,7 +469,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFPDTV", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_6502DTV);
+                    SetIfCond (D, GetCPU () == CPU_6502DTV);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -478,7 +479,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFPM740", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_M740);
+                    SetIfCond (D, GetCPU () == CPU_M740);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -488,7 +489,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFPSC02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_65SC02);
+                    SetIfCond (D, GetCPU () == CPU_65SC02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -498,7 +499,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFPSWEET16", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_SWEET16);
+                    SetIfCond (D, GetCPU () == CPU_SWEET16);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -508,7 +509,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFPWC02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_W65C02);
+                    SetIfCond (D, GetCPU () == CPU_W65C02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();

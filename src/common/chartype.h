@@ -40,8 +40,6 @@
 
 #include <ctype.h>
 
-/* common */
-#include "inline.h"
 
 
 /* This module contains replacements for functions in ctype.h besides other
@@ -73,15 +71,11 @@ int IsAscii (char C);
 int IsBlank (char C);
 /* Check for a space or tab */
 
-#if defined(HAVE_INLINE)
-INLINE int IsControl (char C)
+static inline int IsControl (char C)
 /* Check for control chars */
 {
     return iscntrl ((unsigned char) C);
 }
-#else
-#  define IsControl(C)          iscntrl (C)
-#endif
 
 int IsSpace (char C);
 /* Check for any white space characters */

@@ -39,7 +39,6 @@
 
 
 /* common */
-#include "inline.h"
 #include "xmalloc.h"
 
 
@@ -99,15 +98,11 @@ struct HashTable {
 
 
 
-#if defined(HAVE_INLINE)
-INLINE void InitHashNode (HashNode* N)
+static inline void InitHashNode (HashNode* N)
 /* Initialize a hash node. */
 {
     N->Next     = 0;
 }
-#else
-#define InitHashNode(N)         do { (N)->Next   = 0; } while (0)
-#endif
 
 
 
@@ -125,29 +120,21 @@ void DoneHashTable (HashTable* T);
 ** in the table!
 */
 
-#if defined(HAVE_INLINE)
-INLINE HashTable* NewHashTable (unsigned Slots, const HashFunctions* Func)
+static inline HashTable* NewHashTable (unsigned Slots, const HashFunctions* Func)
 /* Create a new hash table and return it. */
 {
     /* Allocate memory, initialize and return it */
     return InitHashTable (xmalloc (sizeof (HashTable)), Slots, Func);
 }
-#else
-#define NewHashTable(Slots, Func) InitHashTable(xmalloc (sizeof (HashTable)), Slots, Func)
-#endif
 
 void FreeHashTable (HashTable* T);
 /* Free a hash table. Note: This will not free the entries in the table! */
 
-#if defined(HAVE_INLINE)
-INLINE unsigned HT_GetCount (const HashTable* T)
+static inline unsigned HT_GetCount (const HashTable* T)
 /* Return the number of items in the table. */
 {
     return T->Count;
 }
-#else
-#define HT_GetCount(T)  ((T)->Count)
-#endif
 
 HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash);
 /* Find the node with the given key. Differs from HT_Find in that the hash

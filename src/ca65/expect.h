@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 inline.h                                  */
+/*                                 expect.h                                  */
 /*                                                                           */
-/*              Definitions to use the inline compiler feature               */
+/*                      Print errors about expected tokens                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2005  Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2025,      Kugelfuhr                                                  */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,24 +30,54 @@
 
 
 
-#ifndef INLINE_H
-#define INLINE_H
+#ifndef EXPECT_H
+#define EXPECT_H
+
+
+
+/* ca65 */
+#include "token.h"
 
 
 
 /*****************************************************************************/
-/*                                  Defines                                  */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-#if defined(__GNUC__) && !defined(DISABLE_INLINE)
-#  define HAVE_INLINE   1
-#  define INLINE        static __inline__
-#endif
+void ErrorExpect (const char* Msg);
+/* Output an error message about some expected token using Msg and the
+ * description of the following token. This means that Msg should contain
+ * something like "xyz expected". The actual error message would then be
+ * "xyz expected but found zyx".
+ */
+
+int Expect (token_t Expected, const char* Msg);
+/* Check if the next token is the expected one. If not, print Msg plus some
+ * information about the token that was actually found. This means that Msg
+ * should contain something like "xyz expected". The actual error message would
+ * then be "xyz expected but found zyx".
+ * Returns true if the token was found, otherwise false.
+ */
+
+int ExpectSkip (token_t Expected, const char* Msg);
+/* Check if the next token is the expected one. If not, print Msg plus some
+ * information about the token that was actually found and skip the remainder
+ * of the line. This means that Msg should contain something like "xyz
+ * expected". The actual error message would then be "xyz expected but found
+ * zyx".
+ * Returns true if the token was found, otherwise false.
+ */
+
+int ExpectSep (void);
+/* Check if we've reached a line separator. If so, return true. If not, output
+** an error and skip all tokens until the line separator is reached. Then
+** return false.
+*/
 
 
 
-/* End of inline.h */
+/* End of expect.h */
 
 #endif

@@ -380,28 +380,37 @@ unsigned OptIndLoads2 (CodeSeg* S)
 
 
 
-static unsigned IsDecSP (const CodeEntry* E)
-/* Check if this is an insn that decrements the stack pointer. If so, return
-** the decrement. If not, return zero.
-** The function expects E to be a subroutine call.
+static signed IsShift (const CodeEntry* E, const char* dec, const char* inc, const char* sub, const char* add)
+/* Check if this is an insn that increments/decrements the stack pointer or AX.
+** If so, return the value (negative for dec, positive for inc). If not, return zero.
 */
 {
-    if (strncmp (E->Arg, "decsp", 5) == 0) {
+    if (E->OPC != OP65_JSR && E->OPC != OP65_JMP) {
+        return 0;
+    }
+
+    if (strncmp (E->Arg, dec, 5) == 0) {
+        if (E->Arg[5] >= '1' && E->Arg[5] <= '8') {
+            return -(E->Arg[5] - '0');
+        }
+    } else if (strcmp (E->Arg, sub) == 0 && RegValIsKnown (E->RI->In.RegY)) {
+        return -(E->RI->In.RegY);
+    } else if (strncmp (E->Arg, inc, 5) == 0) {
         if (E->Arg[5] >= '1' && E->Arg[5] <= '8') {
             return (E->Arg[5] - '0');
         }
-    } else if (strcmp (E->Arg, "subysp") == 0 && RegValIsKnown (E->RI->In.RegY)) {
-        return E->RI->In.RegY;
+    } else if (strcmp (E->Arg, add) == 0 && RegValIsKnown (E->RI->In.RegY)) {
+        return (E->RI->In.RegY);
     }
 
-    /* If we come here, it's not a decsp op */
+    /* If we come here, it's not a dec/inc op */
     return 0;
 }
 
 
 
-unsigned OptStackPtrOps (CodeSeg* S)
-/* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
+static unsigned OptIncDecOps (CodeSeg* S, const char* dec, const char* inc, const char* sub, const char* add)
+/* Merge adjacent calls to inc/dec/add/sub into one. NOTE: This function won't merge all
 ** known cases!
 */
 {
@@ -412,38 +421,116 @@ unsigned OptStackPtrOps (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        unsigned Dec1;
-        unsigned Dec2;
+        signed Val1;
+        signed Val2;
         const CodeEntry* N;
 
         /* Get the next entry */
         const CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for decspn or subysp */
-        if (E->OPC == OP65_JSR                          &&
-            (Dec1 = IsDecSP (E)) > 0                    &&
-            (N = CS_GetNextEntry (S, I)) != 0           &&
-            (Dec2 = IsDecSP (N)) > 0                    &&
-            (Dec1 += Dec2) <= 255                       &&
+        /* Check for decspn, incspn, subysp or addysp */
+        if (E->OPC == OP65_JSR                            &&
+            (Val1 = IsShift (E, dec, inc, sub, add)) != 0 &&
+            (N = CS_GetNextEntry (S, I)) != 0             &&
+            (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
+            (Val2 = IsShift (N, dec, inc, sub, add)) != 0 &&
+            abs(Val1 += Val2) <= 255                      &&
             !CE_HasLabel (N)) {
 
             CodeEntry* X;
             char Buf[20];
 
-            /* We can combine the two */
-            if (Dec1 <= 8) {
-                /* Insert a call to decsp */
-                xsprintf (Buf, sizeof (Buf), "decsp%u", Dec1);
-                X = NewCodeEntry (OP65_JSR, AM65_ABS, Buf, 0, N->LI);
-                CS_InsertEntry (S, X, I+2);
-            } else {
-                /* Insert a call to subysp */
-                const char* Arg = MakeHexArg (Dec1);
-                X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
-                CS_InsertEntry (S, X, I+2);
-                X = NewCodeEntry (OP65_JSR, AM65_ABS, "subysp", 0, N->LI);
-                CS_InsertEntry (S, X, I+3);
-            }
+            if (Val1 != 0) {
+                /* We can combine the two */
+                if (abs(Val1) <= 8) {
+                    /* Insert a call to inc/dec using the last OPC */
+                    xsprintf (Buf, sizeof (Buf), "%s%u", Val1 < 0 ? dec:inc, abs(Val1));
+                    X = NewCodeEntry (N->OPC, AM65_ABS, Buf, 0, N->LI);
+                    CS_InsertEntry (S, X, I+2);
+                } else {
+                    /* Insert a call to add/sub */
+                    const char* Arg = MakeHexArg (abs(Val1));
+                    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
+                    CS_InsertEntry (S, X, I+2);
+                    if (Val1 < 0) {
+                        X = NewCodeEntry (N->OPC, AM65_ABS, sub, 0, N->LI);
+                    } else {
+                        X = NewCodeEntry (N->OPC, AM65_ABS, add, 0, N->LI);
+                    }
+                    CS_InsertEntry (S, X, I+3);
+                }
+            } /* If total shift == 0, just drop the old code. */
+
+            /* Delete the old code */
+            CS_DelEntries (S, I, 2);
+
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptStackPtrOps (CodeSeg* S)
+{
+    return OptIncDecOps(S, "decsp", "incsp", "subysp", "addysp");
+}
+
+
+
+unsigned OptAXOps (CodeSeg* S)
+{
+    return OptIncDecOps(S, "decax", "incax", "decaxy", "incaxy");
+}
+
+
+
+unsigned OptAXLoad (CodeSeg* S)
+/* Merge jsr incax/jsr ldaxi into ldy/jsr ldaxidx */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        signed Val;
+        const CodeEntry* N;
+
+        /* Get the next entry */
+        const CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for incax followed by jsr/jmp ldaxi */
+        if (E->OPC == OP65_JSR                            &&
+            strncmp (E->Arg, "incax", 5) == 0             &&
+            (N = CS_GetNextEntry (S, I)) != 0             &&
+            (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
+            strcmp (N->Arg, "ldaxi") == 0                 &&
+            !CE_HasLabel (N)) {
+
+            CodeEntry* X;
+            const char* Arg;
+
+            Val = E->Arg[5] - '0';
+            Arg = MakeHexArg (Val + 1);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
+            CS_InsertEntry (S, X, I+2);
+            X = NewCodeEntry (N->OPC, AM65_ABS, "ldaxidx", 0, N->LI);
+            CS_InsertEntry (S, X, I+3);
 
             /* Delete the old code */
             CS_DelEntries (S, I, 2);

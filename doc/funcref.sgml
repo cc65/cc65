@@ -785,6 +785,7 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 <item><ref id="strcpy" name="strcpy">
 <item><ref id="strcspn" name="strcspn">
 <item><ref id="strdup" name="strdup">
+<item><ref id="strndup" name="strndup">
 <item><ref id="strerror" name="strerror">
 <item><ref id="stricmp" name="stricmp">
 <item><ref id="strlen" name="strlen">
@@ -5621,6 +5622,7 @@ be used in presence of a prototype.
 <ref id="free" name="free">,
 <ref id="realloc" name="realloc">,
 <ref id="strdup" name="strdup">
+<ref id="strndup" name="strndup">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -7774,6 +7776,35 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="free" name="free">,
 <ref id="malloc" name="malloc">
+<ref id="strndup" name="strndup">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+
+
+<sect1>strndup<label id="strndup"><p>
+
+<quote>
+<descrip>
+<tag/Function/Allocate a copy of a string on the heap, of a given maximum length.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strndup (const char* s, size_t maxlen);/
+<tag/Description/<tt/strndup/ allocates a memory block on the heap, big enough
+to hold a copy of <tt/s/ including the terminating zero. If the allocation
+fails, <tt/NULL/ is returned, otherwise <tt/s/ is copied into the allocated
+memory block, maxlen characters are kept, and a pointer to the block is returned.
+<tag/Notes/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>It is up to the caller to free the allocated memory block.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="free" name="free">,
+<ref id="malloc" name="malloc">
+<ref id="strndup" name="strndup">
 <tag/Example/None.
 </descrip>
 </quote>

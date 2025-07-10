@@ -37,6 +37,7 @@
 #include "ea.h"
 #include "ea65.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "instr.h"
 #include "nexttok.h"
@@ -96,7 +97,7 @@ void GetSweet16EA (EffAddr* A)
             /* Register number */
             A->Reg = (unsigned) Reg;
         } else {
-            ErrorSkip ("Register or register number expected");
+            ErrorExpect ("Expected register or register number");
             A->Reg = 0;
         }
 

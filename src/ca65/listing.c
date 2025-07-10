@@ -316,7 +316,7 @@ void CreateListing (void)
     /* Open the real listing file */
     F = fopen (SB_GetConstBuf (&ListingName), "w");
     if (F == 0) {
-        Fatal ("Cannot open listing file '%s': %s",
+        Fatal ("Cannot open listing file `%s': %s",
                SB_GetConstBuf (&ListingName),
                strerror (errno));
     }

@@ -39,6 +39,7 @@
 /* ca65 */
 #include "condasm.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "macro.h"
 #include "nexttok.h"
@@ -105,14 +106,21 @@ static long DoStructInternal (long Offs, unsigned Type)
     ** union, the struct may be anonymous; in which case, no new lexical level
     ** is started.
     */
-    int Anon = (CurTok.Tok != TOK_IDENT);
+    int Anon = (CurTok.Tok == TOK_SEP);
 
     if (!Anon) {
-        /* Enter a new scope, then skip the name */
-        SymEnterLevel (&CurTok.SVal, SCOPE_STRUCT, ADDR_SIZE_ABS, 0);
-        NextTok ();
-        /* Start at zero offset in the new scope */
-        Offs = 0;
+        /* Non anonymous structs must have an identifier as name */
+        if (Expect (TOK_IDENT, "Expected a struct/union name")) {
+            /* Enter a new scope, then skip the name */
+            SymEnterLevel (&CurTok.SVal, SCOPE_STRUCT, ADDR_SIZE_ABS, 0);
+            NextTok ();
+            /* Start at zero offset in the new scope */
+            Offs = 0;
+        } else {
+            /* Skip the junk on the line before proceeding */
+            SkipUntilSep ();
+            Anon = 1;
+        }
     }
 
     /* Test for end of line */
@@ -183,7 +191,7 @@ static long DoStructInternal (long Offs, unsigned Type)
             case TOK_RES:
                 NextTok ();
                 if (CurTok.Tok == TOK_SEP) {
-                    ErrorSkip ("Size is missing");
+                    ErrorExpect ("Expected a byte count");
                 } else {
                     MemberSize = Member (1);
                 }
@@ -192,7 +200,7 @@ static long DoStructInternal (long Offs, unsigned Type)
             case TOK_ORG:
                 NextTok ();
                 if (CurTok.Tok == TOK_SEP) {
-                    ErrorSkip ("Address is missing");
+                    ErrorExpect ("Expected an address");
                 } else {
                     Offs = ConstExpression ();
 
@@ -233,7 +241,12 @@ static long DoStructInternal (long Offs, unsigned Type)
             default:
                 if (!CheckConditionals ()) {
                     /* Not a conditional directive */
-                    ErrorSkip ("Invalid storage allocator in struct/union");
+                    if (Sym) {
+                        ErrorExpect ("Expected a storage allocator after the field name");
+                    } else {
+                        ErrorExpect ("Expected a storage allocator");
+                    }
+                    SkipUntilSep ();
                 }
         }
 
@@ -275,9 +288,9 @@ static long DoStructInternal (long Offs, unsigned Type)
 
     /* End of struct/union definition */
     if (Type == STRUCT) {
-        Consume (TOK_ENDSTRUCT, "'.ENDSTRUCT' expected");
+        Consume (TOK_ENDSTRUCT, "Expected `.ENDSTRUCT'");
     } else {
-        Consume (TOK_ENDUNION, "'.ENDUNION' expected");
+        Consume (TOK_ENDUNION, "Expected `.ENDUNION'");
     }
 
     /* Return the size of the struct */

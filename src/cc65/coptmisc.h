@@ -92,9 +92,17 @@ unsigned OptIndLoads2 (CodeSeg* S);
 */
 
 unsigned OptStackPtrOps (CodeSeg* S);
-/* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
+/* Merge adjacent calls to decsp/incax into one. NOTE: This function won't merge all
 ** known cases!
 */
+
+unsigned OptAXOps (CodeSeg* S);
+/* Merge adjacent calls to decax/incax into one. NOTE: This function won't merge all
+** known cases!
+*/
+
+unsigned OptAXLoad (CodeSeg* S);
+/* Merge adjacent calls to incax/ldaxi into ldy/ldaxidx */
 
 unsigned OptGotoSPAdj (CodeSeg* S);
 /* Optimize SP adjustment for forward 'goto' */

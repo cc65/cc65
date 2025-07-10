@@ -33,7 +33,7 @@ ifdef QUIET
   NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
 ifndef CMD_EXE
-  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+  CATERR = 2> $@.errlog && (cat $@.errlog && true)
 endif
 endif
 
@@ -53,7 +53,7 @@ $(WORKDIR):
 
 $(WORKDIR)/%.prg: %.s | $(WORKDIR)
 	$(if $(QUIET),echo asm/err/$*.s)
-	$(NOT) $(CA65) -o $@ $< $(NULLERR)
+	$(NOT) $(CA65) -o $@ $< $(CATERR)
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

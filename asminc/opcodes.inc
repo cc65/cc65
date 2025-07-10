@@ -38,8 +38,6 @@
 ; iax = ($0000,X)
 ; rel = $0000 (PC-relative) (supressed here)
 
-.macpack        cpu
-
 OPC_BRK     = $00
 OPC_ORA_izx = $01
 OPC_ORA_zp  = $05

@@ -1,6 +1,4 @@
 
-.macpack cpu
-
 ; step 1: try to assemble an instruction that's exclusive to this set
 ;         (when possible)
 

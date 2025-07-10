@@ -46,6 +46,7 @@
 /* ca65 */
 #include "dbginfo.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "filetab.h"
 #include "global.h"
@@ -238,8 +239,7 @@ void DbgInfoFunc (void)
     ConsumeComma ();
 
     /* Type */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     Type = ValidateType (&CurTok.SVal);
@@ -267,8 +267,7 @@ void DbgInfoFunc (void)
     ConsumeComma ();
 
     /* Assembler name follows */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     AsmName = GetStrBufId (&CurTok.SVal);
@@ -321,8 +320,7 @@ void DbgInfoLine (void)
     ConsumeComma ();
 
     /* The name of the file follows */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
 
@@ -371,8 +369,7 @@ void DbgInfoSym (void)
     ConsumeComma ();
 
     /* Name */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     Name = GetStrBufId (&CurTok.SVal);
@@ -382,8 +379,7 @@ void DbgInfoSym (void)
     ConsumeComma ();
 
     /* Type */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     Type = ValidateType (&CurTok.SVal);
@@ -418,8 +414,7 @@ void DbgInfoSym (void)
         Offs = ConstExpression ();
     } else {
         /* Register, extern or static: Assembler name follows */
-        if (CurTok.Tok != TOK_STRCON) {
-            ErrorSkip ("String constant expected");
+        if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
             return;
         }
         AsmName = GetStrBufId (&CurTok.SVal);
@@ -468,7 +463,7 @@ void DbgInfoCheck (void)
         /* Search for the symbol name */
         S->Sym = SymFindAny (S->Scope, GetStrBuf (S->AsmName));
         if (S->Sym == 0) {
-            PError (&S->Pos, "Assembler symbol '%s' not found",
+            PError (&S->Pos, "Assembler symbol `%s' not found",
                     GetString (S->AsmName));
         } else {
             /* Set the backlink */

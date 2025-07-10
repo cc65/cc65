@@ -421,8 +421,7 @@ static ExprNode* FuncCapability (void)
         capability_t Cap;
 
         /* We must have an identifier */
-        if (CurTok.Tok != TOK_IDENT) {
-            Error ("Arguments to .CAPABILITY must be identifiers");
+        if (!Expect (TOK_IDENT, "Expected a capability name")) {
             /* Skip tokens until closing paren or end of line */
             while (CurTok.Tok != TOK_RPAREN && !TokIsSep (CurTok.Tok)) {
                 NextTok ();
@@ -942,8 +941,7 @@ static ExprNode* FuncStrAt (void)
     unsigned char C = 0;
 
     /* String constant expected */
-    if (CurTok.Tok != TOK_STRCON) {
-        Error ("String constant expected");
+    if (!Expect (TOK_STRCON, "Expected a string constant")) {
         NextTok ();
         goto ExitPoint;
     }
@@ -985,9 +983,8 @@ static ExprNode* FuncStrLen (void)
     int Len;
 
     /* String constant expected */
-    if (CurTok.Tok != TOK_STRCON) {
+    if (!Expect (TOK_STRCON, "Expected a string constant")) {
 
-        Error ("String constant expected");
         /* Smart error recovery */
         if (CurTok.Tok != TOK_RPAREN) {
             NextTok ();
@@ -1062,9 +1059,7 @@ static ExprNode* Function (ExprNode* (*F) (void))
     NextTok ();
 
     /* Expression must be enclosed in braces */
-    if (CurTok.Tok != TOK_LPAREN) {
-        Error ("'(' expected");
-        SkipUntilSep ();
+    if (!ExpectSkip (TOK_LPAREN, "Expected '('")) {
         return GenLiteral0 ();
     }
     NextTok ();
@@ -1296,7 +1291,7 @@ static ExprNode* Factor (void)
                 NextTok ();
             } else {
                 N = GenLiteral0 ();     /* Dummy */
-                Error ("Syntax error");
+                ErrorExpect ("Expected an expression");
             }
             break;
     }
@@ -1957,9 +1952,8 @@ ExprNode* GenNearAddrExpr (ExprNode* Expr)
     if (IsEasyConst (Expr, &Val)) {
         FreeExpr (Expr);
         Expr = GenLiteralExpr (Val & 0xFFFF);
-        if (Val > 0xFFFF)
-        {
-            Error("Range error: constant too large for assumed near address.");
+        if (Val > 0xFFFF) {
+            Error ("Range error: constant too large for assumed near address.");
         }
     } else {
         ExprNode* Operand = Expr;

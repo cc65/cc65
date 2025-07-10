@@ -108,18 +108,6 @@ static void VPrintMsg (const FilePos* Pos, const char* Desc,
 
 
 
-static void PrintMsg (const FilePos* Pos, const char* Desc,
-                      const char* Format, ...)
-/* Format and output an error/warning message. */
-{
-    va_list ap;
-    va_start (ap, Format);
-    VPrintMsg (Pos, Desc, Format, ap);
-    va_end (ap);
-}
-
-
-
 static void AddNotifications (const Collection* LineInfos)
 /* Output additional notifications for an error or warning */
 {
@@ -165,7 +153,7 @@ static void AddNotifications (const Collection* LineInfos)
         /* Output until an upper limit of messages is reached */
         if (Msg) {
             if (Output < MAX_NOTES) {
-                PrintMsg (GetSourcePos (LI), "Note", "%s", Msg);
+                PNotification (GetSourcePos (LI), "%s", Msg);
                 ++Output;
             } else {
                 ++Skipped;
@@ -176,9 +164,27 @@ static void AddNotifications (const Collection* LineInfos)
     /* Add a note if we have more stuff that we won't output */
     if (Skipped > 0) {
         const LineInfo* LI = CollConstAt (LineInfos, 0);
-        PrintMsg (GetSourcePos (LI), "Note",
-                  "Dropping %u additional line infos", Skipped);
+        PNotification (GetSourcePos (LI), "Dropping %u additional line infos",
+                       Skipped);
     }
+}
+
+
+
+/*****************************************************************************/
+/*                               Notifications                               */
+/*****************************************************************************/
+
+
+
+void PNotification (const FilePos* Pos, const char* Format, ...)
+/* Print a notification message. */
+{
+    /* Output the message */
+    va_list ap;
+    va_start (ap, Format);
+    VPrintMsg (Pos, "Note", Format, ap);
+    va_end (ap);
 }
 
 

@@ -87,12 +87,13 @@ void DoEnum (void)
             continue;
         }
 
+        /* Allow conditionals within an enum */
+        if (CheckConditionals ()) {
+            continue;
+        }
+
         /* The format is "identifier [ = value ]" */
-        if (CurTok.Tok != TOK_IDENT) {
-            /* Maybe it's a conditional? */
-            if (!CheckConditionals ()) {
-                ErrorSkip ("Identifier expected");
-            }
+        if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
             continue;
         }
 

@@ -96,7 +96,7 @@ void GetSweet16EA (EffAddr* A)
             /* Register number */
             A->Reg = (unsigned) Reg;
         } else {
-            ErrorSkip ("Register or register number expected");
+            ErrorExpect ("Expected register or register number");
             A->Reg = 0;
         }
 

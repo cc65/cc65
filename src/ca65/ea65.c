@@ -62,11 +62,11 @@ void GetEA (EffAddr* A)
     if (BracketAsIndirect) {
         IndirectEnter = TOK_LBRACK;
         IndirectLeave = TOK_RBRACK;
-        IndirectExpect = "']' expected";
+        IndirectExpect = "Expected ']'";
     } else {
         IndirectEnter = TOK_LPAREN;
         IndirectLeave = TOK_RPAREN;
-        IndirectExpect = "')' expected";
+        IndirectExpect = "Expected ')'";
     }
 
     /* Clear the output struct */
@@ -136,16 +136,22 @@ void GetEA (EffAddr* A)
                 /* (adr,x) */
                 NextTok ();
                 A->AddrModeSet = AM65_ABS_X_IND | AM65_DIR_X_IND;
-                Consume (IndirectLeave, IndirectExpect);
+                if (!Consume (IndirectLeave, IndirectExpect)) {
+                    SkipUntilSep ();
+                }
             } else if (CurTok.Tok == TOK_S) {
                 /* (rel,s),y */
                 NextTok ();
                 A->AddrModeSet = AM65_STACK_REL_IND_Y;
-                Consume (IndirectLeave, IndirectExpect);
-                ConsumeComma ();
-                Consume (TOK_Y, "'Y' expected");
+                if (!Consume (IndirectLeave, IndirectExpect) ||
+                    !ConsumeComma ()                         ||
+                    !Consume (TOK_Y, "Expected 'Y'")) {
+                    /* In case of errors skip anything else on the line */
+                    SkipUntilSep ();
+                }
             } else {
-                Error ("Syntax error");
+                ErrorExpect ("Expected 'X' or 'S'");
+                SkipUntilSep ();
             }
 
         } else {
@@ -162,7 +168,9 @@ void GetEA (EffAddr* A)
                     A->AddrModeSet = AM65_DIR_IND;
                     break;
                 default:
-                    Consume (TOK_Y, "'Y' expected");
+                    if (!Consume (TOK_Y, "Expected 'Y'")) {
+                        SkipUntilSep ();
+                    }
                     A->AddrModeSet = AM65_DIR_IND_Y;
                     break;
                 }
@@ -190,16 +198,22 @@ void GetEA (EffAddr* A)
         /* [dir] or [dir],y */
         NextTok ();
         A->Expr = Expression ();
-        Consume (TOK_RBRACK, "']' expected");
+        if (!Consume (TOK_RBRACK, "Expected ']'")) {
+            SkipUntilSep ();
+        }
         if (CurTok.Tok == TOK_COMMA) {
             /* [dir],y */
             NextTok ();
             if (GetCPU () == CPU_45GS02) {
-                Consume (TOK_Z, "'Z' expected");
+                if (!Consume (TOK_Z, "Expected 'Z'")) {
+                    SkipUntilSep ();
+                }
                 A->AddrModeSet = AM65_32BIT_BASE_IND_Z;
             }
             else {
-                Consume (TOK_Y, "'Y' expected");
+                if (!Consume (TOK_Y, "Expected 'Y'")) {
+                    SkipUntilSep ();
+                }
                 A->AddrModeSet = AM65_DIR_IND_LONG_Y;
             }
         } else {

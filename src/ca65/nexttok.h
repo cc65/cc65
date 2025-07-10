@@ -51,27 +51,62 @@
 void NextTok (void);
 /* Get next token and handle token level functions */
 
-void Consume (token_t Expected, const char* ErrMsg);
-/* Consume Token, print an error if we don't find it */
+void ErrorExpect (const char* Msg);
+/* Output an error message about some expected token using Msg and the
+ * description of the following token. This means that Msg should contain
+ * something like "xyz expected". The actual error message would then be
+ * "xyz expected but found zyx".
+ */
 
-void ConsumeSep (void);
-/* Consume a separator token */
+int Expect (token_t Expected, const char* Msg);
+/* Check if the next token is the expected one. If not, print Msg plus some
+ * information about the token that was actually found. This means that Msg
+ * should contain something like "xyz expected". The actual error message would
+ * then be "xyz expected but found zyx".
+ * Returns true if the token was found, otherwise false.
+ */
 
-void ConsumeLParen (void);
-/* Consume a left paren */
+int ExpectSkip (token_t Expected, const char* Msg);
+/* Check if the next token is the expected one. If not, print Msg plus some
+ * information about the token that was actually found and skip the remainder
+ * of the line. This means that Msg should contain something like "xyz
+ * expected". The actual error message would then be "xyz expected but found
+ * zyx".
+ * Returns true if the token was found, otherwise false.
+ */
 
-void ConsumeRParen (void);
-/* Consume a right paren */
+int Consume (token_t Expected, const char* ErrMsg);
+/* Consume Token, print an error if we don't find it. Return true if the token
+** was found and false otherwise.
+*/
 
-void ConsumeComma (void);
-/* Consume a comma */
+int ConsumeSep (void);
+/* Consume a separator token. Return true if the token was found and false
+ * otherwise.
+ */
+
+int ConsumeLParen (void);
+/* Consume a left paren. Return true if the token was found and false
+** otherwise.
+*/
+
+int ConsumeRParen (void);
+/* Consume a right paren. Return true if the token was found and false
+** otherwise.
+*/
+
+int ConsumeComma (void);
+/* Consume a comma. Return true if the token was found and false
+** otherwise.
+*/
 
 void SkipUntilSep (void);
 /* Skip tokens until we reach a line separator or end of file */
 
-void ExpectSep (void);
-/* Check if we've reached a line separator, and output an error if not. Do
-** not skip the line separator.
+int ExpectSep (void);
+/* Check if we've reached a line separator. If so, return true. If not, output
+** an error and skip all tokens until the line separator is reached. Then
+** return false.
 */
 
 void EnterRawTokenMode (void);

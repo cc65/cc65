@@ -238,8 +238,7 @@ void DbgInfoFunc (void)
     ConsumeComma ();
 
     /* Type */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     Type = ValidateType (&CurTok.SVal);
@@ -267,8 +266,7 @@ void DbgInfoFunc (void)
     ConsumeComma ();
 
     /* Assembler name follows */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     AsmName = GetStrBufId (&CurTok.SVal);
@@ -321,8 +319,7 @@ void DbgInfoLine (void)
     ConsumeComma ();
 
     /* The name of the file follows */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
 
@@ -371,8 +368,7 @@ void DbgInfoSym (void)
     ConsumeComma ();
 
     /* Name */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     Name = GetStrBufId (&CurTok.SVal);
@@ -382,8 +378,7 @@ void DbgInfoSym (void)
     ConsumeComma ();
 
     /* Type */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     Type = ValidateType (&CurTok.SVal);
@@ -418,8 +413,7 @@ void DbgInfoSym (void)
         Offs = ConstExpression ();
     } else {
         /* Register, extern or static: Assembler name follows */
-        if (CurTok.Tok != TOK_STRCON) {
-            ErrorSkip ("String constant expected");
+        if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
             return;
         }
         AsmName = GetStrBufId (&CurTok.SVal);

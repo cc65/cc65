@@ -1,6 +1,6 @@
-110-capabilities.s:3: Error: Arguments to .CAPABILITY must be identifiers
-110-capabilities.s:8: Error: Arguments to .CAPABILITY must be identifiers
-110-capabilities.s:8: Error: ')' expected
+110-capabilities.s:3: Error: Expected a capability name but found ')'
+110-capabilities.s:8: Error: Expected a capability name but found 'end-of-line'
+110-capabilities.s:8: Error: Expected ')' but found 'end-of-line'
 110-capabilities.s:12: Error: Not a valid capability name: CPU_HAS_BR
-110-capabilities.s:17: Error: ')' expected
-110-capabilities.s:17: Error: Unexpected trailing garbage characters
+110-capabilities.s:17: Error: Expected ')' but found 'cpu_has_bra8'
+110-capabilities.s:17: Error: Expected 'end-of-line' but found 'cpu_has_bra8'

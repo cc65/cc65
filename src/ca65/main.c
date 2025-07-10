@@ -145,7 +145,7 @@ static void SetOptions (void)
     OptTranslator (&Buf);
 
     /* Set date and time */
-    OptDateTime ((unsigned long) time(0));
+    OptDateTime ((unsigned long) time (0));
 
     /* Release memory for the string */
     SB_Done (&Buf);
@@ -708,7 +708,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
-    exit(EXIT_SUCCESS);
+    exit (EXIT_SUCCESS);
 }
 
 
@@ -727,7 +727,7 @@ static void DoPCAssign (void)
 {
     long PC = ConstExpression ();
     if (PC < 0 || PC > 0xFFFFFF) {
-        Error ("Range error");
+        Error ("Program counter value is out of valid range");
     } else {
         EnterAbsoluteMode (PC);
     }
@@ -820,11 +820,10 @@ static void OneLine (void)
             NextTok ();
 
             /* Define the symbol with the expression following the '=' */
-            SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
+            SymDef (Sym, Expression (), ADDR_SIZE_DEFAULT, Flags);
 
             /* Don't allow anything after a symbol definition */
-            ConsumeSep ();
-            return;
+            goto Done;
 
         } else if (CurTok.Tok == TOK_SET) {
 
@@ -842,8 +841,7 @@ static void OneLine (void)
             SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_VAR);
 
             /* Don't allow anything after a symbol definition */
-            ConsumeSep ();
-            return;
+            goto Done;
 
         } else {
 
@@ -853,25 +851,23 @@ static void OneLine (void)
             Seg = ActiveSeg;
             PC  = GetPC ();
 
-            /* Define the label */
-            SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
-
             /* Skip the colon. If NoColonLabels is enabled, allow labels
             ** without a colon if there is no whitespace before the
             ** identifier.
             */
             if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
-                    Error ("':' expected");
-                    /* Try some smart error recovery */
-                    if (CurTok.Tok == TOK_NAMESPACE) {
-                        NextTok ();
-                    }
+                    ErrorExpect ("Expected ':' after identifier to form a label");
+                    SkipUntilSep ();
+                    goto Done;
                 }
             } else {
                 /* Skip the colon */
                 NextTok ();
             }
+
+            /* Define the label */
+            SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
 
             /* If we come here, a new identifier may be waiting, which may
             ** be a macro or instruction.
@@ -906,16 +902,22 @@ static void OneLine (void)
         HandleInstruction (Instr);
     } else if (PCAssignment && (CurTok.Tok == TOK_STAR || CurTok.Tok == TOK_PC)) {
         NextTok ();
-        if (CurTok.Tok != TOK_EQ) {
-            Error ("'=' expected");
-            SkipUntilSep ();
-        } else {
-            /* Skip the equal sign */
-            NextTok ();
-            /* Enter absolute mode */
-            DoPCAssign ();
+        if (!ExpectSkip (TOK_EQ, "Expected '='")) {
+            goto Done;
         }
+        /* Skip the equal sign */
+        NextTok ();
+        /* Enter absolute mode */
+        DoPCAssign ();
+    } else if ((CurTok.Tok >= TOK_FIRSTOP && CurTok.Tok <= TOK_LASTOP) ||
+               (CurTok.Tok >= TOK_FIRSTREG && CurTok.Tok <= TOK_LASTREG) ||
+               CurTok.Tok == TOK_INTCON || CurTok.Tok == TOK_CHARCON ||
+               CurTok.Tok == TOK_STRCON) {
+        ErrorExpect ("Expected a mnemonic");
+        SkipUntilSep ();
+        goto Done;
     }
+
 
     /* If we have defined a label, remember its size. Sym is also set by
     ** a symbol assignment, but in this case Done is false, so we don't
@@ -938,6 +940,7 @@ static void OneLine (void)
         }
     }
 
+Done:
     /* Line separator must come here */
     ConsumeSep ();
 }
@@ -1235,7 +1238,7 @@ int main (int argc, char* argv [])
     }
 
     if (WarningCount > 0 && WarningsAsErrors) {
-        Error("Warnings as errors");
+        Error ("Warnings as errors");
     }
 
     /* If we didn't have an errors, finish off the line infos */

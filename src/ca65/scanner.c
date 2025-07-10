@@ -818,7 +818,7 @@ static void ReadStringConst (int StringTerm)
         int Cooked = 1;
         NeedNext = 1;
 
-        if (StringTerm == 0 && SB_GetLen(&CurTok.SVal) == 1) {
+        if (StringTerm == 0 && SB_GetLen (&CurTok.SVal) == 1) {
             if (C == '\'') {
                 break;
             }
@@ -901,12 +901,12 @@ static void ReadStringConst (int StringTerm)
                 case '7':
                     { /* brace needed for scoping */
                         int Count = 1;
-                        int Final = DigitVal(C);
+                        int Final = DigitVal (C);
                         Cooked = 0;
                         NextChar ();
                         while (IsODigit (C) && Count++ < 3) {
-                           Final = (Final << 3) | DigitVal(C);
-                           NextChar();
+                           Final = (Final << 3) | DigitVal (C);
+                           NextChar ();
                         }
                         if (C >= 256)
                             Error ("Octal character constant out of range");
@@ -1587,8 +1587,8 @@ CharAgain:
                 /* Always a character constant
                 ** Hack: Pass 0 to ReadStringConst for special handling.
                 */
-                ReadStringConst(0);
-                if (SB_GetLen(&CurTok.SVal) != 1) {
+                ReadStringConst (0);
+                if (SB_GetLen (&CurTok.SVal) != 1) {
                     Error ("Illegal character constant");
                     goto CharAgain;
                 }

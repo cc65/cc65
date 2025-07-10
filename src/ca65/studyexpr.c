@@ -1359,8 +1359,7 @@ static void StudyNearAddr (ExprNode* Expr, ExprDesc* D)
     }
 
     /* Promote to absolute if smaller. */
-    if (D->AddrSize < ADDR_SIZE_ABS)
-    {
+    if (D->AddrSize < ADDR_SIZE_ABS) {
         D->AddrSize = ADDR_SIZE_ABS;
     }
 }

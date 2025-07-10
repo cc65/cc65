@@ -41,6 +41,7 @@
 #include "condasm.h"
 #include "enum.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "macro.h"
 #include "nexttok.h"
@@ -147,7 +148,7 @@ void DoEnum (void)
     }
 
     /* End of enum definition */
-    Consume (TOK_ENDENUM, "'.ENDENUM' expected");
+    Consume (TOK_ENDENUM, "`.ENDENUM' expected");
 
     /* Free the base expression */
     FreeExpr (BaseExpr);

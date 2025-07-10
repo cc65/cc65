@@ -35,6 +35,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "instr.h"
 #include "lineinfo.h"

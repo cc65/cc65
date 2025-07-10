@@ -306,9 +306,11 @@ Segment* SegFind (unsigned Name)
 
 
 
-int IsBSSType (Segment* S)
-/* Check if the given segment is a BSS style segment, that is, it does not
-** contain non-zero data.
+Section* GetNonBSSSection (Segment* S)
+/* Used when checking a BSS style segment for initialized data. Will walk over
+** all sections in S and check if any of them contains initialized data. If so,
+** the first section containing initialized data is returned. Otherwise the
+** function returns NULL.
 */
 {
     /* Loop over all sections */
@@ -326,18 +328,20 @@ int IsBSSType (Segment* S)
                 unsigned long Count = F->Size;
                 while (Count--) {
                     if (*Data++ != 0) {
-                        return 0;
+                        return Sec;
                     }
                 }
             } else if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
                 if (GetExprVal (F->Expr) != 0) {
-                    return 0;
+                    return Sec;
                 }
             }
             F = F->Next;
         }
     }
-    return 1;
+
+    /* No uninitialized data found */
+    return 0;
 }
 
 

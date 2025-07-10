@@ -1709,10 +1709,20 @@ static void ProcessSegments (void)
         ** in any of the object file, check that there's no initialized data
         ** in the segment.
         */
-        if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
-            PWarning (GetSourcePos (S->LI),
-                      "Segment `%s' with type `bss' contains initialized data",
-                      GetString (S->Name));
+        if ((S->Flags & SF_BSS) != 0 && S->Seg != 0) {
+            Section* Sec = GetNonBSSSection (S->Seg);
+            if (Sec) {
+                const FilePos* Pos = GetSourcePos (S->LI);
+                if (Sec->Obj) {
+                    AddPNote (Pos, "Initialized data comes at least partially "
+                             "from `%s'", GetString (Sec->Obj->Name));
+                } else {
+                    AddPNote (Pos, "Initialized data is at least partially "
+                              "linker generated");
+                }
+                PWarning (Pos, "Segment `%s' with type `bss' contains "
+                          "initialized data", GetString (S->Name));
+            }
         }
 
         /* If this segment does exist in any of the object files, insert the

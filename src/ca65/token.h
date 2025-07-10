@@ -284,6 +284,7 @@ typedef enum token_t {
     TOK_UNION,
     TOK_VERSION,
     TOK_WARNING,
+    TOK_WEAK,
     TOK_WORD,
     TOK_XMATCH,
     TOK_ZEROPAGE,

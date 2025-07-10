@@ -221,6 +221,10 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
         case SYM_EXPR:  strcat (TypeDesc, ",SYM_EXPR");   break;
     }
 
+    /* Is the symbol weak? */
+    if (Flags & SYM_MASK_WEAK) {
+        strcat (TypeDesc, ",SYM_WEAK");
+    }
     /* Size available? */
     if (SYM_HAS_SIZE (Flags)) {
         strcat (TypeDesc, ",SYM_SIZE");

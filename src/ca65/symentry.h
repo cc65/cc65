@@ -70,6 +70,7 @@ struct HLLDbgSym;
 #define SF_VAR          0x0080          /* Variable symbol */
 #define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
 #define SF_FIXED        0x0200          /* May not be trampoline */
+#define SF_WEAK         0x0400          /* Weak symbol */
 #define SF_MULTDEF      0x1000          /* Multiply defined symbol */
 #define SF_DEFINED      0x2000          /* Defined */
 #define SF_REFERENCED   0x4000          /* Referenced */

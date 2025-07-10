@@ -321,6 +321,7 @@ struct DotKeyword {
     { ".UNION",         TOK_UNION               },
     { ".VERSION",       TOK_VERSION             },
     { ".WARNING",       TOK_WARNING             },
+    { ".WEAK",          TOK_WEAK                },
     { ".WORD",          TOK_WORD                },
     { ".XMATCH",        TOK_XMATCH              },
     { ".XOR",           TOK_BOOLXOR             },

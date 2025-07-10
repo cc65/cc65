@@ -89,7 +89,7 @@ static Export**         ExpPool  = 0;           /* Exports array */
 
 
 /*****************************************************************************/
-/*                              Import handling                              */
+/*                           Symbol table handling                           */
 /*****************************************************************************/
 
 
@@ -97,6 +97,114 @@ static Export**         ExpPool  = 0;           /* Exports array */
 static Export* NewExport (unsigned Type, unsigned char AddrSize,
                           unsigned Name, ObjData* Obj);
 /* Create a new export and initialize it */
+
+
+
+static void UpdateExportsInImportList (Export *E)
+/* Update all exports in the given export's import list */
+{
+    Import* I = E->ImpList;
+
+    while (I) {
+        I->Exp = E;
+        I = I->Next;
+    }
+}
+
+
+
+static Export** GetExportRefRaw (unsigned Name)
+/* Check for an identifier in the symbol table and return the pointer to its
+** preceding chain pointer. If the element is not found, the last pointer in
+** the chain is returned.
+**/
+{
+    /* Pointer to the first chain in the bucket. */
+    Export** Ref = &HashTab[Name & HASHTAB_MASK];
+    Export* E;
+
+    while (1)
+    {
+        E = *Ref;
+        /* Either its the end of chain, or the element is found. */
+        if (E == 0 || E->Name == Name)
+            return Ref;
+
+        /* Go to the next element in the chain. */
+        Ref = &E->Next;
+    }
+}
+
+
+
+static Export* InsertExportAt (Export** Ref, Export* Value)
+/* Insert an export at a given position */
+{
+    /* Value must not be NULL */
+    PRECONDITION (Value != 0);
+
+    /* Not at end of chain? */
+    if (*Ref != 0) {
+        /* Point to the rest of the chain. */
+        Value->Next = (*Ref)->Next;
+    }
+
+    *Ref = Value;
+    ++ExpCount;     /* One more export */
+
+    return Value;
+}
+
+
+
+static Export* ReplaceExportAt (Export** Ref, Export* Value)
+/* Replace the given export by another one */
+{
+    /* Value must not be NULL */
+    PRECONDITION (Value != 0);
+
+    Export* E = *Ref;
+
+    /* At end of chain? */
+    if (E == 0) {
+        /* Treat it as an insertion and quit */
+        return InsertExportAt (Ref, Value);
+    }
+
+    Value->Next     = E->Next;
+    Value->ImpCount = E->ImpCount;
+    Value->ImpList  = E->ImpList;
+    *Ref = Value;
+    xfree (E);
+    /* We must run through the import list and change the
+    ** export pointer now.
+    */
+    UpdateExportsInImportList (Value);
+
+    return Value;
+}
+
+
+
+static Export* GetOrCreateExport (unsigned Name)
+/* Try to find an export, create one if it doesn't exist */
+{
+    Export** Ref = GetExportRefRaw (Name);
+
+    /* Not found? */
+    if (*Ref == 0) {
+        /* Insert a dummy export */
+        InsertExportAt (Ref, NewExport (0, ADDR_SIZE_DEFAULT, Name, 0));
+    }
+
+    return *Ref;
+}
+
+
+
+/*****************************************************************************/
+/*                              Import handling                              */
+/*****************************************************************************/
 
 
 
@@ -214,41 +322,10 @@ Import* GenImport (unsigned Name, unsigned char AddrSize)
 Import* InsertImport (Import* I)
 /* Insert an import into the table, return I */
 {
-    Export* E;
-
     /* As long as the import is not inserted, V.Name is valid */
-    unsigned Name = I->Name;
+    Export* E = GetOrCreateExport (I->Name);
 
-    /* Create a hash value for the given name */
-    unsigned Hash = (Name & HASHTAB_MASK);
-
-    /* Search through the list in that slot for a symbol with that name */
-    if (HashTab[Hash] == 0) {
-        /* The slot is empty, we need to insert a dummy export */
-        E = HashTab[Hash] = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
-        ++ExpCount;
-    } else {
-        E = HashTab [Hash];
-        while (1) {
-            if (E->Name == Name) {
-                /* We have an entry, L points to it */
-                break;
-            }
-            if (E->Next == 0) {
-                /* End of list an entry not found, insert a dummy */
-                E->Next = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
-                E = E->Next;            /* Point to dummy */
-                ++ExpCount;             /* One export more */
-                break;
-            } else {
-                E = E->Next;
-            }
-        }
-    }
-
-    /* Ok, E now points to a valid exports entry for the given import. Insert
-    ** the import into the imports list and update the counters.
-    */
+    /* Insert the import into the imports list and update the counters. */
     I->Exp     = E;
     I->Next    = E->ImpList;
     E->ImpList = I;
@@ -282,7 +359,7 @@ const LineInfo* GetImportPos (const Import* Imp)
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*                              Export handling                              */
 /*****************************************************************************/
 
 
@@ -431,10 +508,8 @@ Export* ReadExport (FILE* F, ObjData* O)
 void InsertExport (Export* E)
 /* Insert an exported identifier and check if it's already in the list */
 {
+    Export** ExportRef;
     Export* L;
-    Export* Last;
-    Import* Imp;
-    unsigned Hash;
 
     /* Mark the export as inserted */
     E->Flags |= EXP_INLIST;
@@ -444,59 +519,45 @@ void InsertExport (Export* E)
         ConDesAddExport (E);
     }
 
-    /* Create a hash value for the given name */
-    Hash = (E->Name & HASHTAB_MASK);
-
     /* Search through the list in that slot */
-    if (HashTab[Hash] == 0) {
-        /* The slot is empty */
-        HashTab[Hash] = E;
-        ++ExpCount;
+    ExportRef = GetExportRefRaw (E->Name);
+    L = *ExportRef;
+
+    if (L == 0) {
+        /* The symbol was not found, so store the export in the symbol table. */
+        InsertExportAt (ExportRef, E);
     } else {
-
-        Last = 0;
-        L = HashTab[Hash];
-        do {
-            if (L->Name == E->Name) {
-                /* This may be an unresolved external */
-                if (L->Expr == 0) {
-
-                    /* This *is* an unresolved external. Use the actual export
-                    ** in E instead of the dummy one in L.
-                    */
-                    E->Next     = L->Next;
-                    E->ImpCount = L->ImpCount;
-                    E->ImpList  = L->ImpList;
-                    if (Last) {
-                        Last->Next = E;
-                    } else {
-                        HashTab[Hash] = E;
-                    }
-                    ImpOpen -= E->ImpCount;     /* Decrease open imports now */
-                    xfree (L);
-                    /* We must run through the import list and change the
-                    ** export pointer now.
-                    */
-                    Imp = E->ImpList;
-                    while (Imp) {
-                        Imp->Exp = E;
-                        Imp = Imp->Next;
-                    }
-                } else if (AllowMultDef == 0) {
-                    /* Duplicate entry, this is fatal unless allowed by the user */
-                    Error ("Duplicate external identifier: '%s'",
-                           GetString (L->Name));
-                }
-                return;
+        /* Unresolved external, weak symbol or ODR (One Definition Rule)
+        ** violation?
+        */
+        if (L->Expr == 0) {
+            /* This *is* an unresolved external. Use the actual export
+            ** in E instead of the dummy one in L.
+            */
+            ReplaceExportAt (ExportRef, E);
+            ImpOpen -= E->ImpCount;     /* Decrease open imports now */
+        } else if (SYM_IS_WEAK (L->Type)) {
+            /* The existing export is a weak symbol. Override it with the new
+            ** symbol (strong or weak) without any fuss.
+            */
+            ReplaceExportAt (ExportRef, E);
+        } else {
+            /* Here the existing export is "strong" (not weak). If the new
+            ** symbol is weak, *or* we explicitely specified at the command-line
+            ** that we allow multiple definitions (which effectively make all
+            ** symbols weak) then that's OK and we can ignore the new weak
+            ** symbol.
+            */
+            if (!SYM_IS_WEAK (E->Type) && AllowMultDef == 0) {
+                /* Both the existing export and the new symbol are strong, so
+                ** this is an ODR violation.
+                */
+                Error ("Duplicate external identifier: '%s'",
+                        GetString (L->Name));
             }
-            Last = L;
-            L = L->Next;
 
-        } while (L);
-
-        /* Insert export at end of queue */
-        Last->Next = E;
-        ++ExpCount;
+            xfree (E);
+        }
     }
 }
 
@@ -610,19 +671,8 @@ Export* FindExport (unsigned Name)
 ** return a pointer to the export.
 */
 {
-    /* Get a pointer to the list with the symbols hash value */
-    Export* L = HashTab[Name & HASHTAB_MASK];
-    while (L) {
-        /* Search through the list in that slot */
-        if (L->Name == Name) {
-            /* Entry found */
-            return L;
-        }
-        L = L->Next;
-    }
-
-    /* Not found */
-    return 0;
+    /* This gives a end of chain (NULL) or the pointer to the export */
+    return *GetExportRefRaw (Name);
 }
 
 

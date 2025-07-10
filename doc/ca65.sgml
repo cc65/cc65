@@ -4531,6 +4531,28 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
             <tt><ref id=".OUT" name=".OUT"></tt>
 
 
+<sect1><tt>.WEAK</tt><label id=".WEAK"><p>
+
+  Declare or make an existing symbol weak. Weak symbols can be overriden by a
+  "strong" (regular) symbol or other weak symbols at the link stage. Note that
+  redefinition of a symbol is still not allowed within the same source file,
+  even for weak ones.
+
+  You don't need to use an additional <tt><ref id=".GLOBAL" name=".GLOBAL"></tt>
+  statement, this is implied by <tt/.WEAK/.
+
+  Example:
+
+  <tscreen><verb>
+        .weak   NumDisks
+
+        NumDisks = 1    ; NumDisks has a default value of 1, but another source
+                        ; file may override it.
+  </verb></tscreen>
+
+  See also: <tt><ref id=".GLOBAL" name=".GLOBAL"></tt>
+
+
 <sect1><tt>.WORD</tt><label id=".WORD"><p>
 
   Define word sized data. Must be followed by a sequence of (word ranged,

@@ -12,7 +12,7 @@
 
 
 /* Workaround missing clock stuff */
-#ifdef __APPLE2__
+#if defined(__APPLE2__) || defined(__AGAT__)
 #  define clock()               0
 #  define CLOCKS_PER_SEC        1
 #endif
@@ -38,7 +38,7 @@ static unsigned char Sieve[COUNT];
 
 
 
-#pragma static-locals(1);
+#pragma static-locals(1)
 
 
 

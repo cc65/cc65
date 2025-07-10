@@ -8,7 +8,7 @@
         .export         _vsnprintf, vsnprintf
         .import         ldaxysp, popax, incsp2, incsp6
         .import         _memcpy, __printf
-        .importzp       sp, ptr1
+        .importzp       c_sp, ptr1
 
         .include        "errno.inc"
 
@@ -55,19 +55,19 @@ vsnprintf:
 ; be formatted and counted.
 
         ldy     #2
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1
 
         lda     #<outdesc
-        sta     (sp),y
+        sta     (c_sp),y
 
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         bmi     L9              ; More than $7FFF
         sta     ptr1+1
 
         lda     #>outdesc
-        sta     (sp),y
+        sta     (c_sp),y
 
 ; Write size-1 to outdesc.uns.  It will be -1 if there is no buffer.
 
@@ -140,7 +140,7 @@ L0:     ldy     #EINVAL
         pla                     ; Drop ap
         pla
         tya
-        jsr     __directerrno   ; Return -1
+        jsr     ___directerrno  ; Return -1
         jmp     incsp6          ; Drop parameters
 
 
@@ -178,12 +178,12 @@ out:
         clc
         adc     ccount+0
         ldy     #4
-        sta     (sp),y
+        sta     (c_sp),y
 
         lda     bufptr+1
         adc     ccount+1
         iny
-        sta     (sp),y
+        sta     (c_sp),y
 
 ; Get Count from stack
 

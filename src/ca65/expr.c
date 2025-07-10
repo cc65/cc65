@@ -37,6 +37,7 @@
 #include <time.h>
 
 /* common */
+#include "capability.h"
 #include "check.h"
 #include "cpu.h"
 #include "exprdefs.h"
@@ -50,6 +51,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "global.h"
 #include "instr.h"
@@ -60,6 +62,7 @@
 #include "studyexpr.h"
 #include "symbol.h"
 #include "symtab.h"
+#include "target.h"
 #include "toklist.h"
 #include "ulabel.h"
 #include "macro.h"
@@ -170,6 +173,25 @@ int IsFarRange (long Val)
 
 
 
+static const ExprNode* ResolveSymbolChain(const ExprNode* E)
+/* Recursive helper function for IsEasyConst */
+{
+    if (E->Op == EXPR_SYMBOL) {
+        SymEntry* Sym = E->V.Sym;
+
+        if (Sym == 0 || Sym->Expr == 0 || SymHasUserMark (Sym)) {
+            return 0;
+        } else {
+            SymMarkUser (Sym);
+            E = ResolveSymbolChain (Sym->Expr);
+            SymUnmarkUser (Sym);
+        }
+    }
+    return E;
+}
+
+
+
 int IsEasyConst (const ExprNode* E, long* Val)
 /* Do some light checking if the given node is a constant. Don't care if E is
 ** a complex expression. If E is a constant, return true and place its value
@@ -177,12 +199,10 @@ int IsEasyConst (const ExprNode* E, long* Val)
 */
 {
     /* Resolve symbols, follow symbol chains */
-    while (E->Op == EXPR_SYMBOL) {
-        E = SymResolve (E->V.Sym);
-        if (E == 0) {
-            /* Could not resolve */
-            return 0;
-        }
+    E = ResolveSymbolChain (E);
+    if (E == 0) {
+        /* Could not resolve */
+        return 0;
     }
 
     /* Symbols resolved, check for a literal */
@@ -387,6 +407,65 @@ static ExprNode* FuncBlank (void)
 
 
 
+static ExprNode* FuncCapability (void)
+/* Handle the .CAPABILITY builtin function */
+{
+    int Result = 1;
+
+    /* What follows is a comma separated list of identifiers. An empty list is
+    ** not allowed.
+    */
+    while (1) {
+
+        const char* Name;
+        capability_t Cap;
+
+        /* We must have an identifier */
+        if (!Expect (TOK_IDENT, "Expected a capability name")) {
+            /* Skip tokens until closing paren or end of line */
+            while (CurTok.Tok != TOK_RPAREN && !TokIsSep (CurTok.Tok)) {
+                NextTok ();
+            }
+            return GenLiteral0 ();
+        }
+
+        /* Search for the capability that matches this identifier. Ignore case
+        ** on the specified capabilities.
+        */
+        UpcaseSVal ();
+        SB_Terminate (&CurTok.SVal);
+        Name = SB_GetConstBuf (&CurTok.SVal);
+        Cap = FindCapability (Name);
+
+        /* Check if the capability is supported */
+        if (Cap == CAP_INVALID) {
+            Error ("Not a valid capability name: %s", Name);
+            Result = 0;
+        } else {
+            /* The pseudo function result is the logical AND of all capabilities
+            ** given.
+            */
+            if (!CPUHasCap (Cap) && !TargetHasCap (Cap)) {
+                Result = 0;
+            }
+        }
+
+        /* Skip the capability name */
+        NextTok ();
+
+        /* Handle end of list or next capability */
+        if (CurTok.Tok != TOK_COMMA) {
+            break;
+        }
+        NextTok ();
+    }
+
+    /* Done */
+    return GenLiteralExpr (Result);
+}
+
+
+
 static ExprNode* FuncConst (void)
 /* Handle the .CONST builtin function */
 {
@@ -466,9 +545,10 @@ static ExprNode* FuncIsMnemonic (void)
             if (FindMacro (&CurTok.SVal) == 0) {
                 Instr = FindInstruction (&CurTok.SVal);
             }
-        }
-        else {
-            /* Macros and symbols may NOT use the names of instructions, so just check for the instruction */
+        } else {
+            /* Macros and symbols may NOT use the names of instructions, so
+            ** just check for the instruction.
+            */
             Instr = FindInstruction (&CurTok.SVal);
         }
     }
@@ -478,7 +558,7 @@ static ExprNode* FuncIsMnemonic (void)
     /* Skip the name */
     NextTok ();
 
-    return GenLiteralExpr (Instr > 0);
+    return GenLiteralExpr (Instr >= 0);
 }
 
 
@@ -514,7 +594,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     token_t Term = GetTokListTerm (TOK_COMMA);
     while (CurTok.Tok != Term) {
 
-        /* We may not end-of-line of end-of-file here */
+        /* We may not end-of-line or end-of-file here */
         if (TokIsSep (CurTok.Tok)) {
             Error ("Unexpected end of line");
             return GenLiteral0 ();
@@ -552,7 +632,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     Node = Root;
     while (CurTok.Tok != Term) {
 
-        /* We may not end-of-line of end-of-file here */
+        /* We may not end-of-line or end-of-file here */
         if (TokIsSep (CurTok.Tok)) {
             Error ("Unexpected end of line");
             return GenLiteral0 ();
@@ -698,7 +778,7 @@ static ExprNode* FuncAddrSize (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
         } else {
             AddrSize = Sym->AddrSize;
         }
@@ -738,13 +818,13 @@ static ExprNode* FuncAddrSize (void)
         if (Sym) {
             AddrSize = Sym->AddrSize;
         } else {
-            Error ("Unknown symbol or scope: '%m%p%m%p'", &ScopeName, &Name);
+            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
         }
 
     }
 
     if (AddrSize == 0) {
-        Warning (1, "Unknown address size: '%m%p%m%p'", &ScopeName, &Name);
+        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
     }
 
     /* Free the string buffers */
@@ -779,7 +859,7 @@ static ExprNode* FuncSizeOf (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: '%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
@@ -831,7 +911,7 @@ static ExprNode* FuncSizeOf (void)
             if (Sym) {
                 SizeSym = GetSizeOfSymbol (Sym);
             } else {
-                Error ("Unknown symbol or scope: '%m%p%m%p'",
+                Error ("Unknown symbol or scope: `%m%p%m%p'",
                        &ScopeName, &Name);
             }
         }
@@ -839,7 +919,7 @@ static ExprNode* FuncSizeOf (void)
 
     /* Check if we have a size */
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
-        Error ("Size of '%m%p%m%p' is unknown", &ScopeName, &Name);
+        Error ("Size of `%m%p%m%p' is unknown", &ScopeName, &Name);
         Size = 0;
     }
 
@@ -861,8 +941,7 @@ static ExprNode* FuncStrAt (void)
     unsigned char C = 0;
 
     /* String constant expected */
-    if (CurTok.Tok != TOK_STRCON) {
-        Error ("String constant expected");
+    if (!Expect (TOK_STRCON, "Expected a string constant")) {
         NextTok ();
         goto ExitPoint;
     }
@@ -904,9 +983,8 @@ static ExprNode* FuncStrLen (void)
     int Len;
 
     /* String constant expected */
-    if (CurTok.Tok != TOK_STRCON) {
+    if (!Expect (TOK_STRCON, "Expected a string constant")) {
 
-        Error ("String constant expected");
         /* Smart error recovery */
         if (CurTok.Tok != TOK_RPAREN) {
             NextTok ();
@@ -981,9 +1059,7 @@ static ExprNode* Function (ExprNode* (*F) (void))
     NextTok ();
 
     /* Expression must be enclosed in braces */
-    if (CurTok.Tok != TOK_LPAREN) {
-        Error ("'(' expected");
-        SkipUntilSep ();
+    if (!ExpectSkip (TOK_LPAREN, "Expected `('")) {
         return GenLiteral0 ();
     }
     NextTok ();
@@ -1111,6 +1187,10 @@ static ExprNode* Factor (void)
             N = Function (FuncBlank);
             break;
 
+        case TOK_CAP:
+            N = Function (FuncCapability);
+            break;
+
         case TOK_CONST:
             N = Function (FuncConst);
             break;
@@ -1208,11 +1288,11 @@ static ExprNode* Factor (void)
                 SB_GetLen (&CurTok.SVal) == 1) {
                 /* A character constant */
                 N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
+                NextTok ();
             } else {
                 N = GenLiteral0 ();     /* Dummy */
-                Error ("Syntax error");
+                ErrorExpect ("Expected an expression");
             }
-            NextTok ();
             break;
     }
     return N;
@@ -1692,7 +1772,7 @@ ExprNode* GenLiteralExpr (long Val)
 
 
 ExprNode* GenLiteral0 (void)
-/* Return an expression tree that encodes the the number zero */
+/* Return an expression tree that encodes the number zero */
 {
     return GenLiteralExpr (0);
 }
@@ -1874,9 +1954,8 @@ ExprNode* GenNearAddrExpr (ExprNode* Expr)
     if (IsEasyConst (Expr, &Val)) {
         FreeExpr (Expr);
         Expr = GenLiteralExpr (Val & 0xFFFF);
-        if (Val > 0xFFFF)
-        {
-            Error("Range error: constant too large for assumed near address.");
+        if (Val > 0xFFFF) {
+            Error ("Range error: constant too large for assumed near address.");
         }
     } else {
         ExprNode* Operand = Expr;

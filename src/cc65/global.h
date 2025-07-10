@@ -52,8 +52,11 @@
 
 /* Options */
 extern unsigned char    AddSource;              /* Add source lines as comments */
+extern unsigned char    AllowNewComments;       /* Allow new style comments in C89 mode */
 extern unsigned char    AutoCDecl;              /* Make functions default to __cdecl__ */
 extern unsigned char    DebugInfo;              /* Add debug info to the obj */
+extern unsigned char    DumpPredefMacros;       /* Output predefined macros */
+extern unsigned char    DumpUserMacros;         /* Output user macros */
 extern unsigned char    PreprocessOnly;         /* Just preprocess the input */
 extern unsigned char    DebugOptOutput;         /* Output debug stuff */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
@@ -77,6 +80,7 @@ extern IntStack         DataAlignment;          /* Alignment for data */
 extern StrBuf           DepName;                /* Name of dependencies file */
 extern StrBuf           FullDepName;            /* Name of full dependencies file */
 extern StrBuf           DepTarget;              /* Name of dependency target */
+extern StrBuf           DebugTableName;         /* Name of debug table dump file */
 
 
 

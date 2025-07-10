@@ -7,17 +7,16 @@
 ;
 
         .importzp       ptr1, ptr2
-        .export         __heapblocksize
+        .export         ___heapblocksize
 
         .include        "_heap.inc"
 
         .macpack        generic
-        .macpack        cpu
 
 ;-----------------------------------------------------------------------------
 ; Code
 
-__heapblocksize:
+___heapblocksize:
 
 ; Below the user data is a pointer that points to the start of the real
 ; (raw) memory block. The first word of this block is the size. To access
@@ -39,7 +38,7 @@ __heapblocksize:
         ldy     #usedblock::size+1
         lda     (ptr2),y
         tax
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (ptr2)
 .else
         dey

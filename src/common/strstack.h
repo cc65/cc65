@@ -38,10 +38,6 @@
 
 
 
-#include "inline.h"
-
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -65,25 +61,17 @@ struct StrStack {
 
 
 
-#if defined(HAVE_INLINE)
-INLINE int SS_IsFull (const StrStack* S)
+static inline int SS_IsFull (const StrStack* S)
 /* Return true if there is no space left on the given string stack */
 {
     return (S->Count >= sizeof (S->Stack) / sizeof (S->Stack[0]));
 }
-#else
-#  define SS_IsFull(S)  ((S)->Count >= sizeof ((S)->Stack) / sizeof ((S)->Stack[0]))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned SS_GetCount (const StrStack* S)
+static inline unsigned SS_GetCount (const StrStack* S)
 /* Return the number of elements on the given string stack */
 {
     return S->Count;
 }
-#else
-#  define SS_GetCount(S)        (S)->Count
-#endif
 
 const char* SS_Get (const StrStack* S);
 /* Get the value on top of a string stack */

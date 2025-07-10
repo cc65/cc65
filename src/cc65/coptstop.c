@@ -1105,6 +1105,62 @@ static unsigned Opt_tosxorax (StackOpData* D)
 
 
 
+static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
+/* Optimize the tosandax/tosorax/tosxorax sequence. */
+{
+    CodeEntry*  X;
+
+
+    /* Inline the bitwise operation */
+    D->IP = D->OpIndex+1;
+
+    /* Backup lhs if necessary */
+    if ((D->Rhs.A.Flags & LI_DIRECT) == 0) {
+        if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+            /* Just reload lhs */
+            X = NewCodeEntry (OPC, D->Lhs.A.LoadEntry->AM, D->Lhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+        } else {
+            /* Backup lhs */
+            X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
+            InsertEntry (D, X, D->PushIndex+1);
+            /* Add code for low operand */
+            X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+        }
+    } else {
+        /* Add code for low operand */
+        X = NewCodeEntry (OPC, D->Rhs.A.LoadEntry->AM, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* Rhs load entries may be removed */
+        D->Rhs.A.Flags |= LI_REMOVE;
+    }
+
+    /* Do high-byte operation only when its result is used */
+    if ((GetRegInfo (D->Code, D->IP, REG_X) & REG_X) != 0) {
+        /* Replace the high-byte load with 0 for EOR, or just leave it alone */
+        if (OPC == OP65_EOR) {
+            X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (0), 0, D->Rhs.X.ChgEntry->LI);
+            InsertEntry (D, X, D->IP++);
+            D->Rhs.X.Flags |= LI_REMOVE;
+        } else {
+            D->Rhs.X.Flags |= LI_DONT_REMOVE;
+        }
+    } else {
+        /* Rhs load entries may be removed */
+        D->Rhs.X.Flags |= LI_REMOVE;
+    }
+
+    /* Remove the push and the call to the tossubax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 /* Optimize the TOS compare sequence with a bool transformer */
 {
@@ -1153,6 +1209,8 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 
         /* Save lhs into zeropage */
         AddStoreLhsA (D);
+        /* AddStoreLhsA may have moved the OpIndex, recalculate insertion point to prevent label migration. */
+        D->IP = D->OpIndex + 1;
 
         /* cmp */
         X = NewCodeEntry (OP65_CMP, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
@@ -1171,6 +1229,14 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 
     /* We changed the sequence */
     return 1;
+}
+
+
+
+static unsigned Opt_a_tosand (StackOpData* D)
+/* Optimize the tosandax sequence. */
+{
+    return Opt_a_tosbitwise (D, OP65_AND);
 }
 
 
@@ -1206,6 +1272,8 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
             /* RHS src is not directly comparable */
             X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->Rhs.A.ChgIndex + 1);
+            /* RHS insertion may have moved the OpIndex, recalculate insertion point to prevent label migration. */
+            D->IP = D->OpIndex + 1;
 
             /* Cmp with stored RHS */
             X = NewCodeEntry (OP65_CMP, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
@@ -1224,10 +1292,10 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
                 }
                 InsertEntry (D, X, D->IP++);
 
-                /* cmp src,y OR cmp (sp),y */
+                /* cmp src,y OR cmp (c_sp),y */
                 if (D->Rhs.A.LoadEntry->OPC == OP65_JSR) {
-                    /* opc (sp),y */
-                    X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+                    /* opc (c_sp),y */
+                    X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
                 } else {
                     /* opc src,y */
                     X = NewCodeEntry (OP65_CMP, D->Rhs.A.LoadEntry->AM, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
@@ -1288,6 +1356,66 @@ static unsigned Opt_a_tosne (StackOpData* D)
 
 
 
+static unsigned Opt_a_tosor (StackOpData* D)
+/* Optimize the tosorax sequence. */
+{
+    return Opt_a_tosbitwise (D, OP65_ORA);
+}
+
+
+
+static unsigned Opt_a_tossub (StackOpData* D)
+/* Optimize the tossubax sequence. */
+{
+    CodeEntry*  X;
+
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
+
+    /* sec */
+    X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Add code for low operand */
+    AddOpLow (D, OP65_SBC, &D->Rhs);
+
+    /* Do sign-extension as high-byte operation only when its result is used */
+    if ((GetRegInfo (D->Code, D->IP, REG_X) & REG_X) != 0) {
+        CodeLabel* L;
+        CodeEntry* N;
+
+        X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (0), 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* Add sign extension - N is unused now */
+        N = CS_GetEntry (D->Code, D->IP);
+        CHECK (N != 0);
+        L = CS_GenLabel (D->Code, N);
+
+        X = NewCodeEntry (OP65_BCS, AM65_BRA, L->Name, L, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* Rhs load entries must be removed */
+    D->Rhs.X.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_REMOVE;
+
+    /* Remove the push and the call to the tossubax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_a_tosuge (StackOpData* D)
 /* Optimize the tosgeax and tosugeax sequences */
 {
@@ -1320,6 +1448,14 @@ static unsigned Opt_a_tosult (StackOpData* D)
 
 
 
+static unsigned Opt_a_tosxor (StackOpData* D)
+/* Optimize the tosxorax sequence. */
+{
+    return Opt_a_tosbitwise (D, OP65_EOR);
+}
+
+
+
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
@@ -1328,8 +1464,10 @@ static unsigned Opt_a_tosult (StackOpData* D)
 
 /* The first column of these two tables must be sorted in lexical order */
 
+/* CAUTION: table must be sorted for bsearch */
 static const OptFuncDesc FuncTable[] = {
-    { "__bzero",    Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
+/* BEGIN SORTED.SH */
+    { "___bzero",   Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
     { "staspidx",   Opt_staspidx,  REG_NONE, OP_NONE                                   },
     { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                                   },
     { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                                   },
@@ -1349,9 +1487,13 @@ static const OptFuncDesc FuncTable[] = {
     { "tosuleax",   Opt_tosuleax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tosultax",   Opt_tosultax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                                   },
+/* END SORTED.SH */
 };
 
+/* CAUTION: table must be sorted for bsearch */
 static const OptFuncDesc FuncRegATable[] = {
+/* BEGIN SORTED.SH */
+    { "tosandax",   Opt_a_tosand,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "toseqax",    Opt_a_toseq,   REG_NONE, OP_NONE                                   },
     { "tosgeax",    Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
     { "tosgtax",    Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
@@ -1359,10 +1501,14 @@ static const OptFuncDesc FuncRegATable[] = {
     { "tosleax",    Opt_a_tosule,  REG_NONE, OP_NONE                                   },
     { "tosltax",    Opt_a_tosult,  REG_NONE, OP_NONE                                   },
     { "tosneax",    Opt_a_tosne,   REG_NONE, OP_NONE                                   },
+    { "tosorax",    Opt_a_tosor,   REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tossubax",   Opt_a_tossub,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
     { "tosugeax",   Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
     { "tosugtax",   Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
     { "tosuleax",   Opt_a_tosule,  REG_NONE, OP_NONE                                   },
     { "tosultax",   Opt_a_tosult,  REG_NONE, OP_NONE                                   },
+    { "tosxorax",   Opt_a_tosxor,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+/* END SORTED.SH */
 };
 
 #define FUNC_COUNT(Table) (sizeof(Table) / sizeof(Table[0]))

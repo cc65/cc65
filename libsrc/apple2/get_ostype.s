@@ -4,8 +4,10 @@
 ; unsigned char get_ostype (void)
 ;
 
+        ; Priority higher than the default one so that things depending
+        ; on ostype can get ostype set when called at normal priority
         .constructor    initostype, 9
-        .export         _get_ostype
+        .export         _get_ostype, ostype
 
 ; Identify machine according to:
 ; Apple II Miscellaneous TechNote #7, Apple II Family Identification

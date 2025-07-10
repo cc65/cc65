@@ -44,19 +44,6 @@
 
 
 /*****************************************************************************/
-/*             Remove calls to the bool transformer subroutines              */
-/*****************************************************************************/
-
-
-
-unsigned OptBoolTrans (CodeSeg* S);
-/* Try to remove the call to boolean transformer routines where the call is
-** not really needed.
-*/
-
-
-
-/*****************************************************************************/
 /*                        Optimizations for compares                         */
 /*****************************************************************************/
 
@@ -126,10 +113,10 @@ unsigned OptCmp5 (CodeSeg* S);
 /* Optimize compares of local variables:
 **
 **      ldy     #o
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      tax
 **      dey
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      cpx     #a
 **      bne     L1
 **      cmp     #b
@@ -137,10 +124,8 @@ unsigned OptCmp5 (CodeSeg* S);
 */
 
 unsigned OptCmp6 (CodeSeg* S);
-/* Search for calls to compare subroutines followed by a conditional branch
-** and replace them by cheaper versions, since the branch means that the
-** boolean value returned by these routines is not needed (we may also check
-** that explicitly, but for the current code generator it is always true).
+/* Remove compare instructions before an RTS or an exit by jumping to some
+** other function.
 */
 
 unsigned OptCmp7 (CodeSeg* S);

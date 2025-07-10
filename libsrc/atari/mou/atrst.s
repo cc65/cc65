@@ -268,9 +268,10 @@ INSTALL:
         and     #$0f
         sta     old_porta_vbi
 
-; Done, return zero (= MOUSE_ERR_OK)
+; Done
 
-        ldx     #$00
+        ldx     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         txa
         rts
 
@@ -398,12 +399,12 @@ MOVE:   php
         jsr     CMOVEY                  ; Set it
 
         ldy     #$01
-        lda     (sp),y
+        lda     (c_sp),y
         sta     XPos+1
         sta     XPosWrk+1
         tax
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         sta     XPos                    ; New X position
         sta     XPosWrk
         jsr     CMOVEX                  ; Move the cursor

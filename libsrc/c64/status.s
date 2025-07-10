@@ -1,5 +1,15 @@
 ;
-; Oliver Schmidt, 2012-09-30
+; Stefan Haubenthal, 2023-01-16
 ;
 
-        .exportzp       ST := $90       ; IEC status byte
+        .export         initst
+
+        .include        "c64.inc"
+
+.proc   initst
+
+        lda     #$00
+        sta     STATUS
+        rts
+
+.endproc

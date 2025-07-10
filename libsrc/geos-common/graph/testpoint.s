@@ -10,7 +10,7 @@
             .export _TestPoint
 
             .include "jumptab.inc"
-            
+
 _TestPoint:
         jsr PointRegs
         jsr TestPoint

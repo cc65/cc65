@@ -169,7 +169,7 @@ void testdefault2(unsigned char i) {
 
                 case 170:
                         break;
-                
+
                 case 18:
                         break;
                 case 19:
@@ -215,12 +215,12 @@ int main(void) {
         testlimits(32767);
         testlimits(-32768);
         testlimits(-1);
-        
+
         testdefault1(1);
         testdefault1(2);
         testdefault1(3);
         testdefault1(4);
-        
+
         testdefault2(1);
         testdefault2(2);
         testdefault2(3);

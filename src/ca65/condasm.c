@@ -35,6 +35,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "instr.h"
 #include "lineinfo.h"
@@ -133,24 +134,26 @@ static void SetIfCond (IfDesc* ID, int C)
 
 
 
-static void ElseClause (IfDesc* ID, const char* Directive)
-/* Enter an .ELSE clause */
+static int ElseClause (IfDesc* ID, const char* Directive)
+/* Enter an .ELSE clause. Return true if this was ok, zero on errors. */
 {
     /* Check if we have an open .IF - otherwise .ELSE is not allowed */
     if (ID == 0) {
         Error ("Unexpected %s", Directive);
-        return;
+        return 0;
     }
 
     /* Check for a duplicate else, then remember that we had one */
     if (ID->Flags & ifElse) {
         /* We already had a .ELSE ! */
         Error ("Duplicate .ELSE");
+        return 0;
     }
     ID->Flags |= ifElse;
 
     /* Condition is inverted now */
     ID->Flags ^= ifCond;
+    return 1;
 }
 
 
@@ -192,7 +195,7 @@ static void FreeIf (void)
 {
     int Done;
     do {
-        IfDesc* ID = GetCurrentIf();
+        IfDesc* ID = GetCurrentIf ();
         if (ID == 0) {
             Error (" Unexpected .ENDIF");
             Done = 1;
@@ -226,46 +229,52 @@ void DoConditionals (void)
                 D = GetCurrentIf ();
 
                 /* Allow an .ELSE */
-                ElseClause (D, ".ELSE");
+                if (ElseClause (D, ".ELSE")) {
+                    /* Remember the data for the .ELSE */
+                    if (D) {
+                        ReleaseFullLineInfo (&D->LineInfos);
+                        GetFullLineInfo (&D->LineInfos);
+                        D->Name = ".ELSE";
+                    }
 
-                /* Remember the data for the .ELSE */
-                if (D) {
-                    ReleaseFullLineInfo (&D->LineInfos);
-                    GetFullLineInfo (&D->LineInfos);
-                    D->Name = ".ELSE";
+                    /* Calculate the new overall condition */
+                    CalcOverallIfCond ();
+
+                    /* Skip .ELSE */
+                    NextTok ();
+                    ExpectSep ();
+                } else {
+                    /* Problem with .ELSE, ignore remainder of line */
+                    SkipUntilSep ();
                 }
-
-                /* Calculate the new overall condition */
-                CalcOverallIfCond ();
-
-                /* Skip .ELSE */
-                NextTok ();
-                ExpectSep ();
                 break;
 
             case TOK_ELSEIF:
                 D = GetCurrentIf ();
                 /* Handle as if there was an .ELSE first */
-                ElseClause (D, ".ELSEIF");
+                if (ElseClause (D, ".ELSEIF")) {
+                    /* Calculate the new overall if condition */
+                    CalcOverallIfCond ();
 
-                /* Calculate the new overall if condition */
-                CalcOverallIfCond ();
+                    /* Allocate and prepare a new descriptor */
+                    D = AllocIf (".ELSEIF", 0);
+                    NextTok ();
 
-                /* Allocate and prepare a new descriptor */
-                D = AllocIf (".ELSEIF", 0);
-                NextTok ();
+                    /* Ignore the new condition if we are inside a false .ELSE
+                    ** branch. This way we won't get any errors about undefined
+                    ** symbols or similar...
+                    */
+                    if (IfCond) {
+                        SetIfCond (D, ConstExpression ());
+                        ExpectSep ();
+                    }
 
-                /* Ignore the new condition if we are inside a false .ELSE
-                ** branch. This way we won't get any errors about undefined
-                ** symbols or similar...
-                */
-                if (IfCond) {
-                    SetIfCond (D, ConstExpression ());
-                    ExpectSep ();
+                    /* Get the new overall condition */
+                    CalcOverallIfCond ();
+                } else {
+                    /* Problem with .ELSEIF, ignore remainder of line */
+                    SkipUntilSep ();
                 }
-
-                /* Get the new overall condition */
-                CalcOverallIfCond ();
                 break;
 
             case TOK_ENDIF:
@@ -310,7 +319,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFCONST", 1);
                 NextTok ();
                 if (IfCond) {
-                    ExprNode* Expr = Expression();
+                    ExprNode* Expr = Expression ();
                     SetIfCond (D, IsConstExpr (Expr, 0));
                     FreeExpr (Expr);
                     ExpectSep ();
@@ -346,7 +355,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFNCONST", 1);
                 NextTok ();
                 if (IfCond) {
-                    ExprNode* Expr = Expression();
+                    ExprNode* Expr = Expression ();
                     SetIfCond (D, !IsConstExpr (Expr, 0));
                     FreeExpr (Expr);
                     ExpectSep ();
@@ -380,7 +389,17 @@ void DoConditionals (void)
                 D = AllocIf (".IFP02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_6502);
+                    SetIfCond (D, GetCPU () == CPU_6502);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFP02X:
+                D = AllocIf (".IFP02X", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU () == CPU_6502X);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -390,7 +409,27 @@ void DoConditionals (void)
                 D = AllocIf (".IFP4510", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_4510);
+                    SetIfCond (D, GetCPU () == CPU_4510);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFP45GS02:
+                D = AllocIf (".IFP45GS02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU () == CPU_45GS02);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFP6280:
+                D = AllocIf (".IFP6280", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU () == CPU_HUC6280);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -400,7 +439,7 @@ void DoConditionals (void)
                 D = AllocIf (".IFP816", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_65816);
+                    SetIfCond (D, GetCPU () == CPU_65816);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -410,7 +449,17 @@ void DoConditionals (void)
                 D = AllocIf (".IFPC02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_65C02);
+                    SetIfCond (D, GetCPU () == CPU_65C02);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFPCE02:
+                D = AllocIf (".IFPCE02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU () == CPU_65CE02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -420,7 +469,17 @@ void DoConditionals (void)
                 D = AllocIf (".IFPDTV", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_6502DTV);
+                    SetIfCond (D, GetCPU () == CPU_6502DTV);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFPM740:
+                D = AllocIf (".IFPM740", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU () == CPU_M740);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -430,7 +489,27 @@ void DoConditionals (void)
                 D = AllocIf (".IFPSC02", 1);
                 NextTok ();
                 if (IfCond) {
-                    SetIfCond (D, GetCPU() == CPU_65SC02);
+                    SetIfCond (D, GetCPU () == CPU_65SC02);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFPSWEET16:
+                D = AllocIf (".IFPSWEET16", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU () == CPU_SWEET16);
+                }
+                ExpectSep ();
+                CalcOverallIfCond ();
+                break;
+
+            case TOK_IFPWC02:
+                D = AllocIf (".IFPWC02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU () == CPU_W65C02);
                 }
                 ExpectSep ();
                 CalcOverallIfCond ();
@@ -477,11 +556,18 @@ int CheckConditionals (void)
         case TOK_IFNDEF:
         case TOK_IFNREF:
         case TOK_IFP02:
+        case TOK_IFP02X:
         case TOK_IFP4510:
+        case TOK_IFP45GS02:
+        case TOK_IFP6280:
         case TOK_IFP816:
         case TOK_IFPC02:
+        case TOK_IFPCE02:
         case TOK_IFPDTV:
+        case TOK_IFPM740:
         case TOK_IFPSC02:
+        case TOK_IFPSWEET16:
+        case TOK_IFPWC02:
         case TOK_IFREF:
             DoConditionals ();
             return 1;

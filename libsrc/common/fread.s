@@ -14,7 +14,7 @@
         .import         pushwysp
         .import         tosumulax, tosudivax
 
-        .importzp       ptr1, sp
+        .importzp       ptr1, c_sp
 
         .include        "errno.inc"
         .include        "_file.inc"
@@ -47,29 +47,43 @@
 
         ldy     #_FILE::f_flags
         lda     (file),y
+        .if .cap(CPU_HAS_BITIMM)
+        bit     #_FOPEN                 ; Is the file open?
+        .else
         and     #_FOPEN                 ; Is the file open?
+        .endif
         beq     @L1                     ; Branch if no
 
 ; Check if the stream is in an error state
 
+        .if .cap(CPU_HAS_BITIMM)
+        bit     #_FERROR
+        .else
         lda     (file),y                ; get file->f_flags again
         and     #_FERROR
+        .endif
         beq     @L2
 
 ; File not open or in error state
 
 @L1:    lda     #EINVAL
-        jsr     __seterrno              ; Set __errno, return zero in A
+        jsr     ___seterrno              ; Set __errno, return zero in A
         tax                             ; a/x = 0
         jmp     @L99                    ; Bail out
 
 ; Remember if we have a pushed back character and reset the flag.
 
-@L2:    tax                             ; X = 0
+@L2:    .if .cap(CPU_HAS_BITIMM)
+        ldx     #$00
+        bit     #_FPUSHBACK
+        beq     @L3
+        .else
+        tax                             ; X = 0
         lda     (file),y
         and     #_FPUSHBACK
         beq     @L3
         lda     (file),y
+        .endif
         and     #<~_FPUSHBACK
         sta     (file),y                ; file->f_flags &= ~_FPUSHBACK;
         inx                             ; X = 1
@@ -118,24 +132,36 @@
 ; Copy the buffer pointer into ptr1, and increment the pointer value passed
 ; to read() by one, so read() starts to store data at buf+1.
 
-        ldy     #0
-        lda     (sp),y
+        .if .cap(CPU_HAS_ZPIND)
+        lda     (c_sp)
         sta     ptr1
         add     #1
-        sta     (sp),y
+        sta     (c_sp)
+        ldy     #1
+        .else
+        ldy     #0
+        lda     (c_sp),y
+        sta     ptr1
+        add     #1
+        sta     (c_sp),y
         iny
-        lda     (sp),y
+        .endif
+        lda     (c_sp),y
         sta     ptr1+1
         adc     #0
-        sta     (sp),y                  ; ptr1 = buf++;
+        sta     (c_sp),y                ; ptr1 = buf++;
 
 ; Get the buffered character and place it as first character into the read
 ; buffer.
 
         ldy     #_FILE::f_pushback
         lda     (file),y
+        .if .cap(CPU_HAS_ZPIND)
+        sta     (ptr1)                  ; *buf = file->f_pushback;
+        .else
         ldy     #0
         sta     (ptr1),y                ; *buf = file->f_pushback;
+        .endif
 
 ; Restore the low byte of count and decrement count by one. This may result
 ; in count being zero, so check for that.
@@ -161,7 +187,7 @@
         bne     @L8
 
 ; Error in read. Set the stream error flag and bail out. errno has already
-; been set by read(). On entry to label @L7, X must be zero. 
+; been set by read(). On entry to label @L7, X must be zero.
 
         inx                             ; X = 0
         lda     #_FERROR
@@ -210,4 +236,3 @@
 .bss
 save:   .res    2
 pb:     .res    1
-

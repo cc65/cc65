@@ -10,15 +10,13 @@
 ;
         .export         pushl0, push0ax, pusheax
         .import         decsp4
-        .importzp       sp, sreg
-
-        .macpack        cpu
+        .importzp       c_sp, sreg
 
 pushl0:
         lda     #0
         tax
 push0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -31,19 +29,19 @@ pusheax:
         jsr     decsp4
         ldy     #3
         lda     sreg+1
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         lda     sreg
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         txa
-        sta     (sp),y
+        sta     (c_sp),y
         pla
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-        sta     (sp)
-.else        
+.if .cap(CPU_HAS_ZPIND)
+        sta     (c_sp)
+.else
         dey
-        sta     (sp),y
-.endif        
+        sta     (c_sp),y
+.endif
         rts
 

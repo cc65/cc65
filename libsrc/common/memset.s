@@ -1,6 +1,6 @@
 ;
 ; void* __fastcall__ memset (void* ptr, int c, size_t n);
-; void* __fastcall__ _bzero (void* ptr, size_t n);
+; void* __fastcall__ __bzero (void* ptr, size_t n);
 ; void __fastcall__ bzero (void* ptr, size_t n);
 ;
 ; Ullrich von Bassewitz, 29.05.1998
@@ -8,19 +8,19 @@
 ; Christian Krueger, 12.09.2009, slightly improved 12.01.2011
 ;
 ; NOTE: bzero will return it's first argument as memset does. It is no problem
-;       to declare the return value as void, since it may be ignored. _bzero
-;       (note the leading underscore) is declared with the proper return type,
-;       because the compiler will replace memset by _bzero if the fill value
+;       to declare the return value as void, since it may be ignored. __bzero
+;       (note the leading underscores) is declared with the proper return type,
+;       because the compiler will replace memset by __bzero if the fill value
 ;       is zero, and the optimizer looks at the return type to see if the value
 ;       in a/x is of any use.
 ;
 
-        .export         _memset, _bzero, __bzero
+        .export         _memset, _bzero, ___bzero
         .import         popax
-        .importzp       sp, ptr1, ptr2, ptr3
+        .importzp       c_sp, ptr1, ptr2, ptr3
 
 _bzero:
-__bzero:
+___bzero:
         sta     ptr3
         stx     ptr3+1          ; Save n
         ldx     #0              ; Fill with zeros
@@ -36,10 +36,10 @@ _memset:
 
 common:                         ; Fill value is in X!
         ldy     #1
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1+1          ; save high byte of ptr
         dey                     ; Y = 0
-        lda     (sp),y          ; Get ptr
+        lda     (c_sp),y        ; Get ptr
         sta     ptr1
 
         lsr     ptr3+1          ; divide number of
@@ -87,7 +87,7 @@ L3:     dey
         sta     (ptr1),y                ; set bytes in low
         sta     (ptr2),y                ; and high section
         bne     L3              ; flags still up to date from dey!
-leave:  
+leave:
         jmp     popax           ; Pop ptr and return as result
 
-                
+

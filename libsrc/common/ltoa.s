@@ -10,15 +10,13 @@
         .import         __hextab, __longminstr
         .importzp       sreg, ptr1, ptr2, ptr3, tmp1
 
-        .macpack        cpu
-
 .code
 
 ;
 ; Common subroutine to pop the parameters and put them into core
 ;
 
-dopop:  sta     tmp1            ; will loose high byte
+dopop:  sta     tmp1            ; will lose high byte
         jsr     popax           ; get s to ptr2
         sta     ptr2
         stx     ptr2+1
@@ -56,7 +54,7 @@ L1:     lda     __longminstr,y  ; copy -2147483648
         dey
         bpl     L1
         jmp     L10
-                  
+
 ; Check if the value is negative. If so, write a - sign and negate the
 ; number.
 
@@ -64,9 +62,9 @@ L2:     txa                     ; get high byte
         bpl     ultoa
         lda     #'-'
 
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sta     (ptr2)
-.else        
+.else
         ldy     #0
         sta     (ptr2),y        ; store sign
 .endif
@@ -79,7 +77,7 @@ L3:     lda     ptr1            ; negate val
         ldx     ptr1+1
 
         jsr     negeax
-        
+
         sta     ptr1
         stx     ptr1+1
         jmp     ultoa

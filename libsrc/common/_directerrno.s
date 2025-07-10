@@ -7,18 +7,16 @@
 
         .include        "errno.inc"
 
-        .macpack        cpu
-
 ; ----------------------------------------------------------------------------
-; int __fastcall__ _directerrno (unsigned char code);
-; /* Set errno to a specific error code, clear _oserror, and return -1. Used
+; int __fastcall__ __directerrno (unsigned char code);
+; /* Set errno to a specific error code, clear __oserror, and return -1. Used
 ; ** by the library.
 ; */
 
-__directerrno:
-        jsr     __seterrno              ; Set errno (returns with .A = 0)
-        sta     __oserror               ; Clear __oserror
-.if (.cpu .bitand CPU_ISET_65SC02)
+___directerrno:
+        jsr     ___seterrno             ; Set errno (returns with .A = 0)
+        sta     ___oserror              ; Clear ___oserror
+.if .cap(CPU_HAS_INA)
         dec     a
 .else
         lda     #$FF                    ; Return -1

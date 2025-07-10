@@ -24,6 +24,10 @@
 #  define SCREEN_RAM ((unsigned char*)0x8000)
 #elif defined(__VIC20__)
 #  define SCREEN_RAM ((unsigned char*)0x1000)
+#elif defined(__C65__)
+#  define SCREEN_RAM ((unsigned char*)0x0800)
+#elif defined(__MEGA65__)
+#  define SCREEN_RAM ((unsigned char*)0x0800)
 #else
 #  error This program cannot test that target.
 #  define SCREEN_RAM ((unsigned char*)0)
@@ -294,8 +298,8 @@ int main (void)
     revers(0); cputc('x'); chBack (); c1 = cpeekrevers(); chForth();
     revers(1); cputc('X'); chBack (); c2 = cpeekrevers(); chForth();
     cputc('\n'); cputc('\r');
-    revers(c1); cputc('o'); 
-    revers(c2); cputc('O'); 
+    revers(c1); cputc('o');
+    revers(c2); cputc('O');
 
     /* test cpeeks() */
     revers(0);

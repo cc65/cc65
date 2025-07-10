@@ -54,11 +54,12 @@ const char CfgExt[]           = ".cfg"; /* Config file extension */
 /* Flags and other command line stuff */
 unsigned char DebugInfo       = 0;      /* Add debug info to the object file */
 unsigned char FormFeeds       = 0;      /* Add form feeds to the output? */
+unsigned char MultiPass       = 0;      /* Run several passes to resolve labels */
 unsigned char UseHexOffs      = 0;      /* Use hexadecimal label offsets */
-unsigned char PassCount       = 2;      /* How many passed do we do? */
 signed char   NewlineAfterJMP = -1;     /* Add a newline after a JMP insn? */
 signed char   NewlineAfterRTS = -1;     /* Add a newline after a RTS insn? */
-long          StartAddr       = -1L;    /* Start/load address of the program */
+unsigned char HaveStartAddr   = 0;      /* Flag for start address given */
+uint32_t      StartAddr       = 0;      /* Start/load address of the program */
 unsigned char SyncLines       = 0;      /* Accept line markers in the info file */
 long          InputOffs       = -1L;    /* Offset into input file */
 long          InputSize       = -1L;    /* Number of bytes to read from input */

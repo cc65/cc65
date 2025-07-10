@@ -134,7 +134,7 @@ static Segment* NewSegment (const char* Name, unsigned char AddrSize)
 
     /* Check the segment name for invalid names */
     if (!ValidSegName (Name)) {
-        Error ("Illegal segment name: '%s'", Name);
+        Error ("Illegal segment name: `%s'", Name);
     }
 
     /* Create a new segment and return it */
@@ -306,7 +306,7 @@ void SegAlign (unsigned long Alignment, int FillVal)
         ActiveSeg->Align = CombinedAlignment;
 
         /* Output a warning for larger alignments if not suppressed */
-        if (CombinedAlignment >= LARGE_ALIGNMENT && !LargeAlignment) {
+        if (CombinedAlignment >= LARGE_ALIGNMENT && CombinedAlignment > ActiveSeg->Align && CombinedAlignment > Alignment && !LargeAlignment) {
             Warning (0, "Combined alignment is suspiciously large (%lu)",
                      CombinedAlignment);
         }
@@ -417,7 +417,7 @@ void SegDone (void)
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
-                        LIError (&F->LI, "Range error");
+                        LIError (&F->LI, "Range error (Address size %u does not match fragment size %u)", ED.AddrSize, F->Len);
                     }
                 }
 
@@ -476,7 +476,18 @@ void SegDump (void)
     printf ("\n");
 }
 
-
+void ListSegments (FILE* destination)
+{
+    /* summary of segments when seglist requested */
+    unsigned I;
+    fprintf (destination, "\nSegment summary\n\n");
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        Segment* S = CollAtUnchecked (&SegmentList, I);
+        if(S->FragCount) {
+            fprintf (destination, "Segment: %02X = %s\n", S->Num, S->Def->Name);
+        }
+    }
+}
 
 void SegInit (void)
 /* Initialize segments */

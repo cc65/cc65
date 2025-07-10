@@ -1,12 +1,14 @@
 ; 2018-04-13, Jede (jede@oric.org)
 ;
-
+;
 ; void cputc (char c);
 ;
+; Important note: The implementation of cputs() relies on the cputc() function
+; not clobbering ptr1. Beware when rewriting or changing this function!
 
         .export         _cputc, _cputcxy, cputdirect, display_conio
         .export         CHARCOLOR, OLD_CHARCOLOR, BGCOLOR, OLD_BGCOLOR
-        
+
         .import         update_adscr
         .import         popax
 
@@ -19,13 +21,13 @@ _cputcxy:
     sta     SCRY                  ; Store Y
     stx     SCRX                  ; Store X
     jsr     update_adscr
-    pla        
+    pla
 
 _cputc:
     cmp     #$0D
     bne     @not_CR
     ldy     #$00
-    sty     SCRX 
+    sty     SCRX
     rts
 @not_CR:
     cmp     #$0A
@@ -80,10 +82,10 @@ do_not_change_color:
     sty     SCRX
 
     inc     SCRY
-    
+
     jmp     update_adscr
-    
-@no_inc:    
+
+@no_inc:
     sty     SCRX
     rts
 .endproc

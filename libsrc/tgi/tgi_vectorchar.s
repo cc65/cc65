@@ -79,9 +79,9 @@ GetProcessedCoord:
 
         jsr     GetOp
 
-; Multiplicate with the scale factor.
+; Multiply with the scale factor.
 
-        jmp     tgi_imulround           ; Multiplicate, round and scale
+        jmp     tgi_imulround           ; Multiply, round and scale
 
 ;----------------------------------------------------------------------------
 ; Add the base coordinate with offset in Y to the value in A/X
@@ -133,7 +133,7 @@ GetProcessedCoord:
 .code
 .proc   _tgi_vectorchar
 
-; Multiplicate the char value by two and save into Y
+; Multiply the char value by two and save into Y
 
         asl     a
         tay

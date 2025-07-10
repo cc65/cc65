@@ -94,23 +94,29 @@ Short options:
   -W n                          Set warning level n
   -d                            Debug mode
   -g                            Add debug info to object file
+  -x                            Expand macros in the listing
+                                repeat -x for full expansion
   -h                            Help (this text)
   -i                            Ignore case of symbols
   -l name                       Create a listing file if assembly was ok
   -mm model                     Set the memory model
   -o name                       Name the output file
   -s                            Enable smart mode
+  -S                            Generate segment offsets in listing
   -t sys                        Set the target system
   -v                            Increase verbosity
 
 Long options:
   --auto-import                 Mark unresolved symbols as import
   --bin-include-dir dir         Set a search path for binary includes
+  --color [on|auto|off]         Color diagnostics (default: auto)
   --cpu type                    Set cpu type
   --create-dep name             Create a make dependency file
   --create-full-dep name        Create a full make dependency file
   --debug                       Debug mode
   --debug-info                  Add debug info to object file
+  --expand-macros               Expand macros in listing
+                                Repeat to get full expansion
   --feature name                Set an emulation feature
   --help                        Help (this text)
   --ignore-case                 Ignore case of symbols
@@ -119,12 +125,15 @@ Long options:
   --listing name                Create a listing file if assembly was ok
   --list-bytes n                Maximum number of bytes per listing line
   --memory-model model          Set the memory model
+  --no-utf8                     Disable use of UTF-8 in diagnostics
   --pagelength n                Set the page length for the listing
   --relax-checks                Relax some checks (see docs)
+  --segment-list                Generate segment offsets in listing
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity
   --version                     Print the assembler version
+  --warnings-as-errors          Treat warnings as errors
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -145,13 +154,34 @@ Here is a description of all the command line options:
   name="search paths">.
 
 
+  <label id="option--color">
+  <tag><tt>--color</tt></tag>
+
+  This option controls if the assembler will use colors when printing
+  diagnostics. The default is "auto" which will enable colors if the output
+  goes to a terminal (not to a file).
+
+
   <label id="option--cpu">
   <tag><tt>--cpu type</tt></tag>
 
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
-
-        6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, sweet16, HuC6280, 4510
+  <itemize>
+  <item>6502 - NMOS 6502 (all legal instructions)
+  <item>6502X - NMOS 6502 with all undocumented instructions
+  <item>6502DTV - the emulated CPU of the C64DTV device
+  <item>65SC02 - first CMOS instruction set (no bit manipulation, no wai/stp)
+  <item>65C02 - CMOS with Rockwell extensions
+  <item>W65C02 - full CMOS instruction set (has bit manipulation and wai/stp)
+  <item>65CE02 - CMOS with CSG extensions
+  <item>4510 - the CPU of the Commodore C65
+  <item>45GS02 - the CPU of the Commodore MEGA65
+  <item>HuC6280 - the CPU of the PC engine
+  <item>M740 - a Microcontroller by Mitsubishi
+  <item>65816 - the CPU of the SNES, and the SCPU
+  <item>sweet16 - an interpreter for a pseudo 16 bit CPU
+  </itemize>
 
 
   <label id="option-create-dep">
@@ -183,7 +213,7 @@ Here is a description of all the command line options:
 
   Enable an emulation feature. This is identical as using <tt/.FEATURE/
   in the source with two exceptions: Feature names must be lower case, and
-  each feature must be specified by using an extra <tt/--feature/ option,
+  each feature must be specified by using a separate <tt/--feature/ option,
   comma separated lists are not allowed.
 
   See the discussion of the <tt><ref id=".FEATURE" name=".FEATURE"></tt>
@@ -245,6 +275,14 @@ Here is a description of all the command line options:
   huge.
 
 
+  <label id="option--no-utf8">
+  <tag><tt>--no-utf8</tt></tag>
+
+  Disable the use of UTF-8 characters in diagnostics. This might be necessary
+  if auto detection fails or if the output is captured for processing with a
+  tool that is not UTF-8 capable.
+
+
   <label id="option-o">
   <tag><tt>-o name</tt></tag>
 
@@ -264,14 +302,17 @@ Here is a description of all the command line options:
   <label id="option--relax-checks">
   <tag><tt>--relax-checks</tt></tag>
 
-  Relax some checks done by the assembler. This will allow code that is an
+  Disables some error checks done by the assembler. This will allow code that is an
   error in most cases and flagged as such by the assembler, but can be valid
   in special situations.
 
-  Examples are:
+  Disabled checks are:
 <itemize>
-<item>Short branches between two different segments.
-<item>Byte sized address loads where the address is not a zeropage address.
+<item>Address vs. fragment size: a byte sized load from an non-zeropage
+  address is truncated instead of producing an error.
+<item>Indirect jump on page boundary: <tt>jmp (label)</tt> on a label that
+  resides on a page boundary (<tt>$xxFF</tt>) fetches the second byte from the
+  wrong address on 6502 CPUs, now allowed instead of producing an error.
 </itemize>
 
 
@@ -298,10 +339,10 @@ Here is a description of all the command line options:
   character constants into the character set of the target platform. The
   default for the target system is "none", which means that no translation
   will take place. The assembler supports the same target systems as the
-  compiler, see there for a list.
+  compiler, see <htmlurl url="ca65.html#option-t" name="there for a list">.
 
   Depending on the target, the default CPU type is also set. This can be
-  overriden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
+  overridden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
 
 
   <label id="option-v">
@@ -359,6 +400,13 @@ Here is a description of all the command line options:
   warning level is 1, and it would probably be silly to set it to
   something lower.
 
+
+  <label id="option--warnings-as-errors">
+  <tag><tt>--warnings-as-errors</tt></tag>
+
+  An error will be generated if any warnings were produced.
+
+
 </descrip>
 <p>
 
@@ -388,7 +436,7 @@ name="--bin-include-dir">/ option on the command line.
 
 
 
-<sect>Input format<p>
+<sect>Input format<p><label id="input-format">
 
 <sect1>Assembler syntax<p>
 
@@ -415,24 +463,177 @@ Here are some examples for valid input lines:
 The assembler accepts
 
 <itemize>
-<item>all valid 6502 mnemonics when in 6502 mode (the default or after the
+<item>all valid 6502 mnemonics when in <ref id="6502-mode" name="6502 mode">
+      (the default or after the
       <tt><ref id=".P02" name=".P02"></tt> command was given).
-<item>all valid 6502 mnemonics plus a set of illegal instructions when in
-      <ref id="6502X-mode" name="6502X mode">.
-<item>all valid 6502DTV mnemonics when in 6502DTV mode (after the
+<item>all valid 6502 mnemonics, plus a set of illegal instructions, when in
+      <ref id="6502X-mode" name="6502X mode"> (after the
+      <tt><ref id=".P02X" name=".P02X"></tt> command was given).
+<item>all valid 6502DTV mnemonics when in <ref id="DTV-mode" name="DTV mode"> (after the
       <tt><ref id=".PDTV" name=".PDTV"></tt> command was given).
-<item>all valid 65SC02 mnemonics when in 65SC02 mode (after the
+<item>all valid 65SC02 mnemonics when in <ref id="65SC02-mode" name="65SC02 mode"> (after the
       <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
-<item>all valid 65C02 mnemonics when in 65C02 mode (after the
+<item>all valid 65C02 mnemonics when in <ref id="65C02-mode" name="65C02 mode"> (after the
       <tt><ref id=".PC02" name=".PC02"></tt> command was given).
-<item>all valid 65816 mnemonics when in 65816 mode (after the
-      <tt><ref id=".P816" name=".P816"></tt> command was given).
-<item>all valid 4510 mnemonics when in 4510 mode (after the
+<item>all valid W65C02 mnemonics when in <ref id="W65C02-mode" name="W65C02 mode"> (after the
+      <tt><ref id=".PWC02" name=".PWC02"></tt> command was given).
+<item>all valid 65CE02 mnemonics when in <ref id="65CE02-mode" name="65CE02 mode"> (after the
+      <tt><ref id=".PCE02" name=".PCE02"></tt> command was given).
+<item>all valid 4510 mnemonics when in <ref id="4510-mode" name="4510 mode"> (after the
       <tt><ref id=".P4510" name=".P4510"></tt> command was given).
+<item>all valid 45GS02 mnemonics when in <ref id="45GS02-mode" name="45GS02 mode"> (after the
+      <tt><ref id=".P45GS02" name=".P45GS02"></tt> command was given).
+<item>all valid HuC6280 mnemonics when in <ref id="HUC6280-mode" name="HuC6280 mode"> (after the
+      <tt><ref id=".P6280" name=".P6280"></tt> command was given).
+<item>all valid M740 mnemonics when in <ref id="M740-mode" name="M740 mode"> (after the
+      <tt><ref id=".PM740" name=".PM740"></tt> command was given).
+<item>all valid 65816 mnemonics when in <ref id="65816-mode" name="65816 mode"> (after the
+      <tt><ref id=".P816" name=".P816"></tt> command was given).
+</itemize>
+
+for more details on the various CPUs, see <tt><htmlurl url="cpus.html" name="here"></tt>.
+
+On 6502-derived platforms the <tt/BRK/ instruction has an optional signature
+byte. If omitted, the assembler will only produce only 1 byte.
+
+<tscreen><verb>
+                brk                     ; 1-byte:  $00
+                brk     $34             ; 2-bytes: $00 $34
+                brk     #$34            ; 2-bytes: $00 $34
+</verb></tscreen>
+
+<sect2>6502 mode<label id="6502-mode"><p>
+
+In 6502 mode (which is the default) the assembler accepts all regular "legal"
+6502 mnemonics and addressing modes.
+
+<sect2>6502X mode<label id="6502X-mode"><p>
+
+6502X mode is an extension to the normal 6502 mode. In this mode, several
+mnemonics for undocumented instructions of the NMOS 6502 CPUs are accepted.
+
+Note: Since these instructions are undocumented, there are no official mnemonics
+for them.
+
+<itemize>
+<item><tt>ALR: A:=(A and #{imm})/2;</tt>
+<item><tt>ANC: A:= A and #{imm};</tt> Generates opcode &dollar;0B.
+<item><tt>ANE: A:= (A or CONST) and X and #{imm};</tt>
+<item><tt>ARR: A:=(A and #{imm})/2;</tt>
+<item><tt>AXS: X:=A and X-#{imm};</tt>
+<item><tt>DCP: {addr}:={addr}-1; A-{addr};</tt>
+<item><tt>ISC: {addr}:={addr}+1; A:=A-{addr};</tt>
+<item><tt>JAM:</tt>
+<item><tt>LAS: A,X,S:={addr} and S;</tt>
+<item><tt>LAX: A,X:={addr};</tt>
+<item><tt>NOP: #{imm}; zp; zp,x; abs; abs,x</tt>
+<item><tt>RLA: {addr}:={addr}rol; A:=A and {addr};</tt>
+<item><tt>RRA: {addr}:={addr}ror; A:=A adc {addr};</tt>
+<item><tt>SAX: {addr}:=A and X;</tt>
+<item><tt>SHA: {addr}:=A and X and {addr hi +1};</tt>
+<item><tt>SHX: {addr}:=X and {addr hi +1};</tt>
+<item><tt>SHY: {addr}:=Y and {addr hi +1};</tt>
+<item><tt>SLO: {addr}:={addr}*2; A:=A or {addr};</tt>
+<item><tt>SRE: {addr}:={addr}/2; A:=A xor {addr};</tt>
+<item><tt>TAS: {addr}:=A and X and {addr hi +1}; SP:=A and X;</tt>
 </itemize>
 
 
-<sect1>65816 mode<p>
+<sect2>DTV mode<label id="DTV-mode"><p>
+
+The C64DTV CPU is based on the 6510, but adds some instructions, and does not
+support all undocumented instructions.
+
+<itemize>
+<item><tt>bra {rel}</tt> Generates opcode &dollar;12.
+<item><tt>sac #{imm}</tt> Generates opcode &dollar;32.
+<item><tt>sir #{imm}</tt> Generates opcode &dollar;42.
+</itemize>
+
+Supported undocumented instructions:
+
+<itemize>
+<item><tt>ALR: A:=(A and #{imm})/2;</tt>
+<item><tt>ANC: A:=A and #{imm};</tt> Generates opcode &dollar;0B.
+<item><tt>ARR: A:=(A and #{imm})/2;</tt>
+<item><tt>AXS: X:=A and X-#{imm};</tt>
+<item><tt>LAS: A,X,S:={addr} and S;</tt>
+<item><tt>LAX: A,X:={addr};</tt>
+<item><tt>NOP: #{imm}; zp; zp,x; abs; abs,x</tt>
+<item><tt>RLA: {addr}:={addr}rol; A:=A and {addr};</tt>
+<item><tt>RRA: {addr}:={addr}ror; A:=A adc {addr};</tt>
+<item><tt>SHX: {addr}:=X and {addr hi +1};</tt>
+<item><tt>SHY: {addr}:=y and {addr hi +1};</tt>
+</itemize>
+
+
+<sect2>65SC02 mode<label id="65SC02-mode"><p>
+
+65SC02 mode supports all regular 6502 instructions, plus the original CMOS
+instructions.
+
+
+<sect2>65C02 mode (CMOS with Rockwell extensions)<label id="65C02-mode"><p>
+
+65C02 mode supports all original CMOS instructions, plus the Rockwell (bit
+manipulation instructions) extensions.
+
+
+<sect2>W65C02 mode (CMOS with WDC extensions)<label id="W65C02-mode"><p>
+
+W65C02 mode supports the Rockwell extensions, plus wai and stp.
+
+
+<sect2>65CE02 mode<label id="65CE02-mode"><p>
+
+All 65CE02 instructions are accepted, plus the Rockwell extensions.
+
+
+<sect2>4510 mode<label id="4510-mode"><p>
+
+The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
+It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
+address mapping for 20 bits of address space (1 megabyte addressable area).
+
+As compared to the description of the CPU in the
+<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/c65manualupdated.txt.gz"
+name="C65 System Specification">
+<url url="https://raw.githubusercontent.com/MEGA65/c65-specifications/master/c65manualupdated.txt"
+name="(updated version)"> uses these changes:
+<itemize>
+<item><tt>LDA (d,SP),Y</tt> may also be written as <tt>LDA (d,S),Y</tt>
+(matching the 65816 notation).
+<item>All branch instruction allow now 16 bit offsets. To use a 16 bit
+branch you have to prefix these with an "L" (e.g. "<tt>LBNE</tt>" instead of
+"<tt>BNE</tt>"). This might change at a later implementation of the assembler.
+</itemize>
+
+For more information about the Commodore C65/C64DX and the 4510 CPU, see
+<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and
+<url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
+
+<sect2>45GS02 mode<label id="45GS02-mode"><p>
+
+The 45GS02 is a microcontroller that is the core of the MEGA65.
+It is an extension of the 4510 CPU and adds 32-bit addressing and a 32-bit
+pseudo register Q that is comprised of the four registers A, X, Y, and Z.
+
+<sect2>HUC6280 mode (CMOS with Hudson extensions)<label id="HUC6280-mode"><p>
+
+The HUC6280 is a superset of 65C02, used in the PC Engine.
+
+
+<sect2>M740 mode<label id="M740-mode"><p>
+
+The M740 is a microcontroller by Mitsubishi, which was marketed for embedded
+devices in the mid 80s. It is a superset of 6502, and a subset of 65SC02, plus
+some new instructions.
+
+For more information about the M740 Controllers, see
+<url url="https://en.wikipedia.org/wiki/Mitsubishi_740" name="Wikipedia">.
+
+
+<sect2>65816 mode<label id="65816-mode"><p><p>
 
 In 65816 mode, several aliases are accepted, in addition to the official
 mnemonics:
@@ -448,57 +649,26 @@ mnemonics:
 <item><tt>TSA</tt> is an alias for <tt>TSC</tt>
 </itemize>
 
+The <tt/MVN/ and <tt/MVP/ instructions accept two different argument forms.
+Either two bank bytes may be given with a <tt/#/ prefix,
+or two far addresses whose high byte will be used.
 
-<sect1>6502X mode<label id="6502X-mode"><p>
+<tscreen><verb>
+                mvn     #^src, #^dst       ; bank of src to bank of dst
+                mvn     src, dst           ; bank of src to bank of dst
+                mvp     #$12, #$78         ; bank $12 to $78
+                mvp     $123456, $789ABC   ; bank $12 to $78
+</verb></tscreen>
 
-6502X mode is an extension to the normal 6502 mode. In this mode, several
-mnemonics for illegal instructions of the NMOS 6502 CPUs are accepted. Since
-these instructions are illegal, there are no official mnemonics for them. The
-unofficial ones are taken from <url
-url="http://www.oxyron.de/html/opcodes02.html">. Please note that only the
-ones marked as "stable" are supported. The following table uses information
-from the mentioned web page, for more information, see there.
-
-<itemize>
-<item><tt>ALR: A:=(A and #{imm})/2;</tt>
-<item><tt>ANC: A:=A and #{imm};</tt> Generates opcode &dollar;0B.
-<item><tt>ARR: A:=(A and #{imm})/2;</tt>
-<item><tt>AXS: X:=A and X-#{imm};</tt>
-<item><tt>DCP: {adr}:={adr}-1; A-{adr};</tt>
-<item><tt>ISC: {adr}:={adr}+1; A:=A-{adr};</tt>
-<item><tt>LAS: A,X,S:={adr} and S;</tt>
-<item><tt>LAX: A,X:={adr};</tt>
-<item><tt>RLA: {adr}:={adr}rol; A:=A and {adr};</tt>
-<item><tt>RRA: {adr}:={adr}ror; A:=A adc {adr};</tt>
-<item><tt>SAX: {adr}:=A and X;</tt>
-<item><tt>SLO: {adr}:={adr}*2; A:=A or {adr};</tt>
-<item><tt>SRE: {adr}:={adr}/2; A:=A xor {adr};</tt>
-</itemize>
+also see <ref id="long_jsr_jmp_rts" name="long_jsr_jmp_rts">
+ <ref id=".SMART" name=".SMART">
+ <ref id=".A8" name=".A8">
+ <ref id=".A16" name=".A16">
+ <ref id=".I8" name=".I8">
+ <ref id=".I16" name=".I16">
 
 
-<sect1>4510 mode<p>
-
-The 4510 is a microcontroller that is the core of the Commodore C65 aka C64DX.
-It contains among other functions a slightly modified 65CE02/4502 CPU, to allow
-address mapping for 20 bits of address space (1 megabyte addressable area).
-As compared to the description of the CPU in the
-<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/c65manualupdated.txt.gz"
-name="C65 System Specification">
-<url url="https://raw.githubusercontent.com/MEGA65/c65-specifications/master/c65manualupdated.txt"
-name="(updated version)"> uses these changes:
-<itemize>
-<item><tt>LDA (d,SP),Y</tt> may also be written as <tt>LDA (d,S),Y</tt>
-(matching the 65816 notataion).
-<item>All branch instruction allow now 16 bit offsets. To use a 16 bit
-branch you have to prefix these with an "L" (e.g. "<tt>LBNE</tt>" instead of
-"<tt>BNE</tt>"). This might change at a later implementation of the assembler.
-</itemize>
-For more information about the Commodore C65/C64DX and the 4510 CPU, see
-<url url="http://www.zimmers.net/anonftp/pub/cbm/c65/"> and
-<url url="https://en.wikipedia.org/wiki/Commodore_65" name="Wikipedia">.
-
-
-<sect1>sweet16 mode<label id="sweet16-mode"><p>
+<sect2>sweet16 mode<label id="sweet16-mode"><p>
 
 SWEET 16 is an interpreter for a pseudo 16 bit CPU written by Steve Wozniak
 for the Apple ][ machines. It is available in the Apple ][ ROM. ca65 can
@@ -772,6 +942,7 @@ See the description of the <tt><ref id=".PROC" name=".PROC"></tt>
 directive for more information.
 
 
+<label id=cheap-locals>
 <sect1>Cheap local labels<p>
 
 Cheap local labels are defined like standard labels, but the name of the
@@ -798,47 +969,38 @@ names like "Loop". Here is an example:
                 bne    @Loop            ; ERROR: Unknown identifier!
 </verb></tscreen>
 
+
 <sect1>Unnamed labels<p>
 
-If you really want to write messy code, there are also unnamed labels. These
-labels do not have a name (you guessed that already, didn't you?). A colon is
-used to mark the absence of the name.
+If you really want to write messy code, there are also unnamed labels. To define
+an unnamed label, use sole <tt>:</tt>.
 
-Unnamed labels may be accessed by using the colon plus several minus or plus
-characters as a label designator. Using the '-' characters will create a back
-reference (use the n'th label backwards), using '+' will create a forward
-reference (use the n'th label in forward direction). An example will help to
-understand this:
+To reference an unnamed label, use <tt>:</tt> with several <tt>-</tt> or <tt>+</tt> characters.
+The <tt>-</tt> characters will create a back reference (n'th label backwards),
+the <tt>+</tt> will create a forward reference (n'th label in forward direction).
+As an alternative, angle brackets <tt>&lt;</tt> and <tt>&gt;</tt> may be used
+instead of <tt>-</tt> and <tt>+</tt> with the same meaning.
+
+Example:
 
 <tscreen><verb>
-        :       lda     (ptr1),y        ; #1
-                cmp     (ptr2),y
-                bne     :+              ; -> #2
-                tax
-                beq     :+++            ; -> #4
-                iny
-                bne     :-              ; -> #1
-                inc     ptr1+1
-                inc     ptr2+1
-                bne     :-              ; -> #1
-
-        :       bcs     :+              ; #2 -> #3
-                ldx     #$FF
-                rts
-
-        :       ldx     #$01            ; #3
-        :       rts                     ; #4
+        cpy #0
+        beq :++
+    :
+        sta $2007
+        dey
+        bne :-
+    :
+        rts
 </verb></tscreen>
 
-As you can see from the example, unnamed labels will make even short
-sections of code hard to understand, because you have to count labels
-to find branch targets (this is the reason why I for my part do
-prefer the "cheap" local labels). Nevertheless, unnamed labels are
-convenient in some situations, so it's your decision.
+Unnamed labels may make even short sections of code hard to understand, because
+you have to count labels to find branch targets. It's better to prefer the
+"cheap" local labels. Nevertheless, unnamed labels are convenient in some
+situations, so it's up to your discretion.
 
 <em/Note:/ <ref id="scopes" name="Scopes"> organize named symbols, not
 unnamed ones, so scopes don't have an effect on unnamed labels.
-
 
 
 <sect1>Using macros to define labels and constants<p>
@@ -1035,7 +1197,7 @@ The namespace token (<tt/::/) is used to access other scopes:
         .endscope
 
                 ...
-                lda     foo::bar        ; Access foo in scope bar
+                lda     #foo::bar        ; Access bar in scope foo
 </verb></tscreen>
 
 The only way to deny access to a scope from the outside is to declare a scope
@@ -1264,16 +1426,44 @@ writable.
   Reading this pseudo variable will give a constant integer value that
   tells which CPU is currently enabled. It can also tell which instruction
   set the CPU is able to translate. The value read from the pseudo variable
-  should be further examined by using one of the constants defined by the
-  "cpu" macro package (see <tt/<ref id=".MACPACK" name=".MACPACK">/).
+  should be further examined by using one of the following constants:
 
-  It may be used to replace the .IFPxx pseudo instructions or to construct
-  even more complex expressions.
+<tscreen><verb>
+    CPU_6502
+    CPU_65SC02
+    CPU_65C02
+    CPU_65816
+    CPU_SWEET16
+    CPU_HUC6280
+    CPU_4510
+    CPU_45GS02
+    CPU_6502DTV
+    CPU_M740
+</verb></tscreen>
+
+Above constants may be used to determine the exact type of the currently
+enabled CPU. In addition to that, for each CPU instruction set, another
+constant is defined:
+
+<tscreen><verb>
+    CPU_ISET_6502
+    CPU_ISET_65SC02
+    CPU_ISET_65C02
+    CPU_ISET_65816
+    CPU_ISET_SWEET16
+    CPU_ISET_HUC6280
+    CPU_ISET_4510
+    CPU_ISET_45GS02
+    CPU_ISET_6502DTV
+    CPU_ISET_M740
+</verb></tscreen>
+
+  <tt/.CPU/ may be used to replace the .IFPxx pseudo instructions or to
+  construct even more complex expressions.
 
   Example:
 
   <tscreen><verb>
-        .macpack        cpu
         .if     (.cpu .bitand CPU_ISET_65816)
                 phx
                 phy
@@ -1284,6 +1474,44 @@ writable.
                 pha
         .endif
   </verb></tscreen>
+
+<bf>The dilemma:</bf>
+
+The original design of this feature was made under the assumption, that any
+"higher" CPU will support the entire instruction set of the "lower" CPU. For
+example: the WDC W65C02 supports all instructions of the 65C02, which again
+support all instructions of the 65SC02. Unfortunately this is not true for all
+CMOS CPUs - when the 65CE02 was made, some instructions were changed, and a new
+addressingmode was added. As a result all CPUS after (and including) 65CE02
+are no more (source code) compatible with all instructions originally introduced
+by the 65SC02.
+
+Because of this, the .CPU function and the ISET* macros were repurposed to
+indicate <em>groups of instructions</em> only, ie only the set of instructions
+that was added by that particular CPU. In the value returned by .CPU only the
+bits will be set, that refer to the groups of instructions that are completely
+supported by that CPU.
+
+The advantage of this is, that the mechanism keeps working for all new CPUs
+added. The inevitable disadvantage is that you now have to know exactly which
+CPU added which instructions (look <htmlurl url="cpus.html" name="here"> for reference).
+
+<tscreen><verb>
+        .if (.cpu .bitand CPU_ISET_65SC02)
+                ; This will be assembled for the W65C02, 65C02, 65SC02, 65816, HUC6820
+                lda     (c_sp)
+        .elseif (.cpu .bitand CPU_ISET_65CE02)
+                ; This will be assembled for the 65CE02, 4510, 45GS02
+                ldz     #$00
+                lda     (c_sp),z
+        .else
+                ldy     #$00
+                lda     (c_sp),y
+        .endif
+</verb></tscreen>
+
+  See also: <tt><ref id=".CAP" name=".CAP"></tt>, which is a similar mechanism,
+  but without the problem outlined above.
 
 
 <sect1><tt>.ISIZE</tt><label id=".ISIZE"><p>
@@ -1339,17 +1567,22 @@ writable.
   Reading this pseudo variable will give the assembler version according to
   the following formula:
 
-        VER_MAJOR*$100 + VER_MINOR*$10
+        <tt>(VER_MAJOR * 0x100) + VER_MINOR</tt>
 
-  It may be used to encode the assembler version or check the assembler for
-  special features not available with older versions.
+  The upper 8 bits are the major-, the lower 8 bits are the  minor version.
 
   Example:
 
-  Version 2.14 of the assembler will return $2E0 as numerical constant when
-  reading the pseudo variable <tt/.VERSION/.
+  For example, version 47.11 of the assembler would have this macro defined as
+  <tt/0x2f0b/.
 
-
+  Note: until 2.19 this pseudo variable was defined as <tt>(VER_MAJOR * 0x100) + VER_MINOR * 0x10</tt> -
+  which resulted in broken values starting at version 2.16 of the assembler. For
+  this reason the value of this pseudo variable is considered purely informal - you should
+  not use it to check for a specific assembler version and use different code
+  according to the detected version - please update your code to work with the
+  recent version of the assembler instead (There is very little reason to not use
+  the most recent version - and even less to support older versions in your code).
 
 <sect>Pseudo functions<label id="pseudo-functions"><p>
 
@@ -1380,10 +1613,6 @@ either a string or an expression value.
                 .endif
         .endmacro
   </verb></tscreen>
-
-  This command is new and must be enabled with the <tt/.FEATURE addrsize/ command.
-
-  See: <tt><ref id=".FEATURE" name=".FEATURE"></tt>
 
 
 <sect1><tt>.BANK</tt><label id=".BANK"><p>
@@ -1453,6 +1682,61 @@ either a string or an expression value.
   <tscreen><verb>
         .if     .blank({arg})
   </verb></tscreen>
+
+
+
+<sect1><tt>.CAP, .CAPABILITY</tt><label id=".CAP"><p>
+
+  Builtin function. The function allows to check for capabilities of the
+  currently selected CPU or target system. It must be called with a comma
+  separated list of identifiers and returns non zero if all of the given
+  capabilities are available. Otherwise it returns zero.
+
+  Existing capabilities are:
+
+<descrip>
+
+  <tag><tt>CPU_HAS_BITIMM</tt></tag>
+  Checks for the availability of the "bit #imm" instruction.
+
+  <tag><tt>CPU_HAS_BRA8</tt></tag>
+  Checks for the availability of a short (8 bit) branch.
+
+  <tag><tt>CPU_HAS_INA</tt></tag>
+  Checks for the availability of accu inc/dec instructions.
+
+  <tag><tt>CPU_HAS_PUSHXY</tt></tag>
+  Checks for the capability to push and pop the X and Y registers.
+
+  <tag><tt>CPU_HAS_ZPIND</tt></tag>
+  Checks for the availability of the "zeropage indirect" addressing mode as it
+  is implemented in the 65SC02 CPU.
+
+  <tag><tt>CPU_HAS_STZ</tt></tag>
+  Checks for the availability of the "store zero" instruction as it is
+  implemented in the 65SC02 CPU.
+
+</descrip>
+
+  Case is ignored when checking the identifiers. The <tt/.cap/ function is
+  easier to use than checking <tt/.cpu/ and requires no intimate knowledge
+  of all instruction sets. For more detailed checking <tt/.cpu/ is still
+  available.
+
+  Example:
+
+  <tscreen><verb>
+        .if     .cap(CPU_HAS_BRA, CPU_HAS_PUSHXY)
+                phx
+                bra     L1
+        .else
+                txa
+                pha
+                jmp     L1
+        .endif
+  </verb></tscreen>
+
+  See also: <tt><ref id=".CPU" name=".CPU"></tt>
 
 
 
@@ -2019,7 +2303,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A16</tt><label id=".A16"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 16 bit.
+  Valid only in 65816 mode. Assume the accumulator is 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate accumulator addressing mode.
@@ -2029,7 +2313,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.A8</tt><label id=".A8"><p>
 
-  Valid only in 65816 mode. Switch the accumulator to 8 bit.
+  Valid only in 65816 mode. Assume the accumulator is 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate accu addressing mode.
@@ -2112,15 +2396,15 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   the assembler will force a segment alignment to the least common multiple of
-  15, 18 and 251 - which is 22590. To protect the user against errors, the
-  assembler will issue a warning when the combined alignment exceeds 256. The
-  command line option <tt><ref id="option--large-alignment"
-  name="--large-alignment"></tt> will disable this warning.
+  15, 18 and 251 - which is 22590. To protect the user against errors, when the
+  combined alignment is larger than the explicitly requested alignments,
+  the assembler will issue a warning if it also exceeds 256. The command line
+  option <tt><ref id="option--large-alignment" name="--large-alignment"></tt>
+  will disable this warning.
 
-  Please note that with alignments that are a power of two (which were the
-  only alignments possible in older versions of the assembler), the problem is
-  less severe, because the least common multiple of powers to the same base is
-  always the larger one.
+  Please note that with only alignments that are a power of two, a warning will
+  never occur, because the least common multiple of powers to the same base is
+  always simply the larger one.
 
 
 
@@ -2255,7 +2539,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Switch on or off case sensitivity on identifiers. The default is off
   (that is, identifiers are case sensitive), but may be changed by the
   -i switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -2404,7 +2688,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   Switch on or off debug info generation. The default is off (that is,
   the object file will not contain debug infos), but may be changed by the
   -g switch on the command line.
-  The command must be followed by a '+' or '-' character to switch the
+  The command can be followed by a '+' or '-' character to switch the
   option on or off respectively.
 
   Example:
@@ -2514,7 +2798,19 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.ENDMAC, .ENDMACRO</tt><label id=".ENDMACRO"><p>
 
-  Marks the end of a macro definition.
+  Marks the end of a macro definition. Note, <tt>.ENDMACRO</tt> should be on
+  its own line to successfully end the macro definition. It is possible to use
+  <tt><ref id=".DEFINE" name=".DEFINE"></tt> to create a symbol that references
+  <tt>.ENDMACRO</tt> without ending the macro definition.
+
+  Example:
+
+  <tscreen><verb>
+        .macro  new_mac
+                .define startmac .macro
+                .define endmac .endmacro
+        .endmacro
+  </verb></tscreen>
 
   See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
        <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>,
@@ -2738,24 +3034,22 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   This directive may be used to enable one or more compatibility features
   of the assembler. While the use of <tt/.FEATURE/ should be avoided when
   possible, it may be useful when porting sources written for other
-  assemblers. There is no way to switch a feature off, once you have
-  enabled it, so using
+  assemblers. After the feature name an optional '+' or '-' may specify whether
+  to enable or disable the feature (enable if omitted). Multiple features may be
+  enabled, separated by commas. Examples:
 
   <tscreen><verb>
-        .FEATURE        xxx
+        ; enable c_comments
+        .feature   c_comments
+        .feature   c_comments +
+        ; enable force_range, disable underline_in_numbers, enable labels_without_colons
+        .feature   force_range, underline_in_numbers -, labels_without_colons +
+        .feature   force_range +, underline_in_numbers off, labels_without_colons on
   </verb></tscreen>
-
-  will enable the feature until end of assembly is reached.
 
   The following features are available:
 
   <descrip>
-
-  <tag><tt>addrsize</tt><label id="addrsize"></tag>
-
-    Enables the .ADDRSIZE pseudo function. This function is experimental and not enabled by default.
-
-    See also: <tt><ref id=".ADDRSIZE" name=".ADDRSIZE"></tt>
 
   <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 
@@ -2824,6 +3118,43 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
     reserved keywords built into the assembler, that starts with a dot, may be
     overridden. When using this feature, you may also get into trouble if
     later versions of the assembler define new keywords starting with a dot.
+
+  <tag><tt>line_continuations</tt><label id="line_continuations"></tag>
+
+    Switch on or off line continuations using the backslash character
+    before a newline. The option is off by default.
+    Note: Line continuations do not work in a comment. A backslash at the
+    end of a comment is treated as part of the comment and does not trigger
+    line continuation.
+
+  Example:
+
+    <tscreen><verb>
+          .feature line_continuations +   ; Allow line continuations
+
+          lda     \
+                  #$20                    ; This is legal now
+    </verb></tscreen>
+
+    For backward compatibility reasons, the <tt>.LINECONT +</tt> control command
+    is also supported and enables the same feature.
+
+  <tag><tt>long_jsr_jmp_rts</tt><label id="long_jsr_jmp_rts"></tag>
+
+    Affects 65816 mode only.
+
+    Allows <tt>jsr</tt> and <tt>jmp</tt> to produce long jumps if the target
+    address has been previously declared in a <tt>far</tt> segment,
+    or imported as <tt>far</tt>.
+    Otherwise <tt>jsl</tt> and <tt>jml</tt> must be used instead.
+
+    Also allows <tt><ref id=".SMART" name=".SMART"></tt> to convert <tt>rts</tt>
+    to a long return <tt>rtl</tt> when the enclosing scope or memory model
+    indicates returning from a <tt>far</tt> procedure.
+
+    This permits compatibility with the old behavior of this assembler, or other
+    assemblers which similarly allowed <tt>jsr</tt> and <tt>jmp</tt> to be used
+    this way.
 
   <tag><tt>loose_char_term</tt><label id="loose_char_term"></tag>
 
@@ -3036,7 +3367,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.I16</tt><label id=".I16"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 16 bit.
+  Valid only in 65816 mode. Assume the index registers are 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate operands.
@@ -3047,7 +3378,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
 <sect1><tt>.I8</tt><label id=".I8"><p>
 
-  Valid only in 65816 mode. Switch the index registers to 8 bit.
+  Valid only in 65816 mode. Assume the index registers are 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate operands.
@@ -3108,7 +3439,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFDEF</tt><label id=".IFDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is already
+  a symbol name. The condition is true if the given symbol is already
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3143,7 +3474,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFNDEF</tt><label id=".IFNDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
-  a symbol name. The condition is true if the the given symbol is not
+  a symbol name. The condition is true if the given symbol is not
   defined, and false otherwise.
 
   See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
@@ -3152,7 +3483,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 <sect1><tt>.IFNREF</tt><label id=".IFNREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   not referenced before, and false otherwise.
 
   See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
@@ -3164,10 +3495,28 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   (see <tt><ref id=".P02" name=".P02"></tt> command).
 
 
+<sect1><tt>.IFP02X</tt><label id=".IFP02X"><p>
+
+  Conditional assembly: Check if the assembler is currently in 6502X mode
+  (see <tt><ref id=".P02X" name=".P02X"></tt> command).
+
+
 <sect1><tt>.IFP4510</tt><label id=".IFP4510"><p>
 
   Conditional assembly: Check if the assembler is currently in 4510 mode
   (see <tt><ref id=".P4510" name=".P4510"></tt> command).
+
+
+<sect1><tt>.IFP45GS02</tt><label id=".IFP45GS02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 45GS02 mode
+  (see <tt><ref id=".P45GS02" name=".P45GS02"></tt> command).
+
+
+<sect1><tt>.IFP6280</tt><label id=".IFP816"><p>
+
+  Conditional assembly: Check if the assembler is currently in HuC6280 mode
+  (see <tt><ref id=".P6280" name=".P6280"></tt> command).
 
 
 <sect1><tt>.IFP816</tt><label id=".IFP816"><p>
@@ -3182,10 +3531,22 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   (see <tt><ref id=".PC02" name=".PC02"></tt> command).
 
 
+<sect1><tt>.IFPCE02</tt><label id=".IFPCE02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 65CE02 mode
+  (see <tt><ref id=".PCE02" name=".PCE02"></tt> command).
+
+
 <sect1><tt>.IFPDTV</tt><label id=".IFPDTV"><p>
 
   Conditional assembly: Check if the assembler is currently in 6502DTV mode
   (see <tt><ref id=".PDTV" name=".PDTV"></tt> command).
+
+
+<sect1><tt>.IFPM740</tt><label id=".IFPM740"><p>
+
+  Conditional assembly: Check if the assembler is currently in M740 mode
+  (see <tt><ref id=".PM740" name=".PM740"></tt> command).
 
 
 <sect1><tt>.IFPSC02</tt><label id=".IFPSC02"><p>
@@ -3194,10 +3555,16 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   (see <tt><ref id=".PSC02" name=".PSC02"></tt> command).
 
 
+<sect1><tt>.IFPSWEET16</tt><label id=".IFPSWEET16"><p>
+
+  Conditional assembly: Check if the assembler is currently in Sweet16 mode
+  (see <tt><ref id=".PSWEET16" name=".PSWEET16"></tt> command).
+
+
 <sect1><tt>.IFREF</tt><label id=".IFREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
-  by a symbol name. The condition is true if if the the given symbol was
+  by a symbol name. The condition is true if the given symbol was
   referenced before, and false otherwise.
 
   This command may be used to build subroutine libraries in include files
@@ -3215,6 +3582,12 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
   See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>, and
   <tt><ref id=".REFERTO" name=".REFERTO"></tt>
+
+
+<sect1><tt>.IFPWC02</tt><label id=".IFPWC02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 65WC02 mode
+  (see <tt><ref id=".PWC02" name=".PWC02"></tt> command).
 
 
 <sect1><tt>.IMPORT</tt><label id=".IMPORT"><p>
@@ -3312,29 +3685,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
   the feature in more detail.
 
 
-<sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
-
-  Switch on or off line continuations using the backslash character
-  before a newline. The option is off by default.
-  Note: Line continuations do not work in a comment. A backslash at the
-  end of a comment is treated as part of the comment and does not trigger
-  line continuation.
-  The command must be followed by a '+' or '-' character to switch the
-  option on or off respectively.
-
-  Example:
-
-  <tscreen><verb>
-        .linecont       +               ; Allow line continuations
-
-        lda     \
-                #$20                    ; This is legal now
-  </verb></tscreen>
-
-
 <sect1><tt>.LIST</tt><label id=".LIST"><p>
 
-  Enable output to the listing. The command must be followed by a boolean
+  Enable output to the listing. The command can be followed by a boolean
   switch ("on", "off", "+" or "-") and will enable or disable listing
   output.
   The option has no effect if the listing is not enabled by the command line
@@ -3426,20 +3779,23 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.LOCAL</tt><label id=".LOCAL"><p>
 
-  This command may only be used inside a macro definition. It declares a
-  list of identifiers as local to the macro expansion.
+  This command may only be used inside a macro definition. It declares a list
+  of identifiers as local to the macro expansion. The identifers may be
+  standard identifiers or cheap local identifiers depending on the planed use.
 
   A problem when using macros are labels: Since they don't change their name,
   you get a "duplicate symbol" error if the macro is expanded the second time.
   Labels declared with <tt><ref id=".LOCAL" name=".LOCAL"></tt> have their
-  name mapped to an internal unique name (<tt/___ABCD__/) with each macro
+  name replaced by an internally generated unique name for each macro
   invocation.
 
-  Some other assemblers start a new lexical block inside a macro expansion.
-  This has some drawbacks however, since that will not allow <em/any/ symbol
-  to be visible outside a macro, a feature that is sometimes useful. The
-  <tt><ref id=".LOCAL" name=".LOCAL"></tt> command is in my eyes a better way
-  to address the problem.
+  Please note that while the generated names are unique and guaranteed to not
+  clash with any user generated names, they are still regular symbols and
+  added to the current scope. This means that a local macro label will start a
+  new scope for cheap locals whenever the macro is expanded. To avoid that,
+  you may also use a <ref id="cheap-locals" name="cheap local symbol"> for the
+  name. In this case the assembler will generate unique cheap local
+  identifiers instead of standard ones.
 
   You get an error when using <tt><ref id=".LOCAL" name=".LOCAL"></tt> outside
   a macro.
@@ -3478,7 +3834,6 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tscreen><verb>
         atari           Defines the scrcode macro.
         cbm             Defines the scrcode macro.
-        cpu             Defines constants for the .CPU variable.
         generic         Defines generic macros like add, sub, and blt.
         longbranch      Defines conditional long-jump macros.
   </verb></tscreen>
@@ -3567,6 +3922,17 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tt><ref id="option--cpu" name="--cpu"></tt> command line option.
 
   See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+
+<sect1><tt>.P02X</tt><label id=".P02X"><p>
+
+  Enable the 6502X instruction set, disable 65SC02, 65C02 and 65816
+  instructions.
+
+  See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
   name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
   <tt><ref id=".P4510" name=".P4510"></tt>
 
@@ -3577,8 +3943,31 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instruction sets.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
-  <tt><ref id=".P816" name=".P816"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P816" name=".P816"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+
+<sect1><tt>.P45GS02</tt><label id=".P45GS02"><p>
+
+  Enable the 45GS02 instruction set. This is a superset of the 4510, 65C02, and
+  6502 instruction sets.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P816" name=".P816"></tt>, and
+  <tt><ref id=".P4510" name=".P4510"></tt>
+
+
+<sect1><tt>.P6280</tt><label id=".P6280"><p>
+
+  Enable the HuC6280 instruction set. This is a superset of the 65C02 and
+  6502 instruction sets.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 
 <sect1><tt>.P816</tt><label id=".P816"><p>
@@ -3587,8 +3976,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instruction sets.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 
 <sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
@@ -3616,13 +4006,32 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 and 65SC02 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+<sect1><tt>.PCE02</tt><label id=".PCE02"><p>
+
+  Enable the 65CE02 instructions set. This instruction set includes all
+  6502 and extended 65CE02 instructions.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 
 <sect1><tt>.PDTV</tt><label id=".PDTV"><p>
 
-  Enable the 6502DTV instruction set. This is a superset of the 6502 
+  Enable the 6502DTV instruction set. This is a superset of the 6502
+  instruction set.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>
+
+
+<sect1><tt>.PM740</tt><label id=".PM740"><p>
+
+  Enable the M740 instruction set. This is a superset of the 6502
   instruction set.
 
   See: <tt><ref id=".P02" name=".P02"></tt>
@@ -3713,8 +4122,19 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   6502 instructions.
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
-  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt> and
-  <tt><ref id=".P4510" name=".P4510"></tt>
+  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
+
+
+<sect1><tt>.PSWEET16</tt><label id=".PSWEET16"><p>
+
+  Enable the Sweet16 instructions set.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
+  name=".PC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 
 <sect1><tt>.PUSHCHARMAP</tt><label id=".PUSHCHARMAP"><p>
@@ -3724,7 +4144,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
   <tt/.PUSHCHARMAP/ allows together with <tt><ref id=".POPCHARMAP"
   name=".POPCHARMAP"></tt> to switch to another character mapping and to restore the old
-  characther mapping later, without knowledge of the current mapping.
+  character mapping later, without knowledge of the current mapping.
 
   The assembler will print an error message if the character mapping stack is already full,
   when this command is issued.
@@ -3763,6 +4183,17 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   full, when this command is issued.
 
   See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
+
+
+<sect1><tt>.PWC02</tt><label id=".PWC02"><p>
+
+  Enable the W65C02 instructions set. This instruction set includes all
+  6502, 65SC02, 65C02 and two extra instructions (wai and stp)
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".P816" name=".P816"></tt>,
+  <tt><ref id=".P4510" name=".P4510"></tt>, and
+  <tt><ref id=".P45GS02" name=".P45GS02"></tt>
 
 
 <sect1><tt>.REFERTO, .REFTO</tt><label id=".REFERTO"><p>
@@ -3845,7 +4276,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
   Reserve storage. The command is followed by one or two constant
   expressions. The first one is mandatory and defines, how many bytes of
-  storage should be defined. The second, optional expression must by a
+  storage should be defined. The second, optional expression must be a
   constant byte value that will be used as value of the data. If there
   is no fill value given, the linker will use the value defined in the
   linker configuration file (default: zero).
@@ -3962,24 +4393,29 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510 and HuC6280.
+  namely: 6502, 6502X, 6502DTV, 65SC02, 65C02, 65816, 4510, 45GS02, HuC6280 and m740.
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
+       <tt><ref id=".IFP02X" name=".IFP02X"></tt>,
        <tt><ref id=".IFPDTV" name=".IFPDTV"></tt>,
        <tt><ref id=".IFP816" name=".IFP816"></tt>,
        <tt><ref id=".IFPC02" name=".IFPC02"></tt>,
+       <tt><ref id=".IFPM740" name=".IFPM740"></tt>,
        <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
        <tt><ref id=".P02" name=".P02"></tt>,
+       <tt><ref id=".P02X" name=".P02X"></tt>,
        <tt><ref id=".P816" name=".P816"></tt>,
        <tt><ref id=".P4510" name=".P4510"></tt>,
+       <tt><ref id=".P45GS02" name=".P45GS02"></tt>,
        <tt><ref id=".PC02" name=".PC02"></tt>,
+       <tt><ref id=".PM740" name=".PM740"></tt>,
        <tt><ref id=".PSC02" name=".PSC02"></tt>
 
 
 <sect1><tt>.SMART</tt><label id=".SMART"><p>
 
-  Switch on or off smart mode. The command must be followed by a '+' or '-'
+  Switch on or off smart mode. The command can be followed by a '+' or '-'
   character to switch the option on or off respectively. The default is off
   (that is, the assembler doesn't try to be smart), but this default may be
   changed by the -s switch on the command line.
@@ -3994,7 +4430,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
         the assembler cannot trace the execution flow this may lead to false
         results in some cases. If in doubt, use the <tt/.Inn/ and <tt/.Ann/
         instructions to tell the assembler about the current settings.
-  <item>In 65816 mode, replace a <tt/RTS/ instruction by <tt/RTL/ if it is
+  <item>In 65816 mode, if the <tt><ref id="long_jsr_jmp_rts"
+        name="long_jsr_jmp_rts"></tt> feature is enabled,
+        smart mode will replace a <tt/RTS/ instruction by <tt/RTL/ if it is
         used within a procedure declared as <tt/far/, or if the procedure has
         no explicit address specification, but it is <tt/far/ because of the
         memory model used.
@@ -4025,7 +4463,9 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.TAG</tt><label id=".TAG"><p>
 
-  Allocate space for a struct or union.
+  Allocate space for a struct or union. This is equivalent to
+  <tt><ref id=".RES" name=".RES"></tt> with the
+  <tt><ref id=".SIZEOF" name=".SIZEOF"></tt> of a struct.
 
   Example:
 
@@ -4039,6 +4479,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
                 .tag    Point           ; Allocate 4 bytes
   </verb></tscreen>
 
+  See: <ref id="structs" name="&quot;Structs and unions&quot;">
 
 <sect1><tt>.UNDEF, .UNDEFINE</tt><label id=".UNDEFINE"><p>
 
@@ -4199,8 +4640,13 @@ macro actually takes in the definition. You may also leave intermediate
 parameters empty. Empty parameters are replaced by empty space (that is,
 they are removed when the macro is expanded). If you have a look at our
 macro definition above, you will see, that replacing the "addr" parameter
-by nothing will lead to wrong code in most lines. To help you, writing
-macros with a variable parameter list, there are some control commands:
+by nothing will lead to wrong code in most lines.
+
+The names "a", "x" and "y" should be avoided for macro parameters, as these
+will usually conflict with the 6502 registers.
+
+For writing macros with a variable parameter list, control commands are
+available:
 
 <tt><ref id=".IFBLANK" name=".IFBLANK"></tt> tests the rest of the line and
 returns true, if there are any tokens on the remainder of the line. Since
@@ -4211,15 +4657,15 @@ opposite.
 Look at this example:
 
 <tscreen><verb>
-.macro  ldaxy   a, x, y
-.ifnblank       a
-        lda     #a
+.macro  ldaxy   i, j, k
+.ifnblank       i
+        lda     #i
 .endif
-.ifnblank       x
-        ldx     #x
+.ifnblank       j
+        ldx     #j
 .endif
-.ifnblank       y
-        ldy     #y
+.ifnblank       k
+        ldy     #k
 .endif
 .endmacro
 </verb></tscreen>
@@ -4423,9 +4869,9 @@ different:
 
 <item>  Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> may not
         span more than a line. You may use line continuation (see <tt><ref
-        id=".LINECONT" name=".LINECONT"></tt>) to spread the definition over
-        more than one line for increased readability, but the macro itself
-        may not contain an end-of-line token.
+        id="line_continuations" name="line_continuations"></tt>) to spread the
+        definition over more than one line for increased readability, but the
+        macro itself may not contain an end-of-line token.
 
 <item>  Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> share
         the name space with classic macros, but they are detected and replaced
@@ -4687,64 +5133,6 @@ This macro package defines a macro named <tt/scrcode/. It takes a string
 as argument and places this string into memory translated into screen codes.
 
 
-<sect1><tt>.MACPACK cpu</tt><p>
-
-This macro package does not define any macros but constants used to examine
-the value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable. For
-each supported CPU a constant similar to
-
-<tscreen><verb>
-    CPU_6502
-    CPU_65SC02
-    CPU_65C02
-    CPU_65816
-    CPU_SWEET16
-    CPU_HUC6280
-    CPU_4510
-    CPU_6502DTV
-</verb></tscreen>
-
-is defined. These constants may be used to determine the exact type of the
-currently enabled CPU. In addition to that, for each CPU instruction set,
-another constant is defined:
-
-<tscreen><verb>
-    CPU_ISET_6502
-    CPU_ISET_65SC02
-    CPU_ISET_65C02
-    CPU_ISET_65816
-    CPU_ISET_SWEET16
-    CPU_ISET_HUC6280
-    CPU_ISET_4510
-    CPU_ISET_6502DTV
-</verb></tscreen>
-
-The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
-be checked with <tt/<ref id="operators" name=".BITAND">/ to determine if the
-currently enabled CPU supports a specific instruction set. For example the
-65C02 supports all instructions of the 65SC02 CPU, so it has the
-<tt/CPU_ISET_65SC02/ bit set in addition to its native <tt/CPU_ISET_65C02/
-bit. Using
-
-<tscreen><verb>
-        .if (.cpu .bitand CPU_ISET_65SC02)
-                lda     (sp)
-        .else
-                ldy     #$00
-                lda     (sp),y
-        .endif
-</verb></tscreen>
-
-it is possible to determine if the
-
-<tscreen><verb>
-                lda     (sp)
-</verb></tscreen>
-
-instruction is supported, which is the case for the 65SC02, 65C02 and 65816
-CPUs (the latter two are upwards compatible to the 65SC02).
-
-
 <sect1><tt>.MACPACK module</tt><p>
 
 This macro package defines a macro named <tt/module_header/. It takes an
@@ -4759,10 +5147,12 @@ For better orthogonality, the assembler defines similar symbols as the
 compiler, depending on the target system selected:
 
 <itemize>
+<item><tt/__AGAT__/ - Target system is <tt/agat/
 <item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
 <item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
 <item><tt/__ATARI5200__/ - Target system is <tt/atari5200/
+<item><tt/__ATARI7800__/ - Target system is <tt/atari7800/
 <item><tt/__ATARI__/ - Target system is <tt/atari/ or <tt/atarixl/
 <item><tt/__ATARIXL__/ - Target system is <tt/atarixl/
 <item><tt/__ATMOS__/ - Target system is <tt/atmos/
@@ -4770,23 +5160,31 @@ compiler, depending on the target system selected:
 <item><tt/__C128__/ - Target system is <tt/c128/
 <item><tt/__C16__/ - Target system is <tt/c16/ or <tt/plus4/
 <item><tt/__C64__/ - Target system is <tt/c64/
+<item><tt/__C65__/ - Target system is <tt/c65/
 <item><tt/__CBM__/ - Target is a Commodore or Commodore-alike system
 <item><tt/__CBM510__/ - Target system is <tt/cbm510/
 <item><tt/__CBM610__/ - Target system is <tt/cbm610/
+<item><tt/__CREATIVISION__/ - Target system is <tt/creativision/
 <item><tt/__CX16__/ - Target system is <tt/cx16/
+<item><tt/__GAMATE__/ - Target system is <tt/gamate/
 <item><tt/__GEOS__/ - Target is a GEOS system
 <item><tt/__GEOS_APPLE__/ - Target system is <tt/geos-apple/
 <item><tt/__GEOS_CBM__/ - Target system is <tt/geos-cbm/
+<item><tt/__KIM1__/ - Target system is <tt/kim1/
 <item><tt/__LUNIX__/ - Target system is <tt/lunix/
 <item><tt/__LYNX__/ - Target system is <tt/lynx/
+<item><tt/__MEGA65__/ - Target system is <tt/mega65/
 <item><tt/__NES__/ - Target system is <tt/nes/
 <item><tt/__OSIC1P__/ - Target system is <tt/osic1p/
+<item><tt/__PCE__/ - Target system is <tt/pce/
 <item><tt/__PET__/ - Target system is <tt/pet/
 <item><tt/__PLUS4__/ - Target system is <tt/plus4/
+<item><tt/__RP6502__/ - Target system is <tt/rp6502/
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/
 <item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
 <item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
 <item><tt/__SYM1__/ - Target system is <tt/sym1/
+<item><tt/__TELESTRAT__/ - Target system is <tt/telestrat/
 <item><tt/__VIC20__/ - Target system is <tt/vic20/
 </itemize>
 
@@ -4798,10 +5196,15 @@ compiler, depending on the target system selected:
 
 Structs and unions are special forms of <ref id="scopes" name="scopes">.  They
 are, to some degree, comparable to their C counterparts. Both have a list of
-members. Each member allocates storage, and optionally may have a name whose
-value, in the case of a struct, usually is the storage offset from the
-beginning, and in the case of a union, doesn't change, and usually is zero.
+members. Each member allocates storage, and optionally may have a name.
 
+Each named member has a constant value equal to the storage offset from the
+beginning of the structure. In the case of a union, all members are placed at
+the same offset, typically 0.
+
+Each named member also has a storage size which can be accessed with the
+<tt><ref id=".SIZEOF" name=".SIZEOF"></tt> operator. The struct or union itself
+also has a <tt/.SIZEOF/ indicating its total storage size.
 
 <sect1>Declaration<p>
 
@@ -4828,8 +5231,9 @@ A struct or union may not necessarily have a name. If it is anonymous, no
 local scope is opened; the identifiers used to name the members are placed
 into the current scope instead.
 
-A struct may contain unnamed members and definitions of local structs/unions.
-The storage allocators may contain a multiplier, as in the example below:
+Storage allocators may contain a multiplier. A struct may also contain members
+and definitions of local structs/unions. Example:
+
 <tscreen><verb>
       .struct Circle
               .struct Point
@@ -4838,7 +5242,8 @@ The storage allocators may contain a multiplier, as in the example below:
               Radius  .word
       .endstruct
 </verb></tscreen>
-The size of the Circle struct is 6 (three words).
+
+In this example the size of the Circle struct is 6 (three words).
 
 
 <sect1>The storage allocator keywords<p>
@@ -4848,7 +5253,7 @@ The size of the Circle struct is 6 (three words).
   <tag/.BYTE, .RES/
     Allocates multiples of 1 byte.  <tt/.RES/ requires an operand.
 
-  <tag/.DBYTE, .WORD, .ADDR/
+  <tag/.DBYT, .WORD, .ADDR/
     Allocates multiples of 2 bytes.
 
   <tag/.FARADDR/
@@ -4856,6 +5261,15 @@ The size of the Circle struct is 6 (three words).
 
   <tag/.DWORD/
     Allocates multiples of 4 bytes.
+
+  <tag/.TAG/
+    Allocates a previously defined struct.
+
+  <tag/.STRUCT, .UNION/
+    Begins a nested .struct or .union definition, and allocates it.
+    Note that its member offset values will begin at 0, unless this nested
+    structure is anonymous, in which case they will instead become members of
+    the enclosing scope.
 
   </descrip>
 
@@ -4901,13 +5315,54 @@ name=".TAG"> directive.
 C:      .tag    Circle
 </verb></tscreen>
 
-Currently, members are just offsets from the start of the struct or union. To
+Members are just offsets from the start of the struct or union. To
 access a field of a struct, the member offset must be added to the address of
 the struct variable itself:
 <tscreen><verb>
-        lda     C+Circle::Radius        ; Load circle radius into A
+        lda    C + Circle::Radius                    ; Load circle radius
+        lda    C + Circle::Origin + Point::ycoord    ; Load circle origin.ycoord
 </verb></tscreen>
-That may change in a future version of the assembler.
+
+Nested structures or unions are treated differently depending on whether they
+are anonymous. If named, a new structure definition is created within the
+enclosing scope, with its offsets beginning at 0. If anonymous, the members of
+the new structure are added to the enclosing scope instead, with offsets
+continuing through that scope. Example:
+
+<tscreen><verb>
+      .struct Object
+              id .byte                ; Object::id = 0
+              target .struct Point    ; Object::target = 1
+                      xcoord  .word   ; Object::Point::xcoord = 0
+                      ycoord  .word   ; Object::Point::ycoord = 2
+              .endstruct
+               cost .struct           ; Object::cost = 5
+                      price  .word    ; Object::price = 5
+                      tax  .word      ; Object::tax = 7
+              .endstruct
+              .struct
+                      radius  .word   ; Object::radius = 9
+              .endstruct
+      .endstruct
+
+O:    .tag   Object
+      lda    O + Object::target + Object::Point::ycoord  ; Named struct
+      lda    O + Object::tax                             ; Anonymous
+      lda    O + Object::radius                          ; Anonymous
+
+      ; Be careful not to use a named nested structure without also adding the
+      ; offset to the nested structure itself.
+      lda    O + Object::Point::ycoord                   ; Incorrect!
+      lda    O + Object::target + Object::Point::ycoord  ; Correct
+</verb></tscreen>
+
+In this example, the first nested structure is named "Point", and its member
+offsets begin at 0. On the other hand, the two anonymous structures simply
+continue to add members to the enclosing "Object" structure.
+
+Note that an anonymous structure does not need a member name, since all of its
+members become part of the enclosing structure. The "cost" member in the
+example is redundantly the same offset as its first member "price".
 
 
 <sect1>Limitations<p>

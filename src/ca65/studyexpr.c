@@ -43,6 +43,7 @@
 
 /* ca65 */
 #include "error.h"
+#include "expr.h"
 #include "segment.h"
 #include "studyexpr.h"
 #include "symtab.h"
@@ -186,6 +187,70 @@ static void ED_MergeAddrSize (ExprDesc* ED, const ExprDesc* Right)
     }
 }
 
+
+static void ED_MergeAddrSizeAND (ExprNode* Expr, ExprDesc* ED, const ExprDesc* Right)
+/* Merge the address sizes of two expressions into ED, special case for AND operator */
+{
+    int ConstL, ConstR;
+    int Size, ConstSize;
+    long Val, ValR;
+
+    if (ED->AddrSize == ADDR_SIZE_DEFAULT) {
+        /* If ED is valid, ADDR_SIZE_DEFAULT gets always overridden, otherwise
+        ** it takes precedence over anything else.
+        */
+        if (ED_IsValid (ED)) {
+            ED->AddrSize = Right->AddrSize;
+        }
+    } else if (Right->AddrSize == ADDR_SIZE_DEFAULT) {
+        /* If Right is valid, ADDR_SIZE_DEFAULT gets always overridden,
+        ** otherwise it takes precedence over anything else.
+        */
+        if (!ED_IsValid (Right)) {
+            ED->AddrSize = Right->AddrSize;
+        }
+    } else {
+        /* Neither ED nor Right has a default address size, use the smaller of
+        ** the two.
+        */
+        if (Right->AddrSize < ED->AddrSize) {
+            ED->AddrSize = Right->AddrSize;
+        }
+    }
+    /* Check if either side of the expression is constant */
+    ConstL = IsConstExpr (Expr->Left, &Val);
+    ConstR = IsConstExpr (Expr->Right, &ValR);
+    if (!ConstL && !ConstR) {
+        /* If neither part of the expression is constant, the above is all we can do */
+        return;
+    }
+    /* We start assuming the left side is constant, left value is in Val, right
+       size in Size */
+    Size = Right->AddrSize;
+    /* Now check if the right side is constant, and if so put the right value
+       into Val and the Left size into Size. */
+    if (ConstR) {
+        Val = ValR;
+        Size = ED->AddrSize;
+    }
+    /* Figure out the size of the constant value */
+    if (IsByteRange (Val)) {
+        ConstSize = ADDR_SIZE_ZP;
+    } else if (IsWordRange (Val)) {
+        ConstSize = ADDR_SIZE_ABS;
+    } else if (IsFarRange (Val)) {
+        ConstSize = ADDR_SIZE_FAR;
+    } else {
+        ConstSize = ADDR_SIZE_LONG;
+    }
+
+    if (Size == ADDR_SIZE_DEFAULT) {
+        ED->AddrSize = ConstSize;
+    } else {
+        /* use the smaller of the two sizes */
+        ED->AddrSize = (ConstSize < Size) ? ConstSize : Size;
+    }
+}
 
 
 static ED_SymRef* ED_FindSymRef (ExprDesc* ED, SymEntry* Sym)
@@ -489,7 +554,11 @@ static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
 
         /* Merge references and update address size */
         ED_MergeRefs (D, &Right);
-        ED_MergeAddrSize (D, &Right);
+        if (Expr->Op == EXPR_AND) {
+            ED_MergeAddrSizeAND (Expr, D, &Right);
+        } else {
+            ED_MergeAddrSize (D, &Right);
+        }
 
     }
 
@@ -524,7 +593,7 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
 
         if (SymHasUserMark (Sym)) {
             LIError (&Sym->DefLines,
-                     "Circular reference in definition of symbol '%m%p'",
+                     "Circular reference in definition of symbol `%m%p'",
                      GetSymName (Sym));
             ED_SetError (D);
         } else {
@@ -541,12 +610,13 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
                 DumpExpr (Expr, SymResolve);
             }
 
-            /* If the symbol has an explicit address size, use it. This may
-            ** lead to range errors later (maybe even in the linker stage), if
-            ** the user lied about the address size, but for now we trust him.
+            /* If the symbol has an explicit address size that is smaller than
+            ** the one found, use it. This may lead to range errors later
+            ** (maybe even in the linker stage) if the user lied about the
+            ** address size, but for now we trust him.
             */
             AddrSize = GetSymAddrSize (Sym);
-            if (AddrSize != ADDR_SIZE_DEFAULT) {
+            if (AddrSize != ADDR_SIZE_DEFAULT && AddrSize < D->AddrSize) {
                 D->AddrSize = AddrSize;
             }
         }
@@ -711,7 +781,7 @@ static void StudyMul (ExprNode* Expr, ExprDesc* D)
     */
     if (ED_IsConst (D) && ED_IsValid (&Right)) {
 
-        /* Multiplicate both, result goes into Right */
+        /* Multiply both, result goes into Right */
         ED_Mul (&Right, D);
 
         /* Move result into D */
@@ -719,7 +789,7 @@ static void StudyMul (ExprNode* Expr, ExprDesc* D)
 
     } else if (ED_IsConst (&Right) && ED_IsValid (D)) {
 
-        /* Multiplicate both */
+        /* Multiply both */
         ED_Mul (D, &Right);
 
     } else {
@@ -1289,8 +1359,7 @@ static void StudyNearAddr (ExprNode* Expr, ExprDesc* D)
     }
 
     /* Promote to absolute if smaller. */
-    if (D->AddrSize < ADDR_SIZE_ABS)
-    {
+    if (D->AddrSize < ADDR_SIZE_ABS) {
         D->AddrSize = ADDR_SIZE_ABS;
     }
 }

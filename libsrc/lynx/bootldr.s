@@ -15,47 +15,63 @@
         .segment "BOOTLDR"
 ;**********************************
 ; Here is the bootloader in plaintext
-; The idea is to make the smalles possible encrypted loader as decryption
+; The idea is to make the smallest possible encrypted loader as decryption
 ; is very slow. The minimum size is 49 bytes plus a zero byte.
 ;**********************************
-;       EXE = $fb68
+;                  EXE = $fb68
 ;
-;       .org $0200
+;                  .org $0200
 ;
-;       ; 1. force Mikey to be in memory
-;       stz MAPCTL
+;                  ; 1. force Mikey to be in memory
+; 9C F9 FF         stz MAPCTL
 ;
-;       ; 3. set ComLynx to open collector
-;       lda #4          ; a = 00000100
-;       sta SERCTL      ; set the ComLynx to open collector
+;                  ; 2. clear palette
+; A0 1F            ldy #31
+; A9 00            lda #0
+; 99 A0 FD nextc:  sta GCOLMAP, y
+; 88               dey
+; 10 FA            bpl nextc
 ;
-;       ; 4. make sure the ROM is powered on
-;       lda #8          ; a = 00001000
-;       sta IODAT       ; set the ROM power to on
+;                  ; 3. set ComLynx to open collector
+; A9 04            lda #4          ; a = 00000100
+; 8D 8C FD         sta SERCTL      ; set the ComLynx to open collector
 ;
-;       ; 5. read in secondary exe + 8 bytes from the cart and store it in $f000
-;       ldx #0          ; x = 0
-;       ldy #$97        ; y = secondary loader size (151 bytes)
-;rloop1: lda RCART0     ; read a byte from the cart
-;       sta EXE,X       ; EXE[X] = a
-;       inx             ; x++
-;       dey             ; y--
-;       bne rloop1      ; loops until y wraps
+;                  ; 4. set AUDIN to output
+; A9 1A            lda #$1a        ; audin = out, rest = out,
+;                                  ; noexp = in, cart addr = out, ext pwd = in
+; 8D 8A FD         sta IODIR
 ;
-;       ; 6. jump to secondary loader
-;       jmp EXE         ; run the secondary loader
+;                  ; 5. set AUDIN to LOW
+; A9 0B            lda #$0B        ; Set AUDIN low
+; 85 1A            sta $1a         ; Save local copy to ZP
+; 8D 8B FD         sta IODAT
 ;
-;       .reloc
+;                  ; 6. read in secondary exe + 8 bytes from the cart
+;                  ; and store it in $f000
+; A2 00            ldx #0          ; x = 0
+; A0 97            ldy #$97        ; y = secondary loader size (151 bytes)
+; AD B2 FC rloop1: lda RCART0      ; read a byte from the cart
+; 9D 68 FB         sta EXE,X       ; EXE[X] = a
+; E8               inx             ; x++
+; 88               dey             ; y--
+; D0 F6            bne rloop1      ; loops until y wraps
+;
+;                  ; 7. jump to secondary loader
+; 4C 68 FB         jmp EXE
+; 00 00 00 00      ; spares
+; 00               ; End of encrypted header mark
+;
+;   .reloc
 ;**********************************
 ; After compilation, encryption and obfuscation it turns into this.
 ;**********************************
-        .byte $ff, $81, $ca, $33, $be, $80, $a2, $c4 
-        .byte $6d, $98, $fe, $8d, $bc, $66, $c0, $7a 
-        .byte $09, $50, $23, $28, $18, $c8, $06, $70 
-        .byte $58, $4f, $1b, $e1, $c7, $90, $08, $cd 
-        .byte $1a, $6e, $5a, $45, $32, $d7, $6d, $c6 
-        .byte $8a, $e5, $d8, $5c, $a0, $e8, $4f, $7a 
-        .byte $5f, $73, $8d, $22
+        .byte $ff, $b6, $bb, $82, $d5, $9f, $48, $cf
+        .byte $23, $37, $8e, $07, $38, $f5, $b6, $30
+        .byte $d6, $2f, $12, $29, $9f, $43, $5b, $2e
+        .byte $f5, $66, $5c, $db, $93, $1a, $78, $55
+        .byte $5e, $c9, $0d, $72, $1b, $e9, $d8, $4d
+        .byte $2f, $e4, $95, $c0, $4f, $7f, $1b, $66
+        .byte $8b, $a7, $fc, $21
 
 ;**********************************
 ; Now we have the secondary loader
@@ -139,7 +155,7 @@ secreadbyte0:
         bne exit
 
 ;**********************************
-; Select a block 
+; Select a block
 ;**********************************
 seclynxblock:
         pha

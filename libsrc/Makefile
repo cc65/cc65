@@ -1,13 +1,31 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 ifneq ($(shell echo),)
   CMD_EXE = 1
+endif
+
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+    PQ = "QUIET=1"
+    PD = --no-print-directory
 endif
 
 CBMS = c128   \
        c16    \
        c64    \
+       c65    \
        cbm510 \
        cbm610 \
        cx16   \
+       mega65 \
        pet    \
        plus4  \
        vic20
@@ -15,27 +33,35 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-TARGETS = apple2       \
+TARGETS = agat         \
+          apple2       \
           apple2enh    \
           atari        \
           atarixl      \
           atari2600    \
           atari5200    \
+          atari7800    \
           atmos        \
           creativision \
           $(CBMS)      \
           $(GEOS)      \
           gamate       \
+          kim1         \
           lynx         \
           nes          \
           none         \
           osic1p       \
           pce          \
+          rp6502       \
           sim6502      \
           sim65c02     \
           supervision  \
           sym1         \
           telestrat
+
+TARGETTEST = none     \
+             sim6502  \
+             sim65c02
 
 DRVTYPES = emd \
            joy \
@@ -51,7 +77,7 @@ OUTPUTDIRS := lib                                                               
               $(subst ../,,$(wildcard ../target/*/drv/*))                                     \
               $(subst ../,,$(wildcard ../target/*/util))
 
-.PHONY: all mostlyclean clean install zip lib $(TARGETS)
+.PHONY: all mostlyclean clean install zip lib libtest $(TARGETS)
 
 .SUFFIXES:
 
@@ -79,6 +105,8 @@ datadir = $(PREFIX)/share/cc65
 
 all lib: $(TARGETS)
 
+libtest: $(TARGETTEST)
+
 mostlyclean:
 	$(call RMDIR,../libwrk)
 
@@ -95,7 +123,6 @@ INSTALL = install
 
 define INSTALL_recipe
 
-$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 $(INSTALL) -d $(DESTDIR)$(datadir)/$(dir)
 $(INSTALL) -m0644 ../$(dir)/*.* $(DESTDIR)$(datadir)/$(dir)
 
@@ -115,13 +142,17 @@ endef # ZIP_recipe
 zip:
 	$(foreach dir,$(OUTPUTDIRS),$(ZIP_recipe))
 
-$(TARGETS):
-	@$(MAKE) --no-print-directory $@
+$(TARGETS): | ../lib
+	@$(MAKE) $(PD) $@ $(PQ)
+
+# ../lib must be created globally before doing lib targets in parallel
+../lib:
+	@$(call MKDIR,$@)
 
 else # TARGET
 
-CA65FLAGS =
-CC65FLAGS = -Or -W error
+CA65FLAGS = -g
+CC65FLAGS = -g -Or -W error
 
 EXTZP = cbm510 \
         cbm610 \
@@ -231,8 +262,8 @@ $1_DYNS = $$(patsubst $$($1_SRCPAT),$$($1_DYNPAT),$$($1_SRCS))
 $1_DRVS = $$(patsubst $$($1_DYNPAT),$$($1_DRVPAT),$$($1_DYNS))
 
 $$($1_STCPAT): $$($1_SRCPAT)
-	@echo $$(TARGET) - $$< - static
-	@$$(CA65) -t $$(TARGET) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
+	$$(if $$(QUIET),@echo $$(TARGET) - $$< - static)
+	$$(CA65) -t $$(TARGET) -D DYN_DRV=0 $$(CA65FLAGS) --create-dep $$(@:.o=.d) -o $$@ $$<
 
 OBJS += $$($1_STCS)
 DEPS += $$($1_STCS:.o=.d)
@@ -240,8 +271,8 @@ DEPS += $$($1_STCS:.o=.d)
 $$($1_DYNS): | $$($1_DYNDIR)
 
 $$($1_DRVPAT): $$($1_DYNPAT) $$(ZPOBJ) | $$($1_DRVDIR)
-	@echo $$(TARGET) - $$(<F)
-	@$$(LD65) -o $$@ -t module $$^
+	$$(if $$(QUIET),@echo $$(TARGET) - $$(<F))
+	$$(LD65) -o $$@ -t module $$^
 
 $$($1_DYNDIR) $$($1_DRVDIR):
 	@$$(call MKDIR,$$@)
@@ -263,16 +294,16 @@ export CC65_HOME := $(abspath ..)
 
 define ASSEMBLE_recipe
 
-$(if $(QUIET),,@echo $(TARGET) - $<)
-@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
+    $(if $(QUIET),@echo $(TARGET) - $<)
+    $(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 endef # ASSEMBLE_recipe
 
 define COMPILE_recipe
 
-$(if $(QUIET),,@echo $(TARGET) - $<)
-@$(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
-@$(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
+    $(if $(QUIET),@echo $(TARGET) - $<)
+    $(CC65) -t $(TARGET) $(CC65FLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
+    $(CA65) -t $(TARGET) -o $@ $(@:.o=.s)
 
 endef # COMPILE_recipe
 
@@ -283,13 +314,16 @@ endef # COMPILE_recipe
 	$(COMPILE_recipe)
 
 $(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../libwrk/$(TARGET) ../lib
-	@echo $(TARGET) - $(<F)
+	$(if $(QUIET),@echo $(TARGET) - $(<F))
 	@$(CA65) -t $(TARGET) $(CA65FLAGS) --create-dep $(@:../lib/%.o=../libwrk/$(TARGET)/%.d) -o $@ $<
 
+$(EXTRA_OBJS): | ../lib
+
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
+	$(if $(QUIET),@echo $(TARGET) - $<)
 	$(AR65) a $@ $?
 
-../libwrk/$(TARGET) ../lib ../target/$(TARGET)/util:
+../libwrk/$(TARGET) ../target/$(TARGET)/util:
 	@$(call MKDIR,$@)
 
 $(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib

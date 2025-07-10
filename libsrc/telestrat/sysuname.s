@@ -23,23 +23,13 @@ utsdata:
         .asciiz         ""
 
         ; release
-        .byte           ((.VERSION >> 8) & $0F) + '0'
+        .byte           .string (>.version)
         .byte           '.'
-        .if             ((.VERSION >> 4) & $0F) > 9
-        .byte           ((.VERSION >> 4) & $0F) / 10 + '0'
-        .byte           ((.VERSION >> 4) & $0F) .MOD 10 + '0'
-        .else
-        .byte           ((.VERSION >> 4) & $0F) + '0'
-        .endif
+        .byte           .string (<.version)
         .byte           $00
 
         ; version
-        .if             (.VERSION & $0F) > 9
-        .byte           (.VERSION & $0F) / 10 + '0'
-        .byte           (.VERSION & $0F) .MOD 10 + '0'
-        .else
-        .byte           (.VERSION & $0F) + '0'
-        .endif
+        .byte           '0'     ; unused
         .byte           $00
 
         ; machine

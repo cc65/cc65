@@ -10,7 +10,8 @@
         .import         isdisk
         .import         opencmdchannel
         .import         closecmdchannel
-        .importzp       ST
+        .import         initst
+        .import         READST
         .importzp       tmp2
 
 ;------------------------------------------------------------------------------
@@ -33,28 +34,27 @@ next:   inx
 ; interpret a non-disk as a no-op while we need to interpret it
 ; as an error here
 
-        jsr     isdisk
+        jsr     isdisk  ; carry clear if the unit number in X is a disk
         bcs     next
 
 ; [open|close]cmdchannel don't call into the Kernal at all if they
 ; only [in|de]crement the reference count of the shared cmdchannel
 ; so we need to explicitly initialize ST here
 
-        lda     #$00
-        sta     ST
+        stx     tmp2    ; further calls my use X
 
-        stx     tmp2
+        jsr     initst
+
+        ldx     tmp2    ; get unit number back
         jsr     opencmdchannel
-        ldx     tmp2
+        ldx     tmp2    ; get unit number back
         jsr     closecmdchannel
-        ldx     tmp2
 
-; As we had to reference ST above anyway we can as well do so
-; here too (instead of calling READST)
+        ldx     tmp2    ; get unit number back
 
-        lda     ST
+        jsr     READST  ; preserves X, returns A and Flags
 
-; Either the Kernal calls above were successfull or there was
+; Either the Kernal calls above were successful or there was
 ; already a cmdchannel to the device open - which is a pretty
 ; good indication of its existence ;-)
 

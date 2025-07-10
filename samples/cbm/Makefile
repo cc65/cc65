@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 
 # Run 'make SYS=<target>'; or, set a SYS env.
 # var. to build for another target system.
@@ -31,7 +37,15 @@ else
   CL := $(if $(wildcard ../../bin/cl65*),../../bin/cl65,cl65)
   LD := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
   SP := $(if $(wildcard ../../bin/sp65*),../../bin/sp65,sp65)
-endif 
+endif
+
+ifeq ($(SILENT),s)
+    QUIET = 1
+endif
+
+ifdef QUIET
+    .SILENT:
+endif
 
 ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   ifdef CC65_HOME
@@ -80,17 +94,19 @@ ifneq ($(filter disk samples.%,$(MAKECMDGOALS)),)
   C1541 ?= c1541
 endif
 
-DISK_c64 = samples.d64
+DISK_$(SYS) = samples.d64
 
 EXELIST_c64 = \
         fire \
         plasma \
-        nachtm
+        nachtm \
+        hello
 
 EXELIST_c128 = \
         fire \
         plasma \
-        nachtm
+        nachtm \
+        hello
 
 EXELIST_cbm510 = \
         fire \
@@ -101,16 +117,17 @@ EXELIST_cbm610 = \
         nachtm
 
 EXELIST_plus4 = \
-        plasma
+        plasma \
+        hello
 
 EXELIST_c16 = \
-        notavailable
+        hello
 
 EXELIST_pet = \
         notavailable
 
 EXELIST_vic20 = \
-        notavailable
+        hello
 
 ifneq ($(EXELIST_$(SYS)),)
 samples: $(EXELIST_$(SYS))
@@ -130,11 +147,24 @@ else
 endif
 
 fire: fire.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o fire -m fire.map fire.c
 plasma: plasma.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o plasma -m plasma.map plasma.c
 nachtm: nachtm.c
+	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o nachtm -m nachtm.map nachtm.c
+hello: hello-asm.s
+	$(if $(QUIET),echo $(SYS):$@)
+        # Use separate assembler ...
+	$(AS) -t $(SYS) hello-asm.s
+        # ... and linker commands ...
+	$(LD) -C $(SYS)-asm.cfg -o hello -m hello-asm.map -u __EXEHDR__ hello-asm.o $(SYS).lib
+	@$(DEL) hello-asm.o 2>$(NULLDEV)
+        # ... or compile & link utility
+#	$(CL) -C $(SYS)-asm.cfg -o hello -m hello-asm.map -u __EXEHDR__ hello-asm.s
+
 
 # --------------------------------------------------------------------------
 # Rule to make a CBM disk with all samples. Needs the c1541 program that comes
@@ -153,6 +183,7 @@ $(C1541) -attach $@ -write "$(subst ?,$(SPACE),$(file))" $(notdir $(file)),s >$(
 endef # D64_WRITE_SEQ_recipe
 
 samples.d64: samples
+	$(if $(QUIET),echo $(SYS):$@)
 	@$(C1541) -format "samples,00" d64 $@ >$(NULLDEV)
 	$(foreach file,$(EXELIST_$(SYS)),$(D64_WRITE_PRG_recipe))
 #	$(foreach file,$(OVERLAYLIST),$(D64_WRITE_PRG_recipe))

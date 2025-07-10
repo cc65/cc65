@@ -4,24 +4,34 @@
 ; void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
 ; void __fastcall__ cputc (char c);
 ;
+; Important note: The implementation of cputs() relies on the cputc() function
+; not clobbering ptr1. Beware when rewriting or changing this function!
 
-        .ifdef  __APPLE2ENH__
         .constructor    initconio
-        .endif
         .export         _cputcxy, _cputc
         .export         cputdirect, newline, putchar, putchardirect
         .import         gotoxy, VTABZ
 
+        .ifndef __APPLE2ENH__
+        .import         machinetype
+        .import         uppercasemask
+        .endif
+
+        .include        "zeropage.inc"
         .include        "apple2.inc"
 
         .segment        "ONCE"
 
-        .ifdef  __APPLE2ENH__
 initconio:
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bmi     :+
+        rts
+:
+        .endif
         sta     SETALTCHAR      ; Switch in alternate charset
         bit     LORES           ; Limit SET80COL-HISCR to text
         rts
-        .endif
 
         .code
 
@@ -33,7 +43,7 @@ _cputcxy:
         pla                     ; Restore C and run into _cputc
 
 _cputc:
-        cmp     #$0D            ; Test for \r = carrage return
+        cmp     #$0D            ; Test for \r = carriage return
         beq     left
         cmp     #$0A            ; Test for \n = line feed
         beq     newline
@@ -41,19 +51,53 @@ _cputc:
         .ifndef __APPLE2ENH__
         cmp     #$E0            ; Test for lowercase
         bcc     cputdirect
-        and     #$DF            ; Convert to uppercase
+        and     uppercasemask
         .endif
 
 cputdirect:
         jsr     putchar
-        inc     CH              ; Bump to next column
+
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bpl     :+
+        .endif
+        bit     RD80VID         ; In 80 column mode?
+        bpl     :+
+        inc     OURCH           ; Bump to next column
+        lda     OURCH
+        .ifdef __APPLE2ENH__
+        bra     check           ; Must leave CH alone
+        .else
+        jmp     check
+        .endif
+
+:       inc     CH              ; Bump to next column
         lda     CH
-        cmp     WNDWDTH
-        bcc     :+
+check:  cmp     WNDWDTH
+        bcc     done
         jsr     newline
-left:   lda     #$00            ; Goto left edge of screen
+left:
+        .ifdef  __APPLE2ENH__
+        stz     CH              ; Goto left edge of screen
+        .else
+        lda     #$00
         sta     CH
-:       rts
+        .endif
+
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bpl     done
+        .endif
+
+        bit     RD80VID         ; In 80 column mode?
+        bpl     done
+        .ifdef  __APPLE2ENH__
+        stz     OURCH           ; Goto left edge of screen
+        .else
+        sta     OURCH
+        .endif
+
+done:   rts
 
 newline:
         inc     CV              ; Bump to next line
@@ -77,22 +121,32 @@ putchar:
 mask:   and     INVFLG          ; Apply normal, inverse, flash
 
 putchardirect:
-        pha
+        tax
         ldy     CH
-        .ifdef  __APPLE2ENH__
+
+        sec                     ; Assume main memory
+
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bpl     put
+        .endif
+
         bit     RD80VID         ; In 80 column mode?
         bpl     put             ; No, just go ahead
-        tya
+        lda     OURCH
         lsr                     ; Div by 2
         tay
         bcs     put             ; Odd cols go in main memory
+        php
+        sei                     ; No valid MSLOT et al. in aux memory
         bit     HISCR           ; Assume SET80COL
-        .endif
+
 put:    lda     (BASL),Y        ; Get current character
-        tax                     ; Return old character for _cgetc
-        pla
+        sta     tmp3            ; Save old character for _cgetc
+        txa
         sta     (BASL),Y
-        .ifdef  __APPLE2ENH__
-        bit     LOWSCR          ; Doesn't hurt in 40 column mode
-        .endif
-        rts
+
+        bcs     :+              ; In main memory
+        bit     LOWSCR
+        plp
+:       rts

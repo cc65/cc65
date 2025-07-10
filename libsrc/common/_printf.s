@@ -37,7 +37,11 @@ FCount          = ptr2
 
 GetFormatChar:
         ldy     #0
+        .if .cap(CPU_HAS_ZPIND)
+        lda     (Format)
+        .else
         lda     (Format),y
+        .endif
 IncFormatPtr:
         inc     Format
         bne     @L1
@@ -110,7 +114,11 @@ GetIntArg:
         lda     (ArgList),y
         tax
         dey
+        .if .cap(CPU_HAS_ZPIND)
+        lda     (ArgList)
+        .else
         lda     (ArgList),y
+        .endif
         rts
 
 ; ----------------------------------------------------------------------------
@@ -135,9 +143,9 @@ ReadInt:
         pha                             ; Save digit value
         lda     ptr1
         ldx     ptr1+1
-        asl     ptr1
+        asl     a
         rol     ptr1+1                  ; * 2
-        asl     ptr1
+        asl     a
         rol     ptr1+1                  ; * 4, assume carry clear
         adc     ptr1
         sta     ptr1
@@ -265,10 +273,16 @@ Save:   lda     regbank,y
 ; Initialize the output counter in the output descriptor to zero
 
         lda     #0
+        .if .cap(CPU_HAS_ZPIND)
+        sta     (OutData)
+        ldy     #$01
+        sta     (OutData),y
+        .else
         tay
         sta     (OutData),y
         iny
         sta     (OutData),y
+        .endif
 
 ; Get the output function from the output descriptor and remember it
 
@@ -323,22 +337,26 @@ MainLoop:
         jsr     decsp6                  ; 3 args
         ldy     #5
         lda     OutData+1
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         lda     OutData
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         lda     FSave+1
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         lda     FSave
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         lda     FCount+1
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         lda     FCount
-        sta     (sp),y
+        .if .cap(CPU_HAS_ZPIND)
+        sta     (c_sp)
+        .else
+        sta     (c_sp),y
+        .endif
         jsr     CallOutFunc             ; Call the output function
 
 ; We're back from out(), or we didn't call it. Check for end of string.
@@ -502,10 +520,10 @@ DoFormat:
 ; It is a character
 
         jsr     GetIntArg               ; Get the argument (promoted to int)
-        sta     Buf                     ; Place it as zero terminated string...
-        lda     #0
-        sta     Buf+1                   ; ...into the buffer
-        jmp     HaveArg                 ; Done
+        sta     Buf                     ; Place it into the buffer
+        ldx     #0
+        lda     #1                      ; Buffer length is 1
+        jmp     HaveArg1
 
 ; Is it an integer?
 
@@ -551,10 +569,16 @@ CheckCount:
         jsr     GetIntArg
         sta     ptr1
         stx     ptr1+1                  ; Get user supplied pointer
+        .if .cap(CPU_HAS_ZPIND)
+        lda     (OutData)             ; Low byte of OutData->ccount
+        sta     (ptr1)
+        ldy     #1
+        .else
         ldy     #0
         lda     (OutData),y             ; Low byte of OutData->ccount
         sta     (ptr1),y
         iny
+        .endif
         lda     (OutData),y             ; High byte of OutData->ccount
         sta     (ptr1),y
         jmp     MainLoop                ; Done
@@ -671,6 +695,7 @@ HaveArg:
         lda     Str
         ldx     Str+1
         jsr     _strlen                 ; Get length of argument
+HaveArg1:                               ; Jumped into here from %c handling
         sta     ArgLen
         stx     ArgLen+1
 

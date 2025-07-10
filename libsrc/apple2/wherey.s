@@ -12,5 +12,5 @@ _wherey:
         lda     CV
         sec
         sbc     WNDTOP
-        ldx     #$00
+        ldx     #>$0000
         rts

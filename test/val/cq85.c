@@ -62,7 +62,7 @@ int s85(struct defs *pd0){
      struct tnode *right;
    };
 
-   struct tnode s1, s2, *sp;
+   struct tnode s1, s2, *c_sp;
 
    struct{
      char cdummy;
@@ -294,7 +294,7 @@ int main(int n,char **args) {
 
 int j;
 static struct defs d0, *pd0;
-        
+
    d0.flgs = 1;          /* These flags dictate            */
    d0.flgm = 1;          /*     the verbosity of           */
    d0.flgd = 1;          /*         the program.           */

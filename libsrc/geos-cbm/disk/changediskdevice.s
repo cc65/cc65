@@ -9,7 +9,7 @@
             .import setoserror
 
             .include "jumptab.inc"
-        
+
 _ChangeDiskDevice:
         jsr ChangeDiskDevice
         jmp setoserror

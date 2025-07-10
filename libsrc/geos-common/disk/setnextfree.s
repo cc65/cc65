@@ -5,20 +5,20 @@
 
 ; struct tr_se SetNextFree (struct tr_se *startTS);
 
-            .import __oserror
+            .import ___oserror
             .import gettrse
             .export _SetNextFree
 
             .include "jumptab.inc"
             .include "diskdrv.inc"
             .include "geossym.inc"
-        
+
 _SetNextFree:
         jsr gettrse
         sta r3L
         stx r3H
         jsr SetNextFree
-        stx __oserror
+        stx ___oserror
         lda r3L
         ldx r3H
         rts

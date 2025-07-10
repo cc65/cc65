@@ -60,6 +60,7 @@
 #include "dbginfo.h"
 #include "enum.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "feature.h"
 #include "filetab.h"
@@ -167,13 +168,17 @@ static void SetBoolOption (unsigned char* Flag)
         switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
             case 0:     *Flag = 0; NextTok ();                  break;
             case 1:     *Flag = 1; NextTok ();                  break;
-            default:    ErrorSkip ("'on' or 'off' expected");   break;
+            default:
+                ErrorExpect ("Expected ON or OFF");
+                SkipUntilSep ();
+                break;
         }
     } else if (TokIsSep (CurTok.Tok)) {
         /* Without anything assume switch on */
         *Flag = 1;
     } else {
-        ErrorSkip ("'on' or 'off' expected");
+        ErrorExpect ("Expected ON or OFF");
+        SkipUntilSep ();
     }
 }
 
@@ -216,8 +221,7 @@ static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
     while (1) {
 
         /* We need an identifier here */
-        if (CurTok.Tok != TOK_IDENT) {
-            ErrorSkip ("Identifier expected");
+        if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
             return;
         }
 
@@ -283,7 +287,7 @@ static void ConDes (const StrBuf* Name, unsigned Type)
         Prio = ConstExpression ();
         if (Prio < CD_PRIO_MIN || Prio > CD_PRIO_MAX) {
             /* Value out of range */
-            Error ("Range error");
+            Error ("Given priority is out of range");
             return;
         }
     } else {
@@ -333,7 +337,7 @@ static StrBuf* GenArrayType (StrBuf* Type, unsigned SpanSize,
 static void DoA16 (void)
 /* Switch the accu to 16 bit mode (assembler only) */
 {
-    if (GetCPU() != CPU_65816) {
+    if (GetCPU () != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
         /* Immidiate mode has two extension bytes */
@@ -346,7 +350,7 @@ static void DoA16 (void)
 static void DoA8 (void)
 /* Switch the accu to 8 bit mode (assembler only) */
 {
-    if (GetCPU() != CPU_65816) {
+    if (GetCPU () != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
         /* Immidiate mode has one extension byte */
@@ -400,7 +404,7 @@ static void DoAlign (void)
     /* Read the alignment value */
     Alignment = ConstExpression ();
     if (Alignment <= 0 || (unsigned long) Alignment > MAX_ALIGNMENT) {
-        ErrorSkip ("Range error");
+        ErrorSkip ("Alignment is out of range");
         return;
     }
 
@@ -410,7 +414,7 @@ static void DoAlign (void)
         FillVal = ConstExpression ();
         /* We need a byte value here */
         if (!IsByteRange (FillVal)) {
-            ErrorSkip ("Range error");
+            ErrorSkip ("Fill value is not in byte range");
             return;
         }
     } else {
@@ -428,8 +432,7 @@ static void DoASCIIZ (void)
 {
     while (1) {
         /* Must have a string constant */
-        if (CurTok.Tok != TOK_STRCON) {
-            ErrorSkip ("String constant expected");
+        if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
             return;
         }
 
@@ -463,11 +466,10 @@ static void DoAssert (void)
 
     /* First we have the expression that has to evaluated */
     ExprNode* Expr = Expression ();
-    ConsumeComma ();
 
-    /* Action follows */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
+    /* Followed by comma and action */
+    if (!ConsumeComma () || !Expect (TOK_IDENT, "Expected an identifier")) {
+        SkipUntilSep ();
         return;
     }
     switch (GetSubKey (ActionTab, sizeof (ActionTab) / sizeof (ActionTab[0]))) {
@@ -496,9 +498,8 @@ static void DoAssert (void)
 
         default:
             Error ("Illegal assert action specifier");
-            /* Use lderror - there won't be an .o file anyway */
-            Action = ASSERT_ACT_LDERROR;
-            break;
+            SkipUntilSep ();
+            return;
 
     }
     NextTok ();
@@ -512,8 +513,7 @@ static void DoAssert (void)
         NextTok ();
 
         /* Read the message */
-        if (CurTok.Tok != TOK_STRCON) {
-            ErrorSkip ("String constant expected");
+        if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
             return;
         }
 
@@ -642,20 +642,23 @@ static void DoCharMap (void)
 
     /* Read the index as numerical value */
     Index = ConstExpression ();
-    if (Index < 0 || Index > 255) {
+    if (IsByteRange (Index)) {
         /* Value out of range */
-        ErrorSkip ("Index range error");
+        ErrorSkip ("Index must be in byte range");
         return;
     }
 
     /* Comma follows */
-    ConsumeComma ();
+    if (!ConsumeComma ()) {
+        SkipUntilSep ();
+        return;
+    }
 
     /* Read the character code */
     Code = ConstExpression ();
-    if (Code < 0 || Code > 255) {
+    if (!IsByteRange (Code)) {
         /* Value out of range */
-        ErrorSkip ("Code range error");
+        ErrorSkip ("Replacement character code must be in byte range");
         return;
     }
 
@@ -685,15 +688,17 @@ static void DoConDes (void)
     long Type;
 
     /* Symbol name follows */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
+    if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
         return;
     }
     SB_Copy (&Name, &CurTok.SVal);
     NextTok ();
 
     /* Type follows. May be encoded as identifier or numerical */
-    ConsumeComma ();
+    if (!ConsumeComma ()) {
+        SkipUntilSep ();
+        goto ExitPoint;
+    }
     if (CurTok.Tok == TOK_IDENT) {
 
         /* Map the following keyword to a number, then skip it */
@@ -702,7 +707,8 @@ static void DoConDes (void)
 
         /* Check if we got a valid keyword */
         if (Type < 0) {
-            ErrorSkip ("Syntax error");
+            ErrorExpect ("Expected CONSTRUCTOR, DESTRUCTOR or INTERRUPTOR");
+            SkipUntilSep ();
             goto ExitPoint;
         }
 
@@ -712,7 +718,7 @@ static void DoConDes (void)
         Type = ConstExpression ();
         if (Type < CD_TYPE_MIN || Type > CD_TYPE_MAX) {
             /* Value out of range */
-            ErrorSkip ("Range error");
+            ErrorSkip ("Numeric condes type is out of range");
             goto ExitPoint;
         }
 
@@ -734,8 +740,7 @@ static void DoConstructor (void)
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
+    if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
         return;
     }
     SB_Copy (&Name, &CurTok.SVal);
@@ -771,8 +776,7 @@ static void DoDbg (void)
 
 
     /* We expect a subkey */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
+    if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
         return;
     }
 
@@ -788,7 +792,10 @@ static void DoDbg (void)
         case 1:     DbgInfoFunc ();             break;
         case 2:     DbgInfoLine ();             break;
         case 3:     DbgInfoSym ();              break;
-        default:    ErrorSkip ("Syntax error"); break;
+        default:
+            ErrorExpect ("Expected FILE, FUNC, LINE or SYM");
+            SkipUntilSep ();
+            break;
     }
 }
 
@@ -853,9 +860,7 @@ static void DoDelMac (void)
 /* Delete a classic macro */
 {
     /* We expect an identifier */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
-    } else {
+    if (ExpectSkip (TOK_IDENT, "Expected an identifier")) {
         MacUndef (&CurTok.SVal, MAC_STYLE_CLASSIC);
         NextTok ();
     }
@@ -869,8 +874,7 @@ static void DoDestructor (void)
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
+    if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
         return;
     }
     SB_Copy (&Name, &CurTok.SVal);
@@ -938,9 +942,7 @@ static void DoEndScope (void)
 static void DoError (void)
 /* User error */
 {
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
-    } else {
+    if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         Error ("User error: %m%p", &CurTok.SVal);
         SkipUntilSep ();
     }
@@ -1010,9 +1012,7 @@ static void DoFarAddr (void)
 static void DoFatal (void)
 /* Fatal user error */
 {
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
-    } else {
+    if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         Fatal ("User error: %m%p", &CurTok.SVal);
         SkipUntilSep ();
     }
@@ -1023,29 +1023,43 @@ static void DoFatal (void)
 static void DoFeature (void)
 /* Switch the Feature option */
 {
-    /* Allow a list of comma separated keywords */
+    feature_t Feature;
+    unsigned char On;
+
+    /* Allow a list of comma separated feature keywords with optional +/- or ON/OFF */
     while (1) {
 
         /* We expect an identifier */
-        if (CurTok.Tok != TOK_IDENT) {
-            ErrorSkip ("Identifier expected");
+        if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
             return;
         }
 
         /* Make the string attribute lower case */
         LocaseSVal ();
-
-        /* Set the feature and check for errors */
-        if (SetFeature (&CurTok.SVal) == FEAT_UNKNOWN) {
+        Feature = FindFeature (&CurTok.SVal);
+        if (Feature == FEAT_UNKNOWN) {
             /* Not found */
-            ErrorSkip ("Invalid feature: '%m%p'", &CurTok.SVal);
+            ErrorSkip ("Invalid feature: `%m%p'", &CurTok.SVal);
             return;
-        } else {
-            /* Skip the keyword */
-            NextTok ();
         }
 
-        /* Allow more than one keyword */
+        if (Feature == FEAT_ADDRSIZE) {
+            Warning (1, "Deprecated feature `addrsize'");
+            Notification ("Pseudo function `.addrsize' is always available");
+        }
+
+        NextTok ();
+
+        /* Optional +/- or ON/OFF */
+        On = 1;
+        if (CurTok.Tok != TOK_COMMA && !TokIsSep (CurTok.Tok)) {
+            SetBoolOption (&On);
+        }
+
+        /* Apply feature setting. */
+        SetFeature (Feature, On);
+
+        /* Allow more than one feature separated by commas. */
         if (CurTok.Tok == TOK_COMMA) {
             NextTok ();
         } else {
@@ -1073,19 +1087,17 @@ static void DoFileOpt (void)
         OptNum = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
         if (OptNum < 0) {
             /* Not found */
-            ErrorSkip ("File option keyword expected");
+            ErrorExpect ("Expected a file option keyword");
+            SkipUntilSep ();
             return;
         }
 
         /* Skip the keyword */
         NextTok ();
 
-        /* Must be followed by a comma */
-        ConsumeComma ();
-
-        /* We accept only string options for now */
-        if (CurTok.Tok != TOK_STRCON) {
-            ErrorSkip ("String constant expected");
+        /* Must be followed by a comma and a string option */
+        if (!ConsumeComma () || !Expect (TOK_STRCON, "Expected a string constant")) {
+            SkipUntilSep ();
             return;
         }
 
@@ -1120,16 +1132,13 @@ static void DoFileOpt (void)
         /* Option given as number */
         OptNum = ConstExpression ();
         if (!IsByteRange (OptNum)) {
-            ErrorSkip ("Range error");
+            ErrorSkip ("Option number must be in byte range");
             return;
         }
 
-        /* Must be followed by a comma */
-        ConsumeComma ();
-
-        /* We accept only string options for now */
-        if (CurTok.Tok != TOK_STRCON) {
-            ErrorSkip ("String constant expected");
+        /* Must be followed by a comma plus a string constant */
+        if (!ConsumeComma () || !Expect (TOK_STRCON, "Expected a string constant")) {
+            SkipUntilSep ();
             return;
         }
 
@@ -1184,7 +1193,7 @@ static void DoHiBytes (void)
 static void DoI16 (void)
 /* Switch the index registers to 16 bit mode (assembler only) */
 {
-    if (GetCPU() != CPU_65816) {
+    if (GetCPU () != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
         /* Immidiate mode has two extension bytes */
@@ -1197,7 +1206,7 @@ static void DoI16 (void)
 static void DoI8 (void)
 /* Switch the index registers to 16 bit mode (assembler only) */
 {
-    if (GetCPU() != CPU_65816) {
+    if (GetCPU () != CPU_65816) {
         Error ("Command is only valid in 65816 mode");
     } else {
         /* Immidiate mode has one extension byte */
@@ -1234,8 +1243,7 @@ static void DoIncBin (void)
     FILE* F;
 
     /* Name must follow */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
+    if (!ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         return;
     }
     SB_Copy (&Name, &CurTok.SVal);
@@ -1263,7 +1271,7 @@ static void DoIncBin (void)
         char* PathName = SearchFile (BinSearchPath, SB_GetConstBuf (&Name));
         if (PathName == 0 || (F = fopen (PathName, "rb")) == 0) {
             /* Not found or cannot open, print an error and bail out */
-            ErrorSkip ("Cannot open include file '%m%p': %s", &Name, strerror (errno));
+            ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
             xfree (PathName);
             goto ExitPoint;
         }
@@ -1289,7 +1297,7 @@ static void DoIncBin (void)
     */
     SB_Terminate (&Name);
     if (FileStat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
-        Fatal ("Cannot stat input file '%m%p': %s", &Name, strerror (errno));
+        Fatal ("Cannot stat input file `%m%p': %s", &Name, strerror (errno));
     }
 
     /* Add the file to the input file table */
@@ -1300,13 +1308,16 @@ static void DoIncBin (void)
         Count = Size - Start;
         if (Count < 0) {
             /* Nothing to read - flag this as a range error */
-            ErrorSkip ("Range error");
+            ErrorSkip ("Start offset is larger than file size");
             goto Done;
         }
     } else {
         /* Count was given, check if it is valid */
-        if (Start + Count > Size) {
-            ErrorSkip ("Range error");
+        if (Start > Size) {
+            ErrorSkip ("Start offset is larger than file size");
+            goto Done;
+        } else if (Start + Count > Size) {
+            ErrorSkip ("Not enough bytes left in file at offset %ld", Start);
             goto Done;
         }
     }
@@ -1326,7 +1337,7 @@ static void DoIncBin (void)
         size_t BytesRead = fread (Buf, 1, BytesToRead, F);
         if (BytesToRead != BytesRead) {
             /* Some sort of error */
-            ErrorSkip ("Cannot read from include file '%m%p': %s",
+            ErrorSkip ("Cannot read from include file `%m%p': %s",
                        &Name, strerror (errno));
             break;
         }
@@ -1353,9 +1364,7 @@ static void DoInclude (void)
 /* Include another file */
 {
     /* Name must follow */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
-    } else {
+    if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         SB_Terminate (&CurTok.SVal);
         if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
             /* Error opening the file, skip remainder of line */
@@ -1372,8 +1381,7 @@ static void DoInterruptor (void)
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
+    if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
         return;
     }
     SB_Copy (&Name, &CurTok.SVal);
@@ -1460,9 +1468,7 @@ static void DoListBytes (void)
 static void DoLocalChar (void)
 /* Define the character that starts local labels */
 {
-    if (CurTok.Tok != TOK_CHARCON) {
-        ErrorSkip ("Character constant expected");
-    } else {
+    if (ExpectSkip (TOK_CHARCON, "Expected a character constant")) {
         if (CurTok.IVal != '@' && CurTok.IVal != '?') {
             Error ("Invalid start character for locals");
         } else {
@@ -1478,15 +1484,14 @@ static void DoMacPack (void)
 /* Insert a macro package */
 {
     /* We expect an identifier */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
-    } else {
-        SB_AppendStr (&CurTok.SVal, ".mac");
-        SB_Terminate (&CurTok.SVal);
-        if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
-            /* Error opening the file, skip remainder of line */
-            SkipUntilSep ();
-        }
+    if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
+        return;
+    }
+    SB_AppendStr (&CurTok.SVal, ".mac");
+    SB_Terminate (&CurTok.SVal);
+    if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
+        /* Error opening the file, skip remainder of line */
+        SkipUntilSep ();
     }
 }
 
@@ -1524,12 +1529,10 @@ static void DoOrg (void)
 static void DoOut (void)
 /* Output a string */
 {
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
-    } else {
+    if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         /* Output the string and be sure to flush the output to keep it in
-        ** sync with any error messages if the output is redirected to a file.
-        */
+         * sync with any error messages if the output is redirected to a file.
+         */
         printf ("%.*s\n",
                 (int) SB_GetLen (&CurTok.SVal),
                 SB_GetConstBuf (&CurTok.SVal));
@@ -1548,6 +1551,14 @@ static void DoP02 (void)
 
 
 
+static void DoP02X (void)
+/* Switch to 6502X CPU */
+{
+    SetCPU (CPU_6502X);
+}
+
+
+
 static void DoPC02 (void)
 /* Switch to 65C02 CPU */
 {
@@ -1556,10 +1567,18 @@ static void DoPC02 (void)
 
 
 
-static void DoP816 (void)
-/* Switch to 65816 CPU */
+static void DoPWC02 (void)
+/* Switch to W65C02 CPU */
 {
-    SetCPU (CPU_65816);
+    SetCPU (CPU_W65C02);
+}
+
+
+
+static void DoPCE02 (void)
+/* Switch to 65CE02 CPU */
+{
+    SetCPU (CPU_65CE02);
 }
 
 
@@ -1572,10 +1591,42 @@ static void DoP4510 (void)
 
 
 
+static void DoP45GS02 (void)
+/* Switch to 45GS02 CPU */
+{
+    SetCPU (CPU_45GS02);
+}
+
+
+
+static void DoP6280 (void)
+/* Switch to HuC6280 CPU */
+{
+    SetCPU (CPU_HUC6280);
+}
+
+
+
+static void DoP816 (void)
+/* Switch to 65816 CPU */
+{
+    SetCPU (CPU_65816);
+}
+
+
+
 static void DoPDTV (void)
 /* Switch to C64DTV CPU */
 {
     SetCPU (CPU_6502DTV);
+}
+
+
+
+static void DoPM740 (void)
+/* Switch to M740 CPU */
+{
+    SetCPU (CPU_M740);
 }
 
 
@@ -1690,6 +1741,14 @@ static void DoPSC02 (void)
 
 
 
+static void DoPSweet16 (void)
+/* Switch to Sweet16 CPU */
+{
+    SetCPU (CPU_SWEET16);
+}
+
+
+
 static void DoPushCharmap (void)
 /* Save the current charmap */
 {
@@ -1765,7 +1824,7 @@ static void DoRes (void)
 
     Count = ConstExpression ();
     if (Count > 0xFFFF || Count < 0) {
-        ErrorSkip ("Range error");
+        ErrorSkip ("Invalid number of bytes specified");
         return;
     }
     if (CurTok.Tok == TOK_COMMA) {
@@ -1773,7 +1832,7 @@ static void DoRes (void)
         Val = ConstExpression ();
         /* We need a byte value here */
         if (!IsByteRange (Val)) {
-            ErrorSkip ("Range error");
+            ErrorSkip ("Fill value is not in byte range");
             return;
         }
 
@@ -1833,12 +1892,10 @@ static void DoScope (void)
 static void DoSegment (void)
 /* Switch to another segment */
 {
-    StrBuf Name = STATIC_STRBUF_INITIALIZER;
-    SegDef Def;
+    if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
 
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
-    } else {
+        SegDef Def;
+        StrBuf Name = AUTO_STRBUF_INITIALIZER;
 
         /* Save the name of the segment and skip it */
         SB_Copy (&Name, &CurTok.SVal);
@@ -1853,10 +1910,10 @@ static void DoSegment (void)
 
         /* Set the segment */
         UseSeg (&Def);
-    }
 
-    /* Free memory for Name */
-    SB_Done (&Name);
+        /* Free memory for Name */
+        SB_Done (&Name);
+    }
 }
 
 
@@ -1865,9 +1922,7 @@ static void DoSetCPU (void)
 /* Switch the CPU instruction set */
 {
     /* We expect an identifier */
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
-    } else {
+    if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         cpu_t CPU;
 
         /* Try to find the CPU */
@@ -1878,8 +1933,8 @@ static void DoSetCPU (void)
         SetCPU (CPU);
 
         /* Skip the identifier. If the CPU switch was successful, the scanner
-        ** will treat the input now correctly for the new CPU.
-        */
+         * will treat the input now correctly for the new CPU.
+         */
         NextTok ();
     }
 }
@@ -1954,9 +2009,7 @@ static void DoUnDef (void)
     EnableDefineStyleMacros ();
 
     /* We expect an identifier */
-    if (CurTok.Tok != TOK_IDENT) {
-        ErrorSkip ("Identifier expected");
-    } else {
+    if (ExpectSkip (TOK_IDENT, "Expected an identifier")) {
         MacUndef (&CurTok.SVal, MAC_STYLE_DEFINE);
         NextTok ();
     }
@@ -1967,7 +2020,7 @@ static void DoUnDef (void)
 static void DoUnexpected (void)
 /* Got an unexpected keyword */
 {
-    Error ("Unexpected '%m%p'", &Keyword);
+    Error ("Unexpected `%m%p'", &Keyword);
     SkipUntilSep ();
 }
 
@@ -1976,9 +2029,7 @@ static void DoUnexpected (void)
 static void DoWarning (void)
 /* User warning */
 {
-    if (CurTok.Tok != TOK_STRCON) {
-        ErrorSkip ("String constant expected");
-    } else {
+    if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
         Warning (0, "User warning: %m%p", &CurTok.SVal);
         SkipUntilSep ();
     }
@@ -2043,70 +2094,74 @@ struct CtrlDesc {
     void        (*Handler) (void);      /* Command handler */
 };
 
+/* NOTE: .AND, .BITAND, .BITNOT, .BITOR, .BITXOR, .MOD, .NOT, .OR, .SHL, .SHR
+** and .XOR do NOT go into this table.
+*/
 #define PSEUDO_COUNT    (sizeof (CtrlCmdTab) / sizeof (CtrlCmdTab [0]))
 static CtrlDesc CtrlCmdTab [] = {
-    { ccNone,           DoA16           },
-    { ccNone,           DoA8            },
+    { ccNone,           DoA16           },      /* .A16 */
+    { ccNone,           DoA8            },      /* .A8 */
     { ccNone,           DoAddr          },      /* .ADDR */
     { ccNone,           DoUnexpected    },      /* .ADDRSIZE */
-    { ccNone,           DoAlign         },
-    { ccNone,           DoASCIIZ        },
+    { ccNone,           DoAlign         },      /* .ALIGN */
+    { ccNone,           DoASCIIZ        },      /* .ASCIIZ */
     { ccNone,           DoUnexpected    },      /* .ASIZE */
-    { ccNone,           DoAssert        },
-    { ccNone,           DoAutoImport    },
+    { ccNone,           DoAssert        },      /* .ASSERT */
+    { ccNone,           DoAutoImport    },      /* .AUTOIMPORT */
     { ccNone,           DoUnexpected    },      /* .BANK */
     { ccNone,           DoUnexpected    },      /* .BANKBYTE */
-    { ccNone,           DoBankBytes     },
+    { ccNone,           DoBankBytes     },      /* .BANKBYTES */
     { ccNone,           DoUnexpected    },      /* .BLANK */
-    { ccNone,           DoBss           },
-    { ccNone,           DoByte          },
-    { ccNone,           DoCase          },
-    { ccNone,           DoCharMap       },
-    { ccNone,           DoCode          },
+    { ccNone,           DoBss           },      /* .BSS */
+    { ccNone,           DoByte          },      /* .BYT, .BYTE */
+    { ccNone,           DoUnexpected    },      /* .CAP */
+    { ccNone,           DoCase          },      /* .CASE */
+    { ccNone,           DoCharMap       },      /* .CHARMAP */
+    { ccNone,           DoCode          },      /* .CODE */
     { ccNone,           DoUnexpected,   },      /* .CONCAT */
-    { ccNone,           DoConDes        },
+    { ccNone,           DoConDes        },      /* .CONDES */
     { ccNone,           DoUnexpected    },      /* .CONST */
-    { ccNone,           DoConstructor   },
+    { ccNone,           DoConstructor   },      /* .CONSTRUCTOR */
     { ccNone,           DoUnexpected    },      /* .CPU */
-    { ccNone,           DoData          },
-    { ccNone,           DoDbg,          },
-    { ccNone,           DoDByt          },
-    { ccNone,           DoDebugInfo     },
-    { ccKeepToken,      DoDefine        },
+    { ccNone,           DoData          },      /* .DATA */
+    { ccNone,           DoDbg,          },      /* .DBG */
+    { ccNone,           DoDByt          },      /* .DBYT */
+    { ccNone,           DoDebugInfo     },      /* .DEBUGINFO */
+    { ccKeepToken,      DoDefine        },      /* .DEF, .DEFINE */
     { ccNone,           DoUnexpected    },      /* .DEFINED */
     { ccNone,           DoUnexpected    },      /* .DEFINEDMACRO */
-    { ccNone,           DoDelMac        },
-    { ccNone,           DoDestructor    },
-    { ccNone,           DoDWord         },
+    { ccNone,           DoDelMac        },      /* .DELMAC, .DELMACRO */
+    { ccNone,           DoDestructor    },      /* .DESTRUCTOR */
+    { ccNone,           DoDWord         },      /* .DWORD */
     { ccKeepToken,      DoConditionals  },      /* .ELSE */
     { ccKeepToken,      DoConditionals  },      /* .ELSEIF */
-    { ccKeepToken,      DoEnd           },
+    { ccKeepToken,      DoEnd           },      /* .END */
     { ccNone,           DoUnexpected    },      /* .ENDENUM */
     { ccKeepToken,      DoConditionals  },      /* .ENDIF */
-    { ccNone,           DoUnexpected    },      /* .ENDMACRO */
-    { ccNone,           DoEndProc       },
-    { ccNone,           DoUnexpected    },      /* .ENDREPEAT */
-    { ccNone,           DoEndScope      },
+    { ccNone,           DoUnexpected    },      /* .ENDMAC, .ENDMACRO */
+    { ccNone,           DoEndProc       },      /* .ENDPROC */
+    { ccNone,           DoUnexpected    },      /* .ENDREP, .ENDREPEAT */
+    { ccNone,           DoEndScope      },      /* .ENDSCOPE */
     { ccNone,           DoUnexpected    },      /* .ENDSTRUCT */
     { ccNone,           DoUnexpected    },      /* .ENDUNION */
-    { ccNone,           DoEnum          },
-    { ccNone,           DoError         },
-    { ccNone,           DoExitMacro     },
-    { ccNone,           DoExport        },
-    { ccNone,           DoExportZP      },
-    { ccNone,           DoFarAddr       },
-    { ccNone,           DoFatal         },
-    { ccNone,           DoFeature       },
-    { ccNone,           DoFileOpt       },
-    { ccNone,           DoForceImport   },
+    { ccNone,           DoEnum          },      /* .ENUM */
+    { ccNone,           DoError         },      /* .ERROR */
+    { ccNone,           DoExitMacro     },      /* .EXITMAC, .EXITMACRO */
+    { ccNone,           DoExport        },      /* .EXPORT */
+    { ccNone,           DoExportZP      },      /* .EXPORTZP */
+    { ccNone,           DoFarAddr       },      /* .FARADDR */
+    { ccNone,           DoFatal         },      /* .FATAL */
+    { ccNone,           DoFeature       },      /* .FEATURE */
+    { ccNone,           DoFileOpt       },      /* .FOPT, .FILEOPT */
+    { ccNone,           DoForceImport   },      /* .FORCEIMPORT */
     { ccNone,           DoUnexpected    },      /* .FORCEWORD */
-    { ccNone,           DoGlobal        },
-    { ccNone,           DoGlobalZP      },
+    { ccNone,           DoGlobal        },      /* .GLOBAL */
+    { ccNone,           DoGlobalZP      },      /* .GLOBALZP */
     { ccNone,           DoUnexpected    },      /* .HIBYTE */
-    { ccNone,           DoHiBytes       },
+    { ccNone,           DoHiBytes       },      /* .HIBYTES */
     { ccNone,           DoUnexpected    },      /* .HIWORD */
-    { ccNone,           DoI16           },
-    { ccNone,           DoI8            },
+    { ccNone,           DoI16           },      /* .I16 */
+    { ccNone,           DoI8            },      /* .I8 */
     { ccNone,           DoUnexpected    },      /* .IDENT */
     { ccKeepToken,      DoConditionals  },      /* .IF */
     { ccKeepToken,      DoConditionals  },      /* .IFBLANK */
@@ -2117,81 +2172,95 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,      DoConditionals  },      /* .IFNDEF */
     { ccKeepToken,      DoConditionals  },      /* .IFNREF */
     { ccKeepToken,      DoConditionals  },      /* .IFP02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP02X */
     { ccKeepToken,      DoConditionals  },      /* .IFP4510 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP45GS02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFP6280 */
     { ccKeepToken,      DoConditionals  },      /* .IFP816 */
     { ccKeepToken,      DoConditionals  },      /* .IFPC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPCE02 */
     { ccKeepToken,      DoConditionals  },      /* .IFPDTV */
+    { ccKeepToken,      DoConditionals  },      /* .IFPM740 */
     { ccKeepToken,      DoConditionals  },      /* .IFPSC02 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPSWEET16 */
+    { ccKeepToken,      DoConditionals  },      /* .IFPWC02 */
     { ccKeepToken,      DoConditionals  },      /* .IFREF */
-    { ccNone,           DoImport        },
-    { ccNone,           DoImportZP      },
-    { ccNone,           DoIncBin        },
-    { ccNone,           DoInclude       },
-    { ccNone,           DoInterruptor   },
+    { ccNone,           DoImport        },      /* .IMPORT */
+    { ccNone,           DoImportZP      },      /* .IMPORTZP */
+    { ccNone,           DoIncBin        },      /* .INCBIN */
+    { ccNone,           DoInclude       },      /* .INCLUDE */
+    { ccNone,           DoInterruptor   },      /* .INTERRUPTPOR */
     { ccNone,           DoUnexpected    },      /* .ISIZE */
     { ccNone,           DoUnexpected    },      /* .ISMNEMONIC */
     { ccNone,           DoInvalid       },      /* .LEFT */
-    { ccNone,           DoLineCont      },
-    { ccNone,           DoList          },
-    { ccNone,           DoListBytes     },
-    { ccNone,           DoLiteral       },
+    { ccNone,           DoLineCont      },      /* .LINECONT */
+    { ccNone,           DoList          },      /* .LIST */
+    { ccNone,           DoListBytes     },      /* .LISTBYTES */
+    { ccNone,           DoLiteral       },      /* .LITERAL */
     { ccNone,           DoUnexpected    },      /* .LOBYTE */
-    { ccNone,           DoLoBytes       },
+    { ccNone,           DoLoBytes       },      /* .LOBYTES */
     { ccNone,           DoUnexpected    },      /* .LOCAL */
-    { ccNone,           DoLocalChar     },
+    { ccNone,           DoLocalChar     },      /* .LOCALCHAR */
     { ccNone,           DoUnexpected    },      /* .LOWORD */
-    { ccNone,           DoMacPack       },
-    { ccNone,           DoMacro         },
+    { ccNone,           DoMacPack       },      /* .MACPACK */
+    { ccNone,           DoMacro         },      /* .MAC, .MACRO */
     { ccNone,           DoUnexpected    },      /* .MATCH */
     { ccNone,           DoUnexpected    },      /* .MAX */
     { ccNone,           DoInvalid       },      /* .MID */
     { ccNone,           DoUnexpected    },      /* .MIN */
-    { ccNone,           DoNull          },
-    { ccNone,           DoOrg           },
-    { ccNone,           DoOut           },
-    { ccNone,           DoP02           },
-    { ccNone,           DoP4510         },
-    { ccNone,           DoP816          },
-    { ccNone,           DoPageLength    },
+    { ccNone,           DoNull          },      /* .NULL */
+    { ccNone,           DoOrg           },      /* .ORG */
+    { ccNone,           DoOut           },      /* .OUT */
+    { ccNone,           DoP02           },      /* .P02 */
+    { ccNone,           DoP02X          },      /* .P02X */
+    { ccNone,           DoP4510         },      /* .P4510 */
+    { ccNone,           DoP45GS02       },      /* .P45GS02 */
+    { ccNone,           DoP6280         },      /* .P6280 */
+    { ccNone,           DoP816          },      /* .P816 */
+    { ccNone,           DoPageLength    },      /* .PAGELEN, .PAGELENGTH */
     { ccNone,           DoUnexpected    },      /* .PARAMCOUNT */
-    { ccNone,           DoPC02          },
-    { ccNone,           DoPDTV          },
-    { ccNone,           DoPopCharmap    },
-    { ccNone,           DoPopCPU        },
-    { ccNone,           DoPopSeg        },
-    { ccNone,           DoProc          },
-    { ccNone,           DoPSC02         },
-    { ccNone,           DoPushCharmap   },
-    { ccNone,           DoPushCPU       },
-    { ccNone,           DoPushSeg       },
-    { ccNone,           DoUnexpected    },      /* .REFERENCED */
-    { ccNone,           DoReferTo       },      /* .REFERTO */
-    { ccNone,           DoReloc         },
-    { ccNone,           DoRepeat        },
-    { ccNone,           DoRes           },
+    { ccNone,           DoPC02          },      /* .PC02 */
+    { ccNone,           DoPCE02         },      /* .PCE02 */
+    { ccNone,           DoPDTV          },      /* .PDTV */
+    { ccNone,           DoPM740         },      /* .PM740 */
+    { ccNone,           DoPopCharmap    },      /* .POPCHARMAP */
+    { ccNone,           DoPopCPU        },      /* .POPCPU */
+    { ccNone,           DoPopSeg        },      /* .POPSEG */
+    { ccNone,           DoProc          },      /* .PROC */
+    { ccNone,           DoPSC02         },      /* .PSC02 */
+    { ccNone,           DoPSweet16      },      /* .PSWEET16 */
+    { ccNone,           DoPushCharmap   },      /* .PUSHCHARMAP */
+    { ccNone,           DoPushCPU       },      /* .PUSHCPU */
+    { ccNone,           DoPushSeg       },      /* .PUSHSEG */
+    { ccNone,           DoPWC02         },      /* .PWC02 */
+    { ccNone,           DoUnexpected    },      /* .REF, .REFERENCED */
+    { ccNone,           DoReferTo       },      /* .REFTO, .REFERTO */
+    { ccNone,           DoReloc         },      /* .RELOC */
+    { ccKeepToken,      DoRepeat        },      /* .REPEAT */
+    { ccNone,           DoRes           },      /* .RES */
     { ccNone,           DoInvalid       },      /* .RIGHT */
-    { ccNone,           DoROData        },
-    { ccNone,           DoScope         },
-    { ccNone,           DoSegment       },
+    { ccNone,           DoROData        },      /* .RODATA */
+    { ccNone,           DoScope         },      /* .SCOPE */
+    { ccNone,           DoSegment       },      /* .SEGMENT */
     { ccNone,           DoUnexpected    },      /* .SET */
-    { ccNone,           DoSetCPU        },
+    { ccNone,           DoSetCPU        },      /* .SETCPU */
     { ccNone,           DoUnexpected    },      /* .SIZEOF */
-    { ccNone,           DoSmart         },
+    { ccNone,           DoSmart         },      /* .SMART */
     { ccNone,           DoUnexpected    },      /* .SPRINTF */
     { ccNone,           DoUnexpected    },      /* .STRAT */
     { ccNone,           DoUnexpected    },      /* .STRING */
     { ccNone,           DoUnexpected    },      /* .STRLEN */
-    { ccNone,           DoStruct        },
-    { ccNone,           DoTag           },
+    { ccNone,           DoStruct        },      /* .STRUCT */
+    { ccNone,           DoTag           },      /* .TAG */
     { ccNone,           DoUnexpected    },      /* .TCOUNT */
     { ccNone,           DoUnexpected    },      /* .TIME */
-    { ccKeepToken,      DoUnDef         },
-    { ccNone,           DoUnion         },
+    { ccKeepToken,      DoUnDef         },      /* .UNDEF, .UNDEFINE */
+    { ccNone,           DoUnion         },      /* .UNION */
     { ccNone,           DoUnexpected    },      /* .VERSION */
-    { ccNone,           DoWarning       },
-    { ccNone,           DoWord          },
+    { ccNone,           DoWarning       },      /* .WARNING */
+    { ccNone,           DoWord          },      /* .WORD */
     { ccNone,           DoUnexpected    },      /* .XMATCH */
-    { ccNone,           DoZeropage      },
+    { ccNone,           DoZeropage      },      /* .ZEROPAGE */
 };
 
 

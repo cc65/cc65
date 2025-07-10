@@ -50,6 +50,7 @@
 #include "litpool.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "stackptr.h"
 #include "stdfunc.h"
 #include "stdnames.h"
@@ -77,19 +78,20 @@ static void StdFunc_strlen (FuncDesc*, ExprDesc*);
 
 
 
-/* Table with all known functions and their handlers. Must be sorted
-** alphabetically!
+/* Table with all known functions and their handlers.
+** CAUTION: table must be alphabetically sorted for bsearch
 */
 static struct StdFuncDesc {
     const char*         Name;
     void                (*Handler) (FuncDesc*, ExprDesc*);
 } StdFuncs[] = {
+/* BEGIN SORTED.SH */
     {   "memcpy",       StdFunc_memcpy          },
     {   "memset",       StdFunc_memset          },
     {   "strcmp",       StdFunc_strcmp          },
     {   "strcpy",       StdFunc_strcpy          },
     {   "strlen",       StdFunc_strlen          },
-
+/* END SORTED.SH */
 };
 #define FUNC_COUNT      (sizeof (StdFuncs) / sizeof (StdFuncs[0]))
 
@@ -184,7 +186,10 @@ static void ParseArg (ArgDesc* Arg, const Type* Type, ExprDesc* Expr)
     GetCodePos (&Arg->End);
 
     /* Use the type of the argument for the push */
-    Arg->Flags |= TypeOf (Arg->Expr.Type);
+    Arg->Flags |= CG_TypeOf (Arg->Expr.Type);
+
+    /* Propagate from subexpressions */
+    Expr->Flags |= Arg->Expr.Flags & E_MASK_VIRAL;
 }
 
 
@@ -276,13 +281,11 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         ** generated, and emit better code.
         */
         if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256 &&
-            ((ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr)) ||
-             (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr))) &&
-            ((ED_IsRVal (&Arg1.Expr) && ED_IsLocConst (&Arg1.Expr)) ||
-             (ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr)))) {
+            (ED_IsConstAddr (&Arg2.Expr) || ED_IsZPInd (&Arg2.Expr)) &&
+            (ED_IsConstAddr (&Arg1.Expr) || ED_IsZPInd (&Arg1.Expr))) {
 
-            int Reg1 = ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr);
-            int Reg2 = ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr);
+            int Reg1 = ED_IsZPInd (&Arg1.Expr);
+            int Reg2 = ED_IsZPInd (&Arg2.Expr);
 
             /* Drop the generated code */
             RemoveCode (&Arg1.Expr.Start);
@@ -338,9 +341,9 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         }
 
         if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256 &&
-            ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr) &&
-            ED_IsRVal (&Arg1.Expr) && ED_IsLocStack (&Arg1.Expr) &&
-            (Arg1.Expr.IVal - StackPtr) + Arg3.Expr.IVal < 256) {
+            ED_IsConstAddr (&Arg2.Expr) &&
+            ED_IsStackAddr (&Arg1.Expr) &&
+            ED_GetStackOffs (&Arg1.Expr, Arg3.Expr.IVal) < 256) {
 
             /* It is possible to just use one index register even if the stack
             ** offset is not zero, by adjusting the offset to the constant
@@ -349,7 +352,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** than 256. Register space is zero page, which means that the
             ** address calculation could overflow in the linker.
             */
-            int AllowOneIndex = !ED_IsLocRegister (&Arg2.Expr) &&
+            int AllowOneIndex = !ED_IsLocZP (&Arg2.Expr) &&
                                 !(ED_IsLocNone (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
@@ -368,7 +371,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
                     g_defcodelabel (Label);
                     AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg2.Expr, -Offs));
-                    AddCodeLine ("sta (sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("dey");
                     AddCodeLine ("bpl %s", LocalLabelName (Label));
                 } else {
@@ -376,7 +379,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
                     g_defcodelabel (Label);
                     AddCodeLine ("lda %s,x", ED_GetLabelName (&Arg2.Expr, 0));
-                    AddCodeLine ("sta (sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("dey");
                     AddCodeLine ("dex");
                     AddCodeLine ("bpl %s", LocalLabelName (Label));
@@ -388,7 +391,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
                     g_defcodelabel (Label);
                     AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg2.Expr, -Offs));
-                    AddCodeLine ("sta (sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("iny");
                     AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
                     AddCodeLine ("bne %s", LocalLabelName (Label));
@@ -397,7 +400,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
                     g_defcodelabel (Label);
                     AddCodeLine ("lda %s,x", ED_GetLabelName (&Arg2.Expr, 0));
-                    AddCodeLine ("sta (sp),y");
+                    AddCodeLine ("sta (c_sp),y");
                     AddCodeLine ("iny");
                     AddCodeLine ("inx");
                     AddCmpCodeIfSizeNot256 ("cpx #$%02X", Arg3.Expr.IVal);
@@ -416,9 +419,9 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         }
 
         if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256 &&
-            ED_IsRVal (&Arg2.Expr) && ED_IsLocStack (&Arg2.Expr) &&
-            (Arg2.Expr.IVal - StackPtr) + Arg3.Expr.IVal < 256 &&
-            ED_IsRVal (&Arg1.Expr) && ED_IsLocConst (&Arg1.Expr)) {
+            ED_IsStackAddr (&Arg2.Expr) &&
+            ED_GetStackOffs (&Arg2.Expr, Arg3.Expr.IVal) < 256 &&
+            ED_IsConstAddr (&Arg1.Expr)) {
 
             /* It is possible to just use one index register even if the stack
             ** offset is not zero, by adjusting the offset to the constant
@@ -427,7 +430,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** than 256. Register space is zero page, which means that the
             ** address calculation could overflow in the linker.
             */
-            int AllowOneIndex = !ED_IsLocRegister (&Arg1.Expr) &&
+            int AllowOneIndex = !ED_IsLocZP (&Arg1.Expr) &&
                                 !(ED_IsLocNone (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
@@ -445,7 +448,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 if (Offs == 0) {
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
                     g_defcodelabel (Label);
-                    AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, 0));
                     AddCodeLine ("dey");
                     AddCodeLine ("bpl %s", LocalLabelName (Label));
@@ -453,7 +456,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldx #$%02X", (unsigned char) (Arg3.Expr.IVal-1));
                     AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
                     g_defcodelabel (Label);
-                    AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sta %s,x", ED_GetLabelName (&Arg1.Expr, 0));
                     AddCodeLine ("dey");
                     AddCodeLine ("dex");
@@ -465,7 +468,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 if (Offs == 0 || AllowOneIndex) {
                     AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
                     g_defcodelabel (Label);
-                    AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, -Offs));
                     AddCodeLine ("iny");
                     AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
@@ -474,7 +477,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                     AddCodeLine ("ldx #$00");
                     AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
                     g_defcodelabel (Label);
-                    AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("lda (c_sp),y");
                     AddCodeLine ("sta %s,x", ED_GetLabelName (&Arg1.Expr, 0));
                     AddCodeLine ("iny");
                     AddCodeLine ("inx");
@@ -493,8 +496,8 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             goto ExitPoint;
         }
 
-        if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256   &&
-            ED_IsRVal (&Arg2.Expr) && ED_IsLocStack (&Arg2.Expr)     &&
+        if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256 &&
+            ED_IsStackAddr (&Arg2.Expr) &&
             (Offs = ED_GetStackOffs (&Arg2.Expr, 0)) == 0) {
 
             /* Drop the generated code but leave the load of the first argument*/
@@ -509,14 +512,14 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             if (Arg3.Expr.IVal <= 129) {
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
                 g_defcodelabel (Label);
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("sta (ptr1),y");
                 AddCodeLine ("dey");
                 AddCodeLine ("bpl %s", LocalLabelName (Label));
             } else {
                 AddCodeLine ("ldy #$00");
                 g_defcodelabel (Label);
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("sta (ptr1),y");
                 AddCodeLine ("iny");
                 AddCmpCodeIfSizeNot256 ("cpy #$%02X", Arg3.Expr.IVal);
@@ -528,7 +531,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
             /* The function result is an rvalue in the primary register */
             ED_FinalizeRValLoad (Expr);
-            Expr->Type = GetFuncReturn (Expr->Type);
+            Expr->Type = GetFuncReturnType (Expr->Type);
 
             /* Bail out, no need for further processing */
             goto ExitPoint;
@@ -537,7 +540,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
     /* We expect the closing brace */
@@ -601,7 +604,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     DoDeferred (SQP_KEEP_EAX, &Arg3.Expr);
 
     /* Emit the actual function call. This will also cleanup the stack. */
-    g_call (CF_FIXARGC, MemSet? Func_memset : Func__bzero, ParamSize);
+    g_call (CF_FIXARGC, MemSet? Func_memset : Func___bzero, ParamSize);
 
     if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal == 0) {
 
@@ -633,10 +636,9 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         */
         if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256 &&
             ED_IsConstAbsInt (&Arg2.Expr) &&
-            ((ED_IsRVal (&Arg1.Expr) && ED_IsLocConst (&Arg1.Expr)) ||
-             (ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr)))) {
+            (ED_IsConstAddr (&Arg1.Expr) || ED_IsZPInd (&Arg1.Expr))) {
 
-            int Reg = ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr);
+            int Reg = ED_IsZPInd (&Arg1.Expr);
 
             /* Drop the generated code */
             RemoveCode (&Arg1.Expr.Start);
@@ -685,8 +687,8 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
         if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256 &&
             ED_IsConstAbsInt (&Arg2.Expr) &&
-            ED_IsRVal (&Arg1.Expr) && ED_IsLocStack (&Arg1.Expr) &&
-            (Arg1.Expr.IVal - StackPtr) + Arg3.Expr.IVal < 256) {
+            ED_IsStackAddr (&Arg1.Expr) &&
+            ED_GetStackOffs (&Arg1.Expr, Arg3.Expr.IVal) < 256) {
 
             /* Calculate the real stack offset */
             int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
@@ -701,7 +703,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             AddCodeLine ("ldy #$%02X", (unsigned char) Offs);
             AddCodeLine ("lda #$%02X", (unsigned char) Arg2.Expr.IVal);
             g_defcodelabel (Label);
-            AddCodeLine ("sta (sp),y");
+            AddCodeLine ("sta (c_sp),y");
             AddCodeLine ("iny");
             AddCmpCodeIfSizeNot256 ("cpy #$%02X", Offs + Arg3.Expr.IVal);
             AddCodeLine ("bne %s", LocalLabelName (Label));
@@ -754,7 +756,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
             /* The function result is an rvalue in the primary register */
             ED_FinalizeRValLoad (Expr);
-            Expr->Type = GetFuncReturn (Expr->Type);
+            Expr->Type = GetFuncReturnType (Expr->Type);
 
             /* Bail out, no need for further processing */
             goto ExitPoint;
@@ -763,7 +765,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
     /* We expect the closing brace */
@@ -832,7 +834,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         */
         if (ED_IsLocLiteral (&Arg2.Expr) &&
             IS_Get (&WritableStrings) == 0 &&
-            GetLiteralSize (Arg2.Expr.V.LVal) == 1 &&
+            GetLiteralSize (Arg2.Expr.V.LVal) >= 1 &&
             GetLiteralStr (Arg2.Expr.V.LVal)[0] == '\0') {
 
             /* Drop the generated code so we have the first argument in the
@@ -846,7 +848,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             /* We do now have Arg1 in the primary. Load the first character from
             ** this string and cast to int. This is the function result.
             */
-            IsArray = IsTypeArray (Arg1.Type) && ED_IsRVal (&Arg1.Expr);
+            IsArray = IsTypeArray (Arg1.Type) && ED_IsAddrExpr (&Arg1.Expr);
             if (IsArray && ED_IsLocStack (&Arg1.Expr) &&
                 (Offs = ED_GetStackOffs (&Arg1.Expr, 0) < 256)) {
                 /* Drop the generated code */
@@ -855,7 +857,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 /* Generate code */
                 AddCodeLine ("ldy #$%02X", Offs);
                 AddCodeLine ("ldx #$00");
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
             } else if (IsArray && ED_IsLocConst (&Arg1.Expr)) {
                 /* Drop the generated code */
                 RemoveCode (&Arg1.Load);
@@ -874,22 +876,20 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             }
 
         } else if ((IS_Get (&CodeSizeFactor) >= 165) &&
-                   ((ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr)) ||
-                    (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr))) &&
-                   ((ED_IsRVal (&Arg1.Expr) && ED_IsLocConst (&Arg1.Expr)) ||
-                    (ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr))) &&
+                   (ED_IsConstAddr (&Arg2.Expr) || ED_IsZPInd (&Arg2.Expr)) &&
+                   (ED_IsConstAddr (&Arg1.Expr) || ED_IsZPInd (&Arg1.Expr)) &&
                    (IS_Get (&EagerlyInlineFuncs) || (ECount1 > 0 && ECount1 < 256))) {
 
             unsigned    Entry, Loop, Fin;   /* Labels */
             const char* Load;
             const char* Compare;
 
-            if (ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr)) {
+            if (ED_IsZPInd (&Arg1.Expr)) {
                 Load = "lda (%s),y";
             } else {
                 Load = "lda %s,y";
             }
-            if (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr)) {
+            if (ED_IsZPInd (&Arg2.Expr)) {
                 Compare = "cmp (%s),y";
             } else {
                 Compare = "cmp %s,y";
@@ -920,14 +920,13 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             g_defcodelabel (Fin);
 
         } else if ((IS_Get (&CodeSizeFactor) > 190) &&
-                   ((ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr)) ||
-                    (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr))) &&
+                   (ED_IsConstAddr (&Arg2.Expr) || ED_IsZPInd (&Arg2.Expr)) &&
                    (IS_Get (&EagerlyInlineFuncs) || (ECount1 > 0 && ECount1 < 256))) {
 
             unsigned    Entry, Loop, Fin;   /* Labels */
             const char* Compare;
 
-            if (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr)) {
+            if (ED_IsZPInd (&Arg2.Expr)) {
                 Compare = "cmp (%s),y";
             } else {
                 Compare = "cmp %s,y";
@@ -965,7 +964,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    Expr->Type = GetFuncReturnType (Expr->Type);
 
     /* We expect the closing brace */
     ConsumeRParen ();
@@ -1024,21 +1023,19 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         ** be generated. If such a situation is detected, throw away the
         ** generated, and emit better code.
         */
-        if (((ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr)) ||
-             (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr))) &&
-            ((ED_IsRVal (&Arg1.Expr) && ED_IsLocConst (&Arg1.Expr)) ||
-             (ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr))) &&
+        if ((ED_IsConstAddr (&Arg2.Expr) || ED_IsZPInd (&Arg2.Expr)) &&
+            (ED_IsConstAddr (&Arg1.Expr) || ED_IsZPInd (&Arg1.Expr)) &&
             (IS_Get (&EagerlyInlineFuncs) ||
             (ECount != UNSPECIFIED && ECount < 256))) {
 
             const char* Load;
             const char* Store;
-            if (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr)) {
+            if (ED_IsZPInd (&Arg2.Expr)) {
                 Load = "lda (%s),y";
             } else {
                 Load = "lda %s,y";
             }
-            if (ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr)) {
+            if (ED_IsZPInd (&Arg1.Expr)) {
                 Store = "sta (%s),y";
             } else {
                 Store = "sta %s,y";
@@ -1065,9 +1062,9 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             goto ExitPoint;
         }
 
-        if (ED_IsRVal (&Arg2.Expr) && ED_IsLocStack (&Arg2.Expr) &&
+        if (ED_IsStackAddr (&Arg2.Expr) &&
             StackPtr >= -255 &&
-            ED_IsRVal (&Arg1.Expr) && ED_IsLocConst (&Arg1.Expr)) {
+            ED_IsConstAddr (&Arg1.Expr)) {
 
             /* It is possible to just use one index register even if the stack
             ** offset is not zero, by adjusting the offset to the constant
@@ -1076,7 +1073,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** than 256. Register space is zero page, which means that the
             ** address calculation could overflow in the linker.
             */
-            int AllowOneIndex = !ED_IsLocRegister (&Arg1.Expr) &&
+            int AllowOneIndex = !ED_IsLocZP (&Arg1.Expr) &&
                                 !(ED_IsLocNone (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
@@ -1093,14 +1090,14 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             if (Offs == 0 || AllowOneIndex) {
                 g_defcodelabel (L1);
                 AddCodeLine ("iny");
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, -Offs));
             } else {
                 AddCodeLine ("ldx #$FF");
                 g_defcodelabel (L1);
                 AddCodeLine ("iny");
                 AddCodeLine ("inx");
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("lda (c_sp),y");
                 AddCodeLine ("sta %s,x", ED_GetLabelName (&Arg1.Expr, 0));
             }
             AddCodeLine ("bne %s", LocalLabelName (L1));
@@ -1112,8 +1109,8 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             goto ExitPoint;
         }
 
-        if (ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr) &&
-            ED_IsRVal (&Arg1.Expr) && ED_IsLocStack (&Arg1.Expr) &&
+        if (ED_IsConstAddr (&Arg2.Expr) &&
+            ED_IsStackAddr (&Arg1.Expr) &&
             StackPtr >= -255) {
 
             /* It is possible to just use one index register even if the stack
@@ -1123,7 +1120,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             ** than 256. Register space is zero page, which means that the
             ** address calculation could overflow in the linker.
             */
-            int AllowOneIndex = !ED_IsLocRegister (&Arg2.Expr) &&
+            int AllowOneIndex = !ED_IsLocZP (&Arg2.Expr) &&
                                 !(ED_IsLocNone (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
             /* Calculate the real stack offset */
@@ -1141,14 +1138,14 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                 g_defcodelabel (L1);
                 AddCodeLine ("iny");
                 AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg2.Expr, -Offs));
-                AddCodeLine ("sta (sp),y");
+                AddCodeLine ("sta (c_sp),y");
             } else {
                 AddCodeLine ("ldx #$FF");
                 g_defcodelabel (L1);
                 AddCodeLine ("iny");
                 AddCodeLine ("inx");
                 AddCodeLine ("lda %s,x", ED_GetLabelName (&Arg2.Expr, 0));
-                AddCodeLine ("sta (sp),y");
+                AddCodeLine ("sta (c_sp),y");
             }
             AddCodeLine ("bne %s", LocalLabelName (L1));
 
@@ -1162,7 +1159,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* The function result is an rvalue in the primary register */
     ED_FinalizeRValLoad (Expr);
-    Expr->Type = GetFuncReturn (Expr->Type);
+    Expr->Type = GetFuncReturnType (Expr->Type);
 
 ExitPoint:
     /* We expect the closing brace */
@@ -1230,9 +1227,13 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         ** at runtime.
         */
         if (ED_IsLocLiteral (&Arg) && IS_Get (&WritableStrings) == 0) {
+            /* Get the length of the C string within the string literal.
+            ** Note: Keep in mind that the literal could contain '\0' in it.
+            */
+            size_t Len = strnlen (GetLiteralStr (Arg.V.LVal), GetLiteralSize (Arg.V.LVal) - 1);
 
             /* Constant string literal */
-            ED_MakeConstAbs (Expr, GetLiteralSize (Arg.V.LVal) - 1, type_size_t);
+            ED_MakeConstAbs (Expr, Len, type_size_t);
 
             /* We don't need the literal any longer */
             ReleaseLiteral (Arg.V.LVal);
@@ -1272,7 +1273,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         ** completely within the reach of a byte sized index register.
         */
         if (ED_IsLocStack (&Arg) && IsArray && IsByteIndex &&
-            (Arg.IVal - StackPtr) + ECount < 256) {
+            ED_GetStackOffs (&Arg, ECount) < 256) {
 
             /* Calculate the true stack offset */
             int Offs = ED_GetStackOffs (&Arg, 0);
@@ -1284,7 +1285,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             g_defcodelabel (L);
             AddCodeLine ("inx");
             AddCodeLine ("iny");
-            AddCodeLine ("lda (sp),y");
+            AddCodeLine ("lda (c_sp),y");
             AddCodeLine ("bne %s", LocalLabelName (L));
             AddCodeLine ("txa");
             AddCodeLine ("ldx #$00");
@@ -1301,7 +1302,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         ** get inlined if requested on the command line, since we cannot know how
         ** big the buffer actually is, so inlining is not always safe.
         */
-        if (ED_IsLocRegister (&Arg) && ED_IsLVal (&Arg) && IsPtr &&
+        if (ED_IsZPInd (&Arg) && IsPtr &&
             IS_Get (&EagerlyInlineFuncs)) {
 
             /* Generate the strlen code */
@@ -1365,6 +1366,9 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 ExitPoint:
     /* We expect the closing brace */
     ConsumeRParen ();
+
+    /* Propagate from subexpressions */
+    Expr->Flags |= Arg.Flags & E_MASK_VIRAL;
 }
 
 
@@ -1405,4 +1409,7 @@ void HandleStdFunc (int Index, FuncDesc* F, ExprDesc* lval)
 
     /* Call the handler function */
     D->Handler (F, lval);
+
+    /* We assume all function calls had side effects */
+    lval->Flags |= E_SIDE_EFFECTS;
 }

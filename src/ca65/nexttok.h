@@ -51,28 +51,33 @@
 void NextTok (void);
 /* Get next token and handle token level functions */
 
-void Consume (token_t Expected, const char* ErrMsg);
-/* Consume Token, print an error if we don't find it */
+int Consume (token_t Expected, const char* ErrMsg);
+/* Consume Token, print an error if we don't find it. Return true if the token
+** was found and false otherwise.
+*/
 
-void ConsumeSep (void);
-/* Consume a separator token */
+int ConsumeSep (void);
+/* Consume a separator token. Return true if the token was found and false
+ * otherwise.
+ */
 
-void ConsumeLParen (void);
-/* Consume a left paren */
+int ConsumeLParen (void);
+/* Consume a left paren. Return true if the token was found and false
+** otherwise.
+*/
 
-void ConsumeRParen (void);
-/* Consume a right paren */
+int ConsumeRParen (void);
+/* Consume a right paren. Return true if the token was found and false
+** otherwise.
+*/
 
-void ConsumeComma (void);
-/* Consume a comma */
+int ConsumeComma (void);
+/* Consume a comma. Return true if the token was found and false
+** otherwise.
+*/
 
 void SkipUntilSep (void);
 /* Skip tokens until we reach a line separator or end of file */
-
-void ExpectSep (void);
-/* Check if we've reached a line separator, and output an error if not. Do
-** not skip the line separator.
-*/
 
 void EnterRawTokenMode (void);
 /* Enter raw token mode. In raw mode, token handling functions are not

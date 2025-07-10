@@ -9,7 +9,7 @@
 ;
 ;
 ; unsigned int __fastcall__ mul20(unsigned char value);
-; 
+;
 ; REMARKS: Function is defined to return with carry-flag cleared
 
 
@@ -34,7 +34,7 @@ mul5:   adc     tmp4            ; * 5
         inx                     ; yes, correct...
 
 mul10:  stx     tmp4            ; continue with classic shifting...
-        
+
         asl     a               ; * 10
         rol     tmp4
 

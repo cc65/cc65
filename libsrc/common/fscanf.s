@@ -6,7 +6,7 @@
 
         .export         _fscanf
         .import         addysp, decsp4, _vfscanf
-        .importzp       sp, ptr1
+        .importzp       c_sp, ptr1
 
         .macpack        generic
 
@@ -50,9 +50,9 @@ _fscanf:
 ; Calculate a pointer to the Format argument
 
         lda     ParamSize
-        add     sp
+        add     c_sp
         sta     ptr1
-        ldx     sp+1
+        ldx     c_sp+1
         bcc     @L1
         inx
 @L1:    stx     ptr1+1
@@ -61,7 +61,7 @@ _fscanf:
 
         ldy     #4-1
 @L2:    lda     (ptr1),y
-        sta     (sp),y
+        sta     (c_sp),y
         dey
         bpl     @L2
 

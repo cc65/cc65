@@ -42,7 +42,6 @@
 #include "coll.h"
 #include "gentype.h"
 #include "hashtab.h"
-#include "inline.h"
 #include "strbuf.h"
 
 
@@ -75,15 +74,11 @@ struct Span{
 
 
 
-#if defined(HAVE_INLINE)
-INLINE unsigned long GetSpanSize (const Span* R)
+static inline unsigned long GetSpanSize (const Span* R)
 /* Return the span size in bytes */
 {
     return (R->End - R->Start);
 }
-#else
-#  define GetSpanSize(R)   ((R)->End - (R)->Start)
-#endif
 
 void SetSpanType (Span* S, const StrBuf* Type);
 /* Set the generic type of the span to Type */

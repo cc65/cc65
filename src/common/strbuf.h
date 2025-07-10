@@ -44,7 +44,6 @@
 /* common */
 #include "attrib.h"
 #include "check.h"
-#include "inline.h"
 
 
 
@@ -53,10 +52,17 @@
 /*****************************************************************************/
 
 
+/* We want to track whether a character is "raw" or not. */
+/* "raw" characters should NOT be translated when translating a string. */
+/* We do this by keeping a second array parallel to "Buf" called "Cooked". */
+/* Think of "cooked" as the inverse of "raw". */
+/* If Cooked[n] is 0, then the character is raw and should not be translated. */
+/* This was done to keep LIT_STR_BUFFER sane. */
 
 typedef struct StrBuf StrBuf;
 struct StrBuf {
     char*       Buf;                    /* Pointer to buffer */
+    char*       Cooked;                 /* Pointer to cooked buffer */
     unsigned    Len;                    /* Length of the string */
     unsigned    Index;                  /* Used for reading (Get and friends) */
     unsigned    Allocated;              /* Size of allocated memory */
@@ -66,13 +72,13 @@ struct StrBuf {
 extern const StrBuf EmptyStrBuf;
 
 /* Initializer for static string bufs */
-#define STATIC_STRBUF_INITIALIZER       { 0, 0, 0, 0 }
+#define STATIC_STRBUF_INITIALIZER       { 0, 0, 0, 0, 0 }
 
 /* Initializer for auto string bufs */
-#define AUTO_STRBUF_INITIALIZER         { 0, 0, 0, 0 }
+#define AUTO_STRBUF_INITIALIZER         { 0, 0, 0, 0, 0 }
 
 /* Initialize with a string literal (beware: evaluates str twice!) */
-#define LIT_STRBUF_INITIALIZER(str)     { (char*)str, sizeof(str)-1, 0, 0 }
+#define LIT_STRBUF_INITIALIZER(str)     { (char*)str, (char *)str, sizeof(str)-1, 0, 0 }
 
 
 
@@ -82,16 +88,12 @@ extern const StrBuf EmptyStrBuf;
 
 
 
-#if defined(HAVE_INLINE)
-INLINE StrBuf* SB_Init (StrBuf* B)
+static inline StrBuf* SB_Init (StrBuf* B)
 /* Initialize a string buffer */
 {
     *B = EmptyStrBuf;
     return B;
 }
-#else
-StrBuf* SB_Init (StrBuf* B);
-#endif
 
 StrBuf* SB_InitFromString (StrBuf* B, const char* S);
 /* Initialize a string buffer from a literal string. Beware: The buffer won't
@@ -114,190 +116,126 @@ void SB_Realloc (StrBuf* B, unsigned NewSize);
 ** available.
 */
 
-#if defined(HAVE_INLINE)
-INLINE unsigned SB_GetLen (const StrBuf* B)
+static inline unsigned SB_GetLen (const StrBuf* B)
 /* Return the length of the buffer contents */
 {
     return B->Len;
 }
-#else
-#  define SB_GetLen(B)  (B)->Len
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned SB_GetIndex (const StrBuf* B)
+static inline unsigned SB_GetIndex (const StrBuf* B)
 /* Return the user index of the string buffer */
 {
     return B->Index;
 }
-#else
-#  define SB_GetIndex(B)  (B)->Index
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SB_SetIndex (StrBuf* B, unsigned Index)
+static inline void SB_SetIndex (StrBuf* B, unsigned Index)
 /* Set the user index of the string buffer */
 {
     B->Index = Index;
 }
-#else
-#  define SB_SetIndex(B, Idx) ((B)->Index = (Idx))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE const char* SB_GetConstBuf (const StrBuf* B)
+static inline const char* SB_GetConstBuf (const StrBuf* B)
 /* Return a buffer pointer */
 {
     return B->Buf;
 }
-#else
-#  define SB_GetConstBuf(B)     (B)->Buf
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE char* SB_GetBuf (StrBuf* B)
+static inline char* SB_GetBuf (StrBuf* B)
 /* Return a buffer pointer */
 {
     return B->Buf;
 }
-#else
-#  define SB_GetBuf(B)     (B)->Buf
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE char SB_At (const StrBuf* B, unsigned Index)
+static inline char* SB_GetCooked (StrBuf* B)
+/* Return a cooked pointer */
+{
+    return B->Cooked;
+}
+
+static inline char SB_At (const StrBuf* B, unsigned Index)
 /* Get a character from the buffer */
 {
     PRECONDITION (Index < B->Len);
     return B->Buf[Index];
 }
-#else
-char SB_At (const StrBuf* B, unsigned Index);
-/* Get a character from the buffer */
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE char SB_AtUnchecked (const StrBuf* B, unsigned Index)
+static inline char SB_AtUnchecked (const StrBuf* B, unsigned Index)
 /* Get a character from the buffer */
 {
     return B->Buf[Index];
 }
-#else
-#  define SB_AtUnchecked(B, Index)      ((B)->Buf[Index])
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SB_IsEmpty (const StrBuf* B)
+static inline int SB_IsEmpty (const StrBuf* B)
 /* Return true if the string buffer is empty */
 {
     return (B->Len == 0);
 }
-#else
-#  define SB_IsEmpty(B) ((B)->Len == 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SB_NotEmpty (const StrBuf* B)
+static inline int SB_NotEmpty (const StrBuf* B)
 /* Return true if the string buffer is not empty */
 {
     return (B->Len > 0);
 }
-#else
-#  define SB_NotEmpty(B) ((B)->Len > 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SB_Clear (StrBuf* B)
+static inline void SB_Clear (StrBuf* B)
 /* Clear the string buffer (make it empty) */
 {
     B->Len = B->Index = 0;
 }
-#else
-#  define SB_Clear(B)   ((B)->Len = (B)->Index = 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SB_Reset (StrBuf* B)
+static inline void SB_Reset (StrBuf* B)
 /* Reset the string buffer index to zero */
 {
     B->Index = 0;
 }
-#else
-#  define SB_Reset(B)   ((B)->Index = 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE char SB_Get (StrBuf* B)
+static inline char SB_Get (StrBuf* B)
 /* Return the next character from the string incrementing Index. Returns NUL
 ** if the end of the string is reached.
 */
 {
     return (B->Index < B->Len)? B->Buf[B->Index++] : '\0';
 }
-#else
-#  define SB_Get(B)     (((B)->Index < (B)->Len)? (B)->Buf[(B)->Index++] : '\0')
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE char SB_Peek (const StrBuf* B)
+static inline char SB_Peek (const StrBuf* B)
 /* Look at the next character from the string without incrementing Index.
 ** Returns NUL if the end of the string is reached.
 */
 {
     return (B->Index < B->Len)? B->Buf[B->Index] : '\0';
 }
-#else
-#  define SB_Peek(B)     (((B)->Index < (B)->Len)? (B)->Buf[(B)->Index] : '\0')
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE char SB_LookAt (const StrBuf* B, unsigned Index)
+static inline char SB_LookAt (const StrBuf* B, unsigned Index)
 /* Look at a specific character from the string. Returns NUL if the given
 ** index is greater than the size of the string.
 */
 {
     return (Index < B->Len)? B->Buf[Index] : '\0';
 }
-#else
-#  define SB_LookAt(B,Index)     (((Index) < (B)->Len)? (B)->Buf[(Index)] : '\0')
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE char SB_LookAtLast (const StrBuf* B)
+static inline char SB_LookAtLast (const StrBuf* B)
 /* Look at the last character from the string. Returns NUL if the string buffer
 ** is empty.
 */
 {
     return (B->Len > 0)? B->Buf[B->Len-1] : '\0';
 }
-#else
-#  define SB_LookAtLast(B)      (((B)->Len > 0)? (B)->Buf[(B)->Len-1] : '\0')
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SB_Skip (StrBuf* B)
+static inline void SB_Skip (StrBuf* B)
 /* Skip the next character in the string buffer if this is possible. */
 {
     if (B->Index < B->Len) {
         ++B->Index;
     }
 }
-#else
-#  define SB_Skip(B)     do { if ((B)->Index < (B)->Len) ++(B)->Index; } while (0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SB_SkipMultiple (StrBuf* B, unsigned Count)
+static inline void SB_SkipMultiple (StrBuf* B, unsigned Count)
 /* Skip a number of characters in the string buffer if this is possible. */
 {
     if ((B->Index += Count) > B->Len) {
         B->Index = B->Len;
     }
 }
-#else
-#  define SB_SkipMultiple(B, Count)     \
-        do { if (((B)->Index += (Count)) > (B)->Len) (B)->Index = (B)->Len; } while (0)
-#endif
 
 void SB_Drop (StrBuf* B, unsigned Count);
 /* Drop characters from the end of the string. */
@@ -310,59 +248,50 @@ void SB_Terminate (StrBuf* B);
 void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size);
 /* Copy Buf to Target, discarding the old contents of Target */
 
-#if defined(HAVE_INLINE)
-INLINE void SB_CopyStr (StrBuf* Target, const char* S)
+void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char *Cooked, unsigned Size);
+/* Copy Buf and Cooked to Target, discarding the old contents of Target */
+
+static inline void SB_CopyStr (StrBuf* Target, const char* S)
 /* Copy S to Target, discarding the old contents of Target */
 {
-    SB_CopyBuf (Target, S, strlen (S));
+    SB_CopyBuf (Target, S, (unsigned)strlen (S));
 }
-#else
-void SB_CopyStr (StrBuf* Target, const char* S);
-/* Copy S to Target, discarding the old contents of Target */
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SB_Copy (StrBuf* Target, const StrBuf* Source)
+static inline void SB_Copy (StrBuf* Target, const StrBuf* Source)
 /* Copy Source to Target, discarding the old contents of Target */
 {
-    SB_CopyBuf (Target, Source->Buf, Source->Len);
+    SB_CopyBufCooked (Target, Source->Buf, Source->Cooked, Source->Len);
     Target->Index = Source->Index;
 }
-#else
-void SB_Copy (StrBuf* Target, const StrBuf* Source);
-/* Copy Source to Target, discarding the old contents of Target */
-#endif
 
 void SB_AppendChar (StrBuf* B, int C);
 /* Append a character to a string buffer */
 
+void SB_AppendCharCooked (StrBuf* B, int C, int Cooked);
+/* Append a character to a string buffer, raw if Cooked == 0 */
+
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size);
 /* Append a character buffer to the end of the string buffer */
 
-#if defined(HAVE_INLINE)
-INLINE void SB_AppendStr (StrBuf* B, const char* S)
+static inline void SB_AppendStr (StrBuf* B, const char* S)
 /* Append a string to the end of the string buffer */
 {
-    SB_AppendBuf (B, S, strlen (S));
+    SB_AppendBuf (B, S, (unsigned)strlen (S));
 }
-#else
-void SB_AppendStr (StrBuf* B, const char* S);
-/* Append a string to the end of the string buffer */
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SB_Append (StrBuf* Target, const StrBuf* Source)
+static inline void SB_Append (StrBuf* Target, const StrBuf* Source)
 /* Append the contents of Source to Target */
 {
-    SB_AppendBuf (Target, Source->Buf, Source->Len);
+    unsigned NewLen = Target->Len + Source->Len;
+    if (NewLen > Target->Allocated) {
+        SB_Realloc (Target, NewLen);
+    }
+    memcpy (Target->Buf + Target->Len, Source->Buf, Source->Len);
+    memcpy (Target->Cooked + Target->Len, Source->Cooked, Source->Len);
+    Target->Len = NewLen;
 }
-#else
-void SB_Append (StrBuf* Target, const StrBuf* Source);
-/* Append the contents of Source to Target */
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void SB_Cut (StrBuf* B, unsigned Len)
+static inline void SB_Cut (StrBuf* B, unsigned Len)
 /* Cut the contents of B at the given length. If the current length of the
 ** buffer is smaller than Len, nothing will happen.
 */
@@ -371,12 +300,6 @@ INLINE void SB_Cut (StrBuf* B, unsigned Len)
         B->Len = Len;
     }
 }
-#else
-void SB_Cut (StrBuf* B, unsigned Len);
-/* Cut the contents of B at the given length. If the current length of the
-** buffer is smaller than Len, nothing will happen.
-*/
-#endif
 
 void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Len);
 /* Copy a slice from Source into Target. The current contents of Target are

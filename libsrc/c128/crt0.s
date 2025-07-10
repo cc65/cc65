@@ -9,7 +9,6 @@
         .import         push0, callmain
         .import         RESTOR, BSOUT, CLRCH
         .import         __MAIN_START__, __MAIN_SIZE__, __STACKSIZE__
-        .importzp       ST
 
         .include        "zeropage.inc"
         .include        "c128.inc"
@@ -39,7 +38,7 @@ Start:
 ; Save the zero-page locations that we need.
 
         ldx     #zpspace-1
-L1:     lda     sp,x
+L1:     lda     c_sp,x
         sta     zpsave,x
         dex
         bpl     L1
@@ -58,12 +57,21 @@ L1:     lda     sp,x
 
         lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        sta     sp
-        stx     sp+1            ; Set argument stack ptr
+        sta     c_sp
+        stx     c_sp+1          ; Set argument stack ptr
 
 ; Call the module constructors.
 
         jsr     initlib
+
+; Disable the BASIC part of the IRQ handler. It would usually (once per frame)
+; copy the VIC shadow register, move sprites, play music. This would only get
+; in the way, so we turn it off.
+
+        lda     INIT_STATUS
+        sta     initsave
+        and     #$fe
+        sta     INIT_STATUS
 
 ; Set the bank for the file name to our execution bank. We must do this
 ; *after* calling the constructors because some of them might depend on
@@ -85,14 +93,19 @@ _exit:  pha                     ; Save the return code on stack
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
-        sta     sp,x
+        sta     c_sp,x
         dex
         bpl     L2
+
+; Enable the BASIC interrupt again
+
+        lda     initsave
+        sta     INIT_STATUS
 
 ; Place the program return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Reset the stack and the memory configuration.
 
@@ -116,5 +129,6 @@ zpsave: .res    zpspace
 
 .bss
 
-spsave: .res    1
-mmusave:.res    1
+spsave:   .res    1
+mmusave:  .res    1
+initsave: .res    1

@@ -11,10 +11,8 @@
         .import         poplsargs, udiv32, negeax
         .importzp       sreg, ptr1, ptr2, tmp1, tmp3, tmp4
 
-        .macpack        cpu
-
 tosmod0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -23,7 +21,7 @@ tosmod0ax:
         sty     sreg+1
 .endif
 
-tosmodeax:                         
+tosmodeax:
         jsr     poplsargs       ; Get arguments from stack, adjust sign
         jsr     udiv32          ; Do the division, remainder is in (ptr2:tmp3:tmp4)
 

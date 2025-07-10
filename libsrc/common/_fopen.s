@@ -9,7 +9,7 @@
 
         .import         _open
         .import         pushax, incsp4, return0
-        .importzp       sp, ptr1
+        .importzp       c_sp, ptr1
 
 
         .include        "errno.inc"
@@ -28,10 +28,10 @@
 ; Get a pointer to the mode string
 
         ldy     #1
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1+1
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1
 
 ; Look at the first character in mode
@@ -69,7 +69,7 @@
 
 invmode:
         lda     #EINVAL
-        jsr     __seterrno      ; Set __errno, returns zero in A
+        jsr     ___seterrno     ; Set __errno, returns zero in A
         tax                     ; a/x = 0
         jmp     incsp4
 
@@ -78,10 +78,10 @@ invmode:
 
 modeok: ldy     #$00
         txa                     ; Mode -> A
-        sta     (sp),y
+        sta     (c_sp),y
         tya
         iny
-        sta     (sp),y
+        sta     (c_sp),y
         ldy     #4              ; Size of arguments in bytes
         jsr     _open           ; Will cleanup the stack
 
@@ -91,7 +91,7 @@ modeok: ldy     #$00
         bne     openok
         cmp     #$FF
         bne     openok
-        jmp     return0         ; Failure, errno/_oserror already set
+        jmp     return0         ; Failure, errno/__oserror already set
 
 ; Open call succeeded
 

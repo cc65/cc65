@@ -139,9 +139,10 @@ INSTALL:
         jsr     CMOVEY
         cli
 
-; Done, return zero (= MOUSE_ERR_OK)
+; Done
 
-        ldx     #$00
+        ldx     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         txa
         rts
 
@@ -229,11 +230,11 @@ MOVE:   sei                             ; No interrupts
         jsr     CMOVEY                  ; Set it
 
         ldy     #$01
-        lda     (sp),y
+        lda     (c_sp),y
         sta     XPos+1
         tax
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         sta     XPos                    ; New X position
 
         jsr     CMOVEX                  ; Move the cursor
@@ -297,8 +298,8 @@ INFO:   jsr     POS
 ; Must return an error code in a/x.
 ;
 
-IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
-        ldx     #>MOUSE_ERR_INV_IOCTL
+IOCTL:  lda     #MOUSE_ERR_INV_IOCTL    ; We don't support ioclts for now
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------

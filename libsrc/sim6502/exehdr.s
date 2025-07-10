@@ -5,7 +5,7 @@
 ;
 
         .export         __EXEHDR__ : absolute = 1       ; Linker referenced
-        .importzp       sp
+        .importzp       c_sp
         .import         __MAIN_START__
         .import         startup
 
@@ -13,7 +13,15 @@
 
         .byte   $73, $69, $6D, $36, $35        ; 'sim65'
         .byte   2                              ; header version
-        .byte   .defined(__SIM65C02__)         ; CPU type
-        .byte   sp                             ; sp address
+.if (.cpu .bitand ::CPU_ISET_6502X)
+        .byte   2
+.elseif (.cpu .bitand ::CPU_ISET_65C02)
+        .byte   1
+.elseif (.cpu .bitand ::CPU_ISET_6502)
+        .byte   0
+.else
+        .error Unknown CPU type.
+.endif
+        .byte   c_sp                           ; c_sp address
         .addr   __MAIN_START__                 ; load address
         .addr   startup                        ; reset address

@@ -67,7 +67,6 @@
 #define COLOR_WHITE             WHITE
 #define COLOR_RED               RED
 #define COLOR_CYAN              CYAN
-#define COLOR_VIOLET            PURPLE
 #define COLOR_PURPLE            PURPLE
 #define COLOR_GREEN             GREEN
 #define COLOR_BLUE              BLUE
@@ -85,7 +84,6 @@
 #define TGI_COLOR_WHITE         COLOR_WHITE
 #define TGI_COLOR_RED           COLOR_RED
 #define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
 #define TGI_COLOR_PURPLE        COLOR_PURPLE
 #define TGI_COLOR_GREEN         COLOR_GREEN
 #define TGI_COLOR_BLUE          COLOR_BLUE

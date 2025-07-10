@@ -67,6 +67,10 @@
 #  include <pet.h>
 #elif defined(__CX16__)   && !defined(_CX16_H)
 #  include <cx16.h>
+#elif defined(__C65__)   && !defined(_C65_H)
+#  include <c65.h>
+#elif defined(__MEGA65__)   && !defined(_MEGA65_H)
+#  include <mega65.h>
 #endif
 
 /* Include definitions for CBM file types */
@@ -225,7 +229,7 @@ void cbm_k_untlk (void);
 
 
 
-/* The cbm_* I/O functions below set _oserror (see errno.h),
+/* The cbm_* I/O functions below set __oserror (see errno.h),
 ** in case of an error.
 **
 ** error-code   BASIC error
@@ -251,7 +255,7 @@ unsigned int __fastcall__ cbm_load (const char* name, unsigned char device, void
 ** address of the file if "data" is the null pointer (like load"name",8,1
 ** in BASIC).
 ** Returns number of bytes that were loaded if loading was successful;
-** otherwise 0, "_oserror" contains an error-code, then (see table above).
+** otherwise 0, "__oserror" contains an error-code, then (see table above).
 */
 
 unsigned char __fastcall__ cbm_save (const char* name, unsigned char device,
@@ -274,7 +278,7 @@ void __fastcall__ cbm_close (unsigned char lfn);
 int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size);
 /* Reads up to "size" bytes from a file into "buffer".
 ** Returns the number of actually-read bytes, 0 if there are no bytes left.
-** -1 in case of an error; then, _oserror contains an error-code (see table
+** -1 in case of an error; then, __oserror contains an error-code (see table
 ** above).  (Remember:  0 means end-of-file; -1 means error.)
 */
 
@@ -282,7 +286,7 @@ int __fastcall__ cbm_write (unsigned char lfn, const void* buffer,
                             unsigned int size);
 /* Writes up to "size" bytes from "buffer" to a file.
 ** Returns the number of actually-written bytes, or -1 in case of an error;
-** _oserror contains an error-code, then (see above table).
+** __oserror contains an error-code, then (see above table).
 */
 
 unsigned char cbm_opendir (unsigned char lfn, unsigned char device, ...);

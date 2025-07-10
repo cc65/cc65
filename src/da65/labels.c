@@ -33,15 +33,17 @@
 
 
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
 /* common */
+#include "coll.h"
+#include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 
 /* da65 */
-#include "attrtab.h"
 #include "code.h"
 #include "comments.h"
 #include "error.h"
@@ -57,8 +59,85 @@
 
 
 
-/* Symbol table */
-static const char* SymTab[0x10000];
+/* Label structure how it is found in the label table */
+typedef struct Label Label;
+struct Label {
+    struct Label*       Next;           /* Next entry in linked list */
+    uint32_t            Addr;           /* The full address */
+    char                Name[1];        /* Symbol name, dynamically allocated */
+};
+
+/* Labels use a hash table and a linear list for collision resolution. The
+** hash function is easy and effective. It evaluates just the lower bits of
+** the address.
+*/
+#define LABEL_HASH_SIZE         4096u   /* Must be power of two */
+static Label* LabelTab[LABEL_HASH_SIZE];
+
+/* Total number of labels */
+static unsigned long LabelCount = 0;
+
+
+
+/*****************************************************************************/
+/*                               struct Label                                */
+/*****************************************************************************/
+
+
+
+static Label* NewLabel (uint32_t Addr, const char* Name)
+/* Create a new label structure and return it */
+{
+    /* Get the length of the name */
+    unsigned Len = strlen (Name);
+
+    /* Create a new label */
+    Label* L = xmalloc (sizeof (Label) + Len);
+
+    /* Fill in the data */
+    L->Next = 0;
+    L->Addr = Addr;
+    memcpy (L->Name, Name, Len + 1);
+
+    /* Return the label just created */
+    return L;
+}
+
+
+
+static uint32_t GetLabelHash (uint32_t Addr)
+/* Get the hash for a label at the given address */
+{
+    return (Addr & (LABEL_HASH_SIZE - 1));
+}
+
+
+
+static Label* FindLabel (uint32_t Addr)
+/* Search for a label for the given address and return it. Returns NULL if
+** no label exists for the address.
+*/
+{
+    Label* L = LabelTab[GetLabelHash (Addr)];
+    while (L) {
+        if (L->Addr == Addr) {
+            break;
+        }
+        L = L->Next;
+    }
+    return L;
+}
+
+
+
+static void InsertLabel (Label* L)
+/* Insert a label into the tables */
+{
+    /* Insert into hash table */
+    uint32_t Hash = GetLabelHash (L->Addr);
+    L->Next = LabelTab[Hash];
+    LabelTab[Hash] = L;
+}
 
 
 
@@ -68,19 +147,19 @@ static const char* SymTab[0x10000];
 
 
 
-static const char* MakeLabelName (unsigned Addr)
+static const char* MakeLabelName (uint32_t Addr)
 /* Make the default label name from the given address and return it in a
 ** static buffer.
 */
 {
     static char LabelBuf [32];
-    xsprintf (LabelBuf, sizeof (LabelBuf), "L%04X", Addr);
+    xsprintf (LabelBuf, sizeof (LabelBuf), "L%04" PRIX32, Addr);
     return LabelBuf;
 }
 
 
 
-static void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
+static void AddLabel (uint32_t Addr, attr_t Attr, const char* Name)
 /* Add a label */
 {
     /* Get an existing label attribute */
@@ -88,30 +167,37 @@ static void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
 
     /* Must not have two symbols for one address */
     if (ExistingAttr != atNoLabel) {
-        /* Allow redefinition if identical. Beware: Unnamed labels don't
-        ** have a name (you guessed that, didn't you?).
+        /* Allow redefinition if identical. Beware: Unnamed labels do not
+        ** have an entry in the label table.
         */
+        Label* L = FindLabel (Addr);
         if (ExistingAttr == Attr &&
-            ((Name == 0 && SymTab[Addr] == 0) ||
-             (Name != 0 && SymTab[Addr] != 0 &&
-             strcmp (SymTab[Addr], Name) == 0))) {
+            ((Name == 0 && L == 0) ||
+             (Name != 0 && L != 0 && strcmp (Name, L->Name) == 0))) {
             return;
         }
         Error ("Duplicate label for address $%04X (%s): '%s'", Addr,
-               SymTab[Addr] == 0 ? "<unnamed label>" : SymTab[Addr],
-               Name == 0 ? "<unnamed label>" : Name);
+               L? L->Name : "<unnamed label>",
+               Name? Name : "<unnamed label>");
     }
 
-    /* Create a new label (xstrdup will return NULL if input NULL) */
-    SymTab[Addr] = xstrdup (Name);
+    /* If this is not an unnamed label, create a new label entry and
+    ** insert it.
+    */
+    if (Name != 0) {
+        InsertLabel (NewLabel (Addr, Name));
+    }
 
     /* Remember the attribute */
     MarkAddr (Addr, Attr);
+
+    /* Count labels */
+    ++LabelCount;
 }
 
 
 
-void AddIntLabel (unsigned Addr)
+void AddIntLabel (uint32_t Addr)
 /* Add an internal label using the address to generate the name. */
 {
     AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
@@ -119,7 +205,7 @@ void AddIntLabel (unsigned Addr)
 
 
 
-void AddExtLabel (unsigned Addr, const char* Name)
+void AddExtLabel (uint32_t Addr, const char* Name)
 /* Add an external label */
 {
     AddLabel (Addr, atExtLabel, Name);
@@ -127,7 +213,7 @@ void AddExtLabel (unsigned Addr, const char* Name)
 
 
 
-void AddUnnamedLabel (unsigned Addr)
+void AddUnnamedLabel (uint32_t Addr)
 /* Add an unnamed label */
 {
     AddLabel (Addr, atUnnamedLabel, 0);
@@ -135,11 +221,27 @@ void AddUnnamedLabel (unsigned Addr)
 
 
 
-void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Offs)
+void AddDepLabel (uint32_t Addr, attr_t Attr, const char* BaseName, unsigned Offs)
 /* Add a dependent label at the given address using "basename+Offs" as the new
 ** name.
 */
 {
+    /* Create the new name in the buffer */
+    StrBuf Name = AUTO_STRBUF_INITIALIZER;
+    if (UseHexOffs) {
+        SB_Printf (&Name, "%s+$%02X", BaseName, Offs);
+    } else {
+        SB_Printf (&Name, "%s+%u", BaseName, Offs);
+    }
+
+    /* Define the labels */
+    AddLabel (Addr, Attr | atDepLabel, SB_GetConstBuf (&Name));
+
+    /* Free the name buffer */
+    SB_Done (&Name);
+
+
+
     /* Allocate memory for the dependent label name */
     unsigned NameLen = strlen (BaseName);
     char*    DepName = xmalloc (NameLen + 7);   /* "+$ABCD\0" */
@@ -160,7 +262,7 @@ void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Off
 
 
 
-static void AddLabelRange (unsigned Addr, attr_t Attr,
+static void AddLabelRange (uint32_t Addr, attr_t Attr,
                            const char* Name, unsigned Count)
 /* Add a label for a range. The first entry gets the label "Name" while the
 ** others get "Name+offs".
@@ -198,7 +300,7 @@ static void AddLabelRange (unsigned Addr, attr_t Attr,
 
 
 
-void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count)
+void AddIntLabelRange (uint32_t Addr, const char* Name, unsigned Count)
 /* Add an internal label for a range. The first entry gets the label "Name"
 ** while the others get "Name+offs".
 */
@@ -209,7 +311,7 @@ void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count)
 
 
 
-void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count)
+void AddExtLabelRange (uint32_t Addr, const char* Name, unsigned Count)
 /* Add an external label for a range. The first entry gets the label "Name"
 ** while the others get "Name+offs".
 */
@@ -220,7 +322,7 @@ void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count)
 
 
 
-int HaveLabel (unsigned Addr)
+int HaveLabel (uint32_t Addr)
 /* Check if there is a label for the given address */
 {
     /* Check for a label */
@@ -229,7 +331,7 @@ int HaveLabel (unsigned Addr)
 
 
 
-int MustDefLabel (unsigned Addr)
+int MustDefLabel (uint32_t Addr)
 /* Return true if we must define a label for this address, that is, if there
 ** is a label at this address, and it is an external or internal label.
 */
@@ -243,7 +345,7 @@ int MustDefLabel (unsigned Addr)
 
 
 
-const char* GetLabelName (unsigned Addr)
+const char* GetLabelName (uint32_t Addr)
 /* Return the label name for an address */
 {
     /* Get the label attribute */
@@ -256,13 +358,14 @@ const char* GetLabelName (unsigned Addr)
         return "";
     } else {
         /* Return the label if any */
-        return SymTab[Addr];
+        const Label* L = FindLabel (Addr);
+        return L? L->Name : 0;
     }
 }
 
 
 
-const char* GetLabel (unsigned Addr, unsigned RefFrom)
+const char* GetLabel (uint32_t Addr, uint32_t RefFrom)
 /* Return the label name for an address, as it is used in a label reference.
 ** RefFrom is the address the label is referenced from. This is needed in case
 ** of unnamed labels, to determine the name.
@@ -292,7 +395,7 @@ const char* GetLabel (unsigned Addr, unsigned RefFrom)
         */
         if (Addr <= RefFrom) {
             /* Search backwards */
-            unsigned I = RefFrom;
+            uint32_t I = RefFrom;
             while (Addr < I) {
                 --I;
                 A = GetLabelAttr (I);
@@ -310,7 +413,7 @@ const char* GetLabel (unsigned Addr, unsigned RefFrom)
 
         } else {
             /* Search forwards */
-            unsigned I = RefFrom;
+            uint32_t I = RefFrom;
             while (Addr > I) {
                 ++I;
                 A = GetLabelAttr (I);
@@ -326,22 +429,22 @@ const char* GetLabel (unsigned Addr, unsigned RefFrom)
             /* Return the label name */
             return FwdLabels[Count-1];
         }
-
     } else {
         /* Return the label if any */
-        return SymTab[Addr];
+        const Label* L = FindLabel (Addr);
+        return L? L->Name : 0;
     }
 }
 
 
 
-void ForwardLabel (unsigned Offs)
+void ForwardLabel (uint32_t Offs)
 /* If necessary, output a forward label, one that is within the next few
 ** bytes and is therefore output as "label = * + x".
 */
 {
     /* Calculate the actual address */
-    unsigned long Addr = PC + Offs;
+    uint32_t Addr = PC + Offs;
 
     /* Get the type of the label */
     attr_t A = GetLabelAttr (Addr);
@@ -355,7 +458,7 @@ void ForwardLabel (unsigned Offs)
     ** an error.
     */
     if (A == atUnnamedLabel) {
-        Error ("Cannot define unnamed label at address $%04lX", Addr);
+        Error ("Cannot define unnamed label at address $%04" PRIX32, Addr);
     }
 
     /* Output the label */
@@ -364,18 +467,33 @@ void ForwardLabel (unsigned Offs)
 
 
 
-static void DefOutOfRangeLabel (unsigned long Addr)
+static int CompareLabels (void* Data attribute ((unused)),
+                          const void* L1, const void* L2)
+/* Compare functions for sorting the out-of-range labels */
+{
+    if (((const Label*) L1)->Addr < ((const Label*) L2)->Addr) {
+        return -1;
+    } else if (((const Label*) L1)->Addr > ((const Label*) L2)->Addr) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+
+static void DefOutOfRangeLabel (const Label* L)
 /* Define one label that is outside code range. */
 {
-    switch (GetLabelAttr (Addr)) {
+    switch (GetLabelAttr (L->Addr)) {
 
         case atIntLabel:
         case atExtLabel:
-            DefConst (SymTab[Addr], GetComment (Addr), Addr);
+            DefConst (L->Name, GetComment (L->Addr), L->Addr);
             break;
 
         case atUnnamedLabel:
-            Error ("Cannot define unnamed label at address $%04lX", Addr);
+            Error ("Cannot define unnamed label at address $%04" PRIX32, L->Addr);
             break;
 
         default:
@@ -389,28 +507,48 @@ static void DefOutOfRangeLabel (unsigned long Addr)
 void DefOutOfRangeLabels (void)
 /* Output any labels that are out of the loaded code range */
 {
-    unsigned long Addr;
+    unsigned I;
 
-    SeparatorLine ();
+    /* This requires somewhat more effort since the labels output should be
+    ** sorted by address for better readability. This is not directly
+    ** possible when using a hash table, so an intermediate data structure
+    ** is required. It is not possible to collect out-of-range labels while
+    ** generating them, since they may come from an info file and are added
+    ** while no input file was read. Which means it cannot be determined at
+    ** that point if they're out-of-range or not.
+    */
+    Collection Labels = AUTO_COLLECTION_INITIALIZER;
+    CollGrow (&Labels, 128);
 
-    /* Low range */
-    Addr = 0;
-    while (Addr < CodeStart) {
-        DefOutOfRangeLabel (Addr++);
-    }
-
-    /* Skip areas in code range */
-    while (Addr <= CodeEnd) {
-        if (GetStyleAttr (Addr) == atSkip) {
-            DefOutOfRangeLabel (Addr);
+    /* Walk over the hash and copy all out-of-range labels */
+    for (I = 0; I < LABEL_HASH_SIZE; ++I) {
+        Label* L = LabelTab[I];
+        while (L) {
+            if (L->Addr < CodeStart || L->Addr > CodeEnd) {
+                CollAppend (&Labels, L);
+            }
+            L = L->Next;
         }
-        ++Addr;
     }
 
-    /* High range */
-    while (Addr < 0x10000) {
-        DefOutOfRangeLabel (Addr++);
-    }
+    /* Sort the out-of-range labels by address */
+    CollSort (&Labels, CompareLabels, 0);
 
+    /* Output the labels */
     SeparatorLine ();
+    for (I = 0; I < CollCount (&Labels); ++I) {
+        DefOutOfRangeLabel (CollConstAt (&Labels, I));
+    }
+    SeparatorLine ();
+
+    /* Free allocated storage */
+    DoneCollection (&Labels);
+}
+
+
+
+unsigned long GetLabelCount (void)
+/* Return the total number of labels defined so far */
+{
+    return LabelCount;
 }

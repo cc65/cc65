@@ -211,26 +211,36 @@ static void SymReplaceExprRefs (SymEntry* S)
 void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags)
 /* Define a new symbol */
 {
+    int Redef = 0;      /* Flag for symbol redefinition */
+
     if (S->Flags & SF_IMPORT) {
         /* Defined symbol is marked as imported external symbol */
-        Error ("Symbol '%m%p' is already an import", GetSymName (S));
+        Error ("Symbol `%m%p' is already an import", GetSymName (S));
+        if (CollCount (&S->DefLines) > 0) {
+            PNotification (GetSourcePos (CollAt(&S->DefLines, 0)),
+                           "The symbol was previously imported here");
+        }
         return;
     }
     if ((Flags & SF_VAR) != 0 && (S->Flags & (SF_EXPORT | SF_GLOBAL))) {
         /* Variable symbols cannot be exports or globals */
-        Error ("Var symbol '%m%p' cannot be an export or global symbol", GetSymName (S));
+        Error ("Var symbol `%m%p' cannot be an export or global symbol", GetSymName (S));
         return;
     }
     if (S->Flags & SF_DEFINED) {
         /* Multiple definition. In case of a variable, this is legal. */
         if ((S->Flags & SF_VAR) == 0) {
-            Error ("Symbol '%m%p' is already defined", GetSymName (S));
+            Error ("Symbol `%m%p' is already defined", GetSymName (S));
+            if (CollCount (&S->DefLines) > 0) {
+                PNotification (GetSourcePos (CollAt(&S->DefLines, 0)),
+                               "The symbol was previously defined here");
+            }
             S->Flags |= SF_MULTDEF;
             return;
         } else {
             /* Redefinition must also be a variable symbol */
             if ((Flags & SF_VAR) == 0) {
-                Error ("Symbol '%m%p' is already different kind", GetSymName (S));
+                Error ("Symbol `%m%p' is already different kind", GetSymName (S));
                 return;
             }
             /* Delete the current symbol expression, since it will get
@@ -238,6 +248,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
             */
             FreeExpr (S->Expr);
             S->Expr = 0;
+            Redef = 1;
         }
     }
 
@@ -285,14 +296,16 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
             S->ExportSize = S->AddrSize;
         } else if (S->AddrSize > S->ExportSize) {
             /* We're exporting a symbol smaller than it actually is */
-            Warning (1, "Symbol '%m%p' is %s but exported %s",
+            Warning (1, "Symbol `%m%p' is %s but exported %s",
                      GetSymName (S), AddrSizeToStr (S->AddrSize),
                      AddrSizeToStr (S->ExportSize));
         }
     }
 
-    /* If this is not a local symbol, remember it as the last global one */
-    if ((S->Flags & SF_LOCAL) == 0) {
+    /* If this is not a local symbol and not a redefinition for a variable
+    ** symbol, remember it as the last global one.
+    */
+    if ((S->Flags & SF_LOCAL) == 0 && !Redef) {
         SymLast = S;
     }
 }
@@ -315,13 +328,13 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 /* Mark the given symbol as an imported symbol */
 {
     if (S->Flags & SF_DEFINED) {
-        Error ("Symbol '%m%p' is already defined", GetSymName (S));
+        Error ("Symbol `%m%p' is already defined", GetSymName (S));
         S->Flags |= SF_MULTDEF;
         return;
     }
     if (S->Flags & SF_EXPORT) {
         /* The symbol is already marked as exported symbol */
-        Error ("Cannot import exported symbol '%m%p'", GetSymName (S));
+        Error ("Cannot import exported symbol `%m%p'", GetSymName (S));
         return;
     }
 
@@ -337,16 +350,16 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     */
     if (S->Flags & SF_IMPORT) {
         if ((Flags & SF_FORCED) != (S->Flags & SF_FORCED)) {
-            Error ("Redeclaration mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Redeclaration mismatch for symbol `%m%p'", GetSymName (S));
         }
         if (AddrSize != S->AddrSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
     }
     if (S->Flags & SF_GLOBAL) {
         S->Flags &= ~SF_GLOBAL;
         if (AddrSize != S->AddrSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
     }
 
@@ -369,12 +382,12 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     /* Check if it's ok to export the symbol */
     if (S->Flags & SF_IMPORT) {
         /* The symbol is already marked as imported external symbol */
-        Error ("Symbol '%m%p' is already an import", GetSymName (S));
+        Error ("Symbol `%m%p' is already an import", GetSymName (S));
         return;
     }
     if (S->Flags & SF_VAR) {
         /* Variable symbols cannot be exported */
-        Error ("Var symbol '%m%p' cannot be exported", GetSymName (S));
+        Error ("Var symbol `%m%p' cannot be exported", GetSymName (S));
         return;
     }
 
@@ -383,7 +396,7 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     */
     if (S->Flags & SF_GLOBAL) {
         if (AddrSize != S->ExportSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
         S->Flags &= ~SF_GLOBAL;
 
@@ -398,7 +411,7 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     */
     if ((S->Flags & (SF_EXPORT|SF_DEFINED)) == SF_EXPORT) {
         if (S->ExportSize != AddrSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
     }
     S->ExportSize = AddrSize;
@@ -412,7 +425,7 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
             S->ExportSize = S->AddrSize;
         } else if (S->AddrSize > S->ExportSize) {
             /* We're exporting a symbol smaller than it actually is */
-            Warning (1, "Symbol '%m%p' is %s but exported %s",
+            Warning (1, "Symbol `%m%p' is %s but exported %s",
                      GetSymName (S), AddrSizeToStr (S->AddrSize),
                      AddrSizeToStr (S->ExportSize));
         }
@@ -434,7 +447,7 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 {
     if (S->Flags & SF_VAR) {
         /* Variable symbols cannot be exported or imported */
-        Error ("Var symbol '%m%p' cannot be made global", GetSymName (S));
+        Error ("Var symbol `%m%p' cannot be made global", GetSymName (S));
         return;
     }
 
@@ -447,7 +460,7 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
             AddrSize = GetCurrentSegAddrSize ();
         }
         if (AddrSize != S->AddrSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
         return;
     }
@@ -459,12 +472,12 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
         if ((S->Flags & SF_DEFINED) == 0) {
             /* Symbol is undefined */
             if (AddrSize != S->ExportSize) {
-                Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+                Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
             }
         } else if (AddrSize != ADDR_SIZE_DEFAULT) {
             /* Symbol is defined and address size given */
             if (AddrSize != S->ExportSize) {
-                Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+                Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
             }
         }
         return;
@@ -476,7 +489,7 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     */
     if (S->Flags & SF_GLOBAL) {
         if (AddrSize != S->ExportSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
         return;
     }
@@ -494,7 +507,7 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
             S->ExportSize = S->AddrSize;
         } else if (S->AddrSize > S->ExportSize) {
             /* We're exporting a symbol smaller than it actually is */
-            Warning (1, "Symbol '%m%p' is %s but exported %s",
+            Warning (1, "Symbol `%m%p' is %s but exported %s",
                      GetSymName (S), AddrSizeToStr (S->AddrSize),
                      AddrSizeToStr (S->ExportSize));
         }
@@ -537,13 +550,25 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
     /* Check for errors */
     if (S->Flags & SF_IMPORT) {
         /* The symbol is already marked as imported external symbol */
-        Error ("Symbol '%m%p' is already an import", GetSymName (S));
+        Error ("Symbol `%m%p' is already an import", GetSymName (S));
         return;
     }
     if (S->Flags & SF_VAR) {
         /* Variable symbols cannot be exported or imported */
-        Error ("Var symbol '%m%p' cannot be exported", GetSymName (S));
+        Error ("Var symbol `%m%p' cannot be exported", GetSymName (S));
         return;
+    }
+
+    /* If the symbol is already defined, check symbol size against the
+    ** exported size.
+    */
+    if (S->Flags & SF_DEFINED) {
+        if (AddrSize == ADDR_SIZE_DEFAULT) {
+            /* Use the real size of the symbol */
+            AddrSize = S->AddrSize;
+        } else if (S->AddrSize != AddrSize) {
+            Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
+        }
     }
 
     /* If the symbol was already marked as an export or global, check if
@@ -552,30 +577,18 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
     */
     if (S->Flags & (SF_EXPORT | SF_GLOBAL)) {
         if (S->ExportSize != AddrSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
         S->Flags &= ~SF_GLOBAL;
     }
     S->ExportSize = AddrSize;
-
-    /* If the symbol is already defined, check symbol size against the
-    ** exported size.
-    */
-    if (S->Flags & SF_DEFINED) {
-        if (S->ExportSize == ADDR_SIZE_DEFAULT) {
-            /* Use the real size of the symbol */
-            S->ExportSize = S->AddrSize;
-        } else if (S->AddrSize != S->ExportSize) {
-            Error ("Address size mismatch for symbol '%m%p'", GetSymName (S));
-        }
-    }
 
     /* If the symbol already was declared as a condes of this type,
     ** check if the new priority value is the same as the old one.
     */
     if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
         if (S->ConDesPrio[Type] != Prio) {
-            Error ("Redeclaration mismatch for symbol '%m%p'", GetSymName (S));
+            Error ("Redeclaration mismatch for symbol `%m%p'", GetSymName (S));
         }
     }
     S->ConDesPrio[Type] = Prio;

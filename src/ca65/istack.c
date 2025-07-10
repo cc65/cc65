@@ -81,7 +81,7 @@ void PushInput (int (*Func) (void*), void* Data, const char* Desc)
     /* Check for a stack overflow */
     if (ICount > ISTACK_MAX) {
         Fatal ("Maximum input stack nesting exceeded");
-    }                                                
+    }
 
     /* Create a new stack element */
     E = xmalloc (sizeof (*E));
@@ -93,6 +93,7 @@ void PushInput (int (*Func) (void*), void* Data, const char* Desc)
 
     /* Push it */
     E->Next = IStack;
+    ICount++;
     IStack  = E;
 }
 
@@ -111,7 +112,7 @@ void PopInput (void)
 
     /* Pop it */
     IStack = IStack->Next;
-
+    ICount--;
     /* And delete it */
     xfree (E);
 }
@@ -156,3 +157,33 @@ void CheckInputStack (void)
         Error ("Open %s", IStack->Desc);
     }
 }
+
+unsigned GetStackDepth (void)
+{
+    return ICount;
+}
+
+
+InputStack RetrieveInputStack (void)
+/* Retrieve the current input stack. This will also clear it. Used when
+** including a file. The current input stack is stored together with the old
+** input file and restored when the file is closed.
+ */
+{
+    /* We do not touch the counter so input sources are counted across
+    ** includes.
+     */
+    InputStack S = IStack;
+    IStack = 0;
+    return S;
+}
+
+
+
+void RestoreInputStack (InputStack S)
+/* Restore an old input stack that was retrieved by RetrieveInputStack(). */
+{
+    CHECK (IStack == 0);
+    IStack = S;
+}
+

@@ -281,7 +281,7 @@ const ConDesImport* ConDesGetImport (unsigned Type)
     /* Check the parameters */
     PRECONDITION (Type <= CD_TYPE_MAX);
 
-    /* Return the import */    
+    /* Return the import */
     Import = &ConDes[Type].Import;
     return (Import->Name != INVALID_STRING_ID)? Import : 0;
 }

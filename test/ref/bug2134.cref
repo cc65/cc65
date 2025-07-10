@@ -1,0 +1,2 @@
+bug2134.c:1: Warning: Braces around scalar initializer
+bug2134.c:2: Warning: Braces around scalar initializer

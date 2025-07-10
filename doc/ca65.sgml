@@ -127,7 +127,7 @@ Long options:
   --memory-model model          Set the memory model
   --no-utf8                     Disable use of UTF-8 in diagnostics
   --pagelength n                Set the page length for the listing
-  --relax-checks                Disables some error checks
+  --relax-checks                Relax some checks (see docs)
   --segment-list                Generate segment offsets in listing
   --smart                       Enable smart mode
   --target sys                  Set the target system

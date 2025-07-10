@@ -195,6 +195,9 @@ void PrintExportMapByValue (FILE* F);
 void PrintImportMap (FILE* F);
 /* Print an import map to the given file */
 
+void PrintLabelLine (FILE* F, unsigned NameId, long Val);
+/* Output one label into a vice label file doing some cleanup on the name. */
+
 void PrintExportLabels (FILE* F);
 /* Print the exports in a VICE label file */
 

@@ -12,7 +12,7 @@
             .include "jumptab.inc"
             .include "diskdrv.inc"
             .include "geossym.inc"
-        
+
 _GetBlock:
         sta r4L
         stx r4H

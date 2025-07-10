@@ -1,7 +1,7 @@
 #include <string.h>
 #include "unittest.h"
 
-                                                        
+
 /* Test string. Must NOT have duplicate characters! */
 static char S[] = "Helo wrd!\n";
 

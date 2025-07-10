@@ -6,20 +6,73 @@
 ; Almost 7 times faster, uses no RAM (vs 14 bytes BSS), and takes 1/4 the space
 ; vs the official C source.
 ;
+;
+; C implementation was:
 
-        .importzp       sp, sreg, regsave, regbank
+; void decompress_lz4 (unsigned char *in, unsigned char *out, const int outlen) {
+;   unsigned char token, tmp;
+;   unsigned int offset;
+;   unsigned char *end = out+outlen;
+;   unsigned char *copysrc;
+;
+;   while (out < end) {
+;     token = *in++;
+;     offset = token >> 4;
+;
+;     token &= 0x0f;
+;     token += 4; // Minmatch
+;
+;     if (offset == 15) {
+; moreliterals:
+;       tmp = *in++;
+;       offset += tmp;
+;       if (tmp == 255)
+;         goto moreliterals;
+;     }
+;
+;     if (offset) {
+;       memcpy(out, in, offset);
+;       out += offset;
+;       in += offset;
+;     }
+;
+;     if (out >= end) {
+;       return;
+;     }
+;
+;     offset = (*in);
+;     in++;
+;     offset += (*in)<<8;
+;     in++;
+;
+;     copysrc = out - offset;
+;     offset = token;
+;
+;     if (token == 19) {
+; morematches:
+;       tmp = *in++;
+;       offset += tmp;
+;       if (tmp == 255)
+;         goto morematches;
+;     }
+;
+;     memcpy(out, copysrc, offset);
+;     out += offset;
+;   }
+; }
+
+        .importzp       c_sp, sreg, regsave, regbank
         .importzp       tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
         .macpack        longbranch
         .import         memcpy_upwards,pushax,popax
         .export         _decompress_lz4
 
 out = regsave
-written = regsave + 2
+end = regsave + 2
 tmp = tmp1
 token = tmp2
 offset = ptr3
 in = sreg
-outlen = ptr4
 
 ; ---------------------------------------------------------------
 ; void decompress_lz4 (const u8 *in, u8 * const out, const u16 outlen)
@@ -29,37 +82,43 @@ outlen = ptr4
 
 .proc   _decompress_lz4: near
 
-        sta     outlen
-        stx     outlen+1
+        sta     tmp
+        stx     tmp+1
 
+;
+; end = out + outlen;
+;
         jsr     popax
         sta     out
-        stx     out+1
+        clc
+        adc     tmp
+        sta     end
+        txa
+        sta     out+1
+        adc     tmp+1
+        sta     end+1
 
         jsr     popax
         sta     in
         stx     in+1
 
 ;
-; written = 0;
+; while (out < end) {
 ;
-        lda     #$00
-        sta     written
-;
-; while (written < outlen) {
-;
-        jmp     L0046
+        jmp     check_len
 ;
 ; token = *in++;
 ;
-L0004:  ldy     #$00
+get_token:
+        ldy     #$00
         lda     (in),y
-        sta     token
+        tay                   ; Backup token to Y
 
         inc     in
-        bne     L000A
+        bne     :+
         inc     in+1
-L000A:
+
+:
 ;
 ; offset = token >> 4;
 ;
@@ -74,7 +133,7 @@ L000A:
 ; token &= 0xf;
 ; token += 4; // Minmatch
 ;
-        lda     token
+        tya                   ; Get token back from Y
         and     #$0F
         clc
         adc     #$04
@@ -84,7 +143,8 @@ L000A:
 ;
         lda     offset
         cmp     #$0F
-L0013:  bne     L001A
+moreliterals:
+        bne     check_offset_not_zero
 ;
 ; tmp = *in++;
 ;
@@ -93,9 +153,10 @@ L0013:  bne     L001A
         sta     tmp
 
         inc     in
-        bne     L0017
+        bne     :+
         inc     in+1
-L0017:
+
+:
 ;
 ; offset += tmp;
 ;
@@ -113,24 +174,20 @@ L0017:
 ;
 ; goto moreliterals;
 ;
-        jmp     L0013
+        jmp     moreliterals
 ;
 ; if (offset) {
 ;
-L001A:  lda     offset
+check_offset_not_zero:
+        lda     offset
         ora     offset+1
-        beq     L001C
+        beq     check_end
 ;
-; memcpy(&out[written], in, offset);
+; memcpy(out, in, offset);
 ;
         lda     out
-        clc
-        adc     written
         sta     ptr2
-        lda     out+1
-        adc     written+1
-        tax
-        lda     ptr2
+        ldx     out+1
         stx     ptr2+1
         jsr     pushax
         lda     in
@@ -140,15 +197,15 @@ L001A:  lda     offset
 ;        ldy     #$00 - not needed as pushax zeroes Y
         jsr     memcpy_upwards
 ;
-; written += offset;
+; out += offset;
+; memcpy returned a pointer to out
 ;
-        lda     offset
         clc
-        adc     written
-        sta     written
-        lda     offset+1
-        adc     written+1
-        sta     written+1
+        adc     offset
+        sta     out
+        txa
+        adc     offset+1
+        sta     out+1
 ;
 ; in += offset;
 ;
@@ -160,21 +217,23 @@ L001A:  lda     offset
         adc     in+1
         sta     in+1
 ;
-; if (written >= outlen)
+; if (out >= end)
 ;
-L001C:  lda     written
-        cmp     outlen
-        lda     written+1
-        sbc     outlen+1
+check_end:
+        lda     out
+        cmp     end
+        lda     out+1
+        sbc     end+1
 ;
 ; return;
 ;
-        bcc     L0047
+        bcc     end_not_reached
         rts
 ;
 ; memcpy(&offset, in, 2);
 ;
-L0047:  ldy     #$00
+end_not_reached:
+        ldy     #$00
         lda     (in),y
         sta     offset
         iny
@@ -187,23 +246,18 @@ L0047:  ldy     #$00
         clc
         adc     in
         sta     in
-        bcc     L002F
+        bcc     :+
         inc     in+1
+
+:
 ;
-; copysrc = out + written - offset;
+; copysrc = out - offset;
 ;
-L002F:  lda     out
-        clc
-        adc     written
-        tay
-        lda     out+1
-        adc     written+1
-        tax
-        tya
+        lda     out
         sec
         sbc     offset
         sta     ptr1
-        txa
+        lda     out+1
         sbc     offset+1
         sta     ptr1+1
 ;
@@ -217,7 +271,8 @@ L002F:  lda     out
 ; if (token == 19) {
 ;
         cmp     #$13
-L0045:  bne     L003C
+morematches:
+        bne     token_not_19
 ;
 ; tmp = *in++;
 ;
@@ -226,9 +281,9 @@ L0045:  bne     L003C
         sta     tmp
 
         inc     in
-        bne     L0039
+        bne     :+
         inc     in+1
-L0039:
+:
 ;
 ; offset += tmp;
 ;
@@ -246,41 +301,36 @@ L0039:
 ;
 ; goto morematches;
 ;
-        jmp     L0045
+        jmp     morematches
 ;
-; memcpy(&out[written], copysrc, offset);
+; memcpy(out, copysrc, offset);
 ;
-L003C:  lda     out
-        clc
-        adc     written
+token_not_19:
+        lda     out
         sta     ptr2
-        lda     out+1
-        adc     written+1
-        tax
-        lda     ptr2
+        ldx     out+1
         stx     ptr2+1
         jsr     pushax
         jsr     memcpy_upwards
 ;
-; written += offset;
+; out += offset;
 ;
-        lda     offset
         clc
-        adc     written
-        sta     written
-        lda     offset+1
-        adc     written+1
-L0046:  sta     written+1
+        adc     offset
+        sta     out
+        txa
+        adc     offset+1
+        sta     out+1     ; 0 on the first loop iteration
+check_len:
 ;
-; while (written < outlen) {
+; while (out < end) {
 ;
-        lda     written
-        cmp     outlen
-        lda     written+1
-        sbc     outlen+1
-        jcc     L0004
+        lda     out
+        cmp     end
+        lda     out+1
+        sbc     end+1
+        jcc     get_token
 
         rts
 
 .endproc
-

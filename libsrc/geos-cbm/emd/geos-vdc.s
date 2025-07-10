@@ -82,54 +82,55 @@ INSTALL:
         pha
         lda #$35
         sta $01
-            
+
         ldx #VDC_CSET           ; determine size of RAM...
         jsr vdcgetreg
         sta tmp1
         ora #%00010000
         jsr vdcputreg           ; turn on 64k
-            
+
         jsr settestadr1         ; save original value of test byte
         jsr vdcgetbyte
         sta tmp2
-            
+
         lda #$55                ; write $55 here
         ldy #ptr1
         jsr test64k             ; read it here and there
         lda #$aa                ; write $aa here
         ldy #ptr2
         jsr test64k             ; read it here and there
-            
+
         jsr settestadr1
         lda tmp2
         jsr vdcputbyte          ; restore original value of test byte
-            
+
         lda ptr1                ; do bytes match?
         cmp ptr1+1
         bne @have64k
         lda ptr2
         cmp ptr2+1
         bne @have64k
-            
+
         ldx #VDC_CSET
         lda tmp1
         jsr vdcputreg           ; restore 16/64k flag
         jmp @endok              ; and leave default values for 16k
-            
-@have64k:   
+
+@have64k:
         lda #<256
         ldx #>256
         sta pagecount
         stx pagecount+1
-@endok:     
+@endok:
         pla
         sta $01
         plp
-        lda #<EM_ERR_OK
-        ldx #>EM_ERR_OK
-        rts 
-            
-test64k:    
+        lda #EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        tax
+        rts
+
+test64k:
         sta tmp1
         sty ptr3
         lda #0
@@ -186,14 +187,14 @@ MAP:    sta curpage
         sta ptr1+1
         ldy #0
         sty ptr1
-            
+
         lda #<window
         sta ptr2
         lda #>window
         sta ptr2+1
-            
+
         jsr transferin
-            
+
         lda #<window
         ldx #>window
         rts
@@ -299,7 +300,7 @@ COPYFROM:
         bne @L1
 
 ; Copy the remainder of the page
-                 
+
 @L2:    ldy #EM_COPY::COUNT
         lda (ptr3),y            ; Get bytes in last page
         beq @L4
@@ -391,9 +392,9 @@ vdcgetreg:
 @L0:    bit VDC_ADDR_REG
         bpl @L0
         lda VDC_DATA_REG
-        rts 
+        rts
 
-vdcputbyte: 
+vdcputbyte:
         ldx #VDC_DATA
 vdcputreg:
         stx VDC_ADDR_REG

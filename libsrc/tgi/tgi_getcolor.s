@@ -2,7 +2,7 @@
 ; Ullrich von Bassewitz, 22.06.2002
 ;
 ; unsigned char tgi_getcolor (void);
-; /* Return the current drawing color */
+; /* Return the current drawing color (palette index) */
 
 
         .include        "tgi-kernel.inc"

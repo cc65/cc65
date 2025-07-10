@@ -41,6 +41,7 @@
 #include "condasm.h"
 #include "enum.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "macro.h"
 #include "nexttok.h"
@@ -87,12 +88,13 @@ void DoEnum (void)
             continue;
         }
 
+        /* Allow conditionals within an enum */
+        if (CheckConditionals ()) {
+            continue;
+        }
+
         /* The format is "identifier [ = value ]" */
-        if (CurTok.Tok != TOK_IDENT) {
-            /* Maybe it's a conditional? */
-            if (!CheckConditionals ()) {
-                ErrorSkip ("Identifier expected");
-            }
+        if (!ExpectSkip (TOK_IDENT, "Expected an identifier")) {
             continue;
         }
 
@@ -146,7 +148,7 @@ void DoEnum (void)
     }
 
     /* End of enum definition */
-    Consume (TOK_ENDENUM, "'.ENDENUM' expected");
+    Consume (TOK_ENDENUM, "`.ENDENUM' expected");
 
     /* Free the base expression */
     FreeExpr (BaseExpr);

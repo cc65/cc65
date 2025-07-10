@@ -38,10 +38,6 @@
 
 
 
-#include "inline.h"
-
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -68,35 +64,23 @@ struct IntStack {
 
 
 
-#if defined(HAVE_INLINE)
-INLINE int IS_IsFull (const IntStack* S)
+static inline int IS_IsFull (const IntStack* S)
 /* Return true if there is no space left on the given int stack */
 {
     return (S->Count >= sizeof (S->Stack) / sizeof (S->Stack[0]));
 }
-#else
-#  define IS_IsFull(S)  ((S)->Count >= sizeof ((S)->Stack) / sizeof ((S)->Stack[0]))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IS_IsEmpty (const IntStack* S)
+static inline int IS_IsEmpty (const IntStack* S)
 /* Return true if there are no values on the given int stack */
 {
     return (S->Count == 0);
 }
-#else
-#  define IS_IsEmpty(S)  ((S)->Count == 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned IS_GetCount (const IntStack* S)
+static inline unsigned IS_GetCount (const IntStack* S)
 /* Return the number of elements on the given int stack */
 {
     return S->Count;
 }
-#else
-#  define IS_GetCount(S)        (S)->Count
-#endif
 
 long IS_Get (const IntStack* S);
 /* Get the value on top of an int stack */

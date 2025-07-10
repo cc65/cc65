@@ -6,7 +6,7 @@
 ;
 
         .export         _cclearxy, _cclear
-        .import         setscrptr  
+        .import         setscrptr
         .import         rvs
         .import         popax
         .importzp       ptr2
@@ -25,7 +25,7 @@ _cclear:
         tax                     ; Is the length zero?
         beq     @L9             ; Jump if done
         jsr     setscrptr       ; Set ptr2 to screen, won't use X
-        lda     #' '       
+        lda     #' '
         ora     rvs
 @L1:    sta     (ptr2),y        ; Write one char
         iny                     ; Next char

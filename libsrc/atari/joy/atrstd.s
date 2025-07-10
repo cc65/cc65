@@ -62,7 +62,8 @@ JOY_COUNT       = 4             ; Number of joysticks we support
 
 INSTALL:
         lda     #JOY_ERR_OK
-        ldx     #0
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

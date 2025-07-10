@@ -24,7 +24,7 @@ _dio_open:
         lda     #$28            ; "No device connected"
 
         ; Return oserror
-oserr:  sta     __oserror
+oserr:  sta     ___oserror
         jmp     return0
 
         ; Return success
@@ -34,5 +34,5 @@ oserr:  sta     __oserror
         asl
         asl
         ldx     #$00
-        stx     __oserror
+        stx     ___oserror
         rts

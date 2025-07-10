@@ -36,6 +36,24 @@
 #  error "This module may only be used when compiling for the Challenger 1P!"
 #endif
 
+/* Colors are not functional, display is black and white only. */
+#define COLOR_BLACK     0x00
+#define COLOR_WHITE     0x01
+
+#define CH_ULCORNER     0xCC
+#define CH_URCORNER     0xCD
+#define CH_LLCORNER     0xCB
+#define CH_LRCORNER     0xCE
+#define CH_TTEE         0xD9
+#define CH_BTEE         0xD7
+#define CH_LTEE         0xD8
+#define CH_RTEE         0xDA
+#define CH_CROSS        0xDB
+#define CH_HLINE        0x94
+#define CH_VLINE        0x95
+
+#define CH_ENTER        0x0D
+
 /* The following #defines will cause the matching functions calls in conio.h
 ** to be overlaid by macros with the same names, saving the function call
 ** overhead.
@@ -43,5 +61,6 @@
 #define _textcolor(color)       COLOR_WHITE
 #define _bgcolor(color)         COLOR_BLACK
 #define _bordercolor(color)     COLOR_BLACK
+#define _cpeekcolor(color)      COLOR_WHITE
 
 #endif

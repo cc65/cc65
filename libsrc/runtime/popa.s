@@ -5,23 +5,21 @@
 ;
 
         .export         popa
-        .importzp       sp
-
-        .macpack        cpu
+        .importzp       c_sp
 
 .proc   popa
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (sp)
+.if .cap(CPU_HAS_ZPIND)
+        lda     (c_sp)
 .else
         ldy     #0              ; (2)
-        lda     (sp),y          ; (7) Read byte
+        lda     (c_sp),y        ; (7) Read byte
 .endif
-        inc     sp              ; (12)
+        inc     c_sp            ; (12)
         beq     @L1             ; (14)
         rts                     ; (20)
 
-@L1:    inc     sp+1
+@L1:    inc     c_sp+1
         rts
 
 .endproc

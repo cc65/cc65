@@ -75,7 +75,10 @@ void ReleaseLiteral (Literal* L);
 /* Decrement the reference counter for the literal */
 
 void TranslateLiteral (Literal* L);
-/* Translate a literal into the target charset. */
+/* Translate a literal into the target charset */
+
+void ConcatLiteral (Literal* L, const Literal* Appended);
+/* Concatenate string literals */
 
 unsigned GetLiteralLabel (const Literal* L);
 /* Return the asm label for a literal */
@@ -121,11 +124,6 @@ void OutputGlobalLiteralPool (void);
 
 Literal* AddLiteral (const char* S);
 /* Add a literal string to the literal pool. Return the literal. */
-
-Literal* AddLiteralBuf (const void* Buf, unsigned Len);
-/* Add a buffer containing a literal string to the literal pool. Return the
-** literal.
-*/
 
 Literal* AddLiteralStr (const StrBuf* S);
 /* Add a literal string to the literal pool. Return the literal. */

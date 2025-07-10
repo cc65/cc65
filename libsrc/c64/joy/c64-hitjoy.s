@@ -59,8 +59,9 @@ temp4:  .byte 0
 ;
 
 INSTALL:
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 
 ;       rts             ; Run into UNINSTALL instead
 
@@ -101,7 +102,7 @@ readadapter:
         lda     #%00010001
         sta     $dd0e           ; control register a
                                 ; timer: start
-                                ;        continous
+                                ;        continuous
                                 ;        forced load
                                 ; serial port: input
 
@@ -109,7 +110,7 @@ readadapter:
         lda     #%01010001
         sta     $dc0e           ; control register a
                                 ; timer: start
-                                ;        continous
+                                ;        continuous
                                 ;        forced load
                                 ; serial port: output
 

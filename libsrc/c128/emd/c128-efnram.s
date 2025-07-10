@@ -87,16 +87,17 @@ INSTALL:
         cli
         cmp     tmp1
         beq     @ram_present
-        lda     #<EM_ERR_NO_DEVICE
-        ldx     #>EM_ERR_NO_DEVICE
+        lda     #EM_ERR_NO_DEVICE
+        ldx     #0 ; return value is char
         rts
 
 @ram_present:
         ldx     #$FF
         stx     curpage
         stx     curpage+1               ; Invalidate the current page
+        .assert EM_ERR_OK = 0, error
         inx
-        txa                             ; A = X = EM_ERR_OK
+        txa
 ;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

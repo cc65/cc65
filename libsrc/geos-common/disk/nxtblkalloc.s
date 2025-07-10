@@ -13,7 +13,7 @@
             .include "jumptab.inc"
             .include "diskdrv.inc"
             .include "geossym.inc"
-        
+
 _NxtBlkAlloc:
         sta r2L
         stx r2H

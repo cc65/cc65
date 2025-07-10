@@ -19,8 +19,11 @@
 ; ESC_GRAPHICS, ESC_RULER, GOTOX, GOTOY, GOTOXY, NEWCARDSET, all 1..8
 ;
 ; note that there are conflicts between control characters and keyboard:
-; HOME = KEY_ENTER, KEY_HOME = REV_ON, 
+; HOME = KEY_ENTER, KEY_HOME = REV_ON,
 ; UPLINE = ?, KEY_UPARROW = GOTOY, ...
+;
+; Important note: The implementation of cputs() relies on the cputc() function
+; not clobbering ptr1. Beware when rewriting or changing this function!
 
             .export _cputcxy, _cputc
             .import gotoxy, fixcursor

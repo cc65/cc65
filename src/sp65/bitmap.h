@@ -75,6 +75,9 @@ struct Bitmap {
     unsigned    Width;
     unsigned    Height;
 
+    /* Bits per pixels */
+    unsigned    BPP;
+
     /* Palette for indexed bitmap types, otherwise NULL */
     Palette*    Pal;
 
@@ -177,6 +180,17 @@ INLINE unsigned GetBitmapColors (const Bitmap* B)
 }
 #else
 # define GetBitmapColors(B)     ((B)->Pal? (B)->Pal->Count : (1U << 24))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned GetBitmapBPP (const Bitmap* B)
+/* Get the bits per pixel of the converted sprite
+ */
+{
+    return B->BPP;
+}
+#else
+# define GetBitmapBPP(B)     ((B)->BPP
 #endif
 
 

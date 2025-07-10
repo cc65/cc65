@@ -105,7 +105,7 @@ errexit:jsr     incsp3          ; Preserves A
 
 ; set __errno
 
-        jmp     __directerrno
+        jmp     ___directerrno
 
 ; -------
 

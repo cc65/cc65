@@ -93,7 +93,7 @@ void CreateMapFile (int ShortMap)
             ** requested
             */
             if (VerboseMap || S->Size > 0) {
-                fprintf (F, 
+                fprintf (F,
                          "    %-17s Offs=%06lX  Size=%06lX  "
                          "Align=%05lX  Fill=%04lX\n",
                          GetString (S->Seg->Name), S->Offs, S->Size,

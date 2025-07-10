@@ -34,5 +34,5 @@ So testing with 999 gives:
 231 mod 999 is 0
 999 mod 999 is 0
 
-This seems to be systematic. 
+This seems to be systematic.
 */

@@ -5,7 +5,7 @@
 ;
 ; Driver for GEOS standard input device interface
 ;
-                                         
+
             .export _mouse_init, _mouse_done
             .export _mouse_hide, _mouse_show
             .export _mouse_box
@@ -13,7 +13,7 @@
             .export _mouse_move, _mouse_buttons
 
             .import popsreg, addysp1
-            .importzp sp, sreg, ptr1
+            .importzp c_sp, sreg, ptr1
 
             .include "const.inc"
             .include "jumptab.inc"
@@ -87,22 +87,22 @@ _mouse_box:
 
         sta mouseBottom
 
-        lda (sp),y
+        lda (c_sp),y
         sta mouseRight
         iny
-        lda (sp),y
+        lda (c_sp),y
         sta mouseRight+1        ; maxx
 
         iny
-        lda (sp),y
+        lda (c_sp),y
         sta mouseTop
         iny                     ; Skip high byte
 
         iny
-        lda (sp),y
+        lda (c_sp),y
         sta mouseLeft
         iny
-        lda (sp),y
+        lda (c_sp),y
         sta mouseLeft+1         ; minx
 
         jmp addysp1             ; Drop params, return

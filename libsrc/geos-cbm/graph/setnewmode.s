@@ -9,7 +9,7 @@
 
             .include "jumptab.inc"
             .include "geossym.inc"
-        
+
 _SetNewMode:
             lda graphMode
             eor #$80

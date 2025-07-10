@@ -1,4 +1,4 @@
-;                         
+;
 ; Ullrich von Bassewitz, 2006-06-05
 ;
 ; unsigned char __fastcall__ mouse_load_driver (const struct mouse_callbacks* c,

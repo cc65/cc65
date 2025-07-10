@@ -1,0 +1,21 @@
+inline-error.c:3: Error: 'inline' on empty declaration
+inline-error.c:4: Error: 'inline' on empty declaration
+inline-error.c:5: Error: 'inline' on non-function declaration
+inline-error.c:6: Error: 'inline' on non-function declaration
+inline-error.c:7: Error: 'inline' on non-function declaration
+inline-error.c:14: Error: Unexpected function specifiers
+inline-error.c:15: Error: Mixed declarations and code are not supported in cc65
+inline-error.c:16: Error: Mixed declarations and code are not supported in cc65
+inline-error.c:19: Error: 'main' cannot be declared inline
+inline-error.c:20: Error: 'inline' on empty declaration
+inline-error.c:21: Error: 'inline' on empty declaration
+inline-error.c:22: Error: 'inline' on non-function declaration
+inline-error.c:23: Error: 'inline' on non-function declaration
+inline-error.c:24: Error: 'inline' on non-function declaration
+inline-error.c:34: Warning: Variable 'fp2' is defined but never used
+inline-error.c:36: Error: 'main' cannot be declared inline
+inline-error.c:39: Warning: Inline function 'f1a' used but never defined
+inline-error.c:39: Warning: Inline function 'f1b' used but never defined
+inline-error.c:39: Warning: Static function 'f1c' used but never defined
+inline-error.c:39: Warning: Inline function 'f2a' used but never defined
+inline-error.c:39: Warning: Inline function 'f2b' used but never defined

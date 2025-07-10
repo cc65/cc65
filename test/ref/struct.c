@@ -246,7 +246,7 @@ rect screen =
                 );
 
         test1();
-        
+
         for (i = 0; i < sizeof pts/sizeof pts[0]; i++) {
                 printf("(%d,%d) is ", pts[i].x,
                         (x = makepoint(pts[i].x, pts[i].y)).y);

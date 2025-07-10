@@ -41,7 +41,7 @@ _clock_getres:
 enosys: lda     #ENOSYS
 
         ; Set __errno
-        jmp     __directerrno
+        jmp     ___directerrno
 
 ;----------------------------------------------------------------------------
 ; timespec struct with tv_sec set to 1 second

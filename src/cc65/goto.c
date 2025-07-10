@@ -43,6 +43,7 @@
 #include "expr.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "standard.h"
 #include "symtab.h"
 #include "goto.h"
@@ -91,7 +92,7 @@ void GotoStatement (void)
 
             /* Find array size */
             if (!IsTypeArray (arr->Type) || SizeOf (arr->Type) == 0 ||
-                !(arr->Flags & SC_STATIC) ||
+                (arr->Flags & SC_STORAGEMASK) != SC_STATIC ||
                 SizeOf (GetElementType(arr->Type)) != 2) {
                 Error ("Expected a static array");
             } else if (GetElementCount (arr->Type) > 127) {

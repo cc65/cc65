@@ -78,8 +78,7 @@
 #define COLOR_WHITE             0x01
 #define COLOR_RED               0x02
 #define COLOR_CYAN              0x03
-#define COLOR_VIOLET            0x04
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            0x04
 #define COLOR_GREEN             0x05
 #define COLOR_BLUE              0x06
 #define COLOR_YELLOW            0x07
@@ -129,7 +128,7 @@ extern void cbm510_inkwl_mou[];
 extern void cbm510_joy_mou[];   /* Referred to by mouse_static_stddrv[] */
 extern void cbm510_ram_emd[];
 extern void cbm510_std_joy[];   /* Referred to by joy_static_stddrv[] */
-extern void cbm510_std_ser[];
+extern void cbm510_std_ser[];   /* Referred to by ser_static_stddrv[] */
 
 
 

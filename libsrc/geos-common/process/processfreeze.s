@@ -10,11 +10,11 @@
             .export _UnfreezeProcess
 
             .include "jumptab.inc"
-            
+
 _FreezeProcess:
         tax
         jmp FreezeProcess
-            
+
 _UnfreezeProcess:
         tax
         jmp UnfreezeProcess

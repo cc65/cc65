@@ -20,7 +20,7 @@ _cclearxy:
 _cclear:
         cmp     #0              ; Is the length zero?
         beq     L9              ; Jump if done
-        sta     tmp1                                 
+        sta     tmp1
 L1:     lda     #' '
         jsr     cputdirect      ; Direct output
         dec     tmp1

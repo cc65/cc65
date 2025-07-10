@@ -11,7 +11,7 @@
             .include "jumptab.inc"
             .include "diskdrv.inc"
             .include "geossym.inc"
-        
+
 _OpenRecordFile:
         sta r0L
         stx r0H

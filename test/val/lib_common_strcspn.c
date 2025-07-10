@@ -11,7 +11,7 @@ static char* TestChars="1234567890";                    // we like to find numbe
 TEST
 {
     unsigned i;
-    
+
     for (i=0; i < EstimatedStringSize; ++i)
       EstimatedString[i] = (i%26)+'A';                 // put ABCD... into the string to be estimated
 

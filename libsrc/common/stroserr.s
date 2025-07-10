@@ -1,11 +1,11 @@
 ;
 ; Ullrich von Bassewitz, 17.07.2002
 ;
-; const char* __fastcall__ _stroserror (unsigned char errcode);
+; const char* __fastcall__ __stroserror (unsigned char errcode);
 ; /* Map an operating system error number to an error message. */
 ;
 
-        .export         __stroserror
+        .export         ___stroserror
         .import         __sys_oserrlist
         .importzp       ptr1, tmp1
 
@@ -21,7 +21,7 @@
 ; and terminated by an entry with length zero that is returned if the
 ; error code could not be found.
 
-__stroserror:
+___stroserror:
         sta     tmp1                    ; Save the error code
 
         ldy     #<__sys_oserrlist

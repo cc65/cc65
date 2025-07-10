@@ -6,7 +6,7 @@
 
         .export         aslax1, shlax1
         .importzp       tmp1
-                            
+
 aslax1:
 shlax1: stx     tmp1
         asl     A

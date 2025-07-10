@@ -100,12 +100,14 @@ masktable:
 ;
 
 INSTALL:
-        lda     #JOY_ERR_OK             ; Assume we have a joystick
-        ldx     VIC_CLK_128             ; Test for a C128
-        cpx     #$FF
+        lda     #JOY_ERR_OK             ; Assume we have a "joystick"
+        .assert JOY_ERR_OK = 0, error
+        tax                             ; Set high byte
+        ldy     VIC_CLK_128             ; Test for a C128
+        cpy     #$FF
         bne     @C128                   ; Jump if we have one
         lda     #JOY_ERR_NO_DEVICE      ; No C128 -> no numpad
-@C128:  ldx     #0                      ; Set high byte
+@C128:
 
 ;       rts                     ; Run into UNINSTALL instead
 

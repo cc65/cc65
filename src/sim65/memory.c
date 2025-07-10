@@ -36,7 +36,7 @@
 #include <string.h>
 
 #include "memory.h"
-
+#include "peripherals.h"
 
 
 /*****************************************************************************/
@@ -45,8 +45,8 @@
 
 
 
-/* THE memory */
-static unsigned char Mem[0x10000];
+/* The memory */
+uint8_t Mem[0x10000];
 
 
 
@@ -56,15 +56,22 @@ static unsigned char Mem[0x10000];
 
 
 
-void MemWriteByte (unsigned Addr, unsigned char Val)
+void MemWriteByte (uint16_t Addr, uint8_t Val)
 /* Write a byte to a memory location */
 {
-    Mem[Addr] = Val;
+    if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) && (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS))
+    {
+        /* Defer the the memory-mapped peripherals handler for this write. */
+        PeripheralsWriteByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS, Val);
+    } else {
+        /* Write to the Mem array. */
+        Mem[Addr] = Val;
+    }
 }
 
 
 
-void MemWriteWord (unsigned Addr, unsigned Val)
+void MemWriteWord (uint16_t Addr, uint16_t Val)
 /* Write a word to a memory location */
 {
     MemWriteByte (Addr, Val & 0xFF);
@@ -73,30 +80,37 @@ void MemWriteWord (unsigned Addr, unsigned Val)
 
 
 
-unsigned char MemReadByte (unsigned Addr)
+uint8_t MemReadByte (uint16_t Addr)
 /* Read a byte from a memory location */
 {
-    return Mem[Addr];
+    if ((PERIPHERALS_APERTURE_BASE_ADDRESS <= Addr) && (Addr <= PERIPHERALS_APERTURE_LAST_ADDRESS))
+    {
+        /* Defer the the memory-mapped peripherals handler for this read. */
+        return PeripheralsReadByte (Addr - PERIPHERALS_APERTURE_BASE_ADDRESS);
+    } else {
+        /* Read from the Mem array. */
+        return Mem[Addr];
+    }
 }
 
 
 
-unsigned MemReadWord (unsigned Addr)
+uint16_t MemReadWord (uint16_t Addr)
 /* Read a word from a memory location */
 {
-    unsigned W = MemReadByte (Addr++);
+    uint8_t W = MemReadByte (Addr++);
     return (W | (MemReadByte (Addr) << 8));
 }
 
 
 
-unsigned MemReadZPWord (unsigned char Addr)
+uint16_t MemReadZPWord (uint8_t Addr)
 /* Read a word from the zero page. This function differs from MemReadWord in that
 ** the read will always be in the zero page, even in case of an address
 ** overflow.
 */
 {
-    unsigned W = MemReadByte (Addr++);
+    uint8_t W = MemReadByte (Addr++);
     return (W | (MemReadByte (Addr) << 8));
 }
 

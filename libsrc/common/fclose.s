@@ -7,7 +7,7 @@
 
         .export         _fclose
 
-        .import         _close
+        .import         _close, ___directerrno
         .importzp       ptr1
 
         .include        "errno.inc"
@@ -31,10 +31,7 @@
 ; File is not open
 
         lda     #EINVAL
-        jsr     __seterrno
-        lda     #$FF            ; Return -1
-        tax
-        rts
+        jmp     ___directerrno
 
 ; File is open. Reset the flags and close the file.
 
@@ -47,4 +44,3 @@
         jmp     _close          ; Will set errno and return an error flag
 
 .endproc
-

@@ -33,9 +33,9 @@ _init:    jsr     ACCESS               ; Unlock System RAM
 ; Set cc65 argument stack pointer
 
           lda     #<(__RAM_START__ + __RAM_SIZE__)
-          sta     sp
+          sta     c_sp
           lda     #>(__RAM_START__ + __RAM_SIZE__)
-          sta     sp+1
+          sta     c_sp+1
 
 ; Initialize memory storage
 
@@ -53,5 +53,5 @@ _exit:    jsr     donelib              ; Run destructors
           lda     TECHO
           ora     #$80                 ; Re-enable console echo
           sta     TECHO
-          jsr     NACCES               ; Lock System RAM
-          rts                          ; Re-enter Sym-1 monitor
+          jmp     NACCES               ; Lock System RAM
+                                       ; Re-enter Sym-1 monitor

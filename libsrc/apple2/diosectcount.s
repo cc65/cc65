@@ -16,7 +16,7 @@ _dio_query_sectcount:
         ; Set handle
         sta     mliparam + MLI::ON_LINE::UNIT_NUM
 
-        ; Get ProDOS 8 block size (clears __oserror)
+        ; Get ProDOS 8 block size (clears ___oserror)
         jsr     _dio_query_sectsize
 
         ; Alloc buffer
@@ -74,7 +74,7 @@ done:   lda     ptr4
         rts
 
 nomem:  lda     #$FF            ; Error code for sure not used by MLI
-oserr:  sta     __oserror
+oserr:  sta     ___oserror
 
         ; Save total blocks for failure
         lda     #$00
@@ -85,7 +85,7 @@ oserr:  sta     __oserror
         ; Check for non-ProDOS disk
 check:  cmp     #$52            ; "Not a ProDOS volume"
         bne     oserr
-        sta     __oserror
+        sta     ___oserror
 
         ; Save total blocks for a 16-sector disk
         lda     #<280

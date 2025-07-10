@@ -10,7 +10,7 @@ TEST
 {
     unsigned i, v;
     char*    p;
-    
+
     for (i=0; i < BufferSize; ++i)
       Buffer[i+1] = (i%128);
 
@@ -35,7 +35,7 @@ TEST
         ASSERT_AreEqual(i%128, (unsigned)Buffer[i+2], "%u", "Unexpected value in buffer at position %u!" COMMA i+2);
     }
 
-    v = Buffer[BufferSize+1];   // rember value of first untouched end-byte 
+    v = Buffer[BufferSize+1];   // rember value of first untouched end-byte
 
     // copy downwards
     p = memmove(Buffer+1, Buffer+2, BufferSize);

@@ -30,7 +30,7 @@ KBNPR:          .byte   0
         .code
 _kbhit:
         lda     KBEDG
-        bne     L1 
+        bne     L1
         lda     $FCB0           ; Read the Opt buttons
         and     #$0c
         sta     KBTMP

@@ -35,10 +35,6 @@
 
 
 
-#include "inline.h"
-
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -56,10 +52,16 @@ struct IntPtrStack {
 };
 
 /* An initializer for an empty int stack */
-#define STATIC_INTPTRSTACK_INITIALIZER     { 0, { 0, 0 }, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} } }
+#define STATIC_INTPTRSTACK_INITIALIZER  {                                   \
+    0,                                                                      \
+    { 0, 0 }, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }      \
+}
 
 /* Declare an int stack with the given value as first element */
-#define INTPTRSTACK(Val, Ptr)   { 1, { {Val, Ptr}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} } }
+#define INTPTRSTACK(Val, Ptr) {                                             \
+    1,                                                                      \
+    { {Val, Ptr}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }  \
+}
 
 
 
@@ -69,35 +71,23 @@ struct IntPtrStack {
 
 
 
-#if defined(HAVE_INLINE)
-INLINE int IPS_IsFull (const IntPtrStack* S)
+static inline int IPS_IsFull (const IntPtrStack* S)
 /* Return true if there is no space left on the given int stack */
 {
     return (S->Count >= sizeof (S->Stack) / sizeof (S->Stack[0]));
 }
-#else
-#  define IPS_IsFull(S)  ((S)->Count >= sizeof ((S)->Stack) / sizeof ((S)->Stack[0]))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int IPS_IsEmpty (const IntPtrStack* S)
+static inline int IPS_IsEmpty (const IntPtrStack* S)
 /* Return true if there are no values on the given int stack */
 {
     return (S->Count == 0);
 }
-#else
-#  define IPS_IsEmpty(S)  ((S)->Count == 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned IPS_GetCount (const IntPtrStack* S)
+static inline unsigned IPS_GetCount (const IntPtrStack* S)
 /* Return the number of elements on the given int stack */
 {
     return S->Count;
 }
-#else
-#  define IPS_GetCount(S)        (S)->Count
-#endif
 
 void IPS_Get (const IntPtrStack* S, long *Val, void **Ptr);
 /* Get the value on top of an int stack */

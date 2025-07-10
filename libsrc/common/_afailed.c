@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 
-void __fastcall__ _afailed (char* file, unsigned line)
+void __fastcall__ __afailed (char* file, unsigned line)
 {
     raise (SIGABRT);
     fprintf (stderr, "ASSERTION FAILED IN %s:%u\n", file, line);

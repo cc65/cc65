@@ -10,8 +10,6 @@
 
         .include        "errno.inc"
 
-        .macpack        cpu
-
 ; ---------------------------------------------------------------------------
 
 .proc   _atexit
@@ -38,10 +36,10 @@
 ; Error, no space left
 
 @Error: lda     #ENOSPC         ; No space left
-        jsr     __seterrno
+        jsr     ___seterrno
         ldx     #$FF            ; Return -1
         txa
-        rts
+Exit:   rts
 
 .endproc
 
@@ -54,7 +52,7 @@
 .proc   doatexit
 
         ldy     exitfunc_index          ; Get index
-        beq     @L9                     ; Jump if done
+        beq     _atexit::Exit           ; Jump if done
         dey
         lda     exitfunc_table,y
         tax
@@ -62,13 +60,11 @@
         lda     exitfunc_table,y
         sty     exitfunc_index
         jsr     callax                  ; Call the function
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_BRA8)
         bra     doatexit
 .else
         jmp     doatexit                ; Next one
 .endif
-
-@L9:    rts
 
 .endproc
 

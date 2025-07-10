@@ -57,8 +57,9 @@ JOY_COUNT       = 2             ; Number of joysticks we support
 ;
 
 INSTALL:
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
@@ -116,7 +117,7 @@ READ:   ldx     #$0F            ; Switch to the system bank
         lsr     tmp1
         lsr     tmp1
 
-; Mask the relavant bits, get the push button bit
+; Mask the relevant bits, get the push button bit
 
 @L2:    asl     a               ; push button bit into carry
         lda     tmp1

@@ -10,7 +10,7 @@
         .include        "modload.inc"
 
         .import         ser_clear_ptr
-        .import         return0
+        .import         return0, return1
 
 
 
@@ -28,10 +28,10 @@ _ser_unload:
         tax
         pla                             ; Get pointer to driver
         jsr     _mod_free               ; Free the driver
-        jmp     return0                 ; Return SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        jmp     return0
 
 no_driver:
-        tax                             ; X = 0
         pla                             ; Remove pushed junk
-        lda     #<SER_ERR_NO_DRIVER
-        rts
+        .assert SER_ERR_NO_DRIVER = 1, error
+        jmp     return1

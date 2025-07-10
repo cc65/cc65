@@ -250,7 +250,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "iny",  1,  flNone,                   OH_Implicit              }, /* $c8 */
     {   "cmp",  2,  flNone,                   OH_Immediate             }, /* $c9 */
     {   "dex",  1,  flNone,                   OH_Implicit              }, /* $ca */
-    {   "wai",  1,  flNone,                   OH_Implicit              }, /* $cb */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $cb */
     {   "cpy",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cc */
     {   "cmp",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cd */
     {   "dec",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ce */
@@ -266,7 +266,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "cld",  1,  flNone,                   OH_Implicit              }, /* $d8 */
     {   "cmp",  3,  flUseLabel,               OH_AbsoluteY             }, /* $d9 */
     {   "phx",  1,  flNone,                   OH_Implicit              }, /* $da */
-    {   "stp",  1,  flNone,                   OH_Implicit              }, /* $db */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $db */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $dc */
     {   "cmp",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $dd */
     {   "dec",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $de */

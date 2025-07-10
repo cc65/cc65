@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <geos.h>
 
-void _afailed (char* file, unsigned line)
+void __afailed (char* file, unsigned line)
 {
     ExitTurbo();
 

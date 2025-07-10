@@ -60,7 +60,7 @@ struct Color {
 /*****************************************************************************/
 
 
-                                                             
+
 #if defined(HAVE_INLINE)
 
 INLINE Color RGB (unsigned char R, unsigned char G, unsigned char B)

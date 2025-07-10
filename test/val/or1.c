@@ -57,23 +57,23 @@ void or_lit2uint(void)
     failures++;
 
   uint0 |= 1;
-  if(uint0 != 1) 
+  if(uint0 != 1)
     failures++;
 
   uint0 |= 2;
-  if(uint0 != 3) 
+  if(uint0 != 3)
     failures++;
 
   uint0 |= 0x100;
-  if(uint0 != 0x103) 
+  if(uint0 != 0x103)
     failures++;
 
   uint0 |= 0x102;
-  if(uint0 != 0x103) 
+  if(uint0 != 0x103)
     failures++;
 
   uint0 |= 0x303;
-  if(uint0 != 0x303) 
+  if(uint0 != 0x303)
     failures++;
 }
 
@@ -83,27 +83,27 @@ void or_lit2ulong(void)
     failures++;
 
   ulong0 |= 1;
-  if(ulong0 != 1) 
+  if(ulong0 != 1)
     failures++;
 
   ulong0 |= 2;
-  if(ulong0 != 3) 
+  if(ulong0 != 3)
     failures++;
 
   ulong0 |= 0x100;
-  if(ulong0 != 0x103) 
+  if(ulong0 != 0x103)
     failures++;
 
   ulong0 |= 0x102;
-  if(ulong0 != 0x103) 
+  if(ulong0 != 0x103)
     failures++;
 
   ulong0 |= 0x303;
-  if(ulong0 != 0x303) 
+  if(ulong0 != 0x303)
     failures++;
 
   ulong0 |= 0x80000000;
-  if(ulong0 != 0x80000303) 
+  if(ulong0 != 0x80000303)
     failures++;
 }
 

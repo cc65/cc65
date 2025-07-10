@@ -39,7 +39,7 @@
 ** are declared here.
 **
 ** To use the debugger, just call DbgInit in your application. Once it has
-** been called, the debugger will catch any BRK opcode. Use the BREAK macro 
+** been called, the debugger will catch any BRK opcode. Use the BREAK macro
 ** defined below to insert breakpoints into your code.
 **
 ** There are currently a lot of things that cannot be debugged, graphical
@@ -121,4 +121,4 @@ void __fastcall__ DbgInit (unsigned unused);
 
 
 
-                                  
+

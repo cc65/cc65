@@ -129,10 +129,10 @@ void c_int_lt_lit1(unsigned char expected_result)
 
   if(int0 < 0x0101)
     result |= 0x10;
-  
+
   if(int0 < 0x01ff)
     result |= 0x20;
-  
+
   if(int0 < 0x0200)
     result |= 0x40;
 
@@ -214,10 +214,10 @@ void c_int_lt_lit2(unsigned char expected_result)
 
   if(int0 < -0x0101)
     result |= 0x10;
-  
+
   if(int0 < -0x0100)
     result |= 0x20;
-  
+
   if(int0 < -0xff)
     result |= 0x40;
 

@@ -1,0 +1,15 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 050-case-off-3.s
+Current file: 050-case-off-3.s
+
+000000r 1               ; 2022-06-20 Spiro Trikaliotis
+000000r 1               
+000000r 1                       .case off
+000000r 1               
+000000r 1               CamelCase:
+000000r 1  A9 00                lda #0
+000002r 1               
+000002r 1               Test:
+000002r 1  F0 FC                beq CamelCase
+000004r 1  D0 FA                bne camelcase
+000004r 1               

@@ -11,7 +11,7 @@
             .include "jumptab.inc"
             .include "diskdrv.inc"
             .include "geossym.inc"
-        
+
 _FreeFile:
         sta r9L
         stx r9H

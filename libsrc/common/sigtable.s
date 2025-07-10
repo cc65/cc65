@@ -14,11 +14,11 @@
 .data
 
 sigtable:
-        .word   __sig_dfl       ; SIGABRT
-        .word   __sig_dfl       ; SIGFPE
-        .word   __sig_dfl       ; SIGILL
-        .word   __sig_dfl       ; SIGINT
-        .word   __sig_dfl       ; SIGSEGV
-        .word   __sig_dfl       ; SIGTERM
+        .word   ___sig_dfl      ; SIGABRT
+        .word   ___sig_dfl      ; SIGFPE
+        .word   ___sig_dfl      ; SIGILL
+        .word   ___sig_dfl      ; SIGINT
+        .word   ___sig_dfl      ; SIGSEGV
+        .word   ___sig_dfl      ; SIGTERM
 
 

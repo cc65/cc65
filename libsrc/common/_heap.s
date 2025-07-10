@@ -6,22 +6,22 @@
 
         .constructor    initheap, 24
         .import         __BSS_RUN__, __BSS_SIZE__, __STACKSIZE__
-        .importzp       sp
+        .importzp       c_sp
 
         .include        "_heap.inc"
 
 
 .data
 
-__heaporg:
+___heaporg:
         .word   __BSS_RUN__+__BSS_SIZE__        ; Linker calculates this symbol
-__heapptr:
+___heapptr:
         .word   __BSS_RUN__+__BSS_SIZE__        ; Dito
-__heapend:
+___heapend:
         .word   __BSS_RUN__+__BSS_SIZE__
-__heapfirst:
+___heapfirst:
         .word   0
-__heaplast:
+___heaplast:
         .word   0
 
 
@@ -31,12 +31,12 @@ __heaplast:
 
 initheap:
         sec
-        lda     sp
+        lda     c_sp
         sbc     #<__STACKSIZE__
-        sta     __heapend
-        lda     sp+1
+        sta     ___heapend
+        lda     c_sp+1
         sbc     #>__STACKSIZE__
-        sta     __heapend+1
+        sta     ___heapend+1
         rts
 
-                      
+

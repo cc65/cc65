@@ -137,9 +137,10 @@ INSTALL:
         ldx     YPos+1
         jsr     CMOVEY
 
-; Done, return zero (= MOUSE_ERR_OK)
+; Done
 
-        ldx     #$00
+        ldx     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         txa
         rts
 
@@ -240,11 +241,11 @@ MOVE:   php
         jsr     CMOVEY                  ; Set it
 
         ldy     #$01
-        lda     (sp),y
+        lda     (c_sp),y
         sta     XPos+1
         tax
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         sta     XPos                    ; New X position
         jsr     CMOVEX                  ; Move the cursor
 

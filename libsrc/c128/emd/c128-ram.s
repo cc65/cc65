@@ -68,8 +68,9 @@ INSTALL:
         ldx     #$FF
         stx     curpage
         stx     curpage+1               ; Invalidate the current page
+        .assert EM_ERR_OK = 0, error
         inx
-        txa                             ; A = X = EM_ERR_OK
+        txa
 ;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

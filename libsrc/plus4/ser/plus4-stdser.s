@@ -64,15 +64,15 @@ ACIA_STATUS     := ACIA+1       ; Status register
 ACIA_CMD        := ACIA+2       ; Command register
 ACIA_CTRL       := ACIA+3       ; Control register
 
+RecvHead        := $07D1        ; Head of receive buffer
+RecvTail        := $07D2        ; Tail of receive buffer
+RecvFreeCnt     := $07D3        ; Number of bytes in receive buffer
 ;----------------------------------------------------------------------------
 ;
 ; Global variables
 ;
 
 .bss
-RecvHead:       .res    1       ; Head of receive buffer
-RecvTail:       .res    1       ; Tail of receive buffer
-RecvFreeCnt:    .res    1       ; Number of bytes in receive buffer
 SendHead:       .res    1       ; Head of send buffer
 SendTail:       .res    1       ; Tail of send buffer
 SendFreeCnt:    .res    1       ; Number of bytes in send buffer
@@ -88,7 +88,7 @@ SendBuf:        .res    256
 
 ; Tables used to translate RS232 params into register values
 
-BaudTable:                      ; bit7 = 1 means setting is invalid
+BaudTable:                      ; Bit7 = 1 means setting is invalid
         .byte   $FF             ; SER_BAUD_45_5
         .byte   $01             ; SER_BAUD_50
         .byte   $02             ; SER_BAUD_75
@@ -157,8 +157,9 @@ SER_CLOSE:
 
 ; Done, return an error code
 
-        lda     #<SER_ERR_OK
-        tax                     ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 ;----------------------------------------------------------------------------
@@ -225,22 +226,23 @@ SER_OPEN:
 
 ; Done
 
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
 ; Invalid parameter
 
 InvParam:
-        lda     #<SER_ERR_INIT_FAILED
-        ldx     #>SER_ERR_INIT_FAILED
+        lda     #SER_ERR_INIT_FAILED
+        ldx     #0 ; return value is char
         rts
 
 ; Baud rate not available
 
 InvBaud:
-        lda     #<SER_ERR_BAUD_UNAVAIL
-        ldx     #>SER_ERR_BAUD_UNAVAIL
+        lda     #SER_ERR_BAUD_UNAVAIL
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------
@@ -250,19 +252,14 @@ InvBaud:
 ;
 
 SER_GET:
-        ldx     SendFreeCnt             ; Send data if necessary
-        inx                             ; X == $FF?
-        beq     @L1
-        lda     #$00
-        jsr     TryToSend
 
 ; Check for buffer empty
 
-@L1:    lda     RecvFreeCnt             ; (25)
+        lda     RecvFreeCnt             ; (25)
         cmp     #$ff
         bne     @L2
-        lda     #<SER_ERR_NO_DATA
-        ldx     #>SER_ERR_NO_DATA
+        lda     #SER_ERR_NO_DATA
+        ldx     #0 ; return value is char
         rts
 
 ; Check for flow stopped & enough free: release flow control
@@ -298,27 +295,30 @@ SER_PUT:
 ; Try to send
 
         ldx     SendFreeCnt
-        inx                             ; X = $ff?
+        cpx     #$ff                   ; Nothing to flush
         beq     @L2
         pha
         lda     #$00
         jsr     TryToSend
         pla
 
-; Put byte into send buffer & send
+; Reload SendFreeCnt after TryToSend
 
-@L2:    ldx     SendFreeCnt
-        bne     @L3
-        lda     #<SER_ERR_OVERFLOW      ; X is already zero
+        ldx     SendFreeCnt
+        bne     @L2
+        lda     #SER_ERR_OVERFLOW      ; X is already zero
         rts
 
-@L3:    ldx     SendTail
+; Put byte into send buffer & send
+
+@L2:    ldx     SendTail
         sta     SendBuf,x
         inc     SendTail
         dec     SendFreeCnt
         lda     #$ff
         jsr     TryToSend
-        lda     #<SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
         tax
         rts
 
@@ -331,7 +331,8 @@ SER_STATUS:
         lda     ACIA_STATUS
         ldx     #0
         sta     (ptr1,x)
-        txa                             ; SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        txa
         rts
 
 ;----------------------------------------------------------------------------
@@ -341,8 +342,8 @@ SER_STATUS:
 ;
 
 SER_IOCTL:
-        lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
-        ldx     #>SER_ERR_INV_IOCTL
+        lda     #SER_ERR_INV_IOCTL      ; We don't support ioclts for now
+        ldx     #0 ; return value is char
         rts                             ; Run into IRQ instead
 
 ;----------------------------------------------------------------------------
@@ -353,26 +354,27 @@ SER_IOCTL:
 ;
 
 SER_IRQ:
-        lda     ACIA_STATUS     ; Check ACIA status for receive interrupt
-        and     #$08
-        beq     @L9             ; Jump if no ACIA interrupt (carry still clear)
-        lda     ACIA_DATA       ; Get byte from ACIA
-        ldx     RecvFreeCnt     ; Check if we have free space left
-        beq     @L1             ; Jump if no space in receive buffer
-        ldy     RecvTail        ; Load buffer pointer
-        sta     RecvBuf,y       ; Store received byte in buffer
-        inc     RecvTail        ; Increment buffer pointer
-        dec     RecvFreeCnt     ; Decrement free space counter
-        cpx     #33             ; Check for buffer space low
-        bcc     @L1             ; Assert flow control if buffer space low
+        lda     ACIA_STATUS     ; (4)  Check for byte received
+        and     #$08            ; (2)
+        beq     @L9             ; (2*)
+
+        lda     ACIA_DATA       ; (4)  Get byte and put into receive buffer
+        ldy     RecvTail        ; (4)
+        ldx     RecvFreeCnt     ; (4)
+        beq     @L3             ; (2*) Jump if no space in receive buffer
+        sta     RecvBuf,y       ; (5)
+        inc     RecvTail        ; (6)
+        dec     RecvFreeCnt     ; (6)
+        cpx     #33             ; (2)  Check for buffer space low
+        bcc     @L2             ; (2*)
         rts                     ; Return with carry set (interrupt handled)
 
 ; Assert flow control if buffer space too low
 
-@L1:    lda     RtsOff
-        sta     ACIA_CMD
-        sta     Stopped
-        sec                     ; Interrupt handled
+@L2:    lda     RtsOff          ; (3)
+        sta     ACIA_CMD        ; (4)
+        sta     Stopped         ; (3)
+@L3:    sec                     ; Interrupt handled
 @L9:    rts
 
 ;----------------------------------------------------------------------------
@@ -383,25 +385,25 @@ SER_IRQ:
         sta     tmp1            ; Remember tryHard flag
 @L0:    lda     SendFreeCnt
         cmp     #$ff
-        beq     @L3             ; Bail out
+        beq     @L2             ; Bail out
 
 ; Check for flow stopped
 
 @L1:    lda     Stopped
-        bne     @L3             ; Bail out
+        bne     @L2             ; Bail out
 
 ; Check that swiftlink is ready to send
 
-@L2:    lda     ACIA_STATUS
+        lda     ACIA_STATUS
         and     #$10
-        bne     @L4
+        bne     @L3
         bit     tmp1            ;keep trying if must try hard
-        bmi     @L0
-@L3:    rts
+        bmi     @L1
+@L2:    rts
 
 ; Send byte and try again
 
-@L4:    ldx     SendHead
+@L3:    ldx     SendHead
         lda     SendBuf,x
         sta     ACIA_DATA
         inc     SendHead

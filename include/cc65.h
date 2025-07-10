@@ -59,21 +59,21 @@ unsigned long __fastcall__ udiv32by16r16 (unsigned long rhs, unsigned lhs);
 */
 
 int __fastcall__ imul8x8r16 (signed char lhs, signed char rhs);
-/* Multiplicate two signed 8 bit to yield an signed 16 bit result */
+/* Multiply two signed 8 bit to yield an signed 16 bit result */
 
 long __fastcall__ imul16x16r32 (int lhs, int rhs);
-/* Multiplicate two signed 16 bit to yield a signed 32 bit result */
+/* Multiply two signed 16 bit to yield a signed 32 bit result */
 
 unsigned __fastcall__ umul8x8r16 (unsigned char lhs, unsigned char rhs);
-/* Multiplicate two unsigned 8 bit to yield an unsigned 16 bit result */
+/* Multiply two unsigned 8 bit to yield an unsigned 16 bit result */
 
 unsigned long __fastcall__ umul16x8r32 (unsigned lhs, unsigned char rhs);
-/* Multiplicate an unsigned 16 bit by an unsigned 8 bit number yielding a 24
+/* Multiply an unsigned 16 bit by an unsigned 8 bit number yielding a 24
 ** bit unsigned result that is extended to 32 bits for easier handling from C.
 */
 
 unsigned long __fastcall__ umul16x16r32 (unsigned lhs, unsigned rhs);
-/* Multiplicate two unsigned 16 bit to yield an unsigned 32 bit result */
+/* Multiply two unsigned 16 bit to yield an unsigned 32 bit result */
 
 unsigned int __fastcall__ mul20 (unsigned char value);
 /* Multiply an 8 bit unsigned value by 20 and return the 16 bit unsigned

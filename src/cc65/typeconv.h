@@ -63,9 +63,6 @@ void TypeComposition (Type* lhs, const Type* rhs);
 ** type or this fails with a critical check.
 */
 
-FuncDesc* RefineFuncDesc (Type* OldType, const Type* NewType);
-/* Refine the existing function descriptor with a new one */
-
 
 
 /* End of typeconv.h */

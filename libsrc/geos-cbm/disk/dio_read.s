@@ -8,7 +8,7 @@
 ;
 
             .export _dio_read
-            .import dio_params, __oserror
+            .import dio_params, ___oserror
 
             .include "geossym.inc"
             .include "jumptab.inc"
@@ -18,6 +18,6 @@ _dio_read:
         tay
         bne err
         jsr ReadBlock
-        stx __oserror
+        stx ___oserror
         txa
 err:    rts

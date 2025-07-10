@@ -7,12 +7,10 @@
 
         .export         tosudiv0ax, tosudiveax, getlop, udiv32
         .import         addysp1
-        .importzp       sp, sreg, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
-
-        .macpack        cpu
+        .importzp       c_sp, sreg, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 
 tosudiv0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -21,8 +19,8 @@ tosudiv0ax:
         sty     sreg+1
 .endif
 
-tosudiveax:                         
-        jsr     getlop          ; Get the paramameters
+tosudiveax:
+        jsr     getlop          ; Get the parameters
         jsr     udiv32          ; Do the division
         lda     ptr1            ; Result is in ptr1:sreg
         ldx     ptr1+1
@@ -38,22 +36,22 @@ getlop: sta     ptr3            ; Put right operand in place
         lda     sreg+1
         sta     ptr4+1
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-        lda     (sp)
+.if .cap(CPU_HAS_ZPIND)
+        lda     (c_sp)
         ldy     #1
 .else
         ldy     #0              ; Put left operand in place
-        lda     (sp),y
+        lda     (c_sp),y
         iny
 .endif
         sta     ptr1
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1+1
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     sreg
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     sreg+1
         jmp     addysp1         ; Drop parameters
 

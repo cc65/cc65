@@ -380,28 +380,37 @@ unsigned OptIndLoads2 (CodeSeg* S)
 
 
 
-static unsigned IsDecSP (const CodeEntry* E)
-/* Check if this is an insn that decrements the stack pointer. If so, return
-** the decrement. If not, return zero.
-** The function expects E to be a subroutine call.
+static signed IsShift (const CodeEntry* E, const char* dec, const char* inc, const char* sub, const char* add)
+/* Check if this is an insn that increments/decrements the stack pointer or AX.
+** If so, return the value (negative for dec, positive for inc). If not, return zero.
 */
 {
-    if (strncmp (E->Arg, "decsp", 5) == 0) {
+    if (E->OPC != OP65_JSR && E->OPC != OP65_JMP) {
+        return 0;
+    }
+
+    if (strncmp (E->Arg, dec, 5) == 0) {
+        if (E->Arg[5] >= '1' && E->Arg[5] <= '8') {
+            return -(E->Arg[5] - '0');
+        }
+    } else if (strcmp (E->Arg, sub) == 0 && RegValIsKnown (E->RI->In.RegY)) {
+        return -(E->RI->In.RegY);
+    } else if (strncmp (E->Arg, inc, 5) == 0) {
         if (E->Arg[5] >= '1' && E->Arg[5] <= '8') {
             return (E->Arg[5] - '0');
         }
-    } else if (strcmp (E->Arg, "subysp") == 0 && RegValIsKnown (E->RI->In.RegY)) {
-        return E->RI->In.RegY;
+    } else if (strcmp (E->Arg, add) == 0 && RegValIsKnown (E->RI->In.RegY)) {
+        return (E->RI->In.RegY);
     }
 
-    /* If we come here, it's not a decsp op */
+    /* If we come here, it's not a dec/inc op */
     return 0;
 }
 
 
 
-unsigned OptStackPtrOps (CodeSeg* S)
-/* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
+static unsigned OptIncDecOps (CodeSeg* S, const char* dec, const char* inc, const char* sub, const char* add)
+/* Merge adjacent calls to inc/dec/add/sub into one. NOTE: This function won't merge all
 ** known cases!
 */
 {
@@ -412,38 +421,116 @@ unsigned OptStackPtrOps (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        unsigned Dec1;
-        unsigned Dec2;
+        signed Val1;
+        signed Val2;
         const CodeEntry* N;
 
         /* Get the next entry */
         const CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for decspn or subysp */
-        if (E->OPC == OP65_JSR                          &&
-            (Dec1 = IsDecSP (E)) > 0                    &&
-            (N = CS_GetNextEntry (S, I)) != 0           &&
-            (Dec2 = IsDecSP (N)) > 0                    &&
-            (Dec1 += Dec2) <= 255                       &&
+        /* Check for decspn, incspn, subysp or addysp */
+        if (E->OPC == OP65_JSR                            &&
+            (Val1 = IsShift (E, dec, inc, sub, add)) != 0 &&
+            (N = CS_GetNextEntry (S, I)) != 0             &&
+            (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
+            (Val2 = IsShift (N, dec, inc, sub, add)) != 0 &&
+            abs(Val1 += Val2) <= 255                      &&
             !CE_HasLabel (N)) {
 
             CodeEntry* X;
             char Buf[20];
 
-            /* We can combine the two */
-            if (Dec1 <= 8) {
-                /* Insert a call to decsp */
-                xsprintf (Buf, sizeof (Buf), "decsp%u", Dec1);
-                X = NewCodeEntry (OP65_JSR, AM65_ABS, Buf, 0, N->LI);
-                CS_InsertEntry (S, X, I+2);
-            } else {
-                /* Insert a call to subysp */
-                const char* Arg = MakeHexArg (Dec1);
-                X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
-                CS_InsertEntry (S, X, I+2);
-                X = NewCodeEntry (OP65_JSR, AM65_ABS, "subysp", 0, N->LI);
-                CS_InsertEntry (S, X, I+3);
-            }
+            if (Val1 != 0) {
+                /* We can combine the two */
+                if (abs(Val1) <= 8) {
+                    /* Insert a call to inc/dec using the last OPC */
+                    xsprintf (Buf, sizeof (Buf), "%s%u", Val1 < 0 ? dec:inc, abs(Val1));
+                    X = NewCodeEntry (N->OPC, AM65_ABS, Buf, 0, N->LI);
+                    CS_InsertEntry (S, X, I+2);
+                } else {
+                    /* Insert a call to add/sub */
+                    const char* Arg = MakeHexArg (abs(Val1));
+                    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
+                    CS_InsertEntry (S, X, I+2);
+                    if (Val1 < 0) {
+                        X = NewCodeEntry (N->OPC, AM65_ABS, sub, 0, N->LI);
+                    } else {
+                        X = NewCodeEntry (N->OPC, AM65_ABS, add, 0, N->LI);
+                    }
+                    CS_InsertEntry (S, X, I+3);
+                }
+            } /* If total shift == 0, just drop the old code. */
+
+            /* Delete the old code */
+            CS_DelEntries (S, I, 2);
+
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptStackPtrOps (CodeSeg* S)
+{
+    return OptIncDecOps(S, "decsp", "incsp", "subysp", "addysp");
+}
+
+
+
+unsigned OptAXOps (CodeSeg* S)
+{
+    return OptIncDecOps(S, "decax", "incax", "decaxy", "incaxy");
+}
+
+
+
+unsigned OptAXLoad (CodeSeg* S)
+/* Merge jsr incax/jsr ldaxi into ldy/jsr ldaxidx */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        signed Val;
+        const CodeEntry* N;
+
+        /* Get the next entry */
+        const CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for incax followed by jsr/jmp ldaxi */
+        if (E->OPC == OP65_JSR                            &&
+            strncmp (E->Arg, "incax", 5) == 0             &&
+            (N = CS_GetNextEntry (S, I)) != 0             &&
+            (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
+            strcmp (N->Arg, "ldaxi") == 0                 &&
+            !CE_HasLabel (N)) {
+
+            CodeEntry* X;
+            const char* Arg;
+
+            Val = E->Arg[5] - '0';
+            Arg = MakeHexArg (Val + 1);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
+            CS_InsertEntry (S, X, I+2);
+            X = NewCodeEntry (N->OPC, AM65_ABS, "ldaxidx", 0, N->LI);
+            CS_InsertEntry (S, X, I+3);
 
             /* Delete the old code */
             CS_DelEntries (S, I, 2);
@@ -492,9 +579,9 @@ unsigned OptGotoSPAdj (CodeSeg* S)
             L[1]->AM == AM65_ABS             &&
             L[2]->OPC == OP65_CLC            &&
             L[3]->OPC == OP65_ADC            &&
-            strcmp (L[3]->Arg, "sp") == 0    &&
+            strcmp (L[3]->Arg, "c_sp") == 0    &&
             L[6]->OPC == OP65_ADC            &&
-            strcmp (L[6]->Arg, "sp+1") == 0  &&
+            strcmp (L[6]->Arg, "c_sp+1") == 0  &&
             L[9]->OPC == OP65_JMP) {
             adjustment = FindSPAdjustment (L[1]->Arg);
 
@@ -582,8 +669,54 @@ unsigned OptGotoSPAdj (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*                         Optimize stack load ops                           */
+/*                       Optimize stack load/store ops                       */
 /*****************************************************************************/
+
+
+
+unsigned OptLoadStore2 (CodeSeg* S)
+/* Remove 16 bit stack loads followed by a store into the same location. */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check if this is a 16 bit load followed by a store into the same
+        ** address.
+        */
+        if (CE_IsCallTo (E, "ldaxysp")          &&  /* Stack load ... */
+            RegValIsKnown (E->RI->In.RegY)      &&  /* ... with known offs */
+            (N = CS_GetNextEntry (S, I)) != 0   &&  /* Next insn ... */
+            !CE_HasLabel (N)                    &&  /* ... without label ... */
+            N->OPC == OP65_LDY                  &&  /* ... is LDY */
+            CE_IsKnownImm (N, E->RI->In.RegY-1) &&  /* Same offset as load */
+            (N = CS_GetNextEntry (S, I+1)) != 0 &&  /* Next insn ... */
+            !CE_HasLabel (N)                    &&  /* ... without label ... */
+            CE_IsCallTo (N, "staxysp")) {           /* ... is store */
+
+            /* Found - remove it. Leave the load in place. If it's unused, it
+            ** will get removed by later steps.
+            */
+            CS_DelEntries (S, I+1, 2);
+
+            /* Remember, we had changes */
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
 
 
 
@@ -617,7 +750,7 @@ unsigned OptLoad1 (CodeSeg* S)
             CS_InsertEntry (S, X, I+1);
 
             /* Load from stack */
-            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, E->LI);
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, E->LI);
             CS_InsertEntry (S, X, I+2);
 
             /* Now remove the call to the subroutine */
@@ -673,8 +806,8 @@ unsigned OptLoad2 (CodeSeg* S)
                 ** later
                 */
 
-                /* lda (sp),y */
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
+                /* lda (c_sp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
                 /* sta abs */
@@ -685,8 +818,8 @@ unsigned OptLoad2 (CodeSeg* S)
                 X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+5);
 
-                /* lda (sp),y */
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
+                /* lda (c_sp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+6);
 
                 /* sta abs */
@@ -700,8 +833,8 @@ unsigned OptLoad2 (CodeSeg* S)
 
                 /* Standard replacement */
 
-                /* lda (sp),y */
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
+                /* lda (c_sp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
 
                 /* tax */
@@ -712,8 +845,8 @@ unsigned OptLoad2 (CodeSeg* S)
                 X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                /* lda (sp),y */
-                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[0]->LI);
+                /* lda (c_sp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "c_sp", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+4);
 
                 /* Now remove the call to the subroutine */
@@ -724,6 +857,231 @@ unsigned OptLoad2 (CodeSeg* S)
             /* Remember, we had changes */
             ++Changes;
 
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptBinOps1 (CodeSeg* S)
+/* Search for an AND/EOR/ORA where the value of A or the operand is known and
+** replace it by something simpler.
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Get a pointer to the input registers of the insn */
+        const RegContents* In  = &E->RI->In;
+
+        /* Check for AND/EOR/ORA and a known value in A */
+        int Delete = 0;
+        CodeEntry* X = 0;
+        switch (E->OPC) {
+
+            case OP65_AND:
+                if (In->RegA == 0x00) {
+                    /* Zero AND anything gives zero. The instruction can be
+                    ** replaced by an immediate load of zero.
+                    */
+                    X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, E->LI);
+                } else if (In->RegA == 0xFF) {
+                    /* 0xFF AND anything equals the operand. The instruction
+                    ** can be replaced by a simple load of the operand.
+                    */
+                    X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                } else if (E->AM == AM65_ZP) {
+                    short Operand = -1;
+                    switch (GetKnownReg (E->Use & REG_ZP, In)) {
+                        case REG_TMP1:      Operand = In->Tmp1;     break;
+                        case REG_PTR1_LO:   Operand = In->Ptr1Lo;   break;
+                        case REG_PTR1_HI:   Operand = In->Ptr1Hi;   break;
+                        case REG_SREG_LO:   Operand = In->SRegLo;   break;
+                        case REG_SREG_HI:   Operand = In->SRegHi;   break;
+                    }
+                    if (Operand == 0x00) {
+                        /* AND with zero gives zero. The instruction can be
+                        ** replaced by an immediate load of zero.
+                        */
+                        X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, E->LI);
+                    } else if (Operand == 0xFF) {
+                        /* AND with 0xFF is a no-op besides setting the flags.
+                        ** The instruction can be removed if the flags aren't
+                        ** used later.
+                        */
+                        if (!LoadFlagsUsed (S, I+1)) {
+                            Delete = 1;
+                        }
+                    } else if (Operand >= 0) {
+                        /* The instruction can be replaced by an immediate
+                        ** AND.
+                        */
+                        const char* Arg = MakeHexArg (Operand);
+                        X = NewCodeEntry (OP65_AND, AM65_IMM, Arg, 0, E->LI);
+                    }
+                }
+                break;
+
+            case OP65_EOR:
+                if (In->RegA == 0x00) {
+                    /* Zero EOR anything equals the operand. The instruction
+                    ** can be replaced by a simple load.
+                    */
+                    X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                } else if (E->AM == AM65_ZP) {
+                    short Operand = -1;
+                    switch (GetKnownReg (E->Use & REG_ZP, In)) {
+                        case REG_TMP1:      Operand = In->Tmp1;     break;
+                        case REG_PTR1_LO:   Operand = In->Ptr1Lo;   break;
+                        case REG_PTR1_HI:   Operand = In->Ptr1Hi;   break;
+                        case REG_SREG_LO:   Operand = In->SRegLo;   break;
+                        case REG_SREG_HI:   Operand = In->SRegHi;   break;
+                    }
+                    if (Operand == 0x00) {
+                        /* EOR with 0x00 is a no-op besides setting the flags.
+                        ** The instruction can be removed if the flags aren't
+                        ** used later.
+                        */
+                        if (!LoadFlagsUsed (S, I+1)) {
+                            Delete = 1;
+                        }
+                    } else if (Operand >= 0) {
+                        /* The instruction can be replaced by an immediate
+                        ** EOR.
+                        */
+                        const char* Arg = MakeHexArg (Operand);
+                        X = NewCodeEntry (OP65_EOR, AM65_IMM, Arg, 0, E->LI);
+                    }
+                }
+                break;
+
+            case OP65_ORA:
+                if (In->RegA == 0x00) {
+                    /* ORA with 0x00 is a no-op. The instruction can be
+                    ** replaced by a simple load.
+                    */
+                    X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, E->LI);
+                } else if (In->RegA == 0xFF) {
+                    /* ORA with 0xFF gives 0xFF. The instruction can be replaced
+                    ** by an immediate load of 0xFF.
+                    */
+                    X = NewCodeEntry (OP65_LDA, AM65_IMM, "$FF", 0, E->LI);
+                } else if (E->AM == AM65_ZP) {
+                    short Operand = -1;
+                    switch (GetKnownReg (E->Use & REG_ZP, In)) {
+                        case REG_TMP1:      Operand = In->Tmp1;     break;
+                        case REG_PTR1_LO:   Operand = In->Ptr1Lo;   break;
+                        case REG_PTR1_HI:   Operand = In->Ptr1Hi;   break;
+                        case REG_SREG_LO:   Operand = In->SRegLo;   break;
+                        case REG_SREG_HI:   Operand = In->SRegHi;   break;
+                    }
+                    if (Operand == 0x00) {
+                        /* ORA with 0x00 is a no-op besides setting the flags.
+                        ** The instruction can be removed if the flags aren't
+                        ** used later.
+                        */
+                        if (!LoadFlagsUsed (S, I+1)) {
+                            Delete = 1;
+                        }
+                    } else if (Operand == 0xFF) {
+                        /* ORA with 0xFF results in 0xFF. The instruction can
+                        ** be replaced by a simple load.
+                        */
+                        X = NewCodeEntry (OP65_LDA, AM65_IMM, "$FF", 0, E->LI);
+                    } else if (Operand >= 0) {
+                        /* The instruction can be replaced by an immediate
+                        ** ORA.
+                        */
+                        const char* Arg = MakeHexArg (Operand);
+                        X = NewCodeEntry (OP65_ORA, AM65_IMM, Arg, 0, E->LI);
+                    }
+                }
+                break;
+
+            default:
+                break;
+
+        }
+
+        /* If we must delete the instruction, do that. If we have a replacement
+        ** entry, place it and remove the old one.
+        */
+        if (X) {
+            CS_InsertEntry (S, X, I+1);
+            Delete = 1;
+        }
+        if (Delete) {
+            CS_DelEntry (S, I);
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptBinOps2 (CodeSeg* S)
+/* Search for an AND/EOR/ORA for identical memory locations and replace it
+** by something simpler.
+*/
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* N;
+
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check if this is an 8 bit load followed by a bit operation with the
+        ** same memory cell.
+        */
+        if (E->OPC == OP65_LDA                  &&
+            (N = CS_GetNextEntry (S, I)) != 0   &&  /* Next insn ... */
+            !CE_HasLabel (N)                    &&  /* ... without label ... */
+            (N->OPC == OP65_AND ||                  /* ... is AND/EOR/ORA ... */
+             N->OPC == OP65_EOR ||
+             N->OPC == OP65_ORA)                &&
+            E->AM == N->AM                      && /* ... with same addr mode ... */
+            strcmp (E->Arg, N->Arg) == 0) {        /* ... and same argument */
+
+            /* For an EOR, the result is zero. For the other instructions, the
+            ** result doesn't change so they can be removed.
+            */
+            if (N->OPC == OP65_EOR) {
+                /* Simply insert a load of the now known value. The flags will
+                ** be correct because of the load and the preceeding
+                ** instructions will be removed by later steps.
+                */
+                CodeEntry* X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, N->LI);
+                CS_InsertEntry (S, X, I+2);
+            } else {
+                CS_DelEntry (S, I+1);
+            }
+
+            /* Remember, we had changes */
+            ++Changes;
         }
 
         /* Next entry */

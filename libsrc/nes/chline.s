@@ -10,7 +10,7 @@
         .importzp       tmp1
 
         .include        "nes.inc"
-                                 
+
 _chlinexy:
         pha                     ; Save the length
         jsr     gotoxy          ; Call this one, will pop params

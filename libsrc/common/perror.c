@@ -42,7 +42,7 @@
 void __fastcall__ perror (const char* msg)
 {
     /* Fetch the message that corresponds to errno */
-    const char* errormsg = strerror (_errno);
+    const char* errormsg = strerror (__errno);
 
     /* Different output depending on msg */
     if (msg) {

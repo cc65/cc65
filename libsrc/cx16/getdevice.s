@@ -56,7 +56,7 @@ next:   inx
 
         lda     STATUS
 
-; Either the Kernal calls above were successfull, or there was
+; Either the Kernal calls above were successful, or there was
 ; already a cmdchannel to the device open -- which is a pretty
 ; good indication of its existence. ;-)
 

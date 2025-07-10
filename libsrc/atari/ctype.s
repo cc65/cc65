@@ -12,7 +12,7 @@
 
         .include        "ctypetable.inc"
         .export         __ctypeidx
-        
+
 ; The tables are readonly, put them into the rodata segment
 
 .rodata

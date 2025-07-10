@@ -56,6 +56,9 @@
 /* Global pointer to line information for the current line */
 static LineInfo* CurLineInfo = 0;
 
+/* Global pointer to previously checked line information about file inclusion hierarchy */
+static LineInfo* PrevCheckedLI = 0;
+
 
 
 /*****************************************************************************/
@@ -64,7 +67,7 @@ static LineInfo* CurLineInfo = 0;
 
 
 
-static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line)
+static LineInfo* NewLineInfo (const StrBuf* Line)
 /* Create and return a new line info. Ref count will be 1. */
 {
     unsigned    Len;
@@ -87,8 +90,9 @@ static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* L
 
     /* Initialize the fields */
     LI->RefCount  = 1;
-    LI->InputFile = F;
-    LI->LineNum   = LineNum;
+    LI->File      = 0;
+    LI->IncFiles  = 0;
+    GetFileInclusionInfo (LI);
 
     /* Copy the line, replacing tabs by spaces in the given line since tabs
     ** will give rather arbitrary results when used in the output later, and
@@ -117,6 +121,7 @@ static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* L
 static void FreeLineInfo (LineInfo* LI)
 /* Free a LineInfo structure */
 {
+    FreeFileInclusionInfo (LI);
     xfree (LI);
 }
 
@@ -156,8 +161,8 @@ LineInfo* GetCurLineInfo (void)
 
 
 
-void UpdateLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line)
-/* Update the line info - called if a new line is read */
+void UpdateCurrentLineInfo (const StrBuf* Line)
+/* Update the current line info - called if a new line is read */
 {
     /* If a current line info exists, release it */
     if (CurLineInfo) {
@@ -172,23 +177,60 @@ void UpdateLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line)
     }
 
     /* Create a new line info */
-    CurLineInfo = NewLineInfo (F, LineNum, Line);
+    CurLineInfo = NewLineInfo (Line);
 }
 
 
 
-const char* GetInputName (const LineInfo* LI)
-/* Return the file name from a line info */
+void RememberCheckedLI (LineInfo* LI)
+/* Remember the latest checked line info struct */
 {
-    PRECONDITION (LI != 0);
-    return GetInputFile (LI->InputFile);
+    if (PrevCheckedLI != LI) {
+        if (PrevCheckedLI != 0) {
+            ReleaseLineInfo (PrevCheckedLI);
+        }
+        PrevCheckedLI = UseLineInfo (LI);
+    }
 }
 
 
 
-unsigned GetInputLine (const LineInfo* LI)
-/* Return the line number from a line info */
+LineInfo* GetPrevCheckedLI (void)
+/* Get the latest checked line info struct */
+{
+    return PrevCheckedLI;
+}
+
+
+
+const char* GetPresumedFileName (const LineInfo* LI)
+/* Return the presumed file name from a line info */
 {
     PRECONDITION (LI != 0);
-    return LI->LineNum;
+    return LI->File->Name;
+}
+
+
+
+unsigned GetPresumedLineNum (const LineInfo* LI)
+/* Return the presumed line number from a line info */
+{
+    PRECONDITION (LI != 0);
+    return LI->File->LineNum;
+}
+
+
+
+const char* GetActualFileName (const struct LineInfo* LI)
+/* Return the actual name of the source file from a line info struct */
+{
+    return LI->File != 0 ? GetInputFileName (LI->File->InputFile) : "<out of filescope>";
+}
+
+
+
+unsigned GetActualLineNum (const struct LineInfo* LI)
+/* Return the actual line number of the source file from a line info struct */
+{
+    return LI->ActualLineNum;
 }

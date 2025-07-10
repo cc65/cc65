@@ -38,7 +38,7 @@
 
 
 
-/* common */    
+/* common */
 #include "cpu.h"
 
 /* da65 */

@@ -147,13 +147,14 @@ INSTALL:
         jsr     restore_data
         cpy     #$01
         beq     @present
-        lda     #<EM_ERR_NO_DEVICE
-        ldx     #>EM_ERR_NO_DEVICE
+        lda     #EM_ERR_NO_DEVICE
+        ldx     #0 ; return value is char
         rts
 
 @present:
-        lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
+        lda     #EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

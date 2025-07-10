@@ -58,7 +58,7 @@
 typedef struct Segment Segment;
 struct Segment {
     Segment*            NextStart;      /* Pointer to next segment */
-    unsigned long       Start;
+    uint32_t            Start;
     unsigned            AddrSize;
     char                Name[1];        /* Name, dynamically allocated */
 };
@@ -76,7 +76,7 @@ static Segment* StartTab[HASH_SIZE];    /* Table containing segment starts */
 
 
 
-void AddAbsSegment (unsigned Start, unsigned End, const char* Name)
+void AddAbsSegment (uint32_t Start, uint32_t End, const char* Name)
 /* Add an absolute segment to the segment table */
 {
     /* Get the length of the name */
@@ -104,7 +104,7 @@ void AddAbsSegment (unsigned Start, unsigned End, const char* Name)
 
 
 
-char* GetSegmentStartName (unsigned Addr)
+char* GetSegmentStartName (uint32_t Addr)
 /* Return the name of the segment which starts at the given address */
 {
     Segment* S = StartTab[Addr % HASH_SIZE];
@@ -122,7 +122,7 @@ char* GetSegmentStartName (unsigned Addr)
 
 
 
-unsigned GetSegmentAddrSize (unsigned Addr)
+unsigned GetSegmentAddrSize (uint32_t Addr)
 /* Return the address size of the segment which starts at the given address */
 {
     Segment* S = StartTab[Addr % HASH_SIZE];

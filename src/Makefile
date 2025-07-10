@@ -1,3 +1,9 @@
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
@@ -20,7 +26,7 @@ PROGS = ar65     \
 .SUFFIXES:
 
 bindir  := $(PREFIX)/bin
-datadir := $(if $(PREFIX),$(PREFIX)/share/cc65,$(abspath ..))
+datadir := $(PREFIX)/share/cc65
 
 CA65_INC = $(datadir)/asminc
 CC65_INC = $(datadir)/include
@@ -38,6 +44,21 @@ else
   NULLDEV = /dev/null
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
+endif
+
+ifeq ($(SILENT),s)
+    QUIET = 1
+    NULLOUT = >$(NULLDEV)
+    NULLERR = 2>$(NULLDEV)
+endif
+
+ifdef QUIET
+    .SILENT:
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+ifndef CMD_EXE
+    CATERR = 2> $@.errlog || (cat $@.errlog && false)
+endif
 endif
 
 CC = $(CROSS_COMPILE)gcc
@@ -58,13 +79,16 @@ ifndef BUILD_ID
     BUILD_ID := N/A
   endif
 endif
-$(info BUILD_ID: $(BUILD_ID))
+
+ifneq ($(SILENT),s)
+  $(info BUILD_ID: $(BUILD_ID))
+endif
 
 CFLAGS += -MMD -MP -O3 -I common \
           -Wall -Wextra -Wno-char-subscripts $(USER_CFLAGS) \
-          -DCA65_INC="$(CA65_INC)" -DCC65_INC="$(CC65_INC)" -DCL65_TGT="$(CL65_TGT)" \
-          -DLD65_LIB="$(LD65_LIB)" -DLD65_OBJ="$(LD65_OBJ)" -DLD65_CFG="$(LD65_CFG)" \
-          -DBUILD_ID="$(BUILD_ID)"
+          -DCA65_INC="\"$(CA65_INC)\"" -DCC65_INC="\"$(CC65_INC)\"" -DCL65_TGT="\"$(CL65_TGT)\"" \
+          -DLD65_LIB="\"$(LD65_LIB)\"" -DLD65_OBJ="\"$(LD65_OBJ)\"" -DLD65_CFG="\"$(LD65_CFG)\"" \
+          -DBUILD_ID="\"$(BUILD_ID)\""
 
 LDLIBS += -lm
 
@@ -77,6 +101,13 @@ ifdef CROSS_COMPILE
 endif
 
 all bin: $(PROGS)
+ifeq ($(MAKELEVEL),0)
+ifndef PREFIX
+ifndef DESTDIR
+	$(warning Warning: PREFIX and DESTDIR are empty - make install will not work)
+endif
+endif
+endif
 
 mostlyclean:
 	$(call RMDIR,../wrk)
@@ -105,12 +136,15 @@ $(RM) /usr/local/bin/$(prog)
 endef # UNAVAIL_recipe
 
 install:
-	$(if $(PREFIX),,$(error variable "PREFIX" must be set))
 	$(INSTALL) -d $(DESTDIR)$(bindir)
 	$(INSTALL) ../bin/* $(DESTDIR)$(bindir)
 
 avail:
+ifneq ($(patsubst %,../bin/%,$(PROGS)),$(wildcard $(patsubst %,../bin/%,$(PROGS))))
+	$(error executables are missing, please run make first)
+else
 	$(foreach prog,$(PROGS),$(AVAIL_recipe))
+endif
 
 unavail:
 	$(foreach prog,$(PROGS),$(UNAVAIL_recipe))
@@ -119,6 +153,7 @@ endif # CMD_EXE
 
 zip:
 	@cd .. && zip cc65 bin/*
+	@echo 'https://github.com/cc65/cc65/commits/'$(word 2,$(BUILD_ID))|zip -zq ../cc65
 
 define OBJS_template
 
@@ -145,8 +180,8 @@ $1: ../bin/$1$(EXE_SUFFIX)
 endef # PROG_template
 
 ../wrk/%.o: %.c
-	@echo $<
-	@$(CC) -c $(CFLAGS) -o $@ $<
+	$(if $(QUIET),echo CC:$@)
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 ../bin:
 	@$(call MKDIR,$@)
@@ -154,8 +189,25 @@ endef # PROG_template
 $(eval $(call OBJS_template,common))
 
 ../wrk/common/common.a: $(common_OBJS)
-	$(AR) r $@ $?
+	$(if $(QUIET),echo AR:$@)
+	$(AR) r $@ $? $(CATERR)
 
 $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
+
+
+.PHONY: dbginfo dbgsh test
+
+test: dbginfo dbgsh
+
+$(eval $(call OBJS_template,dbginfo))
+
+dbginfo: $(dbginfo_OBJS)
+
+../wrk/dbgsh$(EXE_SUFFIX): $(dbginfo_OBJS) ../wrk/common/common.a
+	$(if $(QUIET),echo LINK:$@)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+dbgsh: ../wrk/dbgsh$(EXE_SUFFIX)
+
 
 -include $(DEPS)

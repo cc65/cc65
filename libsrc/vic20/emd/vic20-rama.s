@@ -71,12 +71,13 @@ INSTALL:
 
         ldx     #$FF
         stx     curpage                 ; Invalidate the current page
-        inx                             ; X = 0
-        txa                             ; A = X = EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        inx
+        txa
         rts
 
-nomem:  ldx     #>EM_ERR_NO_DEVICE
-        lda     #<EM_ERR_NO_DEVICE
+nomem:  ldx     #0 ; return value is char
+        lda     #EM_ERR_NO_DEVICE
 ;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

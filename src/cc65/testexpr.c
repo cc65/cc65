@@ -39,6 +39,7 @@
 #include "expr.h"
 #include "loadexpr.h"
 #include "scanner.h"
+#include "seqpoint.h"
 #include "testexpr.h"
 
 
@@ -75,7 +76,7 @@ unsigned Test (unsigned Label, int Invert)
         /* Constant rvalue */
         if (!Invert && Expr.IVal == 0) {
             g_jump (Label);
-            Warning ("Unreachable code");
+            UnreachableCodeWarning ();
         } else if (Invert && Expr.IVal != 0) {
             g_jump (Label);
         }

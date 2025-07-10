@@ -73,7 +73,8 @@ INSTALL:
         and     #$f0
         cmp     #$80
         bne     @L1
-        lda     #EM_ERR_OK
+        .assert EM_ERR_OK = 0, error
+        txa
         rts
 @L1:    lda     #EM_ERR_NO_DEVICE
 ;       rts

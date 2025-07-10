@@ -96,6 +96,7 @@ static emd_test_t drivers[] = {
     { '8', "C64DTV himem", "dtv-himem.emd" },
     { '9', "65816 extra banks", "c64-65816.emd" },
     { 'k', "Kerberos", "c64-kerberos.emd" },
+    { 'r', "Retro Replay RAM", "c64-rrr.emd" },
 #endif
 
 #if defined(__C128__)

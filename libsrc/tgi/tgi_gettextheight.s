@@ -15,7 +15,7 @@
 ; */
 ;
 
-.proc   _tgi_gettextheight        
+.proc   _tgi_gettextheight
 
         ldy     _tgi_font
         bne     @L2                     ; Jump if vector font

@@ -79,8 +79,7 @@
 #define BCOLOR_WHITE            0x01
 #define BCOLOR_RED              0x02
 #define BCOLOR_CYAN             0x03
-#define BCOLOR_VIOLET           0x04
-#define BCOLOR_PURPLE           BCOLOR_VIOLET
+#define BCOLOR_PURPLE           0x04
 #define BCOLOR_GREEN            0x05
 #define BCOLOR_BLUE             0x06
 #define BCOLOR_YELLOW           0x07
@@ -98,8 +97,7 @@
 #define COLOR_WHITE             (BCOLOR_WHITE | CATTR_LUMA7)
 #define COLOR_RED               (BCOLOR_RED | CATTR_LUMA4)
 #define COLOR_CYAN              (BCOLOR_CYAN | CATTR_LUMA7)
-#define COLOR_VIOLET            (BCOLOR_VIOLET | CATTR_LUMA7)
-#define COLOR_PURPLE            COLOR_VIOLET
+#define COLOR_PURPLE            (BCOLOR_LIGHTVIOLET | CATTR_LUMA7)
 #define COLOR_GREEN             (BCOLOR_GREEN | CATTR_LUMA7)
 #define COLOR_BLUE              (BCOLOR_BLUE | CATTR_LUMA7)
 #define COLOR_YELLOW            (BCOLOR_YELLOW | CATTR_LUMA7)
@@ -112,7 +110,23 @@
 #define COLOR_LIGHTBLUE         (BCOLOR_LIGHTBLUE | CATTR_LUMA7)
 #define COLOR_GRAY3             (BCOLOR_WHITE | CATTR_LUMA5)
 
-
+/* TGI color defines */
+#define TGI_COLOR_BLACK         (BCOLOR_BLACK)
+#define TGI_COLOR_WHITE         (BCOLOR_WHITE | CATTR_LUMA7)
+#define TGI_COLOR_RED           (BCOLOR_RED | CATTR_LUMA4)
+#define TGI_COLOR_CYAN          (BCOLOR_CYAN | CATTR_LUMA7)
+#define TGI_COLOR_PURPLE        (BCOLOR_LIGHTVIOLET | CATTR_LUMA7)
+#define TGI_COLOR_GREEN         (BCOLOR_GREEN | CATTR_LUMA7)
+#define TGI_COLOR_BLUE          (BCOLOR_BLUE | CATTR_LUMA7)
+#define TGI_COLOR_YELLOW        (BCOLOR_YELLOW | CATTR_LUMA7)
+#define TGI_COLOR_ORANGE        (BCOLOR_ORANGE | CATTR_LUMA7)
+#define TGI_COLOR_BROWN         (BCOLOR_BROWN | CATTR_LUMA7)
+#define TGI_COLOR_LIGHTRED      (BCOLOR_RED | CATTR_LUMA7)
+#define TGI_COLOR_GRAY1         (BCOLOR_WHITE | CATTR_LUMA1)
+#define TGI_COLOR_GRAY2         (BCOLOR_WHITE | CATTR_LUMA3)
+#define TGI_COLOR_LIGHTGREEN    (BCOLOR_LIGHTGREEN | CATTR_LUMA7)
+#define TGI_COLOR_LIGHTBLUE     (BCOLOR_LIGHTBLUE | CATTR_LUMA7)
+#define TGI_COLOR_GRAY3         (BCOLOR_WHITE | CATTR_LUMA5)
 
 /* Masks for joy_read */
 #define JOY_UP_MASK             0x01

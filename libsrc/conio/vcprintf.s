@@ -7,10 +7,9 @@
         .export         _vcprintf
         .import         pushax, popax, popptr1
         .import         __printf, _cputc
-        .importzp       sp, ptr1, ptr2, ptr3, tmp1
+        .importzp       c_sp, ptr1, ptr2, ptr3, tmp1
 
         .macpack        generic
-
 
 .data
 
@@ -74,20 +73,39 @@ out:    jsr     popax           ; count
 
 ; Loop outputting characters
 
+.if .cap(CPU_HAS_ZPIND, CPU_HAS_BRA8)
+
 @L1:    dec     outdesc+6
         beq     @L4
-@L2:    ldy     tmp1
-        lda     (ptr1),y
-        iny
-        bne     @L3
-        inc     ptr1+1
-@L3:    sty     tmp1
-        jsr     _cputc
-        jmp     @L1
+@L2:    lda     (ptr1)          ; (5)
+        inc     ptr1            ; (10)
+        bne     @L3             ; (12)
+        inc     ptr1+1          ; (17)
+@L3:    jsr     _cputc          ; (23)
+        bra     @L1             ; (26)
 
 @L4:    dec     outdesc+7
         bne     @L2
         rts
+
+.else
+
+@L1:    dec     outdesc+6
+        beq     @L4
+@L2:    ldy     tmp1            ; (3)
+        lda     (ptr1),y        ; (8)
+        iny                     ; (10)
+        bne     @L3             ; (12)
+        inc     ptr1+1          ; (17)
+@L3:    sty     tmp1            ; (20)
+        jsr     _cputc          ; (26)
+        jmp     @L1             ; (32)
+
+@L4:    dec     outdesc+7
+        bne     @L2
+        rts
+
+.endif
 
 ; ----------------------------------------------------------------------------
 ; vcprintf - formatted console i/o
@@ -119,10 +137,10 @@ _vcprintf:
 ; Get the format parameter and push it again
 
         ldy     #1
-        lda     (sp),y
+        lda     (c_sp),y
         tax
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         jsr     pushax
 
 ; Replace the passed format parameter on the stack by &d - this creates
@@ -131,10 +149,10 @@ _vcprintf:
 
         ldy     #2              ; Low byte of d
         lda     #<outdesc
-        sta     (sp),y
+        sta     (c_sp),y
         iny
         lda     #>outdesc
-        sta     (sp),y
+        sta     (c_sp),y
 
 ; Restore ap and call _printf
 

@@ -8,7 +8,6 @@
         .import         zerobss, push0
         .import         callmain
         .import         CLRCH, BSOUT
-        .importzp       ST
 
         .include        "zeropage.inc"
         .include        "pet.inc"
@@ -23,7 +22,7 @@ Start:
 ; Save the zero-page locations that we need.
 
         ldx     #zpspace-1
-L1:     lda     sp,x
+L1:     lda     c_sp,x
         sta     zpsave,x
         dex
         bpl     L1
@@ -52,9 +51,9 @@ L1:     lda     sp,x
         stx     spsave          ; Save the system stack ptr
 
         lda     MEMSIZE
-        sta     sp
+        sta     c_sp
         lda     MEMSIZE+1
-        sta     sp+1            ; Set argument stack ptr
+        sta     c_sp+1          ; Set argument stack ptr
 
 ; Call the module constructors.
 
@@ -73,14 +72,14 @@ _exit:  pha                     ; Save the return code on stack
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
-        sta     sp,x
+        sta     c_sp,x
         dex
         bpl     L2
 
 ; Store the program return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Restore the stack pointer.
 

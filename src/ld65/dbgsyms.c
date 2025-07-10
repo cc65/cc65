@@ -532,7 +532,7 @@ void PrintDbgSymLabels (FILE* F)
             if (GetDbgSym (D, Val) == 0) {
 
                 /* Emit the VICE label line */
-                fprintf (F, "al %06lX .%s\n", Val, GetString (D->Name));
+                PrintLabelLine (F, D->Name, Val);
 
                 /* Insert the symbol into the table */
                 InsertDbgSym (D, Val);

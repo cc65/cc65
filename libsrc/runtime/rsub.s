@@ -7,9 +7,7 @@
 
         .export         tosrsuba0, tosrsubax
         .import         addysp1
-        .importzp       sp, tmp1
-
-        .macpack        cpu
+        .importzp       c_sp, tmp1
 
 ;
 ; AX = AX - TOS
@@ -19,17 +17,17 @@ tosrsuba0:
         ldx     #0
 tosrsubax:
         sec
-.if (.cpu .bitand CPU_ISET_65SC02)
-        sbc     (sp)
+.if .cap(CPU_HAS_ZPIND)
+        sbc     (c_sp)
         ldy     #1
 .else
         ldy     #0
-        sbc     (sp),y          ; lo byte
+        sbc     (c_sp),y        ; lo byte
         iny
 .endif
         sta     tmp1            ; save lo byte
         txa
-        sbc     (sp),y          ; hi byte
+        sbc     (c_sp),y        ; hi byte
         tax
         lda     tmp1
         jmp     addysp1         ; drop TOS, set condition codes

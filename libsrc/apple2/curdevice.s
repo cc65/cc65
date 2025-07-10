@@ -23,5 +23,5 @@ _getcurrentdevice:
         bne     :+
         lda     #$FF            ; INVALID_DEVICE
 
-:       ldx     #$00
+:       ldx     #>$0000
         rts

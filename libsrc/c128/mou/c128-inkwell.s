@@ -228,9 +228,10 @@ INSTALL:
         jsr     MoveX
         cli
 
-; Done, return zero.
+; Done
 
         lda     #MOUSE_ERR_OK
+        .assert MOUSE_ERR_OK = 0, error
         tax
         rts
 
@@ -322,10 +323,10 @@ MOVE:   sei                             ; No interrupts
         jsr     MoveY
 
         ldy     #$01
-        lda     (sp),y
+        lda     (c_sp),y
         tax
         dey
-        lda     (sp),y
+        lda     (c_sp),y
         jsr     MoveX                   ; Move the cursor
 
         cli                             ; Allow interrupts

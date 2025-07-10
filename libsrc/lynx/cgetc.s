@@ -19,7 +19,7 @@
 ; and Opt1 + Opt2 pressed '3'.
 ; So the keyboard returns '1', '2', '3', 'P', 'R', 'F' or '?'.
 
-_cgetc:   
+_cgetc:
         jsr     _kbhit          ; Check for char available
         beq     _cgetc
         ora     KBSTL

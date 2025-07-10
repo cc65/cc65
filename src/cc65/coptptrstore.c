@@ -396,7 +396,7 @@ unsigned OptPtrStore2 (CodeSeg* S)
 ** L:   jsr     pushax
 **      ldy     yyy
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     #$00
 **      jsr     staspidx
 **
@@ -406,7 +406,7 @@ unsigned OptPtrStore2 (CodeSeg* S)
 **      stx     ptr1+1
 **      ldy     yyy-2
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     xxx
 **      sta     (ptr1),y
 **
@@ -414,7 +414,7 @@ unsigned OptPtrStore2 (CodeSeg* S)
 **
 **      ldy     yyy-2
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     xxx
 **      sta     (zp),y
 **
@@ -422,7 +422,7 @@ unsigned OptPtrStore2 (CodeSeg* S)
 **
 **      ldy     yyy-2
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     xxx
 **      sta     label,y
 **
@@ -430,7 +430,7 @@ unsigned OptPtrStore2 (CodeSeg* S)
 **
 **      ldy     yyy-2
 **      ldx     #$00
-**      lda     (sp),y
+**      lda     (c_sp),y
 **      ldy     xxx
 **      sta     $xxxx,y
 **
@@ -468,7 +468,7 @@ unsigned OptPtrStore2 (CodeSeg* S)
             L[6]->OPC == OP65_LDX                               &&
             L[7]->OPC == OP65_LDA                               &&
             L[7]->AM == AM65_ZP_INDY                            &&
-            strcmp (L[7]->Arg, "sp") == 0                       &&
+            strcmp (L[7]->Arg, "c_sp") == 0                     &&
             L[8]->OPC == OP65_LDY                               &&
             (L[8]->AM == AM65_ABS                       ||
              L[8]->AM == AM65_ZP                        ||

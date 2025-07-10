@@ -44,8 +44,10 @@
 
 
 
-void DoPragma (void);
-/* Handle pragmas. These come always in form of the new C99 _Pragma() operator. */
+void ConsumePragma (void);
+/* Parse a pragma. The pragma comes always in the form of the new C99 _Pragma()
+** operator.
+*/
 
 
 

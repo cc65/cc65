@@ -1,0 +1,2 @@
+136-errormsg.s:5: Error: Missing '.ENDMACRO' for definition of macro 'mac'
+136-errormsg.s:1: Note: Macro definition started here

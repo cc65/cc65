@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -7,8 +6,7 @@ unsigned int n, i, c;
 
 void usage(char *arg)
 {
-    printf("usage: %s [file]\n", arg);
-    exit(-1);
+    printf("usage: %s file\n", arg);
 }
 
 int main(int argc, char *argv[]) {
@@ -33,5 +31,5 @@ int main(int argc, char *argv[]) {
     fputc((n >> 8) & 0xff, in);
 
     fclose(in);
-    return (0);
+    return 0;
 }

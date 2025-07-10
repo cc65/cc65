@@ -1063,7 +1063,7 @@ static char StackHandler (void)
                 break;
 
             case 'a':
-#ifdef CH_CURS_UP:
+#ifdef CH_CURS_UP
             case CH_CURS_UP:
 #endif
                 --StackAddr;
@@ -1579,12 +1579,12 @@ void DbgEntry (void)
             case 'q':
                 /* Quit program */
                 clrscr ();
-                
+
                 /* Exit intentionally with error because one may
-                **  say that DbgEntry is always abnormal. 
+                **  say that DbgEntry is always abnormal.
                 */
                 exit (EXIT_FAILURE);
-        
+
         }
     }
 }

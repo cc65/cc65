@@ -82,8 +82,8 @@ tvmode:                         ; PAL/NTSC check here, result in A
         pha
         lda #IO_IN              ; enable access to I/O
         sta CPU_DATA
-        bit rasreg
-        bpl tvmode              ; wait for rasterline  127<x<256
+:       bit rasreg
+        bpl :-                  ; wait for rasterline  127<x<256
         lda #24                 ; (rasterline now >=256!)
 modelp:
         cmp rasreg              ; wait for rasterline = 24 (or 280 on PAL)

@@ -2,7 +2,7 @@
 ; Ullrich von Bassewitz, 2010-11-13
 ;
 ; This module supplies the load address that is expected by Commodore
-; machines in the first two bytes of an excutable disk file.
+; machines in the first two bytes of an executable disk file.
 ;
 
 

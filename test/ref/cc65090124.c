@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! 
+  !!DESCRIPTION!!
   !!ORIGIN!!      testsuite
   !!LICENCE!!     Public Domain
   !!AUTHOR!!
@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 /*
-there is a bug in the preprocessor (i think) ... the following works 
+there is a bug in the preprocessor (i think) ... the following works
 (compiles) correctly:
 
 unsigned long fs,fd,a;
@@ -32,7 +32,7 @@ int main(void)
         fs=(func((fd/a),(func(2,0x0082c90f))));
 }
 
-i get "Error: ')' expected" on that line. (this is with the snapshot, freshly 
+i get "Error: ')' expected" on that line. (this is with the snapshot, freshly
 compiled 5 minutes ago)
 */
 

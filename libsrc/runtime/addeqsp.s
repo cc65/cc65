@@ -5,19 +5,19 @@
 ;
 
         .export         addeq0sp, addeqysp
-        .importzp       sp
+        .importzp       c_sp
 
 addeq0sp:
         ldy     #0
 addeqysp:
         clc
-        adc     (sp),y
-        sta     (sp),y
+        adc     (c_sp),y
+        sta     (c_sp),y
         pha
         iny
         txa
-        adc     (sp),y
-        sta     (sp),y
+        adc     (c_sp),y
+        sta     (c_sp),y
         tax
         pla
         rts

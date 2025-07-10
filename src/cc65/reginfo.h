@@ -40,9 +40,6 @@
 
 #include <stdio.h>      /* ### */
 
-/* common */
-#include "inline.h"
-
 
 
 /*****************************************************************************/
@@ -160,52 +157,35 @@ void RC_InvalidatePS (RegContents* C);
 void RC_Dump (FILE* F, const RegContents* RC);
 /* Dump the contents of the given RegContents struct */
 
-#if defined(HAVE_INLINE)
-INLINE int RegValIsKnown (short Val)
+static inline int RegValIsKnown (short Val)
 /* Return true if the register value is known */
 {
     return (Val >= 0);
 }
-#else
-#  define RegValIsKnown(S)      ((S) >= 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int RegValIsUnknown (short Val)
+static inline int RegValIsUnknown (short Val)
 /* Return true if the register value is not known */
 {
     return (Val < 0);
 }
-#else
-#  define RegValIsUnknown(S)      ((S) < 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
+static inline int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates)
 /* Return true if all queried processor states are known.
 ** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 */
 {
     return ((PFlags << (PSTATE_BITS_SHIFT - 8)) & WhatStates & PSTATE_BITS_MASK) == 0;
 }
-#else
-int PStatesAreKnown (unsigned short PFlags, unsigned WhatStates);
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int PStatesAreUnknown (unsigned short PFlags, unsigned WhatStates)
+static inline int PStatesAreUnknown (unsigned short PFlags, unsigned WhatStates)
 /* Return true if any queried processor states are unknown.
 ** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 */
 {
     return !PStatesAreKnown (PFlags, WhatStates);
 }
-#else
-#  define PStatesAreUnknown(V, B)      (!PStatesAreKnown (V, B))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
+static inline int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
 /* Return true if all queried processor states are known to be set.
 ** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 */
@@ -213,12 +193,8 @@ INLINE int PStatesAreSet (unsigned short PFlags, unsigned WhatStates)
     return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
            (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == WhatStates >> PSTATE_BITS_SHIFT;
 }
-#else
-int PStatesAreSet (unsigned short PFlags, unsigned WhatStates);
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
+static inline int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
 /* Return true if the queried processor states are known to be cleared.
 ** Note: WhatStates takes PSTATE_* rather than PFVAL_*.
 */
@@ -226,9 +202,6 @@ INLINE int PStatesAreClear (unsigned short PFlags, unsigned WhatStates)
     return (PFlags & (WhatStates >> (PSTATE_BITS_SHIFT - 8))) == 0 &&
            (PFlags & (WhatStates >> PSTATE_BITS_SHIFT)) == 0;
 }
-#else
-int PStatesAreClear (unsigned short PFlags, unsigned WhatStates);
-#endif
 
 RegInfo* NewRegInfo (const RegContents* RC);
 /* Allocate a new register info, initialize and return it. If RC is not

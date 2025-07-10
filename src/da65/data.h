@@ -44,25 +44,25 @@
 
 
 
-unsigned ByteTable (void);
+uint32_t ByteTable (void);
 /* Output a table of bytes */
 
-unsigned DByteTable (void);
+uint32_t DByteTable (void);
 /* Output a table of dbytes */
 
-unsigned WordTable (void);
+uint32_t WordTable (void);
 /* Output a table of words */
 
-unsigned DWordTable (void);
+uint32_t DWordTable (void);
 /* Output a table of double words */
 
-unsigned AddrTable (void);
+uint32_t AddrTable (void);
 /* Output a table of addresses */
 
-unsigned RtsTable (void);
+uint32_t RtsTable (void);
 /* Output a table of RTS addresses (address - 1) */
 
-unsigned TextTable (void);
+uint32_t TextTable (void);
 /* Output a table of text messages */
 
 

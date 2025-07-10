@@ -68,4 +68,4 @@ enosys: lda     #ENOSYS
 erange: lda     #ERANGE
 
         ; Set __errno
-errno:  jmp     __directerrno
+errno:  jmp     ___directerrno

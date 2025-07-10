@@ -6,9 +6,9 @@
 ; size_t _heapmaxavail (void);
 ;
 ;
-                            
+
         .importzp       ptr1, ptr2
-        .export         __heapmaxavail
+        .export         ___heapmaxavail
 
         .include        "_heap.inc"
 
@@ -17,22 +17,22 @@
 ;-----------------------------------------------------------------------------
 ; Code
 
-__heapmaxavail:
+___heapmaxavail:
 
 ; size_t Size = (_heapend - _heapptr) * sizeof (*_heapend);
 
-        lda     __heapend
-        sub     __heapptr
+        lda     ___heapend
+        sub     ___heapptr
         sta     ptr2
-        lda     __heapend+1
-        sbc     __heapptr+1
+        lda     ___heapend+1
+        sbc     ___heapptr+1
         sta     ptr2+1
 
 ; struct freeblock* F = _heapfirst;
 
-        lda     __heapfirst
+        lda     ___heapfirst
         sta     ptr1
-        lda     __heapfirst+1
+        lda     ___heapfirst+1
 @L1:    sta     ptr1+1
 
 ; while (F) {

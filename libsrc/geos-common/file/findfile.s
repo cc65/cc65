@@ -11,7 +11,7 @@
             .include "jumptab.inc"
             .include "diskdrv.inc"
             .include "geossym.inc"
-        
+
 _FindFile:
         sta r6L
         stx r6H

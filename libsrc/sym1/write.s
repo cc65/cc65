@@ -13,7 +13,7 @@
 
 .proc           _write
 
-        sta     ptr3            
+        sta     ptr3
         stx     ptr3+1          ; Count in ptr3
         inx
         stx     ptr2+1          ; Increment and store in ptr2

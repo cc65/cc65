@@ -11,6 +11,7 @@
 ;
 
         .export         _isascii
+        .import         return0
 
 _isascii:
         asl     a               ; high-bit to carry
@@ -19,6 +20,4 @@ _isascii:
         adc     #$FF            ; calculate return value based on carry
         rts
 
-@L1:    lda     #$00            ; return false
-        tax
-        rts
+@L1:    jmp     return0         ; return false

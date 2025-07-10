@@ -36,27 +36,65 @@
 #ifndef PREPROC_H
 #define PREPROC_H
 
-
-
-/*****************************************************************************/
-/*                                   data                                    */
-/*****************************************************************************/
-
-
-
-/* Set when the preprocessor calls NoCodeConstExpr() recursively */
-extern unsigned char Preprocessing;
-
-
+#include "macrotab.h"
 
 /*****************************************************************************/
-/*                                   code                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
+
+/* Maximum #if depth per file */
+#define MAX_PP_IFS      256
+
+/* Data struct used for per-file-directive handling */
+typedef struct PPIfStack PPIfStack;
+struct PPIfStack {
+    unsigned char   Stack[MAX_PP_IFS];
+    int             Index;
+};
+
+/* Forward */
+struct IFile;
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+void HandleSpecialMacro (Macro* M, const char* Name);
+/* Handle special "magic" macros that may change */
+
+void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
+/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
+** non-newline whitespace sequences.
+*/
 
 void Preprocess (void);
 /* Preprocess a line */
+
+void InitPreprocess (void);
+/* Init preprocessor */
+
+void DonePreprocess (void);
+/* Done with preprocessor */
+
+void SetPPIfStack (PPIfStack* Stack);
+/* Specify which PP #if stack to use */
+
+void ContinueLine (void);
+/* Continue the current line ended with a '\\' */
+
+void PreprocessBegin (struct IFile* Input);
+/* Initialize the preprocessor for a new input file */
+
+void PreprocessEnd (struct IFile* Input);
+/* Preprocessor done with current file. The parameter is the file we're
+** switching back to.
+*/
 
 
 

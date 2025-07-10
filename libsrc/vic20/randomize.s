@@ -2,16 +2,16 @@
 ; 2002-11-05, Ullrich von Bassewitz
 ; 2015-09-11, Greg King
 ;
-; void _randomize (void);
+; void __randomize (void);
 ; /* Initialize the random number generator */
 ;
 
-        .export         __randomize
+        .export         ___randomize
         .import         _srand
 
         .include        "vic20.inc"
 
-__randomize:
+___randomize:
         lda     VIC_LINES       ; Get overflow bit
         asl     a               ; Shift bit 7 into carry
         lda     VIC_HLINE       ; Get bit 1-8 of rasterline

@@ -9,7 +9,7 @@
             .export _InvertLine
 
             .include "jumptab.inc"
-            
+
 _InvertLine:
         jsr HLineRegs
         jmp InvertLine

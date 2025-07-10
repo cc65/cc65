@@ -19,9 +19,9 @@ _strerror:
 ; The given error code is invalid
 
 @L1:    lda     #<EINVAL
-        sta     __errno
+        sta     ___errno
         lda     #>EINVAL        ; = 0
-        sta     __errno+1
+        sta     ___errno+1
 ;       lda     #$00            ; A contains zero: "Unknown error"
 
 ; Load the pointer to the error message and return

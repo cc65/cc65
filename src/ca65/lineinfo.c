@@ -429,7 +429,7 @@ void ReleaseFullLineInfo (Collection* LineInfos)
 
     /* Walk over all entries */
     for (I = 0; I < CollCount (LineInfos); ++I) {
-        /* Release the the line info */
+        /* Release the line info */
         ReleaseLineInfo (CollAt (LineInfos, I));
     }
 

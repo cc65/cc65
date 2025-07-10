@@ -18,8 +18,6 @@
         .import __CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
         .import __DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
 
-        .macpack        cpu
-
 ; --------------------------------------------------------------------------
 ; Initialize library modules
 

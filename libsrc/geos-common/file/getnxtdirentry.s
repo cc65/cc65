@@ -5,7 +5,7 @@
 
 ; struct filehandle* GetNxtDirEntry (void);
 
-            .import __oserror, return0
+            .import ___oserror, return0
             .export _GetNxtDirEntry
 
             .include "diskdrv.inc"
@@ -13,7 +13,7 @@
 
 _GetNxtDirEntry:
         jsr GetNxtDirEntry
-        stx __oserror
+        stx ___oserror
         txa
         bne L1                  ; jump if disk error
         tya

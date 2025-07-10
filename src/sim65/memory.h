@@ -36,7 +36,9 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
+#include <stdint.h>
 
+extern uint8_t Mem[0x10000];
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -44,19 +46,19 @@
 
 
 
-void MemWriteByte (unsigned Addr, unsigned char Val);
+void MemWriteByte (uint16_t Addr, uint8_t Val);
 /* Write a byte to a memory location */
 
-void MemWriteWord (unsigned Addr, unsigned Val);
+void MemWriteWord (uint16_t Addr, uint16_t Val);
 /* Write a word to a memory location */
 
-unsigned char MemReadByte (unsigned Addr);
+uint8_t MemReadByte (uint16_t Addr);
 /* Read a byte from a memory location */
 
-unsigned MemReadWord (unsigned Addr);
+uint16_t MemReadWord (uint16_t Addr);
 /* Read a word from a memory location */
 
-unsigned MemReadZPWord (unsigned char Addr);
+uint16_t MemReadZPWord (uint8_t Addr);
 /* Read a word from the zero page. This function differs from MemReadWord in that
 ** the read will always be in the zero page, even in case of an address
 ** overflow.

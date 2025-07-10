@@ -284,7 +284,7 @@ void c_ifelse1(void)
 void c_minus1(void)
 {
   printf("long0:%ld long1:%ld\n",long0,long1);
-  
+
   printf("(long0 != -1)\n");
   if(long0 != -1)
   {
@@ -432,7 +432,7 @@ main (void)
 
   success = failures;
   done ();
-  
+
   printf("failures: %d\n",failures);
 
   return failures;

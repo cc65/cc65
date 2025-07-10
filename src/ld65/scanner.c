@@ -95,6 +95,9 @@ void CfgWarning (const FilePos* Pos, const char* Format, ...)
     Warning ("%s:%u: %s",
              GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
     SB_Done (&Buf);
+
+    /* Count warnings */
+    ++WarningCount;
 }
 
 
@@ -196,7 +199,7 @@ static void StrVal (void)
 
                     default:
                         CfgWarning (&CfgErrorPos,
-                                    "Unkown escape sequence '%%%c'", C);
+                                    "Unknown escape sequence '%%%c'", C);
                         SB_AppendChar (&CfgSVal, '%');
                         SB_AppendChar (&CfgSVal, C);
                         NextChar ();

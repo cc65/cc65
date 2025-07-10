@@ -10,7 +10,7 @@
         .include        "modload.inc"
 
         .import         joy_clear_ptr
-        .import         return0
+        .import         return0, return1
 
 
 
@@ -31,7 +31,6 @@ _joy_unload:
         jmp     return0                 ; Return JOY_ERR_OK
 
 no_driver:
-        tax                             ; X = 0
         pla                             ; Remove pushed junk
-        lda     #JOY_ERR_NO_DRIVER
-        rts
+        .assert JOY_ERR_NO_DRIVER = 1, error
+        jmp     return1                 ; Return JOY_ERR_NO_DRIVER

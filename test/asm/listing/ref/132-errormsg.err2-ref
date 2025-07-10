@@ -1,0 +1,2 @@
+132-errormsg.s:1: Error: Expected a parameter name but found 'X'
+132-errormsg.s:1: Error: Expected ')' but found 'X'

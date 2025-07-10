@@ -81,7 +81,7 @@ void Error (const char* Format, ...)
 void Internal (const char* Format, ...)
 /* Print an internal error message and die */
 {
-    va_list ap;     
+    va_list ap;
     va_start (ap, Format);
     fprintf (stderr, "%s: Internal error: ", ProgName);
     vfprintf (stderr, Format, ap);

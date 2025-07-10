@@ -10,7 +10,7 @@
 
             .include "jumptab.inc"
             .include "diskdrv.inc"
-        
+
 _CloseRecordFile:
         jsr CloseRecordFile
         jmp setoserror

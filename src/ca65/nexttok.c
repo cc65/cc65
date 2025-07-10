@@ -44,6 +44,7 @@
 /* ca65 */
 #include "condasm.h"
 #include "error.h"
+#include "expect.h"
 #include "expr.h"
 #include "global.h"
 #include "scanner.h"
@@ -179,7 +180,7 @@ static void FuncConcat (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("')' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -253,7 +254,7 @@ static void FuncIdent (void)
     SB_Copy (&Buf, &CurTok.SVal);
     NextTok ();
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("')' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = Id;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -600,7 +601,7 @@ static void FuncSPrintF (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("')' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &R);
@@ -660,7 +661,7 @@ static void FuncString (void)
     ** by the string token just created.
     */
     if (CurTok.Tok != TOK_RPAREN) {
-        Error ("')' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -725,52 +726,65 @@ void NextTok (void)
 
 
 
-void Consume (token_t Expected, const char* ErrMsg)
-/* Consume Expected, print an error if we don't find it */
+int Consume (token_t Expected, const char* ErrMsg)
+/* Consume Token, print an error if we don't find it. Return true if the token
+** was found and false otherwise.
+*/
 {
-    if (CurTok.Tok == Expected) {
+    if (Expect (Expected, ErrMsg)) {
         NextTok ();
+        return 1;
     } else {
-        Error ("%s", ErrMsg);
+        return 0;
     }
 }
 
 
 
-void ConsumeSep (void)
-/* Consume a separator token */
+int ConsumeSep (void)
+/* Consume a separator token. Return true if the token was found and false
+ * otherwise.
+ */
 {
     /* We expect a separator token */
-    ExpectSep ();
+    int Found = ExpectSep ();
 
     /* If we are at end of line, skip it */
     if (CurTok.Tok == TOK_SEP) {
         NextTok ();
     }
+
+    return Found;
 }
 
 
 
-void ConsumeLParen (void)
-/* Consume a left paren */
+int ConsumeLParen (void)
+/* Consume a left paren. Return true if the token was found and false
+** otherwise.
+*/
 {
-    Consume (TOK_LPAREN, "'(' expected");
+    return Consume (TOK_LPAREN, "Expected `('");
 }
 
 
 
-void ConsumeRParen (void)
-/* Consume a right paren */
+int ConsumeRParen (void)
+/* Consume a right paren. Return true if the token was found and false
+** otherwise.
+*/
 {
-    Consume (TOK_RPAREN, "')' expected");
+    return Consume (TOK_RPAREN, "Expected `)'");
 }
 
 
 
-void ConsumeComma (void)
-/* Consume a comma */
+int ConsumeComma (void)
+/* Consume a comma. Return true if the token was found and false
+** otherwise.
+*/
 {
-    Consume (TOK_COMMA, "',' expected");
+    return Consume (TOK_COMMA, "Expected `,'");
 }
 
 
@@ -780,18 +794,6 @@ void SkipUntilSep (void)
 {
     while (!TokIsSep (CurTok.Tok)) {
         NextTok ();
-    }
-}
-
-
-
-void ExpectSep (void)
-/* Check if we've reached a line separator, and output an error if not. Do
-** not skip the line separator.
-*/
-{
-    if (!TokIsSep (CurTok.Tok)) {
-        ErrorSkip ("Unexpected trailing garbage characters");
     }
 }
 

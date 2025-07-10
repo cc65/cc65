@@ -10,9 +10,9 @@
         .import         BSOUT
         .import         __MAIN_START__, __MAIN_SIZE__   ; Linker generated
         .import         __STACKSIZE__                   ; from configure file
-        .importzp       ST
 
         .include        "zeropage.inc"
+        .include        "c64.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -55,14 +55,14 @@ _exit:  pha                     ; Save the return code on stack
 
         ldx     #zpspace-1
 L2:     lda     zpsave,x
-        sta     sp,x
+        sta     c_sp,x
         dex
         bpl     L2
 
 ; Place the program return code into BASIC's status variable.
 
         pla
-        sta     ST
+        sta     STATUS
 
 ; Restore the system stuff.
 
@@ -85,7 +85,7 @@ init:
 ; Save the zero-page locations that we need.
 
         ldx     #zpspace-1
-L1:     lda     sp,x
+L1:     lda     c_sp,x
         sta     zpsave,x
         dex
         bpl     L1
@@ -94,8 +94,8 @@ L1:     lda     sp,x
 
         lda     #<(__MAIN_START__ + __MAIN_SIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__)
-        sta     sp
-        stx     sp+1            ; Set argument stack ptr
+        sta     c_sp
+        stx     c_sp+1          ; Set argument stack ptr
 
 ; Switch to the second charset.
 

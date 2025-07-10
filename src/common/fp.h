@@ -102,7 +102,7 @@ Float FP_F_Sub (Float Left, Float Right);
 /* Subtract two floats */
 
 Float FP_F_Mul (Float Left, Float Right);
-/* Multiplicate two floats */
+/* Multiply two floats */
 
 Float FP_F_Div (Float Left, Float Right);
 /* Divide two floats */
@@ -129,7 +129,7 @@ Double FP_D_Sub (Double Left, Double Right);
 /* Subtract two floats */
 
 Double FP_D_Mul (Double Left, Double Right);
-/* Multiplicate two floats */
+/* Multiply two floats */
 
 Double FP_D_Div (Double Left, Double Right);
 /* Divide two floats */

@@ -74,7 +74,7 @@ prep:
         jsr     getcursor       ; Get character at cursor position
         cmp     #mouse_txt_char ; "mouse" character
         bne     overwr          ; no, probably program has overwritten it
-        lda     backup          ; 
+        lda     backup          ;
         jmp     setcursor       ; Draw character
 overwr: sta     backup
         rts

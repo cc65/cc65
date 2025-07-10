@@ -66,7 +66,7 @@ char* StrCopy (char* Dest, size_t DestSize, const char* Source)
 
 
 int StrCaseCmp (const char* S1, const char* S2)
-/* Compare two strings ignoring case */        
+/* Compare two strings ignoring case */
 {
     int Diff;
     while ((Diff = toupper (*S1) - toupper (*S2)) == 0 && *S1) {
@@ -77,4 +77,4 @@ int StrCaseCmp (const char* S1, const char* S2)
 }
 
 
-                  
+

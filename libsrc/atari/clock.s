@@ -3,10 +3,10 @@
 ; originally by Ullrich von Bassewitz and Sidney Cadot
 ;
 ; clock_t clock (void);
-; clock_t _clocks_per_sec (void);
+; clock_t __clocks_per_sec (void);
 ;
 
-        .export         _clock, __clocks_per_sec
+        .export         _clock, ___clocks_per_sec
         .importzp       sreg
 
         .include        "atari.inc"
@@ -28,7 +28,7 @@
 .endproc
 
 
-.proc   __clocks_per_sec
+.proc   ___clocks_per_sec
 
         ldx     #$00            ; Clear byte 1 of return value
         stx     sreg            ; Clear byte 2 of return value

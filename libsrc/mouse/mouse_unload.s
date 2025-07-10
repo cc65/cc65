@@ -8,7 +8,7 @@
         .include        "mouse-kernel.inc"
         .include        "modload.inc"
 
-        .import         return0
+        .import         return0, return1
 
 
 
@@ -29,7 +29,6 @@ _mouse_unload:
         jmp     return0                 ; Return MOUSE_ERR_OK
 
 no_driver:
-        tax                             ; X = 0
         pla                             ; Remove pushed junk
-        lda     #<MOUSE_ERR_NO_DRIVER
-        rts
+        .assert MOUSE_ERR_NO_DRIVER = 1, error
+        jmp     return1                 ; Return MOUSE_ERR_NO_DRIVER

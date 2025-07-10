@@ -50,7 +50,7 @@ check_device:
         lda     #SIO_STAT
         sta     DCOMND          ; set command into DCB
         lda     #%01000000      ; direction value, "receive data"
-        sta     DSTATS          ; set data flow directon
+        sta     DSTATS          ; set data flow direction
         lda     #15
         sta     DTIMLO          ; value got from DOS source
         lda     #4

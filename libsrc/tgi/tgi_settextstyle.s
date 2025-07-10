@@ -9,8 +9,6 @@
         .import         umul8x16r24
         .import         popa, popax
 
-        .macpack        cpu
-
 ;-----------------------------------------------------------------------------
 ; void __fastcall__ tgi_settextstyle (unsigned width, unsigned height,
 ;                                     unsigned char dir, unsigned char font);
@@ -82,7 +80,7 @@ process_onedim:
 ; Disallowing characters larger than 256 pixels, we just drop the high byte
 ; and remember the low 16 bit as size in 8.8 format.
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_PUSHXY)
         phy                             ; Save Y
         jsr     umul8x16r24
         ply                             ; Restore Y

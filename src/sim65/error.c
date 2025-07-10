@@ -36,8 +36,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <inttypes.h>
 
 #include "error.h"
+#include "peripherals.h"
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* flag to print cycles at program termination */
+int PrintCycles = 0;
 
 
 
@@ -98,4 +110,15 @@ void Internal (const char* Format, ...)
     putc ('\n', stderr);
     va_end (ap);
     exit (SIM65_ERROR);
+}
+
+
+
+void SimExit (int Code)
+/* Exit the simulation with an exit code */
+{
+    if (PrintCycles) {
+        fprintf (stdout, "%" PRIu64 " cycles\n", Peripherals.Counter.ClockCycles);
+    }
+    exit (Code);
 }

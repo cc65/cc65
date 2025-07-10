@@ -5,7 +5,7 @@
 ;
 
         .include "atari.inc"
-        .import __rwsetup,__do_oserror,__inviocb,__oserror
+        .import __rwsetup,__do_oserror,__inviocb,___oserror
         .export _read
 
 _read:  jsr     __rwsetup       ; do common setup for read and write
@@ -33,7 +33,7 @@ done:   lda     ICBLL,x         ; buf len lo
         lda     ICBLH,x         ; get buf len hi
         tax                     ; to X
 okdone: lda     #0
-        sta     __oserror       ; clear system dependend error code
+        sta     ___oserror      ; clear system dependent error code
         pla                     ; get buf len lo
         rts
 
@@ -147,6 +147,7 @@ icbll_copy:
         sta     dataptr+1
         lda     ICBLL,x
         sta     copylen
+        beq     copied          ; length = 0 if EOF
         pha                     ; remember for return value
         ldy     #0
         ldx     index
@@ -159,7 +160,7 @@ copy:   lda     linebuf,x
         bne     copy
 
         pla                     ; length
-        pha                     ; save length to return at okdone
+copied: pha                     ; save length to return at okdone
 
         clc
         adc     index

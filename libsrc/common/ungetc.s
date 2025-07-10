@@ -62,10 +62,6 @@
 ; File is not open or the character is invalid
 
 error:  lda     #EINVAL
-        jsr     __seterrno
-        lda     #$FF                    ; Return -1
-        tax
-        rts
+        jmp     ___directerrno
 
 .endproc
-           

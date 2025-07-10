@@ -141,8 +141,9 @@ SER_CLOSE:
         sta     ACIA::CMD,x
 
         ; Done, return an error code
-:       lda     #<SER_ERR_OK
-        tax                     ; A is zero
+:       lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         stx     Index           ; Mark port as closed
         rts
 
@@ -205,8 +206,9 @@ SER_OPEN:
 
         ; Done
         stx     Index                   ; Mark port as open
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        tax
         rts
 
         ; Invalid parameter
@@ -225,18 +227,12 @@ InvBaud:lda     #<SER_ERR_BAUD_UNAVAIL
 ; returned.
 
 SER_GET:
-        ldy     SendFreeCnt     ; Send data if necessary
-        iny                     ; Y == $FF?
-        beq     :+
-        lda     #$00            ; TryHard = false
-        jsr     TryToSend
-
         ; Check for buffer empty
-:       lda     RecvFreeCnt     ; (25)
+        lda     RecvFreeCnt     ; (25)
         cmp     #$FF
         bne     :+
-        lda     #<SER_ERR_NO_DATA
-        ldx     #>SER_ERR_NO_DATA
+        lda     #SER_ERR_NO_DATA
+        ldx     #0 ; return value is char
         rts
 
         ; Check for flow stopped & enough free: release flow control
@@ -267,27 +263,29 @@ SER_GET:
 SER_PUT:
         ; Try to send
         ldy     SendFreeCnt
-        iny                     ; Y = $FF?
+        cpy     #$FF            ; Nothing to flush
         beq     :+
         pha
         lda     #$00            ; TryHard = false
         jsr     TryToSend
         pla
 
-        ; Put byte into send buffer & send
-:       ldy     SendFreeCnt
+        ; Reload SendFreeCnt after TryToSend
+        ldy     SendFreeCnt
         bne     :+
-        lda     #<SER_ERR_OVERFLOW
-        ldx     #>SER_ERR_OVERFLOW
+        lda     #SER_ERR_OVERFLOW
+        ldx     #0 ; return value is char
         rts
 
+        ; Put byte into send buffer & send
 :       ldy     SendTail
         sta     SendBuf,y
         inc     SendTail
         dec     SendFreeCnt
         lda     #$FF            ; TryHard = true
         jsr     TryToSend
-        lda     #<SER_ERR_OK
+        lda     #SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
         tax
         rts
 
@@ -299,7 +297,8 @@ SER_STATUS:
         lda     ACIA::STATUS
         ldx     #$00
         sta     (ptr1,x)
-        txa                     ; SER_ERR_OK
+        .assert SER_ERR_OK = 0, error
+        txa
         rts
 
 ;----------------------------------------------------------------------------
@@ -308,8 +307,8 @@ SER_STATUS:
 ; Must return an SER_ERR_xx code in a/x.
 
 SER_IOCTL:
-        lda     #<SER_ERR_INV_IOCTL
-        ldx     #>SER_ERR_INV_IOCTL
+        lda     #SER_ERR_INV_IOCTL
+        ldx     #0 ; return value is char
         rts
 
 ;----------------------------------------------------------------------------
@@ -325,19 +324,19 @@ SER_IRQ:
         and     #$08
         beq     Done            ; Jump if no ACIA interrupt
         lda     ACIA::DATA,x    ; Get byte from ACIA
-        ldy     RecvFreeCnt     ; Check if we have free space left
+        ldx     RecvFreeCnt     ; Check if we have free space left
         beq     Flow            ; Jump if no space in receive buffer
         ldy     RecvTail        ; Load buffer pointer
         sta     RecvBuf,y       ; Store received byte in buffer
         inc     RecvTail        ; Increment buffer pointer
         dec     RecvFreeCnt     ; Decrement free space counter
-        ldy     RecvFreeCnt     ; Check for buffer space low
-        cpy     #33
+        cpx     #33
         bcc     Flow            ; Assert flow control if buffer space low
         rts                     ; Interrupt handled (carry already set)
 
         ; Assert flow control if buffer space too low
-Flow:   lda     RtsOff
+Flow:   ldx     Index           ; Reload port
+        lda     RtsOff
         sta     ACIA::CMD,x
         sta     Stopped
         sec                     ; Interrupt handled
@@ -348,12 +347,13 @@ Done:   rts
 
 TryToSend:
         sta     tmp1            ; Remember tryHard flag
-Again:  lda     SendFreeCnt
+NextByte:
+        lda     SendFreeCnt
         cmp     #$FF
         beq     Quit            ; Bail out
 
         ; Check for flow stopped
-        lda     Stopped
+Again:  lda     Stopped
         bne     Quit            ; Bail out
 
         ; Check that ACIA is ready to send
@@ -370,4 +370,4 @@ Send:   ldy     SendHead
         sta     ACIA::DATA
         inc     SendHead
         inc     SendFreeCnt
-        jmp     Again
+        jmp     NextByte

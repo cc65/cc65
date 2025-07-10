@@ -123,6 +123,13 @@ struct ser_params {
     unsigned char       handshake;      /* Type of handshake to use */
 };
 
+/* The name of the standard serial driver for a platform */
+extern const char ser_stddrv[];
+
+/* The address of the static standard serial driver for a platform */
+extern const void ser_static_stddrv[];
+
+
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -148,7 +155,7 @@ unsigned char __fastcall__ ser_open (const struct ser_params* params);
 /* "Open" the port by setting the port parameters and enable interrupts. */
 
 unsigned char ser_close (void);
-/* "Close" the port. Clear buffers and and disable interrupts. */
+/* "Close" the port. Clear buffers and disable interrupts. */
 
 unsigned char __fastcall__ ser_get (char* b);
 /* Get a character from the serial port. If no characters are available, the
@@ -171,6 +178,3 @@ unsigned char __fastcall__ ser_ioctl (unsigned char code, void* data);
 
 /* End of serial.h */
 #endif
-
-
-

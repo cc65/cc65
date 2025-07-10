@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 test.c(20): Error: Incompatible pointer types
 for   APtr=&(Bs[7].Data[1]);
 
-My experience in C is very limited, but as this works both in MSVC and 
+My experience in C is very limited, but as this works both in MSVC and
 the 8 bit Z80 compiler i originally used, i guess its an bug in CC65.
 
 As a workaround, an typecast via  APtr=(TypA*)&(Bs[7].Data[1]);

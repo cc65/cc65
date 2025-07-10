@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                declattr.h                                 */
 /*                                                                           */
-/*                          Declaration attributes                           */
+/*                           Declarator attributes                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /* Forward */
-struct Declaration;
+struct Declarator;
 
 /* Supported attribute types */
 typedef enum {
@@ -67,7 +67,7 @@ struct DeclAttr {
 
 
 
-void ParseAttribute (struct Declaration* D);
+void ParseAttribute (struct Declarator* D);
 /* Parse an additional __attribute__ modifier */
 
 

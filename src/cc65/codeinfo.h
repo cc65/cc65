@@ -75,8 +75,8 @@ struct RegContents;
 #define REG_SP_HI       0x2000U
 
 /* Defines for some special register usage */
-#define SLV_IND         0x00010000U     /* Accesses (sp),y */
-#define SLV_TOP         0x00020000U     /* Accesses (sp),0 */
+#define SLV_IND         0x00010000U     /* Accesses (c_sp),y */
+#define SLV_TOP         0x00020000U     /* Accesses (c_sp),0 */
 #define SLV_SP65        0x00200000U     /* Accesses 6502 stack pointer */
 #define SLV_PH65        0x00400000U     /* Pushes onto 6502 stack */
 #define SLV_PL65        0x00800000U     /* Pops from 6502 stack */
@@ -122,7 +122,7 @@ struct RegContents;
 typedef struct ZPInfo ZPInfo;
 struct ZPInfo {
     unsigned char  Len;         /* Length of the following string */
-    char           Name[10];    /* Name of zero page symbol */
+    char           Name[64];    /* Name of zero page symbol */
     unsigned char  Size;        /* Maximum buffer size of this register */
     unsigned short ByteUse;     /* Register info for this symbol */
     unsigned short WordUse;     /* Register info for 16 bit access */
@@ -200,6 +200,9 @@ int RegAXUsed (struct CodeSeg* S, unsigned Index);
 
 int RegEAXUsed (struct CodeSeg* S, unsigned Index);
 /* Check if any of the four bytes in EAX are used. */
+
+int LoadFlagsUsed (struct CodeSeg* S, unsigned Index);
+/* Check if one of the flags set by a register load (Z and N) are used. */
 
 unsigned GetKnownReg (unsigned Use, const struct RegContents* RC);
 /* Return the register or zero page location from the set in Use, thats

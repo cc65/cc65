@@ -38,6 +38,10 @@
 
 
 
+#include <stdint.h>
+
+
+
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -55,16 +59,19 @@ extern const char       CfgExt[];       /* Config file extension */
 /* Flags and other command line stuff */
 extern unsigned char    DebugInfo;      /* Add debug info to the object file */
 extern unsigned char    FormFeeds;      /* Add form feeds to the output? */
+extern unsigned char    MultiPass;      /* Run several passes to resolve labels */
 extern unsigned char    UseHexOffs;     /* Use hexadecimal label offsets */
-extern unsigned char    PassCount;      /* How many passed do we do? */
 extern signed char      NewlineAfterJMP;/* Add a newline after a JMP insn? */
 extern signed char      NewlineAfterRTS;/* Add a newline after a RTS insn? */
-extern long             StartAddr;      /* Start/load address of the program */
+extern unsigned char    HaveStartAddr;  /* Flag for start address given */
+extern uint32_t         StartAddr;      /* Start/load address of the program */
 extern unsigned char    SyncLines;      /* Accept line markers in the info file */
 extern long             InputOffs;      /* Offset into input file */
 extern long             InputSize;      /* Number of bytes to read from input */
 
 /* Stuff needed by many routines */
+#define PASS_PREP       1               /* Preparation pass */
+#define PASS_FINAL      2               /* Final pass generating output */
 extern unsigned         Pass;           /* Disassembler pass */
 extern char             Now[128];       /* Current time as string */
 

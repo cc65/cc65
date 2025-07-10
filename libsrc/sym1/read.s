@@ -48,6 +48,6 @@ putch:  ldy     #$00             ; Put char into return buffer
 
 done:   lda     ptr3
         ldx     ptr3+1
-        rts                      ; Return count                       
+        rts                      ; Return count
 
 .endproc

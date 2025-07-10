@@ -29,7 +29,7 @@ main() {
                         p[j] = x[i][j];
         }
         g(z, y);
-        
+
         return 0;
 }
 

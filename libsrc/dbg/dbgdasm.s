@@ -77,7 +77,7 @@ disassret:
         inx                     ; Adjust for opcode byte
         txa
         ldx     #$00            ; Clear high byte
-        rts     
+        rts
 
 ; -------------------------------------------------------------------------
 ; Helper functions

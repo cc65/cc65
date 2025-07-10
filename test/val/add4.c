@@ -22,7 +22,6 @@ long long0 = 0;
 long long1 = 0;
 unsigned long ulong0 = 0;
 unsigned long ulong1 = 0;
-#define NULL 0
 char *cP0=NULL;
 char *cP1=NULL;
 int *iP0=NULL;

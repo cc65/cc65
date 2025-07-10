@@ -59,8 +59,8 @@ start:
 
         lda     #<(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
         ldx     #>(__MAIN_START__ + __MAIN_SIZE__ + __STACKSIZE__)
-        sta     sp
-        stx     sp+1
+        sta     c_sp
+        stx     c_sp+1
 
 .else
 
@@ -75,11 +75,11 @@ start:
         lda     MEMTOP
         sbc     #<__RESERVED_MEMORY__
         sta     APPMHI                  ; initialize our APPMHI value
-        sta     sp                      ; set up runtime stack part 1
+        sta     c_sp                    ; set up runtime stack part 1
         lda     MEMTOP+1
         sbc     #>__RESERVED_MEMORY__
         sta     APPMHI+1
-        sta     sp+1                    ; set up runtime stack part 2
+        sta     c_sp+1                  ; set up runtime stack part 2
 
 .endif
 
@@ -201,6 +201,10 @@ __LMARGN_save:  .res    1
 .ifndef __ATARIXL__
 APPMHI_save:    .res    2
 .endif
+
+; ------------------------------------------------------------------------
+
+.segment "INIT"       ; have at least one (empty) segment of INIT, exehdr.s needs its definition
 
 ; ------------------------------------------------------------------------
 

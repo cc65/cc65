@@ -30,7 +30,7 @@ _vsprintf:
         ldy     #2
         jsr     staxysp
 
-; Contine by jumping to vsnprintf, which expects ap on the CPU stack and will 
+; Continue by jumping to vsnprintf, which expects ap on the CPU stack and will
 ; cleanup the C stack
 
         jmp     vsnprintf

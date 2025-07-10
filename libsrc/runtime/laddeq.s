@@ -11,8 +11,6 @@
         .export         laddeq1, laddeqa, laddeq
         .importzp       sreg, ptr1, tmp1
 
-        .macpack        cpu
-
 laddeq1:
         lda     #$01
 
@@ -24,7 +22,7 @@ laddeqa:
 laddeq: sty     ptr1+1                  ; Store high byte of address
         clc
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         adc     (ptr1)
         sta     (ptr1)
         ldy     #$01                    ; Address byte 1

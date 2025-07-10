@@ -65,35 +65,23 @@ extern StringPool* TypePool;
 
 
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetTypeId (const StrBuf* Type)
+static inline unsigned GetTypeId (const StrBuf* Type)
 /* Return the id of the given generic type */
 {
     return SP_Add (TypePool, Type);
 }
-#else
-#  define GetTypeId(Type)       SP_Add (TypePool, (Type))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE const StrBuf* GetType (unsigned Index)
+static inline const StrBuf* GetType (unsigned Index)
 /* Convert a type index into a type string */
 {
     return SP_Get (TypePool, Index);
 }
-#else
-#  define GetType(Index)        SP_Get (TypePool, (Index))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned TypeCount (void)
+static inline unsigned TypeCount (void)
 /* Return the number of types in the pool */
 {
     return SP_GetCount (TypePool);
 }
-#else
-#  define TypeCount()   SP_GetCount (TypePool)
-#endif
 
 void PrintDbgTypes (FILE* F);
 /* Output the types to a debug info file */

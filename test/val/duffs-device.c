@@ -1,6 +1,6 @@
 /*
   !!DESCRIPTION!! Implementation of Duff's device (loop unrolling).
-  !!ORIGIN!!      
+  !!ORIGIN!!
   !!LICENCE!!     GPL, read COPYING.GPL
 */
 
@@ -34,7 +34,7 @@ int acmp(char* a, char* b, int count)
   return 0;
 }
 
-void duffit (char* to, char* from, int count) 
+void duffit (char* to, char* from, int count)
 {
   int n = (count + 7) / 8;
 
@@ -55,14 +55,14 @@ int main(void)
 {
   char a[ASIZE] = {1};
   char b[ASIZE] = {2};
-  
+
   /* a and b should be different */
   if(!acmp(a, b, ASIZE)) {
     failures++;
   }
-  
+
   duffit(a, b, ASIZE);
-  
+
   /* a and b should be the same */
   if(acmp(a, b, ASIZE)) {
     failures++;

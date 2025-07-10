@@ -188,7 +188,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "dey",  1,  flNone,                   OH_Implicit              }, /* $88 */
     {   "nop",  2,  flNone,                   OH_Immediate             }, /* $89 */
     {   "txa",  1,  flNone,                   OH_Implicit              }, /* $8a */
-    {   "xaa",  2,  flNone,                   OH_Immediate             }, /* $8b */
+    {   "ane",  2,  flNone,                   OH_Immediate             }, /* $8b */
     {   "sty",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8c */
     {   "sta",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8d */
     {   "stx",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8e */
@@ -196,7 +196,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "bcc",  2,  flLabel,                  OH_Relative              }, /* $90 */
     {   "sta",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $91 */
     {   "jam",  1,  flNone,                   OH_Implicit              }, /* $92 */
-    {   "ahx",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $93 */
+    {   "sha",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $93 */
     {   "sty",  2,  flUseLabel,               OH_DirectX               }, /* $94 */
     {   "sta",  2,  flUseLabel,               OH_DirectX               }, /* $95 */
     {   "stx",  2,  flUseLabel,               OH_DirectY               }, /* $96 */
@@ -208,7 +208,7 @@ const OpcDesc OpcTable_6502X[256] = {
     {   "shy",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $9c */
     {   "sta",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $9d */
     {   "shx",  3,  flUseLabel,               OH_AbsoluteY             }, /* $9e */
-    {   "ahx",  3,  flUseLabel,               OH_AbsoluteY             }, /* $9f */
+    {   "sha",  3,  flUseLabel,               OH_AbsoluteY             }, /* $9f */
     {   "ldy",  2,  flNone,                   OH_Immediate             }, /* $a0 */
     {   "lda",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $a1 */
     {   "ldx",  2,  flNone,                   OH_Immediate             }, /* $a2 */

@@ -1,11 +1,11 @@
 /*
     GEOSLib example
-    
+
     using DlgBoxFileSelect
-    
+
     Maciej 'YTM/Elysium' Witkowiak
     <ytm@elysium.pl>
-    
+
     26.12.1999
 */
 

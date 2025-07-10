@@ -28,14 +28,14 @@ _raise:
         sta     jmpvec+1
         lda     sigtable+1,x
         sta     jmpvec+2
-                            
+
 ; Reset the signal handler to SIG_DFL (I don't like this because it may
-; introduce race conditions, but it's the simplest way to satisfy the 
+; introduce race conditions, but it's the simplest way to satisfy the
 ; standard).
 
-        lda     #<__sig_dfl
+        lda     #<___sig_dfl
         sta     sigtable,x
-        lda     #>__sig_dfl
+        lda     #>___sig_dfl
         sta     sigtable+1,x
 
 ; Restore the signal number and call the function
@@ -51,4 +51,4 @@ _raise:
 invalidsig:
         rts
 
-            
+

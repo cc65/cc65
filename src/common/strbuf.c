@@ -62,17 +62,6 @@ const StrBuf EmptyStrBuf = STATIC_STRBUF_INITIALIZER;
 
 
 
-#if !defined(HAVE_INLINE)
-StrBuf* SB_Init (StrBuf* B)
-/* Initialize a string buffer */
-{
-    *B = EmptyStrBuf;
-    return B;
-}
-#endif
-
-
-
 StrBuf* SB_InitFromString (StrBuf* B, const char* S)
 /* Initialize a string buffer from a literal string. Beware: The buffer won't
 ** store a copy but a pointer to the actual string.
@@ -82,6 +71,7 @@ StrBuf* SB_InitFromString (StrBuf* B, const char* S)
     B->Len       = strlen (S);
     B->Index     = 0;
     B->Buf       = (char*) S;
+    B->Cooked    = (char*) S;
     return B;
 }
 
@@ -92,6 +82,7 @@ void SB_Done (StrBuf* B)
 {
     if (B->Allocated) {
         xfree (B->Buf);
+        xfree (B->Cooked);
     }
 }
 
@@ -146,10 +137,12 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
     */
     if (B->Allocated) {
         /* Just reallocate the block */
-        B->Buf   = xrealloc (B->Buf, NewAllocated);
+        B->Buf    = xrealloc (B->Buf, NewAllocated);
+        B->Cooked = xrealloc (B->Cooked, NewAllocated);
     } else {
         /* Allocate a new block and copy */
-        B->Buf   = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
+        B->Buf    = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
+        B->Cooked = memcpy (xmalloc (NewAllocated), B->Cooked, B->Len);
     }
 
     /* Remember the new block size */
@@ -178,25 +171,16 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
     /* Free the old buffer if there is one */
     if (B->Allocated) {
         xfree (B->Buf);
+        xfree (B->Cooked);
     }
 
     /* Allocate a fresh block */
-    B->Buf = xmalloc (NewAllocated);
+    B->Buf    = xmalloc (NewAllocated);
+    B->Cooked = xmalloc (NewAllocated);
 
     /* Remember the new block size */
     B->Allocated = NewAllocated;
 }
-
-
-
-#if !defined(HAVE_INLINE)
-char SB_At (const StrBuf* B, unsigned Index)
-/* Get a character from the buffer */
-{
-    PRECONDITION (Index < B->Len);
-    return B->Buf[Index];
-}
-#endif
 
 
 
@@ -222,6 +206,7 @@ void SB_Terminate (StrBuf* B)
         SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = '\0';
+    B->Cooked[B->Len] = '\0';
 }
 
 
@@ -234,30 +219,25 @@ void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
             SB_CheapRealloc (Target, Size);
         }
         memcpy (Target->Buf, Buf, Size);
+        memcpy (Target->Cooked, Buf, Size); /* nothing raw */
     }
     Target->Len = Size;
 }
 
 
 
-#if !defined(HAVE_INLINE)
-void SB_CopyStr (StrBuf* Target, const char* S)
-/* Copy S to Target, discarding the old contents of Target */
+void SB_CopyBufCooked (StrBuf* Target, const char* Buf, const char* Cooked, unsigned Size)
+/* Copy Buf and Cooked to Target, discarding the old contents of Target */
 {
-    SB_CopyBuf (Target, S, strlen (S));
+    if (Size) {
+        if (Target->Allocated < Size) {
+            SB_CheapRealloc (Target, Size);
+        }
+        memcpy (Target->Buf, Buf, Size);
+        memcpy (Target->Cooked, Cooked, Size);
+    }
+    Target->Len = Size;
 }
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void SB_Copy (StrBuf* Target, const StrBuf* Source)
-/* Copy Source to Target, discarding the old contents of Target */
-{
-    SB_CopyBuf (Target, Source->Buf, Source->Len);
-    Target->Index = Source->Index;
-}
-#endif
 
 
 
@@ -269,6 +249,21 @@ void SB_AppendChar (StrBuf* B, int C)
         SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = (char) C;
+    B->Cooked[B->Len] = (char) C;
+    B->Len = NewLen;
+}
+
+
+
+void SB_AppendCharCooked (StrBuf* B, int C, int Cooked)
+/* Append a character to a string buffer */
+{
+    unsigned NewLen = B->Len + 1;
+    if (NewLen > B->Allocated) {
+        SB_Realloc (B, NewLen);
+    }
+    B->Buf[B->Len] = (char) C;
+    B->Cooked[B->Len] = (char) (Cooked ? C : 0);
     B->Len = NewLen;
 }
 
@@ -282,42 +277,9 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
         SB_Realloc (B, NewLen);
     }
     memcpy (B->Buf + B->Len, S, Size);
+    memcpy (B->Cooked + B->Len, S, Size);
     B->Len = NewLen;
 }
-
-
-
-#if !defined(HAVE_INLINE)
-void SB_AppendStr (StrBuf* B, const char* S)
-/* Append a string to the end of the string buffer */
-{
-    SB_AppendBuf (B, S, strlen (S));
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void SB_Append (StrBuf* Target, const StrBuf* Source)
-/* Append the contents of Source to Target */
-{
-    SB_AppendBuf (Target, Source->Buf, Source->Len);
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void SB_Cut (StrBuf* B, unsigned Len)
-/* Cut the contents of B at the given length. If the current length of the
-** buffer is smaller than Len, nothing will happen.
-*/
-{
-    if (Len < B->Len) {
-        B->Len = Len;
-    }
-}
-#endif
 
 
 

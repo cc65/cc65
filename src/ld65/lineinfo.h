@@ -110,69 +110,43 @@ const LineInfo* GetAsmLineInfo (const Collection* LineInfos);
 ** and return it. Return NULL if no such line info was found.
 */
 
-#if defined(HAVE_INLINE)
-INLINE const FilePos* GetSourcePos (const LineInfo* LI)
+static inline const FilePos* GetSourcePos (const LineInfo* LI)
 /* Return the source file position from the given line info */
 {
     return &LI->Pos;
 }
-#else
-#  define GetSourcePos(LI)      (&(LI)->Pos)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE const char* GetSourceName (const LineInfo* LI)
+static inline const char* GetSourceName (const LineInfo* LI)
 /* Return the name of a source file from the given line info */
 {
     return GetString (LI->Pos.Name);
 }
-#else
-#  define GetSourceName(LI)     (GetString ((LI)->Pos.Name))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetSourceLine (const LineInfo* LI)
+static inline unsigned GetSourceLine (const LineInfo* LI)
 /* Return the source file line from the given line info */
 {
     return LI->Pos.Line;
 }
-#else
-#  define GetSourceLine(LI)     ((LI)->Pos.Line)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetSourceCol (const LineInfo* LI)
+static inline unsigned GetSourceCol (const LineInfo* LI)
 /* Return the source file column from the given line info */
 {
     return LI->Pos.Col;
 }
-#else
-#  define GetSourceCol(LI)      ((LI)->Pos.Col)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE const char* GetSourceNameFromList (const Collection* LineInfos)
+static inline const char* GetSourceNameFromList (const Collection* LineInfos)
 /* Return the name of a source file from a list of line infos */
 {
     /* The relevant entry is in slot zero */
     return GetSourceName (CollConstAt (LineInfos, 0));
 }
-#else
-#  define GetSourceNameFromList(LineInfos)      \
-        GetSourceName ((const LineInfo*) CollConstAt ((LineInfos), 0))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetSourceLineFromList (const Collection* LineInfos)
+static inline unsigned GetSourceLineFromList (const Collection* LineInfos)
 /* Return the source file line from a list of line infos */
 {
     /* The relevant entry is in slot zero */
     return GetSourceLine (CollConstAt (LineInfos, 0));
 }
-#else
-#  define GetSourceLineFromList(LineInfos)      \
-        GetSourceLine ((const LineInfo*) CollConstAt ((LineInfos), 0))
-#endif
 
 unsigned LineInfoCount (void);
 /* Return the total number of line infos */

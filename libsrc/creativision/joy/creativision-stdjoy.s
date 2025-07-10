@@ -59,7 +59,8 @@ JOY_RIGHT       =       $08
 ;
 
 INSTALL:        lda     #JOY_ERR_OK
-                ldx     #>$0000
+                .assert JOY_ERR_OK = 0, error
+                tax
 ;               rts                             ; Fall through
 
 ; ------------------------------------------------------------------------

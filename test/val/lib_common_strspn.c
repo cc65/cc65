@@ -10,7 +10,7 @@ static char* TestChars="1234567890";                    // we like to find numbe
 TEST
 {
     unsigned i;
-    
+
     for (i=0; i < EstimatedStringSize; ++i)
       EstimatedString[i] = (i%10)+'0';                 // put 0123... into the string to be estimated
 

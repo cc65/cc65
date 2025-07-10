@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! 
+  !!DESCRIPTION!!
   !!ORIGIN!!      testsuite
   !!LICENCE!!     Public Domain
   !!AUTHOR!!      Groepaz/Hitmen
@@ -24,7 +24,7 @@ FILE *outfile=NULL;
 #else
 
 #endif
-                         
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -65,17 +65,17 @@ static unsigned char ch;
 
                 /* basic line-link / file-length */
                 memcpy(buffer,b1,4);
-                
-                dir->off=dir->off+4;    
+
+                dir->off=dir->off+4;
                 entry.d_reclen=254*(buffer[2]+(buffer[3]<<8));
 
                 /* read file entry */
                 memcpy(buffer,b2,0x10);
-                        
-                dir->off=dir->off+i;    
+
+                dir->off=dir->off+i;
 
                 printf("Xreaddir: '%s'\n",buffer);
-                
+
                 /* skip until either quote (file) or b (blocks free => end) */
                 i=0;ii=0;
                 while(i==0){
@@ -113,9 +113,9 @@ int main(void)
 char mydirname[XNAME_MAX+1]=".";
 XDIR mydir;
 struct Xdirent *mydirent;
-        
+
     printf("start\n");
-    
+
     if((mydirent=Xreaddir(&mydir))==NULL)
     {
             printf("NULL\n");

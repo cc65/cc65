@@ -53,7 +53,8 @@ enum {
     flLabel         = flUseLabel|flGenLabel,    /* Generate and use a label */
     flIllegal       = 0x10,                     /* Illegal instruction */
     flAbsOverride   = 0x20,                     /* Need a: override */
-    flFarOverride   = 0x40                      /* Need f: override */
+    flFarOverride   = 0x40,                     /* Need f: override */
+    flSizeChanges   = 0x80                      /* 65816: size may change */
 };
 
 /* Forward/typedef for struct OpcDesc */

@@ -65,12 +65,23 @@ struct SymTable {
 /* An empty symbol table */
 extern SymTable         EmptySymTab;
 
-/* Forwards */
-struct FuncDesc;
+/* Lexical level linked list node type */
+typedef struct LexicalLevel LexicalLevel;
+struct LexicalLevel {
+    LexicalLevel*       PrevLex;
+    unsigned            CurrentLevel;
+};
 
 /* Predefined lexical levels */
+#define LEX_LEVEL_NONE          0U
 #define LEX_LEVEL_GLOBAL        1U
 #define LEX_LEVEL_FUNCTION      2U
+#define LEX_LEVEL_BLOCK         3U
+#define LEX_LEVEL_STRUCT        4U
+#define LEX_LEVEL_PARAM_LIST    5U  /* HACK for error recovery */
+
+/* Forwards */
+struct FuncDesc;
 
 
 
@@ -80,8 +91,17 @@ struct FuncDesc;
 
 
 
+unsigned GetLexicalLevelDepth (void);
+/* Return the current lexical level depth */
+
 unsigned GetLexicalLevel (void);
 /* Return the current lexical level */
+
+void PushLexicalLevel (unsigned NewLevel);
+/* Enter the specified lexical level */
+
+void PopLexicalLevel (void);
+/* Exit the current lexical level */
 
 void EnterGlobalLevel (void);
 /* Enter the program global lexical level */
@@ -122,7 +142,7 @@ void LeaveStructLevel (void);
 
 
 SymEntry* FindSym (const char* Name);
-/* Find the symbol with the given name */
+/* Find with the given name the symbol visible in the current scope */
 
 SymEntry* FindGlobalSym (const char* Name);
 /* Find the symbol with the given name in the global symbol table only */
@@ -131,7 +151,7 @@ SymEntry* FindLocalSym (const char* Name);
 /* Find the symbol with the given name in the current symbol table only */
 
 SymEntry* FindTagSym (const char* Name);
-/* Find the symbol with the given name in the tag table */
+/* Find with the given name the tag symbol visible in the current scope */
 
 SymEntry FindStructField (const Type* TypeArray, const char* Name);
 /* Find a struct/union field in the fields list.
@@ -150,10 +170,10 @@ unsigned short FindSPAdjustment (const char* Name);
 
 
 SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTable* Tab, unsigned* DSFlags);
-/* Add an enum entry and return it */
+/* Add an enum tag entry and return it */
 
 SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTable* Tab, unsigned* DSFlags);
-/* Add a struct/union entry and return it */
+/* Add a struct/union tag entry and return it */
 
 SymEntry* AddBitField (const char* Name, const Type* Type, unsigned Offs,
                        unsigned BitOffs, unsigned BitWidth, int SignednessSpecified);
@@ -191,8 +211,11 @@ SymTable* GetFieldSymTab (void);
 SymTable* GetLabelSymTab (void);
 /* Return the label symbol table */
 
-int SymIsLocal (SymEntry* Sym);
-/* Return true if the symbol is defined in the highest lexical level */
+int SymIsLocal (const SymEntry* Sym);
+/* Return true if the symbol is declared in the highest lexical level */
+
+int SymIsGlobal (const SymEntry* Sym);
+/* Return true if the symbol is declared in the file scope level */
 
 void MakeZPSym (const char* Name);
 /* Mark the given symbol as zero page symbol */

@@ -18,7 +18,7 @@ _cvlinexy:
         jsr gotoxy              ; Call this one, will pop params
         pla                     ; Restore the length
 
-_cvline:    
+_cvline:
         cmp #0                  ; Is the length zero?
         beq L9                  ; Jump if done
         tax

@@ -7,7 +7,7 @@
 ;-------------------------------------------------------------------------
 ; ATASCII CHARACTER DEFS
 ;-------------------------------------------------------------------------
- 
+
 ATEOL   = $9B      ; END-OF-LINE, used by CONIO
 
 ;-------------------------------------------------------------------------
@@ -27,9 +27,9 @@ CH_VLINE    = $01  ; exclamation mark
 
 POKMSK  =  $00     ; Mask for Pokey IRQ enable
 RTCLOK  =  $01     ; 60 hz. clock
-JUMP    =  $01   
+JUMP    =  $01
 CRITIC  =  $03     ; Critical section
-ATRACT  =  $04     ; Attract Mode 
+ATRACT  =  $04     ; Attract Mode
 
 SDLSTL  =  $05     ; DLISTL Shadow
 SDLSTH  =  $06     ; DLISTH  "
@@ -66,20 +66,20 @@ SAVMSC          =       $1B             ; pointer to screen memory (conio)
 ;-------------------------------------------------------------------------
 
 ;Interrupt Vectors
-                 
-VIMIRQ  =  $0200   ; Immediate IRQ    
+
+VIMIRQ  =  $0200   ; Immediate IRQ
                       ; Preset $FC03 (SYSIRQ)
 VVBLKI  =  $0202   ; Vblank immediate
                       ; Preset $FCB8 (SYSVBL)
 VVBLKD  =  $0204   ; Vblank deferred
                       ; Preset $FCB2 (XITVBL)
-VDSLST  =  $0206   ; Display List 
+VDSLST  =  $0206   ; Display List
                       ; Preset $FEA1 (OSDLI)
 VKYBDI  =  $0208   ; Keyboard immediate
                       ; Preset $FD02 (SYSKBD)
 VKYBDF  =  $020A   ; Deferred Keyboard
                       ; Preset $FCB2 (XITVBL)
-VTRIGR  =  $020C   ; Soft Trigger   
+VTRIGR  =  $020C   ; Soft Trigger
 VBRKOP  =  $020E   ; BRK Opcode
 VSERIN  =  $0210   ; Serial in Ready
 VSEROR  =  $0212   ; Serial Out Ready

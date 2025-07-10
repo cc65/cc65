@@ -70,8 +70,6 @@ struct FuncDesc {
     unsigned            ParamSize;       /* Size of the parameters            */
     struct SymEntry*    LastParam;       /* Pointer to last parameter         */
     struct FuncDesc*    FuncDef;         /* Descriptor used in definition     */
-    struct SymEntry*    WrappedCall;     /* Pointer to the WrappedCall        */
-    unsigned int        WrappedCallData; /* The WrappedCall's user data       */
 };
 
 

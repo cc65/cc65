@@ -32,13 +32,13 @@ static void QuickSort (register unsigned char* Base, int Lo, int Hi,
                 J -= Size;
             }
             if (I <= J) {
-                _swap (Base + I, Base + J, Size);
+                __swap (Base + I, Base + J, Size);
                 I += Size;
                 J -= Size;
             }
         }
         if (J != Lo) {
-            _swap (Base + J, Base + Lo, Size);
+            __swap (Base + J, Base + Lo, Size);
         }
         if (((unsigned) J) * 2 > (Hi + Lo)) {
             QuickSort (Base, J + Size, Hi, Size, Compare);

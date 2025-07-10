@@ -7,8 +7,9 @@
         .export         _clrscr
         .include        "atari5200.inc"
         .importzp       ptr1
+        .importzp       screen_width, screen_height
 
-SCRSIZE =       480             ; 20x24: size of default conio atari5200 screen
+SCRSIZE = screen_width * screen_height
 
 _clrscr:lda     SAVMSC          ; screen memory
         sta     ptr1

@@ -81,7 +81,7 @@ ExprNode* GenLiteralExpr (long Val);
 /* Return an expression tree that encodes the given literal value */
 
 ExprNode* GenLiteral0 (void);
-/* Return an expression tree that encodes the the number zero */
+/* Return an expression tree that encodes the number zero */
 
 ExprNode* GenSymExpr (struct SymEntry* Sym);
 /* Return an expression node that encodes the given symbol */
@@ -172,7 +172,7 @@ ExprNode* FuncHiByte (void);
 /* Handle the .HIBYTE builtin function */
 
 ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size);
-/* Force the given expression into a specific size of ForceRange is true */
+/* Force the given expression into a specific size if ForceRange is true */
 
 ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size);
 /* Parse an expression and force it within a given size if ForceRange is true */

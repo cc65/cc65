@@ -63,45 +63,29 @@ extern StringPool* StrPool;
 
 
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetStrBufId (const StrBuf* S)
+static inline unsigned GetStrBufId (const StrBuf* S)
 /* Return the id of the given string buffer */
 {
     return SP_Add (StrPool, S);
 }
-#else
-#  define GetStrBufId(S)        SP_Add (StrPool, (S))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetStringId (const char* S)
+static inline unsigned GetStringId (const char* S)
 /* Return the id of the given string */
 {
     return SP_AddStr (StrPool, S);
 }
-#else
-#  define GetStringId(S)        SP_AddStr (StrPool, (S))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE const StrBuf* GetStrBuf (unsigned Index)
+static inline const StrBuf* GetStrBuf (unsigned Index)
 /* Convert a string index into a string */
 {
     return SP_Get (StrPool, Index);
 }
-#else
-#  define GetStrBuf(Index)      SP_Get (StrPool, (Index))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE const char* GetString (unsigned Index)
+static inline const char* GetString (unsigned Index)
 /* Convert a string index into a string */
 {
     return SB_GetConstBuf (SP_Get (StrPool, Index));
 }
-#else
-#  define GetString(Index)      SB_GetConstBuf (SP_Get (StrPool, (Index)))
-#endif
 
 void WriteStrPool (void);
 /* Write the string pool to the object file */

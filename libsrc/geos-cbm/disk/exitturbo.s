@@ -8,5 +8,5 @@
             .export _ExitTurbo
 
             .include "jumptab.inc"
-        
+
 _ExitTurbo      = ExitTurbo

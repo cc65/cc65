@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                declattr.c                                 */
 /*                                                                           */
-/*                          Declaration attributes                           */
+/*                           Declarator attributes                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -55,8 +55,8 @@
 
 
 /* Forwards for attribute handlers */
-static void NoReturnAttr (Declaration* D);
-static void UnusedAttr (Declaration* D);
+static void NoReturnAttr (Declarator* D);
+static void UnusedAttr (Declarator* D);
 
 
 
@@ -64,7 +64,7 @@ static void UnusedAttr (Declaration* D);
 typedef struct AttrDesc AttrDesc;
 struct AttrDesc {
     const char  Name[15];
-    void        (*Handler) (Declaration*);
+    void        (*Handler) (Declarator*);
 };
 static const AttrDesc AttrTable [] = {
     { "__noreturn__",   NoReturnAttr    },
@@ -141,8 +141,8 @@ static void ErrorSkip (void)
 
 
 
-static void AddAttr (Declaration* D, DeclAttr* A)
-/* Add an attribute to a declaration */
+static void AddAttr (Declarator* D, DeclAttr* A)
+/* Add an attribute to a declarator */
 {
     /* Allocate the list if necessary, the add the attribute */
     if (D->Attributes == 0) {
@@ -159,7 +159,7 @@ static void AddAttr (Declaration* D, DeclAttr* A)
 
 
 
-static void NoReturnAttr (Declaration* D)
+static void NoReturnAttr (Declarator* D)
 /* Parse the "noreturn" attribute */
 {
     /* Add the noreturn attribute */
@@ -168,7 +168,7 @@ static void NoReturnAttr (Declaration* D)
 
 
 
-static void UnusedAttr (Declaration* D)
+static void UnusedAttr (Declarator* D)
 /* Parse the "unused" attribute */
 {
     /* Add the noreturn attribute */
@@ -177,7 +177,7 @@ static void UnusedAttr (Declaration* D)
 
 
 
-void ParseAttribute (Declaration* D)
+void ParseAttribute (Declarator* D)
 /* Parse an additional __attribute__ modifier */
 {
     /* Do we have an attribute? */

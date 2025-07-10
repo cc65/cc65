@@ -1,0 +1,29 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 040-align.s
+Current file: 040-align.s
+
+000000r 1               ; 2022-06-20 Spiro Trikaliotis
+000000r 1               
+000000r 1  00                   .byte 0
+000001r 1               
+000001r 1  xx xx xx             .align 4
+000004r 1  04                   .byte 4
+000005r 1  0C 00                .word 12
+000007r 1  12 00                .word 18
+000009r 1               
+000009r 1                       .align 1
+000009r 1  01                   .byte 1
+00000Ar 1               
+00000Ar 1  xx xx xx xx          .align 8
+00000Er 1  xx xx        
+000010r 1  08                   .byte 8
+000011r 1               
+000011r 1  xx xx xx xx          .align 8
+000015r 1  xx xx xx     
+000018r 1  08                   .byte 8
+000019r 1               
+000019r 1  xx xx xx xx          .align 128
+00001Dr 1  xx xx xx xx  
+000021r 1  xx xx xx xx  
+000080r 1  80                   .byte 128
+000080r 1               

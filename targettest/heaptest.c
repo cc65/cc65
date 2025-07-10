@@ -10,7 +10,7 @@ static unsigned char* V[256];
 
 
 
-static char* Alloc (void)
+static unsigned char* Alloc (void)
 /* Allocate a random sized chunk of memory */
 {
     /* Determine the size */
@@ -234,6 +234,3 @@ int main (void)
     /* Done */
     return EXIT_SUCCESS;
 }
-
-
-

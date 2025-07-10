@@ -7,4 +7,4 @@
 
 __inviocb:
         lda     #<EINVAL
-        jmp     __directerrno
+        jmp     ___directerrno

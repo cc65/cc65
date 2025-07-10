@@ -10,19 +10,20 @@
 ; int tolower (int c);
 ;
 
-        .export         _tolower
+        .export         _tolower, tolowerdirect
         .include        "ctype.inc"
         .import         ctypemaskdirect
 
 _tolower:
         cpx     #$00            ; out of range?
-        bne     @L2             ; if so, return the argument unchanged
-        tay                     ; save char
+        bne     out             ; if so, return the argument unchanged
+tolowerdirect:
+        pha                     ; save char
         jsr     ctypemaskdirect ; get character classification
         and     #CT_UPPER       ; upper case char?
         beq     @L1             ; jump if no
-        tya                     ; restore char
+        pla                     ; restore char
         adc     #<('a'-'A')     ; make lower case char (ctypemaskdirect ensures carry clear)
         rts
-@L1:    tya                     ; restore char
-@L2:    rts
+@L1:    pla                     ; restore char
+out:    rts

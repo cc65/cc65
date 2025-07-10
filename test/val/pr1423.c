@@ -10,7 +10,7 @@ void test1(void)
     }
     fails++;
     return;
-} 
+}
 
 void test2(void)
 {

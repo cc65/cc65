@@ -50,6 +50,46 @@
 typedef long int off_t;
 #endif
 
+#ifndef _HAVE_dev_t
+#define _HAVE_dev_t
+typedef unsigned long int dev_t;
+#endif
+
+#ifndef _HAVE_ino_t
+#define _HAVE_ino_t
+typedef unsigned long int ino_t;
+#endif
+
+#ifndef _HAVE_nlink_t
+#define _HAVE_nlink_t
+typedef unsigned long int nlink_t;
+#endif
+
+#ifndef _HAVE_uid_t
+#define _HAVE_uid_t
+typedef unsigned char uid_t;
+#endif
+
+#ifndef _HAVE_gid_t
+#define _HAVE_gid_t
+typedef unsigned char gid_t;
+#endif
+
+#ifndef _HAVE_mode_t
+#define _HAVE_mode_t
+typedef unsigned char mode_t;
+#endif
+
+#ifndef _HAVE_fsblkcnt_t
+#define _HAVE_fsblkcnt_t
+typedef unsigned long int fsblkcnt_t;
+#endif
+
+#ifndef _HAVE_fsfilcnt_t
+#define _HAVE_fsfilcnt_t
+typedef unsigned long int fsfilcnt_t;
+#endif
+
 
 
 /*****************************************************************************/
@@ -60,6 +100,3 @@ typedef long int off_t;
 
 /* End of types.h */
 #endif
-
-
-

@@ -50,8 +50,9 @@ padbuffer:      .res    JOY_COUNT
 ;
 
 INSTALL:
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 
 ;        rts                     ; Run into UNINSTALL instead
 

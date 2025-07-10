@@ -8,7 +8,7 @@
 ;
 
             .export _dio_write_verify
-            .import dio_params, __oserror
+            .import dio_params, ___oserror
 
             .include "geossym.inc"
             .include "jumptab.inc"
@@ -18,6 +18,6 @@ _dio_write_verify:
         tay
         bne err
         jsr VerWriteBlock
-        stx __oserror
+        stx ___oserror
         txa
 err:    rts

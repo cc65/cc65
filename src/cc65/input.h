@@ -41,15 +41,20 @@
 #include <stdio.h>
 
 /* common */
+#include "coll.h"
 #include "strbuf.h"
 
 
 
 /*****************************************************************************/
-/*                                   data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
+
+/* Forwards */
+struct IFile;
+struct LineInfo;
 
 /* An enum that describes different types of input files. The members are
 ** choosen so that it is possible to combine them to bitsets
@@ -60,8 +65,27 @@ typedef enum {
     IT_USRINC = 0x04,           /* User include file (using "") */
 } InputType;
 
-/* Forward for an IFile structure */
-struct IFile;
+/* A bitmapped set of flags for include guard processing in the preprocessor */
+typedef enum {
+    IG_NONE         = 0x00,
+    IG_NEWFILE      = 0x01,     /* File processing started */
+    IG_ISGUARDED    = 0x02,     /* File contains an include guard */
+    IG_GUARDCLOSED  = 0x04,     /* Include guard was closed */
+    IG_COMPLETE     = IG_ISGUARDED | IG_GUARDCLOSED,
+} GuardFlags;
+
+/* Struct that describes an input file */
+typedef struct IFile IFile;
+struct IFile {
+    unsigned        Index;      /* File index */
+    unsigned        Usage;      /* Usage counter */
+    unsigned long   Size;       /* File size */
+    unsigned long   MTime;      /* Time of last modification */
+    InputType       Type;       /* Type of input file */
+    GuardFlags      GFlags;     /* Flags for include guard processing */
+    StrBuf          GuardMacro; /* Include guard macro name */
+    char            Name[1];    /* Name of file (dynamically allocated) */
+};
 
 /* The current input line */
 extern StrBuf* Line;
@@ -84,11 +108,27 @@ void OpenMainFile (const char* Name);
 void OpenIncludeFile (const char* Name, InputType IT);
 /* Open an include file and insert it into the tables. */
 
+void CloseIncludeFile (void);
+/* Close an include file and switch to the higher level file. Set Input to
+** NULL if this was the main file.
+*/
+
 void NextChar (void);
 /* Read the next character from the input stream and make CurC and NextC
 ** valid. If end of line is reached, both are set to NUL, no more lines
 ** are read by this function.
 */
+
+Collection* UseInputStack (Collection* InputStack);
+/* Use the provided input stack for incoming input. Return the previously used
+** InputStack.
+*/
+
+void PushLine (StrBuf* L);
+/* Save the current input line and use a new one */
+
+void ReuseInputLine (void);
+/* Save and reuse the current line as the next line */
 
 void ClearLine (void);
 /* Clear the current input line */
@@ -99,16 +139,41 @@ StrBuf* InitLine (StrBuf* Buf);
 */
 
 int NextLine (void);
-/* Get a line from the current input. Returns 0 on end of file. */
+/* Get a line from the current input. Returns 0 on end of file with no new
+** input bytes.
+*/
 
-const char* GetInputFile (const struct IFile* IF);
-/* Return a filename from an IFile struct */
+int PreprocessNextLine (void);
+/* Get a line from opened input files and do preprocess. Returns 0 on end of
+** main file.
+*/
 
-const char* GetCurrentFile (void);
+void GetFileInclusionInfo (struct LineInfo* LI);
+/* Get info about source file inclusion for LineInfo struct */
+
+void FreeFileInclusionInfo (struct LineInfo* LI);
+/* Free info about source file inclusion for LineInfo struct */
+
+int HasFileInclusionChanged (const struct LineInfo* LI);
+/* Return true if file inclusion has changed from last time */
+
+const char* GetInputFileName (const struct IFile* IF);
+/* Return the name of the file from an IFile struct */
+
+const char* GetCurrentFileName (void);
 /* Return the name of the current input file */
 
-unsigned GetCurrentLine (void);
+unsigned GetCurrentLineNum (void);
 /* Return the line number in the current input file */
+
+void SetCurrentLineNum (unsigned LineNum);
+/* Set the line number in the current input file */
+
+void SetCurrentFileName (const char* Name);
+/* Set the presumed name of the current input file */
+
+unsigned GetCurrentCounter (void);
+/* Return the counter number in the current input file */
 
 void CreateDependencies (void);
 /* Create dependency files requested by the user */

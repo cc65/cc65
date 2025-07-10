@@ -9,45 +9,43 @@
 ; called a lot!
 
         .export         tosadda0, tosaddax
-        .importzp       sp, tmp1
-
-        .macpack        cpu
+        .importzp       c_sp, tmp1
 
 tosadda0:
         ldx     #0
 tosaddax:
         clc                     ; (2)
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
 
-        adc     (sp)            ; (7)
+        adc     (c_sp)          ; (7)
         tay                     ; (9)
-        inc     sp              ; (14)
+        inc     c_sp            ; (14)
         bne     hiadd           ; (17)
-        inc     sp+1            ; (-1+5)
+        inc     c_sp+1          ; (-1+5)
 hiadd:  txa                     ; (19)
-        adc     (sp)            ; (24)
+        adc     (c_sp)          ; (24)
         tax                     ; (26)
-        inc     sp              ; (31)
+        inc     c_sp            ; (31)
         bne     done            ; (34)
-        inc     sp+1            ; (-1+5)
+        inc     c_sp+1          ; (-1+5)
 done:   tya                     ; (36)
 
-.else        
+.else
 
         ldy     #0              ; (4)
-        adc     (sp),y          ; (9) lo byte
+        adc     (c_sp),y        ; (9) lo byte
         iny                     ; (11)
         sta     tmp1            ; (14) save it
-        txa                     ; (16) 
-        adc     (sp),y          ; (21) hi byte
+        txa                     ; (16)
+        adc     (c_sp),y        ; (21) hi byte
         tax                     ; (23)
         clc                     ; (25)
-        lda     sp              ; (28)
+        lda     c_sp            ; (28)
         adc     #2              ; (30)
-        sta     sp              ; (33)
+        sta     c_sp            ; (33)
         bcc     L1              ; (36)
-        inc     sp+1            ; (-1+5)
+        inc     c_sp+1          ; (-1+5)
 L1:     lda     tmp1            ; (39) restore low byte
 
 .endif

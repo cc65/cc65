@@ -93,7 +93,7 @@ sdnobw: lda     DOS+1           ; SD version
         ldy     #31             ; offset for OSRMFLG
         lda     (DOSVEC),y      ; get OSRMFLG
         bne     sdcrts1
-        
+
 sdcrts0:clc
         rts
 sdcrts1:sec

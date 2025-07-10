@@ -1,14 +1,14 @@
 ;
 ; Ullrich von Bassewitz, 17.05.2000
 ;
-; int __fastcall__ _osmaperrno (unsigned char oserror);
+; int __fastcall__ __osmaperrno (unsigned char oserror);
 ;
 
-        .export         __osmaperrno
+        .export         ___osmaperrno
 
         .include        "errno.inc"
 
-__osmaperrno:
+___osmaperrno:
         ldx     #ErrTabSize
 :       cmp     ErrTab-2,x      ; Search for the error code
         beq     :+              ; Jump if found
@@ -23,7 +23,7 @@ __osmaperrno:
 
         ; Found the code
 :       lda     ErrTab-1,x
-        ldx     #$00            ; High byte always zero
+        ldx     #>$0000
         rts
 
         .rodata

@@ -24,7 +24,7 @@
     .byte   $01                     ; Version of the header
     .byte   $00,%00000000           ; 6502 only
     .byte   $00,$00                 ; Type of language
-    .byte   $00,$00                 ; OS version 
+    .byte   $00,$00                 ; OS version
 
     .byte   $00                     ; Reserved
     .byte   $00                     ; Auto or not

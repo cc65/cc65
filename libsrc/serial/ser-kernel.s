@@ -7,6 +7,7 @@
         .import         return0, ser_libref
         .importzp       ptr1
         .interruptor    ser_irq, 29     ; Export as high priority IRQ handler
+        .destructor     _ser_uninstall
 
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
@@ -44,7 +45,16 @@ ser_sig:        .byte   $73, $65, $72, SER_API_VERSION  ; "ser", version
 
 
 _ser_install:
-        sta     _ser_drv
+        ldy     _ser_drv                ; Check no driver is installed
+        bne     ErrInstalled
+        ldy     _ser_drv+1
+        beq     :+
+ErrInstalled:
+        ldx     #$00
+        lda     #SER_ERR_INSTALLED
+        rts
+
+:       sta     _ser_drv
         sta     ptr1
         stx     _ser_drv+1
         stx     ptr1+1
@@ -107,7 +117,14 @@ copy:   lda     (ptr1),y
 ; */
 
 _ser_uninstall:
-        jsr     ser_uninstall           ; Call driver routine
+        ldx     _ser_drv                ; Check a driver is installed
+        bne     :+
+        ldx     _ser_drv+1
+        bne     :+
+        lda     #SER_ERR_NO_DRIVER
+        rts
+
+:       jsr     ser_uninstall           ; Call driver routine
 
         lda     #$60                    ; RTS opcode
         sta     ser_irq                 ; Disable IRQ entry point
@@ -117,5 +134,6 @@ _ser_clear_ptr:                         ; External entry point
         sta     _ser_drv
         sta     _ser_drv+1              ; Clear the driver pointer
 
+done:
         tax
         rts                             ; Return zero

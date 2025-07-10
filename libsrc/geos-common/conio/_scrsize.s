@@ -11,7 +11,7 @@
         .importzp cursor_r, cursor_c
         .import _cursor
         .constructor initscrsize
-                      
+
         .include "geossym.inc"
 
 .segment        "ONCE"
@@ -38,7 +38,7 @@ L1:     lda #40                 ; 40 columns (more or less)
 
 .code
 
-screensize: 
+screensize:
         ldx xsize
         ldy ysize
         rts

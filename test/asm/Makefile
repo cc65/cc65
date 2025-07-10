@@ -1,77 +1,51 @@
-# Makefile for the assembler regression tests
+# ---- Display info during parsing phase ----
+SILENT:=$(findstring s,$(word 1, $(MAKEFLAGS)))
+ifneq ($(SILENT),s)
+    $(info Using Makefile: $(realpath $(firstword $(MAKEFILE_LIST))) $(MAKECMDGOALS))
+endif
+
+# top-level Makefile for the regression tests
 
 ifneq ($(shell echo),)
   CMD_EXE = 1
 endif
 
 ifdef CMD_EXE
-  EXE = .exe
-  MKDIR = mkdir $(subst /,\,$1)
-  RMDIR = -rmdir /q /s $(subst /,\,$1)
+  RMDIR = -rmdir /s /q $(subst /,\,$1)
 else
-  EXE =
-  MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
 endif
 
-ifdef QUIET
-  .SILENT:
+ifeq ($(SILENT),s)
+    QUIET := 1
 endif
 
-CA65 := $(if $(wildcard ../../bin/ca65*),../../bin/ca65,ca65)
-LD65 := $(if $(wildcard ../../bin/ld65*),../../bin/ld65,ld65)
+ifdef QUIET
+    PQ = "QUIET=1"
+    PD = --no-print-directory
+endif
 
-WORKDIR = ../../testwrk/asm
+WORKDIR = ../testwrk/asm
 
-ISEQUAL = ../../testwrk/isequal$(EXE)
+.PHONY: all continue mostlyclean clean
 
-CC = gcc
-CFLAGS = -O2
+all: mostlyclean continue
 
-.PHONY: all clean
+continue: mostlyclean
+	@$(MAKE) $(PD) -C cpudetect all $(PQ)
+	@$(MAKE) $(PD) -C opcodes all $(PQ)
+	@$(MAKE) $(PD) -C listing all $(PQ)
+	@$(MAKE) $(PD) -C val all $(PQ)
+	@$(MAKE) $(PD) -C err all $(PQ)
+	@$(MAKE) $(PD) -C misc all $(PQ)
 
-OPCODE_REFS := $(wildcard *-opcodes.ref)
-OPCODE_BINS = $(OPCODE_REFS:%.ref=$(WORKDIR)/%.bin)
-OPCODE_CPUS = $(OPCODE_REFS:%-opcodes.ref=%)
+mostlyclean:
+	@$(MAKE) $(PD) -C cpudetect clean $(PQ)
+	@$(MAKE) $(PD) -C opcodes clean $(PQ)
+	@$(MAKE) $(PD) -C listing clean $(PQ)
+	@$(MAKE) $(PD) -C val clean $(PQ)
+	@$(MAKE) $(PD) -C err clean $(PQ)
+	@$(MAKE) $(PD) -C misc clean $(PQ)
 
-CPUDETECT_REFS := $(wildcard *-cpudetect.ref)
-CPUDETECT_BINS = $(CPUDETECT_REFS:%.ref=$(WORKDIR)/%.bin)
-CPUDETECT_CPUS = $(CPUDETECT_REFS:%-cpudetect.ref=%)
-
-all: $(OPCODE_BINS) $(CPUDETECT_BINS) $(WORKDIR)/paramcount.o
-
-$(WORKDIR):
-	$(call MKDIR,$(WORKDIR))
-
-$(ISEQUAL): ../isequal.c | $(WORKDIR)
-	$(CC) $(CFLAGS) -o $@ $<
-
-define OPCODE_template
-
-$(WORKDIR)/$1-opcodes.bin: $1-opcodes.s $(ISEQUAL)
-	$(if $(QUIET),echo asm/$1-opcodes.bin)
-	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$<
-	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
-	$(ISEQUAL) $1-opcodes.ref $$@
-
-endef # OPCODE_template
-
-$(foreach cpu,$(OPCODE_CPUS),$(eval $(call OPCODE_template,$(cpu))))
-
-define CPUDETECT_template
-
-$(WORKDIR)/$1-cpudetect.bin: cpudetect.s $1-cpudetect.ref $(ISEQUAL)
-	$(if $(QUIET),echo asm/$1-cpudetect.bin)
-	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$<
-	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib
-	$(ISEQUAL) $1-cpudetect.ref $$@
-
-endef # CPUDETECT_template
-
-$(foreach cpu,$(CPUDETECT_CPUS),$(eval $(call CPUDETECT_template,$(cpu))))
-
-$(WORKDIR)/%.o: %.s | $(WORKDIR)
-	$(CA65) -l $(@:.o=.lst) -o $@ $<
-
-clean:
+clean: mostlyclean
 	@$(call RMDIR,$(WORKDIR))

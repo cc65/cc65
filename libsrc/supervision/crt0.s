@@ -33,8 +33,8 @@ reset:
 
         lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         ldx     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-        sta     sp
-        stx     sp+1            ; Set argument stack ptr
+        sta     c_sp
+        stx     c_sp+1          ; Set argument stack ptr
         jsr     initlib
         jsr     _main
 _exit:  jsr     donelib

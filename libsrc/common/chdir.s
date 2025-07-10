@@ -7,7 +7,7 @@
         .export         _chdir
 
         .import         __syschdir
-        .import         __mappederrno
+        .import         ___mappederrno
 
 
 ;--------------------------------------------------------------------------
@@ -17,7 +17,7 @@
 .proc   _chdir
 
         jsr     __syschdir      ; Call the machine specific function
-        jmp     __mappederrno   ; Store into _oserror, set errno, return 0/-1
+        jmp     ___mappederrno  ; Store into __oserror, set errno, return 0/-1
 
 .endproc
 

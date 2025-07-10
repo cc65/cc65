@@ -8,6 +8,7 @@
         .import         subysp, addysp, decsp1
 
         .include        "zeropage.inc"
+        .include        "apple2.inc"
         .include        "mli.inc"
 
 pushname:
@@ -15,7 +16,7 @@ pushname:
         stx     ptr1+1
 
         ; Alloc pathname buffer
-        ldy     #64+1           ; Max pathname length + zero
+        ldy     #FILENAME_MAX
         jsr     subysp
 
         ; Check for full pathname
@@ -33,8 +34,8 @@ pushname:
         sta     mliparam + MLI::ON_LINE::UNIT_NUM
 
         ; Use allocated pathname buffer
-        lda     sp
-        ldx     sp+1
+        lda     c_sp
+        ldx     c_sp+1
         sta     mliparam + MLI::ON_LINE::DATA_BUFFER
         stx     mliparam + MLI::ON_LINE::DATA_BUFFER+1
 
@@ -45,16 +46,16 @@ pushname:
         bcs     addsp65
 
         ; Get volume name length
-        lda     (sp),y
+        lda     (c_sp),y
         and     #15             ; Max volume name length
 
         ; Bracket volume name with slashes to form prefix
         sta     tmp1
         lda     #'/'
-        sta     (sp),y
+        sta     (c_sp),y
         ldy     tmp1
         iny                     ; Leading slash
-        sta     (sp),y
+        sta     (c_sp),y
         iny                     ; Trailing slash
 
         ; Adjust source pointer for copy
@@ -68,24 +69,24 @@ pushname:
 
         ; Copy source to allocated pathname buffer
 copy:   lda     (ptr1),y
-        sta     (sp),y
+        sta     (c_sp),y
         beq     setlen
         iny
-        cpy     #64+1           ; Max pathname length + zero
+        cpy     #FILENAME_MAX
         bcc     copy
 
         ; Load oserror code
         lda     #$40            ; "Invalid pathname"
 
         ; Free pathname buffer
-addsp65:ldy     #64+1
+addsp65:ldy     #FILENAME_MAX
         bne     addsp           ; Branch always
 
         ; Alloc and set length byte
 setlen: tya
         jsr     decsp1          ; Preserves A
         ldy     #$00
-        sta     (sp),y
+        sta     (c_sp),y
 
         ; Return success
         tya
@@ -93,5 +94,5 @@ setlen: tya
 
 popname:
         ; Cleanup stack
-        ldy     #1 + 64+1       ; Length byte + max pathname length + zero
-addsp:  jmp     addysp          ; Preserves A
+        ldy     #1 + FILENAME_MAX
+addsp:  jmp     addysp          ; Preserves A and X

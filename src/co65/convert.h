@@ -56,7 +56,7 @@ struct O65Data;
 
 
 void Convert (const struct O65Data* D);
-/* Convert the o65 file in D */ 
+/* Convert the o65 file in D */
 
 
 

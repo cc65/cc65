@@ -5,7 +5,7 @@
 ;
 
         .export         _clearerr, _feof, _ferror, _fileno, _fflush
-        .import         return0
+        .import         return0, ___directerrno
         .importzp       ptr1
 
         .include        "_file.inc"
@@ -78,10 +78,7 @@ err:    rts
 ; If the file is not valid, fileno must set errno and return -1
 
 error:  lda     #<EBADF
-        jsr     __seterrno
-        lda     #$FF
-        tax
-        rts
+        jmp     ___directerrno
 .endproc
 
 ;
@@ -89,5 +86,3 @@ error:  lda     #<EBADF
 ;
 
 _fflush = return0
-
-

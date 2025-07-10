@@ -140,7 +140,7 @@ FEATURES {
 
 SYMBOLS {
     # Define the stack size for the application
-    __STACKSIZE__:  value = $0200, weak = yes;
+    __STACKSIZE__:  value = $0200, type = weak;
 }
 </code></tscreen>
 
@@ -193,9 +193,9 @@ _init:    LDX     #$FF                 ; Initialize stack pointer to $01FF
 ; Set cc65 argument stack pointer
 
           LDA     #&lt;(__RAM_START__ + __RAM_SIZE__)
-          STA     sp
+          STA     c_sp
           LDA     #&gt;(__RAM_START__ + __RAM_SIZE__)
-          STA     sp+1
+          STA     c_sp+1
 
 ; ---------------------------------------------------------------------------
 ; Initialize memory storage

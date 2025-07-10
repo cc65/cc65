@@ -33,6 +33,8 @@
 #ifndef _DIRENT_H
 #define _DIRENT_H
 
+#include <target.h>
+
 
 
 /*****************************************************************************/
@@ -46,31 +48,15 @@ typedef struct DIR DIR;
 #if defined(__APPLE2__)
 
 struct dirent {
-    char          d_name[16];
-    unsigned      d_ino;
-    unsigned      d_blocks;
-    unsigned long d_size;
-    unsigned char d_type;
-    struct {
-        unsigned day  :5;
-        unsigned mon  :4;
-        unsigned year :7;
-    }             d_cdate;
-    struct {
-        unsigned char min;
-        unsigned char hour;
-    }             d_ctime;
-    unsigned char d_access;
-    unsigned      d_auxtype;
-    struct {
-        unsigned day  :5;
-        unsigned mon  :4;
-        unsigned year :7;
-    }             d_mdate;
-    struct {
-        unsigned char min;
-        unsigned char hour;
-    }             d_mtime;
+    char            d_name[16];
+    unsigned        d_ino;
+    unsigned        d_blocks;
+    unsigned long   d_size;
+    unsigned char   d_type;
+    struct datetime d_ctime;
+    unsigned char   d_access;
+    unsigned        d_auxtype;
+    struct datetime d_mtime;
 };
 
 #define _DE_ISREG(t)  ((t) != 0x0F)
@@ -160,8 +146,6 @@ long __fastcall__ telldir (DIR* dir);
 void __fastcall__ seekdir (DIR* dir, long offs);
 
 void __fastcall__ rewinddir (DIR* dir);
-
-
 
 /* End of dirent.h */
 #endif

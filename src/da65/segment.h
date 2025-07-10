@@ -44,13 +44,13 @@
 
 
 
-void AddAbsSegment (unsigned Start, unsigned End, const char* Name);
+void AddAbsSegment (uint32_t Start, uint32_t End, const char* Name);
 /* Add an absolute segment to the segment table */
 
-char* GetSegmentStartName (unsigned Addr);
+char* GetSegmentStartName (uint32_t Addr);
 /* Return the name of the segment which starts at the given address */
 
-unsigned GetSegmentAddrSize (unsigned Addr);
+unsigned GetSegmentAddrSize (uint32_t Addr);
 /* Return the address size of the segment which starts at the given address */
 
 

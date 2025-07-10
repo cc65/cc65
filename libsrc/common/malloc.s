@@ -131,6 +131,7 @@ _malloc:
         sta     ptr1
         bcc     @L1
         inc     ptr1+1
+        beq     OutOfHeapSpace          ; if high byte's 0, we overflowed!
 @L1:    ldx     ptr1+1
         bne     @L2
         cmp     #HEAP_MIN_BLOCKSIZE+1
@@ -140,9 +141,9 @@ _malloc:
 
 ; Load a pointer to the freelist into ptr2
 
-@L2:    lda     __heapfirst
+@L2:    lda     ___heapfirst
         sta     ptr2
-        lda     __heapfirst+1
+        lda     ___heapfirst+1
         sta     ptr2+1
 
 ; Search the freelist for a block that is big enough. We will calculate
@@ -173,16 +174,16 @@ _malloc:
 
 ; We did not find a block big enough. Try to use new space from the heap top.
 
-        lda     __heapptr
+        lda     ___heapptr
         add     ptr1                    ; _heapptr + size
         tay
-        lda     __heapptr+1
+        lda     ___heapptr+1
         adc     ptr1+1
         bcs     OutOfHeapSpace          ; On overflow, we're surely out of space
 
-        cmp     __heapend+1
+        cmp     ___heapend+1
         bne     @L5
-        cpy     __heapend
+        cpy     ___heapend
 @L5:    bcc     TakeFromTop
         beq     TakeFromTop
 
@@ -196,13 +197,13 @@ Done:   rts
 ; There is enough space left, take it from the heap top
 
 TakeFromTop:
-        ldx     __heapptr               ; p = _heapptr;
+        ldx     ___heapptr              ; p = _heapptr;
         stx     ptr2
-        ldx     __heapptr+1
+        ldx     ___heapptr+1
         stx     ptr2+1
 
-        sty     __heapptr               ; _heapptr += size;
-        sta     __heapptr+1
+        sty     ___heapptr              ; _heapptr += size;
+        sta     ___heapptr+1
         jmp     FillSizeAndRet          ; Done
 
 ; We found a block big enough. If the block can hold just the
@@ -245,10 +246,10 @@ BlockFound:
 ; Do _hfirst = f->next
 
 @L1:    lda     (ptr2),y                ; Load high byte of f->next
-        sta     __heapfirst+1
+        sta     ___heapfirst+1
         dey                             ; Points to next
         lda     (ptr2),y                ; Load low byte of f->next
-        sta     __heapfirst
+        sta     ___heapfirst
 
 ; Check f->next. Y points always to next if we come here
 
@@ -275,10 +276,10 @@ BlockFound:
 ; Do _hlast = f->prev
 
 @L3:    lda     (ptr2),y                ; Load low byte of f->prev
-        sta     __heaplast
+        sta     ___heaplast
         iny                             ; Points to prev+1
         lda     (ptr2),y                ; Load high byte of f->prev
-        sta     __heaplast+1
+        sta     ___heaplast+1
         jmp     RetUserPtr              ; Done
 
 ; We must slice the block found. Cut off space from the upper end, so we
@@ -336,4 +337,3 @@ RetUserPtr:
         bcc     @L9
         inx
 @L9:    rts
-

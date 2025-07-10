@@ -4,7 +4,7 @@
 ;
 
         .export         _chlinexy, _chline
- 
+
         .import         rvs, display_conio, update_adscr
         .import         popax
 
@@ -22,7 +22,7 @@ _chlinexy:
 _chline:
         tax                     ; Is the length zero?
         beq     @L9             ; Jump if done
-@L1:        
+@L1:
         lda     #'-'            ; Horizontal line screen code
         ora     rvs
 

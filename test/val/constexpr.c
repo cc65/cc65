@@ -8,7 +8,7 @@ if they are being compiled/evaluated correctly.
 related:
 
 pr #1424 - More compile-time constant expressions regarding object addresses
-issue #1196 - Constant expressions in general 
+issue #1196 - Constant expressions in general
 
 */
 

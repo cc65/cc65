@@ -29,6 +29,6 @@ _tgi_unload:
         jmp     _mod_free               ; Free the driver
 
 no_driver:
-        lda     #<TGI_ERR_NO_DRIVER
+        lda     #TGI_ERR_NO_DRIVER
         sta     _tgi_error
         rts

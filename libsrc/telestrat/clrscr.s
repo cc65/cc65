@@ -4,7 +4,7 @@
 
     .export    _clrscr
     .import    OLD_CHARCOLOR, OLD_BGCOLOR, BGCOLOR, CHARCOLOR
-    
+
     .include   "telestrat.inc"
 
 .proc _clrscr
@@ -35,13 +35,13 @@
     ldx     #$00
     stx     SCRY
     stx     SCRX
-    
+
     stx     OLD_BGCOLOR                             ; Black
     stx     BGCOLOR
-    
+
     ldx     #$07                                    ; White
     stx     OLD_CHARCOLOR
     stx     CHARCOLOR
-    
+
     rts
 .endproc

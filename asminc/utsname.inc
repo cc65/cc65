@@ -33,7 +33,7 @@
 
 
 
-; Struct utsname 
+; Struct utsname
 .struct utsname
         sysname         .byte   17
         nodename        .byte   9

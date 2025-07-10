@@ -126,7 +126,7 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
     }
 
     /* Something went wrong when parsing the directory entry */
-    _errno = EIO;
+    __errno = EIO;
 exitpoint:
     return 0;
 }

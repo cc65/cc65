@@ -19,7 +19,7 @@ the native format.
 
 chrcvt65 is a vector font converter. It is able to convert a "BGI Stroked
 Font" to a compact TGI native vector font. See the function <url
-url="funcref.html#tgi_load_vectorfont" name="tgi_load_vectorfont"> for usage.
+url="tgi.html#tgi_load_vectorfont" name="tgi_load_vectorfont"> for usage.
 
 
 

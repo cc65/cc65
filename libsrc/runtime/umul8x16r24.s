@@ -9,8 +9,6 @@
 
         .include        "zeropage.inc"
 
-        .macpack        cpu
-
 ;---------------------------------------------------------------------------
 ; 8x16 => 24 unsigned multiplication routine. Because the overhead for a
 ; 8x16 => 16 unsigned multiplication routine is small, we will tag it with
@@ -31,7 +29,7 @@ umul8x16r16:
 
 umul8x16r24m:
 umul8x16r16m:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     ptr1+1
         stz     sreg
 .else

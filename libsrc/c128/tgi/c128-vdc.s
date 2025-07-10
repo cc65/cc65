@@ -268,7 +268,7 @@ INIT:
 @L1:    ldx     #$FF
         stx     BITMASK
 
-; Remeber current color value
+; Remember current color value
         ldx     #VDC_COLORS
         jsr     VDCReadReg
         sta     OLDCOLOR

@@ -33,6 +33,7 @@
 
 
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -123,7 +124,7 @@ void CloseOutput (void)
 void Output (const char* Format, ...)
 /* Write to the output file */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         va_list ap;
         va_start (ap, Format);
         Col += vfprintf (F, Format, ap);
@@ -136,7 +137,7 @@ void Output (const char* Format, ...)
 void Indent (unsigned N)
 /* Make sure the current line column is at position N (zero based) */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         while (Col < N) {
             fputc (' ', F);
             ++Col;
@@ -149,7 +150,7 @@ void Indent (unsigned N)
 void LineFeed (void)
 /* Add a linefeed to the output file */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         fputc ('\n', F);
         if (PageLength > 0 && ++Line >= PageLength) {
             if (FormFeeds) {
@@ -184,7 +185,7 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
 ** current PC.
 */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         /* Flush existing output if necessary */
         if (Col > 1) {
             LineFeed ();
@@ -208,13 +209,13 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
 
 
 
-void DefConst (const char* Name, const char* Comment, unsigned Addr)
+void DefConst (const char* Name, const char* Comment, uint32_t Addr)
 /* Define an address constant */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         Output ("%s", Name);
         Indent (ACol);
-        Output (":= $%04X", Addr);
+        Output (":= $%04" PRIX32, Addr);
         if (Comment) {
             Indent (CCol);
             Output ("; %s", Comment);
@@ -225,19 +226,19 @@ void DefConst (const char* Name, const char* Comment, unsigned Addr)
 
 
 
-void DataByteLine (unsigned ByteCount)
+void DataByteLine (uint32_t ByteCount)
 /* Output a line with bytes */
 {
-    unsigned I;
+    uint32_t I;
 
     Indent (MCol);
     Output (".byte");
     Indent (ACol);
     for (I = 0; I < ByteCount; ++I) {
         if (I > 0) {
-            Output (",$%02X", CodeBuf[PC+I]);
+            Output (",$%02" PRIX8, CodeBuf[PC+I]);
         } else {
-            Output ("$%02X", CodeBuf[PC+I]);
+            Output ("$%02" PRIX8, CodeBuf[PC+I]);
         }
     }
     LineComment (PC, ByteCount);
@@ -246,19 +247,19 @@ void DataByteLine (unsigned ByteCount)
 
 
 
-void DataDByteLine (unsigned ByteCount)
+void DataDByteLine (uint32_t ByteCount)
 /* Output a line with dbytes */
 {
-    unsigned I;
+    uint32_t I;
 
     Indent (MCol);
     Output (".dbyt");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
         if (I > 0) {
-            Output (",$%04X", GetCodeDByte (PC+I));
+            Output (",$%04" PRIX16, GetCodeDByte (PC+I));
         } else {
-            Output ("$%04X", GetCodeDByte (PC+I));
+            Output ("$%04" PRIX16, GetCodeDByte (PC+I));
         }
     }
     LineComment (PC, ByteCount);
@@ -267,19 +268,19 @@ void DataDByteLine (unsigned ByteCount)
 
 
 
-void DataWordLine (unsigned ByteCount)
+void DataWordLine (uint32_t ByteCount)
 /* Output a line with words */
 {
-    unsigned I;
+    uint32_t I;
 
     Indent (MCol);
     Output (".word");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
         if (I > 0) {
-            Output (",$%04X", GetCodeWord (PC+I));
+            Output (",$%04" PRIX16, GetCodeWord (PC+I));
         } else {
-            Output ("$%04X", GetCodeWord (PC+I));
+            Output ("$%04" PRIX16, GetCodeWord (PC+I));
         }
     }
     LineComment (PC, ByteCount);
@@ -288,19 +289,19 @@ void DataWordLine (unsigned ByteCount)
 
 
 
-void DataDWordLine (unsigned ByteCount)
+void DataDWordLine (uint32_t ByteCount)
 /* Output a line with dwords */
 {
-    unsigned I;
+    uint32_t I;
 
     Indent (MCol);
     Output (".dword");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 4) {
         if (I > 0) {
-            Output (",$%08lX", GetCodeDWord (PC+I));
+            Output (",$%08" PRIX32, GetCodeDWord (PC+I));
         } else {
-            Output ("$%08lX", GetCodeDWord (PC+I));
+            Output ("$%08" PRIX32, GetCodeDWord (PC+I));
         }
     }
     LineComment (PC, ByteCount);
@@ -312,7 +313,7 @@ void DataDWordLine (unsigned ByteCount)
 void SeparatorLine (void)
 /* Print a separator line */
 {
-    if (Pass == PassCount && Comments >= 1) {
+    if (Pass == PASS_FINAL && Comments >= 1) {
         Output ("; ----------------------------------------------------------------------------");
         LineFeed ();
     }
@@ -323,7 +324,7 @@ void SeparatorLine (void)
 void StartSegment (const char* Name, unsigned AddrSize)
 /* Start a segment */
 {
-    if (Pass == PassCount) {
+    if (Pass == PASS_FINAL) {
         LineFeed ();
         Output (".segment");
         Indent (ACol);
@@ -367,17 +368,17 @@ void LineComment (unsigned PC, unsigned Count)
 {
     unsigned I;
 
-    if (Pass == PassCount && Comments >= 2) {
+    if (Pass == PASS_FINAL && Comments >= 2) {
         Indent (CCol);
         Output ("; %04X", PC);
         if (Comments >= 3) {
             for (I = 0; I < Count; ++I) {
-                Output (" %02X", CodeBuf [PC+I]);
+                Output (" %02" PRIX8, CodeBuf [PC+I]);
             }
             if (Comments >= 4) {
                 Indent (TCol);
                 for (I = 0; I < Count; ++I) {
-                    unsigned char C = CodeBuf [PC+I];
+                    uint8_t C = CodeBuf [PC+I];
                     if (!isprint (C)) {
                         C = '.';
                     }
@@ -399,5 +400,25 @@ void OutputSettings (void)
     Indent (ACol);
     Output ("\"%s\"", CPUNames[CPU]);
     LineFeed ();
+    LineFeed ();
+}
+
+
+
+void OutputMFlag (unsigned char enabled)
+/* Output the 65816 M-flag state */
+{
+    Indent (MCol);
+    Output (enabled ? ".a8" : ".a16");
+    LineFeed ();
+}
+
+
+
+void OutputXFlag (unsigned char enabled)
+/* Output the 65816 X-flag state */
+{
+    Indent (MCol);
+    Output (enabled ? ".i8" : ".i16");
     LineFeed ();
 }

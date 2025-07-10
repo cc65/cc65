@@ -89,7 +89,7 @@ int __fastcall__ exec (const char* progname, const char* cmdline)
     }
     utoa (dv, basic.unit, 10);
 
-    /* Tape files can be openned only once; skip this test for the Datasette. */
+    /* Tape files can be opened only once; skip this test for the Datasette. */
     if (dv != 1) {
         /* Don't try to run a program that can't be found. */
         fd = open (progname, O_RDONLY);

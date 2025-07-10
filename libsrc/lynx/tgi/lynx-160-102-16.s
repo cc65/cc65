@@ -43,7 +43,7 @@ libref: .addr   $0000                   ; Library reference
 ; to an RTS for test versions (function not implemented). A future version may
 ; allow for emulation: In this case the vector will be zero. Emulation means
 ; that the graphics kernel will emulate the function by using lower level
-; primitives - for example ploting a line by using calls to SETPIXEL.
+; primitives - for example plotting a line by using calls to SETPIXEL.
 
         .addr   INSTALL
         .addr   UNINSTALL
@@ -113,7 +113,8 @@ text_bitmap:    .res    8*(1+20+1)+1
 
 .rodata
 
-DEFPALETTE:     .byte   >$011
+DEFPALETTE:     .byte   >$223
+                .byte   >$011
                 .byte   >$34d
                 .byte   >$9af
                 .byte   >$9b8
@@ -124,11 +125,11 @@ DEFPALETTE:     .byte   >$011
                 .byte   >$d5f
                 .byte   >$c53
                 .byte   >$822
-                .byte   >$223
                 .byte   >$484
                 .byte   >$8e5
                 .byte   >$cf5
                 .byte   >$fff
+                .byte   <$223
                 .byte   <$011
                 .byte   <$34d
                 .byte   <$9af
@@ -140,7 +141,6 @@ DEFPALETTE:     .byte   >$011
                 .byte   <$d5f
                 .byte   <$c53
                 .byte   <$822
-                .byte   <$223
                 .byte   <$484
                 .byte   <$8e5
                 .byte   <$cf5
@@ -162,6 +162,7 @@ INSTALL:
         lda     #1
         sta     TEXTMAGX
         sta     TEXTMAGY
+        sta     DRAWINDEX
         stz     BGINDEX
         stz     DRAWPAGE
         stz     SWAPREQUEST
@@ -257,7 +258,7 @@ GETERROR:
 ;
 ; The TGI lacks a way to draw sprites. As that functionality is vital to
 ; Lynx games we borrow this CONTROL function to implement the still
-; missing tgi_draw_sprite funtion. To use this in your C-program
+; missing tgi_draw_sprite function. To use this in your C-program
 ; do a #define tgi_draw_sprite(spr) tgi_ioctl(0, spr)
 ;
 ; To do a flip-screen call tgi_ioctl(1, 0)
@@ -418,7 +419,7 @@ cls_sprite:
         .word   0
         .word   $a000                           ; 160
         .word   $6600                           ; 102
-        .byte   $00
+        .byte   $11
 
 .code
 CLEAR:  lda     #<cls_sprite
@@ -844,11 +845,6 @@ OUTTEXT:
         lda     TEXTMAGY
         sta     text_sy+1
 
-        lda     BGINDEX
-        beq     @L1             ; Choose opaque black sprite?
-        lda     #$04            ; No, choose normal sprite
-@L1:
-        sta     text_sprite
         lda     DRAWINDEX       ; Set color
         asl
         asl
@@ -956,7 +952,7 @@ OUTTEXT:
 text_coll:
         .byte   0
 text_sprite:
-        .byte   $00,$90,$20
+        .byte   $04,$90,$20
         .addr   0, text_bitmap
 text_x:
         .word   0

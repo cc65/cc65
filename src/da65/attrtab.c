@@ -33,7 +33,13 @@
 
 
 
+#include <inttypes.h>
+
+/* common */
+#include "xmalloc.h"
+
 /* da65 */
+#include "cpu.h"
 #include "error.h"
 #include "attrtab.h"
 
@@ -45,8 +51,78 @@
 
 
 
-/* Attribute table */
-static unsigned short AttrTab[0x10000];
+/* Attribute structure how it is found in the attribute table */
+typedef struct Attribute Attribute;
+struct Attribute {
+    struct Attribute*   Next;           /* Next entry in linked list */
+    uint32_t            Addr;           /* The full address */
+    attr_t              Attr;           /* Actual attribute */
+};
+
+/* Attributes use a hash table and a linear list for collision resolution. The
+** hash function is easy and effective. It evaluates just the lower bits of
+** the address.
+*/
+#define ATTR_HASH_SIZE          8192u   /* Must be power of two */
+static Attribute* AttributeTab[ATTR_HASH_SIZE];
+
+
+
+/*****************************************************************************/
+/*                             struct Attribute                              */
+/*****************************************************************************/
+
+
+
+static Attribute* NewAttribute (uint32_t Addr, attr_t Attr)
+/* Create a new attribute structure and return it */
+{
+    /* Create a new attribute */
+    Attribute* A = xmalloc (sizeof (Attribute));
+
+    /* Fill in the data */
+    A->Next = 0;
+    A->Addr = Addr;
+    A->Attr = Attr;
+
+    /* Return the attribute just created */
+    return A;
+}
+
+
+
+static uint32_t GetAttributeHash (uint32_t Addr)
+/* Get the hash for an attribute at the given address */
+{
+    return (Addr & (ATTR_HASH_SIZE - 1));
+}
+
+
+
+static Attribute* FindAttribute (uint32_t Addr)
+/* Search for an attribute for the given address and return it. Returns NULL
+** if no attribute exists for the address.
+*/
+{
+    Attribute* A = AttributeTab[GetAttributeHash (Addr)];
+    while (A) {
+        if (A->Addr == Addr) {
+            break;
+        }
+        A = A->Next;
+    }
+    return A;
+}
+
+
+
+static void InsertAttribute (Attribute* A)
+/* Insert an attribute into the hash table */
+{
+    uint32_t Hash = GetAttributeHash (A->Addr);
+    A->Next = AttributeTab[Hash];
+    AttributeTab[Hash] = A;
+}
 
 
 
@@ -56,33 +132,43 @@ static unsigned short AttrTab[0x10000];
 
 
 
-void AddrCheck (unsigned Addr)
+void AddrCheck (uint32_t Addr)
 /* Check if the given address has a valid range */
 {
-    if (Addr >= 0x10000) {
-        Error ("Address out of range: %08X", Addr);
+    if (Addr >= 0x10000 && CPU != CPU_65816) {
+        Error ("Address out of range: $%04" PRIX32, Addr);
     }
 }
 
 
 
-attr_t GetAttr (unsigned Addr)
+attr_t GetAttr (uint32_t Addr)
 /* Return the attribute for the given address */
 {
+    /* As a small optimization we cache the last used attribute so when the
+    ** function is called several times with the same address we do already
+    ** know it.
+    */
+    static const Attribute* A = 0;
+    if (A != 0 && A->Addr == Addr) {
+        return A->Attr;
+    }
+
     /* Check the given address */
     AddrCheck (Addr);
 
     /* Return the attribute */
-    return AttrTab[Addr];
+    A = FindAttribute (Addr);
+    return A? A->Attr : atDefault;
 }
 
 
 
-int SegmentDefined (unsigned Start, unsigned End)
+int SegmentDefined (uint32_t Start, uint32_t End)
 /* Return true if the atSegment bit is set somewhere in the given range */
 {
     while (Start <= End) {
-        if (AttrTab[Start++] & atSegment) {
+        if (GetAttr (Start++) & atSegment) {
             return 1;
         }
     }
@@ -91,7 +177,7 @@ int SegmentDefined (unsigned Start, unsigned End)
 
 
 
-int IsSegmentEnd (unsigned Addr)
+int IsSegmentEnd (uint32_t Addr)
 /* Return true if a segment ends at the given address */
 {
     return (GetAttr (Addr) & atSegmentEnd) != 0x0000;
@@ -99,7 +185,7 @@ int IsSegmentEnd (unsigned Addr)
 
 
 
-int IsSegmentStart (unsigned Addr)
+int IsSegmentStart (uint32_t Addr)
 /* Return true if a segment starts at the given address */
 {
     return (GetAttr (Addr) & atSegmentStart) != 0x0000;
@@ -121,17 +207,16 @@ unsigned GetGranularity (attr_t Style)
         case atAddrTab:  return 2;
         case atRtsTab:   return 2;
         case atTextTab:  return 1;
-
-        case atSkip:
+        case atSkip:     return 1;
         default:
-            Internal ("GetGraularity called for style = %d", Style);
+            Internal ("GetGranularity called for style = %d", Style);
             return 0;
     }
 }
 
 
 
-void MarkRange (unsigned Start, unsigned End, attr_t Attr)
+void MarkRange (uint32_t Start, uint32_t End, attr_t Attr)
 /* Mark a range with the given attribute */
 {
     /* Do it easy here... */
@@ -142,43 +227,50 @@ void MarkRange (unsigned Start, unsigned End, attr_t Attr)
 
 
 
-void MarkAddr (unsigned Addr, attr_t Attr)
+void MarkAddr (uint32_t Addr, attr_t Attr)
 /* Mark an address with an attribute */
 {
     /* Check the given address */
     AddrCheck (Addr);
 
+    /* Get an existing attribute entry */
+    Attribute* A = FindAttribute (Addr);
+
     /* We must not have more than one style bit */
-    if (Attr & atStyleMask) {
-        if (AttrTab[Addr] & atStyleMask) {
-            Error ("Duplicate style for address %04X", Addr);
+    if (A != 0 && (Attr & atStyleMask) != 0) {
+        if ((A->Attr & atStyleMask) != 0) {
+            Error ("Duplicate style for address %04" PRIX32, Addr);
         }
     }
 
     /* Set the style */
-    AttrTab[Addr] |= Attr;
+    if (A) {
+        A->Attr |= Attr;
+    } else {
+        InsertAttribute (NewAttribute (Addr, Attr));
+    }
 }
 
 
 
-attr_t GetStyleAttr (unsigned Addr)
+attr_t GetStyleAttr (uint32_t Addr)
 /* Return the style attribute for the given address */
 {
     /* Check the given address */
     AddrCheck (Addr);
 
     /* Return the attribute */
-    return (AttrTab[Addr] & atStyleMask);
+    return (GetAttr (Addr) & atStyleMask);
 }
 
 
 
-attr_t GetLabelAttr (unsigned Addr)
+attr_t GetLabelAttr (uint32_t Addr)
 /* Return the label attribute for the given address */
 {
     /* Check the given address */
     AddrCheck (Addr);
 
     /* Return the attribute */
-    return (AttrTab[Addr] & atLabelMask);
+    return (GetAttr (Addr) & atLabelMask);
 }

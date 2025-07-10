@@ -63,7 +63,7 @@ L1:     lda     #<brk_handler   ; Set the break vector to our routine
         lda     #$00
         sta     oldvec          ; Clear the old vector
         stx     oldvec+1
-@L9:    rts     
+@L9:    rts
 
 .endproc
 

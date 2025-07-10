@@ -155,89 +155,6 @@ void CollInsert (Collection* C, void* Item, unsigned Index)
 
 
 
-#if !defined(HAVE_INLINE)
-void CollAppend (Collection* C, void* Item)
-/* Append an item to the end of the collection */
-{
-    /* Insert the item at the end of the current list */
-    CollInsert (C, Item, C->Count);
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void* CollAt (const Collection* C, unsigned Index)
-/* Return the item at the given index */
-{
-    /* Check the index */
-    PRECONDITION (Index < C->Count);
-
-    /* Return the element */
-    return C->Items[Index];
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-const void* CollConstAt (const Collection* C, unsigned Index)
-/* Return the item at the given index */
-{
-    /* Check the index */
-    PRECONDITION (Index < C->Count);
-
-    /* Return the element */
-    return C->Items[Index];
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void* CollLast (Collection* C)
-/* Return the last item in a collection */
-{
-    /* We must have at least one entry */
-    PRECONDITION (C->Count > 0);
-
-    /* Return the element */
-    return C->Items[C->Count-1];
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-const void* CollConstLast (const Collection* C)
-/* Return the last item in a collection */
-{
-    /* We must have at least one entry */
-    PRECONDITION (C->Count > 0);
-
-    /* Return the element */
-    return C->Items[C->Count-1];
-}
-#endif
-
-
-
-#if !defined(HAVE_INLINE)
-void* CollPop (Collection* C)
-/* Remove the last segment from the stack and return it. Calls FAIL if the
-** collection is empty.
-*/
-{
-    /* We must have at least one entry */
-    PRECONDITION (C->Count > 0);
-
-    /* Return the element */
-    return C->Items[--C->Count];
-}
-#endif
-
-
-
 int CollIndex (Collection* C, const void* Item)
 /* Return the index of the given item in the collection. Return -1 if the
 ** item was not found in the collection.
@@ -287,22 +204,6 @@ void CollDeleteItem (Collection* C, const void* Item)
     --C->Count;
     memmove (C->Items+Index, C->Items+Index+1, (C->Count-Index) * sizeof (void*));
 }
-
-
-
-#if !defined(HAVE_INLINE)
-void CollReplace (Collection* C, void* Item, unsigned Index)
-/* Replace the item at the given position. The old item will not be freed,
-** just the pointer will get replaced.
-*/
-{
-    /* Check the index */
-    PRECONDITION (Index < C->Count);
-
-    /* Replace the item pointer */
-    C->Items[Index] = Item;
-}
-#endif
 
 
 

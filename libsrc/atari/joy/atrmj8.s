@@ -69,7 +69,8 @@ INSTALL:
         lda     #$34
         sta     PACTL
         lda     #JOY_ERR_OK
-        ldx     #0
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

@@ -11,7 +11,7 @@ TEST
 {
     unsigned i,j;
     char*    p;
-    
+
     for (i=0; i < SourceStringSize; ++i)
       SourceString[i] = (i%128)+1;
 
@@ -23,13 +23,13 @@ TEST
     DestinationString[0] = 0;
 
     ASSERT_AreEqual(0, strlen(DestinationString), "%u", "Destination string initialization or 'strlen()' problem!");
-    
+
     /* Test concatenation to empty buffer */
 
     strcat(DestinationString, SourceString);
-    
+
     ASSERT_AreEqual(SourceStringSize, strlen(DestinationString), "%u", "Unexpected string length while string concatenation to empty buffer!");
-    
+
     /* Test concatenation to non empty buffer */
 
     p = strcat(DestinationString, SourceString);

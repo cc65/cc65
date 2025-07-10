@@ -1,13 +1,18 @@
 ;
-; 2020-04-27, Greg King
+; 2022-03-28, Greg King
 ;
 ; CX16 Kernal functions
 ;
 
         .include        "cbm_kernal.inc"
 
+        .export KBDBUF_PEEK
+        .export KBDBUF_GET_MODIFIERS
+        .export KBDBUF_PUT
+        .export I2C_READ_BYTE
+        .export I2C_WRITE_BYTE
+        .export CX_MONITOR
         .export ENTROPY_GET
-        .export KEYBRD_BUF_PUT
         .export CONSOLE_SET_PAGE_MSG
         .export CONSOLE_PUT_IMAGE
         .export CONSOLE_INIT
@@ -50,7 +55,7 @@
         .export CLOCK_GET_DATE_TIME
         .export JOYSTICK_SCAN
         .export JOYSTICK_GET
-        .export SCREEN_SET_MODE
+        .export SCREEN_MODE
         .export SCREEN_SET_CHARSET
         .export MOUSE_CONFIG
         .export MOUSE_GET

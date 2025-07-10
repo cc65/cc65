@@ -75,7 +75,7 @@ EMD_API_VERSION         = $02
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
-             
+
         .global emd_install
         .global emd_uninstall
         .global emd_pagecount

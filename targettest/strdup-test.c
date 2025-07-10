@@ -5,7 +5,7 @@
 
 #include <_heap.h>
 
-static unsigned char* V[256];
+static char* V[256];
 
 static void ShowInfo (void)
 /* Show heap info */

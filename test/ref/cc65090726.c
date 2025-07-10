@@ -1,5 +1,5 @@
 /*
-  !!DESCRIPTION!! 
+  !!DESCRIPTION!!
   !!ORIGIN!!      testsuite
   !!LICENCE!!     Public Domain
   !!AUTHOR!!
@@ -36,7 +36,7 @@ void Proc1(RecordPtr PtrParIn)
         Proc3((*(PtrParIn->PtrComp)).PtrComp);
         Proc3(NextRecord.PtrComp);
 #endif
-        
+
 #undef   NextRecord
 }
 

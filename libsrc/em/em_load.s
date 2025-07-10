@@ -29,7 +29,7 @@ ctrl:   .addr   _read
         .res    2                       ; MODULE
         .res    2                       ; MODULE_SIZE
         .res    2                       ; MODULE_ID
-                   
+
 ;----------------------------------------------------------------------------
 ; Code
 

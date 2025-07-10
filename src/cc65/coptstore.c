@@ -48,7 +48,7 @@
 
 static void InsertStore (CodeSeg* S, unsigned* IP, LineInfo* LI)
 {
-    CodeEntry* X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, LI);
+    CodeEntry* X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "c_sp", 0, LI);
     CS_InsertEntry (S, X, (*IP)++);
 }
 

@@ -42,7 +42,6 @@
 
 /* common */
 #include "exprdefs.h"
-#include "inline.h"
 
 /* ca65 */
 #include "symentry.h"
@@ -135,25 +134,17 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name);
 ** scope.
 */
 
-#if defined(HAVE_INLINE)
-INLINE unsigned char GetSymTabType (const SymTable* S)
+static inline unsigned char GetSymTabType (const SymTable* S)
 /* Return the type of the given symbol table */
 {
     return S->Type;
 }
-#else
-#  define GetSymTabType(S)      ((S)->Type)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymTabIsClosed (const SymTable* S)
+static inline int SymTabIsClosed (const SymTable* S)
 /* Return true if the symbol table has been closed */
 {
     return (S->Flags & ST_CLOSED) != 0;
 }
-#else
-#  define SymTabIsClosed(S)      (((S)->Flags & ST_CLOSED) != 0)
-#endif
 
 void SymCheck (void);
 /* Run through all symbols and check for anomalies and errors */

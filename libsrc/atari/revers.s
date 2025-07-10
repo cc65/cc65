@@ -4,7 +4,7 @@
 ; unsigned char revers (unsigned char onoff);
 ;
         .include "atari.inc"
-        
+
         .export         _revers
         .export         _revflag
 

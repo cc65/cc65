@@ -3,9 +3,9 @@
 
         .export _pce_font
 
-; The character tiles use only two colors from each pallette.  Color zero
-; comes from pallette zero; color one is different in each pallette.  The
-; color of a character is set by choosing one of the 16 pallettes.
+; The character tiles use only two colors from each palette.  Color zero
+; comes from palette zero; color one is different in each palette.  The
+; color of a character is set by choosing one of the 16 palettes.
 
 .rodata
 

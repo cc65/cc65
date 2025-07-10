@@ -7,7 +7,7 @@
         .export         _rename
 
         .import         __sysrename
-        .import         __mappederrno
+        .import         ___mappederrno
 
 
 ;--------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 .proc   _rename
 
         jsr     __sysrename     ; Call the machine specific function
-        jmp     __mappederrno   ; Store into _oserror, set errno, return 0/-1
+        jmp     ___mappederrno   ; Store into __oserror, set errno, return 0/-1
 
 .endproc
 

@@ -54,15 +54,15 @@ _signal:
         pla
         tax
         pla
-__sig_ign:
+___sig_ign:
         rts
 
 ; Error entry: We use our knowledge that SIG_ERR is zero here to save a byte
 
 invalidsig:
         lda     #<EINVAL
-        jsr     __seterrno      ; Returns 0 in A
+        jsr     ___seterrno     ; Returns 0 in A
         tax                     ; A/X = 0
-__sig_dfl:
+___sig_dfl:
         rts
 

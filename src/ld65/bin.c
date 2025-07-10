@@ -193,8 +193,16 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
                     NewAddr += M->Start;
                 }
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
-                    /* Seek in "overwrite" segments */
                     if (S->Flags & SF_OVERWRITE) {
+                        /* Seek in "overwrite" segments. Fill if the seek position has not been reached yet. */
+                        unsigned long FileLength;
+                        unsigned long SeekTarget = NewAddr - M->Start + M->FileOffs;
+                        fseek (D->F, 0, SEEK_END);
+                        FileLength = ftell (D->F);
+                        if (SeekTarget > FileLength) {
+                            WriteMult (D->F, M->FillVal, SeekTarget - FileLength);
+                            PrintNumVal ("SF_OVERWRITE", SeekTarget - FileLength);
+                        }
                         fseek (D->F, NewAddr - M->Start + M->FileOffs, SEEK_SET);
                     } else {
                         WriteMult (D->F, M->FillVal, NewAddr-Addr);

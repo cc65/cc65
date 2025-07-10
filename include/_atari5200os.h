@@ -31,19 +31,19 @@
 struct __os {
 
     /*Page zero*/
-    unsigned char pokmsk;            // = $00       System mask for POKEY IRQ enable 
+    unsigned char pokmsk;            // = $00       System mask for POKEY IRQ enable
     unsigned char rtclok[2];         // = $01,$02   Real time clock
-    unsigned char critic;            // = $03       Critical section flag 
+    unsigned char critic;            // = $03       Critical section flag
     unsigned char atract;            // = $04       Attract mode counter
-    
+
     union {
         struct {
             unsigned char sdlstl;    // = $05       Save display list LO
             unsigned char sdlsth;    // = $06       Save display list HI
         };
         void*   sdlst;               // = $05,$06   Display list shadow
-    };  
-    
+    };
+
     unsigned char sdmctl;            // = $07       DMACTL shadow
     unsigned char pcolr0;            // = $08       PM color 0
     unsigned char pcolr1;            // = $09       PM color 1
@@ -54,11 +54,25 @@ struct __os {
     unsigned char color2;            // = $0E       PF color 2
     unsigned char color3;            // = $0F       PF color 3
     unsigned char color4;            // = $10       PF color 4
-    unsigned char _free_1[0xEF];     // = $11-$FF   User space
-    
+    unsigned char paddl0;            // = $11       POT0 Shadow
+    unsigned char paddl1;            // = $12       POT1 Shadow
+    unsigned char paddl2;            // = $13       POT2 Shadow
+    unsigned char paddl3;            // = $14       POT3 Shadow
+    unsigned char paddl4;            // = $15       POT4 Shadow
+    unsigned char paddl5;            // = $16       POT5 Shadow
+    unsigned char paddl6;            // = $17       POT6 Shadow
+    unsigned char paddl7;            // = $18       POT7 Shadow
+
+    /*cc65 runtime zero page variables*/
+    unsigned char rowcrs_5200;       // = $19       Cursor row (conio)
+    unsigned char colcrs_5200;       // = $1A       Cursor column (conio)
+    unsigned char* savmsc;           // = $1B/$1C   Pointer to screen memory (conio)
+
+    unsigned char _filler_1[0xE3];   // = $1D-$FF   Filler
+
     /*Stack*/
     unsigned char stack[0x100];      // = $100-$1FF Stack
-    
+
     /*Page 2 OS variables*/
     void (*vinter)(void);            // = $200      Immediate IRQ vector
     void (*vvblki)(void);            // = $202      Immediate VBI vector
@@ -74,7 +88,7 @@ struct __os {
     void (*vtimr1)(void);            // = $216      POKEY timer 1 IRQ vector
     void (*vtimr2)(void);            // = $218      POKEY timer 2 IRQ vector
     void (*vtimr4)(void);            // = $21A      POKEY timer 4 IRQ vector
-    
+
 };
 
 #endif

@@ -11,7 +11,7 @@
 ; Bit 2: bank control
 ; Bit 1: BASIC on/off
 ; Bit 0: OS RAM on/off
-; 
+;
 ; Masks: %11100011  $E3     Bank 0
 ;        %11100111  $E7     Bank 1
 ;        %11101011  $EB     Bank 2
@@ -67,7 +67,7 @@
 ; Constants
 
 BANK    = $4000                         ; bank window
-STACK   = $0100                         ; stack location 
+STACK   = $0100                         ; stack location
 PAGES   = 256                           ; 4 x 16k banks
 
 
@@ -93,17 +93,17 @@ stacktest:      sei
 @2:             sta $4000               ; restore
                 cli
                 rts
-stacktest_end: 
+stacktest_end:
 
 stackcopy:      sei                     ; disable interrupts
 @1:             dex                     ; pre-decrement (full page x=0)
                 ldy #$FF                ; this will be replaced  STACK+3
-                sty $D301               ; set bank 
+                sty $D301               ; set bank
                 lda $FF00,x             ; address to copy from   STACK+8,+9
                 ldy #$FF                ; this will be replaced  STACK+11
-                sty $D301 
+                sty $D301
                 sta $FF00,x             ; address to copy to     STACK+16,+17
-                cpx #0 
+                cpx #0
                 bne @1
                 ldy #$FF                ; portb_save             STACK+23
                 sty $D301
@@ -122,7 +122,7 @@ stackcopy_byte: sei
                 sty $D301
                 cli
                 rts
-stackcopy_byte_end: 
+stackcopy_byte_end:
 
 
 .data
@@ -186,14 +186,14 @@ setpage:
 INSTALL:
         lda     $D301                   ; save state of portb
         sta     portb_save
-        tay 
+        tay
 
         jsr     install_test            ; doesn't touch Y
         sty     STACK+13
 
         lda     $4000                   ; test for extended memory
         jsr     STACK
-        bcs     @1 
+        bcs     @1
         lda     #EM_ERR_OK
         rts
 @1:     lda     #EM_ERR_NO_DEVICE
@@ -242,7 +242,7 @@ MAP:    jsr setpage                     ; extract the bank/page
         lda     banks,x
         sta     STACK+3                 ; set bank to copy from
 ;        lda     ptr1
-;        sta     STACK+8 
+;        sta     STACK+8
         lda     ptr1+1
         sta     STACK+9                 ; set copy from address
         lda     portb_save
@@ -251,10 +251,10 @@ MAP:    jsr setpage                     ; extract the bank/page
         lda     ptr2
         sta     STACK+16
         lda     ptr2+1
-        sta     STACK+17                ; set copy to address 
+        sta     STACK+17                ; set copy to address
 
         ldx     #0                      ; full page copy
-        jsr     STACK                   ; do the copy! 
+        jsr     STACK                   ; do the copy!
 
 ; Return the memory window
 
@@ -298,7 +298,7 @@ COMMIT: lda     curpage                 ; Get the current page
         sta     STACK+3                 ; set bank to copy from
         sta     STACK+23                ; set final portb restore
         lda     ptr1
-        sta     STACK+8 
+        sta     STACK+8
         lda     ptr1+1
         sta     STACK+9                 ; set copy from address
         ldx     curbank
@@ -307,10 +307,10 @@ COMMIT: lda     curpage                 ; Get the current page
         ;lda     ptr2
         ;sta     STACK+16
         lda     ptr2+1
-        sta     STACK+17                ; set copy to address 
+        sta     STACK+17                ; set copy to address
 
         ldx     #0                      ; full page copy
-        jsr     STACK                   ; do the copy! 
+        jsr     STACK                   ; do the copy!
 
 commit_done:
         rts
@@ -329,7 +329,7 @@ COPYFROM:
 
         ldy     #EM_COPY::OFFS
         lda     (ptr3),y
-        sta     STACK+7                 ; offset goes into BANK low 
+        sta     STACK+7                 ; offset goes into BANK low
 
         ldy     #EM_COPY::PAGE
         lda     (ptr3),y
@@ -357,9 +357,9 @@ COPYFROM:
         add     #>BANK                  ; add to BANK address
         sta     STACK+8                 ; current page in bank
         ldx     curbank
-        lda     banks,x 
-        sta     STACK+2                 ; set bank in stack 
-        lda     portb_save 
+        lda     banks,x
+        sta     STACK+2                 ; set bank in stack
+        lda     portb_save
         sta     STACK+10                ; set bank restore in stack
         sta     STACK+18                ; set final restore too
 
@@ -399,7 +399,7 @@ copyfrom_copy:
         bne     @3
         inc     STACK+16
 
-@3:     jmp     copyfrom_copy           ; copy another byte 
+@3:     jmp     copyfrom_copy           ; copy another byte
 
 done:
         rts
@@ -418,7 +418,7 @@ COPYTO:
 
         ldy     #EM_COPY::OFFS
         lda     (ptr3),y
-        sta     STACK+15                 ; offset goes into BANK low 
+        sta     STACK+15                 ; offset goes into BANK low
 
         ldy     #EM_COPY::PAGE
         lda     (ptr3),y
@@ -446,9 +446,9 @@ COPYTO:
         add     #>BANK                  ; add to BANK address
         sta     STACK+16                ; current page in bank
         ldx     curbank
-        lda     banks,x 
-        sta     STACK+10                ; set bank in stack 
-        lda     portb_save 
+        lda     banks,x
+        sta     STACK+10                ; set bank in stack
+        lda     portb_save
         sta     STACK+2                 ; set bank restore in stack
         sta     STACK+18                ; set final restore too
 
@@ -488,5 +488,5 @@ copyto_copy:
         bne     @3
         inc     STACK+8
 
-@3:     jmp     copyto_copy           ; copy another byte 
+@3:     jmp     copyto_copy           ; copy another byte
 

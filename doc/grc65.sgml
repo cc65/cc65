@@ -7,7 +7,7 @@
 <url url="mailto:greg.king5@verizon.net" name="Greg King">
 
 <abstract>
-This document describes a compiler that can create GEOS headers and menues for
+This document describes a compiler that can create GEOS headers and menus for
 cc65-compiled programs.
 </abstract>
 
@@ -24,7 +24,7 @@ Optional resources might be menu definitions, other headers (e.g., for data
 files of an app.), dialog definitions, etc.  Without an application's header,
 GEOS is unable to load and start it.
 
-Currently, <bf/grc65/ supports only menues and the required header definition,
+Currently, <bf/grc65/ supports only menus and the required header definition,
 along with support for building applications with VLIR-structured overlays.
 
 <bf/grc65/ generates output in two formats: C header and <bf/ca65/ source (.s).
@@ -270,7 +270,7 @@ required for the correct process of GEOS sequential application building.
 <p>Large GEOS applications typically don't fit in one piece in their designated
 memory area.  They are therefore split into overlays which are loaded into memory
 on demand.  The individual overlays are stored as records of a VLIR (Variable
-Length Index Record) file.  When GEOS starts a VLIR overlay appliation it loads
+Length Index Record) file.  When GEOS starts a VLIR overlay application it loads
 record number 0 which is supposed to contain the main program.  The record numbers
 starting with 1 are to be used for the actual overlays.
 
@@ -345,7 +345,7 @@ for addresses.
 <!-- <appendix> -->
 <sect>Appendix A -- example.grc<label id="example-grc">
 <p><tscreen><verb>
-; Note that MENU can define both menues and submenues.
+; Note that MENU can define both menus and submenus.
 ; If you want to use any C operators (such as "|", "&", etc.), do it WITHOUT
 ; any spaces between the arguments (the parser is simple and weak).
 

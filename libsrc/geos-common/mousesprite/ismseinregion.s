@@ -7,7 +7,7 @@
 
             .import _InitDrawWindow
             .export _IsMseInRegion
-            
+
             .include "jumptab.inc"
 
 _IsMseInRegion:

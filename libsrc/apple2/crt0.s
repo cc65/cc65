@@ -4,11 +4,13 @@
 ; Startup code for cc65 (Apple2 version)
 ;
 
-        .export         _exit, done, return
+        .export         done, return
+        .export         zpsave, rvsave, reset
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
-        .import         initlib, donelib
+        .import         initlib, _exit
         .import         zerobss, callmain
+        .import         bltu2
         .import         __ONCE_LOAD__, __ONCE_SIZE__    ; Linker generated
         .import         __LC_START__, __LC_LAST__       ; Linker generated
 
@@ -33,41 +35,7 @@
         jsr     zerobss
 
         ; Push the command-line arguments; and, call main().
-        jsr     callmain
-
-        ; Avoid a re-entrance of donelib. This is also the exit() entry.
-_exit:  ldx     #<exit
-        lda     #>exit
-        jsr     reset           ; Setup RESET vector
-
-        ; Switch in ROM, in case it wasn't already switched in by a RESET.
-        bit     $C082
-
-        ; Call the module destructors.
-        jsr     donelib
-
-        ; Restore the original RESET vector.
-exit:   ldx     #$02
-:       lda     rvsave,x
-        sta     SOFTEV,x
-        dex
-        bpl     :-
-
-        ; Copy back the zero-page stuff.
-        ldx     #zpspace-1
-:       lda     zpsave,x
-        sta     sp,x
-        dex
-        bpl     :-
-
-        ; ProDOS TechRefMan, chapter 5.2.1:
-        ; "System programs should set the stack pointer to $FF at the
-        ;  warm-start entry point."
-        ldx     #$FF
-        txs                     ; Re-init stack pointer
-
-        ; We're done
-        jmp     done
+        jmp     callmain
 
 ; ------------------------------------------------------------------------
 
@@ -75,7 +43,7 @@ exit:   ldx     #$02
 
         ; Save the zero-page locations that we need.
 init:   ldx     #zpspace-1
-:       lda     sp,x
+:       lda     c_sp,x
         sta     zpsave,x
         dex
         bpl     :-
@@ -88,8 +56,10 @@ init:   ldx     #zpspace-1
         bpl     :-
 
         ; Check for ProDOS.
-        ldy     $BF00           ; MLI call entry point
-        cpy     #$4C            ; Is MLI present? (JMP opcode)
+        lda     $BF00           ; MLI call entry point
+        sec
+        sbc     #$4C            ; Is MLI present? (JMP opcode)
+        pha                     ; Backup the result for later
         bne     basic
 
         ; Check the ProDOS system bit map.
@@ -113,8 +83,8 @@ basic:  lda     HIMEM
         ldx     HIMEM+1
 
         ; Set up the C stack.
-:       sta     sp
-        stx     sp+1
+:       sta     c_sp
+        stx     c_sp+1
 
         ; ProDOS TechRefMan, chapter 5.3.5:
         ; "Your system program should place in the RESET vector the
@@ -126,11 +96,25 @@ basic:  lda     HIMEM
         ; Call the module constructors.
         jsr     initlib
 
+        ; Copy the LC segment to its destination
         ; Switch in LC bank 2 for W/O.
         bit     $C081
         bit     $C081
 
-        ; Set the source start address.
+        pla                     ; If not running ProDOS, we need to patch 6502 vectors.
+        beq     :+
+
+        lda     #<reset_6502
+        ldx     #>reset_6502
+        sta     ROM_RST
+        stx     ROM_RST+1
+
+        lda     #<irq_6502
+        ldx     #>irq_6502
+        sta     ROM_IRQ
+        stx     ROM_IRQ+1
+
+:       ; Set the source start address.
         ; Aka __LC_LOAD__ iff segment LC exists.
         lda     #<(__ONCE_LOAD__ + __ONCE_SIZE__)
         ldy     #>(__ONCE_LOAD__ + __ONCE_SIZE__)
@@ -153,7 +137,7 @@ basic:  lda     HIMEM
 
         ; Call into Applesoft Block Transfer Up -- which handles zero-
         ; sized blocks well -- to move the content of the LC memory area.
-        jsr     $D39A           ; BLTU2
+        jsr     bltu2
 
         ; Switch in LC bank 2 for R/O and return.
         bit     $C080
@@ -174,6 +158,14 @@ return: rts
 quit:   jsr     $BF00           ; MLI call entry point
         .byte   $65             ; Quit
         .word   q_param
+
+reset_6502:                     ; Used with DOS3.3 programs
+        bit     $C082           ; Switch in ROM
+        jmp     (ROM_RST)       ; Jump to ROM's RESET vector
+
+irq_6502:                       ; Used with DOS3.3 programs
+        bit     $C082           ; Switch in ROM
+        jmp     (ROM_IRQ)       ; Jump to ROM's IRQ/BRK vector
 
 ; ------------------------------------------------------------------------
 

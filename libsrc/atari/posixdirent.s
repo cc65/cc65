@@ -4,7 +4,7 @@
                 .include  "atari.inc"
                 .export   _opendir, _readdir, _closedir
                 .import   findfreeiocb, clriocb
-                .import   __oserror, return0, __do_oserror
+                .import   ___oserror, return0, __do_oserror
                 .importzp ptr1, tmp1
 .ifdef  DEFAULT_DEVICE
                 .import __defdev
@@ -56,13 +56,13 @@
                 jsr     CIOV
                 bmi     cioerr
                 lda     #0
-                sta     __oserror
+                sta     ___oserror
                 tax
                 lda     diriocb
                 rts
 .endproc
 
-cioerr:         sty     __oserror
+cioerr:         sty     ___oserror
                 lda     #CLOSE
                 sta     ICCOM,x
                 jsr     CIOV            ; close IOCB again since open failed
@@ -147,7 +147,7 @@ copychar:       lda     (ptr1),y        ; src=y dest=tmp1
                 jsr     CIOV
                 bmi     @cioerr
                 ldx     #0
-                stx     __oserror               ; clear system specific error code
+                stx     ___oserror               ; clear system specific error code
                 txa
                 rts
 @cioerr:        jmp     __do_oserror

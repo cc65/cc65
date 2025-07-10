@@ -8,7 +8,7 @@
         .export         _itoa, _utoa
         .import         addysp1
         .import         __hextab
-        .importzp       sp, sreg, ptr2, ptr3, tmp1
+        .importzp       c_sp, sreg, ptr2, ptr3, tmp1
 
 .rodata
 specval:
@@ -19,20 +19,20 @@ specval:
 ; Common subroutine to pop the parameters and put them into core
 ;
 
-dopop:  sta     tmp1            ; will loose high byte
+dopop:  sta     tmp1            ; will lose high byte
         ldy     #0
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr2
         sta     ptr3
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr2+1
         sta     ptr3+1
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     sreg
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     sreg+1
         jmp     addysp1         ; Bump stack pointer
 

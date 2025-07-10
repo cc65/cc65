@@ -1,0 +1,3 @@
+ld65: Warning: 201-overwrite-overflow.cfg:3: Segment 'AO' overflows memory area 'A' by 1 byte
+ld65: Warning: 201-overwrite-overflow.cfg:4: Segment 'BO' overflows memory area 'B' by 1 byte
+ld65: Error: Cannot generate most of the files due to memory area overflows

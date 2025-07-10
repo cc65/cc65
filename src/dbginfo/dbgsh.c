@@ -458,7 +458,7 @@ static unsigned FindIdType (const char* TypeName)
         {   "segment",  SegmentId       },
         {   "source",   SourceId        },
         {   "src",      SourceId        },
-        {   "sp",       SpanId          },
+        {   "c_sp",     SpanId          },
         {   "span",     SpanId          },
         {   "sym",      SymbolId        },
         {   "symbol",   SymbolId        },
@@ -721,7 +721,7 @@ static void PrintSegmentHeader (void)
 /* Output a header for a list of segments */
 {
     /* Header */
-    PrintLine ("  id    name            address  size   output file     offs");
+    PrintLine ("  id    name            address  size   output file     offs   bank");
     PrintSeparator ();
 }
 
@@ -741,6 +741,7 @@ static void PrintSegments (const cc65_segmentinfo* S)
         PrintSize (D->segment_size, 7);
         Print ("%-16s", D->output_name? D->output_name : "");
         PrintSize (D->output_offs, 6);
+        PrintId (D->segment_bank, 8);
         NewLine ();
     }
 }

@@ -1,10 +1,22 @@
 ;
-; 2020-01-06, Greg King
+; 2022-03-28, Greg King
 ;
 ; /* Video mode defines */
-; #define VIDEOMODE_40x30         0x00
-; #define VIDEOMODE_80x60         0x02
-; #define VIDEOMODE_320x200       0x80
+; #define VIDEOMODE_80x60         0x00
+; #define VIDEOMODE_80x30         0x01
+; #define VIDEOMODE_40x60         0x02
+; #define VIDEOMODE_40x30         0x03
+; #define VIDEOMODE_40x15         0x04
+; #define VIDEOMODE_20x30         0x05
+; #define VIDEOMODE_20x15         0x06
+; #define VIDEOMODE_22x23         0x07
+; #define VIDEOMODE_64x50         0x08
+; #define VIDEOMODE_64x25         0x09
+; #define VIDEOMODE_32x50         0x0A
+; #define VIDEOMODE_32x25         0x0B
+; #define VIDEOMODE_80COL         VIDEOMODE_80x60
+; #define VIDEOMODE_40COL         VIDEOMODE_40x30
+; #define VIDEOMODE_320x240       0x80
 ; #define VIDEOMODE_SWAP          (-1)
 ;
 ; signed char __fastcall__ videomode (signed char Mode);
@@ -16,25 +28,26 @@
 
         .export         _videomode
 
-        .import         SCREEN_SET_MODE
-        .include        "cx16.inc"
+        .import         SCREEN_MODE
 
 
 .proc   _videomode
-        ldx     SCREEN_MODE     ; Get old mode
-        phx
-
-        jsr     SCREEN_SET_MODE
+        sec                     ; Get old mode
+        pha
+        jsr     SCREEN_MODE
+        plx
+        pha                     ; Save old mode
+        txa
+        clc                     ; Set new mode
+        jsr     SCREEN_MODE
 
         pla                     ; Get back old mode
         ldx     #>$0000         ; Clear high byte
-        bcs     @L1
-        rts
+        bcc     @L1
 
-; The new mode is invalid.  Go back to the old one.  Return -1.
+; The new mode is invalid.  Return -1.
 
-@L1:    sta     SCREEN_MODE
         dex
         txa
-        rts
+@L1:    rts
 .endproc

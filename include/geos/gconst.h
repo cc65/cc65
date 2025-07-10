@@ -4,13 +4,15 @@
   reassembled by Maciej 'YTM/Elysium' Witkowiak
 */
 
-/* Here are constants which didn't fit into any other cathegory... */
+/* Here are constants which didn't fit into any other category... */
 
 #ifndef _GCONST_H
 #define _GCONST_H
 
-#define NULL            0
-#define FALSE           NULL
+#ifndef NULL
+#define NULL            ((void *) 0)
+#endif
+#define FALSE           0
 #define TRUE            0xff
 #define MOUSE_SPRNUM    0
 #define DISK_DRV_LGH    0x0d80

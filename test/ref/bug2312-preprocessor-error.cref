@@ -1,0 +1,2 @@
+bug2312-preprocessor-error.c:5: Error: Missing macro name
+bug2312-preprocessor-error.c:8: Error: Redefinition of typedef 'A' as different kind of symbol

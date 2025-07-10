@@ -16,7 +16,7 @@
 
 #define NUMTESTS 257
 
-typedef struct 
+typedef struct
 {
     bool isalnum;
     bool isalpha;
@@ -30,7 +30,7 @@ typedef struct
     bool isspace;
     bool isupper;
     bool isxdigit;
-    bool isblank; 
+    bool isblank;
 
 } CTypeClassifications;
 
@@ -89,7 +89,7 @@ CTypeClassifications testSet[NUMTESTS] =
     {false, false, true,  false, false, true,  false, true,  true,  false, false, false, false},        // 2D
     {false, false, true,  false, false, true,  false, true,  true,  false, false, false, false},        // 2E
     {false, false, true,  false, false, true,  false, true,  true,  false, false, false, false},        // 2F
- 
+
     {true,  false, true,  false, true,  true,  false, true,  false, false, false, true,  false},        // 30
     {true,  false, true,  false, true,  true,  false, true,  false, false, false, true,  false},        // 31
     {true,  false, true,  false, true,  true,  false, true,  false, false, false, true,  false},        // 32
@@ -123,7 +123,7 @@ CTypeClassifications testSet[NUMTESTS] =
     {true,  true,  true,  false, false, true,  false, true,  false, false, true,  false, false},        // 4D
     {true,  true,  true,  false, false, true,  false, true,  false, false, true,  false, false},        // 4E
     {true,  true,  true,  false, false, true,  false, true,  false, false, true,  false, false},        // 4F
- 
+
     {true,  true,  true,  false, false, true,  false, true,  false, false, true,  false, false},        // 50
     {true,  true,  true,  false, false, true,  false, true,  false, false, true,  false, false},        // 51
     {true,  true,  true,  false, false, true,  false, true,  false, false, true,  false, false},        // 52

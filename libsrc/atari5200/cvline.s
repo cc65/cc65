@@ -5,7 +5,7 @@
 ; void cvline (unsigned char length);
 ;
         .include "atari5200.inc"
-        
+
         .export         _cvlinexy, _cvline
         .import         gotoxy, putchar
         .importzp       tmp1

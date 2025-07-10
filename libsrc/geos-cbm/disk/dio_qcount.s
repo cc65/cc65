@@ -5,11 +5,11 @@
 ;
 
             .export _dio_query_sectcount
-            .import __oserror
+            .import ___oserror
 
 _dio_query_sectcount:
         lda #0
-        sta __oserror
+        sta ___oserror
         lda #<683
         ldx #>683
         rts

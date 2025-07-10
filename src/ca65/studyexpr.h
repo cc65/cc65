@@ -36,7 +36,7 @@
 #ifndef STUDYEXPR_H
 #define STUDYEXPR_H
 
-                                            
+
 
 /* common */
 #include "exprdefs.h"

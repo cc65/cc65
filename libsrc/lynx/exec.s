@@ -6,7 +6,7 @@
 ;
 ; lynx_exec is often used in compilation carts when you run small demos
 ; created with various (non-cc65) compilers.
-; 
+;
 ; void lynx_exec(int fileno)
 ;
         .importzp       _FileDestAddr

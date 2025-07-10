@@ -36,7 +36,7 @@ Here is a small traditional Hello World program for the Atari Lynx.
 <tscreen><verb>
 #include <lynx.h>
 #include <tgi.h>
-#include <6502.h> 
+#include <6502.h>
 
 void main(void) {
   tgi_install(tgi_static_stddrv);

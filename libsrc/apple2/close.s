@@ -33,8 +33,8 @@ zerofd: lda     #$00
         ; Return success
         lda     #$00
 
-        ; Set __oserror
-oserr:  jmp     __mappederrno
+        ; Set ___oserror
+oserr:  jmp     ___mappederrno
 
         ; Set __errno
-errno:  jmp     __directerrno
+errno:  jmp     ___directerrno

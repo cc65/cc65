@@ -78,8 +78,8 @@ typedef enum segment_t {
 } segment_t;
 
 /* A list of all segments used when generating code */
-typedef struct Segments Segments;
-struct Segments {
+typedef struct SegContext SegContext;
+struct SegContext {
     struct TextSeg*     Text;           /* Text segment */
     struct CodeSeg*     Code;           /* Code segment */
     struct DataSeg*     Data;           /* Data segment */
@@ -90,11 +90,11 @@ struct Segments {
     unsigned            NextDataLabel;  /* Number to generate unique data labels */
 };
 
-/* Pointer to the current segment list. Output goes here. */
-extern Segments* CS;
+/* Pointer to the current segment context. Output goes here. */
+extern SegContext* CS;
 
-/* Pointer to the global segment list */
-extern Segments* GS;
+/* Pointer to the global segment context */
+extern SegContext* GS;
 
 
 
@@ -132,17 +132,17 @@ void PopSegName (segment_t Seg);
 const char* GetSegName (segment_t Seg);
 /* Get the name of the given segment */
 
-Segments* PushSegments (struct SymEntry* Func);
-/* Make the new segment list current but remember the old one */
+SegContext* PushSegContext (struct SymEntry* Func);
+/* Make the new segment context current but remember the old one */
 
-void PopSegments (void);
-/* Pop the old segment list (make it current) */
+void PopSegContext (void);
+/* Pop the old segment context (make it current) */
 
 void CreateGlobalSegments (void);
 /* Create the global segments and remember them in GS */
 
 void UseDataSeg (segment_t DSeg);
-/* For the current segment list, use the data segment DSeg */
+/* For the current segment context, use the data segment DSeg */
 
 struct DataSeg* GetDataSeg (void);
 /* Return the current data segment */
@@ -165,7 +165,7 @@ int HaveGlobalCode (void);
 void RemoveGlobalCode (void);
 /* Remove all code from the global code segment. Used for error recovery. */
 
-void OutputSegments (const Segments* S);
+void OutputSegments (const SegContext* S);
 /* Output the given segments to the output file */
 
 

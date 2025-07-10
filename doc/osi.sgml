@@ -187,7 +187,20 @@ Currently the following extra screen configuration modules are implemented:
 <itemize>
 <item><tt>osic1p-screen-s3-32x28.o</tt>: 32 columns by 28 lines mode
 for Briel Superboard ///</item>
+<item><tt>osic1p-screen-c1p-48x12.s</tt>: 48 columns by 12 lines mode
+for Challenger 1P</item>
 </itemize>
+
+On the Briel Superboard /// you enter 32 column mode by holding down
+the BREAK key on powerup.
+
+On the Challenger 1P you can enable 48 column mode by writing a 1 to
+bit 0 of address &dollar;D800, and writing a 0 to go back to 24 column mode.
+You can use code like the following to do this:
+
+<tscreen><verb>
+*(char*)0xd800 = 1; /* Switch to 48 column mode */
+</verb></tscreen>
 
 <sect>Limitations<p>
 

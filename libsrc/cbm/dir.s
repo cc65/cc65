@@ -44,10 +44,10 @@ __dirread:
 ; Replace dir by dir->fd
 
         ldy     #2
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1
         iny
-        lda     (sp),y
+        lda     (c_sp),y
         sta     ptr1+1
         ldy     #DIR::fd+1
         lda     (ptr1),y
@@ -55,10 +55,10 @@ __dirread:
         dey
         lda     (ptr1),y
         ldy     #2
-        sta     (sp),y
+        sta     (c_sp),y
         pla
         iny
-        sta     (sp),y
+        sta     (c_sp),y
 
 ; Get count, save it again, clear the high byte and call read(). By the
 ; previous actions, the stack frame is as read() needs it, and read() will
@@ -92,8 +92,8 @@ L3:     sta     tmp1            ; Save returned count
 ; Didn't read enough bytes. This is an error for us, but errno is not set
 
         lda     #<EIO
-        sta     __errno
-        stx     __errno+1       ; X is zero
+        sta     ___errno
+        stx     ___errno+1      ; X is zero
         bne     L1              ; Branch always
 
 

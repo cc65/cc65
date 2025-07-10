@@ -17,4 +17,3 @@ _CRC:
         lda r2L
         ldx r2H
         rts
-            

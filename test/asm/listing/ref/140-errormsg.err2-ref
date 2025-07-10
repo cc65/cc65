@@ -1,0 +1,2 @@
+140-errormsg.s:5: Error: Too many parameters for macro 'foo'
+140-errormsg.s:1: Note: See definition of macro 'foo' which was here

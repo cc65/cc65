@@ -52,7 +52,7 @@ _read:
 
         ; Device succeeds always
 device: lda     #$00
-        sta     __oserror
+        sta     ___oserror
 
         ; Set counter to zero
         sta     ptr3
@@ -107,4 +107,4 @@ check:  lda     ptr3
 einval: lda     #EINVAL
 
         ; Set __errno
-errno:  jmp     __directerrno
+errno:  jmp     ___directerrno

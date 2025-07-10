@@ -63,7 +63,7 @@ typedef enum {
 
 
 
-FILETYPE GetFileType (const char* Name);
+FILETYPE GetTypeOfFile (const char* Name);
 /* Determine the type of the given file by looking at the name. If the file
 ** type could not be determined, the function returns FILETYPE_UNKOWN.
 */

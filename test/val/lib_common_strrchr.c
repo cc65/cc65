@@ -1,6 +1,6 @@
 #include <string.h>
 #include "unittest.h"
-                                                    
+
 static char TestString[] = "01234567890123456789";  // two times the same string
 static char Found[256];
 

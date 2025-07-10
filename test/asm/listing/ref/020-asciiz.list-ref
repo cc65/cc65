@@ -1,0 +1,31 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 020-asciiz.s
+Current file: 020-asciiz.s
+
+000000r 1               ; 2022-06-15 Spiro Trikaliotis
+000000r 1               
+000000r 1               
+000000r 1                       ; upper case pseudo-op
+000000r 1  00                   .ASCIIZ ""
+000001r 1  48 65 6C 6C          .ASCIIZ "Hello World"
+000005r 1  6F 20 57 6F  
+000009r 1  72 6C 64 00  
+00000Dr 1  48 65 6C 6C          .ASCIIZ "Hello ","World"
+000011r 1  6F 20 57 6F  
+000015r 1  72 6C 64 00  
+000019r 1  48 65 6C 6C          .ASCIIZ "Hello ","World"," ","I"," ","am"," ","testing"
+00001Dr 1  6F 20 57 6F  
+000021r 1  72 6C 64 20  
+000032r 1               
+000032r 1                       ; lower case pseudo-op
+000032r 1  00                   .asciiz ""
+000033r 1  48 65 6C 6C          .asciiz "Hello World"
+000037r 1  6F 20 57 6F  
+00003Br 1  72 6C 64 00  
+00003Fr 1  48 65 6C 6C          .asciiz "Hello ","World"
+000043r 1  6F 20 57 6F  
+000047r 1  72 6C 64 00  
+00004Br 1  48 65 6C 6C          .asciiz "Hello ","World"," ","I"," ","am"," ","testing"
+00004Fr 1  6F 20 57 6F  
+000053r 1  72 6C 64 20  
+000063r 1               

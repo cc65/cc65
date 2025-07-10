@@ -9,11 +9,11 @@
 
 
         .export         _textcolor, _bgcolor, _bordercolor
-        .import         return0, ppubuf_put
+        .import         return0, return1, ppubuf_put
 
         .include        "nes.inc"
 
-_textcolor      = return0
+_textcolor      = return1
 _bordercolor    = return0
 
 .proc   _bgcolor
@@ -54,7 +54,7 @@ colors: .byte $0f       ; 0 black
         .byte $3d       ; 1 white
         .byte $04       ; 2 red
         .byte $3b       ; 3 cyan
-        .byte $14       ; 4 violett
+        .byte $14       ; 4 violet
         .byte $1a       ; 5 green
         .byte $01       ; 6 blue
         .byte $38       ; 7 yellow
@@ -66,4 +66,3 @@ colors: .byte $0f       ; 0 black
         .byte $2b       ; d light green
         .byte $22       ; e light blue
         .byte $3d       ; f light gray
-

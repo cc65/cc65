@@ -215,7 +215,8 @@ SETPALETTE:
         jsr     PAPER
         ldy     #1
         jsr     flipcolor
-        dey                     ; TGI_ERR_OK
+        .assert TGI_ERR_OK = 0, error
+        dey
         sty     ERROR
         sty     PARAM1+1
         jmp     INK

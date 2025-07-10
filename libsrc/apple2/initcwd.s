@@ -3,22 +3,37 @@
 ;
 
         .export         initcwd
-        .import         __cwd
+        .import         __cwd, __dos_type
 
         .include        "zeropage.inc"
+        .include        "apple2.inc"
         .include        "mli.inc"
 
 initcwd:
-        ; Set static prefix buffer
-        lda     #<__cwd
-        ldx     #>__cwd
-        sta     mliparam + MLI::PREFIX::PATHNAME
-        stx     mliparam + MLI::PREFIX::PATHNAME+1
+        ; Check for ProDOS 8
+        lda     __dos_type
+        beq     done
 
-        ; Get current working directory
-        lda     #GET_PREFIX_CALL
-        ldx     #PREFIX_COUNT
-        jsr     callmli
+        ; Save random counter
+        lda     RNDL
+        pha
+        lda     RNDH
+        pha
+
+        ; Call MLI
+        ; We're not using mli.s' callmli because its
+        ; mliparam is in BSS and this will be called
+        ; before LC code is moved to the Language Card.
+
+        jsr     $BF00           ; MLI call entry point
+        .byte   GET_PREFIX_CALL ; MLI command
+        .addr   mli_parameters  ; MLI parameter
+
+        ; Restore random counter
+        pla
+        sta     RNDH
+        pla
+        sta     RNDL
 
         ; Check for null prefix
         ldx     __cwd
@@ -39,3 +54,9 @@ initcwd:
         sta     __cwd,x
 
 done:   rts
+
+        .rodata
+
+mli_parameters:
+        .byte $01               ; Number of parameters
+        .addr __cwd             ; Address of parameter

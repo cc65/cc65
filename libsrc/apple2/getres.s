@@ -52,7 +52,7 @@ _clock_getres:
 enosys: lda     #ENOSYS
 
         ; Set __errno
-        jmp     __directerrno
+        jmp     ___directerrno
 
         .rodata
 

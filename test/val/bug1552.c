@@ -23,7 +23,7 @@ int execute(TREPTR argt, int execflg, int *pf1, int *pf2)
 {
     register TREPTR t;
     int type;
-    switch (type) 
+    switch (type)
     {
         case 6:
         {

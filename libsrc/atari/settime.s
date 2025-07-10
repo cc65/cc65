@@ -96,4 +96,4 @@ done:   jmp     return0
 ; load errno code
 
 enosys: lda     #ENOSYS
-drcter: jmp     __directerrno
+drcter: jmp     ___directerrno

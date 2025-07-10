@@ -45,7 +45,7 @@
 
 
 
-void ParseStaticAssert ()
+void ParseStaticAssert (void)
 {
     /*
     ** static_assert-declaration ::=
@@ -53,44 +53,50 @@ void ParseStaticAssert ()
     **     _Static_assert ( constant-expression , string-literal ) ;
     */
     ExprDesc Expr;
-    int failed;
+    unsigned PrevErrorCount = ErrorCount;
+    int      failed = 0;
 
     /* Skip the _Static_assert token itself */
     CHECK (CurTok.Tok == TOK_STATIC_ASSERT);
     NextToken ();
 
     /* We expect an opening paren */
-    if (!ConsumeLParen ()) {
-        return;
+    if (ConsumeLParen ()) {
+        /* Parse assertion condition */
+        Expr = NoCodeConstAbsIntExpr (hie1);
+        failed = !Expr.IVal;
     }
 
-    /* Parse assertion condition */
-    Expr = NoCodeConstAbsIntExpr (hie1);
-    failed = !Expr.IVal;
+    if (PrevErrorCount != ErrorCount) {
+        goto ExitPoint;
+    }
 
     /* If there is a comma, we also have an error message.  The message is optional because we
     ** support the C2X syntax with only an expression.
     */
     if (CurTok.Tok == TOK_COMMA) {
-        /* Skip the comma. */
+        /* Prevent from translating the message string literal */
+        NoCharMap = 1;
+
+        /* Skip the comma and get the next token */
         NextToken ();
+
+        /* Reenable string literal translation */
+        NoCharMap = 0;
 
         /* String literal */
         if (CurTok.Tok != TOK_SCONST) {
             Error ("String literal expected for static_assert message");
-            return;
-        }
+        } else {
+            /* Issue an error including the message if the static_assert failed. */
+            if (failed) {
+                Error ("static_assert failed '%s'", GetLiteralStr (CurTok.SVal));
+            }
 
-        /* Issue an error including the message if the static_assert failed. */
-        if (failed) {
-            Error ("static_assert failed '%s'", GetLiteralStr (CurTok.SVal));
-        }
-
-        /* Consume the string constant, now that we don't need it anymore.
-        ** This should never fail since we checked the token type above.
-        */
-        if (!Consume (TOK_SCONST, "String literal expected")) {
-            return;
+            /* Consume the string constant, now that we don't need it anymore.
+            ** This should never fail since we checked the token type above.
+            */
+            Consume (TOK_SCONST, "String literal expected");
         }
     } else {
         /* No message. */
@@ -99,7 +105,24 @@ void ParseStaticAssert ()
         }
     }
 
-    /* Closing paren and semi-colon needed */
-    ConsumeRParen ();
-    ConsumeSemi ();
+    /* The assertion failure error is not a syntax error */
+    if (failed) {
+        ++PrevErrorCount;
+    }
+
+    if (PrevErrorCount == ErrorCount) {
+        /* Closing paren needed */
+        ConsumeRParen ();
+    }
+
+    if (PrevErrorCount == ErrorCount) {
+        /* Must be followed by a semicolon */
+        ConsumeSemi ();
+    }
+
+ExitPoint:
+    /* Try some smart error recovery */
+    if (PrevErrorCount != ErrorCount) {
+        SmartErrorSkip (1);
+    }
 }

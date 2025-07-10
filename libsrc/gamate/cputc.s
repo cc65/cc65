@@ -2,6 +2,8 @@
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
 ;
+; Important note: The implementation of cputs() relies on the cputc() function
+; not clobbering ptr1. Beware when rewriting or changing this function!
 
         .export         _cputcxy, _cputc, cputdirect, putchar
         .export         newline, plot
@@ -89,16 +91,17 @@ putchar:
         adc     #>(fontdata-$f8)
         sta     ptr3+1
 
-        lda     CHARCOLOR
-        and     #1
-        beq     @skip_plane1
-
         lda     #LCD_XPOS_PLANE1
         clc
         adc     CURS_X
         sta     LCD_X
 
-        ldy     #$f8
+        ldy     #$F8
+
+        lda     CHARCOLOR
+        lsr
+        bcc     @delete1
+
 @copylp1:
         lda     (ptr3),y
         eor     RVS
@@ -106,11 +109,16 @@ putchar:
         iny
         bne     @copylp1
 
-@skip_plane1:
+        beq @skip_delete1
 
-        lda     CHARCOLOR
-        and     #2
-        beq     @skip_plane2
+@delete1:
+        lda   #$00
+@del1:
+        sta   LCD_DATA
+        iny
+        bne @del1
+
+@skip_delete1:
 
         lda     #LCD_XPOS_PLANE2
         clc
@@ -121,7 +129,12 @@ putchar:
         lda     _plotlo,x
         sta     LCD_Y
 
-        ldy     #$f8
+        ldy     #$F8
+
+        lda     CHARCOLOR
+        and     #2
+        beq     @delete2
+
 @copylp2:
         lda     (ptr3),y
         eor     RVS
@@ -129,7 +142,16 @@ putchar:
         iny
         bne     @copylp2
 
-@skip_plane2:
+        beq    @skip_delete2
+
+@delete2:
+        lda   #$00
+@del2:
+        sta   LCD_DATA
+        iny
+        bne @del2
+
+@skip_delete2:
         pla
         tax
         ldy     CURS_X

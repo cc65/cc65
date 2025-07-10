@@ -53,7 +53,7 @@
 
 void FileSetPos (FILE* F, unsigned long Pos)
 /* Seek to the given absolute position, fail on errors */
-{                 
+{
     if (fseek (F, Pos, SEEK_SET) != 0) {
         Error ("Cannot seek: %s", strerror (errno));
     }

@@ -6,7 +6,7 @@
         .import         __BSS_LOAD__
         .import         __MAIN_START__
         .export         __BLLHDR__: absolute = 1
- 
+
 ; ------------------------------------------------------------------------
 ; BLL header (BLL header)
 

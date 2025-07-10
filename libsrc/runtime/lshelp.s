@@ -39,7 +39,7 @@ poplsargs:
         adc     #$00
         sta     sreg+1
 
-L1:     lda     ptr4+1          ; Is the right operand nagative?
+L1:     lda     ptr4+1          ; Is the right operand negative?
         sta     tmp2            ; Remember the sign for later
         bpl     L2              ; Jump if not
 

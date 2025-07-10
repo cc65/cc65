@@ -16,7 +16,7 @@
 ;
 
         .export         _dio_phys_to_log
-        .import         popax,__oserror
+        .import         popax,___oserror
         .importzp       ptr1,ptr2,ptr3
         .include        "atari.inc"
 
@@ -54,7 +54,7 @@
         ldx     #0
         txa
 ret:
-        sta     __oserror
+        sta     ___oserror
         rts                     ; return success
 
 ; invalid handle

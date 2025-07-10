@@ -1,6 +1,6 @@
 /*
   !!DESCRIPTION!! Testing empty bodied switch statements.
-  !!ORIGIN!!      
+  !!ORIGIN!!
   !!LICENCE!!     GPL, read COPYING.GPL
 */
 

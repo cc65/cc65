@@ -155,7 +155,7 @@ nocursor:
 .proc printy
 
         ldy     #0
-loop1: 
+loop1:
         tya
         pha
         asl

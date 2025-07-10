@@ -55,11 +55,12 @@ INSTALL:
         lda     VIA::PRA
         and     #%00100000
         bne     ijkPresent
-        lda     #<JOY_ERR_NO_DEVICE
+        lda     #JOY_ERR_NO_DEVICE
         .byte   $2C             ; Skip next opcode
 ijkPresent:
-        lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda     #JOY_ERR_OK
+        .assert JOY_ERR_OK = 0, error
+        tax
 ;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

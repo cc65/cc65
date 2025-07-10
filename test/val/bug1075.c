@@ -8,7 +8,7 @@ long rhs;
 
 int test(void)
 {
-    /* the whole lhs is errorneously treated as an absolute address (integer 
+    /* the whole lhs is errorneously treated as an absolute address (integer
        constant) neglecting its dereference */
     return *(char *)0xD77C + rhs;
 }

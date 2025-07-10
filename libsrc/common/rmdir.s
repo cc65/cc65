@@ -7,7 +7,7 @@
         .export         _rmdir
 
         .import         __sysrmdir
-        .import         __mappederrno
+        .import         ___mappederrno
 
 
 ;--------------------------------------------------------------------------
@@ -15,6 +15,6 @@
 .proc   _rmdir
 
         jsr     __sysrmdir      ; Call the machine specific function
-        jmp     __mappederrno   ; Store into _oserror, set errno, return 0/-1
+        jmp     ___mappederrno  ; Store into __oserror, set errno, return 0/-1
 
 .endproc

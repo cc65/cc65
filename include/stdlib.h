@@ -44,6 +44,11 @@ typedef unsigned size_t;
 #define _HAVE_size_t
 #endif
 
+/* NULL pointer */
+#ifndef NULL
+#define NULL ((void *) 0)
+#endif
+
 /* Standard exit codes */
 #define EXIT_SUCCESS    0
 #define EXIT_FAILURE    1
@@ -52,8 +57,8 @@ typedef unsigned size_t;
 
 /* Those non-standard cc65 exit constants definitions are in addition
 ** to the EXIT_SUCCESS and EXIT_FAILURE constants, which should not be
-** redefined 
-*/ 
+** redefined
+*/
 #define EXIT_ASSERT 2
 #define EXIT_ABORT 3
 
@@ -92,24 +97,44 @@ int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size);
 */
 #endif
 
-void __fastcall__ _heapadd (void* mem, size_t size);
+void __fastcall__ __heapadd (void* mem, size_t size);
 /* Add a block to the heap */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heapadd __heapadd
+#endif
 
-size_t __fastcall__ _heapblocksize (const void* block);
+size_t __fastcall__ __heapblocksize (const void* block);
 /* Return the size of an allocated block */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heapblocksize __heapblocksize
+#endif
 
-size_t _heapmemavail (void);
+size_t __heapmemavail (void);
 /* Return the total free heap space */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heapmemavail __heapmemavail
+#endif
 
-size_t _heapmaxavail (void);
+size_t __heapmaxavail (void);
 /* Return the size of the largest free block on the heap */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _heapmaxavail __heapmaxavail
+#endif
 
 
 /* Random numbers */
 #define RAND_MAX        0x7FFF
 int rand (void);
 void __fastcall__ srand (unsigned seed);
-void _randomize (void);         /* Non-standard */
+void __randomize (void);         /* Non-standard */
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _randomize __randomize
+#endif
 
 /* Other standard stuff */
 void abort (void) __attribute__ ((noreturn));
@@ -130,7 +155,11 @@ unsigned long __fastcall__ strtoul (const char* nptr, char** endptr, int base);
 int __fastcall__ system (const char* s);
 
 /* Non-ANSI functions */
-void __fastcall__ _swap (void* p, void* q, size_t size);
+void __fastcall__ __swap (void* p, void* q, size_t size);
+#if __CC65_STD__ == __CC65_STD_CC65__
+/* define old name with one underscore for backwards compatibility */
+#define _swap __swap
+#endif
 #if __CC65_STD__ == __CC65_STD_CC65__
 char* __fastcall__ itoa (int val, char* buf, int radix);
 char* __fastcall__ utoa (unsigned val, char* buf, int radix);
@@ -143,6 +172,3 @@ int __fastcall__ putenv (char* s);
 
 /* End of stdlib.h */
 #endif
-
-
-

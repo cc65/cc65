@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef __C64__    
+#ifdef __C64__
 #include <conio.h>
 #endif
 
 /* apparently we dont trigger the bug when not using absolute addresses? */
-#ifdef __C64__    
+#ifdef __C64__
 #define TARGETMEM   0x4c8
 #define SOURCEMEM   0x702
 #elif __SIM6502__
@@ -27,9 +27,9 @@ static unsigned char mem[0x10];
 static unsigned char u8w = 3;
 static unsigned char u8r = 5;
 
-static unsigned char target[8] = { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7 }; 
-static unsigned char source[8] = { 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf }; 
-static unsigned char expect[8] = { 0x0, 0x1, 0xc, 0xd, 0x4, 0x5, 0x6, 0x7 }; 
+static unsigned char target[8] = { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7 };
+static unsigned char source[8] = { 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf };
+static unsigned char expect[8] = { 0x0, 0x1, 0xc, 0xd, 0x4, 0x5, 0x6, 0x7 };
 
 static unsigned char i;
 static unsigned char err = EXIT_SUCCESS;
@@ -41,17 +41,17 @@ void test1(void)
 
 void dotest(void)
 {
-    
+
     memcpy(TARGETMEM, target, 8);
     memcpy(SOURCEMEM, source, 8);
-    
+
     test1();
 
     memcpy(target, TARGETMEM, 8);
     memcpy(source, SOURCEMEM, 8);
-#ifdef __C64__    
+#ifdef __C64__
     clrscr();
-#endif    
+#endif
     printf("source:");
     for(i = 0; i < 8; ++i) {
         printf("%0x ", source[i]);
@@ -61,13 +61,13 @@ void dotest(void)
         printf("%0x ", target[i]);
     }
     printf("\n\r");
-    
+
     printf("u8w: %d\n\r", u8w);
     printf("u8r:  %d\n\r", u8r);
-    
+
 }
- 
-int main(void) 
+
+int main(void)
 {
     dotest();
     dotest();

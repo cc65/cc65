@@ -38,6 +38,10 @@
 
 
 
+#include <stdint.h>
+
+
+
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -66,15 +70,25 @@ typedef enum attr_t {
     atDepLabel     = 0x0040,    /* Dependent label */
     atUnnamedLabel = 0x0080,    /* Unnamed label */
 
-    atLabelDefined = 0x0100,    /* True if we defined the label */
-
-    atStyleMask    = 0x000F,    /* Output style */
-    atLabelMask    = 0x00F0,    /* Label information */
-
     /* Segment */
     atSegment      = 0x0100,    /* Code is in a segment */
     atSegmentEnd   = 0x0200,    /* Segment end */
     atSegmentStart = 0x0400,    /* Segment start */
+
+    /* Table unit separator */
+    atTableUnit    = 0x0800,
+
+    /* 65816 addressing mode */
+    atMem8         = 0x1000,    /* M flag enabled, 8-bit */
+    atMem16        = 0x2000,    /* M flag disabled, 16-bit */
+    atIdx8         = 0x4000,    /* X flag enabled, 8-bit */
+    atIdx16        = 0x8000,    /* X flag disabled, 16-bit */
+
+    atStyleMask    = 0x000F,    /* Output style */
+    atLabelMask    = 0x00F0,    /* Label information */
+    atSegmentMask  = 0x0700,    /* Segment information */
+    at65816Mask    = 0xF000,    /* 65816 information */
+
 } attr_t;
 
 
@@ -85,34 +99,37 @@ typedef enum attr_t {
 
 
 
-void AddrCheck (unsigned Addr);
+void AddrCheck (uint32_t Addr);
 /* Check if the given address has a valid range */
 
-attr_t GetAttr (unsigned Addr);
+unsigned char IsLongAddr (uint32_t Addr);
+/* Check if the given address is 24-bit */
+
+attr_t GetAttr (uint32_t Addr);
 /* Return the attribute for the given address */
 
-int SegmentDefined (unsigned Start, unsigned End);
+int SegmentDefined (uint32_t Start, unsigned End);
 /* Return true if the atSegment bit is set somewhere in the given range */
 
-int IsSegmentEnd (unsigned Addr);
+int IsSegmentEnd (uint32_t Addr);
 /* Return true if a segment ends at the given address */
 
-int IsSegmentStart (unsigned Addr);
+int IsSegmentStart (uint32_t Addr);
 /* Return true if a segment starts at the given address */
 
 unsigned GetGranularity (attr_t Style);
 /* Get the granularity for the given style */
 
-void MarkRange (unsigned Start, unsigned End, attr_t Attr);
+void MarkRange (uint32_t Start, uint32_t End, attr_t Attr);
 /* Mark a range with the given attribute */
 
-void MarkAddr (unsigned Addr, attr_t Attr);
+void MarkAddr (uint32_t Addr, attr_t Attr);
 /* Mark an address with an attribute */
 
-attr_t GetStyleAttr (unsigned Addr);
+attr_t GetStyleAttr (uint32_t Addr);
 /* Return the style attribute for the given address */
 
-attr_t GetLabelAttr (unsigned Addr);
+attr_t GetLabelAttr (uint32_t Addr);
 /* Return the label attribute for the given address */
 
 

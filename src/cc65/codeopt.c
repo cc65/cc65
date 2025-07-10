@@ -113,6 +113,8 @@ static OptFunc DOptAdd3         = { OptAdd3,         "OptAdd3",          65, 0, 
 static OptFunc DOptAdd4         = { OptAdd4,         "OptAdd4",          90, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd5         = { OptAdd5,         "OptAdd5",         100, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd6         = { OptAdd6,         "OptAdd6",          40, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXLoad       = { OptAXLoad,       "OptAXLoad",        50, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXOps        = { OptAXOps,        "OptAXOps",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegA1       = { OptBNegA1,       "OptBNegA1",       100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegA2       = { OptBNegA2,       "OptBNegA2",       100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegAX1      = { OptBNegAX1,      "OptBNegAX1",      100, 0, 0, 0, 0, 0 };
@@ -236,6 +238,7 @@ static OptFunc* OptFuncs[] = {
     &DOptAdd4,
     &DOptAdd5,
     &DOptAdd6,
+    &DOptAXOps,
     &DOptBNegA1,
     &DOptBNegA2,
     &DOptBNegAX1,
@@ -629,6 +632,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 
     Changes += RunOptFunc (S, &DOptGotoSPAdj, 1);
     Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
+    Changes += RunOptFunc (S, &DOptAXOps, 5);
     Changes += RunOptFunc (S, &DOptAdd3, 1);    /* Before OptPtrLoad5! */
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
@@ -871,6 +875,7 @@ static unsigned RunOptGroup7 (CodeSeg* S)
         ** may have opened new oportunities.
         */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+        Changes += RunOptFunc (S, &DOptAXLoad, 5);
         Changes += RunOptFunc (S, &DOptUnusedStores, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);

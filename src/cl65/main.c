@@ -898,7 +898,8 @@ static void Usage (void)
             "  --version\t\t\tPrint the version number\n"
             "  --verbose\t\t\tVerbose mode\n"
             "  --zeropage-label name\t\tDefine and export a ZEROPAGE segment label\n"
-            "  --zeropage-name seg\t\tSet the name of the ZEROPAGE segment\n",
+            "  --zeropage-name seg\t\tSet the name of the ZEROPAGE segment\n"
+            "  --warnings-as-errors\t\tTreat warnings as errors\n",
             ProgName);
 }
 
@@ -1435,65 +1436,76 @@ static void OptZeropageName (const char* Opt attribute ((unused)), const char* A
 
 
 
+static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
+                                 const char* Arg attribute ((unused)))
+/* Handle the --warnings-as-errors option */
+{
+    CmdAddArg (&CA65, "--warnings-as-errors");
+    CmdAddArg (&LD65, "--warnings-as-errors");
+}
+
+
+
 int main (int argc, char* argv [])
 /* Utility main program */
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--add-source",        0, OptAddSource      },
-        { "--all-cdecl",         0, OptAllCDecl       },
-        { "--asm-args",          1, OptAsmArgs        },
-        { "--asm-define",        1, OptAsmDefine      },
-        { "--asm-include-dir",   1, OptAsmIncludeDir  },
-        { "--bin-include-dir",   1, OptBinIncludeDir  },
-        { "--bss-label",         1, OptBssLabel       },
-        { "--bss-name",          1, OptBssName        },
-        { "--cc-args",           1, OptCCArgs         },
-        { "--cfg-path",          1, OptCfgPath        },
-        { "--check-stack",       0, OptCheckStack     },
-        { "--code-label",        1, OptCodeLabel      },
-        { "--code-name",         1, OptCodeName       },
-        { "--codesize",          1, OptCodeSize       },
-        { "--color",             1, OptColor          },
-        { "--config",            1, OptConfig         },
-        { "--cpu",               1, OptCPU            },
-        { "--create-dep",        1, OptCreateDep      },
-        { "--create-full-dep",   1, OptCreateFullDep  },
-        { "--data-label",        1, OptDataLabel      },
-        { "--data-name",         1, OptDataName       },
-        { "--debug",             0, OptDebug          },
-        { "--debug-info",        0, OptDebugInfo      },
-        { "--feature",           1, OptFeature        },
-        { "--force-import",      1, OptForceImport    },
-        { "--help",              0, OptHelp           },
-        { "--include-dir",       1, OptIncludeDir     },
-        { "--ld-args",           1, OptLdArgs         },
-        { "--lib-path",          1, OptLibPath        },
-        { "--list-targets",      0, OptListTargets    },
-        { "--listing",           1, OptListing        },
-        { "--list-bytes",        1, OptListBytes      },
-        { "--mapfile",           1, OptMapFile        },
-        { "--memory-model",      1, OptMemoryModel    },
-        { "--module",            0, OptModule         },
-        { "--module-id",         1, OptModuleId       },
-        { "--no-target-lib",     0, OptNoTargetLib    },
-        { "--no-utf8",           0, OptNoUtf8         },
-        { "--o65-model",         1, OptO65Model       },
-        { "--obj",               1, OptObj            },
-        { "--obj-path",          1, OptObjPath        },
-        { "--print-target-path", 0, OptPrintTargetPath},
-        { "--register-space",    1, OptRegisterSpace  },
-        { "--register-vars",     0, OptRegisterVars   },
-        { "--rodata-name",       1, OptRodataName     },
-        { "--signed-chars",      0, OptSignedChars    },
-        { "--standard",          1, OptStandard       },
-        { "--start-addr",        1, OptStartAddr      },
-        { "--static-locals",     0, OptStaticLocals   },
-        { "--target",            1, OptTarget         },
-        { "--verbose",           0, OptVerbose        },
-        { "--version",           0, OptVersion        },
-        { "--zeropage-label",    1, OptZeropageLabel  },
-        { "--zeropage-name",     1, OptZeropageName   },
+        { "--add-source",          0, OptAddSource          },
+        { "--all-cdecl",           0, OptAllCDecl           },
+        { "--asm-args",            1, OptAsmArgs            },
+        { "--asm-define",          1, OptAsmDefine          },
+        { "--asm-include-dir",     1, OptAsmIncludeDir      },
+        { "--bin-include-dir",     1, OptBinIncludeDir      },
+        { "--bss-label",           1, OptBssLabel           },
+        { "--bss-name",            1, OptBssName            },
+        { "--cc-args",             1, OptCCArgs             },
+        { "--cfg-path",            1, OptCfgPath            },
+        { "--check-stack",         0, OptCheckStack         },
+        { "--code-label",          1, OptCodeLabel          },
+        { "--code-name",           1, OptCodeName           },
+        { "--codesize",            1, OptCodeSize           },
+        { "--color",               1, OptColor              },
+        { "--config",              1, OptConfig             },
+        { "--cpu",                 1, OptCPU                },
+        { "--create-dep",          1, OptCreateDep          },
+        { "--create-full-dep",     1, OptCreateFullDep      },
+        { "--data-label",          1, OptDataLabel          },
+        { "--data-name",           1, OptDataName           },
+        { "--debug",               0, OptDebug              },
+        { "--debug-info",          0, OptDebugInfo          },
+        { "--feature",             1, OptFeature            },
+        { "--force-import",        1, OptForceImport        },
+        { "--help",                0, OptHelp               },
+        { "--include-dir",         1, OptIncludeDir         },
+        { "--ld-args",             1, OptLdArgs             },
+        { "--lib-path",            1, OptLibPath            },
+        { "--list-targets",        0, OptListTargets        },
+        { "--listing",             1, OptListing            },
+        { "--list-bytes",          1, OptListBytes          },
+        { "--mapfile",             1, OptMapFile            },
+        { "--memory-model",        1, OptMemoryModel        },
+        { "--module",              0, OptModule             },
+        { "--module-id",           1, OptModuleId           },
+        { "--no-target-lib",       0, OptNoTargetLib        },
+        { "--no-utf8",             0, OptNoUtf8             },
+        { "--o65-model",           1, OptO65Model           },
+        { "--obj",                 1, OptObj                },
+        { "--obj-path",            1, OptObjPath            },
+        { "--print-target-path",   0, OptPrintTargetPath    },
+        { "--register-space",      1, OptRegisterSpace      },
+        { "--register-vars",       0, OptRegisterVars       },
+        { "--rodata-name",         1, OptRodataName         },
+        { "--signed-chars",        0, OptSignedChars        },
+        { "--standard",            1, OptStandard           },
+        { "--start-addr",          1, OptStartAddr          },
+        { "--static-locals",       0, OptStaticLocals       },
+        { "--target",              1, OptTarget             },
+        { "--verbose",             0, OptVerbose            },
+        { "--version",             0, OptVersion            },
+        { "--zeropage-label",      1, OptZeropageLabel      },
+        { "--zeropage-name",       1, OptZeropageName       },
+        { "--warnings-as-errors",  0, OptWarningsAsErrors   },
     };
 
     char* CmdPath;

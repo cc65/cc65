@@ -313,7 +313,7 @@ static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptColor(const char* Opt, const char* Arg)
+static void OptColor (const char* Opt, const char* Arg)
 /* Handle the --color option */
 {
     ColorMode Mode = CP_Parse (Arg);
@@ -648,7 +648,7 @@ static void CmdlOptTarget (const char* Opt attribute ((unused)), const char* Arg
 
 
 
-static void ParseCommandLine(void)
+static void ParseCommandLine (void)
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
@@ -886,7 +886,7 @@ int main (int argc, char* argv [])
     }
 
     if (WarningCount > 0 && WarningsAsErrors) {
-        Error("Warnings as errors");
+        Error ("Warnings as errors");
     }
 
     /* Create the output file */

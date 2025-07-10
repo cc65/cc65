@@ -120,7 +120,9 @@ void XexSetRunAd (XexDesc* D, Import *RunAd)
     D->RunAd = RunAd;
 }
 
-XexInitAd* XexSearchInitMem(XexDesc* D, MemoryArea *InitMem)
+
+
+XexInitAd* XexSearchInitMem (XexDesc* D, MemoryArea *InitMem)
 {
     XexInitAd* I;
     for (I=D->InitAds; I != 0; I=I->next)
@@ -130,6 +132,7 @@ XexInitAd* XexSearchInitMem(XexDesc* D, MemoryArea *InitMem)
     }
     return NULL;
 }
+
 
 
 int XexAddInitAd (XexDesc* D, MemoryArea *InitMem, Import *InitAd)
@@ -148,6 +151,8 @@ int XexAddInitAd (XexDesc* D, MemoryArea *InitMem, Import *InitAd)
     D->InitAds = I;
     return 0;
 }
+
+
 
 static unsigned XexWriteExpr (ExprNode* E, int Signed, unsigned Size,
                               unsigned long Offs attribute ((unused)),

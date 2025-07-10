@@ -493,7 +493,7 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
             SB_Done (&Note);
         }
         PError (&CfgErrorPos, "%s expected but got `%s'", Name,
-                SB_GetConstBuf(&CfgSVal));
+                SB_GetConstBuf (&CfgSVal));
         return;
     }
 

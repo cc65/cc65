@@ -642,11 +642,9 @@ void PrintDbgSegments (FILE* F)
             fprintf (F, ",oname=\"%s\",ooffs=%lu",
                      S->OutputName, S->OutputOffs);
         }
-        if (S->MemArea) {
-            if (S->MemArea->BankExpr) {
-                if (IsConstExpr (S->MemArea->BankExpr)) {
-                    fprintf (F, ",bank=%lu", GetExprVal(S->MemArea->BankExpr));
-                }
+        if (S->MemArea && S->MemArea->BankExpr) {
+            if (IsConstExpr (S->MemArea->BankExpr)) {
+                fprintf (F, ",bank=%lu", GetExprVal (S->MemArea->BankExpr));
             }
         }
         fputc ('\n', F);

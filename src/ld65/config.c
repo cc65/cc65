@@ -1291,7 +1291,7 @@ static void ParseConDes (void)
     AttrCheck (AttrFlags, atType, "TYPE");
 
     /* Check if the condes has already attributes defined */
-    if (ConDesHasSegName(Type) || ConDesHasLabel(Type)) {
+    if (ConDesHasSegName (Type) || ConDesHasLabel (Type)) {
         PError (&CfgErrorPos,
                 "`CONDES' attributes for type %d are already defined",
                 Type);

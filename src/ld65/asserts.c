@@ -110,8 +110,7 @@ void CheckAssertions (void)
 
         const LineInfo* LI;
         const FilePos* Pos;
-        const char* Module;
-        unsigned Line;
+        const char* Message;
 
         /* Get the assertion */
         Assertion* A = CollAtUnchecked (&Assertions, I);
@@ -121,25 +120,18 @@ void CheckAssertions (void)
             continue;
         }
 
-        /* Retrieve the relevant line info for this assertion */
-        LI = CollConstAt (&A->LineInfos, 0);
-
-        /* Get the source file position of the assertion plus file and line
-        ** number.
-        */
-        Pos    = GetSourcePos (LI);
-        Line   = GetSourceLine (LI);
-        Module = GetSourceName (LI);
+        /* Get some assertion data */
+        Message = GetString (A->Msg);
+        LI      = CollConstAt (&A->LineInfos, 0);
+        Pos     = GetSourcePos (LI);
 
         /* If the expression is not constant, we're not able to handle it */
         if (!IsConstExpr (A->Expr)) {
-            Warning ("Cannot evaluate assertion in module `%s', line %u",
-                     Module, Line);
+            AddPNote (Pos, "The assert message is: \"%s\"", Message);
+            PWarning (Pos, "Cannot evaluate this source code assertion");
         } else if (GetExprVal (A->Expr) == 0) {
 
             /* Assertion failed */
-            const char* Message = GetString (A->Msg);
-
             switch (A->Action) {
 
                 case ASSERT_ACT_WARN:
@@ -153,9 +145,8 @@ void CheckAssertions (void)
                     break;
 
                 default:
-                    Internal ("Invalid assertion action (%u) in module '%s', "
-                              "line %u (file corrupt?)",
-                              A->Action, Module, Line);
+                    AddPNote (Pos, "The file might be corrupt or wrong version");
+                    PError (Pos, "Invalid assertion action %u", A->Action);
                     break;
             }
         }

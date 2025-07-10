@@ -443,6 +443,28 @@ void CfgRangeCheck (unsigned long Lo, unsigned long Hi)
 
 
 
+static void SpecialTokenHelp (const IdentTok* Table, unsigned Size, StrBuf* Msg)
+/* Create a help message for errors in CfgSpecialToken. StrBuf must be
+** initialized and is overwritten.
+*/
+{
+    unsigned I;
+
+    SB_AppendStr (Msg, "You may use one of `");
+    for (I = 0; I < Size; ++I) {
+        if (I == Size - 1) {
+            SB_AppendStr (Msg, " or `");
+        } else if (I > 0) {
+            SB_AppendStr (Msg, ", `");
+        }
+        SB_AppendStr (Msg, Table[I].Ident);
+        SB_AppendChar (Msg, '\'');
+    }
+    SB_Terminate (Msg);         /* So we may use %s */
+}
+
+
+
 void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
 /* Map an identifier to one of the special tokens in the table */
 {
@@ -461,8 +483,17 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
             }
         }
 
-        /* Not found */
-        PError (&CfgErrorPos, "%s expected, got `%s'", Name, SB_GetConstBuf(&CfgSVal));
+        /* Not found. Add a helpful note about the possible names only if
+        ** there is a not too large number of them.
+        */
+        if (Size > 0 && Size <= 5) {
+            StrBuf Note = AUTO_STRBUF_INITIALIZER;
+            SpecialTokenHelp (Table, Size, &Note);
+            AddPNote (&CfgErrorPos, "%s", SB_GetConstBuf (&Note));
+            SB_Done (&Note);
+        }
+        PError (&CfgErrorPos, "%s expected but got `%s'", Name,
+                SB_GetConstBuf(&CfgSVal));
         return;
     }
 

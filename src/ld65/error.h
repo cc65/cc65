@@ -76,7 +76,7 @@ void Error (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an internal error message and die */
 
-void AddCfgNote (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
+void AddPNote (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
 /* Add a notifcation message using file name and line number of the config file.
 ** See comment for AddNote() above.
 */

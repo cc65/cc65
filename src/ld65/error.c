@@ -329,7 +329,7 @@ void Internal (const char* Format, ...)
 
 
 
-void AddCfgNote (const FilePos* Pos, const char* Format, ...)
+void AddPNote (const FilePos* Pos, const char* Format, ...)
 /* Add a notifcation message using file name and line number of the config file.
 ** See comment for AddNote() above.
 */

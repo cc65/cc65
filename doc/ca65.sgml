@@ -94,6 +94,8 @@ Short options:
   -W n                          Set warning level n
   -d                            Debug mode
   -g                            Add debug info to object file
+  -x                            Expand macros in the listing
+                                repeat -x for full expansion
   -h                            Help (this text)
   -i                            Ignore case of symbols
   -l name                       Create a listing file if assembly was ok
@@ -113,6 +115,8 @@ Long options:
   --create-full-dep name        Create a full make dependency file
   --debug                       Debug mode
   --debug-info                  Add debug info to object file
+  --expand-macros               Expand macros in listing
+                                Repeat to get full expansion
   --feature name                Set an emulation feature
   --help                        Help (this text)
   --ignore-case                 Ignore case of symbols

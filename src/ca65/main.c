@@ -110,6 +110,7 @@ static void Usage (void)
             "  -S\t\t\t\tEnable segment offset listing\n"
             "  -t sys\t\t\tSet the target system\n"
             "  -v\t\t\t\tIncrease verbosity\n"
+            "  -x\t\t\t\tExpand macros\n"
             "\n"
             "Long options:\n"
             "  --auto-import\t\t\tMark unresolved symbols as import\n"
@@ -120,6 +121,7 @@ static void Usage (void)
             "  --create-full-dep name\tCreate a full make dependency file\n"
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
+            "  --expand-macros\t\tExpand macros in the listing\n"
             "  --feature name\t\tSet an emulation feature\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --ignore-case\t\t\tIgnore case of symbols\n"
@@ -757,7 +759,16 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
     WarningsAsErrors = 1;
 }
 
+static void OptExpandMacros (const char* Opt attribute ((unused)),
+    const char* Arg attribute ((unused)))
+    /* Expand macros in listing
+    ** one -x means short listing
+    ** two means full listing
+    */
+{
 
+    ExpandMacros++;
+}
 
 static void DoPCAssign (void)
 /* Start absolute code */
@@ -782,9 +793,10 @@ static void OneLine (void)
     int           Instr = -1;
 
     /* Initialize the new listing line if we are actually reading from file
-    ** and not from internally pushed input.
+    ** and not from internally pushed input
     */
-    if (!HavePushedInput ()) {
+
+    if (!HavePushedInput () ) {
         InitListingLine ();
     }
 
@@ -994,6 +1006,7 @@ static void Assemble (void)
     while (CurTok.Tok != TOK_EOF) {
         OneLine ();
     }
+
 }
 
 
@@ -1056,6 +1069,7 @@ int main (int argc, char* argv [])
         { "--create-full-dep",     1,      OptCreateFullDep        },
         { "--debug",               0,      OptDebug                },
         { "--debug-info",          0,      OptDebugInfo            },
+        { "--expand-macros",       0,      OptExpandMacros         },
         { "--feature",             1,      OptFeature              },
         { "--help",                0,      OptHelp                 },
         { "--ignore-case",         0,      OptIgnoreCase           },
@@ -1187,6 +1201,10 @@ int main (int argc, char* argv [])
                 case 'W':
                     WarnLevel = atoi (GetArg (&I, 2));
                     break;
+                case 'x':
+                    ExpandMacros++;
+                    break;
+
 
                 default:
                     UnknownOption (Arg);

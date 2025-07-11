@@ -642,7 +642,7 @@ static void DoCharMap (void)
 
     /* Read the index as numerical value */
     Index = ConstExpression ();
-    if (IsByteRange (Index)) {
+    if (!IsByteRange (Index)) {
         /* Value out of range */
         ErrorSkip ("Index must be in byte range");
         return;

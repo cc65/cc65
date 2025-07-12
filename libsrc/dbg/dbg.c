@@ -332,7 +332,7 @@ BreakPoint DbgBreaks [MAX_USERBREAKS+2];
 BreakPoint* DbgGetBreakSlot (void);
 /* Search for a free breakpoint slot. Return a pointer to the slot or 0 */
 
-BreakPoint* DbgIsBreak (unsigned Addr);
+BreakPoint* __cdecl__ DbgIsBreak (unsigned Addr);
 /* Check if there is a user breakpoint at the given address, if so, return
 ** a pointer to the slot, else return 0.
 */

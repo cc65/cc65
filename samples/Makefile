@@ -193,6 +193,7 @@ EXELIST_agat =     \
 EXELIST_apple2 =   \
         ascii      \
         checkversion \
+        debug      \
         diodemo    \
         enumdevdir \
         gunzip65   \
@@ -212,6 +213,7 @@ EXELIST_apple2enh = $(EXELIST_apple2)
 EXELIST_atari =    \
         ascii      \
         checkversion \
+        debug      \
         gunzip65   \
         hello      \
         mandelbrot \
@@ -250,6 +252,7 @@ EXELIST_bbc = \
 EXELIST_c64 =      \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -275,6 +278,7 @@ EXELIST_c65 = \
 EXELIST_c128 =     \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -289,6 +293,7 @@ EXELIST_c128 =     \
 EXELIST_c16 =      \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         tinyshell  \
         hello      \
@@ -297,6 +302,7 @@ EXELIST_c16 =      \
 EXELIST_cbm510 =   \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -309,6 +315,7 @@ EXELIST_cbm510 =   \
 EXELIST_cbm610 =   \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -323,6 +330,7 @@ EXELIST_creativision = \
 EXELIST_cx16 =     \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -371,6 +379,7 @@ EXELIST_pce = \
 EXELIST_pet =      \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         hello      \
         joydemo    \
@@ -380,6 +389,7 @@ EXELIST_pet =      \
 EXELIST_plus4 =    \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         gunzip65   \
         hello      \
@@ -421,6 +431,7 @@ EXELIST_telestrat = \
 EXELIST_vic20 =    \
         ascii      \
         checkversion \
+        debug      \
         enumdevdir \
         hello      \
         joydemo    \

@@ -560,6 +560,9 @@ static void DoHeader (void)
     /* OK, all information is gathered, do flushout */
 
     fprintf (outputSFile,
+        "\t.import __VLIR0_START__, __VLIR0_LAST__, __BSS_SIZE__, __STARTUP_RUN__\n\n");
+
+    fprintf (outputSFile,
         "\t\t.segment \"DIRENTRY\"\n\n");
 
     if (apple == 1) {
@@ -607,7 +610,7 @@ static void DoHeader (void)
             "\t.byte %i\n"
             "\t.byte %i\n"
             "\t.byte %i, %i, %i, %i, %i\n\n"
-            "\t.word 0\n"
+            "\t.word ((__VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__) + 253) / 254\n"   /* length in blocks */
             "\t.byte \"PRG formatted GEOS file V1.0\"\n\n",
             myHead.structure, myHead.geostype,
             myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min);
@@ -615,7 +618,6 @@ static void DoHeader (void)
 
     fprintf (outputSFile,
         "\t\t.segment \"FILEINFO\"\n\n"
-        "\t.import __VLIR0_START__, __STARTUP_RUN__\n\n"
         "\t.byte 3, 21, 63 | $80\n");
 
     if (myHead.icon != NULL) {

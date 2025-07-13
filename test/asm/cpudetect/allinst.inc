@@ -1,8 +1,4 @@
-
-    ; just emit to bss for now, this way the output wont get checked, which is
-    ; fine - we only want to see if the assembler accepts all the opcodes it
-    ; should accept for the current CPU mode
-    .bss
+    .code
 
 .if (.cpu .bitand CPU_ISET_6502)
     .scope

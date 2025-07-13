@@ -144,12 +144,12 @@ void CheckAssertions (void)
 
                 case ASSERT_ACT_WARN:
                 case ASSERT_ACT_LDWARN:
-                    CfgWarning (Pos, "Assertion failed: %s", Message);
+                    PWarning (Pos, "Assertion failed: %s", Message);
                     break;
 
                 case ASSERT_ACT_ERROR:
                 case ASSERT_ACT_LDERROR:
-                    CfgError (Pos, "Assertion failed: %s", Message);
+                    PError (Pos, "Assertion failed: %s", Message);
                     break;
 
                 default:

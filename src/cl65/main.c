@@ -1034,8 +1034,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 static void OptColor(const char* Opt, const char* Arg)
 /* Handle the --color option */
 {
-    ColorMode Mode = CP_Parse (Arg);
-    if (Mode == CM_INVALID) {
+    if (CP_Parse (Arg) == CM_INVALID) {
         Error ("Invalid argument to %s: %s", Opt, Arg);
     } else {
         CmdAddArg2 (&CA65, "--color", Arg);

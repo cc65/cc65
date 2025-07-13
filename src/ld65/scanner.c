@@ -127,7 +127,7 @@ static void StrVal (void)
 
             case EOF:
             case '\n':
-                CfgError (&CfgErrorPos, "Unterminated string");
+                PError (&CfgErrorPos, "Unterminated string");
                 break;
 
             case '%':
@@ -137,7 +137,7 @@ static void StrVal (void)
                     case EOF:
                     case '\n':
                     case '\"':
-                        CfgError (&CfgErrorPos, "Unterminated `%%' escape sequence");
+                        PError (&CfgErrorPos, "Unterminated `%%' escape sequence");
                         break;
 
                     case '%':
@@ -155,7 +155,7 @@ static void StrVal (void)
                         break;
 
                     default:
-                        CfgWarning (&CfgErrorPos,
+                        PWarning (&CfgErrorPos,
                                     "Unknown escape sequence `%%%c'", C);
                         SB_AppendChar (&CfgSVal, '%');
                         SB_AppendChar (&CfgSVal, C);
@@ -212,7 +212,7 @@ Again:
     if (C == '$') {
         NextChar ();
         if (!isxdigit (C)) {
-            CfgError (&CfgErrorPos, "Hex digit expected");
+            PError (&CfgErrorPos, "Hex digit expected");
         }
         CfgIVal = 0;
         while (isxdigit (C)) {
@@ -340,7 +340,7 @@ Again:
                     break;
 
                 default:
-                    CfgError (&CfgErrorPos, "Invalid format specification");
+                    PError (&CfgErrorPos, "Invalid format specification");
             }
             break;
 
@@ -349,7 +349,7 @@ Again:
             break;
 
         default:
-            CfgError (&CfgErrorPos, "Invalid character `%c'", C);
+            PError (&CfgErrorPos, "Invalid character `%c'", C);
 
     }
 }
@@ -360,7 +360,7 @@ void CfgConsume (cfgtok_t T, const char* Msg)
 /* Skip a token, print an error message if not found */
 {
     if (CfgTok != T) {
-        CfgError (&CfgErrorPos, "%s", Msg);
+        PError (&CfgErrorPos, "%s", Msg);
     }
     CfgNextTok ();
 }
@@ -407,7 +407,7 @@ void CfgAssureInt (void)
 /* Make sure the next token is an integer */
 {
     if (CfgTok != CFGTOK_INTCON) {
-        CfgError (&CfgErrorPos, "Integer constant expected");
+        PError (&CfgErrorPos, "Integer constant expected");
     }
 }
 
@@ -417,7 +417,7 @@ void CfgAssureStr (void)
 /* Make sure the next token is a string constant */
 {
     if (CfgTok != CFGTOK_STRCON) {
-        CfgError (&CfgErrorPos, "String constant expected");
+        PError (&CfgErrorPos, "String constant expected");
     }
 }
 
@@ -427,7 +427,7 @@ void CfgAssureIdent (void)
 /* Make sure the next token is an identifier */
 {
     if (CfgTok != CFGTOK_IDENT) {
-        CfgError (&CfgErrorPos, "Identifier expected");
+        PError (&CfgErrorPos, "Identifier expected");
     }
 }
 
@@ -437,7 +437,7 @@ void CfgRangeCheck (unsigned long Lo, unsigned long Hi)
 /* Check the range of CfgIVal */
 {
     if (CfgIVal < Lo || CfgIVal > Hi) {
-        CfgError (&CfgErrorPos, "Range error");
+        PError (&CfgErrorPos, "Range error");
     }
 }
 
@@ -462,12 +462,12 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
         }
 
         /* Not found */
-        CfgError (&CfgErrorPos, "%s expected, got `%s'", Name, SB_GetConstBuf(&CfgSVal));
+        PError (&CfgErrorPos, "%s expected, got `%s'", Name, SB_GetConstBuf(&CfgSVal));
         return;
     }
 
     /* No identifier */
-    CfgError (&CfgErrorPos, "%s expected", Name);
+    PError (&CfgErrorPos, "%s expected", Name);
 }
 
 
@@ -488,7 +488,7 @@ void CfgBoolToken (void)
     } else {
         /* We expected an integer here */
         if (CfgTok != CFGTOK_INTCON) {
-            CfgError (&CfgErrorPos, "Boolean value expected");
+            PError (&CfgErrorPos, "Boolean value expected");
         }
         CfgTok = (CfgIVal == 0)? CFGTOK_FALSE : CFGTOK_TRUE;
     }

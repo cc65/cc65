@@ -81,10 +81,10 @@ void AddCfgNote (const FilePos* Pos, const char* Format, ...) attribute((format(
 ** See comment for AddNote() above.
 */
 
-void CfgWarning (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
+void PWarning (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
 /* Print a warning message adding file name and line number of the config file */
 
-void CfgError (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
+void PError (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
 /* Print an error message adding file name and line number of a given file */
 
 

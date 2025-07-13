@@ -228,7 +228,7 @@ static MemoryArea* CfgGetMemory (unsigned Name)
 {
     MemoryArea* M = CfgFindMemory (Name);
     if (M == 0) {
-        CfgError (&CfgErrorPos, "Invalid memory area `%s'", GetString (Name));
+        PError (&CfgErrorPos, "Invalid memory area `%s'", GetString (Name));
     }
     return M;
 }
@@ -321,7 +321,7 @@ static MemoryArea* CreateMemoryArea (const FilePos* Pos, unsigned Name)
     /* Check for duplicate names */
     MemoryArea* M = CfgFindMemory (Name);
     if (M) {
-        CfgError (&CfgErrorPos,
+        PError (&CfgErrorPos,
                   "Memory area `%s' defined twice",
                   GetString (Name));
     }
@@ -345,7 +345,7 @@ static SegDesc* NewSegDesc (unsigned Name)
     /* Check for duplicate names */
     SegDesc* S = CfgFindSegDesc (Name);
     if (S) {
-        CfgError (&CfgErrorPos, "Segment `%s' defined twice", GetString (Name));
+        PError (&CfgErrorPos, "Segment `%s' defined twice", GetString (Name));
     }
 
     /* Allocate memory */
@@ -391,7 +391,7 @@ static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
 */
 {
     if (*Flags & Mask) {
-        CfgError (&CfgErrorPos, "Attribute `%s' is already defined", Name);
+        PError (&CfgErrorPos, "Attribute `%s' is already defined", Name);
     }
     *Flags |= Mask;
 }
@@ -402,7 +402,7 @@ static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
 /* Check that a mandatory attribute was given */
 {
     if ((Attr & Mask) == 0) {
-        CfgError (&CfgErrorPos, "Mandatory attribute `%s' is missing", Name);
+        PError (&CfgErrorPos, "Mandatory attribute `%s' is missing", Name);
     }
 }
 
@@ -554,7 +554,7 @@ static void ParseFiles (void)
 
     /* The MEMORY section must preceed the FILES section */
     if ((SectionsEncountered & SE_MEMORY) == 0) {
-        CfgError (&CfgErrorPos, "MEMORY must precede FILES");
+        PError (&CfgErrorPos, "MEMORY must precede FILES");
     }
 
     /* Parse all files */
@@ -568,7 +568,7 @@ static void ParseFiles (void)
         /* Search for the file, it must exist */
         F = FindFile (GetStrBufId (&CfgSVal));
         if (F == 0) {
-            CfgError (&CfgErrorPos,
+            PError (&CfgErrorPos,
                       "File `%s' not found in MEMORY section",
                       SB_GetConstBuf (&CfgSVal));
         }
@@ -595,7 +595,7 @@ static void ParseFiles (void)
                 case CFGTOK_FORMAT:
                     if (F->Format != BINFMT_DEFAULT) {
                         /* We've set the format already! */
-                        CfgError (&CfgErrorPos,
+                        PError (&CfgErrorPos,
                                   "Cannot set a file format twice");
                     }
                     /* Read the format token */
@@ -667,7 +667,7 @@ static void ParseSegments (void)
 
     /* The MEMORY section must preceed the SEGMENTS section */
     if ((SectionsEncountered & SE_MEMORY) == 0) {
-        CfgError (&CfgErrorPos, "MEMORY must precede SEGMENTS");
+        PError (&CfgErrorPos, "MEMORY must precede SEGMENTS");
     }
 
     while (CfgTok == CFGTOK_IDENT) {
@@ -793,7 +793,7 @@ static void ParseSegments (void)
         ** separate run and load memory areas.
         */
         if ((S->Flags & SF_ALIGN_LOAD) != 0 && (S->Load == S->Run)) {
-            CfgWarning (&CfgErrorPos,
+            PWarning (&CfgErrorPos,
                         "ALIGN_LOAD attribute specified, but no separate "
                         "LOAD and RUN memory areas assigned");
             /* Remove the flag */
@@ -804,7 +804,7 @@ static void ParseSegments (void)
         ** load and run memory areas, because it's is never written to disk.
         */
         if ((S->Flags & SF_BSS) != 0 && (S->Load != S->Run)) {
-            CfgWarning (&CfgErrorPos,
+            PWarning (&CfgErrorPos,
                         "Segment with type `bss' has both LOAD and RUN "
                         "memory areas assigned");
         }
@@ -812,7 +812,7 @@ static void ParseSegments (void)
         /* Don't allow read/write data to be put into a readonly area */
         if ((S->Flags & SF_RO) == 0) {
             if (S->Run->Flags & MF_RO) {
-                CfgError (&CfgErrorPos,
+                PError (&CfgErrorPos,
                           "Cannot put r/w segment `%s' in r/o memory area `%s'",
                           GetString (S->Name), GetString (S->Run->Name));
             }
@@ -823,7 +823,7 @@ static void ParseSegments (void)
                 ((S->Flags & SF_OFFSET) != 0) +
                 ((S->Flags & SF_START)  != 0);
         if (Count > 1) {
-            CfgError (&CfgErrorPos,
+            PError (&CfgErrorPos,
                       "Only one of ALIGN, START, OFFSET may be used");
         }
 
@@ -936,7 +936,7 @@ static void ParseO65 (void)
                         break;
 
                     default:
-                        CfgError (&CfgErrorPos, "Unexpected type token");
+                        PError (&CfgErrorPos, "Unexpected type token");
                 }
                 /* Eat the attribute token */
                 CfgNextTok ();
@@ -958,7 +958,7 @@ static void ParseO65 (void)
                         case CFGTOK_OSA65:    OS = O65OS_OSA65;     break;
                         case CFGTOK_CC65:     OS = O65OS_CC65;      break;
                         case CFGTOK_OPENCBM:  OS = O65OS_OPENCBM;   break;
-                        default:              CfgError (&CfgErrorPos, "Unexpected OS token");
+                        default:              PError (&CfgErrorPos, "Unexpected OS token");
                     }
                 }
                 CfgNextTok ();
@@ -993,12 +993,12 @@ static void ParseO65 (void)
     /* Check for attributes that may not be combined */
     if (OS == O65OS_CC65) {
         if ((AttrFlags & (atImport | atExport)) != 0 && ModuleId < 0x8000) {
-            CfgError (&CfgErrorPos,
+            PError (&CfgErrorPos,
                       "OS type CC65 may not have imports or exports for ids < $8000");
         }
     } else {
         if (AttrFlags & atID) {
-            CfgError (&CfgErrorPos,
+            PError (&CfgErrorPos,
                       "Operating system does not support the ID attribute");
         }
     }
@@ -1071,7 +1071,7 @@ static void ParseXex (void)
                 CfgNextTok ();
                 /* Add to XEX */
                 if (XexAddInitAd (XexFmtDesc, InitMem, InitAd))
-                    CfgError (&CfgErrorPos, "INITAD already given for memory area");
+                    PError (&CfgErrorPos, "INITAD already given for memory area");
                 break;
 
             default:
@@ -1290,7 +1290,7 @@ static void ParseConDes (void)
 
     /* Check if the condes has already attributes defined */
     if (ConDesHasSegName(Type) || ConDesHasLabel(Type)) {
-        CfgError (&CfgErrorPos,
+        PError (&CfgErrorPos,
                   "CONDES attributes for type %d are already defined",
                   Type);
     }
@@ -1559,7 +1559,7 @@ static void ParseSymbols (void)
             case CfgSymImport:
                 /* An import must not have a value */
                 if (AttrFlags & atValue) {
-                    CfgError (&CfgErrorPos, "Imports must not have a value");
+                    PError (&CfgErrorPos, "Imports must not have a value");
                 }
                 /* Generate the import */
                 Imp = InsertImport (GenImport (Name, AddrSize));
@@ -1703,7 +1703,7 @@ static void ProcessSegments (void)
         ** in the segment.
         */
         if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
-            CfgWarning (GetSourcePos (S->LI),
+            PWarning (GetSourcePos (S->LI),
                         "Segment `%s' with type `bss' contains initialized data",
                         GetString (S->Name));
         }
@@ -1732,7 +1732,7 @@ static void ProcessSegments (void)
 
             /* Print a warning if the segment is not optional */
             if ((S->Flags & SF_OPTIONAL) == 0) {
-                CfgWarning (&CfgErrorPos,
+                PWarning (&CfgErrorPos,
                             "Segment `%s' does not exist",
                             GetString (S->Name));
             }
@@ -1764,7 +1764,7 @@ static void ProcessSymbols (void)
             case CfgSymO65Export:
                 /* Check if the export symbol is also defined as an import. */
                 if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
-                    CfgError (
+                    PError (
                         GetSourcePos (Sym->LI),
                         "Exported o65 symbol `%s' cannot also be an o65 import",
                         GetString (Sym->Name)
@@ -1776,7 +1776,7 @@ static void ProcessSymbols (void)
                 ** error message when checking it here.
                 */
                 if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
-                    CfgError (
+                    PError (
                         GetSourcePos (Sym->LI),
                         "Duplicate exported o65 symbol: `%s'",
                         GetString (Sym->Name)
@@ -1790,7 +1790,7 @@ static void ProcessSymbols (void)
             case CfgSymO65Import:
                 /* Check if the import symbol is also defined as an export. */
                 if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
-                    CfgError (
+                    PError (
                         GetSourcePos (Sym->LI),
                         "Imported o65 symbol `%s' cannot also be an o65 export",
                         GetString (Sym->Name)
@@ -1802,7 +1802,7 @@ static void ProcessSymbols (void)
                 ** error message when checking it here.
                 */
                 if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
-                    CfgError (
+                    PError (
                         GetSourcePos (Sym->LI),
                         "Duplicate imported o65 symbol: `%s'",
                         GetString (Sym->Name)
@@ -1913,7 +1913,7 @@ unsigned CfgProcess (void)
         ** and mark the memory area as placed.
         */
         if (!IsConstExpr (M->StartExpr)) {
-            CfgError (GetSourcePos (M->LI),
+            PError (GetSourcePos (M->LI),
                       "Start address of memory area `%s' is not constant",
                       GetString (M->Name));
         }
@@ -1938,13 +1938,13 @@ unsigned CfgProcess (void)
 
         /* Resolve the size expression */
         if (!IsConstExpr (M->SizeExpr)) {
-            CfgError (GetSourcePos (M->LI),
+            PError (GetSourcePos (M->LI),
                       "Size of memory area `%s' is not constant",
                       GetString (M->Name));
         }
         M->Size = GetExprVal (M->SizeExpr);
         if (M->Size >= 0x80000000) {
-            CfgError (GetSourcePos (M->LI),
+            PError (GetSourcePos (M->LI),
                       "Size of memory area `%s' is negative: %ld",
                       GetString (M->Name), (long)M->Size);
         }
@@ -1968,14 +1968,14 @@ unsigned CfgProcess (void)
                 if (S->Flags & (SF_OFFSET | SF_START)) {
                     ++Overwrites;
                 } else {
-                    CfgError (GetSourcePos (M->LI),
+                    PError (GetSourcePos (M->LI),
                               "Segment `%s' of type `overwrite' requires either"
                               " `START' or `OFFSET' attribute to be specified",
                               GetString (S->Name));
                 }
             } else {
                 if (Overwrites > 0) {
-                    CfgError (GetSourcePos (M->LI),
+                    PError (GetSourcePos (M->LI),
                               "Segment `%s' is preceded by at least one segment"
                               " of type `overwrite'",
                               GetString (S->Name));
@@ -2002,7 +2002,7 @@ unsigned CfgProcess (void)
                     /* Segment requires another alignment than configured
                     ** in the linker.
                     */
-                    CfgWarning (GetSourcePos (S->LI),
+                    PWarning (GetSourcePos (S->LI),
                                 "Segment `%s' isn't aligned properly; the"
                                 " resulting executable might not be functional.",
                                 GetString (S->Name));
@@ -2017,7 +2017,7 @@ unsigned CfgProcess (void)
                     ** that is somewhat suspicious.
                     */
                     if (M->FillLevel == 0 && NewAddr > Addr) {
-                        CfgWarning (GetSourcePos (S->LI),
+                        PWarning (GetSourcePos (S->LI),
                                     "The first segment in memory area `%s' "
                                     "needs fill bytes for alignment.",
                                     GetString (M->Name));
@@ -2038,7 +2038,7 @@ unsigned CfgProcess (void)
 
                     if (S->Flags & SF_OVERWRITE) {
                         if (NewAddr < M->Start) {
-                            CfgError (GetSourcePos (S->LI),
+                            PError (GetSourcePos (S->LI),
                                       "Segment `%s' begins before memory area `%s'",
                                       GetString (S->Name), GetString (M->Name));
                         } else {
@@ -2049,12 +2049,12 @@ unsigned CfgProcess (void)
                             /* Offset already too large */
                             ++Overflows;
                             if (S->Flags & SF_OFFSET) {
-                                CfgWarning (GetSourcePos (S->LI),
+                                PWarning (GetSourcePos (S->LI),
                                             "Segment `%s' offset is too small in `%s' by %lu byte%s",
                                             GetString (S->Name), GetString (M->Name),
                                             Addr - NewAddr, (Addr - NewAddr == 1) ? "" : "s");
                             } else {
-                                CfgWarning (GetSourcePos (S->LI),
+                                PWarning (GetSourcePos (S->LI),
                                             "Segment `%s' start address is too low in `%s' by %lu byte%s",
                                             GetString (S->Name), GetString (M->Name),
                                             Addr - NewAddr, (Addr - NewAddr == 1) ? "" : "s");
@@ -2101,7 +2101,7 @@ unsigned CfgProcess (void)
             if (FillLevel > M->Size && (M->Flags & MF_OVERFLOW) == 0) {
                 ++Overflows;
                 M->Flags |= MF_OVERFLOW;
-                CfgWarning (GetSourcePos (M->LI),
+                PWarning (GetSourcePos (M->LI),
                             "Segment `%s' overflows memory area `%s' by %lu byte%s",
                             GetString (S->Name), GetString (M->Name),
                             FillLevel - M->Size, (FillLevel - M->Size == 1) ? "" : "s");

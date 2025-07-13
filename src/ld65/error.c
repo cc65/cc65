@@ -348,7 +348,7 @@ void AddCfgNote (const FilePos* Pos, const char* Format, ...)
 
 
 
-void CfgWarning (const FilePos* Pos, const char* Format, ...)
+void PWarning (const FilePos* Pos, const char* Format, ...)
 /* Print a warning message adding file name and line number of a given file */
 {
     /* Output the message */
@@ -366,7 +366,7 @@ void CfgWarning (const FilePos* Pos, const char* Format, ...)
 
 
 
-void CfgError (const FilePos* Pos, const char* Format, ...)
+void PError (const FilePos* Pos, const char* Format, ...)
 /* Print an error message adding file name and line number of a given file */
 {
     /* Output the message */

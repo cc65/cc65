@@ -109,7 +109,7 @@ static ExprNode* Factor (void)
             break;
 
         default:
-            CfgError (&CfgErrorPos, "Invalid expression: %d", CfgTok);
+            PError (&CfgErrorPos, "Invalid expression: %d", CfgTok);
             break;
     }
 
@@ -213,7 +213,7 @@ long CfgConstExpr (void)
 
     /* Check that it's const */
     if (!IsConstExpr (Expr)) {
-        CfgError (&CfgErrorPos, "Constant expression expected");
+        PError (&CfgErrorPos, "Constant expression expected");
     }
 
     /* Get the value */
@@ -238,7 +238,7 @@ long CfgCheckedConstExpr (long Min, long Max)
 
     /* Check the range */
     if (Val < Min || Val > Max) {
-        CfgError (&CfgErrorPos, "Range error");
+        PError (&CfgErrorPos, "Range error");
     }
 
     /* Return the value */

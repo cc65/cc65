@@ -1,0 +1,2 @@
+170-ld-errormsg.cfg:10: Warning: Segment 'BSS' with type 'bss' contains initialized data
+170-ld-errormsg.cfg:10: Note: Initialized data comes at least partially from '<<<#PATH#>>>'

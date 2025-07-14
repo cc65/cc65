@@ -787,8 +787,8 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
                     for (J = 0; J < Count; ++J) {
                         const LineInfo* LI = CollConstAt (&Imp->RefLines, J);
                         PWarning (GetSourcePos (LI),
-                                    "Unresolved external `%s'",
-                                    Name);
+                                  "Unresolved external `%s'",
+                                  Name);
                     }
                 }
                 Imp = Imp->Next;

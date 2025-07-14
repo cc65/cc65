@@ -1089,6 +1089,14 @@ int main (int argc, char* argv[])
                     OptSignedChars (Arg, 0);
                     break;
 
+                case 'm':
+                    if (Arg[2] == 'm') {
+                        OptMemoryModel (Arg, GetArg (&I, 3));
+                    } else {
+                        UnknownOption (Arg);
+                    }
+                    break;
+
                 case 'o':
                     SetOutputName (GetArg (&I, 2));
                     break;

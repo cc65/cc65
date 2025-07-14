@@ -514,6 +514,28 @@ Here is a description of all the command line options:
   name="#pragma&nbsp;local-strings"></tt> for fine grained control.
 
 
+  <tag><tt>-mm model, --memory-model model</tt></tag>
+
+  This option sets the code and data models for the compiler to use. Please
+  note that memory models are an unfinished feature and using this option
+  with any other memory model than <tt/near/ will cause compile errors.
+  Possible arguments are:
+
+  <descrip>
+    <tag/near/
+      This memory model uses 16 bit addresses for code and data. It is
+      currently the only supported memory model and suited for the 6502.
+
+    <tag/far/
+      This memory model uses 24 bit addresses for code and 16 bit addresses
+      for data. It is suited for the 65816 but currently unsupported.
+
+    <tag/huge/
+      This memory model uses 24 bit addresses for code and data. It is
+      suited for the 65816 but currently unsupported.
+  </descrip>
+
+
   <tag><tt>-o name</tt></tag>
 
   Specify the name of the output file. If you don't specify a name, the

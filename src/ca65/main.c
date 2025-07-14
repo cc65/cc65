@@ -742,6 +742,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
+
+
 static void OptSeglist (const char* Opt attribute ((unused)),
     const char* Arg attribute ((unused)))
     /* Enable segment listing */
@@ -749,12 +751,16 @@ static void OptSeglist (const char* Opt attribute ((unused)),
     SegList = 1;
 }
 
+
+
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
 /* Generate an error if any warnings occur */
 {
     WarningsAsErrors = 1;
 }
+
+
 
 static void OptExpandMacros (const char* Opt attribute ((unused)),
     const char* Arg attribute ((unused)))
@@ -766,6 +772,8 @@ static void OptExpandMacros (const char* Opt attribute ((unused)),
 
     ExpandMacros++;
 }
+
+
 
 static void DoPCAssign (void)
 /* Start absolute code */

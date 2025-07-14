@@ -1441,6 +1441,7 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
 /* Handle the --warnings-as-errors option */
 {
     CmdAddArg (&CA65, "--warnings-as-errors");
+    CmdAddArg (&CC65, "--warnings-as-errors");
     CmdAddArg (&LD65, "--warnings-as-errors");
 }
 

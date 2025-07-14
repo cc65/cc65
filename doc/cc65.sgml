@@ -110,6 +110,7 @@ Long options:
   --target sys                  Set the target system
   --verbose                     Increase verbosity
   --version                     Print the compiler version number
+  --warnings-as-errors          Treat warnings as errors
   --writable-strings            Make string literals writable
 ---------------------------------------------------------------------------
 </verb></tscreen>
@@ -656,6 +657,15 @@ Here is a description of all the command line options:
   or warnings are encountered.
 
 
+  <label id="option--warnings-as-errors">
+  <tag><tt>--warnings-as-errors</tt></tag>
+
+  Treat all warnings as error. This makes the compiler exit with an appropriate
+  error code in case of warnings. The effect of this switch is identical to
+  the command line option <tt/<ref id="option-W" name="-W error">/. It is
+  available for compatibility with the other tools.
+
+
   <label id="option-writable-strings">
   <tag><tt>--writable-strings</tt></tag>
 
@@ -766,7 +776,9 @@ Here is a description of all the command line options:
   <tag><tt/const-comparison/</tag>
         Warn if the result of a comparison is constant.
   <tag><tt/error/</tag>
-        Treat all warnings as errors.
+        Treat all warnings as errors. This has the same effect as using the
+        <tt/<ref id="option--warnings-as-errors" name="--warnings-as-errors">/
+        option.
   <tag><tt/no-effect/</tag>
         Warn about statements that don't have an effect.
   <tag><tt/pointer-sign/</tag>

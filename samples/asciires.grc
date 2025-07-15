@@ -1,0 +1,7 @@
+; this is the resource file for ascii.c, a GEOS application example
+
+HEADER APPLICATION "ascii" "ascii" "V0.1" {
+dostype USR
+author "cc65 team"
+info "This is a cc65 sample."
+}

@@ -40,11 +40,13 @@ ifdef CC65_HOME
   CC = $(CC65_HOME)/bin/cc65
   CL = $(CC65_HOME)/bin/cl65
   LD = $(CC65_HOME)/bin/ld65
+  GRC = $(CC65_HOME)/bin/grc65
 else
   AS := $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
   CC := $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
   CL := $(if $(wildcard ../bin/cl65*),../bin/cl65,cl65)
   LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
+  GRC := $(if $(wildcard ../bin/grc65*),../bin/grc65,grc65)
 endif
 
 ifeq ($(SILENT),s)
@@ -175,6 +177,7 @@ else
 	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 endif
+
 
 # --------------------------------------------------------------------------
 # Lists of subdirectories
@@ -345,10 +348,10 @@ EXELIST_gamate =   \
         hello
 
 EXELIST_geos-cbm = \
-        ascii
+        ascii.cvt
 
 EXELIST_geos-apple = \
-        ascii
+        ascii.cvt
 
 EXELIST_lunix = \
         notavailable
@@ -563,6 +566,26 @@ mandelbrot: mandelbrot.o
 tgidemo.o: override CFLAGS += -D DYN_DRV=0
 tgidemo: tgidemo.o
 	$(LD) -D __HIMEM__=0x6000 $(LDFLAGS) -o $@ -C vic20-tgi.cfg -m $@.map $^ $(SYS).lib
+endif
+
+# --------------------------------------------------------------------------
+# GEOS programs need a resource file linked to them
+ifeq ($(SYS),geos-cbm)
+asciires.o: asciires.grc
+	$(GRC) -t $(SYS) $<
+	$(AS) $(<:.grc=.s)
+ascii.cvt: ascii.o asciires.o
+	$(if $(QUIET),echo $(SYS):$@)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
+endif
+
+ifeq ($(SYS),geos-apple)
+asciires.o: asciires.grc
+	$(GRC) -t $(SYS) $<
+	$(AS) $(<:.grc=.s)
+ascii.cvt: ascii.o asciires.o
+	$(if $(QUIET),echo $(SYS):$@)
+	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
 endif
 
 # --------------------------------------------------------------------------

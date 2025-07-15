@@ -63,7 +63,8 @@ function checkarray
 }
 
 
-find "$CHECK_DIR" -name \*.\[ch\] -print | while read N; do
+FILES=$(find "$CHECK_DIR" -name \*.\[ch\] -print)
+for N in $FILES; do
     grep -q "BEGIN DECL SORTED_CODEOPT.SH" "$N" && checkarray "$N"
 done
 exit 0

@@ -228,7 +228,7 @@ static MemoryArea* CfgGetMemory (unsigned Name)
 {
     MemoryArea* M = CfgFindMemory (Name);
     if (M == 0) {
-        CfgError (&CfgErrorPos, "Invalid memory area '%s'", GetString (Name));
+        PError (&CfgErrorPos, "Invalid memory area `%s'", GetString (Name));
     }
     return M;
 }
@@ -321,9 +321,8 @@ static MemoryArea* CreateMemoryArea (const FilePos* Pos, unsigned Name)
     /* Check for duplicate names */
     MemoryArea* M = CfgFindMemory (Name);
     if (M) {
-        CfgError (&CfgErrorPos,
-                  "Memory area '%s' defined twice",
-                  GetString (Name));
+        PError (&CfgErrorPos, "Memory area `%s' defined twice",
+                GetString (Name));
     }
 
     /* Create a new memory area */
@@ -345,7 +344,7 @@ static SegDesc* NewSegDesc (unsigned Name)
     /* Check for duplicate names */
     SegDesc* S = CfgFindSegDesc (Name);
     if (S) {
-        CfgError (&CfgErrorPos, "Segment '%s' defined twice", GetString (Name));
+        PError (&CfgErrorPos, "Segment `%s' defined twice", GetString (Name));
     }
 
     /* Allocate memory */
@@ -391,7 +390,7 @@ static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
 */
 {
     if (*Flags & Mask) {
-        CfgError (&CfgErrorPos, "%s is already defined", Name);
+        PError (&CfgErrorPos, "Attribute `%s' is already defined", Name);
     }
     *Flags |= Mask;
 }
@@ -402,7 +401,7 @@ static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
 /* Check that a mandatory attribute was given */
 {
     if ((Attr & Mask) == 0) {
-        CfgError (&CfgErrorPos, "%s attribute is missing", Name);
+        PError (&CfgErrorPos, "Mandatory attribute `%s' is missing", Name);
     }
 }
 
@@ -440,7 +439,8 @@ static void ParseMemory (void)
 
             /* Map the identifier to a token */
             cfgtok_t AttrTok;
-            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes),
+                             "Memory attribute");
             AttrTok = CfgTok;
 
             /* An optional assignment follows */
@@ -500,7 +500,7 @@ static void ParseMemory (void)
 
                 case CFGTOK_TYPE:
                     FlagAttr (&M->Attr, MA_TYPE, "TYPE");
-                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "TYPE");
+                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Memory type");
                     if (CfgTok == CFGTOK_RO) {
                         M->Flags |= MF_RO;
                     }
@@ -554,7 +554,7 @@ static void ParseFiles (void)
 
     /* The MEMORY section must preceed the FILES section */
     if ((SectionsEncountered & SE_MEMORY) == 0) {
-        CfgError (&CfgErrorPos, "MEMORY must precede FILES");
+        PError (&CfgErrorPos, "`MEMORY' must precede `FILES'");
     }
 
     /* Parse all files */
@@ -568,9 +568,8 @@ static void ParseFiles (void)
         /* Search for the file, it must exist */
         F = FindFile (GetStrBufId (&CfgSVal));
         if (F == 0) {
-            CfgError (&CfgErrorPos,
-                      "File '%s' not found in MEMORY section",
-                      SB_GetConstBuf (&CfgSVal));
+            PError (&CfgErrorPos, "File `%s' not found in `MEMORY' section",
+                    SB_GetConstBuf (&CfgSVal));
         }
 
         /* Skip the token and the following colon */
@@ -582,7 +581,8 @@ static void ParseFiles (void)
 
             /* Map the identifier to a token */
             cfgtok_t AttrTok;
-            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes),
+                             "File attribute");
             AttrTok = CfgTok;
 
             /* An optional assignment follows */
@@ -595,11 +595,10 @@ static void ParseFiles (void)
                 case CFGTOK_FORMAT:
                     if (F->Format != BINFMT_DEFAULT) {
                         /* We've set the format already! */
-                        CfgError (&CfgErrorPos,
-                                  "Cannot set a file format twice");
+                        PError (&CfgErrorPos, "Cannot set a file format twice");
                     }
                     /* Read the format token */
-                    CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
+                    CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "File format");
                     switch (CfgTok) {
 
                         case CFGTOK_BIN:
@@ -667,7 +666,7 @@ static void ParseSegments (void)
 
     /* The MEMORY section must preceed the SEGMENTS section */
     if ((SectionsEncountered & SE_MEMORY) == 0) {
-        CfgError (&CfgErrorPos, "MEMORY must precede SEGMENTS");
+        PError (&CfgErrorPos, "`MEMORY' must precede `SEGMENTS'");
     }
 
     while (CfgTok == CFGTOK_IDENT) {
@@ -686,7 +685,7 @@ static void ParseSegments (void)
 
             /* Map the identifier to a token */
             cfgtok_t AttrTok;
-            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Segment attribute");
             AttrTok = CfgTok;
 
             /* An optional assignment follows */
@@ -759,7 +758,7 @@ static void ParseSegments (void)
 
                 case CFGTOK_TYPE:
                     FlagAttr (&S->Attr, SA_TYPE, "TYPE");
-                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Segment type");
                     switch (CfgTok) {
                         case CFGTOK_RO:        S->Flags |= SF_RO;                  break;
                         case CFGTOK_RW:        /* Default */                       break;
@@ -793,9 +792,9 @@ static void ParseSegments (void)
         ** separate run and load memory areas.
         */
         if ((S->Flags & SF_ALIGN_LOAD) != 0 && (S->Load == S->Run)) {
-            CfgWarning (&CfgErrorPos,
-                        "ALIGN_LOAD attribute specified, but no separate "
-                        "LOAD and RUN memory areas assigned");
+            PWarning (&CfgErrorPos,
+                      "`ALIGN_LOAD' attribute specified, but no separate "
+                      "`LOAD' and `RUN' memory areas assigned");
             /* Remove the flag */
             S->Flags &= ~SF_ALIGN_LOAD;
         }
@@ -804,17 +803,17 @@ static void ParseSegments (void)
         ** load and run memory areas, because it's is never written to disk.
         */
         if ((S->Flags & SF_BSS) != 0 && (S->Load != S->Run)) {
-            CfgWarning (&CfgErrorPos,
-                        "Segment with type 'bss' has both LOAD and RUN "
-                        "memory areas assigned");
+            PWarning (&CfgErrorPos,
+                      "Segment with type `bss' has both `LOAD' and `RUN' "
+                      "memory areas assigned");
         }
 
         /* Don't allow read/write data to be put into a readonly area */
         if ((S->Flags & SF_RO) == 0) {
             if (S->Run->Flags & MF_RO) {
-                CfgError (&CfgErrorPos,
-                          "Cannot put r/w segment '%s' in r/o memory area '%s'",
-                          GetString (S->Name), GetString (S->Run->Name));
+                PError (&CfgErrorPos,
+                        "Cannot place r/w segment `%s' in r/o memory area `%s'",
+                        GetString (S->Name), GetString (S->Run->Name));
             }
         }
 
@@ -823,8 +822,8 @@ static void ParseSegments (void)
                 ((S->Flags & SF_OFFSET) != 0) +
                 ((S->Flags & SF_START)  != 0);
         if (Count > 1) {
-            CfgError (&CfgErrorPos,
-                      "Only one of ALIGN, START, OFFSET may be used");
+            PError (&CfgErrorPos,
+                    "Only one of `ALIGN', `START' or `OFFSET' may be used");
         }
 
         /* Skip the semicolon */
@@ -881,7 +880,7 @@ static void ParseO65 (void)
 
         /* Map the identifier to a token */
         cfgtok_t AttrTok;
-        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "O65 attribute");
         AttrTok = CfgTok;
 
         /* An optional assignment follows */
@@ -924,7 +923,7 @@ static void ParseO65 (void)
                 /* Cannot have this attribute twice */
                 FlagAttr (&AttrFlags, atType, "TYPE");
                 /* Get the type of the executable */
-                CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                CfgSpecialToken (Types, ENTRY_COUNT (Types), "O65 type");
                 switch (CfgTok) {
 
                     case CFGTOK_SMALL:
@@ -936,7 +935,7 @@ static void ParseO65 (void)
                         break;
 
                     default:
-                        CfgError (&CfgErrorPos, "Unexpected type token");
+                        PError (&CfgErrorPos, "Unexpected type token");
                 }
                 /* Eat the attribute token */
                 CfgNextTok ();
@@ -952,13 +951,15 @@ static void ParseO65 (void)
                     CfgRangeCheck (O65OS_MIN, O65OS_MAX);
                     OS = (unsigned) CfgIVal;
                 } else {
-                    CfgSpecialToken (OperatingSystems, ENTRY_COUNT (OperatingSystems), "OS type");
+                    CfgSpecialToken (OperatingSystems,
+                                     ENTRY_COUNT (OperatingSystems),
+                                     "O65 OS specification");
                     switch (CfgTok) {
                         case CFGTOK_LUNIX:    OS = O65OS_LUNIX;     break;
                         case CFGTOK_OSA65:    OS = O65OS_OSA65;     break;
                         case CFGTOK_CC65:     OS = O65OS_CC65;      break;
                         case CFGTOK_OPENCBM:  OS = O65OS_OPENCBM;   break;
-                        default:              CfgError (&CfgErrorPos, "Unexpected OS token");
+                        default:              PError (&CfgErrorPos, "Unexpected OS token");
                     }
                 }
                 CfgNextTok ();
@@ -993,13 +994,13 @@ static void ParseO65 (void)
     /* Check for attributes that may not be combined */
     if (OS == O65OS_CC65) {
         if ((AttrFlags & (atImport | atExport)) != 0 && ModuleId < 0x8000) {
-            CfgError (&CfgErrorPos,
-                      "OS type CC65 may not have imports or exports for ids < $8000");
+            PError (&CfgErrorPos,
+                    "OS type CC65 may not have imports or exports for ids < $8000");
         }
     } else {
         if (AttrFlags & atID) {
-            CfgError (&CfgErrorPos,
-                      "Operating system does not support the ID attribute");
+            PError (&CfgErrorPos,
+                    "Operating system does not support the ID attribute");
         }
     }
 
@@ -1033,7 +1034,7 @@ static void ParseXex (void)
 
         /* Map the identifier to a token */
         cfgtok_t AttrTok;
-        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Xex attribute");
         AttrTok = CfgTok;
 
         /* An optional assignment follows */
@@ -1071,7 +1072,7 @@ static void ParseXex (void)
                 CfgNextTok ();
                 /* Add to XEX */
                 if (XexAddInitAd (XexFmtDesc, InitMem, InitAd))
-                    CfgError (&CfgErrorPos, "INITAD already given for memory area");
+                    PError (&CfgErrorPos, "`INITAD' already given for memory area");
                 break;
 
             default:
@@ -1104,7 +1105,7 @@ static void ParseFormats (void)
 
         /* Map the identifier to a token */
         cfgtok_t FormatTok;
-        CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
+        CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format attribute");
         FormatTok = CfgTok;
 
         /* Skip the name and the following colon */
@@ -1190,7 +1191,8 @@ static void ParseConDes (void)
 
         /* Map the identifier to a token */
         cfgtok_t AttrTok;
-        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes),
+                         "CONDES attribute");
         AttrTok = CfgTok;
 
         /* An optional assignment follows */
@@ -1232,7 +1234,7 @@ static void ParseConDes (void)
             case CFGTOK_ORDER:
                 /* Don't allow this twice */
                 FlagAttr (&AttrFlags, atOrder, "ORDER");
-                CfgSpecialToken (Orders, ENTRY_COUNT (Orders), "Order");
+                CfgSpecialToken (Orders, ENTRY_COUNT (Orders), "CONDES order");
                 switch (CfgTok) {
                     case CFGTOK_DECREASING: Order = cdDecreasing;       break;
                     case CFGTOK_INCREASING: Order = cdIncreasing;       break;
@@ -1257,7 +1259,7 @@ static void ParseConDes (void)
                     CfgRangeCheck (CD_TYPE_MIN, CD_TYPE_MAX);
                     Type = (int) CfgIVal;
                 } else {
-                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "CONDES type");
                     switch (CfgTok) {
                         case CFGTOK_CONSTRUCTOR: Type = CD_TYPE_CON;    break;
                         case CFGTOK_DESTRUCTOR:  Type = CD_TYPE_DES;    break;
@@ -1289,10 +1291,10 @@ static void ParseConDes (void)
     AttrCheck (AttrFlags, atType, "TYPE");
 
     /* Check if the condes has already attributes defined */
-    if (ConDesHasSegName(Type) || ConDesHasLabel(Type)) {
-        CfgError (&CfgErrorPos,
-                  "CONDES attributes for type %d are already defined",
-                  Type);
+    if (ConDesHasSegName (Type) || ConDesHasLabel (Type)) {
+        PError (&CfgErrorPos,
+                "`CONDES' attributes for type %d are already defined",
+                Type);
     }
 
     /* Define the attributes */
@@ -1334,7 +1336,8 @@ static void ParseStartAddress (void)
 
         /* Map the identifier to a token */
         cfgtok_t AttrTok;
-        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes),
+                         "Start address attribute");
         AttrTok = CfgTok;
 
         /* An optional assignment follows */
@@ -1389,7 +1392,7 @@ static void ParseFeatures (void)
 
         /* Map the identifier to a token */
         cfgtok_t FeatureTok;
-        CfgSpecialToken (Features, ENTRY_COUNT (Features), "Feature");
+        CfgSpecialToken (Features, ENTRY_COUNT (Features), "Feature attribute");
         FeatureTok = CfgTok;
 
         /* Skip the name and the following colon */
@@ -1479,7 +1482,8 @@ static void ParseSymbols (void)
 
             /* Map the identifier to a token */
             cfgtok_t AttrTok;
-            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes),
+                             "Symbol attribute");
             AttrTok = CfgTok;
 
             /* Skip the attribute name */
@@ -1495,7 +1499,8 @@ static void ParseSymbols (void)
                     /* Don't allow this twice */
                     FlagAttr (&AttrFlags, atAddrSize, "ADDRSIZE");
                     /* Map the type to a token */
-                    CfgSpecialToken (AddrSizes, ENTRY_COUNT (AddrSizes), "AddrSize");
+                    CfgSpecialToken (AddrSizes, ENTRY_COUNT (AddrSizes),
+                                     "Address size specification");
                     switch (CfgTok) {
                         case CFGTOK_ABS:    AddrSize = ADDR_SIZE_ABS;   break;
                         case CFGTOK_FAR:    AddrSize = ADDR_SIZE_FAR;   break;
@@ -1511,7 +1516,8 @@ static void ParseSymbols (void)
                     /* Don't allow this twice */
                     FlagAttr (&AttrFlags, atType, "TYPE");
                     /* Map the type to a token */
-                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                    CfgSpecialToken (Types, ENTRY_COUNT (Types),
+                                     "Address size type");
                     switch (CfgTok) {
                         case CFGTOK_EXPORT:     Type = CfgSymExport;    break;
                         case CFGTOK_IMPORT:     Type = CfgSymImport;    break;
@@ -1559,7 +1565,7 @@ static void ParseSymbols (void)
             case CfgSymImport:
                 /* An import must not have a value */
                 if (AttrFlags & atValue) {
-                    CfgError (&CfgErrorPos, "Imports must not have a value");
+                    PError (&CfgErrorPos, "Imports must not have a value");
                 }
                 /* Generate the import */
                 Imp = InsertImport (GenImport (Name, AddrSize));
@@ -1606,12 +1612,13 @@ static void ParseConfig (void)
     do {
 
         /* Read the block ident */
-        CfgSpecialToken (BlockNames, ENTRY_COUNT (BlockNames), "Block identifier");
+        CfgSpecialToken (BlockNames, ENTRY_COUNT (BlockNames),
+                         "Configuration block identifier");
         BlockTok = CfgTok;
         CfgNextTok ();
 
         /* Expected a curly brace */
-        CfgConsume (CFGTOK_LCURLY, "'{' expected");
+        CfgConsume (CFGTOK_LCURLY, "`{' expected");
 
         /* Read the block */
         switch (BlockTok) {
@@ -1646,7 +1653,7 @@ static void ParseConfig (void)
         }
 
         /* Skip closing brace */
-        CfgConsume (CFGTOK_RCURLY, "'}' expected");
+        CfgConsume (CFGTOK_RCURLY, "`}' expected");
 
     } while (CfgTok != CFGTOK_EOF);
 }
@@ -1702,10 +1709,20 @@ static void ProcessSegments (void)
         ** in any of the object file, check that there's no initialized data
         ** in the segment.
         */
-        if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
-            CfgWarning (GetSourcePos (S->LI),
-                        "Segment '%s' with type 'bss' contains initialized data",
-                        GetString (S->Name));
+        if ((S->Flags & SF_BSS) != 0 && S->Seg != 0) {
+            Section* Sec = GetNonBSSSection (S->Seg);
+            if (Sec) {
+                const FilePos* Pos = GetSourcePos (S->LI);
+                if (Sec->Obj) {
+                    AddPNote (Pos, "Initialized data comes at least partially "
+                             "from `%s'", GetString (Sec->Obj->Name));
+                } else {
+                    AddPNote (Pos, "Initialized data is at least partially "
+                              "linker generated");
+                }
+                PWarning (Pos, "Segment `%s' with type `bss' contains "
+                          "initialized data", GetString (S->Name));
+            }
         }
 
         /* If this segment does exist in any of the object files, insert the
@@ -1732,9 +1749,8 @@ static void ProcessSegments (void)
 
             /* Print a warning if the segment is not optional */
             if ((S->Flags & SF_OPTIONAL) == 0) {
-                CfgWarning (&CfgErrorPos,
-                            "Segment '%s' does not exist",
-                            GetString (S->Name));
+                PWarning (&CfgErrorPos, "Segment `%s' does not exist",
+                          GetString (S->Name));
             }
 
             /* Discard the descriptor and remove it from the collection */
@@ -1764,9 +1780,9 @@ static void ProcessSymbols (void)
             case CfgSymO65Export:
                 /* Check if the export symbol is also defined as an import. */
                 if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
-                    CfgError (
+                    PError (
                         GetSourcePos (Sym->LI),
-                        "Exported o65 symbol '%s' cannot also be an o65 import",
+                        "Exported o65 symbol `%s' cannot also be an o65 import",
                         GetString (Sym->Name)
                     );
                 }
@@ -1776,9 +1792,9 @@ static void ProcessSymbols (void)
                 ** error message when checking it here.
                 */
                 if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
-                    CfgError (
+                    PError (
                         GetSourcePos (Sym->LI),
-                        "Duplicate exported o65 symbol: '%s'",
+                        "Duplicate exported o65 symbol: `%s'",
                         GetString (Sym->Name)
                     );
                 }
@@ -1790,9 +1806,9 @@ static void ProcessSymbols (void)
             case CfgSymO65Import:
                 /* Check if the import symbol is also defined as an export. */
                 if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
-                    CfgError (
+                    PError (
                         GetSourcePos (Sym->LI),
-                        "Imported o65 symbol '%s' cannot also be an o65 export",
+                        "Imported o65 symbol `%s' cannot also be an o65 export",
                         GetString (Sym->Name)
                     );
                 }
@@ -1802,9 +1818,9 @@ static void ProcessSymbols (void)
                 ** error message when checking it here.
                 */
                 if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
-                    CfgError (
+                    PError (
                         GetSourcePos (Sym->LI),
-                        "Duplicate imported o65 symbol: '%s'",
+                        "Duplicate imported o65 symbol: `%s'",
                         GetString (Sym->Name)
                     );
                 }
@@ -1913,9 +1929,9 @@ unsigned CfgProcess (void)
         ** and mark the memory area as placed.
         */
         if (!IsConstExpr (M->StartExpr)) {
-            CfgError (GetSourcePos (M->LI),
-                      "Start address of memory area '%s' is not constant",
-                      GetString (M->Name));
+            PError (GetSourcePos (M->LI),
+                    "Start address of memory area `%s' is not constant",
+                    GetString (M->Name));
         }
         Addr = M->Start = GetExprVal (M->StartExpr);
         M->Flags |= MF_PLACED;
@@ -1938,15 +1954,15 @@ unsigned CfgProcess (void)
 
         /* Resolve the size expression */
         if (!IsConstExpr (M->SizeExpr)) {
-            CfgError (GetSourcePos (M->LI),
-                      "Size of memory area '%s' is not constant",
-                      GetString (M->Name));
+            PError (GetSourcePos (M->LI),
+                    "Size of memory area `%s' is not constant",
+                    GetString (M->Name));
         }
         M->Size = GetExprVal (M->SizeExpr);
         if (M->Size >= 0x80000000) {
-            CfgError (GetSourcePos (M->LI),
-                      "Size of memory area '%s' is negative: %ld",
-                      GetString (M->Name), (long)M->Size);
+            PError (GetSourcePos (M->LI),
+                    "Size of memory area `%s' is negative: %ld",
+                    GetString (M->Name), (long)M->Size);
         }
 
         /* Walk through the segments in this memory area */
@@ -1968,17 +1984,17 @@ unsigned CfgProcess (void)
                 if (S->Flags & (SF_OFFSET | SF_START)) {
                     ++Overwrites;
                 } else {
-                    CfgError (GetSourcePos (M->LI),
-                              "Segment '%s' of type 'overwrite' requires either"
-                              " 'Start' or 'Offset' attribute to be specified",
-                              GetString (S->Name));
+                    PError (GetSourcePos (M->LI),
+                            "Segment `%s' of type `overwrite' requires either"
+                            " `START' or `OFFSET' attribute to be specified",
+                            GetString (S->Name));
                 }
             } else {
                 if (Overwrites > 0) {
-                    CfgError (GetSourcePos (M->LI),
-                              "Segment '%s' is preceded by at least one segment"
-                              " of type 'overwrite'",
-                              GetString (S->Name));
+                    PError (GetSourcePos (M->LI),
+                            "Segment `%s' is preceded by at least one segment"
+                            " of type `overwrite'",
+                            GetString (S->Name));
                 }
             }
 
@@ -2002,10 +2018,10 @@ unsigned CfgProcess (void)
                     /* Segment requires another alignment than configured
                     ** in the linker.
                     */
-                    CfgWarning (GetSourcePos (S->LI),
-                                "Segment '%s' isn't aligned properly; the"
-                                " resulting executable might not be functional.",
-                                GetString (S->Name));
+                    PWarning (GetSourcePos (S->LI),
+                              "Segment `%s' isn't aligned properly; the"
+                              " resulting executable might not be functional.",
+                              GetString (S->Name));
                 }
 
                 if (S->Flags & SF_ALIGN) {
@@ -2017,10 +2033,10 @@ unsigned CfgProcess (void)
                     ** that is somewhat suspicious.
                     */
                     if (M->FillLevel == 0 && NewAddr > Addr) {
-                        CfgWarning (GetSourcePos (S->LI),
-                                    "The first segment in memory area '%s' "
-                                    "needs fill bytes for alignment.",
-                                    GetString (M->Name));
+                        PWarning (GetSourcePos (S->LI),
+                                  "The first segment in memory area `%s' "
+                                  "needs fill bytes for alignment.",
+                                  GetString (M->Name));
                     }
 
                     /* Use the aligned address */
@@ -2038,9 +2054,9 @@ unsigned CfgProcess (void)
 
                     if (S->Flags & SF_OVERWRITE) {
                         if (NewAddr < M->Start) {
-                            CfgError (GetSourcePos (S->LI),
-                                      "Segment '%s' begins before memory area '%s'",
-                                      GetString (S->Name), GetString (M->Name));
+                            PError (GetSourcePos (S->LI),
+                                    "Segment `%s' begins before memory area `%s'",
+                                    GetString (S->Name), GetString (M->Name));
                         } else {
                             Addr = NewAddr;
                         }
@@ -2049,15 +2065,23 @@ unsigned CfgProcess (void)
                             /* Offset already too large */
                             ++Overflows;
                             if (S->Flags & SF_OFFSET) {
-                                CfgWarning (GetSourcePos (S->LI),
-                                            "Segment '%s' offset is too small in '%s' by %lu byte%s",
-                                            GetString (S->Name), GetString (M->Name),
-                                            Addr - NewAddr, (Addr - NewAddr == 1) ? "" : "s");
+                                PWarning (
+                                    GetSourcePos (S->LI),
+                                    "Segment `%s' offset is too small in `%s' by %lu byte%s",
+                                    GetString (S->Name),
+                                    GetString (M->Name),
+                                    Addr - NewAddr,
+                                    (Addr - NewAddr == 1) ? "" : "s"
+                                );
                             } else {
-                                CfgWarning (GetSourcePos (S->LI),
-                                            "Segment '%s' start address is too low in '%s' by %lu byte%s",
-                                            GetString (S->Name), GetString (M->Name),
-                                            Addr - NewAddr, (Addr - NewAddr == 1) ? "" : "s");
+                                PWarning (
+                                    GetSourcePos (S->LI),
+                                    "Segment `%s' start address is too low in `%s' by %lu byte%s",
+                                    GetString (S->Name),
+                                    GetString (M->Name),
+                                    Addr - NewAddr,
+                                    (Addr - NewAddr == 1) ? "" : "s"
+                                );
                             }
                         } else {
                             Addr = NewAddr;
@@ -2101,10 +2125,14 @@ unsigned CfgProcess (void)
             if (FillLevel > M->Size && (M->Flags & MF_OVERFLOW) == 0) {
                 ++Overflows;
                 M->Flags |= MF_OVERFLOW;
-                CfgWarning (GetSourcePos (M->LI),
-                            "Segment '%s' overflows memory area '%s' by %lu byte%s",
-                            GetString (S->Name), GetString (M->Name),
-                            FillLevel - M->Size, (FillLevel - M->Size == 1) ? "" : "s");
+                PWarning (
+                    GetSourcePos (M->LI),
+                    "Segment `%s' overflows memory area `%s' by %lu byte%s",
+                    GetString (S->Name),
+                    GetString (M->Name),
+                    FillLevel - M->Size,
+                    (FillLevel - M->Size == 1) ? "" : "s"
+                );
             }
             if (FillLevel > M->FillLevel) {
                 /* Regular segments increase FillLevel. Overwrite segments may

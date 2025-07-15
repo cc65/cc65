@@ -31,6 +31,7 @@
 
 
 #include <stdlib.h>
+#include <string.h>
 #if !defined(_WIN32)
 #  include <unistd.h>
 #else
@@ -151,6 +152,23 @@ void CP_Init (void)
 #endif
 }
 
+
+
+ColorMode CP_Parse (const char* Mode)
+/* Parse the given string which is assumed to be one of the color modes.
+ * Return the matching enum or CM_INVALID if there was no match.
+ */
+{
+    if (strcmp (Mode, "off") == 0 || strcmp (Mode, "false") == 0) {
+        return CM_OFF;
+    } else if (strcmp (Mode, "auto") == 0) {
+        return CM_AUTO;
+    } else if (strcmp (Mode, "on") == 0 || strcmp (Mode, "true") == 0) {
+        return CM_ON;
+    } else {
+        return CM_INVALID;
+    }
+}
 
 
 int CP_IsTTY (void)

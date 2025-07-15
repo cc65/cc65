@@ -1,1 +1,1 @@
-ld65: Error: 032-assert-error6.s:3: Code not at $1001
+032-assert-error6.s:3: Error: Assertion failed: Code not at $1001

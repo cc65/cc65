@@ -1,1 +1,1 @@
-ld65: Error: 034-assert-lderror4.s:3: Code not at $0001
+034-assert-lderror4.s:3: Error: Assertion failed: Code not at $0001

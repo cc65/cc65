@@ -572,8 +572,7 @@ endif
 # GEOS programs need a resource file linked to them
 ifeq ($(SYS),geos-cbm)
 asciires.o: asciires.grc
-	$(GRC) -t $(SYS) $<
-	$(AS) $(<:.grc=.s)
+	$(CL) -c -t $(SYS) $<
 ascii.cvt: ascii.o asciires.o
 	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib
@@ -730,7 +729,6 @@ mostlyclean:
 	@$(DEL) *.lbl *.map *.o 2>$(NULLDEV)
 # we cant use .s since we have asm files in the directory that we want to keep
 	@$(DEL) ${patsubst %.c,%.s,$(wildcard *.c)} 2>$(NULLDEV)
-	@$(DEL) ${patsubst %.grc,%.s,$(wildcard *.grc)} 2>$(NULLDEV)
 
 clean: mostlyclean
 	@$(DEL) $(EXELIST_$(SYS)) $(DISK_$(SYS)) 2>$(NULLDEV)

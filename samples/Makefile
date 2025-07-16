@@ -730,6 +730,7 @@ mostlyclean:
 	@$(DEL) *.lbl *.map *.o 2>$(NULLDEV)
 # we cant use .s since we have asm files in the directory that we want to keep
 	@$(DEL) ${patsubst %.c,%.s,$(wildcard *.c)} 2>$(NULLDEV)
+	@$(DEL) ${patsubst %.grc,%.s,$(wildcard *.grc)} 2>$(NULLDEV)
 
 clean: mostlyclean
 	@$(DEL) $(EXELIST_$(SYS)) $(DISK_$(SYS)) 2>$(NULLDEV)

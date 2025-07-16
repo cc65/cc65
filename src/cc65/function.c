@@ -626,10 +626,8 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     */
     CurrentFunc->TopLevelSP = StackPtr;
 
-    /* Now process statements in this block */
-    while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
-        AnyStatement (0);
-    }
+    /* Now process statements in this block checking for unreachable code */
+    StatementBlock (0);
 
     /* Check if this function is missing a return value */
     if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc)) {

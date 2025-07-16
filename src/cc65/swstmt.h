@@ -39,19 +39,35 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Forwards */
+struct SwitchCtrl;
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-void SwitchStatement (void);
-/* Handle a 'switch' statement */
+int SwitchStatement (void);
+/* Handle a 'switch' statement and return the corresponding SF_xxx flags */
 
 void CaseLabel (void);
 /* Handle a case label */
 
 void DefaultLabel (void);
 /* Handle a default label */
+
+void SwitchBodyStatement (struct SwitchCtrl* Switch, LineInfo* LI, int RetFlags);
+/* Helper function for flow analysis. Must be called for all statements within
+** a switch passing the flags for special statements.
+*/
 
 
 

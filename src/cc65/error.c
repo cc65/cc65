@@ -95,6 +95,7 @@ struct WarnMapEntry {
 static WarnMapEntry WarnMap[] = {
     /* Keep names sorted, even if it isn't used for now */
     { &WarnConstComparison,     "const-comparison"      },
+    { &WarnConstOverflow,       "const-overflow"        },
     { &WarningsAreErrors,       "error"                 },
     { &WarnNoEffect,            "no-effect"             },
     { &WarnPointerSign,         "pointer-sign"          },
@@ -108,7 +109,6 @@ static WarnMapEntry WarnMap[] = {
     { &WarnUnusedLabel,         "unused-label"          },
     { &WarnUnusedParam,         "unused-param"          },
     { &WarnUnusedVar,           "unused-var"            },
-    { &WarnConstOverflow,       "const-overflow"        },
 };
 
 Collection DiagnosticStrBufs;
@@ -142,7 +142,7 @@ void PrintFileInclusionInfo (const LineInfo* LI)
 
 
 
-static LineInfo* GetDiagnosticLI (void)
+LineInfo* GetDiagnosticLI (void)
 /* Get the line info where the diagnostic info refers to */
 {
     if (CurTok.LI) {
@@ -184,7 +184,7 @@ static unsigned GetDiagnosticLineNum (void)
 
 
 
-void Fatal_ (const char *file, int line, const char* Format, ...)
+void Fatal_ (const char* file, int line, const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
     va_list ap;
@@ -208,7 +208,7 @@ void Fatal_ (const char *file, int line, const char* Format, ...)
 
 
 
-void Internal_ (const char *file, int line, const char* Format, ...)
+void Internal_ (const char* file, int line, const char* Format, ...)
 /* Print a message about an internal compiler error and die */
 {
     va_list ap;
@@ -279,7 +279,7 @@ static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 
 
 
-void LIError_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
+void LIError_ (const char* file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
 /* Print an error message with the line info given explicitly */
 {
     va_list ap;
@@ -295,7 +295,7 @@ void LIError_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char
 
 
 
-void Error_ (const char *file, int line, const char* Format, ...)
+void Error_ (const char* file, int line, const char* Format, ...)
 /* Print an error message */
 {
     va_list ap;
@@ -311,7 +311,7 @@ void Error_ (const char *file, int line, const char* Format, ...)
 
 
 
-void PPError_ (const char *file, int line, const char* Format, ...)
+void PPError_ (const char* file, int line, const char* Format, ...)
 /* Print an error message. For use within the preprocessor */
 {
     va_list ap;
@@ -370,7 +370,7 @@ static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 
 
 
-void LIWarning_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
+void LIWarning_ (const char* file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
 /* Print a warning message with the line info given explicitly */
 {
     va_list ap;
@@ -386,7 +386,7 @@ void LIWarning_ (const char *file, int line, errcat_t EC, LineInfo* LI, const ch
 
 
 
-void Warning_ (const char *file, int line, const char* Format, ...)
+void Warning_ (const char* file, int line, const char* Format, ...)
 /* Print a warning message */
 {
     va_list ap;
@@ -402,7 +402,7 @@ void Warning_ (const char *file, int line, const char* Format, ...)
 
 
 
-void PPWarning_ (const char *file, int line, const char* Format, ...)
+void PPWarning_ (const char* file, int line, const char* Format, ...)
 /* Print a warning message. For use within the preprocessor */
 {
     va_list ap;
@@ -424,7 +424,45 @@ void UnreachableCodeWarning (void)
 */
 {
     if (IS_Get (&WarnUnreachableCode)) {
-        Warning ("Unreachable code");
+
+	LineInfo* LI;		  
+
+	/* Add special handling for compound statements if the current token
+	** is from the source. Doing this here is a bit hacky but unfortunately
+	** there's no better place.
+	*/
+	if (CurTok.LI && NextTok.LI) {
+	    if (CurTok.Tok == TOK_LCURLY) {
+		/* Do not point to the compoung statement but to the first
+		** statement within it. If the compound statement is empty
+		** do not even output a warning. This fails of course for
+		** nested compounds but will do the right thing in most cases.
+		*/
+		if (NextTok.Tok == TOK_RCURLY) {
+   		    return;
+		}
+		LI = NextTok.LI;
+	    } else {
+		LI = CurTok.LI;
+	    }
+	} else {
+	    LI = GetCurLineInfo ();
+	}
+
+	/* Now output the warning */
+        LIWarning (EC_PARSER, LI, "Unreachable code");
+    }
+}
+
+
+
+void LIUnreachableCodeWarning (LineInfo* LI)
+/* Print a warning about unreachable code at the given location if these
+** warnings are enabled.
+*/
+{
+    if (IS_Get (&WarnUnreachableCode)) {
+        LIWarning (EC_PARSER, LI, "Unreachable code");
     }
 }
 

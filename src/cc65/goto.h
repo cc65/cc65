@@ -44,8 +44,8 @@
 
 
 
-void GotoStatement (void);
-/* Process a goto statement. */
+int GotoStatement (void);
+/* Process a goto statement and return one of the SF_xxx flags from stmt.h. */
 
 void DoLabel (void);
 /* Define a goto label. */

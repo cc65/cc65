@@ -29,7 +29,7 @@ int optopt;                     /* character checked for validity */
 char *optarg;                   /* argument associated with option */
 
 #define tell(s) fputs(*argv,stderr);fputs(s,stderr); \
-                fputc(optopt,stderr);fputc('\n',stderr);return(BADCH);
+                fputc(optopt,stderr);fputc('\n',stderr);return(BADCH)
 
 int __fastcall__ getopt (int argc, char* const* argv, const char* optstring)
 /* Get option letter from argument vector */

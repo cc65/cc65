@@ -41,10 +41,12 @@
 #include "error.h"
 #include "exprdesc.h"
 #include "expr.h"
+#include "function.h"
 #include "loadexpr.h"
 #include "scanner.h"
 #include "seqpoint.h"
 #include "standard.h"
+#include "stmt.h"
 #include "symtab.h"
 #include "goto.h"
 
@@ -56,8 +58,8 @@
 
 
 
-void GotoStatement (void)
-/* Process a goto statement. */
+int GotoStatement (void)
+/* Process a goto statement and return one of the SF_xxx flags from stmt.h. */
 {
     /* Eat the "goto" */
     NextToken ();
@@ -165,6 +167,8 @@ void GotoStatement (void)
     } else {
         Error ("Label name expected");
     }
+
+    return SF_GOTO | SF_ANY_GOTO;
 }
 
 

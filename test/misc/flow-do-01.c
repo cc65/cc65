@@ -43,7 +43,7 @@ static int f4(void)
 static int f5(void)
 {
     do {
-       	if (a == 2) {
+        if (a == 2) {
             break;
         }
         return a;
@@ -56,7 +56,7 @@ static int f5(void)
 static int f6(void)
 {
     do {
-       	if (a == 2) {
+        if (a == 2) {
             break;
         }
         continue;
@@ -69,11 +69,11 @@ static int f6(void)
 static int f7(void)
 {
     do {
-       	if (a == 2) {
+        if (a == 2) {
             return a;
         } else {
             continue;
-	}
+        }
     } while (1);
     /* Unreachable */
     a = 2;

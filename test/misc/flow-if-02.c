@@ -14,7 +14,7 @@ static int f2(void)
 {
     if (0) {
         /* Unreachable */
-	a = 1;
+        a = 1;
     } else {
         a = 2;
     }
@@ -37,7 +37,7 @@ static int f4(void)
         a = 2;
     } else {
         /* Unreachable */
-	a = 1;
+        a = 1;
     }
     return a;
 }

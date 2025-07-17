@@ -453,6 +453,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     SymEntry*   Param;
     const Type* RType;          /* Real type used for struct parameters */
     const Type* ReturnType;     /* Return type */
+    int         StmtFlags;      /* Flow control flags for the function compound */
 
     /* Remember this function descriptor used for definition */
     GetFuncDesc (Func->Type)->FuncDef = D;
@@ -627,10 +628,12 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     CurrentFunc->TopLevelSP = StackPtr;
 
     /* Now process statements in this block checking for unreachable code */
-    StatementBlock (0);
+    StmtFlags = StatementBlock (0);
 
     /* Check if this function is missing a return value */
-    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc)) {
+    if (!SF_Unreach (StmtFlags) &&
+        !F_HasVoidReturn (CurrentFunc) &&
+        !F_HasReturn (CurrentFunc)) {
         /* If this is the main function in a C99 environment returning an int,
         ** let it always return zero. Otherwise output a warning.
         */

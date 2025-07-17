@@ -156,7 +156,7 @@ $(WORKDIR)/flow-do-01.$1.$2.prg: flow-do-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-do-01.$1.$2.prg)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-do-01.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-do-01.$1.$2.out flow-do-01.ref
-	   
+
 $(WORKDIR)/flow-if-01.$1.$2.prg: flow-if-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-if-01.$1.$2.prg)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-if-01.$1.$2.out
@@ -182,7 +182,7 @@ $(WORKDIR)/flow-while-02.$1.$2.prg: flow-while-02.c $(ISEQUAL) | $(WORKDIR)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-while-02.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-while-02.$1.$2.out flow-while-02.ref
 
-$(WORKDIR)/limits.$1.$2.prg: limits.c $(ISEQUAL) | $(WORKDIR)	     
+$(WORKDIR)/limits.$1.$2.prg: limits.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/limits.$1.$2.prg)
 	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)

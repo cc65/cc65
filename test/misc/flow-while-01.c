@@ -47,7 +47,7 @@ static int f5(void)
 {
     while (1) {
         ++a;
-       	if (a == 4) goto L;
+        if (a == 4) goto L;
         return a;
     }
     /* Reachable via L */
@@ -56,8 +56,8 @@ L:  a = 2;
 
 static int f6(void)
 {
-    while (0) { 
-	/* Unreachable but no warning */
+    while (0) {
+        /* Unreachable but no warning */
     }
     a = 2;
     return a;

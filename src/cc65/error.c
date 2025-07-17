@@ -433,7 +433,7 @@ void UnreachableCodeWarning (void)
         */
         if (CurTok.LI && NextTok.LI) {
             if (CurTok.Tok == TOK_LCURLY) {
-                /* Do not point to the compoung statement but to the first
+                /* Do not point to the compound statement but to the first
                 ** statement within it. If the compound statement is empty
                 ** do not even output a warning. This fails of course for
                 ** nested compounds but will do the right thing in most cases.

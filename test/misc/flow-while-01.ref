@@ -1,0 +1,3 @@
+flow-while-01.c:9: Warning: Unreachable code
+flow-while-01.c:31: Warning: Unreachable code
+flow-while-01.c:38: Warning: Unreachable code

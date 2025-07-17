@@ -47,12 +47,13 @@
 ** analysis and tracks occurance of "return", "break", "goto" and "continue"
 ** (anything that jumps). The flags for the distinct statements are only set
 ** if they are always executed. So for example in case of an if/else statement,
-** SF_RETURN is set only if both branches contain a "return". The SF_ANY flag
-** is set of any of the statements occurred. So for an if/else statement, if
-** one branch contains a "return" and the other a "continue" statement, neither
-** SF_RETURN, nor SF_CONTINUE is set, but SF_ANY.
+** SF_RETURN is set only if both branches contain a "return". The SF_ANY_xxx
+** flags are set if any of the statements occurred. So for an if/else
+** statement, if one branch contains a "return" and the other a "continue"
+** statement, neither SF_RETURN, nor SF_CONTINUE is set, but SF_ANY_RETURN and
+** SF_ANY_CONTINUE.
 ** There are some additional flags that tell if the statement parsed was
-** preceeded by at least one label. These flags do not also set SF_ANY.
+** preceeded by at least one label.
 */
 enum {
     SF_NONE             = 0x0000,
@@ -135,7 +136,6 @@ static inline int SF_Label (int F)
 {
     return (F & SF_MASK_LABEL);
 }
-
 
 
 

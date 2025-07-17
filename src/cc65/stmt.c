@@ -163,6 +163,11 @@ static int IfStatement (void)
     Label1 = GetLocalLabel ();
     TestResult = TestInParens (Label1, 0);
 
+    /* Output a warning if the condition is always false */
+    if (TestResult == TESTEXPR_FALSE) {
+        UnreachableCodeWarning ();
+    }
+
     /* Parse the if body */
     StmtFlags = AnyStatement (0, 0);
 

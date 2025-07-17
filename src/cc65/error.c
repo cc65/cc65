@@ -425,31 +425,31 @@ void UnreachableCodeWarning (void)
 {
     if (IS_Get (&WarnUnreachableCode)) {
 
-	LineInfo* LI;		  
+        LineInfo* LI;
 
-	/* Add special handling for compound statements if the current token
-	** is from the source. Doing this here is a bit hacky but unfortunately
-	** there's no better place.
-	*/
-	if (CurTok.LI && NextTok.LI) {
-	    if (CurTok.Tok == TOK_LCURLY) {
-		/* Do not point to the compoung statement but to the first
-		** statement within it. If the compound statement is empty
-		** do not even output a warning. This fails of course for
-		** nested compounds but will do the right thing in most cases.
-		*/
-		if (NextTok.Tok == TOK_RCURLY) {
-   		    return;
-		}
-		LI = NextTok.LI;
-	    } else {
-		LI = CurTok.LI;
-	    }
-	} else {
-	    LI = GetCurLineInfo ();
-	}
+        /* Add special handling for compound statements if the current token
+        ** is from the source. Doing this here is a bit hacky but unfortunately
+        ** there's no better place.
+        */
+        if (CurTok.LI && NextTok.LI) {
+            if (CurTok.Tok == TOK_LCURLY) {
+                /* Do not point to the compoung statement but to the first
+                ** statement within it. If the compound statement is empty
+                ** do not even output a warning. This fails of course for
+                ** nested compounds but will do the right thing in most cases.
+                */
+                if (NextTok.Tok == TOK_RCURLY) {
+                    return;
+                }
+                LI = NextTok.LI;
+            } else {
+                LI = CurTok.LI;
+            }
+        } else {
+            LI = GetCurLineInfo ();
+        }
 
-	/* Now output the warning */
+        /* Now output the warning */
         LIWarning (EC_PARSER, LI, "Unreachable code");
     }
 }

@@ -53,7 +53,7 @@
 unsigned Test (unsigned Label, int Invert)
 /* Evaluate a boolean test expression and jump depending on the result of
 ** the test and on Invert. The function returns one of the TESTEXPR_xx codes
-** defined above. If the jump is always true, a warning is output.
+** defined above.
 */
 {
     ExprDesc Expr;
@@ -74,10 +74,7 @@ unsigned Test (unsigned Label, int Invert)
         Result = (Expr.IVal != 0) ? TESTEXPR_TRUE : TESTEXPR_FALSE;
 
         /* Constant rvalue */
-        if (!Invert && Expr.IVal == 0) {
-            g_jump (Label);
-            UnreachableCodeWarning ();
-        } else if (Invert && Expr.IVal != 0) {
+        if ((!Invert && Expr.IVal == 0) || (Invert && Expr.IVal != 0)) {
             g_jump (Label);
         }
 
@@ -125,8 +122,7 @@ unsigned Test (unsigned Label, int Invert)
 unsigned TestInParens (unsigned Label, int Invert)
 /* Evaluate a boolean test expression in parenthesis and jump depending on
 ** the result of the test * and on Invert. The function returns one of the
-** TESTEXPR_xx codes defined above. If the jump is always true, a warning is
-** output.
+** TESTEXPR_xx codes defined above.
 */
 {
     unsigned Result;

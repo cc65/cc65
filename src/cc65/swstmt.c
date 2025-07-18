@@ -393,8 +393,8 @@ void SwitchBodyStatement (struct SwitchCtrl* S, LineInfo* LI, int StmtFlags)
     /* Handle code without a label in the switch */
     if (SC_Label (S) == SC_NONE) {
         /* This is a statement that preceedes any switch labels. If the
-        ** switch is not already marked as weird, output and the current
-        ** statement has no label, output a warning about unreachable code.
+        ** switch is not already marked as weird and the current statement
+        ** has no label, output a warning about unreachable code.
         */
         if (!SC_IsWeird (S)) {
             if (!SF_Label (StmtFlags)) {

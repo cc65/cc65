@@ -88,6 +88,9 @@ enum {
     SF_LABEL_CASE       = 0x20000,      /* Statement preceeded by case label */
     SF_LABEL_DEFAULT    = 0x40000,      /* Statement preceeded by default label */
     SF_MASK_LABEL       = 0x70000,      /* Mask for any label */
+
+    /* And a flag to mark an empty statement */
+    SF_EMPTY            = 0x80000,      /* Empty statement */
 };
 
 /* Forward */
@@ -135,6 +138,12 @@ static inline int SF_Label (int F)
 /* Return just the "label" part of the given flags */
 {
     return (F & SF_MASK_LABEL);
+}
+
+static inline int SF_Empty (int F)
+/* Check if this is the empty statement */
+{
+    return (F & SF_EMPTY);
 }
 
 

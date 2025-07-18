@@ -741,16 +741,28 @@ int StatementBlock (struct SwitchCtrl* Switch)
     if (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
         LineInfo* LI1 = UseLineInfo (GetDiagnosticLI ());
         int StmtFlags1 = AnyStatement (0, Switch);
-        int UnreachableWarning = 0;
+        int Unreachable = 0;            /* True if code is unreachable */
+        int UnreachableWarning = 0;     /* True if warning was output */
         while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
             LineInfo* LI2 = UseLineInfo (GetDiagnosticLI ());
             int StmtFlags2 = AnyStatement (0, Switch);
             if (!UnreachableWarning) {
-                /* Check if the code is unreachable because of a preceeding
-                ** jump and if the code doesn't have a jump label.
+                /* If this statement is not already unreachable, check if the
+                ** previous statement made it unreachable.
                 */
-                if ((StmtFlags1 & SF_MASK_UNREACH) != SF_NONE &&
-                    (StmtFlags2 & SF_MASK_LABEL) == SF_NONE) {
+                if (!Unreachable) {
+                    Unreachable = SF_Unreach (StmtFlags1);
+                }
+                /* If the previous statement made this one unreachable, but
+                ** this one has a label, it is not unreachable.
+                */
+                if (Unreachable && SF_Label (StmtFlags2)) {
+                    Unreachable = 0;
+                }
+                /* If this statement is unreachable but not the empty
+                ** statement, output a warning.
+                */
+                if (Unreachable && !SF_Empty (StmtFlags2)) {
                     LIUnreachableCodeWarning (LI2);
                     UnreachableWarning = 1;
                 }
@@ -873,7 +885,7 @@ int AnyStatement (int* PendingToken, struct SwitchCtrl* Switch)
         case TOK_SEMI:
             /* Empty statement. Ignore it */
             CheckSemi (PendingToken);
-            StmtFlags = SF_NONE;
+            StmtFlags = SF_EMPTY;
             break;
 
         case TOK_LCURLY:

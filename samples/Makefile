@@ -572,8 +572,7 @@ endif
 # GEOS programs need a resource file linked to them
 ifeq ($(SYS),geos-cbm)
 asciires.o: asciires.grc
-	$(GRC) -t $(SYS) $<
-	$(AS) $(<:.grc=.s)
+	$(CL) -c -t $(SYS) $<
 ascii.cvt: ascii.o asciires.o
 	$(if $(QUIET),echo $(SYS):$@)
 	$(LD) $(LDFLAGS_$(@F)_$(SYS)) $(LDFLAGS) -o $@ -t $(SYS) -m $@.map $^ $(SYS).lib

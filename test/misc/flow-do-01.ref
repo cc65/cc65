@@ -1,0 +1,5 @@
+flow-do-01.c:9: Warning: Unreachable code
+flow-do-01.c:19: Warning: Unreachable code
+flow-do-01.c:29: Warning: Unreachable code
+flow-do-01.c:39: Warning: Unreachable code
+flow-do-01.c:79: Warning: Unreachable code

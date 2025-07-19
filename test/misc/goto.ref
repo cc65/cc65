@@ -1,4 +1,9 @@
+goto.c:3: Warning: Unreachable code
 goto.c:8: Warning: Goto at line 8 to label start jumps into a block with initialization of an object that has automatic storage duration
+goto.c:17: Warning: Unreachable code
+goto.c:38: Warning: Unreachable code
+goto.c:59: Warning: Unreachable code
+goto.c:80: Warning: Unreachable code
 goto.c:97: Warning: Variable 'a' is defined but never used
 goto.c:117: Warning: Variable 'a' is defined but never used
 goto.c:137: Warning: Variable 'a' is defined but never used
@@ -9,6 +14,7 @@ goto.c:159: Warning: Goto at line 86 to label l8 jumps into a block with initial
 goto.c:159: Warning: Goto at line 106 to label l8 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:159: Warning: Goto at line 126 to label l8 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:159: Warning: Goto at line 146 to label l8 jumps into a block with initialization of an object that has automatic storage duration
+goto.c:161: Warning: Unreachable code
 goto.c:180: Warning: Goto at line 24 to label l9 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:180: Warning: Goto at line 45 to label l9 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:180: Warning: Goto at line 66 to label l9 jumps into a block with initialization of an object that has automatic storage duration
@@ -17,6 +23,7 @@ goto.c:180: Warning: Goto at line 107 to label l9 jumps into a block with initia
 goto.c:180: Warning: Goto at line 127 to label l9 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:180: Warning: Goto at line 147 to label l9 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:180: Warning: Goto at line 168 to label l9 jumps into a block with initialization of an object that has automatic storage duration
+goto.c:182: Warning: Unreachable code
 goto.c:201: Warning: Goto at line 25 to label la jumps into a block with initialization of an object that has automatic storage duration
 goto.c:201: Warning: Goto at line 46 to label la jumps into a block with initialization of an object that has automatic storage duration
 goto.c:201: Warning: Goto at line 67 to label la jumps into a block with initialization of an object that has automatic storage duration
@@ -26,6 +33,7 @@ goto.c:201: Warning: Goto at line 128 to label la jumps into a block with initia
 goto.c:201: Warning: Goto at line 148 to label la jumps into a block with initialization of an object that has automatic storage duration
 goto.c:201: Warning: Goto at line 169 to label la jumps into a block with initialization of an object that has automatic storage duration
 goto.c:201: Warning: Goto at line 190 to label la jumps into a block with initialization of an object that has automatic storage duration
+goto.c:203: Warning: Unreachable code
 goto.c:221: Warning: Goto at line 26 to label lb jumps into a block with initialization of an object that has automatic storage duration
 goto.c:221: Warning: Goto at line 47 to label lb jumps into a block with initialization of an object that has automatic storage duration
 goto.c:221: Warning: Goto at line 68 to label lb jumps into a block with initialization of an object that has automatic storage duration
@@ -57,6 +65,7 @@ goto.c:263: Warning: Goto at line 193 to label ld jumps into a block with initia
 goto.c:263: Warning: Goto at line 214 to label ld jumps into a block with initialization of an object that has automatic storage duration
 goto.c:263: Warning: Goto at line 234 to label ld jumps into a block with initialization of an object that has automatic storage duration
 goto.c:263: Warning: Goto at line 254 to label ld jumps into a block with initialization of an object that has automatic storage duration
+goto.c:265: Warning: Unreachable code
 goto.c:271: Warning: Goto at line 271 to label l8 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:272: Warning: Goto at line 272 to label l9 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:273: Warning: Goto at line 273 to label la jumps into a block with initialization of an object that has automatic storage duration
@@ -75,6 +84,7 @@ goto.c:284: Warning: Goto at line 215 to label le jumps into a block with initia
 goto.c:284: Warning: Goto at line 235 to label le jumps into a block with initialization of an object that has automatic storage duration
 goto.c:284: Warning: Goto at line 255 to label le jumps into a block with initialization of an object that has automatic storage duration
 goto.c:284: Warning: Goto at line 277 to label le jumps into a block with initialization of an object that has automatic storage duration
+goto.c:286: Warning: Unreachable code
 goto.c:292: Warning: Goto at line 292 to label l8 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:293: Warning: Goto at line 293 to label l9 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:294: Warning: Goto at line 294 to label la jumps into a block with initialization of an object that has automatic storage duration
@@ -94,6 +104,7 @@ goto.c:305: Warning: Goto at line 236 to label lf jumps into a block with initia
 goto.c:305: Warning: Goto at line 256 to label lf jumps into a block with initialization of an object that has automatic storage duration
 goto.c:305: Warning: Goto at line 278 to label lf jumps into a block with initialization of an object that has automatic storage duration
 goto.c:305: Warning: Goto at line 299 to label lf jumps into a block with initialization of an object that has automatic storage duration
+goto.c:307: Warning: Unreachable code
 goto.c:313: Warning: Goto at line 313 to label l8 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:314: Warning: Goto at line 314 to label l9 jumps into a block with initialization of an object that has automatic storage duration
 goto.c:315: Warning: Goto at line 315 to label la jumps into a block with initialization of an object that has automatic storage duration

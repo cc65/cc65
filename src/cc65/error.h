@@ -103,6 +103,9 @@ struct StrBuf;
 void PrintFileInclusionInfo (const LineInfo* LI);
 /* Print hierarchy of file inclusion */
 
+LineInfo* GetDiagnosticLI (void);
+/* Get the line info where the diagnostic info refers to */
+
 void Fatal_ (const char *file, int line, const char* Format, ...) attribute ((noreturn, format (printf, 3, 4)));
 #define Fatal(...) Fatal_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a message about a fatal error and die */
@@ -137,6 +140,11 @@ void PPWarning_ (const char *file, int line, const char* Format, ...) attribute 
 
 void UnreachableCodeWarning (void);
 /* Print a warning about unreachable code at the current location if these
+** warnings are enabled.
+*/
+
+void LIUnreachableCodeWarning (LineInfo* LI);
+/* Print a warning about unreachable code at the given location if these
 ** warnings are enabled.
 */
 

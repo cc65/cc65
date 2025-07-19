@@ -59,14 +59,13 @@
 unsigned Test (unsigned Label, int Invert);
 /* Evaluate a boolean test expression and jump depending on the result of
 ** the test and on Invert. The function returns one of the TESTEXPR_xx codes
-** defined above. If the jump is always true, a warning is output.
+** defined above.
 */
 
 unsigned TestInParens (unsigned Label, int Invert);
 /* Evaluate a boolean test expression in parenthesis and jump depending on
 ** the result of the test * and on Invert. The function returns one of the
-** TESTEXPR_xx codes defined above. If the jump is always true, a warning is
-** output.
+** TESTEXPR_xx codes defined above.
 */
 
 

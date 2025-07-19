@@ -560,7 +560,28 @@ static void DoHeader (void)
     /* OK, all information is gathered, do flushout */
 
     fprintf (outputSFile,
-        "\t.import __VLIR0_START__, __VLIR0_LAST__, __BSS_SIZE__, __STARTUP_RUN__\n\n");
+        "\t.import __BSS_SIZE__, __STARTUP_RUN__\n"
+        "\t.import __VLIR0_START__, __VLIR0_LAST__\n"
+        "\t.import __VLIR1_START__, __VLIR1_LAST__\n"
+        "\t.import __VLIR2_START__, __VLIR2_LAST__\n"
+        "\t.import __VLIR3_START__, __VLIR3_LAST__\n"
+        "\t.import __VLIR4_START__, __VLIR4_LAST__\n"
+        "\t.import __VLIR5_START__, __VLIR5_LAST__\n"
+        "\t.import __VLIR6_START__, __VLIR6_LAST__\n"
+        "\t.import __VLIR7_START__, __VLIR7_LAST__\n"
+        "\t.import __VLIR8_START__, __VLIR8_LAST__\n"
+        "\t.import __VLIR9_START__, __VLIR9_LAST__\n"
+        "\t.import __VLIR10_START__, __VLIR10_LAST__\n"
+        "\t.import __VLIR11_START__, __VLIR11_LAST__\n"
+        "\t.import __VLIR12_START__, __VLIR12_LAST__\n"
+        "\t.import __VLIR13_START__, __VLIR13_LAST__\n"
+        "\t.import __VLIR14_START__, __VLIR14_LAST__\n"
+        "\t.import __VLIR15_START__, __VLIR15_LAST__\n"
+        "\t.import __VLIR16_START__, __VLIR16_LAST__\n"
+        "\t.import __VLIR17_START__, __VLIR17_LAST__\n"
+        "\t.import __VLIR18_START__, __VLIR18_LAST__\n"
+        "\t.import __VLIR19_START__, __VLIR19_LAST__\n\n"
+    );
 
     fprintf (outputSFile,
         "\t\t.segment \"DIRENTRY\"\n\n");
@@ -610,7 +631,10 @@ static void DoHeader (void)
             "\t.byte %i\n"
             "\t.byte %i\n"
             "\t.byte %i, %i, %i, %i, %i\n\n"
-            "\t.word ((__VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__) + 253) / 254\n"   /* length in blocks */
+            /* add size of each VLIR segment, plus 1 block for the info block (icon),
+             * plus another block for the VLIR RECORDS table
+             */
+            "\t.word 2 + (((__VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__) + 253) / 254) + (((__VLIR1_LAST__ - __VLIR1_START__) + 253) / 254) + (((__VLIR2_LAST__ - __VLIR2_START__) + 253) / 254) + (((__VLIR3_LAST__ - __VLIR3_START__) + 253) / 254) + (((__VLIR4_LAST__ - __VLIR4_START__) + 253) / 254) + (((__VLIR5_LAST__ - __VLIR5_START__) + 253) / 254) + (((__VLIR6_LAST__ - __VLIR6_START__) + 253) / 254) + (((__VLIR7_LAST__ - __VLIR7_START__) + 253) / 254) + (((__VLIR8_LAST__ - __VLIR8_START__) + 253) / 254) + (((__VLIR9_LAST__ - __VLIR9_START__) + 253) / 254) + (((__VLIR10_LAST__ - __VLIR10_START__) + 253) / 254) + (((__VLIR11_LAST__ - __VLIR11_START__) + 253) / 254) + (((__VLIR12_LAST__ - __VLIR12_START__) + 253) / 254) + (((__VLIR13_LAST__ - __VLIR13_START__) + 253) / 254) + (((__VLIR14_LAST__ - __VLIR14_START__) + 253) / 254) + (((__VLIR15_LAST__ - __VLIR15_START__) + 253) / 254) + (((__VLIR16_LAST__ - __VLIR16_START__) + 253) / 254) + (((__VLIR17_LAST__ - __VLIR17_START__) + 253) / 254) + (((__VLIR18_LAST__ - __VLIR18_START__) + 253) / 254) + (((__VLIR19_LAST__ - __VLIR19_START__) + 253) / 254)\n"   /* length in blocks */
             "\t.byte \"PRG formatted GEOS file V1.0\"\n\n",
             myHead.structure, myHead.geostype,
             myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min);

@@ -64,6 +64,9 @@ struct appheader {
     char *icon;
 };
 
+#define APPHEADER_STRUCTURE_SEQ     0
+#define APPHEADER_STRUCTURE_VLIR    1
+
 const char *mainToken[] = {"MENU", "HEADER", "ICON", "DIALOG", "MEMORY", ""};
 
 const char *toggle[] = {"off", "no", "0", "on", "yes", "1", ""};
@@ -464,8 +467,10 @@ static void DoHeader (void)
     myHead.author = "cc65";
     myHead.info = "Program compiled with cc65 and GEOSLib.";
     myHead.dostype = 128;
-    if (apple == 0) myHead.dostype += 3;
-    myHead.structure = 0;
+    if (apple == 0) {
+        myHead.dostype += 3;
+    }
+    myHead.structure = APPHEADER_STRUCTURE_SEQ;
     myHead.mode = 0;
     myHead.icon = NULL;
 
@@ -542,11 +547,11 @@ static void DoHeader (void)
                         AbEnd ("unknown structure type in header '%s'", myHead.dosname);
                     case 0:
                     case 1:
-                        myHead.structure = 0;
+                        myHead.structure = APPHEADER_STRUCTURE_SEQ;
                         break;
                     case 2:
                     case 3:
-                        myHead.structure = 1;
+                        myHead.structure = APPHEADER_STRUCTURE_VLIR;
                         break;
                 }
                 break;
@@ -588,7 +593,7 @@ static void DoHeader (void)
 
     if (apple == 1) {
 
-        if (myHead.structure == 0) {
+        if (myHead.structure == APPHEADER_STRUCTURE_SEQ) {
             fprintf (outputSFile,
                 "\t.import __VLIR0_START__, __VLIR0_LAST__, __BSS_SIZE__\n\n");
         }
@@ -612,7 +617,7 @@ static void DoHeader (void)
             "\t.word %i << 9 | %i << 5 | %i, %i << 8 | %i\n"
             "\t.word 0\n\n",
             myHead.geostype,
-            myHead.structure == 0 ?
+            myHead.structure == APPHEADER_STRUCTURE_SEQ ?
                 "__VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__" : "0",
             myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min,
             myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min);
@@ -631,13 +636,18 @@ static void DoHeader (void)
             "\t.byte %i\n"
             "\t.byte %i\n"
             "\t.byte %i, %i, %i, %i, %i\n\n"
-            /* add size of each VLIR segment, plus 1 block for the info block (icon),
-             * plus another block for the VLIR RECORDS table
+            /* length in blocks:
+             * add size of each VLIR segment, plus 1 block for the info block (icon),
+             * plus another block for the VLIR RECORDS table (VLIR structure only)
              */
-            "\t.word 2 + (((__VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__) + 253) / 254) + (((__VLIR1_LAST__ - __VLIR1_START__) + 253) / 254) + (((__VLIR2_LAST__ - __VLIR2_START__) + 253) / 254) + (((__VLIR3_LAST__ - __VLIR3_START__) + 253) / 254) + (((__VLIR4_LAST__ - __VLIR4_START__) + 253) / 254) + (((__VLIR5_LAST__ - __VLIR5_START__) + 253) / 254) + (((__VLIR6_LAST__ - __VLIR6_START__) + 253) / 254) + (((__VLIR7_LAST__ - __VLIR7_START__) + 253) / 254) + (((__VLIR8_LAST__ - __VLIR8_START__) + 253) / 254) + (((__VLIR9_LAST__ - __VLIR9_START__) + 253) / 254) + (((__VLIR10_LAST__ - __VLIR10_START__) + 253) / 254) + (((__VLIR11_LAST__ - __VLIR11_START__) + 253) / 254) + (((__VLIR12_LAST__ - __VLIR12_START__) + 253) / 254) + (((__VLIR13_LAST__ - __VLIR13_START__) + 253) / 254) + (((__VLIR14_LAST__ - __VLIR14_START__) + 253) / 254) + (((__VLIR15_LAST__ - __VLIR15_START__) + 253) / 254) + (((__VLIR16_LAST__ - __VLIR16_START__) + 253) / 254) + (((__VLIR17_LAST__ - __VLIR17_START__) + 253) / 254) + (((__VLIR18_LAST__ - __VLIR18_START__) + 253) / 254) + (((__VLIR19_LAST__ - __VLIR19_START__) + 253) / 254)\n"   /* length in blocks */
-            "\t.byte \"PRG formatted GEOS file V1.0\"\n\n",
+            "\t.word %d + (((__VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__) + 253) / 254) + (((__VLIR1_LAST__ - __VLIR1_START__) + 253) / 254) + (((__VLIR2_LAST__ - __VLIR2_START__) + 253) / 254) + (((__VLIR3_LAST__ - __VLIR3_START__) + 253) / 254) + (((__VLIR4_LAST__ - __VLIR4_START__) + 253) / 254) + (((__VLIR5_LAST__ - __VLIR5_START__) + 253) / 254) + (((__VLIR6_LAST__ - __VLIR6_START__) + 253) / 254) + (((__VLIR7_LAST__ - __VLIR7_START__) + 253) / 254) + (((__VLIR8_LAST__ - __VLIR8_START__) + 253) / 254) + (((__VLIR9_LAST__ - __VLIR9_START__) + 253) / 254) + (((__VLIR10_LAST__ - __VLIR10_START__) + 253) / 254) + (((__VLIR11_LAST__ - __VLIR11_START__) + 253) / 254) + (((__VLIR12_LAST__ - __VLIR12_START__) + 253) / 254) + (((__VLIR13_LAST__ - __VLIR13_START__) + 253) / 254) + (((__VLIR14_LAST__ - __VLIR14_START__) + 253) / 254) + (((__VLIR15_LAST__ - __VLIR15_START__) + 253) / 254) + (((__VLIR16_LAST__ - __VLIR16_START__) + 253) / 254) + (((__VLIR17_LAST__ - __VLIR17_START__) + 253) / 254) + (((__VLIR18_LAST__ - __VLIR18_START__) + 253) / 254) + (((__VLIR19_LAST__ - __VLIR19_START__) + 253) / 254)\n"
+            /* PRG formatted or SEQ formatted */
+            "\t.byte \"%s formatted GEOS file V1.0\"\n\n",
             myHead.structure, myHead.geostype,
-            myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min);
+            myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min,
+            (myHead.structure == APPHEADER_STRUCTURE_SEQ) ? 1 : 2,
+            (myHead.structure == APPHEADER_STRUCTURE_SEQ) ? "SEQ" : "PRG"
+        );
     }
 
     fprintf (outputSFile,

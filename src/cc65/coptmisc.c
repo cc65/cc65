@@ -486,14 +486,14 @@ static unsigned OptIncDecOps (CodeSeg* S, const char* dec, const char* inc, cons
 
 unsigned OptStackPtrOps (CodeSeg* S)
 {
-    return OptIncDecOps(S, "decsp", "incsp", "subysp", "addysp");
+    return OptIncDecOps (S, "decsp", "incsp", "subysp", "addysp");
 }
 
 
 
 unsigned OptAXOps (CodeSeg* S)
 {
-    return OptIncDecOps(S, "decax", "incax", "decaxy", "incaxy");
+    return OptIncDecOps (S, "decax", "incax", "decaxy", "incaxy");
 }
 
 
@@ -573,11 +573,9 @@ unsigned OptTosLoadPop (CodeSeg* S)
         const CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check for the sequence */
-        if (E->OPC == OP65_JSR                            &&
-            strncmp (E->Arg, "ldax0sp", 5) == 0           &&
-            (N = CS_GetNextEntry (S, I)) != 0             &&
-            (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
-            strcmp (N->Arg, "incsp2") == 0                &&
+        if (CE_IsCallTo (E, "ldax0sp")                               &&
+            (N = CS_GetNextEntry (S, I)) != 0                        &&
+            (CE_IsCallTo (N, "incsp2") || CE_IsJumpTo (N, "incsp2")) &&
             !CE_HasLabel (N)) {
 
             CodeEntry* X;
@@ -587,9 +585,6 @@ unsigned OptTosLoadPop (CodeSeg* S)
 
             /* Delete the old code */
             CS_DelEntries (S, I, 2);
-
-            /* Regenerate register info */
-            CS_GenRegInfo (S);
 
             /* Remember we had changes */
             ++Changes;
@@ -1203,7 +1198,7 @@ unsigned OptBinOps2 (CodeSeg* S)
 }
 
 
-unsigned OptTosPushPop(CodeSeg *S)
+unsigned OptTosPushPop (CodeSeg* S)
 /* Merge jsr pushax/j?? popax */
 {
     unsigned Changes = 0;
@@ -1219,11 +1214,9 @@ unsigned OptTosPushPop(CodeSeg *S)
         const CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check for decspn, incspn, subysp or addysp */
-        if (E->OPC == OP65_JSR                            &&
-            strcmp(E->Arg, "pushax") == 0                 &&
-            (N = CS_GetNextEntry (S, I)) != 0             &&
-            (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
-            strcmp(N->Arg, "popax") == 0                  &&
+        if (CE_IsCallTo (E, "pushax")                              &&
+            (N = CS_GetNextEntry (S, I)) != 0                      &&
+            (CE_IsCallTo (N, "popax") || CE_IsJumpTo (N, "popax")) &&
             !CE_HasLabel (N)) {
 
             /* Insert an rts if jmp popax */
@@ -1234,9 +1227,6 @@ unsigned OptTosPushPop(CodeSeg *S)
 
             /* Delete the old code */
             CS_DelEntries (S, I+1, 2);
-
-            /* Regenerate register info */
-            CS_GenRegInfo (S);
 
             /* Remember we had changes */
             ++Changes;

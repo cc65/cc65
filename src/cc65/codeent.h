@@ -244,6 +244,12 @@ static inline int CE_IsCallTo (const CodeEntry* E, const char* Name)
     return (E->OPC == OP65_JSR && strcmp (E->Arg, Name) == 0);
 }
 
+static inline int CE_IsJumpTo (const CodeEntry* E, const char* Name)
+/* Check if this is a jump to the given function */
+{
+    return (E->OPC == OP65_JMP && strcmp (E->Arg, Name) == 0);
+}
+
 int CE_UseLoadFlags (CodeEntry* E);
 /* Return true if the instruction uses any flags that are set by a load of
 ** a register (N and Z).

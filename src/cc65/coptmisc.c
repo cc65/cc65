@@ -1201,3 +1201,54 @@ unsigned OptBinOps2 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
+
+
+unsigned OptTosPushPop(CodeSeg *S)
+/* Merge jsr pushax/j?? popax */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        const CodeEntry* N;
+
+        /* Get the next entry */
+        const CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for decspn, incspn, subysp or addysp */
+        if (E->OPC == OP65_JSR                            &&
+            strcmp(E->Arg, "pushax") == 0                 &&
+            (N = CS_GetNextEntry (S, I)) != 0             &&
+            (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
+            strcmp(N->Arg, "popax") == 0                  &&
+            !CE_HasLabel (N)) {
+
+            /* Delete the old code */
+            CS_DelEntries (S, I, 2);
+
+            /* Insert an rts if jmp popax */
+            if (N->OPC == OP65_JMP) {
+              CodeEntry* X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->LI);
+              CS_InsertEntry (S, X, I);
+            }
+
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}

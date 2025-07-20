@@ -107,15 +107,15 @@ struct OptFunc {
 static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Ind     = { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Stores  = { Opt65C02Stores,  "Opt65C02Stores",  100, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXLoad       = { OptAXLoad,       "OptAXLoad",        50, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXLoad2      = { OptAXLoad2,      "OptAXLoad2",       66, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXOps        = { OptAXOps,        "OptAXOps",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd1         = { OptAdd1,         "OptAdd1",         125, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2         = { OptAdd2,         "OptAdd2",         200, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd3         = { OptAdd3,         "OptAdd3",          65, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd4         = { OptAdd4,         "OptAdd4",          90, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd5         = { OptAdd5,         "OptAdd5",         100, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd6         = { OptAdd6,         "OptAdd6",          40, 0, 0, 0, 0, 0 };
-static OptFunc DOptAXLoad       = { OptAXLoad,       "OptAXLoad",        50, 0, 0, 0, 0, 0 };
-static OptFunc DOptAXLoad2      = { OptAXLoad2,      "OptAXLoad2",       66, 0, 0, 0, 0, 0 };
-static OptFunc DOptAXOps        = { OptAXOps,        "OptAXOps",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegA1       = { OptBNegA1,       "OptBNegA1",       100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegA2       = { OptBNegA2,       "OptBNegA2",       100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegAX1      = { OptBNegAX1,      "OptBNegAX1",      100, 0, 0, 0, 0, 0 };
@@ -233,13 +233,15 @@ static OptFunc* OptFuncs[] = {
     &DOpt65C02BitOps,
     &DOpt65C02Ind,
     &DOpt65C02Stores,
+    &DOptAXLoad,
+    &DOptAXLoad2,
+    &DOptAXOps,
     &DOptAdd1,
     &DOptAdd2,
     &DOptAdd3,
     &DOptAdd4,
     &DOptAdd5,
     &DOptAdd6,
-    &DOptAXOps,
     &DOptBNegA1,
     &DOptBNegA2,
     &DOptBNegAX1,

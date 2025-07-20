@@ -34,7 +34,8 @@ function checkarray_quoted_name
     rm -rf .a.tmp
 }
 
-find "$CHECK_DIR" -name \*.\[ch\] -print | while read N; do
+FILES=$(find "$CHECK_DIR" -name \*.\[ch\] -print)
+for N in $FILES; do
     grep -q "BEGIN SORTED_OPCODES.SH" "$N" && checkarray_quoted_name "$N"
 done
 exit 0

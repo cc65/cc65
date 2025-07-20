@@ -140,6 +140,7 @@ static void Usage (void)
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
             "  --version\t\t\tPrint the compiler version number\n"
+            "  --warnings-as-errors\t\tTreat warnings as errors\n"
             "  --writable-strings\t\tMake string literals writable\n",
             ProgName);
 }
@@ -968,6 +969,15 @@ static void OptWarning (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
+                                 const char* Arg attribute ((unused)))
+/* Generate an error if any warnings occur */
+{
+    IS_Set (&WarningsAreErrors, 1);
+}
+
+
+
 static void OptWritableStrings (const char* Opt attribute ((unused)),
                                 const char* Arg attribute ((unused)))
 /* Make string literals writable */
@@ -1016,6 +1026,7 @@ int main (int argc, char* argv[])
         { "--target",               1,      OptTarget               },
         { "--verbose",              0,      OptVerbose              },
         { "--version",              0,      OptVersion              },
+        { "--warnings-as-errors",   0,      OptWarningsAsErrors     },
         { "--writable-strings",     0,      OptWritableStrings      },
     };
 
@@ -1087,6 +1098,14 @@ int main (int argc, char* argv[])
 
                 case 'j':
                     OptSignedChars (Arg, 0);
+                    break;
+
+                case 'm':
+                    if (Arg[2] == 'm') {
+                        OptMemoryModel (Arg, GetArg (&I, 3));
+                    } else {
+                        UnknownOption (Arg);
+                    }
                     break;
 
                 case 'o':

@@ -144,7 +144,7 @@ Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
             if (ObjName == 0) {
                 ObjName = "[linker generated]";
             }
-            Error ("Module '%s': Type mismatch for segment '%s'", ObjName,
+            Error ("Module `%s': Type mismatch for segment `%s'", ObjName,
                    GetString (Name));
         }
     }
@@ -226,13 +226,13 @@ Section* ReadSection (FILE* F, ObjData* O)
     if (Sec->Alignment > 1) {
         Alignment = LeastCommonMultiple (S->Alignment, Sec->Alignment);
         if (Alignment > MAX_ALIGNMENT) {
-            Error ("Combined alignment for segment '%s' is %lu which exceeds "
-                   "%lu. Last module requiring alignment was '%s'.",
+            Error ("Combined alignment for segment `%s' is %lu which exceeds "
+                   "%lu. Last module requiring alignment was `%s'.",
                    GetString (Name), Alignment, MAX_ALIGNMENT,
                    GetObjFileName (O));
         } else if (Alignment >= LARGE_ALIGNMENT && Alignment > S->Alignment && Alignment > Sec->Alignment && !LargeAlignment) {
-            Warning ("Combined alignment for segment '%s' is suspiciously "
-                     "large (%lu). Last module requiring alignment was '%s'.",
+            Warning ("Combined alignment for segment `%s' is suspiciously "
+                     "large (%lu). Last module requiring alignment was `%s'.",
                      GetString (Name), Alignment, GetObjFileName (O));
         }
         S->Alignment = Alignment;
@@ -270,7 +270,7 @@ Section* ReadSection (FILE* F, ObjData* O)
                 break;
 
             default:
-                Error ("Unknown fragment type in module '%s', segment '%s': %02X",
+                Error ("Unknown fragment type in module `%s', segment `%s': %02X",
                        GetObjFileName (O), GetString (S->Name), Type);
                 /* NOTREACHED */
                 return 0;
@@ -306,9 +306,11 @@ Segment* SegFind (unsigned Name)
 
 
 
-int IsBSSType (Segment* S)
-/* Check if the given segment is a BSS style segment, that is, it does not
-** contain non-zero data.
+Section* GetNonBSSSection (Segment* S)
+/* Used when checking a BSS style segment for initialized data. Will walk over
+** all sections in S and check if any of them contains initialized data. If so,
+** the first section containing initialized data is returned. Otherwise the
+** function returns NULL.
 */
 {
     /* Loop over all sections */
@@ -326,18 +328,20 @@ int IsBSSType (Segment* S)
                 unsigned long Count = F->Size;
                 while (Count--) {
                     if (*Data++ != 0) {
-                        return 0;
+                        return Sec;
                     }
                 }
             } else if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
                 if (GetExprVal (F->Expr) != 0) {
-                    return 0;
+                    return Sec;
                 }
             }
             F = F->Next;
         }
     }
-    return 1;
+
+    /* No uninitialized data found */
+    return 0;
 }
 
 
@@ -502,19 +506,19 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
                             break;
 
                         case SEG_EXPR_RANGE_ERROR:
-                            Error ("Range error in module '%s', line %u",
+                            Error ("Range error in module `%s', line %u",
                                    GetFragmentSourceName (Frag),
                                    GetFragmentSourceLine (Frag));
                             break;
 
                         case SEG_EXPR_TOO_COMPLEX:
-                            Error ("Expression too complex in module '%s', line %u",
+                            Error ("Expression too complex in module `%s', line %u",
                                    GetFragmentSourceName (Frag),
                                    GetFragmentSourceLine (Frag));
                             break;
 
                         case SEG_EXPR_INVALID:
-                            Error ("Invalid expression in module '%s', line %u",
+                            Error ("Invalid expression in module `%s', line %u",
                                    GetFragmentSourceName (Frag),
                                    GetFragmentSourceLine (Frag));
                             break;
@@ -638,11 +642,9 @@ void PrintDbgSegments (FILE* F)
             fprintf (F, ",oname=\"%s\",ooffs=%lu",
                      S->OutputName, S->OutputOffs);
         }
-        if (S->MemArea) {
-            if (S->MemArea->BankExpr) {
-                if (IsConstExpr (S->MemArea->BankExpr)) {
-                    fprintf (F, ",bank=%lu", GetExprVal(S->MemArea->BankExpr));
-                }
+        if (S->MemArea && S->MemArea->BankExpr) {
+            if (IsConstExpr (S->MemArea->BankExpr)) {
+                fprintf (F, ",bank=%lu", GetExprVal (S->MemArea->BankExpr));
             }
         }
         fputc ('\n', F);
@@ -664,7 +666,7 @@ void CheckSegments (void)
 
         /* Check it */
         if (S->Size > 0 && S->Dumped == 0) {
-            Error ("Missing memory area assignment for segment '%s'",
+            Error ("Missing memory area assignment for segment `%s'",
                    GetString (S->Name));
         }
     }

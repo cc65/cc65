@@ -110,6 +110,7 @@ Long options:
   --target sys                  Set the target system
   --verbose                     Increase verbosity
   --version                     Print the compiler version number
+  --warnings-as-errors          Treat warnings as errors
   --writable-strings            Make string literals writable
 ---------------------------------------------------------------------------
 </verb></tscreen>
@@ -514,6 +515,28 @@ Here is a description of all the command line options:
   name="#pragma&nbsp;local-strings"></tt> for fine grained control.
 
 
+  <tag><tt>-mm model, --memory-model model</tt></tag>
+
+  This option sets the code and data models for the compiler to use. Please
+  note that memory models are an unfinished feature and using this option
+  with any other memory model than <tt/near/ will cause compile errors.
+  Possible arguments are:
+
+  <descrip>
+    <tag/near/
+      This memory model uses 16 bit addresses for code and data. It is
+      currently the only supported memory model and suited for the 6502.
+
+    <tag/far/
+      This memory model uses 24 bit addresses for code and 16 bit addresses
+      for data. It is suited for the 65816 but currently unsupported.
+
+    <tag/huge/
+      This memory model uses 24 bit addresses for code and data. It is
+      suited for the 65816 but currently unsupported.
+  </descrip>
+
+
   <tag><tt>-o name</tt></tag>
 
   Specify the name of the output file. If you don't specify a name, the
@@ -656,6 +679,15 @@ Here is a description of all the command line options:
   or warnings are encountered.
 
 
+  <label id="option--warnings-as-errors">
+  <tag><tt>--warnings-as-errors</tt></tag>
+
+  Treat all warnings as error. This makes the compiler exit with an appropriate
+  error code in case of warnings. The effect of this switch is identical to
+  the command line option <tt/<ref id="option-W" name="-W error">/. It is
+  available for compatibility with the other tools.
+
+
   <label id="option-writable-strings">
   <tag><tt>--writable-strings</tt></tag>
 
@@ -766,7 +798,9 @@ Here is a description of all the command line options:
   <tag><tt/const-comparison/</tag>
         Warn if the result of a comparison is constant.
   <tag><tt/error/</tag>
-        Treat all warnings as errors.
+        Treat all warnings as errors. This has the same effect as using the
+        <tt/<ref id="option--warnings-as-errors" name="--warnings-as-errors">/
+        option.
   <tag><tt/no-effect/</tag>
         Warn about statements that don't have an effect.
   <tag><tt/pointer-sign/</tag>

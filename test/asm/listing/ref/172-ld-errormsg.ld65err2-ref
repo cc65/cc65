@@ -1,0 +1,2 @@
+172-ld-errormsg.cfg:5: Error: Segment type expected but got 'RWX'
+172-ld-errormsg.cfg:5: Note: You may use one of 'RO', 'RW', 'BSS', 'ZP' or 'OVERWRITE'

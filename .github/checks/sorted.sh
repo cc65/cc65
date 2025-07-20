@@ -33,7 +33,8 @@ function checkarray_quoted_name
 }
 
 
-find "$CHECK_DIR" -name \*.\[ch\] -print | while read N; do
+FILES=$(find "$CHECK_DIR" -name \*.\[ch\] -print)
+for N in $FILES; do
     grep -q "BEGIN SORTED.SH" "$N" && checkarray_quoted_name "$N"
 done
 exit 0

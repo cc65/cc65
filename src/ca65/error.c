@@ -71,7 +71,7 @@ unsigned WarningCount   = 0;
 typedef enum { DC_NOTE, DC_WARN, DC_ERR, DC_FATAL, DC_COUNT } DiagCat;
 
 /* Descriptions for diagnostic categories */
-const char* DiagCatDesc[DC_COUNT] = {
+static const char* DiagCatDesc[DC_COUNT] = {
     "Note", "Warning", "Error", "Fatal error"
 };
 

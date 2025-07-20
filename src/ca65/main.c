@@ -504,14 +504,11 @@ static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* 
 static void OptColor(const char* Opt, const char* Arg)
 /* Handle the --color option */
 {
-    if (strcmp (Arg, "off") == 0 || strcmp (Arg, "false") == 0) {
-        CP_SetColorMode (CM_OFF);
-    } else if (strcmp (Arg, "auto") == 0) {
-        CP_SetColorMode (CM_AUTO);
-    } else if (strcmp (Arg, "on") == 0 || strcmp (Arg, "true") == 0) {
-        CP_SetColorMode (CM_ON);
-    } else {
+    ColorMode Mode = CP_Parse (Arg);
+    if (Mode == CM_INVALID) {
         AbEnd ("Invalid argument to %s: %s", Opt, Arg);
+    } else {
+        CP_SetColorMode (Mode);
     }
 }
 
@@ -745,6 +742,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
     exit (EXIT_SUCCESS);
 }
 
+
+
 static void OptSeglist (const char* Opt attribute ((unused)),
     const char* Arg attribute ((unused)))
     /* Enable segment listing */
@@ -752,12 +751,16 @@ static void OptSeglist (const char* Opt attribute ((unused)),
     SegList = 1;
 }
 
+
+
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
 /* Generate an error if any warnings occur */
 {
     WarningsAsErrors = 1;
 }
+
+
 
 static void OptExpandMacros (const char* Opt attribute ((unused)),
     const char* Arg attribute ((unused)))
@@ -769,6 +772,8 @@ static void OptExpandMacros (const char* Opt attribute ((unused)),
 
     ExpandMacros++;
 }
+
+
 
 static void DoPCAssign (void)
 /* Start absolute code */

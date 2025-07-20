@@ -1,7 +1,7 @@
 ;
 ; Startup code for cc65 (Oric version)
 ;
-; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
+; By Debrune JÃ©rÃ´me <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
 ;
 
         .export         _exit
@@ -36,12 +36,12 @@
 
 ; Call the module destructors. This is also the exit() entry.
 
-_exit:  jsr     donelib
+_exit:
 
-; Restore the system stuff.
+; Save return code on stack
 
-        ldx     spsave
-        txs
+        pha
+        jsr     donelib
 
 ; Copy back the zero-page stuff.
 
@@ -50,6 +50,16 @@ L2:     lda     zpsave,x
         sta     c_sp,x
         dex
         bpl     L2
+
+; Restore the return code.
+; The return code is on the stack, so we can just pop it.
+; This is the return code from main().
+        pla
+
+; Restore the system stuff.
+
+        ldx     spsave
+        txs
 
 ; Back to BASIC.
 

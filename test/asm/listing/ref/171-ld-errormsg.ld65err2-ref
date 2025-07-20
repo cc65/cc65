@@ -1,0 +1,2 @@
+171-ld-errormsg.cfg:3: Warning: Segment 'CODE' overflows memory area 'MAIN' by 1 byte
+ld65: Error: Cannot generate most of the files due to memory area overflow 

@@ -154,13 +154,17 @@ const unsigned CPUIsets[CPU_COUNT] = {
      CAP_BIT (CAP_CPU_HAS_INA)          |       \
      CAP_BIT (CAP_CPU_HAS_PUSHXY))
 #define CAP_W65C02                              \
-    (CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
+    (CAP_BIT (CAP_CPU_HAS_BITIMM)       |       \
+     CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
      CAP_BIT (CAP_CPU_HAS_INA)          |       \
-     CAP_BIT (CAP_CPU_HAS_PUSHXY))
+     CAP_BIT (CAP_CPU_HAS_PUSHXY)       |       \
+     CAP_BIT (CAP_CPU_HAS_ZPIND)        |       \
+     CAP_BIT (CAP_CPU_HAS_STZ))
 #define CAP_65CE02                              \
     (CAP_BIT (CAP_CPU_HAS_BRA8)         |       \
      CAP_BIT (CAP_CPU_HAS_INA)          |       \
-     CAP_BIT (CAP_CPU_HAS_PUSHXY))
+     CAP_BIT (CAP_CPU_HAS_PUSHXY)       |       \
+     CAP_BIT (CAP_CPU_HAS_STZ))
 
 /* Table containing one capability entry per CPU */
 static const uint32_t CPUCaps[CPU_COUNT] = {

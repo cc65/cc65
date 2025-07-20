@@ -61,8 +61,8 @@ define CPUDETECT_template
 
 $(WORKDIR)/$1-cpudetect.bin: cpudetect.s $1-cpudetect.ref $(ISEQUAL)
 	$(if $(QUIET),echo asm/$1-cpudetect.bin)
-	$(CA65) -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$< $(CATERR)
-	$(LD65) -t none -o $$@ $$(@:.bin=.o) none.lib $(CATERR)
+	$(CA65) --no-utf8 -t none --cpu $1 -l $$(@:.bin=.lst) -o $$(@:.bin=.o) $$< $(CATERR)
+	$(LD65) --no-utf8 -t none -o $$@ $$(@:.bin=.o) none.lib $(CATERR)
 	$(ISEQUAL) $1-cpudetect.ref $$@
 
 endef # CPUDETECT_template
@@ -70,7 +70,7 @@ endef # CPUDETECT_template
 $(foreach cpu,$(CPUDETECT_CPUS),$(eval $(call CPUDETECT_template,$(cpu))))
 
 $(WORKDIR)/%.o: %.s | $(WORKDIR)
-	$(CA65) -l $(@:.o=.lst) -o $@ $< $(NULLOUT) $(CATERR)
+	$(CA65) --no-utf8 -l $(@:.o=.lst) -o $@ $< $(NULLOUT) $(CATERR)
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

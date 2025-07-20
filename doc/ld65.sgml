@@ -73,6 +73,7 @@ Short options:
 Long options:
   --allow-multiple-definition   Allow multiple definitions
   --cfg-path path               Specify a config file search path
+  --color [on|auto|off]         Color diagnostics (default: auto)
   --config name                 Use linker config file
   --dbgfile name                Generate debug information
   --define sym=val              Define a symbol
@@ -84,13 +85,13 @@ Long options:
   --lib-path path               Specify a library search path
   --mapfile name                Create a map file
   --module-id id                Specify a module id
+  --no-utf8                     Disable use of UTF-8 in diagnostics
   --obj file                    Link this object file
   --obj-path path               Specify an object file search path
   --start-addr addr             Set the default start address
   --start-group                 Start a library group
   --target sys                  Set the target system
   --version                     Print the linker version
-  --warnings-as-errors          Treat warnings as errors
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -292,6 +293,14 @@ Here is a description of all of the command-line options:
   and in a built-in default directory.
 
 
+  <label id="option--color">
+  <tag><tt>--color</tt></tag>
+
+  This option controls if the linker will use colors when printing
+  diagnostics. The default is "auto" which will enable colors if the output
+  goes to a terminal (not to a file).
+
+
   <label id="option--dbgfile">
   <tag><tt>--dbgfile name</tt></tag>
 
@@ -313,6 +322,14 @@ Here is a description of all of the command-line options:
   Links a library to the output. Use this command-line option instead of just
   naming the library file, if the linker is not able to determine the file
   type because of an unusual extension.
+
+
+  <label id="option--no-utf8">
+  <tag><tt>--no-utf8</tt></tag>
+
+  Disable the use of UTF-8 characters in diagnostics. This might be necessary
+  if auto detection fails or if the output is captured for processing with a
+  tool that is not UTF-8 capable.
 
 
   <tag><tt>--obj file</tt></tag>

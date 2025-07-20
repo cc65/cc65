@@ -77,49 +77,6 @@ static FILE*            InputFile       = 0;
 
 
 /*****************************************************************************/
-/*                              Error handling                               */
-/*****************************************************************************/
-
-
-
-void CfgWarning (const FilePos* Pos, const char* Format, ...)
-/* Print a warning message adding file name and line number of a given file */
-{
-    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
-    va_list ap;
-
-    va_start (ap, Format);
-    SB_VPrintf (&Buf, Format, ap);
-    va_end (ap);
-
-    Warning ("%s:%u: %s",
-             GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
-    SB_Done (&Buf);
-
-    /* Count warnings */
-    ++WarningCount;
-}
-
-
-
-void CfgError (const FilePos* Pos, const char* Format, ...)
-/* Print an error message adding file name and line number of a given file */
-{
-    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
-    va_list ap;
-
-    va_start (ap, Format);
-    SB_VPrintf (&Buf, Format, ap);
-    va_end (ap);
-
-    Error ("%s:%u: %s",
-           GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
-    SB_Done (&Buf);
-}
-
-
-
-/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
@@ -170,7 +127,7 @@ static void StrVal (void)
 
             case EOF:
             case '\n':
-                CfgError (&CfgErrorPos, "Unterminated string");
+                PError (&CfgErrorPos, "Unterminated string");
                 break;
 
             case '%':
@@ -180,7 +137,7 @@ static void StrVal (void)
                     case EOF:
                     case '\n':
                     case '\"':
-                        CfgError (&CfgErrorPos, "Unterminated '%%' escape sequence");
+                        PError (&CfgErrorPos, "Unterminated `%%' escape sequence");
                         break;
 
                     case '%':
@@ -198,8 +155,8 @@ static void StrVal (void)
                         break;
 
                     default:
-                        CfgWarning (&CfgErrorPos,
-                                    "Unknown escape sequence '%%%c'", C);
+                        PWarning (&CfgErrorPos,
+                                    "Unknown escape sequence `%%%c'", C);
                         SB_AppendChar (&CfgSVal, '%');
                         SB_AppendChar (&CfgSVal, C);
                         NextChar ();
@@ -255,7 +212,7 @@ Again:
     if (C == '$') {
         NextChar ();
         if (!isxdigit (C)) {
-            CfgError (&CfgErrorPos, "Hex digit expected");
+            PError (&CfgErrorPos, "Hex digit expected");
         }
         CfgIVal = 0;
         while (isxdigit (C)) {
@@ -383,7 +340,7 @@ Again:
                     break;
 
                 default:
-                    CfgError (&CfgErrorPos, "Invalid format specification");
+                    PError (&CfgErrorPos, "Invalid format specification");
             }
             break;
 
@@ -392,7 +349,7 @@ Again:
             break;
 
         default:
-            CfgError (&CfgErrorPos, "Invalid character '%c'", C);
+            PError (&CfgErrorPos, "Invalid character `%c'", C);
 
     }
 }
@@ -403,7 +360,7 @@ void CfgConsume (cfgtok_t T, const char* Msg)
 /* Skip a token, print an error message if not found */
 {
     if (CfgTok != T) {
-        CfgError (&CfgErrorPos, "%s", Msg);
+        PError (&CfgErrorPos, "%s", Msg);
     }
     CfgNextTok ();
 }
@@ -413,7 +370,7 @@ void CfgConsume (cfgtok_t T, const char* Msg)
 void CfgConsumeSemi (void)
 /* Consume a semicolon */
 {
-    CfgConsume (CFGTOK_SEMI, "';' expected");
+    CfgConsume (CFGTOK_SEMI, "`;' expected");
 }
 
 
@@ -421,7 +378,7 @@ void CfgConsumeSemi (void)
 void CfgConsumeColon (void)
 /* Consume a colon */
 {
-    CfgConsume (CFGTOK_COLON, "':' expected");
+    CfgConsume (CFGTOK_COLON, "`:' expected");
 }
 
 
@@ -450,7 +407,7 @@ void CfgAssureInt (void)
 /* Make sure the next token is an integer */
 {
     if (CfgTok != CFGTOK_INTCON) {
-        CfgError (&CfgErrorPos, "Integer constant expected");
+        PError (&CfgErrorPos, "Integer constant expected");
     }
 }
 
@@ -460,7 +417,7 @@ void CfgAssureStr (void)
 /* Make sure the next token is a string constant */
 {
     if (CfgTok != CFGTOK_STRCON) {
-        CfgError (&CfgErrorPos, "String constant expected");
+        PError (&CfgErrorPos, "String constant expected");
     }
 }
 
@@ -470,7 +427,7 @@ void CfgAssureIdent (void)
 /* Make sure the next token is an identifier */
 {
     if (CfgTok != CFGTOK_IDENT) {
-        CfgError (&CfgErrorPos, "Identifier expected");
+        PError (&CfgErrorPos, "Identifier expected");
     }
 }
 
@@ -480,8 +437,30 @@ void CfgRangeCheck (unsigned long Lo, unsigned long Hi)
 /* Check the range of CfgIVal */
 {
     if (CfgIVal < Lo || CfgIVal > Hi) {
-        CfgError (&CfgErrorPos, "Range error");
+        PError (&CfgErrorPos, "Range error");
     }
+}
+
+
+
+static void SpecialTokenHelp (const IdentTok* Table, unsigned Size, StrBuf* Msg)
+/* Create a help message for errors in CfgSpecialToken. StrBuf must be
+** initialized and is overwritten.
+*/
+{
+    unsigned I;
+
+    SB_AppendStr (Msg, "You may use one of `");
+    for (I = 0; I < Size; ++I) {
+        if (I == Size - 1) {
+            SB_AppendStr (Msg, " or `");
+        } else if (I > 0) {
+            SB_AppendStr (Msg, ", `");
+        }
+        SB_AppendStr (Msg, Table[I].Ident);
+        SB_AppendChar (Msg, '\'');
+    }
+    SB_Terminate (Msg);         /* So we may use %s */
 }
 
 
@@ -504,13 +483,22 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
             }
         }
 
-        /* Not found */
-        CfgError (&CfgErrorPos, "%s expected, got '%s'", Name, SB_GetConstBuf(&CfgSVal));
+        /* Not found. Add a helpful note about the possible names only if
+        ** there is a not too large number of them.
+        */
+        if (Size > 0 && Size <= 5) {
+            StrBuf Note = AUTO_STRBUF_INITIALIZER;
+            SpecialTokenHelp (Table, Size, &Note);
+            AddPNote (&CfgErrorPos, "%s", SB_GetConstBuf (&Note));
+            SB_Done (&Note);
+        }
+        PError (&CfgErrorPos, "%s expected but got `%s'", Name,
+                SB_GetConstBuf (&CfgSVal));
         return;
     }
 
     /* No identifier */
-    CfgError (&CfgErrorPos, "%s expected", Name);
+    PError (&CfgErrorPos, "%s expected", Name);
 }
 
 
@@ -531,7 +519,7 @@ void CfgBoolToken (void)
     } else {
         /* We expected an integer here */
         if (CfgTok != CFGTOK_INTCON) {
-            CfgError (&CfgErrorPos, "Boolean value expected");
+            PError (&CfgErrorPos, "Boolean value expected");
         }
         CfgTok = (CfgIVal == 0)? CFGTOK_FALSE : CFGTOK_TRUE;
     }
@@ -561,7 +549,7 @@ void CfgOpenInput (void)
     /* Open the file */
     InputFile = fopen (CfgName, "r");
     if (InputFile == 0) {
-        Error ("Cannot open '%s': %s", CfgName, strerror (errno));
+        Error ("Cannot open `%s': %s", CfgName, strerror (errno));
     }
 
     /* Initialize variables */

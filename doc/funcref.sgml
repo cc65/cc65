@@ -369,9 +369,14 @@ function.
 
 <sect1><tt/dbg.h/<label id="dbg.h"><p>
 
-<!-- <itemize> -->
-<!-- <item><ref id="DbgInit" name="DbgInit"> -->
-<!-- </itemize> -->
+<itemize>
+<item><ref id="DbgInit" name="DbgInit">
+<!-- <item><ref id="BREAK" name="BREAK"> -->
+<!-- <item><ref id="DbgDisAsm" name="DbgDisAsm"> -->
+<!-- <item><ref id="DbgDisAsmLen" name="DbgDisAsmLen"> -->
+<!-- <item><ref id="DbgIsRAM" name="DbgIsRAM"> -->
+<!-- <item><ref id="DbgMemDump" name="DbgMemDump"> -->
+</itemize>
 
 (incomplete)
 
@@ -3467,6 +3472,24 @@ used in presence of a prototype.
 <ref id="chline" name="chline">,
 <ref id="chlinexy" name="chlinexy">,
 <ref id="cvline" name="cvline">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>DbgInit<label id="DbgInit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Initialize the debugger.
+<tag/Header/<tt/<ref id="dbg.h" name="dbg.h">/
+<tag/Declaration/<tt/void __fastcall__ DbgInit (unsigned unused);/
+<tag/Description/<tt/DbgInit/ initializes the debugger.
+<tag/Notes/<itemize>
+<item>Use 0 as parameter.
+<item>The debugger will popup on next brk encountered.
+</itemize>
+<tag/Availability/cc65
 <tag/Example/None.
 </descrip>
 </quote>

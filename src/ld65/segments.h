@@ -131,9 +131,11 @@ Section* ReadSection (FILE* F, struct ObjData* O);
 Segment* SegFind (unsigned Name);
 /* Return the given segment or NULL if not found. */
 
-int IsBSSType (Segment* S);
-/* Check if the given segment is a BSS style segment, that is, it does not
-** contain non-zero data.
+Section* GetNonBSSSection (Segment* S);
+/* Used when checking a BSS style segment for initialized data. Will walk over
+** all sections in S and check if any of them contains initialized data. If so,
+** the first section containing initialized data is returned. Otherwise the
+** function returns NULL.
 */
 
 void SegDump (void);

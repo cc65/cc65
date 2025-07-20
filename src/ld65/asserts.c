@@ -109,8 +109,8 @@ void CheckAssertions (void)
     for (I = 0; I < CollCount (&Assertions); ++I) {
 
         const LineInfo* LI;
-        const char* Module;
-        unsigned Line;
+        const FilePos* Pos;
+        const char* Message;
 
         /* Get the assertion */
         Assertion* A = CollAtUnchecked (&Assertions, I);
@@ -120,38 +120,33 @@ void CheckAssertions (void)
             continue;
         }
 
-        /* Retrieve the relevant line info for this assertion */
-        LI = CollConstAt (&A->LineInfos, 0);
-
-        /* Get file name and line number from the source */
-        Module = GetSourceName (LI);
-        Line   = GetSourceLine (LI);
+        /* Get some assertion data */
+        Message = GetString (A->Msg);
+        LI      = CollConstAt (&A->LineInfos, 0);
+        Pos     = GetSourcePos (LI);
 
         /* If the expression is not constant, we're not able to handle it */
         if (!IsConstExpr (A->Expr)) {
-            Warning ("Cannot evaluate assertion in module '%s', line %u",
-                     Module, Line);
+            AddPNote (Pos, "The assert message is: \"%s\"", Message);
+            PWarning (Pos, "Cannot evaluate this source code assertion");
         } else if (GetExprVal (A->Expr) == 0) {
 
             /* Assertion failed */
-            const char* Message = GetString (A->Msg);
-
             switch (A->Action) {
 
                 case ASSERT_ACT_WARN:
                 case ASSERT_ACT_LDWARN:
-                    Warning ("%s:%u: %s", Module, Line, Message);
+                    PWarning (Pos, "Assertion failed: %s", Message);
                     break;
 
                 case ASSERT_ACT_ERROR:
                 case ASSERT_ACT_LDERROR:
-                    Error ("%s:%u: %s", Module, Line, Message);
+                    PError (Pos, "Assertion failed: %s", Message);
                     break;
 
                 default:
-                    Internal ("Invalid assertion action (%u) in module '%s', "
-                              "line %u (file corrupt?)",
-                              A->Action, Module, Line);
+                    AddPNote (Pos, "The file might be corrupt or wrong version");
+                    PError (Pos, "Invalid assertion action %u", A->Action);
                     break;
             }
         }

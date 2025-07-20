@@ -1,1 +1,1 @@
-ld65: Warning: <<<#PATH#>>>:<<<#INTEGER#>>>: Segment 'CODE' isn't aligned properly; the resulting executable might not be functional.
+<<<#PATH#>>>:<<<#INTEGER#>>>: Warning: Segment 'CODE' isn't aligned properly; the resulting executable might not be functional.

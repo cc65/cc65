@@ -408,12 +408,12 @@ long GetExprVal (ExprNode* Expr)
                 Error ("Argument of .BANK() isn't a label attached to a segment");
             }
             if (D.Seg->MemArea == 0) {
-                Error ("Segment '%s' is referenced by .BANK(),"
+                Error ("Segment `%s' is referenced by .BANK(),"
                        " but not assigned to a memory area",
                        GetString (D.Seg->Name));
             }
             if (D.Seg->MemArea->BankExpr == 0) {
-                Error ("Memory area '%s' is referenced by .BANK(),"
+                Error ("Memory area `%s' is referenced by .BANK(),"
                        " but has no BANK attribute",
                        GetString (D.Seg->MemArea->Name));
             }

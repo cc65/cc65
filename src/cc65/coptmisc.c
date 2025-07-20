@@ -499,7 +499,7 @@ unsigned OptAXOps (CodeSeg* S)
 
 
 unsigned OptAXLoad (CodeSeg* S)
-/* Merge jsr incax/jsr ldaxi into ldy/jsr ldaxidx */
+/* Merge jsr incax[1-8]/jsr ldaxi into ldy/jsr ldaxidx */
 {
     unsigned Changes = 0;
     unsigned I;
@@ -514,9 +514,10 @@ unsigned OptAXLoad (CodeSeg* S)
         /* Get the next entry */
         const CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for incax followed by jsr/jmp ldaxi */
+        /* Check for incax[1-8] followed by jsr/jmp ldaxi */
         if (E->OPC == OP65_JSR                            &&
             strncmp (E->Arg, "incax", 5) == 0             &&
+            strcmp (E->Arg, "incaxy") != 0                &&
             (N = CS_GetNextEntry (S, I)) != 0             &&
             (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
             strcmp (N->Arg, "ldaxi") == 0                 &&
@@ -534,6 +535,65 @@ unsigned OptAXLoad (CodeSeg* S)
 
             /* Delete the old code */
             CS_DelEntries (S, I, 2);
+
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptAXLoad2 (CodeSeg* S)
+/* Merge ldy/jsr incaxy/jsr ldaxi into ldy/jsr ldaxidx */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        signed Val;
+        CodeEntry* E[3];
+        CodeEntry *X;
+        char *End;
+
+        /* Get the next entry */
+        E[0] = CS_GetEntry (S, I);
+
+        /* Check for ldy followed by incaxy followed by jsr/jmp ldaxi */
+        if (E[0]->OPC == OP65_LDY                            &&
+            E[0]->AM == AM65_IMM                             &&
+            CS_GetEntries (S, E+1, I+1, 2)                   &&
+            E[1]->OPC == OP65_JSR                            &&
+            strcmp (E[1]->Arg, "incaxy") == 0                &&
+            (E[2]->OPC == OP65_JSR || E[2]->OPC == OP65_JMP) &&
+            strcmp (E[2]->Arg, "ldaxi") == 0                 &&
+            !CS_RangeHasLabel (S, I, 3)) {
+
+            /* Replace with ldy (y+1) / jsr ldaxidx */
+            Val = strtoul(E[0]->Arg + 1, &End, 16);
+            Val++;
+
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg(Val), 0, E[0]->LI);
+            CS_InsertEntry (S, X, I+3);
+            X = NewCodeEntry (E[2]->OPC, AM65_ABS, "ldaxidx", 0, E[0]->LI);
+            CS_InsertEntry (S, X, I+4);
+
+            CS_DelEntries (S, I, 3);
 
             /* Regenerate register info */
             CS_GenRegInfo (S);

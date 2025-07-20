@@ -114,6 +114,7 @@ static OptFunc DOptAdd4         = { OptAdd4,         "OptAdd4",          90, 0, 
 static OptFunc DOptAdd5         = { OptAdd5,         "OptAdd5",         100, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd6         = { OptAdd6,         "OptAdd6",          40, 0, 0, 0, 0, 0 };
 static OptFunc DOptAXLoad       = { OptAXLoad,       "OptAXLoad",        50, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXLoad2      = { OptAXLoad2,      "OptAXLoad2",       66, 0, 0, 0, 0, 0 };
 static OptFunc DOptAXOps        = { OptAXOps,        "OptAXOps",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegA1       = { OptBNegA1,       "OptBNegA1",       100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegA2       = { OptBNegA2,       "OptBNegA2",       100, 0, 0, 0, 0, 0 };
@@ -876,6 +877,7 @@ static unsigned RunOptGroup7 (CodeSeg* S)
         */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptAXLoad, 5);
+        Changes += RunOptFunc (S, &DOptAXLoad2, 5);
         Changes += RunOptFunc (S, &DOptUnusedStores, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);

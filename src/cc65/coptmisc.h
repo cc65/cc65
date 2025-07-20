@@ -102,7 +102,10 @@ unsigned OptAXOps (CodeSeg* S);
 */
 
 unsigned OptAXLoad (CodeSeg* S);
-/* Merge adjacent calls to incax/ldaxi into ldy/ldaxidx */
+/* Merge jsr incax[1-8]/jsr ldaxi into ldy/jsr ldaxidx */
+
+unsigned OptAXLoad2 (CodeSeg* S);
+/* Merge ldy/jsr incaxy/jsr ldaxi into ldy/jsr ldaxidx */
 
 unsigned OptGotoSPAdj (CodeSeg* S);
 /* Optimize SP adjustment for forward 'goto' */

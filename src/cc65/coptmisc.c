@@ -434,7 +434,7 @@ static unsigned OptIncDecOps (CodeSeg* S, const char* dec, const char* inc, cons
             (N = CS_GetNextEntry (S, I)) != 0             &&
             (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
             (Val2 = IsShift (N, dec, inc, sub, add)) != 0 &&
-            abs(Val1 += Val2) <= 255                      &&
+            abs (Val1 += Val2) <= 255                     &&
             !CE_HasLabel (N)) {
 
             CodeEntry* X;
@@ -442,14 +442,14 @@ static unsigned OptIncDecOps (CodeSeg* S, const char* dec, const char* inc, cons
 
             if (Val1 != 0) {
                 /* We can combine the two */
-                if (abs(Val1) <= 8) {
+                if (abs (Val1) <= 8) {
                     /* Insert a call to inc/dec using the last OPC */
-                    xsprintf (Buf, sizeof (Buf), "%s%u", Val1 < 0 ? dec:inc, abs(Val1));
+                    xsprintf (Buf, sizeof (Buf), "%s%u", Val1 < 0 ? dec:inc, abs (Val1));
                     X = NewCodeEntry (N->OPC, AM65_ABS, Buf, 0, N->LI);
                     CS_InsertEntry (S, X, I+2);
                 } else {
                     /* Insert a call to add/sub */
-                    const char* Arg = MakeHexArg (abs(Val1));
+                    const char* Arg = MakeHexArg (abs (Val1));
                     X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
                     CS_InsertEntry (S, X, I+2);
                     if (Val1 < 0) {
@@ -568,15 +568,14 @@ unsigned OptAXLoad2 (CodeSeg* S)
 
         signed Val;
         CodeEntry* E[3];
-        CodeEntry *X;
-        char *End;
+        CodeEntry* X;
 
         /* Get the next entry */
         E[0] = CS_GetEntry (S, I);
 
         /* Check for ldy followed by incaxy followed by jsr/jmp ldaxi */
         if (E[0]->OPC == OP65_LDY                            &&
-            E[0]->AM == AM65_IMM                             &&
+            CE_IsConstImm (E[0])                             &&
             CS_GetEntries (S, E+1, I+1, 2)                   &&
             E[1]->OPC == OP65_JSR                            &&
             strcmp (E[1]->Arg, "incaxy") == 0                &&
@@ -585,10 +584,9 @@ unsigned OptAXLoad2 (CodeSeg* S)
             !CS_RangeHasLabel (S, I, 3)) {
 
             /* Replace with ldy (y+1) / jsr ldaxidx */
-            Val = strtoul(E[0]->Arg + 1, &End, 16);
-            Val++;
+            Val = E[0]->Num + 1;
 
-            X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg(Val), 0, E[0]->LI);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (Val), 0, E[0]->LI);
             CS_InsertEntry (S, X, I+3);
             X = NewCodeEntry (E[2]->OPC, AM65_ABS, "ldaxidx", 0, E[0]->LI);
             CS_InsertEntry (S, X, I+4);

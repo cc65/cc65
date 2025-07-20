@@ -229,8 +229,10 @@ static int IfStatement (void)
         g_defcodelabel (Label2);
     }
 
-    /* Done */
-    return StmtFlags;
+    /* Done. We will never return "empty" for an if statement because of side
+    ** effects when evaluating the condition.
+    */
+    return StmtFlags & ~SF_EMPTY;
 }
 
 
@@ -299,8 +301,10 @@ static int DoStatement (void)
         }
     }
 
-    /* "break" and "continue" are not relevant for the following code */
-    StmtFlags &= ~(SF_ANY_BREAK | SF_ANY_CONTINUE);
+    /* "break" and "continue" are not relevant for the following code. "empty"
+    ** is removed because of side effects when evaluating the condition.
+    */
+    StmtFlags &= ~(SF_ANY_BREAK | SF_ANY_CONTINUE | SF_EMPTY);
 
     /* Done */
     return StmtFlags;
@@ -393,8 +397,10 @@ static int WhileStatement (void)
         */
         StmtFlags &= ~SF_MASK_UNREACH;
     }
-    /* "break" and "continue" are not relevant for the following code */
-    StmtFlags &= ~(SF_ANY_BREAK | SF_ANY_CONTINUE);
+    /* "break" and "continue" are not relevant for the following code. "empty"
+    ** is removed because of side effects when evaluating the condition.
+    */
+    StmtFlags &= ~(SF_ANY_BREAK | SF_ANY_CONTINUE | SF_EMPTY);
 
     /* Done */
     return StmtFlags;
@@ -602,6 +608,11 @@ static int ForStatement (void)
     /* Skip the closing paren */
     ConsumeRParen ();
 
+    /* Output a warning if the loop body is never executed */
+    if (TestResult == TESTEXPR_FALSE) {
+        UnreachableCodeWarning ();
+    }
+
     /* Loop body */
     g_defcodelabel (BodyLabel);
     StmtFlags = AnyStatement (&PendingToken, 0);
@@ -628,10 +639,30 @@ static int ForStatement (void)
     /* Remove the loop from the loop stack */
     DelLoop ();
 
-    /* If the condition is always true, any special statements are always
-    ** executed. Otherwise we don't know.
+    /* Fix the flags for the loop. */
+    if (TestResult == TESTEXPR_TRUE) {
+        /* If the loop condition is always true, and we do not have a
+        ** "break" statement, the loop won't terminate. So the only valid
+        ** "unreach" flag is that for the endless loop. Otherwise - if there
+        ** is a "break" statement, the code after the loop is reachable.
+        */
+        StmtFlags &= ~SF_MASK_UNREACH;
+        if (!SF_Any_Break (StmtFlags)) {
+            StmtFlags |= (SF_OTHER | SF_ANY_OTHER);
+        }
+    } else {
+        /* If the loop condition is not always true, the code after the loop
+        ** is always reachable.
+        */
+        StmtFlags &= ~SF_MASK_UNREACH;
+    }
+    /* "break" and "continue" are not relevant for the following code. "empty"
+    ** is removed because of side effects when evaluating the condition.
     */
-    return (TestResult == TESTEXPR_TRUE)? StmtFlags : SF_NONE;
+    StmtFlags &= ~(SF_ANY_BREAK | SF_ANY_CONTINUE | SF_EMPTY);
+
+    /* Done */
+    return StmtFlags;
 }
 
 
@@ -641,14 +672,22 @@ static int CompoundStatement (int* PendingToken, struct SwitchCtrl* Switch)
 ** function returns true if the last statement was a break or return.
 */
 {
+    int OldStack;
+    unsigned OldBlockStackSize;
     int StmtFlags;
-
-    /* Remember the stack at block entry */
-    int OldStack = StackPtr;
-    unsigned OldBlockStackSize = CollCount (&CurrentFunc->LocalsBlockStack);
 
     /* Skip '{' */
     NextToken ();
+
+    /* If the closing curly bracket follows we have an empty statement */
+    if (CurTok.Tok == TOK_RCURLY) {
+        NextToken ();
+        return SF_EMPTY;
+    }
+
+    /* Remember the stack at block entry */
+    OldStack = StackPtr;
+    OldBlockStackSize = CollCount (&CurrentFunc->LocalsBlockStack);
 
     /* Enter a new lexical level */
     EnterBlockLevel ();
@@ -742,36 +781,41 @@ int StatementBlock (struct SwitchCtrl* Switch)
         LineInfo* LI1 = UseLineInfo (GetDiagnosticLI ());
         int StmtFlags1 = AnyStatement (0, Switch);
         int Unreachable = 0;            /* True if code is unreachable */
-        int UnreachableWarning = 0;     /* True if warning was output */
+        int Warning = 0;                /* True if warning was output */
         while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
             LineInfo* LI2 = UseLineInfo (GetDiagnosticLI ());
             int StmtFlags2 = AnyStatement (0, Switch);
-            if (!UnreachableWarning) {
-                /* If this statement is not already unreachable, check if the
-                ** previous statement made it unreachable.
-                */
-                if (!Unreachable) {
-                    Unreachable = SF_Unreach (StmtFlags1);
-                }
-                /* If the previous statement made this one unreachable, but
-                ** this one has a label, it is not unreachable.
-                */
-                if (Unreachable && SF_Label (StmtFlags2)) {
-                    Unreachable = 0;
-                }
-                /* If this statement is unreachable but not the empty
-                ** statement, output a warning.
-                */
-                if (Unreachable && !SF_Empty (StmtFlags2)) {
-                    LIUnreachableCodeWarning (LI2);
-                    UnreachableWarning = 1;
-                }
+
+            /* If this statement is not already unreachable, check if the
+            ** previous statement made it unreachable.
+            */
+            if (!Unreachable) {
+                Unreachable = SF_Unreach (StmtFlags1);
             }
+            /* If the previous statement made this one unreachable, but this
+            ** one has a label, it is not unreachable.
+            */
+            if (Unreachable && SF_Label (StmtFlags2)) {
+                Unreachable = 0;
+            }
+            /* If this statement is unreachable but not the empty statement,
+            ** and we didn't give a warning before, to that now
+            */
+            if (Unreachable && !SF_Empty (StmtFlags2) && !Warning) {
+                LIUnreachableCodeWarning (LI2);
+                Warning = 1;
+            }
+
+            /* If the current statement wasn't unreachable update the flags */
+            if (!Unreachable) {
+                StmtFlags1 = SF_Any (StmtFlags1) | StmtFlags2;
+            }
+
+            /* Prepare for the next round */
             if (LI1) {
                 ReleaseLineInfo (LI1);
             }
             LI1 = LI2;
-            StmtFlags1 = (StmtFlags1 & SF_MASK_ANY) | StmtFlags2;
         }
         if (LI1) {
             ReleaseLineInfo (LI1);

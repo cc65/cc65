@@ -2,7 +2,7 @@ int a;
 
 static int f1(void)
 {
-    while (1) {
+    for (;;) {
         ++a;
     }
     /* Unreachable */
@@ -12,7 +12,17 @@ static int f1(void)
 
 static int f2(void)
 {
-    while (1) {
+    for (;1;) {
+        ++a;
+    }
+    /* Unreachable */
+    a = 2;
+    return a;							 
+}
+
+static int f3(void)
+{
+    for (;;) {
         ++a;
         if (a == 5) break;
     }
@@ -21,9 +31,9 @@ static int f2(void)
     return a;
 }
 
-static int f3(void)
+static int f4(void)
 {
-    while (1) {
+    for (;;) {
         ++a;
         return a;
     }
@@ -31,9 +41,9 @@ static int f3(void)
     a = 2;
 }
 
-static int f4(void)
+static int f5(void)
 {
-    while (0) {
+    for (;0;) {
         /* Unreachable */
         ++a;
         return a;
@@ -43,9 +53,9 @@ static int f4(void)
     return 0;
 }
 
-static int f5(void)
+static int f6(void)
 {
-    while (1) {
+    for (;;) {
         ++a;
         if (a == 4) goto L;
         return a;
@@ -54,18 +64,18 @@ static int f5(void)
 L:  a = 2;
 }
 
-static int f6(void)
+static int f7(void)
 {
-    while (0) {
+    for (;0;) {
         /* Unreachable but no warning */
     }
     a = 2;
     return a;
 }
 
-static int f7(void)
+static int f8(void)
 {
-    while (a) {
+    for (;a;) {
         return a;
     }
     /* Reachable */
@@ -75,6 +85,6 @@ static int f7(void)
 
 int main(void)
 {
-    return f1() + f2() + f3() + f4() + f5() + f6() + f7();
+    return f1() + f2() + f3() + f4() + f5() + f6() + f7() + f8();
 }
 

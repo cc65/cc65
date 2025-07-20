@@ -1226,14 +1226,14 @@ unsigned OptTosPushPop(CodeSeg *S)
             strcmp(N->Arg, "popax") == 0                  &&
             !CE_HasLabel (N)) {
 
-            /* Delete the old code */
-            CS_DelEntries (S, I, 2);
-
             /* Insert an rts if jmp popax */
             if (N->OPC == OP65_JMP) {
               CodeEntry* X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->LI);
               CS_InsertEntry (S, X, I);
             }
+
+            /* Delete the old code */
+            CS_DelEntries (S, I+1, 2);
 
             /* Regenerate register info */
             CS_GenRegInfo (S);

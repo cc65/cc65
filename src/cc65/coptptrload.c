@@ -1529,8 +1529,8 @@ unsigned OptPtrLoad18 (CodeSeg* S)
             X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[0]->LI);
             CS_InsertEntry (S, X, I+9);
 
-            Label = xmalloc(6);
-            sprintf(Label, "$%s%s", L[0]->Arg+1, L[1]->Arg+1);
+            Label = xmalloc (6);
+            sprintf (Label, "$%s%s", L[0]->Arg+1, L[1]->Arg+1);
             X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[0]->LI);
             CS_InsertEntry (S, X, I+10);
             xfree (Label);
@@ -1593,7 +1593,7 @@ unsigned OptPtrLoad19 (CodeSeg* S)
 
         /* Check for the sequence */
         if (L[0]->OPC == OP65_LDX                               &&
-            CE_IsKnownImm(L[0], 0)                              &&
+            CE_IsKnownImm (L[0], 0)                             &&
             CS_GetEntries (S, L+1, I+1, 11)                     &&
             L[1]->OPC == OP65_AND                               &&
             L[1]->AM == AM65_IMM                                &&
@@ -1607,12 +1607,12 @@ unsigned OptPtrLoad19 (CodeSeg* S)
             L[8]->OPC == OP65_TAX                               &&
             L[9]->OPC == OP65_TYA                               &&
             L[10]->OPC == OP65_LDY                              &&
-            CE_IsKnownImm(L[10], 1)                             &&
+            CE_IsKnownImm (L[10], 1)                            &&
             L[4]->Arg[0] == '<'                                 &&
             L[7]->Arg[0] == '>'                                 &&
-            strlen(L[4]->Arg) > 3                               &&
-            strlen(L[7]->Arg) > 3                               &&
-            strcmp(L[4]->Arg+1, L[7]->Arg+1) == 0               &&
+            strlen (L[4]->Arg) > 3                              &&
+            strlen (L[7]->Arg) > 3                              &&
+            strcmp (L[4]->Arg+1, L[7]->Arg+1) == 0              &&
             (strcmp (L[2]->Arg, "aslax1") == 0          ||
              strcmp (L[2]->Arg, "shlax1") == 0)                 &&
             CE_IsCallTo (L[11], "ldaxidx")                      &&
@@ -1620,7 +1620,7 @@ unsigned OptPtrLoad19 (CodeSeg* S)
 
             CodeEntry* X;
             char* Label;
-            int Len = strlen(L[4]->Arg);
+            int Len = strlen (L[4]->Arg);
 
             /* Track the insertion point */
             unsigned IP = I + 12;
@@ -1641,7 +1641,7 @@ unsigned OptPtrLoad19 (CodeSeg* S)
             CS_InsertEntry (S, X, IP++);
 
             /* ldx label+1,y */
-            strcpy(&Label[Len-3], "+1");
+            strcpy (&Label[Len-3], "+1");
             X = NewCodeEntry (OP65_LDX, AM65_ABSY, Label, 0, L[10]->LI);
             CS_InsertEntry (S, X, IP++);
             /* free Label memory */
@@ -1656,7 +1656,7 @@ unsigned OptPtrLoad19 (CodeSeg* S)
             }
 
             /* Remove the ldx #0 */
-            CS_DelEntry(S, I);
+            CS_DelEntry (S, I);
 
             /* Remember, we had changes */
             ++Changes;
@@ -1698,22 +1698,19 @@ unsigned OptPtrLoad20 (CodeSeg* S)
         /* Get the next entry */
         E[0] = CS_GetEntry (S, I);
 
-        if (E[0]->OPC == OP65_JSR                         &&
-            (strcmp (E[0]->Arg, "ldax0sp") == 0 ||
-             strcmp (E[0]->Arg, "ldaxysp") == 0)          &&
-            CS_GetEntries (S, E+1, I+1, 2) != 0           &&
-            E[1]->OPC == OP65_STA                         &&
-            strcmp(E[1]->Arg, "ptr1") == 0                &&
-            E[2]->OPC == OP65_STX                         &&
-            strcmp(E[2]->Arg, "ptr1+1") == 0              &&
+        if ((CE_IsCallTo(E[0], "ldax0sp") ||
+             CE_IsCallTo(E[0], "ldaxysp"))      &&
+            CS_GetEntries (S, E+1, I+1, 2) != 0 &&
+            E[1]->OPC == OP65_STA               &&
+            strcmp (E[1]->Arg, "ptr1") == 0     &&
+            E[2]->OPC == OP65_STX               &&
+            strcmp (E[2]->Arg, "ptr1+1") == 0   &&
             !CS_RangeHasLabel (S, I+1, 2)) {
 
             if (strcmp (E[0]->Arg, "ldaxysp") == 0) {
-                xfree(E[0]->Arg);
-                E[0]->Arg = xstrdup("ldptr1ysp");
+                CE_SetArg (E[0], "ldptr1ysp");
             } else {
-                xfree(E[0]->Arg);
-                E[0]->Arg = xstrdup("ldptr10sp");
+                CE_SetArg (E[0], "ldptr10sp");
             }
             /* Delete the sta/stx */
             CS_DelEntries (S, I+1, 2);

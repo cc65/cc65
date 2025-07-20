@@ -517,7 +517,8 @@ unsigned OptAXLoad (CodeSeg* S)
         /* Check for incax[1-8] followed by jsr/jmp ldaxi */
         if (E->OPC == OP65_JSR                            &&
             strncmp (E->Arg, "incax", 5) == 0             &&
-            strcmp (E->Arg, "incaxy") != 0                &&
+            E->Arg[5] >= '1' && E->Arg[5] <= '8'          &&
+            E->Arg[6]  == '\0'                            &&
             (N = CS_GetNextEntry (S, I)) != 0             &&
             (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
             strcmp (N->Arg, "ldaxi") == 0                 &&

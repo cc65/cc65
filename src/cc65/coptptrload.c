@@ -1671,3 +1671,67 @@ unsigned OptPtrLoad19 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
+
+
+
+unsigned OptPtrLoad20 (CodeSeg* S)
+/* Search for the sequence:
+**
+**      jsr     ldax?sp
+**      sta     ptr1
+**      stx     ptr1+1
+**
+** and replace it by:
+**
+**      jsr    ldptr1?sp
+*/
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* E[3];
+
+        /* Get the next entry */
+        E[0] = CS_GetEntry (S, I);
+
+        if (E[0]->OPC == OP65_JSR                         &&
+            (strcmp (E[0]->Arg, "ldax0sp") == 0 ||
+             strcmp (E[0]->Arg, "ldaxysp") == 0)          &&
+            CS_GetEntries (S, E+1, I+1, 2) != 0           &&
+            E[1]->OPC == OP65_STA                         &&
+            strcmp(E[1]->Arg, "ptr1") == 0                &&
+            E[2]->OPC == OP65_STX                         &&
+            strcmp(E[2]->Arg, "ptr1+1") == 0              &&
+            !CS_RangeHasLabel (S, I+1, 2)) {
+
+            if (strcmp (E[0]->Arg, "ldaxysp") == 0) {
+                xfree(E[0]->Arg);
+                E[0]->Arg = xstrdup("ldptr1ysp");
+            } else {
+                xfree(E[0]->Arg);
+                E[0]->Arg = xstrdup("ldptr10sp");
+            }
+            /* Delete the sta/stx */
+            CS_DelEntries (S, I+1, 2);
+
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}

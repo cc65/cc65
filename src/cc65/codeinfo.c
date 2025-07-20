@@ -190,6 +190,8 @@ static const FuncInfo FuncInfoTable[] = {
     { "ldeaxi",     REG_AX,                 PSTATE_ALL | REG_EAXY | REG_PTR1        },
     { "ldeaxidx",   REG_AXY,                PSTATE_ALL | REG_EAXY | REG_PTR1        },
     { "ldeaxysp",   SLV_IND | REG_Y,        PSTATE_ALL | REG_EAXY                   },
+    { "ldptr10sp",  SLV_TOP,                PSTATE_ALL | REG_AY | REG_PTR1          },
+    { "ldptr1ysp",  REG_Y | SLV_TOP,        PSTATE_ALL | REG_AY | REG_PTR1          },
     { "leaa0sp",    REG_SP | REG_A,         PSTATE_ALL | REG_AX                     },
     { "leaaxsp",    REG_SP | REG_AX,        PSTATE_ALL | REG_AX                     },
     { "leave",      REG_SP,                 PSTATE_ALL | REG_SP | REG_Y             },

@@ -177,6 +177,7 @@ static OptFunc DOptPtrLoad17    = { OptPtrLoad17,    "OptPtrLoad17",    190, 0, 
 static OptFunc DOptPtrLoad18    = { OptPtrLoad18,    "OptPtrLoad18",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad19    = { OptPtrLoad19,    "OptPtrLoad19",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad2     = { OptPtrLoad2,     "OptPtrLoad2",     100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad20    = { OptPtrLoad20,    "OptPtrLoad20",     90, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad3     = { OptPtrLoad3,     "OptPtrLoad3",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad4     = { OptPtrLoad4,     "OptPtrLoad4",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad5     = { OptPtrLoad5,     "OptPtrLoad5",      50, 0, 0, 0, 0, 0 };
@@ -301,6 +302,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad18,
     &DOptPtrLoad19,
     &DOptPtrLoad2,
+    &DOptPtrLoad20,
     &DOptPtrLoad3,
     &DOptPtrLoad4,
     &DOptPtrLoad5,
@@ -894,6 +896,8 @@ static unsigned RunOptGroup7 (CodeSeg* S)
         Changes += RunOptFunc (S, &DOptTransfers1, 1);
         Changes += RunOptFunc (S, &DOptTransfers3, 1);
     }
+
+    Changes += RunOptFunc (S, &DOptPtrLoad20, 1);
 
     /* Adjust branch distances */
     Changes += RunOptFunc (S, &DOptBranchDist, 3);

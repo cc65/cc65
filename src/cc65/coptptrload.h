@@ -405,6 +405,19 @@ unsigned OptPtrLoad19 (CodeSeg* S);
 */
 
 
+unsigned OptPtrLoad20 (CodeSeg* S);
+/* Search for the sequence:
+**
+**      jsr     ldax?sp
+**      sta     ptr1
+**      stx     ptr1+1
+**
+** and replace it by:
+**
+**      jsr    ldptr1?sp
+*/
+
+
 /* End of coptptrload.h */
 
 #endif

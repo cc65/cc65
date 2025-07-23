@@ -35,5 +35,14 @@
         ldy     tmp3
         ldx     tmp1          ; Get whence
         BRK_TELEMON XFSEEK
+        ; A & X contains position (from 0 to 15 bits)
+        ; RES (2 bytes) contains position (from 16 to 31 bits)
+        ; Returns long
+        pha
+        lda     RES+1
+        sta     sreg+1
+        lda     RES
+        sta     sreg
+        pla
         rts
 .endproc

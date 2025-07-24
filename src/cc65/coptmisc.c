@@ -434,7 +434,7 @@ static unsigned OptIncDecOps (CodeSeg* S, const char* dec, const char* inc, cons
             (N = CS_GetNextEntry (S, I)) != 0             &&
             (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
             (Val2 = IsShift (N, dec, inc, sub, add)) != 0 &&
-            abs(Val1 += Val2) <= 255                      &&
+            abs (Val1 += Val2) <= 255                     &&
             !CE_HasLabel (N)) {
 
             CodeEntry* X;
@@ -442,14 +442,14 @@ static unsigned OptIncDecOps (CodeSeg* S, const char* dec, const char* inc, cons
 
             if (Val1 != 0) {
                 /* We can combine the two */
-                if (abs(Val1) <= 8) {
+                if (abs (Val1) <= 8) {
                     /* Insert a call to inc/dec using the last OPC */
-                    xsprintf (Buf, sizeof (Buf), "%s%u", Val1 < 0 ? dec:inc, abs(Val1));
+                    xsprintf (Buf, sizeof (Buf), "%s%u", Val1 < 0 ? dec:inc, abs (Val1));
                     X = NewCodeEntry (N->OPC, AM65_ABS, Buf, 0, N->LI);
                     CS_InsertEntry (S, X, I+2);
                 } else {
                     /* Insert a call to add/sub */
-                    const char* Arg = MakeHexArg (abs(Val1));
+                    const char* Arg = MakeHexArg (abs (Val1));
                     X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
                     CS_InsertEntry (S, X, I+2);
                     if (Val1 < 0) {
@@ -499,7 +499,7 @@ unsigned OptAXOps (CodeSeg* S)
 
 
 unsigned OptAXLoad (CodeSeg* S)
-/* Merge jsr incax/jsr ldaxi into ldy/jsr ldaxidx */
+/* Merge jsr incax[1-8]/jsr ldaxi into ldy/jsr ldaxidx */
 {
     unsigned Changes = 0;
     unsigned I;
@@ -514,9 +514,11 @@ unsigned OptAXLoad (CodeSeg* S)
         /* Get the next entry */
         const CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for incax followed by jsr/jmp ldaxi */
+        /* Check for incax[1-8] followed by jsr/jmp ldaxi */
         if (E->OPC == OP65_JSR                            &&
             strncmp (E->Arg, "incax", 5) == 0             &&
+            E->Arg[5] >= '1' && E->Arg[5] <= '8'          &&
+            E->Arg[6]  == '\0'                            &&
             (N = CS_GetNextEntry (S, I)) != 0             &&
             (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
             strcmp (N->Arg, "ldaxi") == 0                 &&
@@ -534,6 +536,63 @@ unsigned OptAXLoad (CodeSeg* S)
 
             /* Delete the old code */
             CS_DelEntries (S, I, 2);
+
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptAXLoad2 (CodeSeg* S)
+/* Merge ldy/jsr incaxy/jsr ldaxi into ldy/jsr ldaxidx */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        signed Val;
+        CodeEntry* E[3];
+        CodeEntry* X;
+
+        /* Get the next entry */
+        E[0] = CS_GetEntry (S, I);
+
+        /* Check for ldy followed by incaxy followed by jsr/jmp ldaxi */
+        if (E[0]->OPC == OP65_LDY                            &&
+            CE_IsConstImm (E[0])                             &&
+            CS_GetEntries (S, E+1, I+1, 2)                   &&
+            E[1]->OPC == OP65_JSR                            &&
+            strcmp (E[1]->Arg, "incaxy") == 0                &&
+            (E[2]->OPC == OP65_JSR || E[2]->OPC == OP65_JMP) &&
+            strcmp (E[2]->Arg, "ldaxi") == 0                 &&
+            !CS_RangeHasLabel (S, I, 3)) {
+
+            /* Replace with ldy (y+1) / jsr ldaxidx */
+            Val = E[0]->Num + 1;
+
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (Val), 0, E[0]->LI);
+            CS_InsertEntry (S, X, I+3);
+            X = NewCodeEntry (E[2]->OPC, AM65_ABS, "ldaxidx", 0, E[0]->LI);
+            CS_InsertEntry (S, X, I+4);
+
+            CS_DelEntries (S, I, 3);
 
             /* Regenerate register info */
             CS_GenRegInfo (S);

@@ -61,19 +61,73 @@
 
 
 
+/* Some bitmapped flags for use in SwitchCtrl */
+#define SC_NONE         0x0000
+#define SC_CASE         0x0001  /* We had a case label */
+#define SC_DEFAULT      0x0002  /* We had a default label */
+#define SC_MASK_LABEL   0x0003  /* Mask for the labels */
+#define SC_WEIRD        0x0004  /* Flag for a weird switch that contains code
+                                ** outside of any label.
+                                */
+
 typedef struct SwitchCtrl SwitchCtrl;
 struct SwitchCtrl {
     Collection* Nodes;          /* CaseNode tree */
     const Type* ExprType;       /* Switch controlling expression type */
     unsigned    Depth;          /* Number of bytes the selector type has */
     unsigned    DefaultLabel;   /* Label for the default branch */
-
-
-
+    unsigned    CtrlFlags;      /* Bitmapped flags as defined above */
+    int         StmtFlags;      /* Collected statement flags */
 };
 
 /* Pointer to current switch control struct */
 static SwitchCtrl* Switch = 0;
+
+
+
+/*****************************************************************************/
+/*                Functions that work with struct SwitchExpr                 */
+/*****************************************************************************/
+
+
+
+static int SC_Label (const SwitchCtrl* S)
+/* Check if we had a switch label */
+{
+    return (S->CtrlFlags & SC_MASK_LABEL) != SC_NONE;
+}
+
+
+
+static int SC_IsWeird (const SwitchCtrl* S)
+/* Check if this switch is weird */
+{
+    return (S->CtrlFlags & SC_WEIRD) != SC_NONE;
+}
+
+
+
+static void SC_SetCase (SwitchCtrl* S)
+/* Set the current label type to "case" */
+{
+    S->CtrlFlags |=  SC_CASE;
+}
+
+
+
+static void SC_SetDefault (SwitchCtrl* S)
+/* Set the current label type to "default" */
+{
+    S->CtrlFlags |= SC_DEFAULT;
+}
+
+
+
+static void SC_MakeWeird (SwitchCtrl* S)
+/* Mark the switch as weird */
+{
+    S->CtrlFlags |= SC_WEIRD;
+}
 
 
 
@@ -83,8 +137,8 @@ static SwitchCtrl* Switch = 0;
 
 
 
-void SwitchStatement (void)
-/* Handle a switch statement for chars with a cmp cascade for the selector */
+int SwitchStatement (void)
+/* Handle a 'switch' statement and return the corresponding SF_xxx flags */
 {
     ExprDesc    SwitchExpr;     /* Switch statement expression */
     CodeMark    CaseCodeStart;  /* Start of code marker */
@@ -92,7 +146,7 @@ void SwitchStatement (void)
     CodeMark    SwitchCodeEnd;  /* End of switch code */
     unsigned    ExitLabel;      /* Exit label */
     unsigned    SwitchCodeLabel;/* Label for the switch code */
-    int         HaveBreak = 0;  /* True if the last statement had a break */
+    int         StmtFlags;      /* True if the last statement had a break */
     int         RCurlyBrace;    /* True if last token is right curly brace */
     SwitchCtrl* OldSwitch;      /* Pointer to old switch control data */
     SwitchCtrl  SwitchData;     /* New switch data */
@@ -136,6 +190,8 @@ void SwitchStatement (void)
     SwitchData.ExprType     = SwitchExpr.Type;
     SwitchData.Depth        = SizeOf (SwitchExpr.Type);
     SwitchData.DefaultLabel = 0;
+    SwitchData.CtrlFlags    = SC_NONE;
+    SwitchData.StmtFlags    = SF_NONE;
     OldSwitch = Switch;
     Switch = &SwitchData;
 
@@ -148,7 +204,7 @@ void SwitchStatement (void)
     /* Parse the following statement, which may actually be a compound
     ** statement if there is a curly brace at the current input position
     */
-    HaveBreak = AnyStatement (&RCurlyBrace);
+    StmtFlags = AnyStatement (&RCurlyBrace, Switch);
 
     /* Check if we had any labels */
     if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
@@ -162,7 +218,7 @@ void SwitchStatement (void)
     ** carry the label), add a jump to the exit. If it is useless, the
     ** optimizer will remove it later.
     */
-    if (!HaveBreak) {
+    if (SF_Unreach (StmtFlags) == SF_NONE) {
         g_jump (ExitLabel);
     }
 
@@ -201,6 +257,11 @@ void SwitchStatement (void)
     if (RCurlyBrace) {
         NextToken ();
     }
+
+    /* We only return the combined "any" flags from all the statements within
+    ** the switch. Minus "break" which is handled inside the switch.
+    */
+    return SwitchData.StmtFlags & ~SF_ANY_BREAK;
 }
 
 
@@ -268,6 +329,9 @@ void CaseLabel (void)
             Warning (DiagMsg, CaseExpr.IVal);
         }
 
+        /* Remember that we're in a case label section now */
+        SC_SetCase (Switch);
+
     } else {
 
         /* case keyword outside a switch statement */
@@ -297,6 +361,9 @@ void DefaultLabel (void)
             Switch->DefaultLabel = GetLocalLabel ();
             g_defcodelabel (Switch->DefaultLabel);
 
+            /* Remember that we're in the default label section now */
+            SC_SetDefault (Switch);
+
         } else {
             /* We had the default label already */
             Error ("Multiple default labels in one switch");
@@ -311,4 +378,32 @@ void DefaultLabel (void)
 
     /* Skip the colon */
     ConsumeColon ();
+}
+
+
+
+void SwitchBodyStatement (struct SwitchCtrl* S, LineInfo* LI, int StmtFlags)
+/* Helper function for flow analysis. Must be called for all statements within
+** a switch passing the flags for special statements.
+*/
+{
+    /* The control structure passed must be the current one */
+    PRECONDITION (S == Switch);
+
+    /* Handle code without a label in the switch */
+    if (SC_Label (S) == SC_NONE) {
+        /* This is a statement that preceedes any switch labels. If the
+        ** switch is not already marked as weird, output and the current
+        ** statement has no label, output a warning about unreachable code.
+        */
+        if (!SC_IsWeird (S)) {
+            if (!SF_Label (StmtFlags)) {
+                LIUnreachableCodeWarning (LI);
+            }
+            SC_MakeWeird (S);
+        }
+    }
+
+    /* Collect the statement flags. */
+    S->StmtFlags = SF_Any (S->StmtFlags | StmtFlags);
 }

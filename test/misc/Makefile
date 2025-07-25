@@ -152,6 +152,36 @@ $(WORKDIR)/bug2655.$1.$2.prg: bug2655.c $(ISEQUAL) | $(WORKDIR)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/bug2655.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/bug2655.$1.$2.out bug2655.ref
 
+$(WORKDIR)/flow-do-01.$1.$2.prg: flow-do-01.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/flow-do-01.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-do-01.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/flow-do-01.$1.$2.out flow-do-01.ref
+
+$(WORKDIR)/flow-if-01.$1.$2.prg: flow-if-01.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/flow-if-01.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-if-01.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/flow-if-01.$1.$2.out flow-if-01.ref
+
+$(WORKDIR)/flow-if-02.$1.$2.prg: flow-if-02.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/flow-if-02.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-if-02.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/flow-if-02.$1.$2.out flow-if-02.ref
+
+$(WORKDIR)/flow-switch-01.$1.$2.prg: flow-switch-01.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/flow-switch-01.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-switch-01.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/flow-switch-01.$1.$2.out flow-switch-01.ref
+
+$(WORKDIR)/flow-while-01.$1.$2.prg: flow-while-01.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/flow-while-01.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-while-01.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/flow-while-01.$1.$2.out flow-while-01.ref
+
+$(WORKDIR)/flow-while-02.$1.$2.prg: flow-while-02.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/flow-while-02.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-while-02.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/flow-while-02.$1.$2.out flow-while-02.ref
+
 $(WORKDIR)/limits.$1.$2.prg: limits.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/limits.$1.$2.prg)
 	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)

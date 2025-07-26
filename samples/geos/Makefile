@@ -39,10 +39,12 @@ ifdef CMD_EXE
   NULLDEV = nul:
   DEL = -del /f
   RMDIR = rmdir /s /q
+  CP = copy
 else
   NULLDEV = /dev/null
   DEL = $(RM)
   RMDIR = $(RM) -r
+  CP = cp
 endif
 
 ifdef CC65_HOME
@@ -107,7 +109,11 @@ $(C1541) -attach $(0).d64 -geoswrite $(1);
 endef
 
 samples-geos: $(EXELIST_$(SYS))
+ifeq (,$(wildcard ./geos-template.d64))
 	$(C1541) -format "$@,01" d64 $@.d64
+else
+	$(CP) geos-template.d64 $@.d64
+endif
 	$(foreach tool,$(EXELIST_$(SYS)),$(call samples-geos,$(tool)))
 else
 samples:
@@ -172,4 +178,5 @@ clean:
 	@$(DEL) bitmap.c 2>$(NULLDEV)
 	@$(DEL) *.cvt 2>$(NULLDEV)
 	@$(DEL) *.map 2>$(NULLDEV)
+	@$(DEL) samples-geos.d64 2>$(NULLDEV)
 	$(foreach dir,$(DIRLIST),$(SUBDIR_recipe))

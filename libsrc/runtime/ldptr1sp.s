@@ -1,5 +1,5 @@
 ;
-; Ullrich von Bassewitz, 31.08.1998
+; Colin Leroy-Mira, 2025-07-26
 ;
 ; CC65 runtime: Load ptr1 from offset in stack
 ;

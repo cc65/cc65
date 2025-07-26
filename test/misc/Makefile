@@ -157,6 +157,11 @@ $(WORKDIR)/flow-do-01.$1.$2.prg: flow-do-01.c $(ISEQUAL) | $(WORKDIR)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-do-01.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-do-01.$1.$2.out flow-do-01.ref
 
+$(WORKDIR)/flow-for-01.$1.$2.prg: flow-for-01.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/flow-for-01.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-for-01.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/flow-for-01.$1.$2.out flow-for-01.ref
+
 $(WORKDIR)/flow-if-01.$1.$2.prg: flow-if-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-if-01.$1.$2.prg)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-if-01.$1.$2.out
@@ -171,6 +176,11 @@ $(WORKDIR)/flow-switch-01.$1.$2.prg: flow-switch-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-switch-01.$1.$2.prg)
 	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-switch-01.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-switch-01.$1.$2.out flow-switch-01.ref
+
+$(WORKDIR)/flow-switch-02.$1.$2.prg: flow-switch-02.c $(ISEQUAL) | $(WORKDIR)
+	$(if $(QUIET),echo misc/flow-switch-02.$1.$2.prg)
+	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-switch-02.$1.$2.out
+	$(ISEQUAL) $(WORKDIR)/flow-switch-02.$1.$2.out flow-switch-02.ref
 
 $(WORKDIR)/flow-while-01.$1.$2.prg: flow-while-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-while-01.$1.$2.prg)

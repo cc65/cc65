@@ -22,7 +22,7 @@ static int f2(void)
         /* Unreachable */
         break;
     }
-    /* Unreachable but no warning */
+    /* Unreachable */
     a = 2;
     return a;
 }

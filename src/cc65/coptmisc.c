@@ -557,6 +557,57 @@ unsigned OptAXLoad (CodeSeg* S)
 
 
 
+unsigned OptTosLoadPop (CodeSeg* S)
+/* Merge jsr ldax0sp / jsr|jmp incsp2 into jsr|jmp popax */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        const CodeEntry* N;
+
+        /* Get the next entry */
+        const CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (E->OPC == OP65_JSR                            &&
+            strncmp (E->Arg, "ldax0sp", 5) == 0           &&
+            (N = CS_GetNextEntry (S, I)) != 0             &&
+            (N->OPC == OP65_JSR || N->OPC == OP65_JMP)    &&
+            strcmp (N->Arg, "incsp2") == 0                &&
+            !CE_HasLabel (N)) {
+
+            CodeEntry* X;
+
+            X = NewCodeEntry (N->OPC, AM65_ABS, "popax", 0, N->LI);
+            CS_InsertEntry (S, X, I+2);
+
+            /* Delete the old code */
+            CS_DelEntries (S, I, 2);
+
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 unsigned OptAXLoad2 (CodeSeg* S)
 /* Merge ldy/jsr incaxy/jsr ldaxi into ldy/jsr ldaxidx */
 {

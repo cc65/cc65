@@ -128,6 +128,12 @@ static inline int SF_Any_Break (int F)
     return (F & SF_ANY_BREAK);
 }
 
+static inline int SF_Any_Goto (int F)
+/* Check if there was any "goto" statement */
+{
+    return (F & SF_ANY_GOTO);
+}
+
 static inline int SF_Any (int F)
 /* Return just the "any" part of the given flags */
 {

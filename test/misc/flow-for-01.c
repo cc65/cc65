@@ -17,7 +17,7 @@ static int f2(void)
     }
     /* Unreachable */
     a = 2;
-    return a;							 
+    return a;
 }
 
 static int f3(void)

@@ -793,10 +793,13 @@ int StatementBlock (struct SwitchCtrl* Switch)
                 Unreachable = SF_Unreach (StmtFlags1);
             }
             /* If the previous statement made this one unreachable, but this
-            ** one has a label, it is not unreachable.
+            ** one has a label, it is not unreachable. If we've output a
+            ** warning before, reset the warning flag so a new warning is
+            ** output if code becomes unreachable again.
             */
             if (Unreachable && SF_Label (StmtFlags2)) {
                 Unreachable = 0;
+                Warning = 0;
             }
             /* If this statement is unreachable but not the empty statement,
             ** and we didn't give a warning before, to that now

@@ -131,7 +131,11 @@ unsigned OptBinOps2 (CodeSeg* S);
 ** by something simpler.
 */
 
+unsigned OptTosLoadPop (CodeSeg* S);
+/* Merge jsr ldax0sp / jsr|jmp incsp2 into jsr|jmp popax */
 
+unsigned OptTosPushPop (CodeSeg* S);
+/* Merge jsr pushax/j?? popax */
 
 /* End of coptmisc.h */
 

@@ -217,6 +217,8 @@ static OptFunc DOptSub2         = { OptSub2,         "OptSub2",         100, 0, 
 static OptFunc DOptSub3         = { OptSub3,         "OptSub3",         100, 0, 0, 0, 0, 0 };
 static OptFunc DOptTest1        = { OptTest1,        "OptTest1",         65, 0, 0, 0, 0, 0 };
 static OptFunc DOptTest2        = { OptTest2,        "OptTest2",         50, 0, 0, 0, 0, 0 };
+static OptFunc DOptTosLoadPop   = { OptTosLoadPop,   "OptTosLoadPop",    50, 0, 0, 0, 0, 0 };
+static OptFunc DOptTosPushPop   = { OptTosPushPop,   "OptTosPushPop",    33, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers1   = { OptTransfers1,   "OptTransfers1",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers2   = { OptTransfers2,   "OptTransfers2",    60, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers3   = { OptTransfers3,   "OptTransfers3",    65, 0, 0, 0, 0, 0 };
@@ -343,6 +345,8 @@ static OptFunc* OptFuncs[] = {
     &DOptSub3,
     &DOptTest1,
     &DOptTest2,
+    &DOptTosLoadPop,
+    &DOptTosPushPop,
     &DOptTransfers1,
     &DOptTransfers2,
     &DOptTransfers3,
@@ -635,6 +639,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 
     Changes += RunOptFunc (S, &DOptGotoSPAdj, 1);
     Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
+    Changes += RunOptFunc (S, &DOptTosLoadPop, 5);
     Changes += RunOptFunc (S, &DOptAXOps, 5);
     Changes += RunOptFunc (S, &DOptAdd3, 1);    /* Before OptPtrLoad5! */
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
@@ -920,6 +925,8 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     C += RunOptFunc (S, &DOptStackPtrOps, 5);
     /* Re-optimize JSR/RTS that may now be grouped */
     C += RunOptFunc (S, &DOptRTS, 1);
+    C += RunOptFunc (S, &DOptTosLoadPop, 5);
+    C += RunOptFunc (S, &DOptTosPushPop, 5);
 
     Changes += C;
     /* If we had changes, we must run dead code elimination again,

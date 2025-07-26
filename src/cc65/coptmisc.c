@@ -486,14 +486,14 @@ static unsigned OptIncDecOps (CodeSeg* S, const char* dec, const char* inc, cons
 
 unsigned OptStackPtrOps (CodeSeg* S)
 {
-    return OptIncDecOps(S, "decsp", "incsp", "subysp", "addysp");
+    return OptIncDecOps (S, "decsp", "incsp", "subysp", "addysp");
 }
 
 
 
 unsigned OptAXOps (CodeSeg* S)
 {
-    return OptIncDecOps(S, "decax", "incax", "decaxy", "incaxy");
+    return OptIncDecOps (S, "decax", "incax", "decaxy", "incaxy");
 }
 
 
@@ -539,6 +539,52 @@ unsigned OptAXLoad (CodeSeg* S)
 
             /* Regenerate register info */
             CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptTosLoadPop (CodeSeg* S)
+/* Merge jsr ldax0sp / jsr|jmp incsp2 into jsr|jmp popax */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        const CodeEntry* N;
+
+        /* Get the next entry */
+        const CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (CE_IsCallTo (E, "ldax0sp")                               &&
+            (N = CS_GetNextEntry (S, I)) != 0                        &&
+            (CE_IsCallTo (N, "incsp2") || CE_IsJumpTo (N, "incsp2")) &&
+            !CE_HasLabel (N)) {
+
+            CodeEntry* X;
+
+            X = NewCodeEntry (N->OPC, AM65_ABS, "popax", 0, N->LI);
+            CS_InsertEntry (S, X, I+2);
+
+            /* Delete the old code */
+            CS_DelEntries (S, I, 2);
 
             /* Remember we had changes */
             ++Changes;
@@ -1145,6 +1191,52 @@ unsigned OptBinOps2 (CodeSeg* S)
 
         /* Next entry */
         ++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+unsigned OptTosPushPop (CodeSeg* S)
+/* Merge jsr pushax/j?? popax */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        const CodeEntry* N;
+
+        /* Get the next entry */
+        const CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for decspn, incspn, subysp or addysp */
+        if (CE_IsCallTo (E, "pushax")                              &&
+            (N = CS_GetNextEntry (S, I)) != 0                      &&
+            (CE_IsCallTo (N, "popax") || CE_IsJumpTo (N, "popax")) &&
+            !CE_HasLabel (N)) {
+
+            /* Insert an rts if jmp popax */
+            if (N->OPC == OP65_JMP) {
+              CodeEntry* X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->LI);
+              CS_InsertEntry (S, X, I);
+            }
+
+            /* Delete the old code */
+            CS_DelEntries (S, I+1, 2);
+
+            /* Remember we had changes */
+            ++Changes;
+
+        } else {
+
+            /* Next entry */
+            ++I;
+        }
+
     }
 
     /* Return the number of changes made */

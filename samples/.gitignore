@@ -1,0 +1,13 @@
+# general extra output
+*.lst
+*.lbl
+*.map
+# intermediate files
+*.o
+# executables
+*.prg
+*.xex
+*.bin
+*.com
+*.cvt
+*.lnx

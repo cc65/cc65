@@ -124,6 +124,14 @@ static unsigned PopParam (unsigned char Incr)
 static void PVExit (CPURegs* Regs)
 {
     Print (stderr, 1, "PVExit ($%02X)\n", Regs->AC);
+
+    if (PrintCycles) {
+        Print (stdout, 0, "%lu cycles\n", GetCycles ());
+    }
+    if (ProfileFile) {
+        ProfileSave ();
+    }
+
     SimExit (Regs->AC); /* Error code in range 0-255. */
 }
 

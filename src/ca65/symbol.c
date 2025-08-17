@@ -94,10 +94,14 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         */
         Scope = SymFindAnyScope (CurrentScope, Name);
         if (Scope == 0) {
-            /* Scope not found */
-            SB_Terminate (FullName);
-            Error ("No such scope: `%m%p'", FullName);
-            return 0;
+            /* Scope not found, create a new scope here */
+            Scope = SymFindScope (CurrentScope, Name, SYM_ALLOC_NEW);
+            if (Scope == 0) {
+                SB_Terminate (FullName);
+                /* Scope not found */
+                Error ("Can't create scope: `%m%p'", FullName);
+                return 0;
+            }
         }
 
     } else {

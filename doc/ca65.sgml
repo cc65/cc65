@@ -1320,7 +1320,7 @@ if you want to access the "other" symbol <tt/bar/, you would have to write:
 </verb></tscreen>
 
 The above example also shows that to search a scope that is not yet defined in
-the code above the usage, you must use the namespace token (<tt/::/) and
+the code above the usage, you should use the namespace token (<tt/::/) and
 specify the full scope name, to allow the assembler to create the scope at the
 correct place.
 

@@ -318,5 +318,7 @@
 extern unsigned char _filetype;  /* Default: PRODOS_T_BIN */
 extern unsigned int _auxtype;    /* Default: 0            */
 
+
+
 /* End of apple2_filetype.h */
 #endif

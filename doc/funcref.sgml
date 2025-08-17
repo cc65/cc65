@@ -98,6 +98,8 @@ function.
 <item>allow_lowercase
 <item><ref id="beep" name="beep">
 <item><ref id="dir_entry_count" name="dir_entry_count">
+<item><ref id="file_set_type" name="file_set_type">
+<item><ref id="file_set_auxtype" name="file_set_auxtype">
 <item><ref id="get_tv" name="get_tv">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
@@ -114,6 +116,8 @@ function.
 <item>_dos_type
 <item><ref id="beep" name="beep">
 <item><ref id="dir_entry_count" name="dir_entry_count">
+<item><ref id="file_set_type" name="file_set_type">
+<item><ref id="file_set_auxtype" name="file_set_auxtype">
 <item><ref id="get_tv" name="get_tv">
 <item><ref id="get_ostype" name="get_ostype">
 <item><ref id="gmtime_dt" name="gmtime_dt">
@@ -4262,6 +4266,48 @@ file may have unpredictable results.
 <ref id="open" name="open"> <!-- , -->
 <!-- <ref id="read" name="read">, -->
 <!-- <ref id="write" name="write"> -->
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>file_set_auxtype<label id="file_set_auxtype"><p>
+
+<quote>
+<descrip>
+<tag/Function/Updates the ProDOS auxiliary type of a file.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
+<tag/Declaration/<tt/int __fastcall__ file_set_auxtype(const char *pathname, unsigned int auxtype);/
+<tag/Description/<tt/file_set_auxtype/ is machine dependent and does not exist for
+all supported targets. It updates the ProDOS auxiliary
+type of the <tt/pathname/ file, and returns 0 on success
+or sets <tt/errno/ on error.
+<tag/Notes/<itemize>
+<item>The function does not exist on all platforms.
+<item>See <tt/apple2_filetype.h/ for a list of known auxtypes.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>file_set_type<label id="file_set_type"><p>
+
+<quote>
+<descrip>
+<tag/Function/Updates the ProDOS type of a file.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">/
+<tag/Declaration/<tt/int __fastcall__ file_set_type(const char *pathname, unsigned char type);/
+<tag/Description/<tt/file_set_type/ is machine dependent and does not exist for
+all supported targets. It updates the ProDOS type of the
+<tt/pathname/ file, and returns 0 on success or sets
+<tt/errno/ on error.
+<tag/Notes/<itemize>
+<item>The function does not exist on all platforms.
+<item>See <tt/apple2_filetype.h/ for a list of known file types.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
 <tag/Example/None.
 </descrip>
 </quote>

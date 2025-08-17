@@ -294,6 +294,12 @@ unsigned char get_tv (void);
 unsigned char get_ostype (void);
 /* Get the machine type. Returns one of the APPLE_xxx codes. */
 
+int __fastcall__ file_set_type(const char *pathname, unsigned char type);
+/* Sets the ProDOS type for the file, returns 0 on success, sets errno on failure */
+
+int __fastcall__ file_set_auxtype(const char *pathname, unsigned int auxtype);
+/* Sets the ProDOS auxtype for the file, returns 0 on success, sets errno on failure */
+
 void rebootafterexit (void);
 /* Reboot machine after program termination has completed. */
 

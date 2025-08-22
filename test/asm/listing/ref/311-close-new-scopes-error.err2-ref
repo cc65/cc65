@@ -1,1 +1,1 @@
-311-close-new-scopes-error.s:3: Error: Symbol 'start' is undefined
+311-close-new-scopes-error.s:10: Error: Symbol 'start' is undefined

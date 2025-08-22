@@ -1,3 +1,5 @@
+.org $800
+
 .scope main
 .proc foo
 

@@ -2,19 +2,21 @@ ca65 Vx.xx - Git XXXXXXXXX
 Main file   : 310-create-in-current-scope.s
 Current file: 310-create-in-current-scope.s
 
-000000r 1               .scope main
-000000r 1               .proc foo
-000000r 1               
-000000r 1                   ;; should all be the same
-000000r 1  AD rr rr         lda params__bar
-000003r 1  AD rr rr         lda params::bar
-000006r 1  AD rr rr         lda foo::params::bar
-000009r 1               
-000009r 1               .proc params
-000009r 1  00           bar: .byte 0
-00000Ar 1               .endproc
-00000Ar 1                   params__bar := params::bar
-00000Ar 1               
-00000Ar 1               .endproc
-00000Ar 1               .endscope
-00000Ar 1               
+000000r 1               .org $800
+000800  1               
+000800  1               .scope main
+000800  1               .proc foo
+000800  1               
+000800  1                   ;; should all be the same
+000800  1  AD 09 08         lda params__bar
+000803  1  AD 09 08         lda params::bar
+000806  1  AD 09 08         lda foo::params::bar
+000809  1               
+000809  1               .proc params
+000809  1  00           bar: .byte 0
+00080A  1               .endproc
+00080A  1                   params__bar := params::bar
+00080A  1               
+00080A  1               .endproc
+00080A  1               .endscope
+00080A  1               

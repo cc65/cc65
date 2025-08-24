@@ -12,25 +12,24 @@
         .include        "errno.inc"
         .include        "mli.inc"
 
-auxtype        = tmp1
-type           = tmp3
-mod_flag       = tmp4
+new_value      = ptr2     ; ptr1 is used by pushname
+mod_flag       = tmp1
 
 UPDATE_TYPE    = $00
-UPDATE_AUXTYPE = $FF
+UPDATE_AUXTYPE = $80
 
 _file_set_type:
-        sta     type
+        sta     new_value
         ldy     #UPDATE_TYPE
-        sty     mod_flag
         beq     mli_update
 _file_set_auxtype:
-        sta     auxtype
-        stx     auxtype+1
+        sta     new_value
+        stx     new_value+1
         ldy     #UPDATE_AUXTYPE
-        sty     mod_flag
 
 mli_update:
+        sty     mod_flag
+
         ; Get pathname
         jsr     popax
         jsr     pushname
@@ -48,14 +47,14 @@ mli_update:
         ; Update type if needed
         bit     mod_flag
         bmi     :+
-        lda     type
+        lda     new_value
         sta     mliparam + MLI::INFO::FILE_TYPE
         jmp     set_info
 
 :       ; Otherwise update auxtype
-        lda     auxtype
+        lda     new_value
         sta     mliparam + MLI::INFO::AUX_TYPE
-        lda     auxtype+1
+        lda     new_value+1
         sta     mliparam + MLI::INFO::AUX_TYPE+1
 
 set_info:

@@ -728,7 +728,7 @@ ExpandParam:
 
         /* Use next macro token */
         TokSet (Mac->Exp);
-        if (ExpandMacros) {
+        if (ExpandMacros && SB_GetLen (&ListingName) > 0) {
             if (new_expand_line) {
                 /* Suppress unneeded lines if short expansion
                 ** the ExpandStart is used to ensure that

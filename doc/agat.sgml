@@ -38,7 +38,7 @@ The default load address is &dollar;1903.
 Programs containing Agat-specific code may use the <tt/agat.h/ or
 <tt/agat.inc/ include files.
 
-<sect>Usefull info<p>
+<sect>Useful info<p>
 
 <sect1>Emulation<p>
 

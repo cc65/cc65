@@ -88,16 +88,46 @@ static unsigned         LibFiles   = 0; /* Count of library files linked */
 #define INPUT_FILES_SGROUP     3        /* Entry is 'StartGroup' */
 #define INPUT_FILES_EGROUP     4        /* Entry is 'EndGroup' */
 
-#define MAX_INPUTFILES         256
-
 /* Array of inputs (libraries and object files) */
-static struct InputFile {
-    const char *FileName;
-    unsigned Type;
-}                              *InputFiles;
-static unsigned                InputFilesCount = 0;
-static const char              *CmdlineCfgFile = NULL,
-                               *CmdlineTarget = NULL;
+struct InputFile {
+    unsigned char       Type;
+    char                FileName[1];    /* Dynamically allocated */
+};
+typedef struct InputFile InputFile;
+static Collection InputFiles = STATIC_COLLECTION_INITIALIZER;
+
+static const char* CmdlineCfgFile = NULL;
+static const char* CmdlineTarget = NULL;
+
+
+
+/*****************************************************************************/
+/*                             struct InputFile                              */
+/*****************************************************************************/
+
+
+
+static InputFile* NewInputFile (unsigned char Type, const char* FileName)
+/* Create a new InputFile struct and return it */
+{
+    unsigned Length = FileName? strlen (FileName) : 0;
+    InputFile* F = xmalloc (sizeof (InputFile) + Length);
+    F->Type = Type;
+    if (FileName) {
+        memcpy (F->FileName, FileName, Length + 1);
+    } else {
+        F->FileName[0] = '\0';
+    }
+    return F;
+}
+
+
+
+static void FreeInputFile (InputFile* F)
+/* Free an InputFile struct */
+{
+    xfree (F);
+}
 
 
 
@@ -434,10 +464,7 @@ static void OptLargeAlignment (const char* Opt attribute ((unused)),
 static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
 /* Link a library */
 {
-    InputFiles[InputFilesCount].Type = INPUT_FILES_FILE_LIB;
-    InputFiles[InputFilesCount].FileName = Arg;
-    if (++InputFilesCount >= MAX_INPUTFILES)
-        Error ("Too many input files");
+    CollAppend (&InputFiles, NewInputFile (INPUT_FILES_FILE_LIB, Arg));
 }
 
 
@@ -485,10 +512,7 @@ static void OptNoUtf8 (const char* Opt attribute ((unused)),
 static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
 /* Link an object file */
 {
-    InputFiles[InputFilesCount].Type = INPUT_FILES_FILE_OBJ;
-    InputFiles[InputFilesCount].FileName = Arg;
-    if (++InputFilesCount >= MAX_INPUTFILES)
-        Error ("Too many input files");
+    CollAppend (&InputFiles, NewInputFile (INPUT_FILES_FILE_OBJ, Arg));
 }
 
 
@@ -606,10 +630,7 @@ static void CmdlOptStartGroup (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 /* Remember 'start group' occurrence in input files array */
 {
-    InputFiles[InputFilesCount].Type = INPUT_FILES_SGROUP;
-    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
-    if (++InputFilesCount >= MAX_INPUTFILES)
-        Error ("Too many input files");
+    CollAppend (&InputFiles, NewInputFile (INPUT_FILES_SGROUP, 0));
 }
 
 
@@ -618,10 +639,7 @@ static void CmdlOptEndGroup (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 /* Remember 'end group' occurrence in input files array */
 {
-    InputFiles[InputFilesCount].Type = INPUT_FILES_EGROUP;
-    InputFiles[InputFilesCount].FileName = Arg;  /* Unused */
-    if (++InputFilesCount >= MAX_INPUTFILES)
-        Error ("Too many input files");
+    CollAppend (&InputFiles, NewInputFile (INPUT_FILES_EGROUP, 0));
 }
 
 
@@ -678,9 +696,6 @@ static void ParseCommandLine (void)
 
     unsigned I;
     unsigned LabelFileGiven = 0;
-
-    /* Allocate memory for input file array */
-    InputFiles = xmalloc (MAX_INPUTFILES * sizeof (struct InputFile));
 
     /* Defer setting of config/target and input files until all options are parsed */
     I = 1;
@@ -774,13 +789,8 @@ static void ParseCommandLine (void)
             }
 
         } else {
-
             /* A filename */
-            InputFiles[InputFilesCount].Type = INPUT_FILES_FILE;
-            InputFiles[InputFilesCount].FileName = Arg;
-            if (++InputFilesCount >= MAX_INPUTFILES)
-                Error ("Too many input files");
-
+            CollAppend (&InputFiles, NewInputFile (INPUT_FILES_FILE, Arg));
         }
 
         /* Next argument */
@@ -793,17 +803,18 @@ static void ParseCommandLine (void)
         OptConfig (NULL, CmdlineCfgFile);
     }
 
-    /* Process input files */
-    for (I = 0; I < InputFilesCount; ++I) {
-        switch (InputFiles[I].Type) {
+    /* Process input files and delete the entries while doing so */
+    for (I = 0; I < CollCount (&InputFiles); ++I) {
+        InputFile* F = CollAtUnchecked (&InputFiles, I);
+        switch (F->Type) {
             case INPUT_FILES_FILE:
-                LinkFile (InputFiles[I].FileName, FILETYPE_UNKNOWN);
+                LinkFile (F->FileName, FILETYPE_UNKNOWN);
                 break;
             case INPUT_FILES_FILE_LIB:
-                LinkFile (InputFiles[I].FileName, FILETYPE_LIB);
+                LinkFile (F->FileName, FILETYPE_LIB);
                 break;
             case INPUT_FILES_FILE_OBJ:
-                LinkFile (InputFiles[I].FileName, FILETYPE_OBJ);
+                LinkFile (F->FileName, FILETYPE_OBJ);
                 break;
             case INPUT_FILES_SGROUP:
                 OptStartGroup (NULL, 0);
@@ -812,12 +823,14 @@ static void ParseCommandLine (void)
                 OptEndGroup (NULL, 0);
                 break;
             default:
-                abort ();
+                FAIL ("Unknown file type");
         }
+        FreeInputFile (F);
     }
 
     /* Free memory used for input file array */
-    xfree (InputFiles);
+    DoneCollection (&InputFiles);
+    InitCollection (&InputFiles);       /* Don't leave dangling pointers */
 }
 
 

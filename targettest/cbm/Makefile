@@ -128,6 +128,6 @@ testcode.d64: testcode
 #	$(foreach file,$(EMD) $(MOU) $(TGI),$(D64_WRITE_SEQ_recipe))
 
 clean:
-	@$(DEL) *.lbl petscii.prg cbmdir-test.prg 2>$(NULLDEV)
+	@$(DEL) *.lbl petscii.prg cbmdir-test.prg cbmread.prg 2>$(NULLDEV)
 	@$(DEL) $(DISK_c64)
 	@$(DEL) $(DISK_vic20)

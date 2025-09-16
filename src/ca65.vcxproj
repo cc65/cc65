@@ -91,6 +91,7 @@
     <ClInclude Include="ca65\easw16.h" />
     <ClInclude Include="ca65\enum.h" />
     <ClInclude Include="ca65\error.h" />
+    <ClInclude Include="ca65\expect.h" />
     <ClInclude Include="ca65\expr.h" />
     <ClInclude Include="ca65\feature.h" />
     <ClInclude Include="ca65\filetab.h" />
@@ -132,6 +133,7 @@
     <ClCompile Include="ca65\easw16.c" />
     <ClCompile Include="ca65\enum.c" />
     <ClCompile Include="ca65\error.c" />
+    <ClCompile Include="ca65\expect.c" />
     <ClCompile Include="ca65\expr.c" />
     <ClCompile Include="ca65\feature.c" />
     <ClCompile Include="ca65\filetab.c" />

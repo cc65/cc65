@@ -25,7 +25,9 @@ zip:
 
 install:
 ifndef PREFIX
-	$(error Error: PREFIX must be set for install to work)
+ifndef DESTDIR
+	$(error Error: PREFIX or DESTDIR must be set for install to work)
+endif
 endif
 	@$(MAKE) -C src        --no-print-directory $@
 	@$(MAKE) -C libsrc     --no-print-directory $@
@@ -73,7 +75,9 @@ util:
 
 checkprefix:
 ifndef PREFIX
-	$(warning Warning: PREFIX is empty - make install will not work)
+ifndef DESTDIR
+	$(warning Warning: PREFIX and DESTDIR are empty - make install will not work)
+endif
 endif
 
 # check the code style

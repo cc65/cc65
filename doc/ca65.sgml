@@ -94,23 +94,29 @@ Short options:
   -W n                          Set warning level n
   -d                            Debug mode
   -g                            Add debug info to object file
+  -x                            Expand macros in the listing
+                                repeat -x for full expansion
   -h                            Help (this text)
   -i                            Ignore case of symbols
   -l name                       Create a listing file if assembly was ok
   -mm model                     Set the memory model
   -o name                       Name the output file
   -s                            Enable smart mode
+  -S                            Generate segment offsets in listing
   -t sys                        Set the target system
   -v                            Increase verbosity
 
 Long options:
   --auto-import                 Mark unresolved symbols as import
   --bin-include-dir dir         Set a search path for binary includes
+  --color [on|auto|off]         Color diagnostics (default: auto)
   --cpu type                    Set cpu type
   --create-dep name             Create a make dependency file
   --create-full-dep name        Create a full make dependency file
   --debug                       Debug mode
   --debug-info                  Add debug info to object file
+  --expand-macros               Expand macros in listing
+                                Repeat to get full expansion
   --feature name                Set an emulation feature
   --help                        Help (this text)
   --ignore-case                 Ignore case of symbols
@@ -119,8 +125,10 @@ Long options:
   --listing name                Create a listing file if assembly was ok
   --list-bytes n                Maximum number of bytes per listing line
   --memory-model model          Set the memory model
+  --no-utf8                     Disable use of UTF-8 in diagnostics
   --pagelength n                Set the page length for the listing
-  --relax-checks                Disables some error checks
+  --relax-checks                Relax some checks (see docs)
+  --segment-list                Generate segment offsets in listing
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity
@@ -144,6 +152,14 @@ Here is a description of all the command line options:
   current directory is always searched first before considering any
   additional directories. See also the section about <ref id="search-paths"
   name="search paths">.
+
+
+  <label id="option--color">
+  <tag><tt>--color</tt></tag>
+
+  This option controls if the assembler will use colors when printing
+  diagnostics. The default is "auto" which will enable colors if the output
+  goes to a terminal (not to a file).
 
 
   <label id="option--cpu">
@@ -192,6 +208,16 @@ Here is a description of all the command line options:
   mortals:-)
 
 
+  <label id="option-D">
+  <tag><tt>-D</tt></tag>
+
+  This option allows you to define symbols on the command line. Without a
+  value, the symbol is defined with the value zero. When giving a value,
+  you may use the '&dollar;' prefix for hexadecimal symbols. Please note
+  that for some operating systems, '&dollar;' has a special meaning, so
+  you may have to quote the expression.
+
+
   <label id="option--feature">
   <tag><tt>--feature name</tt></tag>
 
@@ -219,6 +245,16 @@ Here is a description of all the command line options:
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
+
+
+  <label id="option-I">
+  <tag><tt>-I dir, --include-dir dir</tt></tag>
+
+  Name a directory which is searched for include files. The option may be
+  used more than once to specify more than one directory to search. The
+  current directory is always searched first before considering any
+  additional directories. See also the section about <ref id="search-paths"
+  name="search paths">.
 
 
   <label id="option-i">
@@ -259,6 +295,14 @@ Here is a description of all the command line options:
   huge.
 
 
+  <label id="option--no-utf8">
+  <tag><tt>--no-utf8</tt></tag>
+
+  Disable the use of UTF-8 characters in diagnostics. This might be necessary
+  if auto detection fails or if the output is captured for processing with a
+  tool that is not UTF-8 capable.
+
+
   <label id="option-o">
   <tag><tt>-o name</tt></tag>
 
@@ -292,6 +336,12 @@ Here is a description of all the command line options:
 </itemize>
 
 
+  <label id="option-S">
+  <tag><tt>-S, --segment-list</tt></tag>
+
+  Add the segment ID in front of each address in the listing file.
+
+
   <label id="option-s">
   <tag><tt>-s, --smart-mode</tt></tag>
 
@@ -321,34 +371,6 @@ Here is a description of all the command line options:
   overridden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
 
 
-  <label id="option-v">
-  <tag><tt>-v, --verbose</tt></tag>
-
-  Increase the assembler verbosity. Usually only needed for debugging
-  purposes. You may use this option more than one time for even more
-  verbose output.
-
-
-  <label id="option-D">
-  <tag><tt>-D</tt></tag>
-
-  This option allows you to define symbols on the command line. Without a
-  value, the symbol is defined with the value zero. When giving a value,
-  you may use the '&dollar;' prefix for hexadecimal symbols. Please note
-  that for some operating systems, '&dollar;' has a special meaning, so
-  you may have to quote the expression.
-
-
-  <label id="option-I">
-  <tag><tt>-I dir, --include-dir dir</tt></tag>
-
-  Name a directory which is searched for include files. The option may be
-  used more than once to specify more than one directory to search. The
-  current directory is always searched first before considering any
-  additional directories. See also the section about <ref id="search-paths"
-  name="search paths">.
-
-
   <label id="option-U">
   <tag><tt>-U, --auto-import</tt></tag>
 
@@ -359,6 +381,14 @@ Here is a description of all the command line options:
   symbols for the runtime library. However, the compiler is supposed to
   generate code that runs through the assembler without problems, something
   which is not always true for assembler programmers.
+
+
+  <label id="option-v">
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Increase the assembler verbosity. Usually only needed for debugging
+  purposes. You may use this option more than one time for even more
+  verbose output.
 
 
   <label id="option-V">
@@ -382,6 +412,12 @@ Here is a description of all the command line options:
 
   An error will be generated if any warnings were produced.
 
+
+  <label id="option-x">
+  <tag><tt>-x, --expand-macros</tt></tag>
+
+  In the listing file, show exactly how macros were expanded. Use twice for
+  more verbose output.
 
 </descrip>
 <p>
@@ -918,6 +954,7 @@ See the description of the <tt><ref id=".PROC" name=".PROC"></tt>
 directive for more information.
 
 
+<label id=cheap-locals>
 <sect1>Cheap local labels<p>
 
 Cheap local labels are defined like standard labels, but the name of the
@@ -1401,16 +1438,44 @@ writable.
   Reading this pseudo variable will give a constant integer value that
   tells which CPU is currently enabled. It can also tell which instruction
   set the CPU is able to translate. The value read from the pseudo variable
-  should be further examined by using one of the constants defined by the
-  "cpu" macro package (see <tt/<ref id=".MACPACK" name=".MACPACK">/).
+  should be further examined by using one of the following constants:
 
-  It may be used to replace the .IFPxx pseudo instructions or to construct
-  even more complex expressions.
+<tscreen><verb>
+    CPU_6502
+    CPU_65SC02
+    CPU_65C02
+    CPU_65816
+    CPU_SWEET16
+    CPU_HUC6280
+    CPU_4510
+    CPU_45GS02
+    CPU_6502DTV
+    CPU_M740
+</verb></tscreen>
+
+Above constants may be used to determine the exact type of the currently
+enabled CPU. In addition to that, for each CPU instruction set, another
+constant is defined:
+
+<tscreen><verb>
+    CPU_ISET_6502
+    CPU_ISET_65SC02
+    CPU_ISET_65C02
+    CPU_ISET_65816
+    CPU_ISET_SWEET16
+    CPU_ISET_HUC6280
+    CPU_ISET_4510
+    CPU_ISET_45GS02
+    CPU_ISET_6502DTV
+    CPU_ISET_M740
+</verb></tscreen>
+
+  <tt/.CPU/ may be used to replace the .IFPxx pseudo instructions or to
+  construct even more complex expressions.
 
   Example:
 
   <tscreen><verb>
-        .macpack        cpu
         .if     (.cpu .bitand CPU_ISET_65816)
                 phx
                 phy
@@ -1421,6 +1486,44 @@ writable.
                 pha
         .endif
   </verb></tscreen>
+
+<bf>The dilemma:</bf>
+
+The original design of this feature was made under the assumption, that any
+"higher" CPU will support the entire instruction set of the "lower" CPU. For
+example: the WDC W65C02 supports all instructions of the 65C02, which again
+support all instructions of the 65SC02. Unfortunately this is not true for all
+CMOS CPUs - when the 65CE02 was made, some instructions were changed, and a new
+addressingmode was added. As a result all CPUS after (and including) 65CE02
+are no more (source code) compatible with all instructions originally introduced
+by the 65SC02.
+
+Because of this, the .CPU function and the ISET* macros were repurposed to
+indicate <em>groups of instructions</em> only, ie only the set of instructions
+that was added by that particular CPU. In the value returned by .CPU only the
+bits will be set, that refer to the groups of instructions that are completely
+supported by that CPU.
+
+The advantage of this is, that the mechanism keeps working for all new CPUs
+added. The inevitable disadvantage is that you now have to know exactly which
+CPU added which instructions (look <htmlurl url="cpus.html" name="here"> for reference).
+
+<tscreen><verb>
+        .if (.cpu .bitand CPU_ISET_65SC02)
+                ; This will be assembled for the W65C02, 65C02, 65SC02, 65816, HUC6820
+                lda     (c_sp)
+        .elseif (.cpu .bitand CPU_ISET_65CE02)
+                ; This will be assembled for the 65CE02, 4510, 45GS02
+                ldz     #$00
+                lda     (c_sp),z
+        .else
+                ldy     #$00
+                lda     (c_sp),y
+        .endif
+</verb></tscreen>
+
+  See also: <tt><ref id=".CAP" name=".CAP"></tt>, which is a similar mechanism,
+  but without the problem outlined above.
 
 
 <sect1><tt>.ISIZE</tt><label id=".ISIZE"><p>
@@ -1591,6 +1694,61 @@ either a string or an expression value.
   <tscreen><verb>
         .if     .blank({arg})
   </verb></tscreen>
+
+
+
+<sect1><tt>.CAP, .CAPABILITY</tt><label id=".CAP"><p>
+
+  Builtin function. The function allows to check for capabilities of the
+  currently selected CPU or target system. It must be called with a comma
+  separated list of identifiers and returns non zero if all of the given
+  capabilities are available. Otherwise it returns zero.
+
+  Existing capabilities are:
+
+<descrip>
+
+  <tag><tt>CPU_HAS_BITIMM</tt></tag>
+  Checks for the availability of the "bit #imm" instruction.
+
+  <tag><tt>CPU_HAS_BRA8</tt></tag>
+  Checks for the availability of a short (8 bit) branch.
+
+  <tag><tt>CPU_HAS_INA</tt></tag>
+  Checks for the availability of accu inc/dec instructions.
+
+  <tag><tt>CPU_HAS_PUSHXY</tt></tag>
+  Checks for the capability to push and pop the X and Y registers.
+
+  <tag><tt>CPU_HAS_ZPIND</tt></tag>
+  Checks for the availability of the "zeropage indirect" addressing mode as it
+  is implemented in the 65SC02 CPU.
+
+  <tag><tt>CPU_HAS_STZ</tt></tag>
+  Checks for the availability of the "store zero" instruction as it is
+  implemented in the 65SC02 CPU.
+
+</descrip>
+
+  Case is ignored when checking the identifiers. The <tt/.cap/ function is
+  easier to use than checking <tt/.cpu/ and requires no intimate knowledge
+  of all instruction sets. For more detailed checking <tt/.cpu/ is still
+  available.
+
+  Example:
+
+  <tscreen><verb>
+        .if     .cap(CPU_HAS_BRA, CPU_HAS_PUSHXY)
+                phx
+                bra     L1
+        .else
+                txa
+                pha
+                jmp     L1
+        .endif
+  </verb></tscreen>
+
+  See also: <tt><ref id=".CPU" name=".CPU"></tt>
 
 
 
@@ -3633,20 +3791,23 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
 <sect1><tt>.LOCAL</tt><label id=".LOCAL"><p>
 
-  This command may only be used inside a macro definition. It declares a
-  list of identifiers as local to the macro expansion.
+  This command may only be used inside a macro definition. It declares a list
+  of identifiers as local to the macro expansion. The identifers may be
+  standard identifiers or cheap local identifiers depending on the planed use.
 
   A problem when using macros are labels: Since they don't change their name,
   you get a "duplicate symbol" error if the macro is expanded the second time.
   Labels declared with <tt><ref id=".LOCAL" name=".LOCAL"></tt> have their
-  name mapped to an internal unique name (<tt/___ABCD__/) with each macro
+  name replaced by an internally generated unique name for each macro
   invocation.
 
-  Some other assemblers start a new lexical block inside a macro expansion.
-  This has some drawbacks however, since that will not allow <em/any/ symbol
-  to be visible outside a macro, a feature that is sometimes useful. The
-  <tt><ref id=".LOCAL" name=".LOCAL"></tt> command is in my eyes a better way
-  to address the problem.
+  Please note that while the generated names are unique and guaranteed to not
+  clash with any user generated names, they are still regular symbols and
+  added to the current scope. This means that a local macro label will start a
+  new scope for cheap locals whenever the macro is expanded. To avoid that,
+  you may also use a <ref id="cheap-locals" name="cheap local symbol"> for the
+  name. In this case the assembler will generate unique cheap local
+  identifiers instead of standard ones.
 
   You get an error when using <tt><ref id=".LOCAL" name=".LOCAL"></tt> outside
   a macro.
@@ -3685,7 +3846,6 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
   <tscreen><verb>
         atari           Defines the scrcode macro.
         cbm             Defines the scrcode macro.
-        cpu             Defines constants for the .CPU variable.
         generic         Defines generic macros like add, sub, and blt.
         longbranch      Defines conditional long-jump macros.
   </verb></tscreen>
@@ -4985,69 +5145,6 @@ This macro package defines a macro named <tt/scrcode/. It takes a string
 as argument and places this string into memory translated into screen codes.
 
 
-<sect1><tt>.MACPACK cpu</tt><p>
-
-This macro package does not define any macros but constants used to examine
-the value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable. For
-each supported CPU a constant similar to
-
-<tscreen><verb>
-    CPU_6502
-    CPU_65SC02
-    CPU_65C02
-    CPU_65816
-    CPU_SWEET16
-    CPU_HUC6280
-    CPU_4510
-    CPU_45GS02
-    CPU_6502DTV
-    CPU_M740
-</verb></tscreen>
-
-is defined. These constants may be used to determine the exact type of the
-currently enabled CPU. In addition to that, for each CPU instruction set,
-another constant is defined:
-
-<tscreen><verb>
-    CPU_ISET_6502
-    CPU_ISET_65SC02
-    CPU_ISET_65C02
-    CPU_ISET_65816
-    CPU_ISET_SWEET16
-    CPU_ISET_HUC6280
-    CPU_ISET_4510
-    CPU_ISET_45GS02
-    CPU_ISET_6502DTV
-    CPU_ISET_M740
-</verb></tscreen>
-
-The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
-be checked with <tt/<ref id="operators" name=".BITAND">/ to determine if the
-currently enabled CPU supports a specific instruction set. For example the
-65C02 supports all instructions of the 65SC02 CPU, so it has the
-<tt/CPU_ISET_65SC02/ bit set in addition to its native <tt/CPU_ISET_65C02/
-bit. Using
-
-<tscreen><verb>
-        .if (.cpu .bitand CPU_ISET_65SC02)
-                lda     (c_sp)
-        .else
-                ldy     #$00
-                lda     (c_sp),y
-        .endif
-</verb></tscreen>
-
-it is possible to determine if the
-
-<tscreen><verb>
-                lda     (c_sp)
-</verb></tscreen>
-
-instruction is supported, which is the case for the 65SC02, 65C02 and 65816
-CPUs (the latter two are upwards compatible to the 65SC02).
-
-see section <ref id="6502-mode" name="6502 format"> and following.
-
 <sect1><tt>.MACPACK module</tt><p>
 
 This macro package defines a macro named <tt/module_header/. It takes an
@@ -5062,6 +5159,7 @@ For better orthogonality, the assembler defines similar symbols as the
 compiler, depending on the target system selected:
 
 <itemize>
+<item><tt/__AGAT__/ - Target system is <tt/agat/
 <item><tt/__APPLE2__/ - Target system is <tt/apple2/ or <tt/apple2enh/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
 <item><tt/__ATARI2600__/ - Target system is <tt/atari2600/
@@ -5074,23 +5172,31 @@ compiler, depending on the target system selected:
 <item><tt/__C128__/ - Target system is <tt/c128/
 <item><tt/__C16__/ - Target system is <tt/c16/ or <tt/plus4/
 <item><tt/__C64__/ - Target system is <tt/c64/
+<item><tt/__C65__/ - Target system is <tt/c65/
 <item><tt/__CBM__/ - Target is a Commodore or Commodore-alike system
 <item><tt/__CBM510__/ - Target system is <tt/cbm510/
 <item><tt/__CBM610__/ - Target system is <tt/cbm610/
+<item><tt/__CREATIVISION__/ - Target system is <tt/creativision/
 <item><tt/__CX16__/ - Target system is <tt/cx16/
+<item><tt/__GAMATE__/ - Target system is <tt/gamate/
 <item><tt/__GEOS__/ - Target is a GEOS system
 <item><tt/__GEOS_APPLE__/ - Target system is <tt/geos-apple/
 <item><tt/__GEOS_CBM__/ - Target system is <tt/geos-cbm/
+<item><tt/__KIM1__/ - Target system is <tt/kim1/
 <item><tt/__LUNIX__/ - Target system is <tt/lunix/
 <item><tt/__LYNX__/ - Target system is <tt/lynx/
+<item><tt/__MEGA65__/ - Target system is <tt/mega65/
 <item><tt/__NES__/ - Target system is <tt/nes/
 <item><tt/__OSIC1P__/ - Target system is <tt/osic1p/
+<item><tt/__PCE__/ - Target system is <tt/pce/
 <item><tt/__PET__/ - Target system is <tt/pet/
 <item><tt/__PLUS4__/ - Target system is <tt/plus4/
+<item><tt/__RP6502__/ - Target system is <tt/rp6502/
 <item><tt/__SIM6502__/ - Target system is <tt/sim6502/
 <item><tt/__SIM65C02__/ - Target system is <tt/sim65c02/
 <item><tt/__SUPERVISION__/ - Target system is <tt/supervision/
 <item><tt/__SYM1__/ - Target system is <tt/sym1/
+<item><tt/__TELESTRAT__/ - Target system is <tt/telestrat/
 <item><tt/__VIC20__/ - Target system is <tt/vic20/
 </itemize>
 

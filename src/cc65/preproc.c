@@ -41,7 +41,6 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
-#include "inline.h"
 #include "print.h"
 #include "xmalloc.h"
 
@@ -156,11 +155,6 @@ struct HiddenMacro {
 /*****************************************************************************/
 
 
-
-static void TranslationPhase3 (StrBuf* Source, StrBuf* Target);
-/* Mimic Translation Phase 3. Handle old and new style comments. Collapse
-** non-newline whitespace sequences.
-*/
 
 static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags);
 /* Preprocess a single line. Handle specified tokens and operators, remove
@@ -3338,7 +3332,22 @@ void HandleSpecialMacro (Macro* M, const char* Name)
 
 
 
-static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
+static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
+/* Preprocess a single line. Handle specified tokens and operators, remove
+** whitespace and comments, then do macro replacement.
+*/
+{
+    MacroExp    E;
+
+    SkipWhitespace (0);
+    InitMacroExp (&E);
+    ReplaceMacros (Source, Target, &E, ModeFlags | MSM_IN_DIRECTIVE);
+    DoneMacroExp (&E);
+}
+
+
+
+void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
 /* Mimic Translation Phase 3. Handle old and new style comments. Collapse
 ** non-newline whitespace sequences.
 */
@@ -3380,21 +3389,6 @@ static void TranslationPhase3 (StrBuf* Source, StrBuf* Target)
 
     /* Switch back to the old source */
     InitLine (OldSource);
-}
-
-
-
-static void PreprocessDirective (StrBuf* Source, StrBuf* Target, unsigned ModeFlags)
-/* Preprocess a single line. Handle specified tokens and operators, remove
-** whitespace and comments, then do macro replacement.
-*/
-{
-    MacroExp    E;
-
-    SkipWhitespace (0);
-    InitMacroExp (&E);
-    ReplaceMacros (Source, Target, &E, ModeFlags | MSM_IN_DIRECTIVE);
-    DoneMacroExp (&E);
 }
 
 

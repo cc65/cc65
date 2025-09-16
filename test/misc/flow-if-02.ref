@@ -1,0 +1,2 @@
+flow-if-02.c:17: Warning: Unreachable code
+flow-if-02.c:40: Warning: Unreachable code

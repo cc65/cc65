@@ -26,7 +26,6 @@
         .include        "ser-error.inc"
 
         .macpack        module
-        .macpack        cpu
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table

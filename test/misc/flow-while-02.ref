@@ -1,0 +1,7 @@
+flow-while-02.c:8: Warning: Unreachable code
+flow-while-02.c:12: Warning: Unreachable code
+flow-while-02.c:23: Warning: Unreachable code
+flow-while-02.c:26: Warning: Unreachable code
+flow-while-02.c:38: Warning: Unreachable code
+flow-while-02.c:50: Warning: Unreachable code
+flow-while-02.c:66: Warning: Unreachable code

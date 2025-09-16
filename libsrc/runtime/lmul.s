@@ -9,11 +9,9 @@
         .import         addysp1
         .importzp       c_sp, sreg, tmp1, tmp2, tmp3, tmp4, ptr1, ptr3, ptr4
 
-        .macpack        cpu
-
 tosmul0ax:
 tosumul0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -26,7 +24,7 @@ tosmuleax:
 tosumuleax:
 mul32:  sta     ptr1
         stx     ptr1+1          ; op2 now in ptr1/sreg
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)
         ldy     #1
 .else

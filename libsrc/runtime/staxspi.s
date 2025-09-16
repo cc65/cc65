@@ -9,8 +9,6 @@
         .import         incsp2
         .importzp       c_sp, tmp1, ptr1
 
-        .macpack        cpu
-
 .proc   staxspidx
 
         sty     tmp1            ; Save Y
@@ -18,7 +16,7 @@
         ldy     #1
         lda     (c_sp),y
         sta     ptr1+1
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)
 .else
         dey

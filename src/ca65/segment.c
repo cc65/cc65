@@ -134,7 +134,7 @@ static Segment* NewSegment (const char* Name, unsigned char AddrSize)
 
     /* Check the segment name for invalid names */
     if (!ValidSegName (Name)) {
-        Error ("Illegal segment name: '%s'", Name);
+        Error ("Illegal segment name: `%s'", Name);
     }
 
     /* Create a new segment and return it */
@@ -476,7 +476,18 @@ void SegDump (void)
     printf ("\n");
 }
 
-
+void ListSegments (FILE* destination)
+{
+    /* summary of segments when seglist requested */
+    unsigned I;
+    fprintf (destination, "\nSegment summary\n\n");
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        Segment* S = CollAtUnchecked (&SegmentList, I);
+        if(S->FragCount) {
+            fprintf (destination, "Segment: %02X = %s\n", S->Num, S->Def->Name);
+        }
+    }
+}
 
 void SegInit (void)
 /* Initialize segments */

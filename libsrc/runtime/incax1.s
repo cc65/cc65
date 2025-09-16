@@ -7,11 +7,10 @@
         .export         incax1
 
         .macpack        generic
-        .macpack        cpu
 
 .proc   incax1
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_INA)
         ina                     ; 65C02 version
         bne     @L9
 .else

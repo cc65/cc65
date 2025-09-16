@@ -79,6 +79,7 @@ void* __fastcall__ __bzero (void* ptr, size_t n);
 #if __CC65_STD__ == __CC65_STD_CC65__
 void __fastcall__ bzero (void* ptr, size_t n);                /* BSD */
 char* __fastcall__ strdup (const char* s);                    /* SYSV/BSD */
+char* __fastcall__ strndup (const char* s, size_t maxlen);    /* SYSV/BSD */
 int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */
 char* __fastcall__ strcasestr (const char* str, const char* substr);

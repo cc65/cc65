@@ -1961,7 +1961,7 @@ static void PutLDM_m740 (const InsDesc* Ins)
     }
     Emit0 (Ins->BaseCode);
     EmitByte (A.Expr);
-    Consume (TOK_HASH, "'#' expected");
+    Consume (TOK_HASH, "`#' expected");
     EmitByte (Expression ());
 }
 
@@ -2091,7 +2091,7 @@ static void PutBitBranch_m740 (const InsDesc* Ins)
     EffAddr A;
 
     /* Evaluate the addressing mode used */
-    GetEA(&A);
+    GetEA (&A);
 
     /* From the possible addressing modes, remove the ones that are invalid
     ** for this instruction or CPU.
@@ -2375,7 +2375,7 @@ static void PutJSR_m740 (const InsDesc* Ins)
                         /* direct page */
                         A.Opcode = 0x22;
                         Emit0 (A.Opcode);
-                        EmitByte(GenByteExpr(A.Expr));
+                        EmitByte (GenByteExpr (A.Expr));
                         return;
                     }
                 }

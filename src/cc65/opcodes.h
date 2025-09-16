@@ -38,11 +38,6 @@
 
 
 
-/* common */
-#include "inline.h"
-
-
-
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -216,27 +211,19 @@ const OPCDesc* FindOP65 (const char* OPC);
 unsigned GetInsnSize (opc_t OPC, am_t AM);
 /* Return the size of the given instruction */
 
-#if defined(HAVE_INLINE)
-INLINE const OPCDesc* GetOPCDesc (opc_t OPC)
+static inline const OPCDesc* GetOPCDesc (opc_t OPC)
 /* Get an opcode description */
 {
     /* Return the description */
     return &OPCTable [OPC];
 }
-#else
-#  define GetOPCDesc(OPC)       (&OPCTable [(OPC)])
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetOPCInfo (opc_t OPC)
+static inline unsigned GetOPCInfo (opc_t OPC)
 /* Get opcode information */
 {
     /* Return the info */
     return OPCTable[OPC].Info;
 }
-#else
-#  define GetOPCInfo(OPC)       (OPCTable[(OPC)].Info)
-#endif
 
 unsigned char GetAMUseInfo (am_t AM);
 /* Get usage info for the given addressing mode (addressing modes that use

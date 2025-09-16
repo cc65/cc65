@@ -107,6 +107,9 @@ struct OptFunc {
 static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Ind     = { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Stores  = { Opt65C02Stores,  "Opt65C02Stores",  100, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXLoad       = { OptAXLoad,       "OptAXLoad",        50, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXLoad2      = { OptAXLoad2,      "OptAXLoad2",       66, 0, 0, 0, 0, 0 };
+static OptFunc DOptAXOps        = { OptAXOps,        "OptAXOps",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd1         = { OptAdd1,         "OptAdd1",         125, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2         = { OptAdd2,         "OptAdd2",         200, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd3         = { OptAdd3,         "OptAdd3",          65, 0, 0, 0, 0, 0 };
@@ -175,6 +178,7 @@ static OptFunc DOptPtrLoad17    = { OptPtrLoad17,    "OptPtrLoad17",    190, 0, 
 static OptFunc DOptPtrLoad18    = { OptPtrLoad18,    "OptPtrLoad18",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad19    = { OptPtrLoad19,    "OptPtrLoad19",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad2     = { OptPtrLoad2,     "OptPtrLoad2",     100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad20    = { OptPtrLoad20,    "OptPtrLoad20",     90, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad3     = { OptPtrLoad3,     "OptPtrLoad3",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad4     = { OptPtrLoad4,     "OptPtrLoad4",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad5     = { OptPtrLoad5,     "OptPtrLoad5",      50, 0, 0, 0, 0, 0 };
@@ -214,6 +218,8 @@ static OptFunc DOptSub2         = { OptSub2,         "OptSub2",         100, 0, 
 static OptFunc DOptSub3         = { OptSub3,         "OptSub3",         100, 0, 0, 0, 0, 0 };
 static OptFunc DOptTest1        = { OptTest1,        "OptTest1",         65, 0, 0, 0, 0, 0 };
 static OptFunc DOptTest2        = { OptTest2,        "OptTest2",         50, 0, 0, 0, 0, 0 };
+static OptFunc DOptTosLoadPop   = { OptTosLoadPop,   "OptTosLoadPop",    50, 0, 0, 0, 0, 0 };
+static OptFunc DOptTosPushPop   = { OptTosPushPop,   "OptTosPushPop",    33, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers1   = { OptTransfers1,   "OptTransfers1",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers2   = { OptTransfers2,   "OptTransfers2",    60, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers3   = { OptTransfers3,   "OptTransfers3",    65, 0, 0, 0, 0, 0 };
@@ -230,6 +236,9 @@ static OptFunc* OptFuncs[] = {
     &DOpt65C02BitOps,
     &DOpt65C02Ind,
     &DOpt65C02Stores,
+    &DOptAXLoad,
+    &DOptAXLoad2,
+    &DOptAXOps,
     &DOptAdd1,
     &DOptAdd2,
     &DOptAdd3,
@@ -298,6 +307,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad18,
     &DOptPtrLoad19,
     &DOptPtrLoad2,
+    &DOptPtrLoad20,
     &DOptPtrLoad3,
     &DOptPtrLoad4,
     &DOptPtrLoad5,
@@ -337,6 +347,8 @@ static OptFunc* OptFuncs[] = {
     &DOptSub3,
     &DOptTest1,
     &DOptTest2,
+    &DOptTosLoadPop,
+    &DOptTosPushPop,
     &DOptTransfers1,
     &DOptTransfers2,
     &DOptTransfers3,
@@ -629,6 +641,8 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 
     Changes += RunOptFunc (S, &DOptGotoSPAdj, 1);
     Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
+    Changes += RunOptFunc (S, &DOptTosLoadPop, 5);
+    Changes += RunOptFunc (S, &DOptAXOps, 5);
     Changes += RunOptFunc (S, &DOptAdd3, 1);    /* Before OptPtrLoad5! */
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
@@ -871,6 +885,8 @@ static unsigned RunOptGroup7 (CodeSeg* S)
         ** may have opened new oportunities.
         */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+        Changes += RunOptFunc (S, &DOptAXLoad, 5);
+        Changes += RunOptFunc (S, &DOptAXLoad2, 5);
         Changes += RunOptFunc (S, &DOptUnusedStores, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
@@ -890,6 +906,8 @@ static unsigned RunOptGroup7 (CodeSeg* S)
         Changes += RunOptFunc (S, &DOptTransfers3, 1);
     }
 
+    Changes += RunOptFunc (S, &DOptPtrLoad20, 1);
+
     /* Adjust branch distances */
     Changes += RunOptFunc (S, &DOptBranchDist, 3);
 
@@ -906,6 +924,13 @@ static unsigned RunOptGroup7 (CodeSeg* S)
     /* Adjust branch distances again, since the previous step may change code
        between branches */
     C += RunOptFunc (S, &DOptBranchDist, 3);
+
+    /* Re-optimize inc/decsp that may now be grouped */
+    C += RunOptFunc (S, &DOptStackPtrOps, 5);
+    /* Re-optimize JSR/RTS that may now be grouped */
+    C += RunOptFunc (S, &DOptRTS, 1);
+    C += RunOptFunc (S, &DOptTosLoadPop, 5);
+    C += RunOptFunc (S, &DOptTosPushPop, 5);
 
     Changes += C;
     /* If we had changes, we must run dead code elimination again,

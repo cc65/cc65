@@ -80,11 +80,13 @@
     <ClInclude Include="common\assertion.h" />
     <ClInclude Include="common\attrib.h" />
     <ClInclude Include="common\bitops.h" />
+    <ClInclude Include="common\capability.h" />
     <ClInclude Include="common\cddefs.h" />
     <ClInclude Include="common\chartype.h" />
     <ClInclude Include="common\check.h" />
     <ClInclude Include="common\cmdline.h" />
     <ClInclude Include="common\coll.h" />
+    <ClInclude Include="common\consprop.h" />
     <ClInclude Include="common\cpu.h" />
     <ClInclude Include="common\debugflag.h" />
     <ClInclude Include="common\exprdefs.h" />
@@ -133,10 +135,12 @@
     <ClCompile Include="common\alignment.c" />
     <ClCompile Include="common\assertion.c" />
     <ClCompile Include="common\bitops.c" />
+    <ClCompile Include="common\capability.c" />
     <ClCompile Include="common\chartype.c" />
     <ClCompile Include="common\check.c" />
     <ClCompile Include="common\cmdline.c" />
     <ClCompile Include="common\coll.c" />
+    <ClCompile Include="common\consprop.c" />
     <ClCompile Include="common\cpu.c" />
     <ClCompile Include="common\debugflag.c" />
     <ClCompile Include="common\exprdefs.c" />

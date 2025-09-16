@@ -9,8 +9,6 @@
         .import         addysp1
         .importzp       c_sp, tmp1
 
-        .macpack        cpu
-
 ;
 ; AX = AX - TOS
 ;
@@ -19,7 +17,7 @@ tosrsuba0:
         ldx     #0
 tosrsubax:
         sec
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sbc     (c_sp)
         ldy     #1
 .else

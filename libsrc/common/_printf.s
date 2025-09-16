@@ -13,7 +13,6 @@
         .import         _strlower, _strlen
 
         .macpack        generic
-        .macpack        cpu
 
 ; ----------------------------------------------------------------------------
 ; We will store variables into the register bank in the zeropage. Define
@@ -38,7 +37,7 @@ FCount          = ptr2
 
 GetFormatChar:
         ldy     #0
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_ZPIND)
         lda     (Format)
         .else
         lda     (Format),y
@@ -115,7 +114,7 @@ GetIntArg:
         lda     (ArgList),y
         tax
         dey
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_ZPIND)
         lda     (ArgList)
         .else
         lda     (ArgList),y
@@ -274,7 +273,7 @@ Save:   lda     regbank,y
 ; Initialize the output counter in the output descriptor to zero
 
         lda     #0
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_ZPIND)
         sta     (OutData)
         ldy     #$01
         sta     (OutData),y
@@ -353,7 +352,7 @@ MainLoop:
         sta     (c_sp),y
         dey
         lda     FCount
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_ZPIND)
         sta     (c_sp)
         .else
         sta     (c_sp),y
@@ -570,7 +569,7 @@ CheckCount:
         jsr     GetIntArg
         sta     ptr1
         stx     ptr1+1                  ; Get user supplied pointer
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_ZPIND)
         lda     (OutData)             ; Low byte of OutData->ccount
         sta     (ptr1)
         ldy     #1

@@ -43,7 +43,6 @@
 
 /* common */
 #include "fp.h"
-#include "inline.h"
 
 /* cc65 */
 #include "asmcode.h"
@@ -235,25 +234,17 @@ ExprDesc* ED_Init (ExprDesc* Expr);
 
 
 
-#if defined(HAVE_INLINE)
-INLINE int ED_GetLoc (const ExprDesc* Expr)
+static inline int ED_GetLoc (const ExprDesc* Expr)
 /* Return the location flags from the expression */
 {
     return (Expr->Flags & E_MASK_LOC);
 }
-#else
-#  define ED_GetLoc(Expr)       ((Expr)->Flags & E_MASK_LOC)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_GetNeeds (const ExprDesc* Expr)
+static inline int ED_GetNeeds (const ExprDesc* Expr)
 /* Get flags about what the expression needs. */
 {
     return (Expr->Flags & E_MASK_NEED);
 }
-#else
-#  define ED_GetNeeds(Expr)     ((Expr)->Flags & E_MASK_NEED)
-#endif
 
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs);
 /* Return the assembler label name of the given expression. Beware: This
@@ -274,269 +265,164 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs);
 
 
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocNone (const ExprDesc* Expr)
+static inline int ED_IsLocNone (const ExprDesc* Expr)
 /* Return true if the expression is an absolute value */
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_NONE;
 }
-#else
-#  define ED_IsLocNone(Expr)    (((Expr)->Flags & E_MASK_LOC) == E_LOC_NONE)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocAbs (const ExprDesc* Expr)
+static inline int ED_IsLocAbs (const ExprDesc* Expr)
 /* Return true if the expression is referenced with an absolute address */
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_ABS;
 }
-#else
-#  define ED_IsLocAbs(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_ABS)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocRegister (const ExprDesc* Expr)
+static inline int ED_IsLocRegister (const ExprDesc* Expr)
 /* Return true if the expression is located in a register */
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_REGISTER;
 }
-#else
-#  define ED_IsLocRegister(Expr)  (((Expr)->Flags & E_MASK_LOC) == E_LOC_REGISTER)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocStack (const ExprDesc* Expr)
+static inline int ED_IsLocStack (const ExprDesc* Expr)
 /* Return true if the expression is located on the stack */
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_STACK;
 }
-#else
-#  define ED_IsLocStack(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_STACK)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocPrimary (const ExprDesc* Expr)
+static inline int ED_IsLocPrimary (const ExprDesc* Expr)
 /* Return true if the expression is an expression in the primary */
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_PRIMARY;
 }
-#else
-#  define ED_IsLocPrimary(Expr)  (((Expr)->Flags & E_MASK_LOC) == E_LOC_PRIMARY)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocExpr (const ExprDesc* Expr)
+static inline int ED_IsLocExpr (const ExprDesc* Expr)
 /* Return true if the expression is an expression referenced in the primary */
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_EXPR;
 }
-#else
-#  define ED_IsLocExpr(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_EXPR)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocLiteral (const ExprDesc* Expr)
+static inline int ED_IsLocLiteral (const ExprDesc* Expr)
 /* Return true if the expression is a string from the literal pool */
 {
     return (Expr->Flags & E_MASK_LOC) == E_LOC_LITERAL;
 }
-#else
-#  define ED_IsLocLiteral(Expr)   (((Expr)->Flags & E_MASK_LOC) == E_LOC_LITERAL)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocConst (const ExprDesc* Expr)
+static inline int ED_IsLocConst (const ExprDesc* Expr)
 /* Return true if the expression is a constant location of some sort */
 {
     return ((Expr)->Flags & E_MASK_LOC & ~E_LOC_CONST) == 0;
 }
-#else
-#  define ED_IsLocConst(Expr)   (((Expr)->Flags & E_MASK_LOC & ~E_LOC_CONST) == 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocQuasiConst (const ExprDesc* Expr)
+static inline int ED_IsLocQuasiConst (const ExprDesc* Expr)
 /* Return true if the expression is a constant location of some sort or on the
 ** stack.
 */
 {
     return ED_IsLocConst (Expr) || ED_IsLocStack (Expr);
 }
-#else
-int ED_IsLocQuasiConst (const ExprDesc* Expr);
-/* Return true if the expression denotes a constant address of some sort. This
-** can be the address of a global variable (maybe with offset) or similar.
-*/
-#endif
 
 int ED_IsLocZP (const ExprDesc* Expr);
 /* Return true if the expression is in a location on a zeropage */
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
+static inline int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr)
 /* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
 {
     return ED_IsLocPrimary (Expr) || ED_IsLocExpr (Expr);
 }
-#else
-int ED_IsLocPrimaryOrExpr (const ExprDesc* Expr);
-/* Return true if the expression is E_LOC_PRIMARY or E_LOC_EXPR */
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_NeedsPrimary (const ExprDesc* Expr)
+static inline int ED_NeedsPrimary (const ExprDesc* Expr)
 /* Check if the expression needs to be in Primary. */
 {
     return (Expr->Flags & E_MASK_NEED) == E_NEED_EAX;
 }
-#else
-#  define ED_NeedsPrimary(Expr) (((Expr)->Flags & E_MASK_NEED) == E_NEED_EAX)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_NeedsTest (const ExprDesc* Expr)
+static inline int ED_NeedsTest (const ExprDesc* Expr)
 /* Check if the expression needs a test. */
 {
     return (Expr->Flags & E_NEED_TEST) != 0;
 }
-#else
-#  define ED_NeedsTest(Expr)    (((Expr)->Flags & E_NEED_TEST) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsTested (const ExprDesc* Expr)
+static inline int ED_IsTested (const ExprDesc* Expr)
 /* Check if the expression has set the condition codes. */
 {
     return (Expr->Flags & E_CC_SET) != 0;
 }
-#else
-#  define ED_IsTested(Expr)   (((Expr)->Flags & E_CC_SET) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_YetToTest (const ExprDesc* Expr)
+static inline int ED_YetToTest (const ExprDesc* Expr)
 /* Check if the expression needs to be tested but not yet. */
 {
     return ((Expr)->Flags & (E_NEED_TEST | E_CC_SET)) == E_NEED_TEST;
 }
-#else
-#  define ED_YetToTest(Expr)    (((Expr)->Flags & (E_NEED_TEST | E_CC_SET)) == E_NEED_TEST)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLoaded (const ExprDesc* Expr)
+static inline int ED_IsLoaded (const ExprDesc* Expr)
 /* Check if the expression is loaded.
 ** NOTE: This is currently unused and not working due to code complexity.
 */
 {
     return (Expr->Flags & E_LOADED) != 0;
 }
-#else
-#  define ED_IsLoaded(Expr)   (((Expr)->Flags & E_LOADED) != 0)
-#endif
 
 int ED_YetToLoad (const ExprDesc* Expr);
 /* Check if the expression is yet to be loaded somehow. */
 
-#if defined(HAVE_INLINE)
-INLINE int ED_NeedsConst (const ExprDesc* Expr)
+static inline int ED_NeedsConst (const ExprDesc* Expr)
 /* Check if the expression need be immutable */
 {
     return (Expr->Flags & E_EVAL_IMMUTABLE_RESULT) == E_EVAL_IMMUTABLE_RESULT;
 }
-#else
-#  define ED_NeedsConst(Expr)   (((Expr)->Flags & E_EVAL_IMMUTABLE_RESULT) == E_EVAL_IMMUTABLE_RESULT)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsUneval (const ExprDesc* Expr)
+static inline int ED_IsUneval (const ExprDesc* Expr)
 /* Check if the expression is not to be evaluated */
 {
     return (Expr->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL;
 }
-#else
-#  define ED_IsUneval(Expr)     (((Expr)->Flags & E_EVAL_UNEVAL) == E_EVAL_UNEVAL)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_MayHaveNoEffect (const ExprDesc* Expr)
+static inline int ED_MayHaveNoEffect (const ExprDesc* Expr)
 /* Check if the expression may be present without effects */
 {
     return (Expr->Flags & E_EVAL_MAYBE_UNUSED) == E_EVAL_MAYBE_UNUSED;
 }
-#else
-#  define ED_MayHaveNoEffect(Expr)  (((Expr)->Flags & E_EVAL_MAYBE_UNUSED) == E_EVAL_MAYBE_UNUSED)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsAddrExpr (const ExprDesc* Expr)
+static inline int ED_IsAddrExpr (const ExprDesc* Expr)
 /* Check if the expression is taken address of instead of its value.
 */
 {
     return (Expr->Flags & E_ADDRESS_OF) != 0;
 }
-#else
-#  define ED_IsAddrExpr(Expr) (((Expr)->Flags & E_ADDRESS_OF) != 0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsIndExpr (const ExprDesc* Expr)
+static inline int ED_IsIndExpr (const ExprDesc* Expr)
 /* Check if the expression is a reference to its value */
 {
     return (Expr->Flags & E_ADDRESS_OF) == 0 &&
            !ED_IsLocNone (Expr) && !ED_IsLocPrimary (Expr);
 }
-#else
-int ED_IsIndExpr (const ExprDesc* Expr);
-/* Check if the expression is a reference to its value */
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsLVal (const ExprDesc* Expr)
+static inline int ED_IsLVal (const ExprDesc* Expr)
 /* Return true if the expression is a reference */
 {
     return ((Expr)->Flags & E_MASK_RTYPE) == E_RTYPE_LVAL;
 }
-#else
-#  define ED_IsLVal(Expr)       (((Expr)->Flags & E_MASK_RTYPE) == E_RTYPE_LVAL)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsRVal (const ExprDesc* Expr)
+static inline int ED_IsRVal (const ExprDesc* Expr)
 /* Return true if the expression is an rvalue */
 {
     return ((Expr)->Flags & E_MASK_RTYPE) == E_RTYPE_RVAL;
 }
-#else
-#  define ED_IsRVal(Expr)       (((Expr)->Flags & E_MASK_RTYPE) == E_RTYPE_RVAL)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsAbs (const ExprDesc* Expr)
+static inline int ED_IsAbs (const ExprDesc* Expr)
 /* Return true if the expression denotes a numeric value or address. */
 {
     return (Expr->Flags & (E_MASK_LOC)) == (E_LOC_NONE) ||
            (Expr->Flags & (E_MASK_LOC|E_ADDRESS_OF)) == (E_LOC_ABS|E_ADDRESS_OF);
 }
-#else
-int ED_IsAbs (const ExprDesc* Expr);
-/* Return true if the expression denotes a numeric value or address. */
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_IsConstAbs (const ExprDesc* Expr)
+static inline int ED_IsConstAbs (const ExprDesc* Expr)
 /* Return true if the expression denotes a constant absolute value. This can be
 ** a numeric constant, cast to any type.
 */
 {
     return ED_IsRVal (Expr) && ED_IsAbs (Expr);
 }
-#else
-int ED_IsConstAbs (const ExprDesc* Expr);
-/* Return true if the expression denotes a constant absolute value. This can be
-** a numeric constant, cast to any type.
-*/
-#endif
 
 int ED_IsConstAbsInt (const ExprDesc* Expr);
 /* Return true if the expression is a constant (numeric) integer. */
@@ -623,8 +509,7 @@ ExprDesc* ED_MakeConstBool (ExprDesc* Expr, long Value);
 ExprDesc* ED_FinalizeRValLoad (ExprDesc* Expr);
 /* Finalize the result of LoadExpr to be an rvalue in the primary register */
 
-#if defined(HAVE_INLINE)
-INLINE void ED_MarkExprAsLVal (ExprDesc* Expr)
+static inline void ED_MarkExprAsLVal (ExprDesc* Expr)
 /* Mark the expression as an lvalue.
 ** HINT: Consider using ED_IndExpr instead of this, unless you know what
 **       consequence there will be, as there are both a big part in the code
@@ -633,12 +518,8 @@ INLINE void ED_MarkExprAsLVal (ExprDesc* Expr)
 {
     Expr->Flags |= E_RTYPE_LVAL;
 }
-#else
-#  define ED_MarkExprAsLVal(Expr)   do { (Expr)->Flags |= E_RTYPE_LVAL; } while (0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void ED_MarkExprAsRVal (ExprDesc* Expr)
+static inline void ED_MarkExprAsRVal (ExprDesc* Expr)
 /* Mark the expression as an rvalue.
 ** HINT: Consider using ED_AddrExpr instead of this, unless you know what
 **       consequence there will be, as there are both a big part in the code
@@ -647,9 +528,6 @@ INLINE void ED_MarkExprAsRVal (ExprDesc* Expr)
 {
     Expr->Flags &= ~E_RTYPE_LVAL;
 }
-#else
-#  define ED_MarkExprAsRVal(Expr)   do { (Expr)->Flags &= ~E_RTYPE_LVAL; } while (0)
-#endif
 
 void ED_AddrExpr (ExprDesc* Expr);
 /* Take address of Expr */
@@ -657,59 +535,38 @@ void ED_AddrExpr (ExprDesc* Expr);
 void ED_IndExpr (ExprDesc* Expr);
 /* Dereference Expr */
 
-#if defined(HAVE_INLINE)
-INLINE void ED_RequireTest (ExprDesc* Expr)
+static inline void ED_RequireTest (ExprDesc* Expr)
 /* Mark the expression for a test. */
 {
     Expr->Flags |= E_NEED_TEST;
 }
-#else
-#  define ED_RequireTest(Expr)  do { (Expr)->Flags |= E_NEED_TEST; } while (0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void ED_RequireNoTest (ExprDesc* Expr)
+static inline void ED_RequireNoTest (ExprDesc* Expr)
 /* Mark the expression not for a test. */
 {
     Expr->Flags &= ~E_NEED_TEST;
 }
-#else
-#  define ED_RequireNoTest(Expr)    do { (Expr)->Flags &= ~E_NEED_TEST; } while (0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void ED_TestDone (ExprDesc* Expr)
+static inline void ED_TestDone (ExprDesc* Expr)
 /* Mark the expression as tested and condition codes set. */
 {
     Expr->Flags |= E_CC_SET;
 }
-#else
-#  define ED_TestDone(Expr)     \
-    do { (Expr)->Flags |= E_CC_SET; } while (0)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE void ED_MarkAsUntested (ExprDesc* Expr)
+static inline void ED_MarkAsUntested (ExprDesc* Expr)
 /* Mark the expression as not tested (condition codes not set). */
 {
     Expr->Flags &= ~E_CC_SET;
 }
-#else
-#  define ED_MarkAsUntested(Expr)   do { (Expr)->Flags &= ~E_CC_SET; } while (0)
-#endif
 
 void ED_MarkForUneval (ExprDesc* Expr);
 /* Mark the expression as not to be evaluated */
 
-#if defined(HAVE_INLINE)
-INLINE void ED_PropagateFrom (ExprDesc* Expr, const ExprDesc* SubExpr)
+static inline void ED_PropagateFrom (ExprDesc* Expr, const ExprDesc* SubExpr)
 /* Propagate viral flags from subexpression */
 {
     Expr->Flags |= SubExpr->Flags & E_MASK_VIRAL;
 }
-#else
-#  define ED_PropagateFrom(Expr, SubExpr)   (void)((Expr)->Flags |= (SubExpr)->Flags & E_MASK_VIRAL)
-#endif
 
 const Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
 /* Replace the type of Expr by a copy of Newtype and return the old type string */

@@ -12,8 +12,6 @@
         .include        "stdio.inc"
         .include        "_file.inc"
 
-        .macpack        cpu
-
 _fgetc:
         sta     ptr1
         stx     ptr1+1
@@ -22,7 +20,7 @@ _fgetc:
         jsr     checkferror
         bne     ret_eof
 
-        .if (.cpu .bitand ::CPU_ISET_65SC02)
+        .if .cap(CPU_HAS_BITIMM)
         bit     #_FPUSHBACK     ; Check for pushed back char
         beq     do_read
         .else

@@ -11,10 +11,8 @@
         .import         addysp1
         .importzp       c_sp, sreg
 
-        .macpack        cpu
-
 tossub0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -26,7 +24,7 @@ tossub0ax:
 tossubeax:
         sec
         eor     #$FF
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         adc     (c_sp)          ; 65SC02 version - saves 2 cycles
         ldy     #1
 .else

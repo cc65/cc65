@@ -1,0 +1,10 @@
+flow-switch-02.c:18: Warning: Case value (256) out of range for switch condition type
+flow-switch-02.c:22: Warning: Unreachable code
+flow-switch-02.c:49: Warning: Result of comparison is always false
+flow-switch-02.c:51: Warning: Unreachable code
+flow-switch-02.c:61: Warning: Unreachable code
+flow-switch-02.c:69: Warning: Result of comparison is always true
+flow-switch-02.c:73: Warning: Unreachable code
+flow-switch-02.c:81: Warning: Unreachable code
+flow-switch-02.c:91: Warning: Unreachable code
+flow-switch-02.c:101: Warning: Unreachable code

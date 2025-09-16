@@ -33,7 +33,7 @@ ifdef QUIET
   NULLOUT = >$(NULLDEV)
   NULLERR = 2>$(NULLDEV)
 ifndef CMD_EXE
-  CATERR = 2> $(WORKDIR)/$$@.errlog || (cat $(WORKDIR)/$$@.errlog && false)
+  CATERR = 2> $@.errlog && (cat $@.errlog && true)
 endif
 endif
 

@@ -92,9 +92,20 @@ unsigned OptIndLoads2 (CodeSeg* S);
 */
 
 unsigned OptStackPtrOps (CodeSeg* S);
-/* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
+/* Merge adjacent calls to decsp/incax into one. NOTE: This function won't merge all
 ** known cases!
 */
+
+unsigned OptAXOps (CodeSeg* S);
+/* Merge adjacent calls to decax/incax into one. NOTE: This function won't merge all
+** known cases!
+*/
+
+unsigned OptAXLoad (CodeSeg* S);
+/* Merge jsr incax[1-8]/jsr ldaxi into ldy/jsr ldaxidx */
+
+unsigned OptAXLoad2 (CodeSeg* S);
+/* Merge ldy/jsr incaxy/jsr ldaxi into ldy/jsr ldaxidx */
 
 unsigned OptGotoSPAdj (CodeSeg* S);
 /* Optimize SP adjustment for forward 'goto' */
@@ -120,7 +131,11 @@ unsigned OptBinOps2 (CodeSeg* S);
 ** by something simpler.
 */
 
+unsigned OptTosLoadPop (CodeSeg* S);
+/* Merge jsr ldax0sp / jsr|jmp incsp2 into jsr|jmp popax */
 
+unsigned OptTosPushPop (CodeSeg* S);
+/* Merge jsr pushax/j?? popax */
 
 /* End of coptmisc.h */
 

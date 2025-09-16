@@ -14,8 +14,6 @@
         .import         addysp
         .importzp       c_sp
 
-        .macpack        cpu
-
 leave00:
         lda     #0
 leave0: ldx     #0
@@ -28,7 +26,7 @@ leavey0:
 leavey:
         jsr     addysp          ; drop stack frame
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
 
 leave:  tay                     ; save A a sec
         lda     (c_sp)          ; that's the pushed arg size

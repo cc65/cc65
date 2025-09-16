@@ -42,7 +42,6 @@
 
 /* common */
 #include "coll.h"
-#include "inline.h"
 
 /* cc65 */
 #include "datatype.h"
@@ -262,118 +261,74 @@ void DumpSymEntry (FILE* F, const SymEntry* E);
 int SymIsOutputFunc (const SymEntry* Sym);
 /* Return true if this is a function that must be output */
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsArray (const SymEntry* Sym)
+static inline int SymIsArray (const SymEntry* Sym)
 /* Return true if the given entry is an array entry */
 {
     return ((Sym->Flags & SC_TYPEMASK) == SC_ARRAY);
 }
-#else
-#  define SymIsArray(Sym)       (((Sym)->Flags & SC_TYPEMASK) == SC_ARRAY)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsBitField (const SymEntry* Sym)
+static inline int SymIsBitField (const SymEntry* Sym)
 /* Return true if the given entry is a bit-field entry */
 {
     return ((Sym->Flags & SC_TYPEMASK) == SC_BITFIELD);
 }
-#else
-#  define SymIsBitField(Sym)    (((Sym)->Flags & SC_TYPEMASK) == SC_BITFIELD)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsLabel (const SymEntry* Sym)
+static inline int SymIsLabel (const SymEntry* Sym)
 /* Return true if the given entry is a label entry */
 {
     return ((Sym)->Flags & SC_TYPEMASK) == SC_LABEL;
 }
-#else
-#  define SymIsLabel(Sym)       (((Sym)->Flags & SC_TYPEMASK) == SC_LABEL)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsTypeDef (const SymEntry* Sym)
+static inline int SymIsTypeDef (const SymEntry* Sym)
 /* Return true if the given entry is a typedef entry */
 {
     return ((Sym->Flags & SC_TYPEMASK) == SC_TYPEDEF);
 }
-#else
-#  define SymIsTypeDef(Sym)     (((Sym)->Flags & SC_TYPEMASK) == SC_TYPEDEF)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsDef (const SymEntry* Sym)
+static inline int SymIsDef (const SymEntry* Sym)
 /* Return true if the given entry is defined */
 {
     return ((Sym->Flags & SC_DEF) == SC_DEF);
 }
-#else
-#  define SymIsDef(Sym)     (((Sym)->Flags & SC_DEF) == SC_DEF)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsRef (const SymEntry* Sym)
+static inline int SymIsRef (const SymEntry* Sym)
 /* Return true if the given entry is referenced */
 {
     return ((Sym->Flags & SC_REF) == SC_REF);
 }
-#else
-#  define SymIsRef(Sym)     (((Sym)->Flags & SC_REF) == SC_REF)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymIsRegVar (const SymEntry* Sym)
+static inline int SymIsRegVar (const SymEntry* Sym)
 /* Return true if the given entry is a register variable */
 {
     return ((Sym->Flags & (SC_STORAGEMASK | SC_TYPEMASK)) == (SC_REGISTER | SC_NONE));
 }
-#else
-#  define SymIsRegVar(Sym)  (((Sym)->Flags & (SC_STORAGEMASK | SC_TYPEMASK)) == (SC_REGISTER | SC_NONE))
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymHasFlexibleArrayMember (const SymEntry* Sym)
+static inline int SymHasFlexibleArrayMember (const SymEntry* Sym)
 /* Return true if the given entry has a flexible array member */
 {
     return ((Sym->Flags & SC_HAVEFAM) == SC_HAVEFAM);
 }
-#else
-#  define SymHasFlexibleArrayMember(Sym)    (((Sym)->Flags & SC_HAVEFAM) == SC_HAVEFAM)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE int SymHasConstMember (const SymEntry* Sym)
+static inline int SymHasConstMember (const SymEntry* Sym)
 /* Return true if the given entry has a const member */
 {
     return ((Sym->Flags & SC_HAVECONST) == SC_HAVECONST);
 }
-#else
-#  define SymHasConstMember(Sym)    (((Sym)->Flags & SC_HAVECONST) == SC_HAVECONST)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE const char* SymGetAsmName (const SymEntry* Sym)
+static inline const char* SymGetAsmName (const SymEntry* Sym)
 /* Return the assembler label name for the symbol (beware: may be NULL!) */
 {
     return Sym->AsmName;
 }
-#else
-#  define SymGetAsmName(Sym)        ((Sym)->AsmName)
-#endif
 
 const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType);
 /* Return an attribute for this symbol or NULL if the attribute does not exist */
 
-#if defined(HAVE_INLINE)
-INLINE int SymHasAttr (const SymEntry* Sym, DeclAttrType A)
+static inline int SymHasAttr (const SymEntry* Sym, DeclAttrType A)
 /* Return true if the symbol has the given attribute */
 {
     return (SymGetAttr (Sym, A) != 0);
 }
-#else
-#  define SymHasAttr(Sym, A)       (SymGetAttr (Sym, A) != 0)
-#endif
 
 void SymUseAttr (SymEntry* Sym, struct Declarator* D);
 /* Use the attributes from the declarator for this symbol */

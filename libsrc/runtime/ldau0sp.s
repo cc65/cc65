@@ -7,8 +7,6 @@
         .export         ldau00sp, ldau0ysp
         .importzp       c_sp, ptr1
 
-        .macpack        cpu
-
 ldau00sp:
         ldy     #1
 ldau0ysp:
@@ -18,7 +16,7 @@ ldau0ysp:
         lda     (c_sp),y
         sta     ptr1
         ldx     #0
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (ptr1)          ; Save one cycle for the C02
 .else
         lda     (ptr1,x)

@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "attrib.h"
 #include "chartype.h"
 #include "check.h"
 #include "target.h"
@@ -242,7 +243,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "pce",            CPU_HUC6280,    BINFMT_BINARY,      CTNone  },
     { "gamate",         CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "c65",            CPU_4510,       BINFMT_BINARY,      CTPET   },
-    { "cx16",           CPU_65C02,      BINFMT_BINARY,      CTPET   },
+    { "cx16",           CPU_W65C02,     BINFMT_BINARY,      CTPET   },
     { "sym1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "mega65",         CPU_45GS02,     BINFMT_BINARY,      CTPET   },
     { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
@@ -301,4 +302,13 @@ const char* GetTargetName (target_t Target)
 {
     /* Return the array entry */
     return GetTargetProperties (Target)->Name;
+}
+
+
+
+int TargetHasCap (capability_t Cap attribute((unused)))
+/* Check if the current target has the given capability */
+{
+    /* Currently unused */
+    return 0;
 }

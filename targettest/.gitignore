@@ -1,0 +1,8 @@
+# general extra output
+*.lst
+*.map
+# executables
+*.prg
+*.xex
+*.bin
+*.com

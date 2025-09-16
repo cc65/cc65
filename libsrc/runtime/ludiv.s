@@ -9,10 +9,8 @@
         .import         addysp1
         .importzp       c_sp, sreg, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 
-        .macpack        cpu
-
 tosudiv0ax:
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_STZ)
         stz     sreg
         stz     sreg+1
 .else
@@ -38,7 +36,7 @@ getlop: sta     ptr3            ; Put right operand in place
         lda     sreg+1
         sta     ptr4+1
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         lda     (c_sp)
         ldy     #1
 .else

@@ -52,6 +52,7 @@
 /* ca65 */
 #include "condasm.h"
 #include "error.h"
+#include "expect.h"
 #include "filetab.h"
 #include "global.h"
 #include "incpath.h"
@@ -158,6 +159,8 @@ struct DotKeyword {
     { ".BSS",           TOK_BSS                 },
     { ".BYT",           TOK_BYTE                },
     { ".BYTE",          TOK_BYTE                },
+    { ".CAP",           TOK_CAP                 },
+    { ".CAPABILITY",    TOK_CAP                 },
     { ".CASE",          TOK_CASE                },
     { ".CHARMAP",       TOK_CHARMAP             },
     { ".CODE",          TOK_CODE                },
@@ -403,6 +406,16 @@ static void IFMarkStart (CharSource* S)
 static void IFNextChar (CharSource* S)
 /* Read the next character from the input file */
 {
+    /* if expanding macros the next input line gets pushed too early
+    ** to the output. So defer the push.
+    ** Its harmless to do it regardless of expansion or not
+    */
+    static int pending_line = 0;
+    if (pending_line) {
+        NewListingLine (&S->V.File.Line, S->V.File.Pos.Name, FCount);
+        pending_line = 0;
+    };
+
     /* Check for end of line, read the next line if needed */
     while (SB_GetIndex (&S->V.File.Line) >= SB_GetLen (&S->V.File.Line)) {
 
@@ -468,7 +481,8 @@ static void IFNextChar (CharSource* S)
         S->V.File.Pos.Line++;
 
         /* Remember the new line for the listing */
-        NewListingLine (&S->V.File.Line, S->V.File.Pos.Name, FCount);
+
+        pending_line = 1;
 
     }
 
@@ -543,7 +557,7 @@ int NewInputFile (const char* Name)
         /* Main file */
         F = fopen (Name, "r");
         if (F == 0) {
-            Fatal ("Cannot open input file '%s': %s", Name, strerror (errno));
+            Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
         }
     } else {
         /* We are on include level. Search for the file in the include
@@ -552,7 +566,7 @@ int NewInputFile (const char* Name)
         PathName = SearchFile (IncSearchPath, Name);
         if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
             /* Not found or cannot open, print an error and bail out */
-            Error ("Cannot open include file '%s': %s", Name, strerror (errno));
+            Error ("Cannot open include file `%s': %s", Name, strerror (errno));
             goto ExitPoint;
         }
 
@@ -569,7 +583,7 @@ int NewInputFile (const char* Name)
     ** here.
     */
     if (FileStat (Name, &Buf) != 0) {
-        Fatal ("Cannot stat input file '%s': %s", Name, strerror (errno));
+        Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
     }
 
     /* Add the file to the input file table and remember the index */
@@ -816,7 +830,7 @@ static void ReadStringConst (int StringTerm)
         int Cooked = 1;
         NeedNext = 1;
 
-        if (StringTerm == 0 && SB_GetLen(&CurTok.SVal) == 1) {
+        if (StringTerm == 0 && SB_GetLen (&CurTok.SVal) == 1) {
             if (C == '\'') {
                 break;
             }
@@ -899,12 +913,12 @@ static void ReadStringConst (int StringTerm)
                 case '7':
                     { /* brace needed for scoping */
                         int Count = 1;
-                        int Final = DigitVal(C);
+                        int Final = DigitVal (C);
                         Cooked = 0;
                         NextChar ();
                         while (IsODigit (C) && Count++ < 3) {
-                           Final = (Final << 3) | DigitVal(C);
-                           NextChar();
+                           Final = (Final << 3) | DigitVal (C);
+                           NextChar ();
                         }
                         if (C >= 256)
                             Error ("Octal character constant out of range");
@@ -1194,7 +1208,7 @@ Again:
                 /* Not found */
                 if (!LeadingDotInIdents) {
                     /* Invalid pseudo instruction */
-                    Error ("'%m%p' is not a recognized control command", &CurTok.SVal);
+                    Error ("`%m%p' is not a recognized control command", &CurTok.SVal);
                     goto Again;
                 }
 
@@ -1585,8 +1599,8 @@ CharAgain:
                 /* Always a character constant
                 ** Hack: Pass 0 to ReadStringConst for special handling.
                 */
-                ReadStringConst(0);
-                if (SB_GetLen(&CurTok.SVal) != 1) {
+                ReadStringConst (0);
+                if (SB_GetLen (&CurTok.SVal) != 1) {
                     Error ("Illegal character constant");
                     goto CharAgain;
                 }
@@ -1684,14 +1698,14 @@ unsigned char ParseAddrSize (void)
 
     /* Check for an identifier */
     if (CurTok.Tok != TOK_IDENT) {
-        Error ("Address size specifier expected");
+        ErrorExpect ("Expected an address size specifier");
         return ADDR_SIZE_DEFAULT;
     }
 
     /* Convert the attribute */
     AddrSize = AddrSizeFromStr (SB_GetConstBuf (&CurTok.SVal));
     if (AddrSize == ADDR_SIZE_INVALID) {
-        Error ("Address size specifier expected");
+        ErrorExpect ("Expected an address size specifier");
         AddrSize = ADDR_SIZE_DEFAULT;
     }
 

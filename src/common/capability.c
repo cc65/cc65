@@ -1,15 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 inline.h                                  */
+/*                               capability.c                                */
 /*                                                                           */
-/*              Definitions to use the inline compiler feature               */
+/*                     Handle CPU or target capabilities                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2005  Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2026,     Kugelfuhr                                                   */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,24 +30,62 @@
 
 
 
-#ifndef INLINE_H
-#define INLINE_H
+#include <stdlib.h>
+
+/* ca65 */
+#include "capability.h"
 
 
 
 /*****************************************************************************/
-/*                                  Defines                                  */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-#if defined(__GNUC__) && !defined(DISABLE_INLINE)
-#  define HAVE_INLINE   1
-#  define INLINE        static __inline__
-#endif
+/* List of dot keywords with the corresponding ids. */
+/* CAUTION: table must be sorted for bsearch. */
+struct Capability {
+    const char*         Key;
+    capability_t        Cap;
+} Capabilities [] = {
+/* BEGIN SORTED.SH */
+    { "CPU_HAS_BITIMM",         CAP_CPU_HAS_BITIMM      },
+    { "CPU_HAS_BRA8",           CAP_CPU_HAS_BRA8        },
+    { "CPU_HAS_INA",            CAP_CPU_HAS_INA         },
+    { "CPU_HAS_PUSHXY",         CAP_CPU_HAS_PUSHXY      },
+    { "CPU_HAS_STZ",            CAP_CPU_HAS_STZ         },
+    { "CPU_HAS_ZPIND",          CAP_CPU_HAS_ZPIND       },
+/* END SORTED.SH */
+};
+#define CAP_TABLE_SIZE (sizeof (Capabilities) / sizeof (Capabilities [0]))
 
 
 
-/* End of inline.h */
 
-#endif
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+static int CmpCapability (const void* K1, const void* K2)
+/* Compare function for the capability search */
+{
+    return strcmp (((struct Capability*)K1)->Key, ((struct Capability*)K2)->Key);
+}
+
+
+
+capability_t FindCapability (const char* Name)
+/* Find the capability with the given name. Returns CAP_INVALID if there is no
+** capability with the given name and a capability code >= 0 instead. The
+** capability name is expected in upper case.
+*/
+{
+    const struct Capability K = { Name, 0 };
+    const struct Capability* C = bsearch (&K, Capabilities, CAP_TABLE_SIZE,
+                                          sizeof (Capabilities [0]),
+                                          CmpCapability);
+    return (C == 0)? CAP_INVALID : C->Cap;
+}

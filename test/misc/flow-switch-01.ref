@@ -1,0 +1,5 @@
+flow-switch-01.c:7: Warning: Unreachable code
+flow-switch-01.c:48: Warning: Unreachable code
+flow-switch-01.c:62: Warning: Unreachable code
+flow-switch-01.c:75: Warning: Unreachable code
+flow-switch-01.c:96: Warning: Unreachable code

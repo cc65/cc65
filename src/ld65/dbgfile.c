@@ -107,7 +107,7 @@ void CreateDbgFile (void)
     /* Open the debug info file */
     FILE* F = fopen (DbgFileName, "w");
     if (F == 0) {
-        Error ("Cannot create debug file '%s': %s", DbgFileName, strerror (errno));
+        Error ("Cannot create debug file `%s': %s", DbgFileName, strerror (errno));
     }
 
     /* Output version information */
@@ -166,6 +166,6 @@ void CreateDbgFile (void)
 
     /* Close the file */
     if (fclose (F) != 0) {
-        Error ("Error closing debug file '%s': %s", DbgFileName, strerror (errno));
+        Error ("Error closing debug file `%s': %s", DbgFileName, strerror (errno));
     }
 }

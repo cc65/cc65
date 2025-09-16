@@ -40,7 +40,6 @@
 
 /* common */
 #include "coll.h"
-#include "inline.h"
 #include "objdefs.h"
 
 
@@ -136,15 +135,11 @@ const char* GetObjFileName (const ObjData* O);
 ** file is NULL.
 */
 
-#if defined(HAVE_INLINE)
-INLINE int ObjHasFiles (const ObjData* O)
+static inline int ObjHasFiles (const ObjData* O)
 /* Return true if the files list does exist */
 {
     return (O != 0 && CollCount (&O->Files) != 0);
 }
-#else
-#  define ObjHasFiles(O)       ((O) != 0 && CollCount (&(O)->Files) != 0)
-#endif
 
 const struct StrBuf* GetObjString (const ObjData* Obj, unsigned Id);
 /* Get a string from an object file checking for an invalid index */

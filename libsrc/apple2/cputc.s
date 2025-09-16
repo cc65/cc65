@@ -4,6 +4,8 @@
 ; void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
 ; void __fastcall__ cputc (char c);
 ;
+; Important note: The implementation of cputs() relies on the cputc() function
+; not clobbering ptr1. Beware when rewriting or changing this function!
 
         .constructor    initconio
         .export         _cputcxy, _cputc
@@ -17,8 +19,6 @@
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
-
-        .macpack        cpu
 
         .segment        "ONCE"
 

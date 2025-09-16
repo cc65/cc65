@@ -8,8 +8,6 @@
         .import         decsp2
         .importzp       c_sp
 
-        .macpack        cpu
-
 ; Convert TOS from int to long
 
 tosulong:
@@ -17,7 +15,7 @@ tosulong:
         jsr     decsp2          ; Make room
         ldy     #2
         lda     (c_sp),y
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sta     (c_sp)          ; 65C02 version
         iny                     ; Y = 3
 .else
@@ -43,7 +41,7 @@ toslong:
         jsr     decsp2          ; Make room
         ldy     #2
         lda     (c_sp),y
-.if (.cpu .bitand CPU_ISET_65SC02)
+.if .cap(CPU_HAS_ZPIND)
         sta     (c_sp)          ; 65C02 version
         iny                     ; Y = 3
 .else

@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "capability.h"
+
+
+
 /*****************************************************************************/
 /*                                   Data                                    */
 /*****************************************************************************/
@@ -64,7 +69,7 @@ typedef enum {
     CPU_COUNT                   /* Number of different CPUs */
 } cpu_t;
 
-/* CPU instruction sets (make sure this matches asminc/cpu.mac) */
+/* CPU instruction sets */
 enum {
     CPU_ISET_NONE       = 1 << CPU_NONE,
     CPU_ISET_6502       = 1 << CPU_6502,
@@ -106,6 +111,9 @@ cpu_t FindCPU (const char* Name);
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
 ** the given name is no valid target.
 */
+
+int CPUHasCap (capability_t Cap);
+/* Check if the current CPU has the given capability */
 
 
 

@@ -40,7 +40,6 @@
 
 /* common */
 #include "filepos.h"
-#include "inline.h"
 #include "strbuf.h"
 
 
@@ -53,76 +52,80 @@
 
 /* Tokens */
 typedef enum token_t {
-    TOK_NONE,           /* Start value, invalid */
-    TOK_EOF,            /* End of input file */
-    TOK_SEP,            /* Separator (usually newline) */
-    TOK_IDENT,          /* An identifier */
-    TOK_LOCAL_IDENT,    /* A cheap local identifier */
+    TOK_NONE,                   /* Start value, invalid */
+    TOK_EOF,                    /* End of input file */
+    TOK_SEP,                    /* Separator (usually newline) */
+    TOK_IDENT,                  /* An identifier */
+    TOK_LOCAL_IDENT,            /* A cheap local identifier */
 
-    TOK_INTCON,         /* Integer constant */
-    TOK_CHARCON,        /* Character constant */
-    TOK_STRCON,         /* String constant */
+    TOK_INTCON,                 /* Integer constant */
+    TOK_CHARCON,                /* Character constant */
+    TOK_STRCON,                 /* String constant */
 
-    TOK_A,              /* A)ccumulator */
-    TOK_X,              /* X register */
-    TOK_Y,              /* Y register */
-    TOK_Z,              /* Z register */
-    TOK_S,              /* S register */
-    TOK_Q,              /* Q pseudo register */
-    TOK_REG,            /* Sweet16 R.. register (in sweet16 mode) */
+    TOK_FIRSTREG,               /* First register name token */
+    TOK_A = TOK_FIRSTREG,       /* A)ccumulator */
+    TOK_Q,                      /* Q pseudo register */
+    TOK_S,                      /* S register */
+    TOK_X,                      /* X register */
+    TOK_Y,                      /* Y register */
+    TOK_Z,                      /* Z register */
+    TOK_REG,                    /* Sweet16 R.. register (in sweet16 mode) */
+    TOK_LASTREG = TOK_REG,      /* Last register name token */
 
-    TOK_ASSIGN,         /* := */
-    TOK_ULABEL,         /* An unnamed label */
+    TOK_ASSIGN,                 /* := */
+    TOK_ULABEL,                 /* An unnamed label */
 
-    TOK_EQ,             /* = */
-    TOK_NE,             /* <> */
-    TOK_LT,             /* < */
-    TOK_GT,             /* > */
-    TOK_LE,             /* <= */
-    TOK_GE,             /* >= */
+    TOK_FIRSTOP,                /* First operator token */
+    TOK_EQ = TOK_FIRSTOP,       /* = */
+    TOK_NE,                     /* <> */
+    TOK_LT,                     /* < */
+    TOK_GT,                     /* > */
+    TOK_LE,                     /* <= */
+    TOK_GE,                     /* >= */
 
-    TOK_BOOLAND,        /* .and */
-    TOK_BOOLOR,         /* .or */
-    TOK_BOOLXOR,        /* .xor */
-    TOK_BOOLNOT,        /* .not */
+    TOK_BOOLAND,                /* .and */
+    TOK_BOOLOR,                 /* .or */
+    TOK_BOOLXOR,                /* .xor */
+    TOK_BOOLNOT,                /* .not */
 
-    TOK_PLUS,           /* + */
-    TOK_MINUS,          /* - */
-    TOK_MUL,            /* * */
-    TOK_STAR = TOK_MUL, /* Alias */
-    TOK_DIV,            /* / */
-    TOK_MOD,            /* ! */
-    TOK_OR,             /* | */
-    TOK_XOR,            /* ^ */
-    TOK_AND,            /* & */
-    TOK_SHL,            /* << */
-    TOK_SHR,            /* >> */
-    TOK_NOT,            /* ~ */
+    TOK_PLUS,                   /* + */
+    TOK_MINUS,                  /* - */
+    TOK_MUL,                    /* * */
+    TOK_STAR = TOK_MUL,         /* Alias */
+    TOK_DIV,                    /* / */
+    TOK_MOD,                    /* ! */
+    TOK_OR,                     /* | */
+    TOK_XOR,                    /* ^ */
+    TOK_AND,                    /* & */
+    TOK_SHL,                    /* << */
+    TOK_SHR,                    /* >> */
+    TOK_NOT,                    /* ~ */
+    TOK_LASTOP = TOK_NOT,       /* Last operator token */
 
-    TOK_PC,             /* $ if enabled */
-    TOK_NAMESPACE,      /* :: */
-    TOK_DOT,            /* . */
-    TOK_COMMA,          /* , */
-    TOK_HASH,           /* # */
-    TOK_COLON,          /* : */
-    TOK_LPAREN,         /* ( */
-    TOK_RPAREN,         /* ) */
-    TOK_LBRACK,         /* [ */
-    TOK_RBRACK,         /* ] */
-    TOK_LCURLY,         /* { */
-    TOK_RCURLY,         /* } */
-    TOK_AT,             /* @ - in Sweet16 mode */
+    TOK_PC,                     /* $ if enabled */
+    TOK_NAMESPACE,              /* :: */
+    TOK_DOT,                    /* . */
+    TOK_COMMA,                  /* , */
+    TOK_HASH,                   /* # */
+    TOK_COLON,                  /* : */
+    TOK_LPAREN,                 /* ( */
+    TOK_RPAREN,                 /* ) */
+    TOK_LBRACK,                 /* [ */
+    TOK_RBRACK,                 /* ] */
+    TOK_LCURLY,                 /* { */
+    TOK_RCURLY,                 /* } */
+    TOK_AT,                     /* @ - in Sweet16 mode */
 
-    TOK_OVERRIDE_ZP,    /* z: */
-    TOK_OVERRIDE_ABS,   /* a: */
-    TOK_OVERRIDE_FAR,   /* f: */
+    TOK_OVERRIDE_ZP,            /* z: */
+    TOK_OVERRIDE_ABS,           /* a: */
+    TOK_OVERRIDE_FAR,           /* f: */
 
-    TOK_MACPARAM,       /* Macro parameter, not generated by scanner */
-    TOK_REPCOUNTER,     /* Repeat counter, not generated by scanner */
+    TOK_MACPARAM,               /* Macro parameter, not generated by scanner */
+    TOK_REPCOUNTER,             /* Repeat counter, not generated by scanner */
 
     /* The next ones are tokens for the pseudo instructions. Keep together! */
     TOK_FIRSTPSEUDO,
-    TOK_A16             = TOK_FIRSTPSEUDO,
+    TOK_A16 = TOK_FIRSTPSEUDO,
     TOK_A8,
     TOK_ADDR,
     TOK_ADDRSIZE,
@@ -137,6 +140,7 @@ typedef enum token_t {
     TOK_BLANK,
     TOK_BSS,
     TOK_BYTE,
+    TOK_CAP,
     TOK_CASE,
     TOK_CHARMAP,
     TOK_CODE,
@@ -283,9 +287,9 @@ typedef enum token_t {
     TOK_WORD,
     TOK_XMATCH,
     TOK_ZEROPAGE,
-    TOK_LASTPSEUDO      = TOK_ZEROPAGE,
+    TOK_LASTPSEUDO = TOK_ZEROPAGE,
 
-    TOK_COUNT           /* Count of tokens */
+    TOK_COUNT                   /* Count of tokens */
 } token_t;
 
 
@@ -317,26 +321,41 @@ struct Token {
 
 
 
-int TokHasSVal (token_t Tok);
+#if defined(HAVE_INLINE)
+INLINE int TokHasSVal (token_t Tok)
 /* Return true if the given token has an attached SVal */
-
-int TokHasIVal (token_t Tok);
-/* Return true if the given token has an attached IVal */
+{
+    return (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT || Tok == TOK_STRCON);
+}
+#else
+#  define TokHasSVal(T)   \
+    ((T) == TOK_IDENT || (T) == TOK_LOCAL_IDENT || (T) == TOK_STRCON)
+#endif
 
 #if defined(HAVE_INLINE)
-INLINE int TokIsSep (enum token_t T)
+INLINE int TokHasIVal (token_t Tok)
+/* Return true if the given token has an attached IVal */
+{
+    return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_REG);
+}
+#else
+#  define TokHasIVal(T)   \
+    ((T) == TOK_INTCON || (T) == TOK_CHARCON || (T) == TOK_REG)
+#endif
+
+static inline int TokIsSep (enum token_t T)
 /* Return true if this is a separator token */
 {
     return (T == TOK_SEP || T == TOK_EOF);
 }
-#else
-#  define TokIsSep(T)   ((T) == TOK_SEP || (T) == TOK_EOF)
-#endif
 
 void CopyToken (Token* Dst, const Token* Src);
 /* Copy a token. The current value of Dst.SVal is free'd, so Dst must be
 ** initialized.
 */
+
+StrBuf* TokenDesc (const Token* T, StrBuf* S);
+/* Place a textual description of the given token into S. */
 
 
 

@@ -83,25 +83,17 @@ CodeLabel* NewCodeLabel (const char* Name, unsigned Hash);
 void FreeCodeLabel (CodeLabel* L);
 /* Free the given code label */
 
-#if defined(HAVE_INLINE)
-INLINE unsigned CL_GetRefCount (const CodeLabel* L)
+static inline unsigned CL_GetRefCount (const CodeLabel* L)
 /* Get the number of references for this label */
 {
     return CollCount (&L->JumpFrom);
 }
-#else
-#  define CL_GetRefCount(L)     CollCount (&(L)->JumpFrom)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE struct CodeEntry* CL_GetRef (CodeLabel* L, unsigned Index)
+static inline struct CodeEntry* CL_GetRef (CodeLabel* L, unsigned Index)
 /* Get a code entry referencing this label */
 {
     return CollAt (&L->JumpFrom, Index);
 }
-#else
-#  define CL_GetRef(L, Index)   CollAt (&(L)->JumpFrom, (Index))
-#endif
 
 void CL_AddRef (CodeLabel* L, struct CodeEntry* E);
 /* Let the CodeEntry E reference the label L */

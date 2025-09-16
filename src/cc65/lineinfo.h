@@ -104,7 +104,7 @@ LineInfo* GetCurLineInfo (void);
 void UpdateCurrentLineInfo (const StrBuf* Line);
 /* Update the current line info - called if a new line is read */
 
-void RememberCheckedLI (struct LineInfo* LI);
+void RememberCheckedLI (LineInfo* LI);
 /* Remember the latest checked line info struct */
 
 LineInfo* GetPrevCheckedLI (void);

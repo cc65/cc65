@@ -9,8 +9,6 @@
         .import         __MAIN_START__
         .import         startup
 
-        .macpack        cpu
-
         .segment        "EXEHDR"
 
         .byte   $73, $69, $6D, $36, $35        ; 'sim65'

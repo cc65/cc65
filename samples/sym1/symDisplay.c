@@ -73,7 +73,7 @@ int main (void) {
 
          displayable = 1;              // Assume character is mapped
 
-         switch ( buffer[l] ) {        // Put the typed charaters
+         switch ( buffer[l] ) {        // Put the typed characters
             case '1':                  // into the display buffer
                DISPLAY.d6 = DISP_1;    // one at a time
                break;

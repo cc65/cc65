@@ -102,10 +102,7 @@ const char* GT_AsString (const StrBuf* Type, StrBuf* String)
 ** will be zero terminated and a pointer to the contents are returned.
 */
 {
-    static const char HexTab[16] = {
-        '0','1','2','3','4','5','6','7',
-        '8','9','A','B','C','D','E','F'
-    };
+    static const char HexTab[] = "0123456789ABCDEF";
     unsigned I;
 
     /* Convert Type into readable hex. String will have twice then length

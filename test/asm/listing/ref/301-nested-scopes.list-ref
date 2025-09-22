@@ -1,0 +1,12 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 301-nested-scopes.s
+Current file: 301-nested-scopes.s
+
+000000r 1                       .scope  outer
+000000r 1                               foo     = 2
+000000r 1                               .scope  inner
+000000r 1  A9 03                                lda     #foo
+000002r 1                                       foo     = 3
+000002r 1                               .endscope
+000002r 1                       .endscope
+000002r 1               

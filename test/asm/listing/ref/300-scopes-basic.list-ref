@@ -1,0 +1,21 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 300-scopes-basic.s
+Current file: 300-scopes-basic.s
+
+000000r 1               
+000000r 1                       .org $800
+000800  1               
+000800  1                       symbol1 := *                    ; ::symbol1
+000800  1  00 08                .addr symbol1                   ; ::symbol1
+000802  1               
+000802  1               
+000802  1               .scope scope1
+000802  1                       symbol1 := *                    ; ::scope1::symbol1
+000802  1               
+000802  1  02 08                .addr symbol1                   ; ::scope1::symbol1
+000804  1  00 08                .addr ::symbol1                 ; ::symbol1
+000806  1               .endscope
+000806  1               
+000806  1  00 08                .addr symbol1                   ; ::symbol1
+000808  1  02 08                .addr scope1::symbol1           ; ::scope1::symbol
+000808  1               

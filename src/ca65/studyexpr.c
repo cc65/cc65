@@ -646,10 +646,14 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
         ** about the address size, check higher lexical levels for a symbol
         ** with the same name and use its address size if we find such a
         ** symbol which is defined.
+        **
+        ** Only do the search if the symbol is not in the current scope,
+        ** assume scoped symbols can't be resolved in a different scope.
         */
         AddrSize = GetSymAddrSize (Sym);
         Parent = GetSymParentScope (Sym);
-        if (AddrSize == ADDR_SIZE_DEFAULT && Parent != 0) {
+        if (AddrSize == ADDR_SIZE_DEFAULT && Parent != 0 &&
+            Sym->Sym.Tab == CurrentScope) {
             SymEntry* H = SymFindAny (Parent, GetSymName (Sym));
             if (H) {
                 AddrSize = GetSymAddrSize (H);

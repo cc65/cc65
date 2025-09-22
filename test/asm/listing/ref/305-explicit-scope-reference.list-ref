@@ -1,0 +1,11 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 305-explicit-scope-reference.s
+Current file: 305-explicit-scope-reference.s
+
+000000r 1                       bar     = 3
+000000r 1               
+000000r 1                       .scope  foo
+000000r 1                               bar     = 2
+000000r 1  A9 03                        lda     #::bar  ; Access the global bar (which is 3)
+000002r 1                       .endscope
+000002r 1               

@@ -3192,7 +3192,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
     This feature makes relocatable/absolute mode local to the current segment.
     Using <tt><ref id=".ORG" name=".ORG"></tt> when <tt/org_per_seg/ is in
-    effect will only enable absolute mode for the current segment. Dito for
+    effect will only enable absolute mode for the current segment. Ditto for
     <tt><ref id=".RELOC" name=".RELOC"></tt>.
 
   <tag><tt>pc_assignment</tt><label id="pc_assignment"></tag>
@@ -3793,7 +3793,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
   This command may only be used inside a macro definition. It declares a list
   of identifiers as local to the macro expansion. The identifiers may be
-  standard identifiers or cheap local identifiers depending on the planed use.
+  standard identifiers or cheap local identifiers depending on the planned use.
 
   A problem when using macros are labels: Since they don't change their name,
   you get a "duplicate symbol" error if the macro is expanded the second time.

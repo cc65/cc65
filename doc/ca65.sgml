@@ -3792,7 +3792,7 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 <sect1><tt>.LOCAL</tt><label id=".LOCAL"><p>
 
   This command may only be used inside a macro definition. It declares a list
-  of identifiers as local to the macro expansion. The identifers may be
+  of identifiers as local to the macro expansion. The identifiers may be
   standard identifiers or cheap local identifiers depending on the planned use.
 
   A problem when using macros are labels: Since they don't change their name,

@@ -2,14 +2,14 @@
 #include <errno.h>
 #include <string.h>
 
-unsigned char __fastcall__ _sysrename (const char* oldpath, const char* newpath)
+int __fastcall__ _sysrename (const char* oldpath, const char* newpath)
 {
     size_t oldpathlen, newpathlen;
     oldpathlen = strlen (oldpath);
     newpathlen = strlen (newpath);
     if (oldpathlen + newpathlen > 510) {
-        RIA.errno_ = EINVAL;
-        return __mappederrno (RIA.errno_);
+        errno = EINVAL;
+        return -1;
     }
     while (oldpathlen) {
         ria_push_char (oldpath[--oldpathlen]);
@@ -18,5 +18,5 @@ unsigned char __fastcall__ _sysrename (const char* oldpath, const char* newpath)
     while (newpathlen) {
         ria_push_char (newpath[--newpathlen]);
     }
-    return ria_call_int_errno (RIA_OP_RENAME);
+    return ria_call_int (RIA_OP_RENAME);
 }

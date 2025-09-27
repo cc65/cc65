@@ -9,10 +9,8 @@
 .export _ria_pop_long, _ria_pop_int
 .export _ria_set_axsreg, _ria_set_ax
 .export _ria_call_int, _ria_call_long
-.export _ria_call_int_errno, _ria_call_long_errno
 
-.importzp c_sp, sreg
-.import ___mappederrno, incsp1
+.importzp sreg
 
 .code
 
@@ -69,21 +67,3 @@ _ria_call_long:
     ldy RIA_SREG+1
     sty sreg+1
     rts
-
-; int __fastcall__ ria_call_int_errno(unsigned char op);
-_ria_call_int_errno:
-    sta RIA_OP
-    jsr RIA_SPIN
-    ldx RIA_X
-    bmi ERROR
-    rts
-
-; long __fastcall__ ria_call_long_errno(unsigned char op);
-_ria_call_long_errno:
-    jsr _ria_call_long
-    bmi ERROR
-    rts
-
-ERROR:
-    lda RIA_ERRNO
-    jmp ___mappederrno

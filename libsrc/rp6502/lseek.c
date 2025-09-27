@@ -7,5 +7,5 @@ off_t __fastcall__ lseek (int fd, off_t offset, int whence)
     ria_push_long (offset);
     ria_push_char (whence);
     ria_set_ax (fd);
-    return ria_call_long_errno (RIA_OP_LSEEK);
+    return ria_call_long (RIA_OP_LSEEK);
 }

@@ -86,11 +86,6 @@ void __fastcall__ ria_set_ax (unsigned int ax);
 int __fastcall__ ria_call_int (unsigned char op);
 long __fastcall__ ria_call_long (unsigned char op);
 
-/* These run _mappederrno() on error */
-
-int __fastcall__ ria_call_int_errno (unsigned char op);
-long __fastcall__ ria_call_long_errno (unsigned char op);
-
 /* OS operation numbers */
 
 #define RIA_OP_EXIT 0xFF
@@ -100,6 +95,7 @@ long __fastcall__ ria_call_long_errno (unsigned char op);
 #define RIA_OP_CODEPAGE 0x03
 #define RIA_OP_LRAND 0x04
 #define RIA_OP_STDIN_OPT 0x05
+#define RIA_OP_ERRNO_OPT 0x06
 #define RIA_OP_CLOCK 0x0F
 #define RIA_OP_CLOCK_GETRES 0x10
 #define RIA_OP_CLOCK_GETTIME 0x11
@@ -124,6 +120,7 @@ int phi2 (void);
 int codepage (int);
 long lrand (void);
 int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length);
+int __fastcall__ errno_opt (unsigned char platform);
 int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);
 int __fastcall__ read_xram (unsigned buf, unsigned count, int fildes);
 int __fastcall__ write_xstack (const void* buf, unsigned count, int fildes);

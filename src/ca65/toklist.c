@@ -252,7 +252,7 @@ static int ReplayTokList (void* List)
 
     /* see description in macro.c */
     static int new_expand_line = 1;
-    if (ExpandMacros) {
+    if (ExpandMacros && SB_GetLen (&ListingName) > 0) {
         if (new_expand_line) {
             if (LineLast->FragList == 0 && ExpandMacros==1) {
                 LineCur->Output--;

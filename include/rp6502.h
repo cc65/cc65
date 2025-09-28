@@ -120,7 +120,6 @@ int phi2 (void);
 int codepage (int);
 long lrand (void);
 int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length);
-int __fastcall__ errno_opt (unsigned char platform);
 int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);
 int __fastcall__ read_xram (unsigned buf, unsigned count, int fildes);
 int __fastcall__ write_xstack (const void* buf, unsigned count, int fildes);

@@ -8,7 +8,7 @@
 
         .include        "rp6502.inc"
         .include        "errno.inc"
-        .export         ___errno, _errno_opt
+        .export         ___errno
         .import         _ria_call_int
         .constructor    _errno_opt_constructor
 
@@ -20,9 +20,6 @@ ___errno        := RIA_ERRNO
 ; Request the RIA use cc65 values for RIA_ERRNO
 _errno_opt_constructor:
         lda #$01 ; 1 = cc65
-
-; int __fastcall__ errno_opt (unsigned char platform);
-_errno_opt:
         sta RIA_A
         lda #RIA_OP_ERRNO_OPT
         jmp _ria_call_int

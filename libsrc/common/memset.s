@@ -81,13 +81,13 @@ L1:     .repeat 2               ; Unroll this a bit to make it faster
 ; Set the remaining bytes if any
 
 L2:     ldy     ptr3            ; Get the low byte of n
-        beq     leave           ; something to set? No -> leave
+        beq     @leave          ; something to set? No -> leave
 
-L3:     dey
+@L3:    dey
         sta     (ptr1),y                ; set bytes in low
         sta     (ptr2),y                ; and high section
-        bne     L3              ; flags still up to date from dey!
-leave:
+        bne     @L3             ; flags still up to date from dey!
+@leave:
         jmp     popax           ; Pop ptr and return as result
 
 

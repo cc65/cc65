@@ -27,26 +27,26 @@ _strspn:
 loadChar:
         ldy #0
         lda (ptr1),y        ; get next char from s1
-        beq leave           ; handly byte of s1
-advance:
+        beq @leave          ; handly byte of s1
+@advance:
         inc ptr1            ; advance string position to test
-        bne check
+        bne @check
         inc ptr1+1
         dey                 ; correct next iny (faster/shorter than bne...)
 
-checkNext:
+@checkNext:
         iny
-check:  cpy tmp1            ; compare with length of test character string
-        beq leave
+@check: cpy tmp1            ; compare with length of test character string
+        beq @leave
         cmp (ptr4),y        ; found matching char?
-        bne checkNext
+        bne @checkNext
 
-foundTestChar:
+@foundTestChar:
         inx
         bne loadChar
         inc tmp2
         bne loadChar        ; like bra...
 
-leave:  txa                 ; restore position of finding
+@leave: txa                 ; restore position of finding
         ldx tmp2            ; and return
         rts

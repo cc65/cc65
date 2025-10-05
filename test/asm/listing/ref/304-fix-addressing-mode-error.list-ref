@@ -1,0 +1,12 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 304-fix-addressing-mode-error.s
+Current file: 304-fix-addressing-mode-error.s
+
+000000r 1                       .scope  outer
+000000r 1                               foo     = $12
+000000r 1                               .scope  inner
+000000r 1  BD 34 12                             lda     a:foo,x
+000003r 1                                       foo     = $1234
+000003r 1                               .endscope
+000003r 1                       .endscope
+000003r 1               

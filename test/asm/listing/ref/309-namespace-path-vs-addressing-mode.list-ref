@@ -1,0 +1,21 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 309-namespace-path-vs-addressing-mode.s
+Current file: 309-namespace-path-vs-addressing-mode.s
+
+000000r 1               .org $2000
+002000  1               
+002000  1               .proc s1
+002000  1               
+002000  1                   symbol := $1
+002000  1               
+002000  1  8E 06 20         stx     s1::s2::symbol
+002003  1  8E 06 20         stx     s2_symbol
+002006  1               
+002006  1               .scope s2
+002006  1  00           symbol:    .byte   0
+002007  1               .endscope
+002007  1               
+002007  1               s2_symbol := s2::symbol
+002007  1               
+002007  1               .endproc
+002007  1               

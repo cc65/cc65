@@ -50,8 +50,28 @@ RIA_OP_READ_XRAM          := $17
 RIA_OP_WRITE_XSTACK       := $18
 RIA_OP_WRITE_XRAM         := $19
 RIA_OP_LSEEK              := $1A
+RIA_OP_LSEEK_CC65         := $1A
 RIA_OP_UNLINK             := $1B
 RIA_OP_RENAME             := $1C
+RIA_OP_LSEEK_LLVM         := $1D
+RIA_OP_SYNCFS             := $1E
+RIA_OP_STAT               := $1F
+RIA_OP_OPENDIR            := $20
+RIA_OP_READDIR            := $21
+RIA_OP_CLOSEDIR           := $22
+RIA_OP_TELLDIR            := $23
+RIA_OP_SEEKDIR            := $24
+RIA_OP_REWINDDIR          := $25
+RIA_OP_CHMOD              := $26
+RIA_OP_UTIME              := $27
+RIA_OP_MKDIR              := $28
+RIA_OP_CHDIR              := $29
+RIA_OP_CHDRIVE            := $2A
+RIA_OP_GETCWD             := $2B
+RIA_OP_SETLABEL           := $2C
+RIA_OP_GETLABEL           := $2D
+RIA_OP_GETFREE            := $2E
+
 
 ; 6522 VIA
 VIA             := $FFD0        ; VIA base address

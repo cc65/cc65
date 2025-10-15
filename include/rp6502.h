@@ -108,22 +108,58 @@ long __fastcall__ ria_call_long (unsigned char op);
 #define RIA_OP_WRITE_XSTACK 0x18
 #define RIA_OP_WRITE_XRAM 0x19
 #define RIA_OP_LSEEK 0x1A
+#define RIA_OP_LSEEK_CC65 0x1A
 #define RIA_OP_UNLINK 0x1B
 #define RIA_OP_RENAME 0x1C
+#define RIA_OP_LSEEK_LLVM 0x1D
+#define RIA_OP_SYNCFS 0x1E
+#define RIA_OP_STAT 0x1F
+#define RIA_OP_OPENDIR 0x20
+#define RIA_OP_READDIR 0x21
+#define RIA_OP_CLOSEDIR 0x22
+#define RIA_OP_TELLDIR 0x23
+#define RIA_OP_SEEKDIR 0x24
+#define RIA_OP_REWINDDIR 0x25
+#define RIA_OP_CHMOD 0x26
+#define RIA_OP_UTIME 0x27
+#define RIA_OP_MKDIR 0x28
+#define RIA_OP_CHDIR 0x29
+#define RIA_OP_CHDRIVE 0x2A
+#define RIA_OP_GETCWD 0x2B
+#define RIA_OP_SETLABEL 0x2C
+#define RIA_OP_GETLABEL 0x2D
+#define RIA_OP_GETFREE 0x2E
 
 /* C API for the operating system. */
+
+typedef struct {
+    unsigned long fsize;    /* File size (invalid for directory) */
+    unsigned fdate;         /* Date of file modification or directory creation */
+    unsigned ftime;         /* Time of file modification or directory creation */
+    unsigned crdate;        /* Date of object createion */
+    unsigned crtime;        /* Time of object createion */
+    unsigned char fattrib;  /* Object attribute */
+    char altname[12 + 1];   /* Alternative object name */
+    char fname[255 + 1];    /* Primary object name */
+} f_stat_t;
 
 int __cdecl__ xregn (char device, char channel, unsigned char address, unsigned count,
     ...);
 int __cdecl__ xreg (char device, char channel, unsigned char address, ...);
-int phi2 (void);
-int codepage (int);
-long lrand (void);
+int __fastcall__ phi2 (void);
+int __fastcall__ codepage (int);
+long __fastcall__ lrand (void);
 int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length);
 int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);
 int __fastcall__ read_xram (unsigned buf, unsigned count, int fildes);
 int __fastcall__ write_xstack (const void* buf, unsigned count, int fildes);
 int __fastcall__ write_xram (unsigned buf, unsigned count, int fildes);
+long __fastcall__ f_lseek (long offset, int whence, int fildes);
+int __fastcall__ f_stat (const char* path, f_stat_t* dirent);
+int __fastcall__ f_opendir (const char* name);
+int __fastcall__ f_readdir (f_stat_t *dirent, int dirdes);
+int __fastcall__ f_closedir (int dirdes);
+
 
 /* Time zone hack */
 

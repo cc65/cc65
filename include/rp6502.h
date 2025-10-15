@@ -133,14 +133,14 @@ long __fastcall__ ria_call_long (unsigned char op);
 /* C API for the operating system. */
 
 typedef struct {
-    unsigned long fsize;    /* File size (invalid for directory) */
-    unsigned fdate;         /* Date of file modification or directory creation */
-    unsigned ftime;         /* Time of file modification or directory creation */
-    unsigned crdate;        /* Date of object createion */
-    unsigned crtime;        /* Time of object createion */
-    unsigned char fattrib;  /* Object attribute */
-    char altname[12 + 1];   /* Alternative object name */
-    char fname[255 + 1];    /* Primary object name */
+    unsigned long fsize;
+    unsigned fdate;
+    unsigned ftime;
+    unsigned crdate;
+    unsigned crtime;
+    unsigned char fattrib;
+    char altname[12 + 1];
+    char fname[255 + 1];
 } f_stat_t;
 
 int __cdecl__ xregn (char device, char channel, unsigned char address, unsigned count,
@@ -157,8 +157,11 @@ int __fastcall__ write_xram (unsigned buf, unsigned count, int fildes);
 long __fastcall__ f_lseek (long offset, int whence, int fildes);
 int __fastcall__ f_stat (const char* path, f_stat_t* dirent);
 int __fastcall__ f_opendir (const char* name);
-int __fastcall__ f_readdir (f_stat_t *dirent, int dirdes);
+int __fastcall__ f_readdir (f_stat_t* dirent, int dirdes);
 int __fastcall__ f_closedir (int dirdes);
+long __fastcall__ f_telldir (int dirdes);
+int __fastcall__ f_seekdir (long offs, int dirdes);
+int __fastcall__ f_rewinddir (int dirdes);
 
 
 /* Time zone hack */

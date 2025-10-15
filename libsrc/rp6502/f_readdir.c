@@ -1,8 +1,6 @@
 #include <rp6502.h>
-#include <errno.h>
-#include <string.h>
 
-int __fastcall__ f_readdir (f_stat_t *dirent, int dirdes)
+int __fastcall__ f_readdir (f_stat_t* dirent, int dirdes)
 {
     int i, ax;
     ria_set_ax (dirdes);

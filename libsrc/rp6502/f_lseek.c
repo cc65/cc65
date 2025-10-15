@@ -1,5 +1,4 @@
 #include <rp6502.h>
-#include <unistd.h>
 
 long __fastcall__ f_lseek (long offset, int whence, int fildes)
 {

@@ -162,6 +162,14 @@ int __fastcall__ f_closedir (int dirdes);
 long __fastcall__ f_telldir (int dirdes);
 int __fastcall__ f_seekdir (long offs, int dirdes);
 int __fastcall__ f_rewinddir (int dirdes);
+int __fastcall__ f_chmod (const char* path, unsigned char attr, unsigned char mask);
+int __fastcall__ f_utime (const char* path, unsigned fdate, unsigned ftime, unsigned crdate, unsigned crtime);
+int __fastcall__ f_mkdir (const char* name);
+int __fastcall__ f_chdrive (const char* name);
+// int __fastcall__ f_getcwd(char* name, unsigned len);
+// int __fastcall__ f_setlabel(const char* name);
+// int __fastcall__ f_getlabel(const char* path, char* label);
+// int __fastcall__ f_getfree(const char* name);
 
 
 /* Time zone hack */

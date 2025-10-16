@@ -1,0 +1,23 @@
+ca65 Vx.xx - Git XXXXXXXXX
+Main file   : 307-scope-chains.s
+Current file: 307-scope-chains.s
+
+000000r 1                       .scope  foo
+000000r 1                               .scope  outer
+000000r 1                                       .scope  inner
+000000r 1                                               bar = 1
+000000r 1                                       .endscope
+000000r 1                               .endscope
+000000r 1                               .scope  another
+000000r 1                                       .scope  nested
+000000r 1  A9 01                                        lda     #outer::inner::bar      ; 1
+000002r 1                                       .endscope
+000002r 1                               .endscope
+000002r 1                       .endscope
+000002r 1               
+000002r 1                       .scope  outer
+000002r 1                               .scope  inner
+000002r 1                                       bar = 2
+000002r 1                               .endscope
+000002r 1                       .endscope
+000002r 1               

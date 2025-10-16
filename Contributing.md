@@ -16,7 +16,7 @@ have in mind is not how we'd expect it to be - talking to us
 before you start might save you a lot of work in those cases.
 
 (''Note:'' The word "must" indicates a requirement.  The word
- "should" indicates a recomendation.)
+ "should" indicates a recommendation.)
 
 *this is work in progress and is constantly updated - if in
 doubt, please ask*
@@ -54,7 +54,7 @@ This is an ongoing controversial topic - everyone knows
 that.  However, the following is how we do it :)
 
 * TAB characters must be expanded to spaces.
-* 4 spaces per indention level (rather than 8) are
+* 4 spaces per indentation level (rather than 8) are
   preferred, especially if there are many different levels.
 * No extra spaces at the end of lines.
 * All text files must end with new-line characters.  Don't
@@ -262,9 +262,9 @@ conform with the C standard. That means:
     .assert RETURN_VALUE = 0
     tax
 
-    ; Sometimes jumping to 'return 0' could save a byte:
+    ; Sometimes jumping to 'return0' could save a byte:
     .assert RETURN_VALUE = 0
-    jmp return 0
+    jmp return0
 ~~~
 
 * Functions, that are intended for a platform's system
@@ -300,7 +300,7 @@ conform with the C standard. That means:
   is on emulators or eg flash cartridges, the process of
   converting them to something that can be used with these
   should be documented in the user manual.
-* Generally every function should live in a seperate source
+* Generally every function should live in a separate source
   file - unless the functions are so closely related that
   splitting makes no sense.
 * Source files should not contain commented out code - if
@@ -342,7 +342,7 @@ to the github actions - those may rely on bash and/or linux tools.
 ## Compiler
 
 * We need a way that makes it possible to feed arbitrary
-  assembler code into the optimzer, so we can have proper
+  assembler code into the optimizer, so we can have proper
   tests for it.
 
 ### Floating point support

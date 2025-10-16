@@ -218,6 +218,8 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
         if (CurrentScope->Flags & ST_DEFINED) {
             Error ("Duplicate scope `%m%p'", ScopeName);
         }
+        /* Open the scope as we are entering it */
+        CurrentScope->Flags &= ~ST_CLOSED;
 
     } else {
         CurrentScope = RootScope = NewSymTable (0, ScopeName);
@@ -294,6 +296,8 @@ SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, SymFindAction Acti
     /* Create a new scope if requested and we didn't find one */
     if (*T == 0 && (Action & SYM_ALLOC_NEW) != 0) {
         *T = NewSymTable (Parent, Name);
+        /* Close the created scope, will be reopened if needed */
+        (*T)->Flags |= ST_CLOSED;
     }
 
     /* Return the scope */

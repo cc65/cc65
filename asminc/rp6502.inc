@@ -72,7 +72,6 @@ RIA_OP_SETLABEL           := $2C
 RIA_OP_GETLABEL           := $2D
 RIA_OP_GETFREE            := $2E
 
-
 ; 6522 VIA
 VIA             := $FFD0        ; VIA base address
 VIA_PB          := VIA+$0       ; Port register B

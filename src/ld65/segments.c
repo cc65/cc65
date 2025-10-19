@@ -236,6 +236,9 @@ Section* ReadSection (FILE* F, ObjData* O)
                      GetString (Name), Alignment, GetObjFileName (O));
         }
         S->Alignment = Alignment;
+        if (Sec->Fill != 0) {
+            Warning("Wasting %lu bytes for alignment from %s", Sec->Fill, GetObjFileName (O));
+        }
     }
 
     /* Start reading fragments from the file and insert them into the section . */

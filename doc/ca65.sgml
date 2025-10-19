@@ -2372,7 +2372,8 @@ Here's a list of all control commands and a description, what they do:
   calculated in advance by the assembler. You are therefore required to
   specify a matching alignment for the segment in the linker config. The
   linker will output a warning if the alignment of the segment is less than
-  what is necessary to have a correct alignment in the object file.
+  what is necessary to have a correct alignment in the object file. It will
+  also emit a warning to inform about the number of bytes wasted for alignment.
 
   Example:
 

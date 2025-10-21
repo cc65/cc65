@@ -284,30 +284,4 @@ typedef struct
     unsigned char has_opacity_metadata; // bool
 } vga_mode4_asprite_t;
 
-/* Values in __oserror are the union of these FatFs errors and errno.h */
-
-typedef enum
-{
-    FR_OK = 32,             /* Succeeded */
-    FR_DISK_ERR,            /* A hard error occurred in the low level disk I/O layer */
-    FR_INT_ERR,             /* Assertion failed */
-    FR_NOT_READY,           /* The physical drive cannot work */
-    FR_NO_FILE,             /* Could not find the file */
-    FR_NO_PATH,             /* Could not find the path */
-    FR_INVALID_NAME,        /* The path name format is invalid */
-    FR_DENIED,              /* Access denied due to prohibited access or directory full */
-    FR_EXIST,               /* Access denied due to prohibited access */
-    FR_INVALID_OBJECT,      /* The file/directory object is invalid */
-    FR_WRITE_PROTECTED,     /* The physical drive is write protected */
-    FR_INVALID_DRIVE,       /* The logical drive number is invalid */
-    FR_NOT_ENABLED,         /* The volume has no work area */
-    FR_NO_FILESYSTEM,       /* There is no valid FAT volume */
-    FR_MKFS_ABORTED,        /* The f_mkfs() aborted due to any problem */
-    FR_TIMEOUT,             /* Could not get a grant to access the volume within defined period */
-    FR_LOCKED,              /* The operation is rejected according to the file sharing policy */
-    FR_NOT_ENOUGH_CORE,     /* LFN working buffer could not be allocated */
-    FR_TOO_MANY_OPEN_FILES, /* Number of open files > FF_FS_LOCK */
-    FR_INVALID_PARAMETER    /* Given parameter is invalid */
-} FRESULT;
-
 #endif /* _RP6502_H */

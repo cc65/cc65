@@ -92,7 +92,7 @@ long __fastcall__ ria_call_long (unsigned char op);
 #define RIA_OP_ZXSTACK 0x00
 #define RIA_OP_XREG 0x01
 #define RIA_OP_PHI2 0x02
-#define RIA_OP_CODEPAGE 0x03
+#define RIA_OP_CODE_PAGE 0x03
 #define RIA_OP_LRAND 0x04
 #define RIA_OP_STDIN_OPT 0x05
 #define RIA_OP_ERRNO_OPT 0x06
@@ -147,7 +147,7 @@ int __cdecl__ xregn (char device, char channel, unsigned char address, unsigned 
     ...);
 int __cdecl__ xreg (char device, char channel, unsigned char address, ...);
 int __fastcall__ phi2 (void);
-int __fastcall__ codepage (int);
+int __fastcall__ code_page (int);
 long __fastcall__ lrand (void);
 int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length);
 int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);

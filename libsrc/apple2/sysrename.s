@@ -20,23 +20,17 @@ __sysrename:
         jsr     pushname_tos
         bne     oserr1
 
-        ; Save pushed oldname
+        ; Set pushed oldname
         lda     c_sp
         ldx     c_sp+1
-        sta     ptr3
-        stx     ptr3+1
+        sta     mliparam + MLI::RENAME::PATHNAME
+        stx     mliparam + MLI::RENAME::PATHNAME+1
 
         ; Restore and push newname
         lda     ptr2
         ldx     ptr2+1
         jsr     pushname
         bne     oserr2
-
-        ; Restore and set pushed oldname
-        lda     ptr3
-        ldx     ptr3+1
-        sta     mliparam + MLI::RENAME::PATHNAME
-        stx     mliparam + MLI::RENAME::PATHNAME+1
 
         ; Set pushed newname
         lda     c_sp

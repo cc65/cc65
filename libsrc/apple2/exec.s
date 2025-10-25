@@ -7,7 +7,7 @@
         .export         _exec
         .import         mli_file_info_direct
         .import         aux80col
-        .import         pushname, popname, popax, done, _exit
+        .import         pushname_tos, popname, popax, done, _exit
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -28,8 +28,7 @@ _exec:
         stx     ptr4+1
 
         ; Get and push name
-        jsr     popax
-        jsr     pushname
+        jsr     pushname_tos
         bne     oserr
 
         jsr     mli_file_info_direct

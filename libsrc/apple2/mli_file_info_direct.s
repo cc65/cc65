@@ -10,7 +10,7 @@
         ; filename stored on top of stack
         ; Returns with carry set on error, and sets errno
 mli_file_info_direct:
-        ; Set pushed name
+        ; Set pushed name from TOS
         lda     c_sp
         ldx     c_sp+1
         sta     mliparam + MLI::INFO::PATHNAME

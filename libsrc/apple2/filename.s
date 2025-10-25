@@ -4,13 +4,15 @@
 ; File name handling for ProDOS 8 file I/O
 ;
 
-        .export         pushname, popname
-        .import         subysp, addysp, decsp1
+        .export         pushname_tos, pushname, popname
+        .import         popax, subysp, addysp, decsp1
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
         .include        "mli.inc"
 
+pushname_tos:
+        jsr     popax
 pushname:
         sta     ptr1
         stx     ptr1+1

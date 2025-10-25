@@ -67,6 +67,9 @@ device: lda     #$00
 next:   jsr     RDKEY
         jsr     COUT
 
+        ; We'll need Y=0 in both branches below
+        ldy     #$00
+
         ; Clear hi bit and check for '\r'
         and     #$7F
         cmp     #$0D
@@ -74,13 +77,11 @@ next:   jsr     RDKEY
 
         ; Replace with '\n' and set count to zero
         lda     #$0A
-        ldy     #$00
         sty     ptr2
         sty     ptr2+1
 
         ; Put char into buf
-:       ldy     #$00
-        sta     (ptr1),y
+:       sta     (ptr1),y
 
         ; Increment pointer
         inc     ptr1

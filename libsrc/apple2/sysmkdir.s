@@ -5,7 +5,7 @@
 ;
 
         .export         __sysmkdir
-        .import         pushname, popname
+        .import         pushname_tos, popname
         .import         addysp, popax
 
         .include        "zeropage.inc"
@@ -18,8 +18,7 @@ __sysmkdir:
         jsr     addysp
 
         ; Get and push name
-        jsr     popax
-        jsr     pushname
+        jsr     pushname_tos
         bne     oserr
 
         ; Set pushed name

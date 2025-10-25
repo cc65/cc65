@@ -5,7 +5,7 @@
 ;
 
         .export         __sysrename
-        .import         pushname, popname
+        .import         pushname, pushname_tos, popname
         .import         popax
 
         .include        "zeropage.inc"
@@ -17,8 +17,7 @@ __sysrename:
         stx     ptr2+1
 
         ; Get and push oldname
-        jsr     popax
-        jsr     pushname
+        jsr     pushname_tos
         bne     oserr1
 
         ; Save pushed oldname

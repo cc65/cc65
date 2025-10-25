@@ -6,13 +6,13 @@
 ;
 
         .export         _file_set_type, _file_set_auxtype
-        .import         pushname, popname, mli_file_info_direct
+        .import         pushname_tos, popname, mli_file_info_direct
         .import         popa, popax
         .include        "zeropage.inc"
         .include        "errno.inc"
         .include        "mli.inc"
 
-new_value      = ptr2     ; ptr1 is used by pushname
+new_value      = ptr2     ; ptr1 is used by pushname_tos
 mod_flag       = tmp1
 
 UPDATE_TYPE    = $00
@@ -31,8 +31,7 @@ mli_update:
         sty     mod_flag
 
         ; Get pathname
-        jsr     popax
-        jsr     pushname
+        jsr     pushname_tos
         bne     oserr
 
         ; ProDOS 8 TechRef, 4.4.4: You should use

@@ -3,7 +3,7 @@
 ;
 
         .export         mli_file_info
-        .import         pushname, popname, mli_file_info_direct
+        .import         pushname_tos, popname, mli_file_info_direct
         .import         popax
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -13,9 +13,8 @@
         ; stored as C string in AX at top of stack
         ; Returns with carry set on error, and sets errno
 mli_file_info:
-        ; Get pathname
-        jsr     popax
-        jsr     pushname
+        ; Get pathname from top of stack
+        jsr     pushname_tos
         bne     oserr
 
         jsr     mli_file_info_direct

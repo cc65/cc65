@@ -9,7 +9,7 @@
         .constructor    raisefilelevel
         .destructor     closeallfiles, 5
 
-        .import         pushname, popname, __dos_type
+        .import         pushname_tos, popname, __dos_type
         .import         iobuf_alloc, iobuf_free
         .import         addysp, incsp4, incaxy, pushax, popax
 
@@ -87,8 +87,7 @@ found:  sty     tmp2
         sta     tmp3
 
         ; Get and push name
-        jsr     popax
-        jsr     pushname
+        jsr     pushname_tos
         bne     oserr1
 
         ; Set pushed name

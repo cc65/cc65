@@ -68,8 +68,7 @@ errno:  jsr     incsp4          ; Preserves A
         jmp     ___directerrno
 
         ; Save fdtab slot
-found:  tya
-        pha
+found:  sty     tmp2
 
         ; Alloc I/O buffer
         lda     #<(fdtab + FD::BUFFER)
@@ -81,15 +80,7 @@ found:  tya
         jsr     pushax          ; Preserves A
         ldx     #>$0400
         jsr     iobuf_alloc
-        tay                     ; Save errno code
-
-        ; Restore fdtab slot
-        pla
-        sta     tmp2            ; Save fdtab slot
-
-        ; Check for error
-        tya                     ; Restore errno code
-        bne     errno
+        bne     errno           ; Check for error
 
         ; Get and save flags
         jsr     popax

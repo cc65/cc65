@@ -9,7 +9,7 @@
         .constructor    raisefilelevel
         .destructor     closeallfiles, 5
 
-        .import         pushname_tos, popname, __dos_type
+        .import         pushname_tos, popname, mli_set_pathname_tos, __dos_type
         .import         iobuf_alloc, iobuf_free
         .import         addysp, incsp4, incaxy, pushax, popax
 
@@ -91,10 +91,7 @@ found:  sty     tmp2
         bne     oserr1
 
         ; Set pushed name
-        lda     c_sp
-        ldx     c_sp+1
-        sta     mliparam + MLI::OPEN::PATHNAME
-        stx     mliparam + MLI::OPEN::PATHNAME+1
+        jsr     mli_set_pathname_tos
 
         ; Check for create flag
         lda     tmp3            ; Restore flags

@@ -53,6 +53,13 @@ EOF_COUNT       = 2
 
         .struct MLI
                 .union
+                        ; Pseudo-struct to make clear that calls with a
+                        ; PATHNAME parameter always have PATHNAME in the
+                        ; same place
+                        .struct PATH
+                                PARAM_COUNT     .byte
+                                PATHNAME        .addr
+                        .endstruct
                         .struct RW_BLOCK
                                 PARAM_COUNT     .byte
                                 UNIT_NUM        .byte
@@ -129,6 +136,13 @@ EOF_COUNT       = 2
                         .endstruct
                 .endunion
         .endstruct
+
+        ; Assert that PATHNAME parameters is always at the same place
+        .assert MLI::CREATE::PATHNAME  = MLI::PATH::PATHNAME, error
+        .assert MLI::DESTROY::PATHNAME = MLI::PATH::PATHNAME, error
+        .assert MLI::INFO::PATHNAME    = MLI::PATH::PATHNAME, error
+        .assert MLI::PREFIX::PATHNAME  = MLI::PATH::PATHNAME, error
+        .assert MLI::OPEN::PATHNAME    = MLI::PATH::PATHNAME, error
 
         .global         mliparam
         .global         callmli

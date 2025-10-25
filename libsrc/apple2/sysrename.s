@@ -5,7 +5,7 @@
 ;
 
         .export         __sysrename
-        .import         pushname, pushname_tos, popname
+        .import         pushname, pushname_tos, mli_set_pathname_tos, popname
         .import         popax
 
         .include        "zeropage.inc"
@@ -21,10 +21,7 @@ __sysrename:
         bne     oserr1
 
         ; Set pushed oldname
-        lda     c_sp
-        ldx     c_sp+1
-        sta     mliparam + MLI::RENAME::PATHNAME
-        stx     mliparam + MLI::RENAME::PATHNAME+1
+        jsr     mli_set_pathname_tos
 
         ; Restore and push newname
         lda     ptr2

@@ -5,7 +5,7 @@
 ;
 
         .export         __syschdir
-        .import         pushname, popname
+        .import         pushname, popname, mli_set_pathname_tos
         .import         initcwd
 
         .include        "zeropage.inc"
@@ -17,10 +17,7 @@ __syschdir:
         bne     oserr
 
         ; Set pushed name
-        lda     c_sp
-        ldx     c_sp+1
-        sta     mliparam + MLI::PREFIX::PATHNAME
-        stx     mliparam + MLI::PREFIX::PATHNAME+1
+        jsr     mli_set_pathname_tos
 
         ; Change directory
         lda     #SET_PREFIX_CALL

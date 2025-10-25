@@ -5,7 +5,7 @@
 ;
 
         .export         __sysmkdir
-        .import         pushname_tos, popname
+        .import         pushname_tos, popname, mli_set_pathname_tos
         .import         addysp, popax
 
         .include        "zeropage.inc"
@@ -22,10 +22,7 @@ __sysmkdir:
         bne     oserr
 
         ; Set pushed name
-        lda     c_sp
-        ldx     c_sp+1
-        sta     mliparam + MLI::CREATE::PATHNAME
-        stx     mliparam + MLI::CREATE::PATHNAME+1
+        jsr     mli_set_pathname_tos
 
         ; Set all other parameters from template
         ldx     #(MLI::CREATE::CREATE_TIME+1) - (MLI::CREATE::PATHNAME+1) - 1

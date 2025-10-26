@@ -179,7 +179,9 @@ static void Usage (void)
             "  --start-addr addr\t\tSet the default start address\n"
             "  --start-group\t\t\tStart a library group\n"
             "  --target sys\t\t\tSet the target system\n"
-            "  --version\t\t\tPrint the linker version\n",
+            "  --version\t\t\tPrint the linker version\n"
+            "  --warn-align-waste\t\tPrint bytes \"wasted\" for alignment\n"
+            "  --warnings-as-errors\t\tTreat warnings as errors\n",
             ProgName);
 }
 
@@ -608,6 +610,15 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptWarnAlignWaste (const char* Opt attribute ((unused)),
+                               const char* Arg attribute ((unused)))
+/* Warn about bytes "wasted" for alignment */
+{
+    WarnAlignWaste = 1;
+}
+
+
+
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
 /* Generate an error if any warnings occur */
@@ -691,6 +702,7 @@ static void ParseCommandLine (void)
         { "--start-group",               0,      CmdlOptStartGroup       },
         { "--target",                    1,      CmdlOptTarget           },
         { "--version",                   0,      OptVersion              },
+        { "--warn-align-waste",          0,      OptWarnAlignWaste       },
         { "--warnings-as-errors",        0,      OptWarningsAsErrors     },
     };
 

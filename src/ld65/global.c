@@ -55,6 +55,7 @@ unsigned long StartAddr         = 0x200;    /* Start address */
 unsigned char VerboseMap        = 0;        /* Verbose map file */
 unsigned char AllowMultDef      = 0;        /* Allow multiple definitions */
 unsigned char LargeAlignment    = 0;        /* Don't warn about large alignments */
+unsigned char WarnAlignWaste    = 0;        /* Warn about "wasted" bytes when aligning */
 unsigned char WarningsAsErrors  = 0;        /* Error if any warnings */
 
 const char* MapFileName         = 0;        /* Name of the map file */

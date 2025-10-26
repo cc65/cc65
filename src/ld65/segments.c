@@ -236,8 +236,9 @@ Section* ReadSection (FILE* F, ObjData* O)
                      GetString (Name), Alignment, GetObjFileName (O));
         }
         S->Alignment = Alignment;
-        if (Sec->Fill != 0) {
-            Warning("Wasting %lu bytes for alignment from %s", Sec->Fill, GetObjFileName (O));
+        if (WarnAlignWaste && Sec->Fill != 0) {
+            Warning("%s: Wasting %lu bytes for `%s' alignment",
+                    GetObjFileName (O), Sec->Fill, GetString (Name));
         }
     }
 

@@ -133,6 +133,7 @@ Long options:
   --target sys                  Set the target system
   --verbose                     Increase verbosity
   --version                     Print the assembler version
+  --warn-align-waste            Print bytes "wasted" for alignment
   --warnings-as-errors          Treat warnings as errors
 ---------------------------------------------------------------------------
 </verb></tscreen>
@@ -405,6 +406,13 @@ Here is a description of all the command line options:
   even warn about such things like unused imported symbols. The default
   warning level is 1, and it would probably be silly to set it to
   something lower.
+
+
+  <label id="option--warn-align-waste">
+  <tag><tt>--warn-align-waste</tt></tag>
+
+  Warnings will be generated when alignment requirements cause emission of
+  fill bytes.
 
 
   <label id="option--warnings-as-errors">

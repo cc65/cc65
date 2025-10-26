@@ -313,7 +313,7 @@ void SegAlign (unsigned long Alignment, int FillVal)
 
         /* Calculate the number of fill bytes */
         Count = AlignCount (ActiveSeg->PC, Alignment);
-        if (Count != 0) {
+        if (WarnAlignWaste && Count != 0) {
             Warning(0, "Wasting %lu bytes for alignment", Count);
         }
     }

@@ -71,6 +71,9 @@
   <tag><htmlurl url="debugging.html" name="debugging.html"></tag>
   Debug programs, using the VICE emulator.
 
+  <tag><htmlurl url="decompression.html" name="decompression.html"></tag>
+  Information about 6502-friendly decompressors shipped in cc65's runtime.
+
 </descrip>
 
 

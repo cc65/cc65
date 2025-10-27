@@ -7,6 +7,7 @@
         .export         done, return
         .export         zpsave, rvsave, reset
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
+        .export         __STARTUP_SEGMENT_START__
 
         .import         initlib, _exit
         .import         zerobss, callmain
@@ -21,6 +22,7 @@
 
         .segment        "STARTUP"
 
+        __STARTUP_SEGMENT_START__ = *
         ; ProDOS TechRefMan, chapter 5.2.1:
         ; "For maximum interrupt efficiency, a system program should not
         ;  use more than the upper 3/4 of the stack."
@@ -36,6 +38,7 @@
 
         ; Push the command-line arguments; and, call main().
         jmp     callmain
+        __STARTUP_SEGMENT_SIZE__ = * - __STARTUP_SEGMENT_START__
 
 ; ------------------------------------------------------------------------
 

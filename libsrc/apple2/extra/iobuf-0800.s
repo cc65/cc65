@@ -2,12 +2,13 @@
 ; Oliver Schmidt, 15.09.2009
 ;
 ; ProDOS 8 I/O buffer management for memory between
-; location $0800 and the cc65 program start address
-;
+; location $0800 and the cc65 program start address,
+; ignoring the STARTUP segment that is outlived at the
+; time we can do I/O.
 
         .constructor    initiobuf
         .export         iobuf_alloc, iobuf_free
-        .import         __MAIN_START__
+        .import         __MAIN_START__, __STARTUP_SEGMENT_START__
         .import         incsp2, popptr1
 
         .include        "zeropage.inc"
@@ -18,7 +19,7 @@
 
 initiobuf:
         ; Convert end address highbyte to table index
-        lda     #>__MAIN_START__
+        lda     #>(__MAIN_START__+__STARTUP_SEGMENT_START__)
         sec
         sbc     #>$0800
         lsr

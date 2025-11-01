@@ -411,9 +411,6 @@ static void SetSys (const char* Sys)
 
     }
 
-    /* Define the symbols for evaluating .cpu */
-    DefineCpuSymbols ();
-
     /* Initialize the translation tables for the target system */
     TgtTranslateInit ();
 }
@@ -1253,6 +1250,9 @@ int main (int argc, char* argv [])
     if (MemoryModel == MMODEL_UNKNOWN) {
         SetMemoryModel (MMODEL_NEAR);
     }
+
+    /* Define the symbols for evaluating .cpu */
+    DefineCpuSymbols ();
 
     /* Set the default segment sizes according to the memory model */
     SetSegmentSizes ();

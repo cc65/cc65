@@ -38,7 +38,7 @@ char* __fastcall__ cgets (char* buffer, int size)
         /* Actually just the last column! */
         --w;
         cursor (1);
-        for (buffer[i] = '\0', --size; i < size; ) {
+        for (--size; i < size; ) {
             c = cgetc ();
             /* Handle CR/LF */
             if (strchr (CRLF, c)) {
@@ -47,10 +47,14 @@ char* __fastcall__ cgets (char* buffer, int size)
                 break;
             }
             /* Handle backspace */
-            if (c == '\b') {
+            if (c == '\b'
+#ifdef CH_DEL
+                || c == CH_DEL
+#endif
+            ) {
                 if (i > 0) {
                     /* Remove the character */
-                    buffer[--i] = '\0';
+                    --i;
                     /* Logic to account for line wrapping */
                     y = wherey ();
                     x = wherex ();
@@ -64,11 +68,11 @@ char* __fastcall__ cgets (char* buffer, int size)
             /* Handle regular characters */
             } else if (isprint (c)) {
                 cputc (c);
-                buffer[i] = c;
-                buffer[++i] = '\0';
+                buffer[i++] = c;
             }
         }
         cursor (0);
+        buffer[i] = '\0';
     }
 
     /* Done */

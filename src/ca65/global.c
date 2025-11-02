@@ -68,6 +68,7 @@ unsigned char LargeAlignment     = 0;   /* Don't warn about large alignments */
 unsigned char RelaxChecks        = 0;   /* Relax a few assembler checks */
 unsigned char StringEscapes      = 0;   /* Allow C-style escapes in strings */
 unsigned char LongJsrJmpRts      = 0;   /* Allow JSR/JMP/RTS as alias for JSL/JML/RTL */
+unsigned char WarnAlignWaste     = 0;   /* Warn about "wasted" bytes when aligning */
 unsigned char WarningsAsErrors   = 0;   /* Error if any warnings */
 unsigned char SegList            = 0;   /* Show segments in listing */
 unsigned char ExpandMacros       = 0;   /* Expand macros in listing */

@@ -897,9 +897,10 @@ static void Usage (void)
             "  --target sys\t\t\tSet the target system\n"
             "  --version\t\t\tPrint the version number\n"
             "  --verbose\t\t\tVerbose mode\n"
+            "  --warn-align-waste\t\tPrint bytes \"wasted\" for alignment\n"
+            "  --warnings-as-errors\t\tTreat warnings as errors\n"
             "  --zeropage-label name\t\tDefine and export a ZEROPAGE segment label\n"
-            "  --zeropage-name seg\t\tSet the name of the ZEROPAGE segment\n"
-            "  --warnings-as-errors\t\tTreat warnings as errors\n",
+            "  --zeropage-name seg\t\tSet the name of the ZEROPAGE segment\n",
             ProgName);
 }
 
@@ -1436,6 +1437,16 @@ static void OptZeropageName (const char* Opt attribute ((unused)), const char* A
 
 
 
+static void OptWarnAlignWaste (const char* Opt attribute ((unused)),
+                               const char* Arg attribute ((unused)))
+/* Handle the --warn-align-waste option */
+{
+    CmdAddArg (&CA65, "--warn-align-waste");
+    CmdAddArg (&LD65, "--warn-align-waste");
+}
+
+
+
 static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
                                  const char* Arg attribute ((unused)))
 /* Handle the --warnings-as-errors option */
@@ -1506,6 +1517,7 @@ int main (int argc, char* argv [])
         { "--version",             0, OptVersion            },
         { "--zeropage-label",      1, OptZeropageLabel      },
         { "--zeropage-name",       1, OptZeropageName       },
+        { "--warn-align-waste",    0, OptWarnAlignWaste     },
         { "--warnings-as-errors",  0, OptWarningsAsErrors   },
     };
 

@@ -2035,8 +2035,8 @@ unsigned CfgProcess (void)
                     if (M->FillLevel == 0 && NewAddr > Addr) {
                         PWarning (GetSourcePos (S->LI),
                                   "The first segment in memory area `%s' "
-                                  "needs fill bytes for alignment.",
-                                  GetString (M->Name));
+                                  "needs %lu fill bytes for alignment.",
+                                  GetString (M->Name), NewAddr - Addr);
                     }
 
                     /* Use the aligned address */

@@ -119,6 +119,8 @@ Long options:
   --target sys                  Set the target system
   --version                     Print the version number
   --verbose                     Verbose mode
+  --warn-align-waste            Print bytes "wasted" for alignment
+  --warnings-as-errors          Treat warnings as errors
   --zeropage-label name         Define and export a ZEROPAGE segment label
   --zeropage-name seg           Set the name of the ZEROPAGE segment
 ---------------------------------------------------------------------------

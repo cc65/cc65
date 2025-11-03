@@ -40,5 +40,11 @@ void __fastcall__ decompress_zx02 (const unsigned char* src, unsigned char* cons
  */
 
 
+void __fastcall__ decompress_zx02_fast (const unsigned char* src, unsigned char* const dst);
+/* Decompresses the source buffer into the destination buffer.
+** compress with zx02 input.bin output.zx02
+ */
+
+
 /* end of zx02.h */
 #endif

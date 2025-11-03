@@ -920,6 +920,7 @@ communication, see also <tt>testcode/lib/ser-test.c</tt>.
 
 <itemize>
 <item><ref id="decompress_zx02" name="decompress_zx02">
+<item><ref id="decompress_zx02_fast" name="decompress_zx02_fast">
 </itemize>
 
 
@@ -3573,6 +3574,28 @@ compressed than with ZX02.
 <item>The project and compressor can be found at <url url="https://github.com/dmsc/zx02">
 <item>ZX02 is the slowest decompressor shipped with cc65 runtime, but is also the
 smallest and has the best compression ratio.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>decompress_zx02_fast<label id="decompress_zx02_fast"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uncompress a ZX02 buffer.
+<tag/Header/<tt/<ref id="zx02.h" name="zx02.h">/
+<tag/Declaration/<tt/void decompress_zx02_fast (const unsigned char* src, unsigned char* const dst);/
+<tag/Description/<tt/decompress_zx02_fast/ uncompresses a ZX02 buffer with format 2.
+<tag/Notes/<itemize>
+<item>Use <tt/zx02 input.bin output.zx02/ to compress your input.
+<item>The project and compressor can be found at <url url="https://github.com/dmsc/zx02">
+<item>ZX02 is the slowest decompressor shipped with cc65 runtime, but is also the
+smallest and has the best compression ratio.
+<item><tt/decompress_zx02_fast/ is 9% faster than <tt/decompress_zx02/, but 34
+bytes bigger.
 </itemize>
 <tag/Availability/cc65
 <tag/Example/None.

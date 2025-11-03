@@ -1,0 +1,164 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>Decompressing data with cc65
+<author><url url="mailto:colin@colino.net" name="Colin Leroy-Mira">
+
+<abstract>
+How to decompress data using one of cc65's runtime decompressors.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+cc65 ships with multiple decompressors, each having pros and cons. This page
+will detail each of them, and how to use them.
+
+
+
+<sect>LZ4<p>
+
+The LZ4 format is widely known. It has a number of drawbacks, though:
+
+There are many LZ4 subformats available, and generating LZ4 data compatible
+with the cc65 decompressor requires some work. The cc65 decompressor works
+on raw LZ4 data with no header, which makes it difficult to generate compressed
+data simply using the <tt/lz4/ command-line utility.
+
+This also means that the function needs to be passed the expected decompressed
+size as argument. This makes generating compressed LZ4 data even harder.
+
+The simplest way to generate "correct" LZ4 data for the cc65 decompressor is
+to write a small C utility, like this one (example stripped of any error checking):
+<tscreen><verb>
+  FILE *fp;
+  size_t read_bytes, wrote_bytes;
+  char header[2];
+  char in_buf[MAX_COMPRESSED_DATA_SIZE*16];
+  char out_buf[MAX_COMPRESSED_DATA_SIZE];
+
+  fp = fopen(argv[1], "rb");
+  read_bytes = fread(in_buf, 1, sizeof(in_buf), fp);
+  fclose(fp);
+
+  wrote_bytes = LZ4_compress_HC(in_buf, out_buf, read_bytes, sizeof(out_buf), 16);
+  header[0] = (read_bytes & 0xFF);
+  header[1] = (read_bytes & 0xFFFF) >> 8;
+
+  fp = fopen("DATA.LZ4", "wb");
+  fwrite(header, 1, sizeof(header), fp);
+  fwrite(out_buf, 1, wrote_bytes, fp);
+  fclose(fp);
+</verb></tscreen>
+
+Decompressing in a cc65 program then looks like:
+<tscreen><verb>
+  int fd;
+  int decompressed_size;
+  char compressed[MAX_COMPRESSED_DATA_SIZE];
+  char destination[MAX_COMPRESSED_DATA_SIZE*16];
+
+  fd = open("DATA.LZ4", O_RDONLY);
+  read(fd, &amp;decompressed_size, sizeof(int));
+  read(fd, compressed, MAX_COMPRESSED_DATA_SIZE);
+  close(fd);
+
+  decompress_lz4(compressed, destination, decompressed_size);
+</verb></tscreen>
+
+<sect>LZSA<p>
+
+The LZSA formats come from Emmanuel Marty and has its code hosted in the
+<url url="https://github.com/emmanuel-marty/lzsa" name="Github LZSA repository">.
+
+Compressing data is simple, from a command-line or shell:
+<tscreen><verb>
+  lzsa -r -f 1 input.bin DATA.LZSA #For lzsa1 format
+  lzsa -r -f 2 input.bin DATA.LZSA #For lzsa2 format
+</verb></tscreen>
+
+Decompressing is then as simple as possible:
+<tscreen><verb>
+  int fd;
+  char compressed[MAX_COMPRESSED_DATA_SIZE];
+  char destination[MAX_COMPRESSED_DATA_SIZE*16];
+
+  fd = open("DATA.LZSA", O_RDONLY);
+  read(fd, compressed, MAX_COMPRESSED_DATA_SIZE);
+  close(fd);
+
+  decompress_lzsa1(compressed, destination);
+  // or
+  // decompress_lzsa2(compressed, destination);
+</verb></tscreen>
+
+<sect>ZX02<p>
+
+The ZX02 formats come from <tt/dmsc/ and has its code hosted in the
+<url url="https://github.com/dmsc/zx02" name="Github ZX02 repository">.
+
+Compressing data is simple, from a command-line or shell:
+<tscreen><verb>
+  zx02 -f input.bin DATA.ZX02
+</verb></tscreen>
+
+Decompressing is then as simple as possible:
+<tscreen><verb>
+  int fd;
+  char compressed[MAX_COMPRESSED_DATA_SIZE];
+  char destination[MAX_COMPRESSED_DATA_SIZE*16];
+
+  fd = open("DATA.ZX02", O_RDONLY);
+  read(fd, compressed, MAX_COMPRESSED_DATA_SIZE);
+  close(fd);
+
+  decompress_zx02(compressed, destination);
+</verb></tscreen>
+
+<sect>In-place decompression<p>
+
+As memory is often sparse in the cc65 targets, it is often possible to decompress
+data "in-place", requiring only the destination buffer and no compressed data
+buffer. But as the cc65 decompressors do not support backwards compressed data,
+it is necessary to have the compressed data at the <tt/end/ of the destination
+buffer, <tt/and/ that the destination buffer has a few extra bytes (8 are enough)
+so that decompressing does not overwrite the end of the compressed data too soon:
+
+<tscreen><verb>
+  #define BUFFER_SIZE = (MAX_UNCOMPRESSED_DATA_SIZE) + 8;
+
+  int fd;
+  int compressed_size;
+  char dest_buf[BUFFER_SIZE];
+  char *end_of_buf = dest_buf + BUFFER_SIZE;
+
+  fd = open("DATA.ZX02", O_RDONLY);
+  compressed_size = read(fd, dest_buf, MAX_UNCOMPRESSED_DATA_SIZE);
+  close(fd);
+  memmove(end_of_buf - compressed_size, dest_buf, compressed_size);
+  decompress_zx02(end_of_buf - compressed_size, dest_buf);
+</verb></tscreen>
+
+<sect>Which decompressor to choose<p>
+
+The best decompressor depends on your use-case and whether you favor size or
+speed. This table allows for a simple comparison.
+Decompression speed is the number of uncompressed bytes per second at 1MHz.
+
+<table><tabular ca="rrrr">
+<bf/Decompressor/|<bf/Approximate compression ratio/|<bf/Decompressor size/|<bf/Decompression speed/@<hline>
+<bf/LZ4/|40.7%|272 bytes|18.6kB/s@<hline>
+<bf/LZSA1/|46.3%|202 bytes|26.8kB/s@<hline>
+<bf/LZSA2/|52.1%|267 bytes|22.5kB/s@<hline>
+<bf/ZX02/|52.8%|138 bytes|16.3kB/s@<hline>
+<bf/ZX02 (fast)/|52.8%|172 bytes|18.2kB/s
+</tabular>
+</table>
+
+In short, if you want to have the smallest amount of data, go with ZX02. If you
+want the fastest decompression speed, go with LZSA1.
+</article>

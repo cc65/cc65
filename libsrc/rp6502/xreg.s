@@ -6,7 +6,7 @@
 
 .export _xreg
 .importzp c_sp
-.import addysp, _ria_call_int_errno
+.import addysp, _ria_call_int
 
 .include "rp6502.inc"
 
@@ -32,6 +32,6 @@
 
     ; run RIA operation
     lda #RIA_OP_XREG
-    jmp _ria_call_int_errno
+    jmp _ria_call_int
 
 .endproc

@@ -34,9 +34,10 @@ RIA_OP_EXIT               := $FF
 RIA_OP_ZXSTACK            := $00
 RIA_OP_XREG               := $01
 RIA_OP_PHI2               := $02
-RIA_OP_CODEPAGE           := $03
+RIA_OP_CODE_PAGE          := $03
 RIA_OP_LRAND              := $04
 RIA_OP_STDIN_OPT          := $05
+RIA_OP_ERRNO_OPT          := $06
 RIA_OP_CLOCK              := $0F
 RIA_OP_CLOCK_GETRES       := $10
 RIA_OP_CLOCK_GETTIME      := $11
@@ -49,8 +50,27 @@ RIA_OP_READ_XRAM          := $17
 RIA_OP_WRITE_XSTACK       := $18
 RIA_OP_WRITE_XRAM         := $19
 RIA_OP_LSEEK              := $1A
+RIA_OP_LSEEK_CC65         := $1A
 RIA_OP_UNLINK             := $1B
 RIA_OP_RENAME             := $1C
+RIA_OP_LSEEK_LLVM         := $1D
+RIA_OP_SYNCFS             := $1E
+RIA_OP_STAT               := $1F
+RIA_OP_OPENDIR            := $20
+RIA_OP_READDIR            := $21
+RIA_OP_CLOSEDIR           := $22
+RIA_OP_TELLDIR            := $23
+RIA_OP_SEEKDIR            := $24
+RIA_OP_REWINDDIR          := $25
+RIA_OP_CHMOD              := $26
+RIA_OP_UTIME              := $27
+RIA_OP_MKDIR              := $28
+RIA_OP_CHDIR              := $29
+RIA_OP_CHDRIVE            := $2A
+RIA_OP_GETCWD             := $2B
+RIA_OP_SETLABEL           := $2C
+RIA_OP_GETLABEL           := $2D
+RIA_OP_GETFREE            := $2E
 
 ; 6522 VIA
 VIA             := $FFD0        ; VIA base address
@@ -72,27 +92,3 @@ VIA_PCR         := VIA+$C       ; Peripheral control register
 VIA_IFR         := VIA+$D       ; Interrupt flag register
 VIA_IER         := VIA+$E       ; Interrupt enable register
 VIA_PA2         := VIA+$F       ; Port register A w/o handshake
-
-; Values in ___oserror are the union of these FatFs errors and errno.inc
-.enum
-    FR_OK = 32             ; Succeeded
-    FR_DISK_ERR            ; A hard error occurred in the low level disk I/O layer
-    FR_INT_ERR             ; Assertion failed
-    FR_NOT_READY           ; The physical drive cannot work
-    FR_NO_FILE             ; Could not find the file
-    FR_NO_PATH             ; Could not find the path
-    FR_INVALID_NAME        ; The path name format is invalid
-    FR_DENIED              ; Access denied due to prohibited access or directory full
-    FR_EXIST               ; Access denied due to prohibited access
-    FR_INVALID_OBJECT      ; The file/directory object is invalid
-    FR_WRITE_PROTECTED     ; The physical drive is write protected
-    FR_INVALID_DRIVE       ; The logical drive number is invalid
-    FR_NOT_ENABLED         ; The volume has no work area
-    FR_NO_FILESYSTEM       ; There is no valid FAT volume
-    FR_MKFS_ABORTED        ; The f_mkfs() aborted due to any problem
-    FR_TIMEOUT             ; Could not get a grant to access the volume within defined period
-    FR_LOCKED              ; The operation is rejected according to the file sharing policy
-    FR_NOT_ENOUGH_CORE     ; LFN working buffer could not be allocated
-    FR_TOO_MANY_OPEN_FILES ; Number of open files > FF_FS_LOCK
-    FR_INVALID_PARAMETER   ; Given parameter is invalid
-.endenum

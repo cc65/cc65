@@ -46,6 +46,6 @@ _exit:
     sta RIA_A
     plx
     stx RIA_X
-    lda #$FF     ; exit()
+    lda #RIA_OP_EXIT
     sta RIA_OP
     stp

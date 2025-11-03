@@ -47,7 +47,7 @@ struct __RP6502
     unsigned char step1;
     unsigned int addr1;
     unsigned char xstack;
-    unsigned int errno;
+    unsigned int errno_;
     unsigned char op;
     unsigned char irq;
     const unsigned char spin;
@@ -86,20 +86,16 @@ void __fastcall__ ria_set_ax (unsigned int ax);
 int __fastcall__ ria_call_int (unsigned char op);
 long __fastcall__ ria_call_long (unsigned char op);
 
-/* These run _mappederrno() on error */
-
-int __fastcall__ ria_call_int_errno (unsigned char op);
-long __fastcall__ ria_call_long_errno (unsigned char op);
-
 /* OS operation numbers */
 
 #define RIA_OP_EXIT 0xFF
 #define RIA_OP_ZXSTACK 0x00
 #define RIA_OP_XREG 0x01
 #define RIA_OP_PHI2 0x02
-#define RIA_OP_CODEPAGE 0x03
+#define RIA_OP_CODE_PAGE 0x03
 #define RIA_OP_LRAND 0x04
 #define RIA_OP_STDIN_OPT 0x05
+#define RIA_OP_ERRNO_OPT 0x06
 #define RIA_OP_CLOCK 0x0F
 #define RIA_OP_CLOCK_GETRES 0x10
 #define RIA_OP_CLOCK_GETTIME 0x11
@@ -112,27 +108,78 @@ long __fastcall__ ria_call_long_errno (unsigned char op);
 #define RIA_OP_WRITE_XSTACK 0x18
 #define RIA_OP_WRITE_XRAM 0x19
 #define RIA_OP_LSEEK 0x1A
+#define RIA_OP_LSEEK_CC65 0x1A
 #define RIA_OP_UNLINK 0x1B
 #define RIA_OP_RENAME 0x1C
+#define RIA_OP_LSEEK_LLVM 0x1D
+#define RIA_OP_SYNCFS 0x1E
+#define RIA_OP_STAT 0x1F
+#define RIA_OP_OPENDIR 0x20
+#define RIA_OP_READDIR 0x21
+#define RIA_OP_CLOSEDIR 0x22
+#define RIA_OP_TELLDIR 0x23
+#define RIA_OP_SEEKDIR 0x24
+#define RIA_OP_REWINDDIR 0x25
+#define RIA_OP_CHMOD 0x26
+#define RIA_OP_UTIME 0x27
+#define RIA_OP_MKDIR 0x28
+#define RIA_OP_CHDIR 0x29
+#define RIA_OP_CHDRIVE 0x2A
+#define RIA_OP_GETCWD 0x2B
+#define RIA_OP_SETLABEL 0x2C
+#define RIA_OP_GETLABEL 0x2D
+#define RIA_OP_GETFREE 0x2E
 
 /* C API for the operating system. */
+
+typedef struct {
+    unsigned long fsize;
+    unsigned fdate;
+    unsigned ftime;
+    unsigned crdate;
+    unsigned crtime;
+    unsigned char fattrib;
+    char altname[12 + 1];
+    char fname[255 + 1];
+} f_stat_t;
 
 int __cdecl__ xregn (char device, char channel, unsigned char address, unsigned count,
     ...);
 int __cdecl__ xreg (char device, char channel, unsigned char address, ...);
-int phi2 (void);
-int codepage (void);
-long lrand (void);
+int __fastcall__ phi2 (void);
+int __fastcall__ code_page (int);
+long __fastcall__ lrand (void);
 int __fastcall__ stdin_opt (unsigned long ctrl_bits, unsigned char str_length);
 int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);
 int __fastcall__ read_xram (unsigned buf, unsigned count, int fildes);
 int __fastcall__ write_xstack (const void* buf, unsigned count, int fildes);
 int __fastcall__ write_xram (unsigned buf, unsigned count, int fildes);
+long __fastcall__ f_lseek (long offset, int whence, int fildes);
+int __fastcall__ f_stat (const char* path, f_stat_t* dirent);
+int __fastcall__ f_opendir (const char* name);
+int __fastcall__ f_readdir (f_stat_t* dirent, int dirdes);
+int __fastcall__ f_closedir (int dirdes);
+long __fastcall__ f_telldir (int dirdes);
+int __fastcall__ f_seekdir (long offs, int dirdes);
+int __fastcall__ f_rewinddir (int dirdes);
+int __fastcall__ f_chmod (const char* path, unsigned char attr, unsigned char mask);
+int __fastcall__ f_utime (const char* path, unsigned fdate, unsigned ftime, unsigned crdate, unsigned crtime);
+int __fastcall__ f_mkdir (const char* name);
+int __fastcall__ f_chdrive (const char* name);
+int __fastcall__ f_getcwd (char* name, int size);
+int __fastcall__ f_setlabel (const char* name);
+int __fastcall__ f_getlabel (const char* path, char* label);
+int __fastcall__ f_getfree (const char* name, unsigned long* free, unsigned long* total);
+
+/* Time zone hack */
+
+void ria_tzset (unsigned long time);
 
 /* XREG location helpers */
 
 #define xreg_ria_keyboard(...) xreg(0, 0, 0, __VA_ARGS__)
 #define xreg_ria_mouse(...) xreg(0, 0, 1, __VA_ARGS__)
+#define xreg_ria_gamepad(...) xreg(0, 0, 2, __VA_ARGS__)
 #define xreg_vga_canvas(...) xreg(1, 0, 0, __VA_ARGS__)
 #define xreg_vga_mode(...) xreg(1, 0, 1, __VA_ARGS__)
 
@@ -236,31 +283,5 @@ typedef struct
     unsigned char log_size;
     unsigned char has_opacity_metadata; // bool
 } vga_mode4_asprite_t;
-
-/* Values in __oserror are the union of these FatFs errors and errno.h */
-
-typedef enum
-{
-    FR_OK = 32,             /* Succeeded */
-    FR_DISK_ERR,            /* A hard error occurred in the low level disk I/O layer */
-    FR_INT_ERR,             /* Assertion failed */
-    FR_NOT_READY,           /* The physical drive cannot work */
-    FR_NO_FILE,             /* Could not find the file */
-    FR_NO_PATH,             /* Could not find the path */
-    FR_INVALID_NAME,        /* The path name format is invalid */
-    FR_DENIED,              /* Access denied due to prohibited access or directory full */
-    FR_EXIST,               /* Access denied due to prohibited access */
-    FR_INVALID_OBJECT,      /* The file/directory object is invalid */
-    FR_WRITE_PROTECTED,     /* The physical drive is write protected */
-    FR_INVALID_DRIVE,       /* The logical drive number is invalid */
-    FR_NOT_ENABLED,         /* The volume has no work area */
-    FR_NO_FILESYSTEM,       /* There is no valid FAT volume */
-    FR_MKFS_ABORTED,        /* The f_mkfs() aborted due to any problem */
-    FR_TIMEOUT,             /* Could not get a grant to access the volume within defined period */
-    FR_LOCKED,              /* The operation is rejected according to the file sharing policy */
-    FR_NOT_ENOUGH_CORE,     /* LFN working buffer could not be allocated */
-    FR_TOO_MANY_OPEN_FILES, /* Number of open files > FF_FS_LOCK */
-    FR_INVALID_PARAMETER    /* Given parameter is invalid */
-} FRESULT;
 
 #endif /* _RP6502_H */

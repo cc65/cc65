@@ -2,16 +2,15 @@
 #include <errno.h>
 #include <string.h>
 
-int __fastcall__ _sysremove (const char* name)
+int __fastcall__ f_mkdir (const char* name)
 {
-    size_t namelen;
-    namelen = strlen (name);
+    size_t namelen = strlen (name);
     if (namelen > 255) {
-        RIA.errno_ = EINVAL;
+        errno = EINVAL;
         return -1;
     }
     while (namelen) {
         ria_push_char (name[--namelen]);
     }
-    return ria_call_int (RIA_OP_UNLINK);
+    return ria_call_int (RIA_OP_MKDIR);
 }

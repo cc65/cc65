@@ -934,7 +934,7 @@ it is used. It uses the <tt><ref id=".SPRINTF" name=".SPRINTF"></tt> function
 and a numeric variable named <tt>lcount</tt>.
 
 <tscreen><verb>
-        .lcount .set 0          ; Initialize the counter
+        lcount  .set 0          ; Initialize the counter
 
         .macro  genlab
                 .ident (.sprintf ("L%04X", lcount)):

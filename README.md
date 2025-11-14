@@ -36,7 +36,7 @@ the [cc65 web site](https://cc65.github.io):
 | Ohio Scientific         | OSI C1P                             |
 | MOS Technology, Inc.    | KIM-1                               |
 | NEC                     | PC Engine (PCE)                     |
-| Dr. Jozo Dujmović       | Picocomputer (RP6502)               |
+| Rumbledethumps          | Picocomputer 6502 (RP6502)          |
 | Watara                  | Watura/QuickShot Supervision        |
 | Synertek                | SYM-1                               |
 | USSR                    | Agat-7/9                            |
@@ -74,7 +74,7 @@ enhanced by James E. Hendrix.
 * [Stephan Mühlstrasser](https://github.com/smuehlst): osic1p target
 * [Wayne Parham](https://github.com/WayneParham): Sym-1 target
 * [Dave Plummer](https://github.com/davepl): KIM-1 target
-* [rumbledethumps](https://github.com/rumbledethumps): Picocomputer target
+* [Rumbledethumps](https://github.com/rumbledethumps): RP6502 target
 
 *(The above list is incomplete, if you feel left out - please speak up or add yourself in a PR)*
 

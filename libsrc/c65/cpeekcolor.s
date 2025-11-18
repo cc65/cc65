@@ -20,15 +20,15 @@ _cpeekcolor:
 
         php
         sei
-        lda     $d030
+        lda     $D030
         ora     #$01
-        sta     $d030
+        sta     $D030
         ldy     #0
         lda     (ptr1),y
         tay
-        lda     $d030
-        and     #$fe
-        sta     $d030
+        lda     $D030
+        and     #$FE
+        sta     $D030
         plp
         tya
 

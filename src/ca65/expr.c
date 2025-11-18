@@ -146,7 +146,7 @@ static void FreeExprNode (ExprNode* E)
 
 
 
-static ExprNode* Expr0 (void);
+static ExprNode* Expr1 (void);
 
 
 
@@ -1106,6 +1106,18 @@ static ExprNode* Factor (void)
             NextTok ();
             break;
 
+        case TOK_BOOLNOT:
+            NextTok ();
+            L = Expr1 ();
+            if (IsEasyConst (L, &Val)) {
+                FreeExpr (L);
+                N = GenLiteralExpr (!Val);
+            } else {
+                N = NewExprNode (EXPR_BOOLNOT);
+                N->Left = L;
+            }
+            break;
+
         case TOK_PLUS:
             NextTok ();
             N = Factor ();
@@ -1159,7 +1171,7 @@ static ExprNode* Factor (void)
 
         case TOK_LPAREN:
             NextTok ();
-            N = Expr0 ();
+            N = Expr1 ();
             ConsumeRParen ();
             break;
 
@@ -1652,51 +1664,12 @@ static ExprNode* Expr1 (void)
 
 
 
-static ExprNode* Expr0 (void)
-/* Boolean operators: NOT */
-{
-    ExprNode* Root;
-
-    /* Handle booleans */
-    if (CurTok.Tok == TOK_BOOLNOT) {
-
-        long Val;
-        ExprNode* Left;
-
-        /* Skip the operator token */
-        NextTok ();
-
-        /* Read the argument */
-        Left = Expr0 ();
-
-        /* If the argument is const, evaluate it directly */
-        if (IsEasyConst (Left, &Val)) {
-            FreeExpr (Left);
-            Root = GenLiteralExpr (!Val);
-        } else {
-            Root = NewExprNode (EXPR_BOOLNOT);
-            Root->Left = Left;
-        }
-
-    } else {
-
-        /* Read left hand side */
-        Root = Expr1 ();
-
-    }
-
-    /* Return the expression tree we've created */
-    return Root;
-}
-
-
-
 ExprNode* Expression (void)
 /* Evaluate an expression, build the expression tree on the heap and return
 ** a pointer to the root of the tree.
 */
 {
-    return Expr0 ();
+    return Expr1 ();
 }
 
 

@@ -119,12 +119,12 @@ putchar:
         php
         sei
         lda     $D030
+        pha
         ora     #$01
         sta     $D030
         lda     CHARCOLOR
         sta     (ptr4),y    ; Set color
-        lda     $D030
-        and     #$FE
+        pla
         sta     $D030
         plp
 

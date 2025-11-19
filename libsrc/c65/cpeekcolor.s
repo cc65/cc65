@@ -21,13 +21,13 @@ _cpeekcolor:
         php
         sei
         lda     $D030
+        pha
         ora     #$01
         sta     $D030
         ldy     #0
         lda     (ptr1),y
         tay
-        lda     $D030
-        and     #$FE
+        pla
         sta     $D030
         plp
         tya

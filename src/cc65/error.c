@@ -109,8 +109,6 @@ static WarnMapEntry WarnMap[] = {
     { &WarnUnusedVar,           "unused-var"            },
 };
 
-Collection DiagnosticStrBufs;
-
 
 
 /*****************************************************************************/
@@ -587,36 +585,3 @@ void ErrorReport (void)
 
 
 
-/*****************************************************************************/
-/*                              Tracked StrBufs                              */
-/*****************************************************************************/
-
-
-
-void InitDiagnosticStrBufs (void)
-/* Init tracking string buffers used for diagnostics */
-{
-    InitCollection (&DiagnosticStrBufs);
-}
-
-
-
-void DoneDiagnosticStrBufs (void)
-/* Done with tracked string buffers used for diagnostics */
-{
-    unsigned I;
-    for (I = 0; I < CollCount (&DiagnosticStrBufs); ++I) {
-        SB_Done (CollAtUnchecked (&DiagnosticStrBufs, I));
-    }
-    DoneCollection (&DiagnosticStrBufs);
-}
-
-
-
-struct StrBuf* NewDiagnosticStrBuf (void)
-/* Get a new tracked string buffer */
-{
-    StrBuf *Buf = NewStrBuf ();
-    CollAppend (&DiagnosticStrBufs, Buf);
-    return Buf;
-}

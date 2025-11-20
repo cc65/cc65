@@ -63,6 +63,7 @@
 #include "incpath.h"
 #include "input.h"
 #include "macrotab.h"
+#include "mngdstrbuf.h"
 #include "output.h"
 #include "scanner.h"
 #include "segments.h"
@@ -1237,9 +1238,6 @@ int main (int argc, char* argv[])
         IS_Set (&Standard, STD_DEFAULT);
     }
 
-    /* Track string buffer allocation */
-    InitDiagnosticStrBufs ();
-
     /* Go! */
     Compile (InputFile);
 
@@ -1263,8 +1261,8 @@ int main (int argc, char* argv[])
         CreateDependencies ();
     }
 
-    /* Done with tracked string buffer allocation */
-    DoneDiagnosticStrBufs ();
+    /* Done with managed string buffers */
+    DoneMngdStrBufs ();
 
     /* Free up the segment address sizes table */
     DoneSegAddrSizes ();

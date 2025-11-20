@@ -177,15 +177,6 @@ unsigned GetTotalWarnings (void);
 void ErrorReport (void);
 /* Report errors (called at end of compile) */
 
-void InitDiagnosticStrBufs (void);
-/* Init tracking string buffers used for diagnostics */
-
-void DoneDiagnosticStrBufs (void);
-/* Done with tracked string buffers used for diagnostics */
-
-struct StrBuf* NewDiagnosticStrBuf (void);
-/* Get a new tracked string buffer */
-
 
 
 /* End of error.h */

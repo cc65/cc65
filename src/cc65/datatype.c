@@ -49,6 +49,7 @@
 #include "funcdesc.h"
 #include "global.h"
 #include "ident.h"
+#include "mngdstrbuf.h"
 #include "symtab.h"
 
 
@@ -1356,7 +1357,7 @@ static const char* GetTagSymName (const Type* T)
 const char* GetFullTypeName (const Type* T)
 /* Return the full name string of the given type */
 {
-    struct StrBuf* Buf = NewDiagnosticStrBuf ();
+    struct StrBuf* Buf = NewMngdStrBuf ();
     GetFullTypeNameBuf (Buf, T);
 
     return SB_GetConstBuf (Buf);

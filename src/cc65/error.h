@@ -106,35 +106,35 @@ void PrintFileInclusionInfo (const LineInfo* LI);
 LineInfo* GetDiagnosticLI (void);
 /* Get the line info where the diagnostic info refers to */
 
-void Fatal_ (const char *file, int line, const char* Format, ...) attribute ((noreturn, format (printf, 3, 4)));
+void Fatal_ (const char* File, int Line, const char* Format, ...) attribute ((noreturn, format (printf, 3, 4)));
 #define Fatal(...) Fatal_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a message about a fatal error and die */
 
-void Internal_ (const char *file, int line, const char* Format, ...) attribute ((noreturn, format (printf, 3, 4)));
+void Internal_ (const char* File, int Line, const char* Format, ...) attribute ((noreturn, format (printf, 3, 4)));
 #define Internal(...) Internal_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a message about an internal compiler error and die */
 
-void Error_ (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void Error_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define Error(...) Error_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print an error message */
 
-void LIError_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 5, 6)));
+void LIError_ (const char* File, int Line, errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 5, 6)));
 #define LIError(...) LIError_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print an error message with the line info given explicitly */
 
-void PPError_ (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void PPError_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define PPError(...) PPError_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print an error message. For use within the preprocessor */
 
-void Warning_ (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void Warning_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define Warning(...) Warning_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a warning message */
 
-void LIWarning_ (const char *file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 5, 6)));
+void LIWarning_ (const char* File, int Line, errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 5, 6)));
 #define LIWarning(...) LIWarning_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a warning message with the line info given explicitly */
 
-void PPWarning_ (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void PPWarning_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define PPWarning(...) PPWarning_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a warning message. For use within the preprocessor */
 
@@ -156,15 +156,15 @@ IntStack* FindWarning (const char* Name);
 void ListWarnings (FILE* F);
 /* Print a list of warning types/names to the given file */
 
-void Note_ (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void Note_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define Note(...) Note_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a note message */
 
-void LINote_ (const char *file, int line, const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 4, 5)));
+void LINote_ (const char* File, int Line, const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 4, 5)));
 #define LINote(...) LINote_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a note message with the line info given explicitly */
 
-void PPNote_ (const char *file, int line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+void PPNote_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define PPNote(...) PPNote_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a note message. For use within the preprocessor */
 

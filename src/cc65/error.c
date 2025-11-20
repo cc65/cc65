@@ -64,8 +64,6 @@ unsigned PPErrorCount     = 0;  /* Pre-parser errors */
 unsigned PPWarningCount   = 0;  /* Pre-parser warnings */
 unsigned ErrorCount       = 0;  /* Errors occurred in parser and later translation phases */
 unsigned WarningCount     = 0;  /* Warnings occurred in parser and later translation phases */
-unsigned RecentLineNo     = 0;
-unsigned RecentErrorCount = 0;
 
 /* Warning and error options */
 IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
@@ -184,13 +182,13 @@ static unsigned GetDiagnosticLineNum (void)
 
 
 
-void Fatal_ (const char* file, int line, const char* Format, ...)
+void Fatal_ (const char* File, int LineNo, const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
     va_list ap;
 
     if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
+        fprintf(stderr, "[%s:%d] ", File, LineNo);
     }
 
     fprintf (stderr, "%s:%u: Fatal: ", GetDiagnosticFileName (), GetDiagnosticLineNum ());
@@ -208,13 +206,13 @@ void Fatal_ (const char* file, int line, const char* Format, ...)
 
 
 
-void Internal_ (const char* file, int line, const char* Format, ...)
+void Internal_ (const char* File, int LineNo, const char* Format, ...)
 /* Print a message about an internal compiler error and die */
 {
     va_list ap;
 
     if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
+        fprintf(stderr, "[%s:%d] ", File, LineNo);
     }
 
     fprintf (stderr, "%s:%u: Internal compiler error:\n",
@@ -244,6 +242,9 @@ void Internal_ (const char* file, int line, const char* Format, ...)
 static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 /* Print an error message - internal function */
 {
+    static unsigned RecentErrorCount = 0;
+    static unsigned RecentLineNo     = 0;
+
     unsigned LineNo = GetPresumedLineNum (LI);
 
     /* Print file inclusion if appropriate */
@@ -279,13 +280,13 @@ static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 
 
 
-void LIError_ (const char* file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
+void LIError_ (const char* File, int Line, errcat_t EC, LineInfo* LI, const char* Format, ...)
 /* Print an error message with the line info given explicitly */
 {
     va_list ap;
 
     if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
+        fprintf(stderr, "[%s:%d] ", File, Line);
     }
 
     va_start (ap, Format);
@@ -295,13 +296,13 @@ void LIError_ (const char* file, int line, errcat_t EC, LineInfo* LI, const char
 
 
 
-void Error_ (const char* file, int line, const char* Format, ...)
+void Error_ (const char* File, int Line, const char* Format, ...)
 /* Print an error message */
 {
     va_list ap;
 
     if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
+        fprintf(stderr, "[%s:%d] ", File, Line);
     }
 
     va_start (ap, Format);
@@ -311,13 +312,13 @@ void Error_ (const char* file, int line, const char* Format, ...)
 
 
 
-void PPError_ (const char* file, int line, const char* Format, ...)
+void PPError_ (const char* File, int Line, const char* Format, ...)
 /* Print an error message. For use within the preprocessor */
 {
     va_list ap;
 
     if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
+        fprintf(stderr, "[%s:%d] ", File, Line);
     }
 
     va_start (ap, Format);
@@ -370,13 +371,13 @@ static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 
 
 
-void LIWarning_ (const char* file, int line, errcat_t EC, LineInfo* LI, const char* Format, ...)
+void LIWarning_ (const char* File, int Line, errcat_t EC, LineInfo* LI, const char* Format, ...)
 /* Print a warning message with the line info given explicitly */
 {
     va_list ap;
 
     if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
+        fprintf(stderr, "[%s:%d] ", File, Line);
     }
 
     va_start (ap, Format);
@@ -386,13 +387,13 @@ void LIWarning_ (const char* file, int line, errcat_t EC, LineInfo* LI, const ch
 
 
 
-void Warning_ (const char* file, int line, const char* Format, ...)
+void Warning_ (const char* File, int Line, const char* Format, ...)
 /* Print a warning message */
 {
     va_list ap;
 
     if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
+        fprintf(stderr, "[%s:%d] ", File, Line);
     }
 
     va_start (ap, Format);
@@ -402,13 +403,13 @@ void Warning_ (const char* file, int line, const char* Format, ...)
 
 
 
-void PPWarning_ (const char* file, int line, const char* Format, ...)
+void PPWarning_ (const char* File, int Line, const char* Format, ...)
 /* Print a warning message. For use within the preprocessor */
 {
     va_list ap;
 
     if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
+        fprintf(stderr, "[%s:%d] ", File, Line);
     }
 
     va_start (ap, Format);
@@ -503,59 +504,51 @@ void ListWarnings (FILE* F)
 
 
 
-static void IntNote (const LineInfo* LI, const char* Msg, va_list ap)
+static void IntNote (const char* File, int Line, const LineInfo* LI,
+                     const char* Msg, va_list ap)
 /* Print a note message - internal function */
 {
-    fprintf (stderr, "%s:%u: Note: ", GetPresumedFileName (LI), GetPresumedLineNum (LI));
+    if (Debug) {
+        fprintf (stderr, "[%s:%d] %s:%u: Note: ", File, Line,
+                 GetPresumedFileName (LI), GetPresumedLineNum (LI));
+    } else {
+        fprintf (stderr, "%s:%u: Note: ", GetPresumedFileName (LI),
+                 GetPresumedLineNum (LI));
+    }
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 }
 
 
 
-void LINote_ (const char *file, int line, const LineInfo* LI, const char* Format, ...)
+void LINote_ (const char* File, int Line, const LineInfo* LI, const char* Format, ...)
 /* Print a note message with the line info given explicitly */
 {
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
-    }
-
     va_start (ap, Format);
-    IntNote (LI, Format, ap);
+    IntNote (File, Line, LI, Format, ap);
     va_end (ap);
 }
 
 
 
-void Note_ (const char *file, int line, const char* Format, ...)
+void Note_ (const char* File, int Line, const char* Format, ...)
 /* Print a note message */
 {
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
-    }
-
     va_start (ap, Format);
-    IntNote (GetDiagnosticLI (), Format, ap);
+    IntNote (File, Line, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
 
 
-void PPNote_ (const char *file, int line, const char* Format, ...)
+void PPNote_ (const char* File, int Line, const char* Format, ...)
 /* Print a note message. For use within the preprocessor */
 {
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", file, line);
-    }
-
     va_start (ap, Format);
-    IntNote (GetDiagnosticLI (), Format, ap);
+    IntNote (File, Line, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 

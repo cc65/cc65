@@ -18,18 +18,17 @@ _cpeekcolor:
         lda     SCREEN_PTR
         sta     ptr1
 
-        php
         sei
         lda     $D030
-        pha
         ora     #$01
         sta     $D030
         ldy     #0
         lda     (ptr1),y
         tay
-        pla
+        lda     $D030
+        and     #$FE
         sta     $D030
-        plp
+        cli
         tya
 
         ldx     #>$0000

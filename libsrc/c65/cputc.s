@@ -116,16 +116,15 @@ putchar:
         adc     #>$D000
         sta     ptr4 + 1
 
-        php
         sei
         lda     $D030
-        pha
         ora     #$01
         sta     $D030
         lda     CHARCOLOR
         sta     (ptr4),y    ; Set color
-        pla
+        lda     $D030
+        and     #$FE
         sta     $D030
-        plp
+        cli
 
         rts

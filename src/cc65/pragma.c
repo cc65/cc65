@@ -857,12 +857,12 @@ static void IntPragma (pragma_scope_t Scope, pragma_t Token, StrBuf* B, IntStack
 
 
 
-static void NoteMessagePragma (const char* Message)
-/* Wrapper for printf-like Note() function protected from user-provided format
-** specifiers.
+static void NotificationMessagePragma (const char* Message)
+/* Wrapper for printf-like Notification() function protected from user-provided
+** format specifiers.
 */
 {
-    Note ("%s", Message);
+    Notification ("%s", Message);
 }
 
 
@@ -960,7 +960,7 @@ static void ParsePragmaString (StrBuf* B)
 
         case PRAGMA_MESSAGE:
             /* PES_IMM is the only sensible option */
-            StringPragma (PES_IMM, B, NoteMessagePragma);
+            StringPragma (PES_IMM, B, NotificationMessagePragma);
             break;
 
         case PRAGMA_OPTIMIZE:

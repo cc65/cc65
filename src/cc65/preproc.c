@@ -943,7 +943,7 @@ static void NewStyleComment (void)
     /* Diagnose if this is unsupported */
     if (IS_Get (&Standard) < STD_C99 && !AllowNewComments) {
         PPError ("C++ style comments are not allowed in C89");
-        PPNote ("(this will be reported only once per input file)");
+        PPNotification ("This error will be reported only once per input file");
         AllowNewComments = 1;
     }
 

@@ -2432,7 +2432,7 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
                 } else {
                     Warning ("Type specifier defaults to 'int' in typedef of '%s'",
                              D->Ident);
-                    Note ("Implicit 'int' type specifier is an obsolete feature");
+                    Notification ("Implicit 'int' type specifier is an obsolete feature");
                 }
             }
         }

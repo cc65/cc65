@@ -156,17 +156,17 @@ IntStack* FindWarning (const char* Name);
 void ListWarnings (FILE* F);
 /* Print a list of warning types/names to the given file */
 
-void Note_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
-#define Note(...) Note_(__FILE__, __LINE__, __VA_ARGS__)
-/* Print a note message */
+void Notification_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+#define Notification(...) Notification_(__FILE__, __LINE__, __VA_ARGS__)
+/* Print a notification message */
 
-void LINote_ (const char* File, int Line, const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 4, 5)));
-#define LINote(...) LINote_(__FILE__, __LINE__, __VA_ARGS__)
-/* Print a note message with the line info given explicitly */
+void LINotification_ (const char* File, int Line, const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 4, 5)));
+#define LINotification(...) LINotification_(__FILE__, __LINE__, __VA_ARGS__)
+/* Print a notification message with the line info given explicitly */
 
-void PPNote_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
-#define PPNote(...) PPNote_(__FILE__, __LINE__, __VA_ARGS__)
-/* Print a note message. For use within the preprocessor */
+void PPNotification_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
+#define PPNotification(...) PPNotification_(__FILE__, __LINE__, __VA_ARGS__)
+/* Print a notification message. For use within the preprocessor */
 
 unsigned GetTotalErrors (void);
 /* Get total count of errors of all categories */

@@ -502,9 +502,9 @@ void ListWarnings (FILE* F)
 
 
 
-static void IntNote (const char* File, int Line, const LineInfo* LI,
-                     const char* Msg, va_list ap)
-/* Print a note message - internal function */
+static void IntNotification (const char* File, int Line, const LineInfo* LI,
+                             const char* Msg, va_list ap)
+/* Print a notification message - internal function */
 {
     if (Debug) {
         fprintf (stderr, "[%s:%d] %s:%u: Note: ", File, Line,
@@ -519,34 +519,35 @@ static void IntNote (const char* File, int Line, const LineInfo* LI,
 
 
 
-void LINote_ (const char* File, int Line, const LineInfo* LI, const char* Format, ...)
-/* Print a note message with the line info given explicitly */
+void LINotification_ (const char* File, int Line, const LineInfo* LI,
+                      const char* Format, ...)
+/* Print a notification message with the line info given explicitly */
 {
     va_list ap;
     va_start (ap, Format);
-    IntNote (File, Line, LI, Format, ap);
+    IntNotification (File, Line, LI, Format, ap);
     va_end (ap);
 }
 
 
 
-void Note_ (const char* File, int Line, const char* Format, ...)
-/* Print a note message */
+void Notification_ (const char* File, int Line, const char* Format, ...)
+/* Print a notification message */
 {
     va_list ap;
     va_start (ap, Format);
-    IntNote (File, Line, GetDiagnosticLI (), Format, ap);
+    IntNotification (File, Line, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
 
 
-void PPNote_ (const char* File, int Line, const char* Format, ...)
-/* Print a note message. For use within the preprocessor */
+void PPNotification_ (const char* File, int Line, const char* Format, ...)
+/* Print a notification message. For use within the preprocessor */
 {
     va_list ap;
     va_start (ap, Format);
-    IntNote (File, Line, GetDiagnosticLI (), Format, ap);
+    IntNotification (File, Line, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 

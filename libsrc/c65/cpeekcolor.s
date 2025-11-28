@@ -18,6 +18,7 @@ _cpeekcolor:
         lda     SCREEN_PTR
         sta     ptr1
 
+        php
         sei
         lda     $D030
         ora     #$01
@@ -28,8 +29,8 @@ _cpeekcolor:
         lda     $D030
         and     #$FE
         sta     $D030
-        cli
         tya
+        plp
 
         ldx     #>$0000
         rts

@@ -116,6 +116,7 @@ putchar:
         adc     #>$D000
         sta     ptr4 + 1
 
+        php
         sei
         lda     $D030
         ora     #$01
@@ -125,6 +126,6 @@ putchar:
         lda     $D030
         and     #$FE
         sta     $D030
-        cli
+        plp
 
         rts

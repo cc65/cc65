@@ -38,6 +38,9 @@
   <tag><htmlurl url="od65.html" name="od65.html"></tag>
   Describes the od65 object-file analyzer.
 
+  <tag><htmlurl url="prof65.html" name="prof65.html"></tag>
+  Describes the sim65 profiler.
+
   <tag><htmlurl url="sim65.html" name="sim65.html"></tag>
   Describes the 6502 and 65C02 simulator.
 

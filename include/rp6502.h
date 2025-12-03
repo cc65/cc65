@@ -171,10 +171,6 @@ int __fastcall__ f_setlabel (const char* name);
 int __fastcall__ f_getlabel (const char* path, char* label);
 int __fastcall__ f_getfree (const char* name, unsigned long* free, unsigned long* total);
 
-/* Time zone hack */
-
-void ria_tzset (unsigned long time);
-
 /* XREG location helpers */
 
 #define xreg_ria_keyboard(...) xreg(0, 0, 0, __VA_ARGS__)

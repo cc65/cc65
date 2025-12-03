@@ -37,7 +37,7 @@ the [cc65 web site](https://cc65.github.io):
 | MOS Technology, Inc.    | KIM-1                               |
 | NEC                     | PC Engine (PCE)                     |
 | Rumbledethumps          | Picocomputer 6502 (RP6502)          |
-| Watara                  | Watura/QuickShot Supervision        |
+| Watara                  | Watara/QuickShot Supervision        |
 | Synertek                | SYM-1                               |
 | USSR                    | Agat-7/9                            |
 

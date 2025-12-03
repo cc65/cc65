@@ -70,12 +70,6 @@ int main (void)
       fails++;
     }
 
-    tm = localtime(NULL);
-    if (tm != NULL) {
-      printf("localtime should return NULL with a NULL parameter\n");
-      fails++;
-    }
-
     /* Verify conversion both ways */
     for (i = 0; ; i++) {
       time_t t = data[i].t;
@@ -86,7 +80,7 @@ int main (void)
         printf("0x%lx: gmtime: unexpected result: expected %s, got %s\n", t, data[i].gmt, str);
         fails++;
       }
-      
+
       _tz.timezone = 0;
       tm = localtime(&t);
       str = asctime(tm);

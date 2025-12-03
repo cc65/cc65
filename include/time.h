@@ -128,12 +128,15 @@ extern struct _timezone {
     char    dstname[5]; /* Name when daylight true, e.g. CEST */
 } _tz;
 
+/* Set _tz for a specific time, if supported by target */
+void __fastcall__ tzset_time (time_t* t);
+
 #define CLK_TCK                 CLOCKS_PER_SEC
 
 /* POSIX function prototypes */
-int __fastcall__ clock_getres (clockid_t clock_id, struct timespec *res);
-int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec *tp);
-int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);
+int __fastcall__ clock_getres (clockid_t clock_id, struct timespec* res);
+int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec* tp);
+int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec* tp);
 
 #endif
 

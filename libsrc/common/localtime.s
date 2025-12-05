@@ -10,23 +10,13 @@
         .importzp       sreg, ptr1
 
 _localtime:
-.if .cap(CPU_HAS_PUSHXY)
-        pha
-        phx
-        jsr     _tzset_time
-        plx
-        pla
-.else
-        pha
-        txa
-        pha
-        jsr     _tzset_time
-        pla
-        tax
-        pla
-.endif
-        jsr     ldeaxi          ; Load value
+        cpx     #$00            ; Check for null pointer
+        bne     :+
+        cmp     #$00
+        beq     no_pointer
+:       jsr     ldeaxi          ; Load value
         jsr     pusheax         ; Push it
+        jsr     _tzset_time
         lda     __tz+1+3
         sta     sreg+1
         lda     __tz+1+2
@@ -35,11 +25,12 @@ _localtime:
         lda     __tz+1
         jsr     tosaddeax       ; Add _tz.timezone
         jsr     __time_t_to_tm  ; Convert to struct tm
-        sta     ptr1            ; Save returned tm pointer
+        sta     ptr1            ; Returned tm pointer
         stx     ptr1+1
         ldy     #16
         lda     __tz+0          ; Load _tz.daylight
         sta     (ptr1),y        ; Store to tm.tm_isdst
-        lda     ptr1            ; Restore returned tm pointer
-        ldx     ptr1+1
+        lda     ptr1
+
+no_pointer:
         rts                     ; A/X already set

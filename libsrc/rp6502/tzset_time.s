@@ -17,13 +17,10 @@
 
 
 _tzset_time:
-        jsr     pushax
-        jsr     ldax0sp
         jsr     ldeaxi
         jsr     pusheax
         lda     #CLOCK_REALTIME
         jsr     pusha
         lda     #<(__tz)
         ldx     #>(__tz)
-        jsr     _clock_gettimezone
-        jmp     incsp2
+        jmp     _clock_gettimezone

@@ -125,8 +125,8 @@ struct timespec {
 extern struct _timezone {
     char    daylight;   /* True if daylight savings time active */
     long    timezone;   /* Number of seconds behind UTC */
-    char    tzname[6];  /* Name of timezone, e.g. CET */
-    char    dstname[6]; /* Name when daylight true, e.g. CEST */
+    char    tzname[5];  /* Name of timezone, e.g. CET */
+    char    dstname[5]; /* Name when daylight true, e.g. CEST */
 } _tz;
 
 #define CLK_TCK                 CLOCKS_PER_SEC

@@ -8,7 +8,7 @@ struct tm* __fastcall__ _time_t_to_tm (const time_t t);
 
 struct tm* __fastcall__ _localtime (const time_t* timep)
 {
-    long time = *timep;
+    time_t time = *timep;
     struct tm* tm;
     ria_set_axsreg (*timep);
     time += ria_call_long (RIA_OP_TZQUERY);

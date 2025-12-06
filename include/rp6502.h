@@ -96,11 +96,12 @@ long __fastcall__ ria_call_long (unsigned char op);
 #define RIA_OP_LRAND 0x04
 #define RIA_OP_STDIN_OPT 0x05
 #define RIA_OP_ERRNO_OPT 0x06
+#define RIA_OP_TZSET 0x0D
+#define RIA_OP_TZQUERY 0x0E
 #define RIA_OP_CLOCK 0x0F
 #define RIA_OP_CLOCK_GETRES 0x10
 #define RIA_OP_CLOCK_GETTIME 0x11
 #define RIA_OP_CLOCK_SETTIME 0x12
-#define RIA_OP_CLOCK_GETTIMEZONE 0x13
 #define RIA_OP_OPEN 0x14
 #define RIA_OP_CLOSE 0x15
 #define RIA_OP_READ_XSTACK 0x16

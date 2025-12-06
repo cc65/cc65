@@ -108,6 +108,7 @@ struct tm* __fastcall__ localtime (const time_t* timep);
 time_t __fastcall__ mktime (struct tm* timep);
 size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format, const struct tm* tm);
 time_t __fastcall__ time (time_t* t);
+void tzset (void);
 
 
 #if __CC65_STD__ >= __CC65_STD_CC65__
@@ -124,12 +125,9 @@ struct timespec {
 extern struct _timezone {
     char    daylight;   /* True if daylight savings time active */
     long    timezone;   /* Number of seconds behind UTC */
-    char    tzname[5];  /* Name of timezone, e.g. CET */
-    char    dstname[5]; /* Name when daylight true, e.g. CEST */
+    char    tzname[6];  /* Name of timezone, e.g. CET */
+    char    dstname[6]; /* Name when daylight true, e.g. CEST */
 } _tz;
-
-/* Set _tz for a specific time, if supported by target */
-void __fastcall__ tzset_time (time_t* t);
 
 #define CLK_TCK                 CLOCKS_PER_SEC
 

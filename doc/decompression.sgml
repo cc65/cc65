@@ -146,7 +146,10 @@ so that decompressing does not overwrite the end of the compressed data too soon
 <sect>Which decompressor to choose<p>
 
 The best decompressor depends on your use-case and whether you favor size or
-speed. This table allows for a simple comparison.
+speed. This table allows for a simple comparison. The numbers come from
+arbitrary real-world data (graphics and code from the Apple II Shufflepuck
+game) in order to give an overview of what to expect from the different
+algorithms.
 Decompression speed is the number of uncompressed bytes per second at 1MHz.
 
 <table><tabular ca="rrrr">

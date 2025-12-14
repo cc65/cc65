@@ -17,7 +17,7 @@ compiler.
 <sect>Overview<p>
 
 The Commander X16 is a modern small computer with firmware that is based partly
-on the ROMs in Commodore's VIC-20 and 64C.  It has a couple of I/O chips
+on the ROMs in Commodore's VIC-20 and C64.  It has a couple of I/O chips
 (WDC65C22 VIA) that are like the ones in the VIC-20.  It supports file storage
 on Secure Digital cards.  It allows two joysticks and a mouse.  It has three
 sound devices.  Its VGA screen has twice the range of the C64 (similar to the

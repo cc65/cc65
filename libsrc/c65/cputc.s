@@ -113,10 +113,19 @@ putchar:
 
         lda     ptr4 + 1
         clc
-        adc     #>$d000
+        adc     #>$D000
         sta     ptr4 + 1
 
+        php
+        sei
+        lda     $D030
+        ora     #$01
+        sta     $D030
         lda     CHARCOLOR
         sta     (ptr4),y    ; Set color
+        lda     $D030
+        and     #$FE
+        sta     $D030
+        plp
 
         rts

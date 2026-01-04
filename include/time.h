@@ -108,6 +108,7 @@ struct tm* __fastcall__ localtime (const time_t* timep);
 time_t __fastcall__ mktime (struct tm* timep);
 size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format, const struct tm* tm);
 time_t __fastcall__ time (time_t* t);
+void tzset (void);
 
 
 #if __CC65_STD__ >= __CC65_STD_CC65__
@@ -131,9 +132,9 @@ extern struct _timezone {
 #define CLK_TCK                 CLOCKS_PER_SEC
 
 /* POSIX function prototypes */
-int __fastcall__ clock_getres (clockid_t clock_id, struct timespec *res);
-int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec *tp);
-int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec *tp);
+int __fastcall__ clock_getres (clockid_t clock_id, struct timespec* res);
+int __fastcall__ clock_gettime (clockid_t clock_id, struct timespec* tp);
+int __fastcall__ clock_settime (clockid_t clock_id, const struct timespec* tp);
 
 #endif
 

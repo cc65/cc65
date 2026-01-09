@@ -18,8 +18,19 @@ _cpeekcolor:
         lda     SCREEN_PTR
         sta     ptr1
 
+        php
+        sei
+        lda     $D030
+        ora     #$01
+        sta     $D030
         ldy     #0
         lda     (ptr1),y
+        tay
+        lda     $D030
+        and     #$FE
+        sta     $D030
+        tya
+        plp
 
         ldx     #>$0000
         rts

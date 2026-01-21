@@ -428,6 +428,22 @@ SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action)
 }
 
 
+SymEntry* SymFindInChildren (SymTable* Parent, const StrBuf* Name)
+{
+    SymTable* Scope = Parent->Childs;
+    SymEntry* Sym = 0;
+
+    if (Scope) {
+        do {
+            Sym = SymFind (Scope, Name, SYM_CHECK_ONLY);
+            Scope = Scope->Next;
+        } while (Sym == 0 && Scope != 0);
+    }
+
+    return Sym;
+}
+
+
 
 SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
 /* Find a symbol in the given or any of its parent scopes. The function will

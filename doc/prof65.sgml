@@ -1,0 +1,135 @@
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
+
+<article>
+
+<title>prof65 Users Guide
+<author>Lauri Kasanen
+
+<abstract>
+prof65 is a profiler for sim65. It allows finding out hot spots in 6502 and 65c02 code.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+
+prof65 is used as part of the toolchain to optimize 6502 or 65C02 code.
+The binary to test should be compiled with <tt/--target sim6502/ or <tt/--target sim65c02/.
+
+
+<sect>Usage<p>
+
+The simulator is called as follows:
+
+<tscreen><verb>
+        Usage: bin/prof65 [args] profile label
+
+        -v      Verbose
+</verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
+
+Here is a description of all the command line options:
+
+<descrip>
+
+  <tag><tt>profile</tt></tag>
+
+  The profile file saved by sim65's -p/--profile argument.
+
+
+  <tag><tt>label</tt></tag>
+
+  The VICE label file as created by cl65's/ld65's -Ln argument.
+
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Increase the profiler verbosity.
+</descrip>
+
+
+<sect>Tutorial<p>
+
+First, create a program to profile.
+
+<tscreen><verb>
+        void muls() {
+            unsigned int sum = 0, i, j;
+            for (i = 0; i < 10; i++) {
+                for (j = 5; j < 15; j++) {
+                    sum += i * j;
+                }
+            }
+        }
+
+        int main() {
+            muls();
+            return 0;
+        }
+</verb></tscreen>
+
+Compile it for the sim6502 target with
+<tt/cl65 -o mytest -Oisr mytest.c --target sim6502 -Ln mylabels/,
+and run it with profiling enabled with
+<tt/sim65 -p myprofile mytest/.
+
+Output the profiling results with
+<tt/prof65 myprofile mylabels/:
+
+<tscreen><verb>
+        CPU cycles total: 44239
+
+        31.9%      14120        mul8x16a
+        19.5%       8630        addeqysp
+        18.4%       8159        _muls
+        11.5%       5100        pushwysp
+        5.9%        2600        popptr1
+        3.8%        1700        incsp2
+        3.6%        1600        mul8x16
+        3.2%        1400        tosumulax
+        1.4%         600        addeq0sp
+</verb></tscreen>
+
+You can run the program again with other arguments, and the profiling results
+will accumulate as long as the -p/--profile argument remains the same. This lets
+you test more paths of your program and still get just one summary.
+
+<sect>Profile file format<p>
+
+The profile file is currently a flat array of 64K unsigned 32-bit integers, in host
+endianess. Each int contains the number of cycles executed at that address.
+
+As such the profiler can output the amount of CPU time taken by each function, but
+it cannot tell which functions called which.
+
+<sect>Copyright<p>
+
+prof65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von
+Bassewitz. For usage of the binaries and/or sources the following conditions
+do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item>  The origin of this software must not be misrepresented; you must not
+        claim that you wrote the original software. If you use this software
+        in a product, an acknowledgment in the product documentation would be
+        appreciated but is not required.
+<item>  Altered source versions must be plainly marked as such, and must not
+        be misrepresented as being the original software.
+<item>  This notice may not be removed or altered from any source
+        distribution.
+</enum>
+
+</article>

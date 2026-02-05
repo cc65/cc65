@@ -59,6 +59,16 @@
 
 
 
+/* Diagnostic category */
+typedef enum { 
+    DC_NOTE, DC_PPWARN, DC_WARN, DC_PPERR, DC_ERR, DC_FATAL, DC_COUNT 
+} DiagCat;
+
+/* Descriptions for diagnostic categories */
+static const char* DiagCatDesc[DC_COUNT] = {
+    "Note", "Warning", "Warning", "Error", "Error", "Fatal error"
+};
+
 /* Count of errors/warnings */
 unsigned PPErrorCount     = 0;  /* Pre-parser errors */
 unsigned PPWarningCount   = 0;  /* Pre-parser warnings */
@@ -237,7 +247,7 @@ void Internal_ (const char* File, int LineNo, const char* Format, ...)
 
 
 
-static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
+static void IntError (DiagCat Cat, LineInfo* LI, const char* Msg, va_list ap)
 /* Print an error message - internal function */
 {
     static unsigned RecentErrorCount = 0;
@@ -259,7 +269,7 @@ static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
         Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 
-    if (EC != EC_PP) {
+    if (Cat != DC_PPERR) {		 
         ++ErrorCount;
     } else {
         ++PPErrorCount;
@@ -278,22 +288,6 @@ static void IntError (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
 
 
 
-void LIError_ (const char* File, int Line, errcat_t EC, LineInfo* LI, const char* Format, ...)
-/* Print an error message with the line info given explicitly */
-{
-    va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", File, Line);
-    }
-
-    va_start (ap, Format);
-    IntError (EC, LI, Format, ap);
-    va_end (ap);
-}
-
-
-
 void Error_ (const char* File, int Line, const char* Format, ...)
 /* Print an error message */
 {
@@ -304,7 +298,7 @@ void Error_ (const char* File, int Line, const char* Format, ...)
     }
 
     va_start (ap, Format);
-    IntError (EC_PARSER, GetDiagnosticLI (), Format, ap);
+    IntError (DC_ERR, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
@@ -320,7 +314,7 @@ void PPError_ (const char* File, int Line, const char* Format, ...)
     }
 
     va_start (ap, Format);
-    IntError (EC_PP, GetCurLineInfo (), Format, ap);
+    IntError (DC_PPERR, GetCurLineInfo (), Format, ap);
     va_end (ap);
 }
 
@@ -332,13 +326,13 @@ void PPError_ (const char* File, int Line, const char* Format, ...)
 
 
 
-static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
+static void IntWarning (DiagCat Cat, LineInfo* LI, const char* Msg, va_list ap)
 /* Print a warning message - internal function */
 {
     if (IS_Get (&WarningsAreErrors)) {
 
         /* Treat the warning as an error */
-        IntError (EC, LI, Msg, ap);
+        IntError (Cat, LI, Msg, ap);
 
     } else if (IS_Get (&WarnEnable)) {
 
@@ -358,29 +352,13 @@ static void IntWarning (errcat_t EC, LineInfo* LI, const char* Msg, va_list ap)
             Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
         }
 
-        if (EC != EC_PP) {
+        if (Cat != DC_PPWARN) {
             ++WarningCount;
         } else {
             ++PPWarningCount;
         }
 
     }
-}
-
-
-
-void LIWarning_ (const char* File, int Line, errcat_t EC, LineInfo* LI, const char* Format, ...)
-/* Print a warning message with the line info given explicitly */
-{
-    va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", File, Line);
-    }
-
-    va_start (ap, Format);
-    IntWarning (EC, LI, Format, ap);
-    va_end (ap);
 }
 
 
@@ -395,7 +373,7 @@ void Warning_ (const char* File, int Line, const char* Format, ...)
     }
 
     va_start (ap, Format);
-    IntWarning (EC_PARSER, GetDiagnosticLI (), Format, ap);
+    IntWarning (DC_WARN, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
@@ -411,46 +389,8 @@ void PPWarning_ (const char* File, int Line, const char* Format, ...)
     }
 
     va_start (ap, Format);
-    IntWarning (EC_PP, GetCurLineInfo (), Format, ap);
+    IntWarning (DC_PPWARN, GetCurLineInfo (), Format, ap);
     va_end (ap);
-}
-
-
-
-void UnreachableCodeWarning (void)
-/* Print a warning about unreachable code at the current location if these
-** warnings are enabled.
-*/
-{
-    if (IS_Get (&WarnUnreachableCode)) {
-
-        LineInfo* LI;
-
-        /* Add special handling for compound statements if the current token
-        ** is from the source. Doing this here is a bit hacky but unfortunately
-        ** there's no better place.
-        */
-        if (CurTok.LI && NextTok.LI) {
-            if (CurTok.Tok == TOK_LCURLY) {
-                /* Do not point to the compound statement but to the first
-                ** statement within it. If the compound statement is empty
-                ** do not even output a warning. This fails of course for
-                ** nested compounds but will do the right thing in most cases.
-                */
-                if (NextTok.Tok == TOK_RCURLY) {
-                    return;
-                }
-                LI = NextTok.LI;
-            } else {
-                LI = CurTok.LI;
-            }
-        } else {
-            LI = GetCurLineInfo ();
-        }
-
-        /* Now output the warning */
-        LIWarning (EC_PARSER, LI, "Unreachable code");
-    }
 }
 
 
@@ -461,8 +401,46 @@ void LIUnreachableCodeWarning (LineInfo* LI)
 */
 {
     if (IS_Get (&WarnUnreachableCode)) {
-        LIWarning (EC_PARSER, LI, "Unreachable code");
+        /* The error message contains no format specifiers, but we need a valid
+        ** va_list argument, so create one. ##########
+        */
+        IntWarning (DC_WARN, LI, "Unreachable code", 0);
     }
+}
+
+
+
+void UnreachableCodeWarning (void)
+/* Print a warning about unreachable code at the current location if these
+** warnings are enabled.
+*/
+{
+    LineInfo* LI;
+
+    /* Add special handling for compound statements if the current token
+    ** is from the source. Doing this here is a bit hacky but unfortunately
+    ** there's no better place.
+    */
+    if (CurTok.LI && NextTok.LI) {
+	if (CurTok.Tok == TOK_LCURLY) {
+	    /* Do not point to the compound statement but to the first
+	    ** statement within it. If the compound statement is empty
+	    ** do not even output a warning. This fails of course for
+	    ** nested compounds but will do the right thing in most cases.
+	    */
+	    if (NextTok.Tok == TOK_RCURLY) {
+		return;
+	    }
+	    LI = NextTok.LI;
+	} else {
+	    LI = CurTok.LI;
+	}
+    } else {
+	LI = GetCurLineInfo ();
+    }
+
+    /* Now output the warning */
+    LIUnreachableCodeWarning (LI);
 }
 
 

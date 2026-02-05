@@ -55,15 +55,6 @@
 
 
 
-/* Error categories */
-typedef enum errcat_t errcat_t;
-enum errcat_t {
-    EC_PP,      /* Pre-parser phases */
-    EC_PARSER,  /* Parser and later phases */
-};
-
-
-
 /* Count of errors/warnings */
 extern unsigned PPErrorCount;           /* Pre-parser errors */
 extern unsigned PPWarningCount;         /* Pre-parser warnings */
@@ -118,10 +109,6 @@ void Error_ (const char* File, int Line, const char* Format, ...) attribute ((fo
 #define Error(...) Error_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print an error message */
 
-void LIError_ (const char* File, int Line, errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 5, 6)));
-#define LIError(...) LIError_(__FILE__, __LINE__, __VA_ARGS__)
-/* Print an error message with the line info given explicitly */
-
 void PPError_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define PPError(...) PPError_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print an error message. For use within the preprocessor */
@@ -129,10 +116,6 @@ void PPError_ (const char* File, int Line, const char* Format, ...) attribute ((
 void Warning_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define Warning(...) Warning_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a warning message */
-
-void LIWarning_ (const char* File, int Line, errcat_t EC, LineInfo* LI, const char* Format, ...) attribute ((format (printf, 5, 6)));
-#define LIWarning(...) LIWarning_(__FILE__, __LINE__, __VA_ARGS__)
-/* Print a warning message with the line info given explicitly */
 
 void PPWarning_ (const char* File, int Line, const char* Format, ...) attribute ((format (printf, 3, 4)));
 #define PPWarning(...) PPWarning_(__FILE__, __LINE__, __VA_ARGS__)

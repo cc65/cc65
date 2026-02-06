@@ -327,7 +327,7 @@ static void SetSys (const char* Sys)
             break;
 
         default:
-            AbEnd ("Unknown target system '%s'", Sys);
+            Fatal ("Unknown target system `%s'", Sys);
     }
 
     /* Initialize the translation tables for the target system */
@@ -355,7 +355,7 @@ static void DefineCpuMacros (void)
         case CPU_M740:
         case CPU_UNKNOWN:
             CPUName = (CPU == CPU_UNKNOWN)? "unknown" : CPUNames[CPU];
-            Internal ("Invalid CPU \"%s\"", CPUName);
+            Internal ("Invalid CPU `%s'", CPUName);
             break;
 
         case CPU_6502:
@@ -435,11 +435,11 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 {
     /* Cannot have the option twice */
     if (SB_NotEmpty (Name)) {
-        Fatal ("Cannot use option '%s' twice", Opt);
+        Fatal ("Cannot use option `%s' twice", Opt);
     }
     /* A typo in OptTab[] might allow a NULL Arg */
     if (Arg == 0) {
-        Internal ("Typo in OptTab[]; option '%s' should require an argument", Opt);
+        Internal ("Typo in OptTab[]; option `%s' should require an argument", Opt);
     }
     /* Remember the file name for later */
     SB_CopyStr (Name, Arg);
@@ -561,9 +561,11 @@ static void OptCodeSize (const char* Opt, const char* Arg)
     char     BoundsCheck;
 
     /* Numeric argument expected */
-    if (sscanf (Arg, "%u%c", &Factor, &BoundsCheck) != 1 ||
-        Factor < 10 || Factor > 1000) {
+    if (sscanf (Arg, "%u%c", &Factor, &BoundsCheck) != 1) {
         Fatal ("Argument for `%s' is invalid", Opt);
+    }
+    if (Factor < 10 || Factor > 1000) {
+        Fatal ("Argument for `%s' is out of range", Opt);
     }
     IS_Set (&CodeSizeFactor, Factor);
 }
@@ -916,7 +918,7 @@ static void OptStandard (const char* Opt, const char* Arg)
     if (Std == STD_UNKNOWN) {
         Fatal ("Invalid argument for `%s': %s", Opt, Arg);
     } else if (IS_Get (&Standard) != STD_UNKNOWN) {
-        Fatal ("Option `%s' given more than once", Opt);
+        Fatal ("Cannot use option `%s' twice", Opt);
     } else {
         IS_Set (&Standard, Std);
     }
@@ -1231,7 +1233,7 @@ int main (int argc, char* argv[])
             }
         } else {
             if (InputFile) {
-                fprintf (stderr, "additional file specs ignored\n");
+                Fatal ("Cannot handle multiple file specs: `%s'", Arg);
             } else {
                 InputFile = Arg;
             }

@@ -71,12 +71,18 @@ struct SourcePos {
 
 /* Diagnostic category */
 typedef enum {
-    DC_NOTE, DC_PPWARN, DC_WARN, DC_PPERR, DC_ERR, DC_FATAL, DC_COUNT
+    DC_NOTE, DC_PPWARN, DC_WARN, DC_PPERR, DC_ERR, DC_FATAL, DC_INT, DC_COUNT
 } DiagCat;
 
 /* Descriptions for diagnostic categories */
 static const char* DiagCatDesc[DC_COUNT] = {
-    "Note", "Warning", "Warning", "Error", "Error", "Fatal error"
+    "Note",
+    "Warning",
+    "Warning",
+    "Error",
+    "Error",
+    "Fatal error",
+    "Internal compiler error"
 };
 
 /* Count of errors/warnings */
@@ -245,7 +251,8 @@ static void VPrintMsg (SourcePos SP, const LineInfo* LI, DiagCat Cat,
         case DC_WARN:   Color = CP_Yellow ();           break;
         case DC_PPERR:
         case DC_ERR:    Color = CP_BrightRed ();        break;
-        case DC_FATAL:  Color = CP_BrightRed ();        break;
+        case DC_FATAL:
+        case DC_INT:    Color = CP_BrightRed ();        break;
         default:        FAIL ("Unexpected Cat value");  break;
     }
 
@@ -346,30 +353,6 @@ LineInfo* GetDiagnosticLI (void)
 
 
 
-static const char* GetDiagnosticFileName (void)
-/* Get the source file name where the diagnostic info refers to */
-{
-    if (CurTok.LI) {
-        return GetPresumedFileName (CurTok.LI);
-    } else {
-        return GetCurrentFileName ();
-    }
-}
-
-
-
-static unsigned GetDiagnosticLineNum (void)
-/* Get the source line number where the diagnostic info refers to */
-{
-    if (CurTok.LI) {
-        return GetPresumedLineNum (CurTok.LI);
-    } else {
-        return GetCurrentLineNum ();
-    }
-}
-
-
-
 /*****************************************************************************/
 /*                         Handling of fatal errors                          */
 /*****************************************************************************/
@@ -379,11 +362,9 @@ static unsigned GetDiagnosticLineNum (void)
 void Fatal_ (const char* File, int Line, const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
-    SourcePos SP = SOURCEPOS (File, Line);
-
     va_list ap;
     va_start (ap, Format);
-    VPrintMsg (SP, CurTok.LI, DC_FATAL, Format, ap);
+    VPrintMsg (SOURCEPOS (File, Line), CurTok.LI, DC_FATAL, Format, ap);
     va_end (ap);
 
     exit (EXIT_FAILURE);
@@ -391,26 +372,13 @@ void Fatal_ (const char* File, int Line, const char* Format, ...)
 
 
 
-void Internal_ (const char* File, int LineNo, const char* Format, ...)
+void Internal_ (const char* File, int Line, const char* Format, ...)
 /* Print a message about an internal compiler error and die */
 {
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", File, LineNo);
-    }
-
-    fprintf (stderr, "%s:%u: Internal compiler error:\n",
-             GetDiagnosticFileName (), GetDiagnosticLineNum ());
-
     va_start (ap, Format);
-    vfprintf (stderr, Format, ap);
+    VPrintMsg (SOURCEPOS (File, Line), CurTok.LI, DC_INT, Format, ap);
     va_end (ap);
-    fprintf (stderr, "\n");
-
-    if (Line) {
-        fprintf (stderr, "\nInput: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-    }
 
     /* Use abort to create a core dump */
     abort ();

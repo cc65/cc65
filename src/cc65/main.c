@@ -113,6 +113,7 @@ static void Usage (void)
             "  --check-stack\t\t\tGenerate stack overflow checks\n"
             "  --code-name seg\t\tSet the name of the CODE segment\n"
             "  --codesize x\t\t\tAccept larger code by factor x\n"
+            "  --color [on|auto|off]\t\tColor diagnostics (default: auto)\n"
             "  --cpu type\t\t\tSet cpu type (6502, 65c02)\n"
             "  --create-dep name\t\tCreate a make dependency file\n"
             "  --create-full-dep name\tCreate a full make dependency file\n"
@@ -133,6 +134,7 @@ static void Usage (void)
             "  --list-warnings\t\tList available warning types for -W\n"
             "  --local-strings\t\tEmit string literals immediately\n"
             "  --memory-model model\t\tSet the memory model\n"
+            "  --no-utf8\t\t\tDisable use of UTF-8 in diagnostics\n"
             "  --register-space b\t\tSet space available for register variables\n"
             "  --register-vars\t\tEnable register variables\n"
             "  --rodata-name seg\t\tSet the name of the RODATA segment\n"
@@ -568,6 +570,19 @@ static void OptCodeSize (const char* Opt, const char* Arg)
 
 
 
+static void OptColor(const char* Opt, const char* Arg)
+/* Handle the --color option */
+{
+    ColorMode Mode = CP_Parse (Arg);
+    if (Mode == CM_INVALID) {
+        AbEnd ("Invalid argument to %s: %s", Opt, Arg);
+    } else {
+        CP_SetColorMode (Mode);
+    }
+}
+
+
+
 static void OptCreateDep (const char* Opt, const char* Arg)
 /* Handle the --create-dep option */
 {
@@ -832,6 +847,15 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
 
 
 
+static void OptNoUtf8 (const char* Opt attribute ((unused)),
+                       const char* Arg attribute ((unused)))
+/* Handle the --no-utf8 option */
+{
+    CP_DisableUTF8 ();
+}
+
+
+
 static void OptRegisterSpace (const char* Opt, const char* Arg)
 /* Handle the --register-space option */
 {
@@ -999,6 +1023,7 @@ int main (int argc, char* argv[])
         { "--check-stack",          0,      OptCheckStack           },
         { "--code-name",            1,      OptCodeName             },
         { "--codesize",             1,      OptCodeSize             },
+        { "--color",                1,      OptColor                },
         { "--cpu",                  1,      OptCPU                  },
         { "--create-dep",           1,      OptCreateDep            },
         { "--create-full-dep",      1,      OptCreateFullDep        },
@@ -1019,6 +1044,7 @@ int main (int argc, char* argv[])
         { "--list-warnings",        0,      OptListWarnings         },
         { "--local-strings",        0,      OptLocalStrings         },
         { "--memory-model",         1,      OptMemoryModel          },
+        { "--no-utf8",              0,      OptNoUtf8               },
         { "--register-space",       1,      OptRegisterSpace        },
         { "--register-vars",        0,      OptRegisterVars         },
         { "--rodata-name",          1,      OptRodataName           },

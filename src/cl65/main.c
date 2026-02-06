@@ -1040,6 +1040,7 @@ static void OptColor(const char* Opt, const char* Arg)
         Error ("Invalid argument to %s: %s", Opt, Arg);
     } else {
         CmdAddArg2 (&CA65, "--color", Arg);
+        CmdAddArg2 (&CC65, "--color", Arg);
         CmdAddArg2 (&LD65, "--color", Arg);
     }
 }
@@ -1259,6 +1260,7 @@ static void OptNoUtf8 (const char* Opt attribute ((unused)),
 /* Handle the --no-utf8 option */
 {
     CmdAddArg (&CA65, "--no-utf8");
+    CmdAddArg (&CC65, "--no-utf8");
     CmdAddArg (&LD65, "--no-utf8");
 }
 

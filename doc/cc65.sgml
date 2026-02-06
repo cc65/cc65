@@ -81,6 +81,7 @@ Long options:
   --check-stack                 Generate stack overflow checks
   --code-name seg               Set the name of the CODE segment
   --codesize x                  Accept larger code by factor x
+  --color [on|auto|off]         Color diagnostics (default: auto)
   --cpu type                    Set cpu type (6502, 65c02)
   --create-dep name             Create a make dependency file
   --create-full-dep name        Create a full make dependency file
@@ -101,6 +102,7 @@ Long options:
   --list-warnings               List available warning types for -W
   --local-strings               Emit string literals immediately
   --memory-model model          Set the memory model
+  --no-utf8                     Disable use of UTF-8 in diagnostics
   --register-space b            Set space available for register variables
   --register-vars               Enable register variables
   --rodata-name seg             Set the name of the RODATA segment
@@ -159,6 +161,14 @@ Here is a description of all the command line options:
   generation and optimization phases. It gives the allowed size increase
   factor (in percent). The default is 100 when not using <tt/-Oi/ and 200 when
   using <tt/-Oi/ (<tt/-Oi/ is the same as <tt/-O --codesize&nbsp;200/).
+
+
+  <label id="option--color">
+  <tag><tt>--color</tt></tag>
+
+  This option controls if the compiler will use colors when printing
+  diagnostics. The default is "auto" which will enable colors if the output
+  goes to a terminal (not to a file).
 
 
   <label id="option--cpu">
@@ -535,6 +545,14 @@ Here is a description of all the command line options:
       This memory model uses 24 bit addresses for code and data. It is
       suited for the 65816 but currently unsupported.
   </descrip>
+
+
+  <label id="option--no-utf8">
+  <tag><tt>--no-utf8</tt></tag>
+
+  Disable the use of UTF-8 characters in diagnostics. This might be necessary
+  if auto detection fails or if the output is captured for processing with a
+  tool that is not UTF-8 capable.
 
 
   <tag><tt>-o name</tt></tag>

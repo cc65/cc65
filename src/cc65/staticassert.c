@@ -90,7 +90,7 @@ void ParseStaticAssert (void)
         } else {
             /* Issue an error including the message if the static_assert failed. */
             if (failed) {
-                Error ("static_assert failed '%s'", GetLiteralStr (CurTok.SVal));
+                Error ("static_assert failed `%s'", GetLiteralStr (CurTok.SVal));
             }
 
             /* Consume the string constant, now that we don't need it anymore.
@@ -126,3 +126,4 @@ ExitPoint:
         SmartErrorSkip (1);
     }
 }
+

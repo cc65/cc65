@@ -160,7 +160,7 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
             ** we cannot allow that here.
             */
             if (ParseInit (Sym->Type) != Size) {
-                Error ("Cannot initialize flexible array members of storage class 'register'");
+                Error ("Cannot initialize flexible array members of storage class `register'");
             }
 
             /* Generate code to copy this data into the variable space */
@@ -209,9 +209,9 @@ static void ParseRegisterDecl (Declarator* Decl, int Reg)
     /* Cannot allocate a variable of unknown size */
     if (HasUnknownSize (Sym->Type)) {
         if (IsTypeArray (Decl->Type)) {
-            Error ("Array '%s' has unknown size", Decl->Ident);
+            Error ("Array `%s' has unknown size", Decl->Ident);
         } else {
-            Error ("Variable '%s' has unknown size", Decl->Ident);
+            Error ("Variable `%s' has unknown size", Decl->Ident);
         }
     }
 }
@@ -405,9 +405,9 @@ static void ParseAutoDecl (Declarator* Decl)
     /* Cannot allocate an incomplete variable */
     if (HasUnknownSize (Sym->Type)) {
         if (IsTypeArray (Decl->Type)) {
-            Error ("Array '%s' has unknown size", Decl->Ident);
+            Error ("Array `%s' has unknown size", Decl->Ident);
         } else {
-            Error ("Variable '%s' has unknown size", Decl->Ident);
+            Error ("Variable `%s' has unknown size", Decl->Ident);
         }
     }
 }
@@ -463,9 +463,9 @@ static void ParseStaticDecl (Declarator* Decl)
     /* Cannot allocate an incomplete variable */
     if (HasUnknownSize (Sym->Type)) {
         if (IsTypeArray (Decl->Type)) {
-            Error ("Array '%s' has unknown size", Decl->Ident);
+            Error ("Array `%s' has unknown size", Decl->Ident);
         } else {
-            Error ("Variable '%s' has unknown size", Decl->Ident);
+            Error ("Variable `%s' has unknown size", Decl->Ident);
         }
     }
 }
@@ -545,7 +545,7 @@ static int ParseOneDecl (DeclSpec* Spec)
         if ((Decl.StorageClass & SC_STORAGEMASK) == SC_EXTERN) {
             /* External identifier - may not get initialized */
             if (CurTok.Tok == TOK_ASSIGN) {
-                Error ("Cannot initialize extern variable '%s'", Decl.Ident);
+                Error ("Cannot initialize extern variable `%s'", Decl.Ident);
                 /* Avoid excess errors */
                 NextToken ();
                 ParseInit (Decl.Type);

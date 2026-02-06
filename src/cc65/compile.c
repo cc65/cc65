@@ -229,7 +229,7 @@ static void Parse (void)
 
                     /* This is a definition with storage */
                     if (SymIsDef (Sym)) {
-                        Error ("Global variable '%s' has already been defined",
+                        Error ("Global variable `%s' has already been defined",
                                Sym->Name);
                     }
                     Sym->Flags |= SC_DEF;
@@ -241,11 +241,11 @@ static void Parse (void)
                         if (!IsEmptiableObjectType (Decl.Type)) {
                             if (!IsTypeArray (Decl.Type)) {
                                 /* Size is unknown and not an array */
-                                Error ("Cannot initialize variable '%s' of unknown size", Decl.Ident);
+                                Error ("Cannot initialize variable `%s' of unknown size", Decl.Ident);
                             }
                         } else if (IS_Get (&Standard) != STD_CC65) {
                             /* We cannot declare variables of type void */
-                            Error ("Illegal type '%s' for variable '%s'",
+                            Error ("Illegal type `%s' for variable `%s'",
                                    GetFullTypeName (Decl.Type),
                                    Decl.Ident);
                         }
@@ -275,12 +275,12 @@ static void Parse (void)
                     /* This is a declaration */
                     if (IsTypeVoid (Decl.Type)) {
                         /* We cannot declare variables of type void */
-                        Error ("Illegal type for variable '%s'", Decl.Ident);
+                        Error ("Illegal type for variable `%s'", Decl.Ident);
                         Sym->Flags |= SC_DEF;
                     } else if (Size == 0 && SymIsDef (Sym) && !IsEmptiableObjectType (Decl.Type)) {
                         /* Size is unknown. Is it an array? */
                         if (!IsTypeArray (Decl.Type)) {
-                            Error ("Variable '%s' has unknown size", Decl.Ident);
+                            Error ("Variable `%s' has unknown size", Decl.Ident);
                             Sym->Flags |= SC_DEF;
                         }
                     } else {
@@ -289,7 +289,7 @@ static void Parse (void)
                         */
                         if (Size == 0 && IsTypeEnum (Decl.Type)) {
                             if (IS_Get (&Standard) != STD_CC65) {
-                                Warning ("ISO C forbids forward references to 'enum' types");
+                                Warning ("ISO C forbids forward references to `enum' types");
                             }
                         }
 
@@ -307,7 +307,7 @@ static void Parse (void)
 
                         if (Sym->V.BssName != 0) {
                             if (strcmp (Sym->V.BssName, bssName) != 0) {
-                                Error ("Global variable '%s' already was defined in the '%s' segment",
+                                Error ("Global variable `%s' already was defined in the `%s' segment",
                                        Sym->Name, Sym->V.BssName);
                             }
                         } else {
@@ -537,7 +537,7 @@ void Compile (const char* FileName)
                         /* Assume array size of 1 */
                         SetElementCount (Entry->Type, 1);
                         Size = SizeOf (Entry->Type);
-                        Warning ("Incomplete array '%s[]' assumed to have one element", Entry->Name);
+                        Warning ("Incomplete array `%s[]' assumed to have one element", Entry->Name);
                     }
 
                     TagSym = GetESUTagSym (GetElementType (Entry->Type));
@@ -558,17 +558,17 @@ void Compile (const char* FileName)
                     Entry->Flags |= SC_DEF;
                 } else if (!IsTypeArray (Entry->Type)) {
                     /* Tentative declared variable is still of incomplete type */
-                    Error ("Definition of '%s' never has its type '%s' completed",
+                    Error ("Definition of `%s' never has its type `%s' completed",
                            Entry->Name,
                            GetFullTypeName (Entry->Type));
                 }
             } else if (!SymIsDef (Entry) && (Entry->Flags & SC_TYPEMASK) == SC_FUNC) {
                 /* Check for undefined functions */
                 if ((Entry->Flags & SC_STORAGEMASK) == SC_STATIC && SymIsRef (Entry)) {
-                    Warning ("Static function '%s' used but never defined",
+                    Warning ("Static function `%s' used but never defined",
                              Entry->Name);
                 } else if ((Entry->Flags & SC_INLINE) != 0) {
-                    Warning ("Inline function '%s' %s but never defined",
+                    Warning ("Inline function `%s' %s but never defined",
                              Entry->Name,
                              SymIsRef (Entry) ? "used" : "declared");
                 }

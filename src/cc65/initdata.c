@@ -574,9 +574,9 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
             if (IsSignUnsigned (TagSym->Type)) {
                 if (Field.IVal < 0 || (unsigned long) Field.IVal != Val) {
                     Warning (IsSignUnsigned (Field.Type) ?
-                             "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             "Implicit truncation from `%s' to `%s : %u' in bit-field initializer"
                              " changes value from %lu to %lu" :
-                             "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             "Implicit truncation from `%s' to `%s : %u' in bit-field initializer"
                              " changes value from %ld to %lu",
                              GetFullTypeName (Field.Type), GetFullTypeName (TagSym->Type),
                              TagSym->Type->A.B.Width, Field.IVal, Val);
@@ -587,9 +587,9 @@ static unsigned ParseStructInit (Type* T, int* Braces, int AllowFlexibleMembers)
                 long RestoredVal = asr_l (asl_l (Val, ShiftBits), ShiftBits);
                 if (Field.IVal != RestoredVal) {
                     Warning (IsSignUnsigned (Field.Type) ?
-                             "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             "Implicit truncation from `%s' to `%s : %u' in bit-field initializer"
                              " changes value from %lu to %ld" :
-                             "Implicit truncation from '%s' to '%s : %u' in bit-field initializer"
+                             "Implicit truncation from `%s' to `%s : %u' in bit-field initializer"
                              " changes value from %ld to %ld",
                              GetFullTypeName (Field.Type), GetFullTypeName (TagSym->Type),
                              TagSym->Type->A.B.Width, Field.IVal, RestoredVal);
@@ -740,7 +740,7 @@ static unsigned ParseVoidInit (Type* T)
 
     /* Number of bytes determined by initializer */
     if (T->A.U != 0 && T->A.U != Size) {
-        Error ("'void' array initialized with elements of variant sizes");
+        Error ("`void' array initialized with elements of variant sizes");
     } else {
         T->A.U = Size;
     }

@@ -132,11 +132,11 @@ int F_CheckParamList (FuncDesc* D, int RequireAll)
         unsigned Size = SizeOf (Param->Type);
         if (RequireAll && IsIncompleteESUType (Param->Type)) {
             if (D->Flags & FD_UNNAMED_PARAMS) {
-                Error ("Parameter %u has incomplete type '%s'",
+                Error ("Parameter %u has incomplete type `%s'",
                        D->ParamCount - I,
                        GetFullTypeName (Param->Type));
             } else {
-                Error ("Parameter '%s' has incomplete type '%s'",
+                Error ("Parameter `%s' has incomplete type `%s'",
                        Param->Name,
                        GetFullTypeName (Param->Type));
             }
@@ -469,11 +469,11 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
     if (!IsTypeArray (ReturnType) && !IsTypeFunc (ReturnType)) {
         /* There are already diagnostics on returning arrays or functions */
         if (IsIncompleteESUType (ReturnType)) {
-            Error ("Function has incomplete return type '%s'",
+            Error ("Function has incomplete return type `%s'",
                     GetFullTypeName (ReturnType));
         } else if (IsPassByRefType (ReturnType)) {
             /* Handle struct/union specially */
-            Error ("Function return type '%s' of size %u is unsupported",
+            Error ("Function return type `%s' of size %u is unsupported",
                    GetFullTypeName (ReturnType), SizeOf (ReturnType));
         }
     }
@@ -585,7 +585,7 @@ void NewFunc (SymEntry* Func, FuncDesc* D)
                 ** We don't currently support this case.
                 */
                 if (RType == Param->Type) {
-                    Error ("Passing '%s' of this size (%d) by value is not supported", GetFullTypeName (Param->Type), SizeOf (RType));
+                    Error ("Passing `%s' of this size (%d) by value is not supported", GetFullTypeName (Param->Type), SizeOf (RType));
                 }
             }
 

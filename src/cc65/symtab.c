@@ -172,17 +172,17 @@ static void CheckSymTable (SymTable* Tab)
                     if (Flags & SC_PARAM) {
                         if (IS_Get (&WarnUnusedParam) &&
                             !IsAnonName (Entry->Name)) {
-                            Warning ("Parameter '%s' is never used", Entry->Name);
+                            Warning ("Parameter `%s' is never used", Entry->Name);
                         }
                     } else if ((Flags & SC_TYPEMASK) == SC_FUNC) {
                         if (IS_Get (&WarnUnusedFunc)) {
-                            Warning ("Function '%s' is defined but never used", Entry->Name);
+                            Warning ("Function `%s' is defined but never used", Entry->Name);
                         }
                     } else if ((Flags & SC_TYPEMASK) == SC_NONE) {
                         if (IS_Get (&WarnUnusedVar) &&
                             !IsAnonName (Entry->Name) &&
                             (Flags & SC_CONST) != SC_CONST) {
-                            Warning ("Variable '%s' is defined but never used", Entry->Name);
+                            Warning ("Variable `%s' is defined but never used", Entry->Name);
                         }
                     }
                 }
@@ -192,11 +192,11 @@ static void CheckSymTable (SymTable* Tab)
             if ((Flags & SC_TYPEMASK) == SC_LABEL) {
                 if (!SymIsDef (Entry)) {
                     /* Undefined label */
-                    Error ("Undefined label: '%s'", Entry->Name);
+                    Error ("Undefined label: `%s'", Entry->Name);
                 } else if (!SymIsRef (Entry)) {
                     /* Defined but not used */
                     if (IS_Get (&WarnUnusedLabel)) {
-                        Warning ("Label '%s' is defined but never used", Entry->Name);
+                        Warning ("Label `%s' is defined but never used", Entry->Name);
                     }
                 }
             }
@@ -270,7 +270,7 @@ void EnterGlobalLevel (void)
         /* Open the table file */
         DebugTableFile = fopen (OutName, "w");
         if (DebugTableFile == 0) {
-            Error ("Cannot create table dump file '%s': %s", OutName, strerror (errno));
+            Error ("Cannot create table dump file `%s': %s", OutName, strerror (errno));
         }
     }
     else if (Debug) {
@@ -339,7 +339,7 @@ void LeaveGlobalLevel (void)
 
         /* Close the file */
         if (DebugTableFile != stdout && fclose (DebugTableFile) != 0) {
-            Error ("Error closing table dump file '%s': %s", SB_GetConstBuf(&DebugTableName), strerror (errno));
+            Error ("Error closing table dump file `%s': %s", SB_GetConstBuf(&DebugTableName), strerror (errno));
         }
     }
 
@@ -710,13 +710,13 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
         /* Existing typedefs cannot be redeclared as anything different */
         if (SCType == SC_TYPEDEF) {
             if (IsDistinctRedef (E_Type, T, TC_IDENTICAL, TCF_MASK_QUAL)) {
-                Error ("Conflicting types for typedef '%s'", Sym->Name);
-                Notification ("'%s' vs '%s'", GetFullTypeName (T),
+                Error ("Conflicting types for typedef `%s'", Sym->Name);
+                Notification ("`%s' vs `%s'", GetFullTypeName (T),
                               GetFullTypeName (E_Type));
                 Sym = 0;
             }
         } else {
-            Error ("Redefinition of typedef '%s' as different kind of symbol", Sym->Name);
+            Error ("Redefinition of typedef `%s' as different kind of symbol", Sym->Name);
             Sym = 0;
         }
 
@@ -732,14 +732,14 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
 
             /* Check for duplicate function definitions */
             if (SymIsDef (Sym) && (Flags & SC_DEF) == SC_DEF) {
-                Error ("Body for function '%s' has already been defined",
+                Error ("Body for function `%s' has already been defined",
                         Sym->Name);
                 Sym = 0;
             } else {
                 /* New type must be compatible with the composite prototype */
                 if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
-                    Error ("Conflicting function types for '%s'", Sym->Name);
-                    Notification ("'%s' vs '%s'", GetFullTypeName (T),
+                    Error ("Conflicting function types for `%s'", Sym->Name);
+                    Notification ("`%s' vs `%s'", GetFullTypeName (T),
                                   GetFullTypeName (E_Type));
                     Sym = 0;
                 } else {
@@ -751,7 +751,7 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
             }
 
         } else {
-            Error ("Redefinition of function '%s' as different kind of symbol", Sym->Name);
+            Error ("Redefinition of function `%s' as different kind of symbol", Sym->Name);
             Sym = 0;
         }
 
@@ -771,8 +771,8 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
             if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
                 IsDistinctRedef (E_Type + 1, T + 1, TC_IDENTICAL, TCF_MASK_QUAL)) {
                 /* Conflicting element types */
-                Error ("Conflicting array types for '%s[]'", Sym->Name);
-                Notification ("'%s' vs '%s'", GetFullTypeName (T),
+                Error ("Conflicting array types for `%s[]'", Sym->Name);
+                Notification ("`%s' vs `%s'", GetFullTypeName (T),
                               GetFullTypeName (E_Type));
                 Sym = 0;
             } else {
@@ -787,11 +787,11 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
 
             /* New type must be equivalent */
             if (SCType != E_SCType) {
-                Error ("Redefinition of '%s' as different kind of symbol", Sym->Name);
+                Error ("Redefinition of `%s' as different kind of symbol", Sym->Name);
                 Sym = 0;
             } else if (IsDistinctRedef (E_Type, T, TC_EQUAL, TCF_MASK_QUAL)) {
-                Error ("Conflicting types for '%s'", Sym->Name);
-                Notification ("'%s' vs '%s'", GetFullTypeName (T),
+                Error ("Conflicting types for `%s'", Sym->Name);
+                Notification ("`%s' vs `%s'", GetFullTypeName (T),
                               GetFullTypeName (E_Type));
                 Sym = 0;
             } else if (E_SCType == SC_ENUMERATOR) {
@@ -799,7 +799,7 @@ static int HandleSymRedefinition (SymEntry* Sym, const Type* T, unsigned Flags)
                 ** all occurences are identical. The current code logic won't
                 ** get here, but let's just do it.
                 */
-                Error ("Redeclaration of enumerator constant '%s'", Sym->Name);
+                Error ("Redeclaration of enumerator constant `%s'", Sym->Name);
                 Sym = 0;
             }
         }
@@ -859,13 +859,13 @@ SymEntry* AddEnumSym (const char* Name, unsigned Flags, const Type* Type, SymTab
         /* We do have an entry. This may be a forward, so check it. */
         if ((TagEntry->Flags & SC_TYPEMASK) != SC_ENUM) {
             /* Existing symbol is not an enum */
-            Error ("Symbol '%s' is already different kind", Name);
+            Error ("Symbol `%s' is already different kind", Name);
             TagEntry = 0;
         } else if (Type != 0) {
             /* Define the struct size if the underlying type is given. */
             if (TagEntry->V.E.Type != 0) {
                 /* Both are definitions. */
-                Error ("Multiple definition for 'enum %s'", Name);
+                Error ("Multiple definition for `enum %s'", Name);
                 TagEntry = 0;
             } else {
                 TagEntry->V.E.SymTab = Tab;
@@ -934,14 +934,14 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
         /* We do have an entry. This may be a forward, so check it. */
         if ((TagEntry->Flags & SC_TYPEMASK) != SCType) {
             /* Existing symbol is not a struct */
-            Error ("Symbol '%s' is already different kind", Name);
+            Error ("Symbol `%s' is already different kind", Name);
             TagEntry = 0;
         } else if ((TagEntry->Flags & Flags & SC_DEF) == SC_DEF) {
             /* Both structs are definitions. */
             if (SCType == SC_STRUCT) {
-                Error ("Multiple definition for 'struct %s'", Name);
+                Error ("Multiple definition for `struct %s'", Name);
             } else {
-                Error ("Multiple definition for 'union %s'", Name);
+                Error ("Multiple definition for `union %s'", Name);
             }
             TagEntry = 0;
         } else {
@@ -962,7 +962,7 @@ SymEntry* AddStructSym (const char* Name, unsigned Flags, unsigned Size, SymTabl
                 } else if (Size == 0) {
                     /* Empty struct is not supported now */
                     if (!IsAnonName (Name)) {
-                        Error ("Empty %s type '%s' is not supported",
+                        Error ("Empty %s type `%s' is not supported",
                                SCType == SC_STRUCT ? "struct" : "union", Name);
                     } else {
                         Error ("Empty %s type is not supported",
@@ -1016,7 +1016,7 @@ SymEntry* AddBitField (const char* Name, const Type* T, unsigned Offs,
     if (Entry) {
 
         /* We have a symbol with this name already */
-        Error ("Multiple definition for bit-field '%s'", Name);
+        Error ("Multiple definition for bit-field `%s'", Name);
 
     } else {
 
@@ -1060,9 +1060,9 @@ SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val
 
     if (Entry) {
         if ((Entry->Flags & SC_TYPEMASK) != (Flags & SC_TYPEMASK)) {
-            Error ("Symbol '%s' is already different kind", Name);
+            Error ("Symbol `%s' is already different kind", Name);
         } else {
-            Error ("Multiple definition for constant '%s'", Name);
+            Error ("Multiple definition for constant `%s'", Name);
         }
         return Entry;
     }
@@ -1133,7 +1133,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
         if (SymIsDef (Entry) && (Flags & SC_DEF) != 0) {
             /* Trying to define the label more than once */
-            Error ("Label '%s' is defined more than once", Name);
+            Error ("Label `%s' is defined more than once", Name);
         }
 
         NewDOR = AddDefOrRef (Entry, Flags);
@@ -1261,16 +1261,16 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
         } else if ((Flags & SC_TYPEMASK) != SC_TYPEDEF) {
             /* Redefinitions are not allowed */
             if (SymIsDef (Entry) && (Flags & SC_DEF) == SC_DEF) {
-                Error ("Multiple definition of '%s'", Entry->Name);
+                Error ("Multiple definition of `%s'", Entry->Name);
                 Entry = 0;
             } else if ((Flags & SC_STRUCTFIELD) != 0) {
-                Error ("Duplicate member '%s'", Entry->Name);
+                Error ("Duplicate member `%s'", Entry->Name);
                 Entry = 0;
             } else if (Entry->Owner == SymTab0) {
                 if ((Flags & SC_STORAGEMASK) == SC_AUTO ||
                     (Flags & SC_STORAGEMASK) == SC_REGISTER ||
                     (Flags & SC_STORAGEMASK) == SC_STATIC) {
-                    Error ("Declaration of '%s' with no linkage follows extern declaration",
+                    Error ("Declaration of `%s' with no linkage follows extern declaration",
                            Name);
                     Entry = 0;
                 }
@@ -1365,7 +1365,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
             ** error since the two declarations would be referring to different
             ** objects with the same identifier.
             */
-            Error ("Extern declaration of '%s' follows declaration with no linkage",
+            Error ("Extern declaration of `%s' follows declaration with no linkage",
                    Name);
             Entry = 0;
         } else if ((Flags & SC_TYPEMASK) != SC_TYPEDEF) {
@@ -1391,7 +1391,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
                     /* It is a static declaration of an object or function that
                     ** has internal linkage. Conflicted wih the previous one.
                     */
-                    Error ("Static declaration of '%s' follows non-static declaration",
+                    Error ("Static declaration of `%s' follows non-static declaration",
                            Name);
                     Entry = 0;
                 }
@@ -1409,14 +1409,14 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
                     ** standard.
                     */
                     Flags &= ~SC_STORAGEMASK;
-                    Warning ("Extern declaration of '%s' follows static declaration",
+                    Warning ("Extern declaration of `%s' follows static declaration",
                              Name);
                 } else if ((Flags & SC_STORAGEMASK) == SC_NONE) {
                     /* It is a non-extern-or-static declaration of an object in
                     ** file scope that has external linkage. Conflicted wih the
                     ** previous one.
                     */
-                    Error ("Non-static declaration of '%s' follows static declaration",
+                    Error ("Non-static declaration of `%s' follows static declaration",
                            Name);
                     Entry = 0;
                 }
@@ -1556,7 +1556,7 @@ void MakeZPSym (const char* Name)
     if (Entry) {
         Entry->Flags |= SC_ZEROPAGE;
     } else {
-        Error ("Undeclared symbol: '%s'", Name);
+        Error ("Undeclared symbol: `%s'", Name);
     }
 }
 

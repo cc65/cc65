@@ -271,7 +271,7 @@ int SB_GetNumber (StrBuf* B, long* Val)
         SB_Skip (B);
         *Val = SignExtendChar (TgtTranslateChar (ParseChar (B)));
         if (SB_Peek (B) != '\'') {
-            Error ("'\'' expected");
+            Error ("`\'' expected");
             return 0;
         } else {
             /* Skip the quote */

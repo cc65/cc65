@@ -543,7 +543,7 @@ static void SegNamePragma (pragma_scope_t Scope, pragma_t Token, StrBuf* B)
     } else {
 
         /* Segment name is invalid */
-        Error ("Illegal segment name: '%s'", Name);
+        Error ("Illegal segment name: `%s'", Name);
 
     }
 
@@ -600,7 +600,7 @@ static void WrappedCallPragma (pragma_scope_t Scope, StrBuf* B)
     /* Skip the following comma */
     if (!GetComma (B)) {
         /* Error already flagged by GetComma */
-        Error ("Value or the word 'bank' required for wrapped-call identifier");
+        Error ("Value or the word `bank' required for wrapped-call identifier");
         goto ExitPoint;
     }
 
@@ -892,7 +892,7 @@ static void ParsePragmaString (StrBuf* B)
         ** for unknown pragmas, but warn about them if enabled (the default).
         */
         if (IS_Get (&WarnUnknownPragma)) {
-            Warning ("Unknown pragma '%s'", SB_GetConstBuf (&Ident));
+            Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
         }
         goto ExitPoint;
     }

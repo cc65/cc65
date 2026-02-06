@@ -182,7 +182,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
         struct stat Buf;
         if (FileStat (IF->Name, &Buf) != 0) {
             /* Error */
-            Fatal ("Cannot stat '%s': %s", IF->Name, strerror (errno));
+            Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
         }
         IF->Size  = (unsigned long) Buf.st_size;
         IF->MTime = (unsigned long) Buf.st_mtime;
@@ -262,7 +262,7 @@ void OpenMainFile (const char* Name)
     FILE* F = fopen (Name, "r");
     if (F == 0) {
         /* Cannot open */
-        Fatal ("Cannot open input file '%s': %s", Name, strerror (errno));
+        Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
     }
 
     /* Allocate a new AFile structure for the file */
@@ -305,7 +305,7 @@ void OpenIncludeFile (const char* Name, InputType IT)
     /* Search for the file */
     N = SearchFile ((IT == IT_SYSINC)? SysIncSearchPath : UsrIncSearchPath, Name);
     if (N == 0) {
-        PPError ("Include file '%s' not found", Name);
+        PPError ("Include file `%s' not found", Name);
         return;
     }
 
@@ -334,12 +334,12 @@ void OpenIncludeFile (const char* Name, InputType IT)
     F = fopen (IF->Name, "r");
     if (F == 0) {
         /* Error opening the file */
-        PPError ("Cannot open include file '%s': %s", IF->Name, strerror (errno));
+        PPError ("Cannot open include file `%s': %s", IF->Name, strerror (errno));
         return;
     }
 
     /* Debugging output */
-    Print (stdout, 1, "Opened include file '%s'\n", IF->Name);
+    Print (stdout, 1, "Opened include file `%s'\n", IF->Name);
 
     /* Allocate a new AFile structure */
     AF = NewAFile (IF, F);
@@ -903,7 +903,7 @@ static void CreateDepFile (const char* Name, InputType Types)
     /* Open the file */
     FILE* F = fopen (Name, "w");
     if (F == 0) {
-        Fatal ("Cannot open dependency file '%s': %s", Name, strerror (errno));
+        Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
     }
 
     /* If a dependency target was given, use it, otherwise use the output

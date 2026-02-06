@@ -76,7 +76,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType, int Explicit)
 
     /* Don't allow casts from void to something else. */
     if (IsTypeVoid (OldType)) {
-        Error ("Cannot convert from 'void' to something else");
+        Error ("Cannot convert from `void' to something else");
         goto ExitPoint;
     }
 
@@ -257,21 +257,21 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
                 /* Specific warning for pointer signedness difference */
                 if (IS_Get (&WarnPointerSign)) {
                     TypeCompatibilityDiagnostic (NewType, Expr->Type,
-                        0, "Pointer conversion to '%s' from '%s' changes pointer signedness");
+                        0, "Pointer conversion to `%s' from `%s' changes pointer signedness");
                 }
             } else if ((Result.C <= TC_PTR_INCOMPATIBLE ||
                  (Result.F & TCF_INCOMPATIBLE_QUAL) != 0)) {
                 /* Incompatible pointee types or qualifiers */
                 if (IS_Get (&WarnPointerTypes)) {
                     TypeCompatibilityDiagnostic (NewType, Expr->Type,
-                        0, "Incompatible pointer conversion to '%s' from '%s'");
+                        0, "Incompatible pointer conversion to `%s' from `%s'");
                 }
             }
 
             if ((Result.F & TCF_PTR_QUAL_DIFF) != 0) {
                 /* Discarding qualifiers is a bad thing and we always warn */
                 TypeCompatibilityDiagnostic (NewType, Expr->Type,
-                    0, "Pointer conversion to '%s' from '%s' discards qualifiers");
+                    0, "Pointer conversion to `%s' from `%s' discards qualifiers");
             }
 
         } else if (IsClassInt (Expr->Type)) {
@@ -290,7 +290,7 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
 
     /* Set default diagnostic message */
     if (Msg == 0) {
-        Msg = "Converting to '%s' from '%s'";
+        Msg = "Converting to `%s' from `%s'";
     }
 
     if (HasError) {
@@ -306,9 +306,9 @@ void TypeConversion (ExprDesc* Expr, const Type* NewType)
             ** be safe, we must ensure that we do have errors.
             */
             if (IsIncompleteESUType (NewType)) {
-                Error ("Conversion to incomplete type '%s'", GetFullTypeName (NewType));
+                Error ("Conversion to incomplete type `%s'", GetFullTypeName (NewType));
             } else {
-                Error ("Conversion from incomplete type '%s'", GetFullTypeName (Expr->Type));
+                Error ("Conversion from incomplete type `%s'", GetFullTypeName (Expr->Type));
             }
         }
     }
@@ -343,14 +343,14 @@ void TypeCast (ExprDesc* Expr)
                 DoConversion (Expr, NewType, 1);
             } else {
                 TypeCompatibilityDiagnostic (NewType, Expr->Type, 1,
-                    "Cast to incompatible type '%s' from '%s'");
+                    "Cast to incompatible type `%s' from `%s'");
             }
         } else {
-            Error ("Cast to incomplete type '%s'",
+            Error ("Cast to incomplete type `%s'",
                    GetFullTypeName (NewType));
         }
     } else {
-        Error ("Arithmetic or pointer type expected but %s is used",
+        Error ("Arithmetic or pointer type expected but `%s' is used",
                GetBasicTypeName (NewType));
     }
 

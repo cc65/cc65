@@ -225,7 +225,7 @@ void ParseAttribute (Declarator* D)
 
         } else {
             /* Attribute not known, maybe typo */
-            Error ("Illegal attribute: '%s'", AttrName);
+            Error ("Illegal attribute: `%s'", AttrName);
 
             /* Skip until end of attribute */
             ErrorSkip ();

@@ -266,25 +266,25 @@ static void VPrintMsg (SourcePos SP, const LineInfo* LI, DiagCat Cat,
     ** worth.
     */
     if (Debug) {
-       	SB_Printf (&S, "%s[%s:%u] %s: %s%s:%s %s%s",
-	     	   CP_White (),
+        SB_Printf (&S, "%s[%s:%u] %s: %s%s:%s %s%s",
+                   CP_White (),
                    SP.File,
                    SP.Line,
-    	     	   SB_GetConstBuf (&Loc),
-	     	   Color,
-	     	   Desc,
-	     	   CP_White (),
-	     	   SB_GetConstBuf (&Msg),
-	     	   CP_Reset ());
+                   SB_GetConstBuf (&Loc),
+                   Color,
+                   Desc,
+                   CP_White (),
+                   SB_GetConstBuf (&Msg),
+                   CP_Reset ());
     } else {
-	SB_Printf (&S, "%s%s: %s%s:%s %s%s",
-	     	   CP_White (),
-	     	   SB_GetConstBuf (&Loc),
-	     	   Color,
-	     	   Desc,
-	     	   CP_White (),
-	     	   SB_GetConstBuf (&Msg),
-	     	   CP_Reset ());
+        SB_Printf (&S, "%s%s: %s%s:%s %s%s",
+                   CP_White (),
+                   SB_GetConstBuf (&Loc),
+                   Color,
+                   Desc,
+                   CP_White (),
+                   SB_GetConstBuf (&Msg),
+                   CP_Reset ());
     }
 
     /* Delete the formatted message and the location string */
@@ -303,7 +303,7 @@ static void VPrintMsg (SourcePos SP, const LineInfo* LI, DiagCat Cat,
 
     /* Bump error counters */
     switch (Cat) {
-        case DC_PPWARN:	++PPWarningCount;       break;
+        case DC_PPWARN: ++PPWarningCount;       break;
         case DC_WARN:   ++WarningCount;         break;
         case DC_PPERR:  ++PPErrorCount;         break;
         case DC_ERR:    ++ErrorCount;           break;
@@ -501,8 +501,8 @@ static void IntWarning (SourcePos SP, DiagCat Cat, LineInfo* LI,
         }
         RememberCheckedLI (LI);
 
-    	/* Output the formatted message */
-       	VPrintMsg (SP, LI, Cat, Msg, ap);
+        /* Output the formatted message */
+        VPrintMsg (SP, LI, Cat, Msg, ap);
     }
 }
 

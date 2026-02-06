@@ -478,7 +478,7 @@ static void CharConst (void)
 
     /* Check for closing quote */
     if (CurC != '\'') {
-        Error ("'\'' expected");
+        Error ("`\'' expected");
     } else {
         /* Skip the quote */
         NextChar ();
@@ -615,7 +615,7 @@ static void NumericConst (void)
     while ((C = SB_Peek (&Src)) != '\0' && (Base <= 10 ? IsDigit (C) : IsXDigit (C))) {
         DigitVal = HexVal (C);
         if (DigitVal >= Base) {
-            Error ("Invalid digit \"%c\" beyond radix %u constant", C, Base);
+            Error ("Invalid digit `%c' beyond radix %u constant", C, Base);
             SB_Clear (&Src);
             break;
         }
@@ -627,7 +627,7 @@ static void NumericConst (void)
         SB_Skip (&Src);
     }
     if (Overflow) {
-        Error ("Numerical constant \"%s\" too large for internal %d-bit representation",
+        Error ("Numerical constant `%s' too large for internal %d-bit representation",
                SB_GetConstBuf (&Src), (int)(sizeof(IVal)*CHAR_BIT));
     }
 
@@ -662,7 +662,7 @@ static void NumericConst (void)
             }
         } else {
             if (SB_Peek (&Src) != '\0') {
-                Error ("Invalid suffix \"%s\" on integer constant",
+                Error ("Invalid suffix `%s' on integer constant",
                        SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
             }
 
@@ -811,7 +811,7 @@ static void NumericConst (void)
             NextTok.Type = type_float;
         } else {
             if (SB_Peek (&Src) != '\0') {
-                Error ("Invalid suffix \"%s\" on floating constant",
+                Error ("Invalid suffix `%s' on floating constant",
                        SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
             }
             NextTok.Type = type_double;
@@ -1499,7 +1499,7 @@ int Consume (token_t Token, const char* ErrorMsg)
 int ConsumeColon (void)
 /* Check for a colon and skip it. */
 {
-    return Consume (TOK_COLON, "':' expected");
+    return Consume (TOK_COLON, "`:' expected");
 }
 
 
@@ -1512,7 +1512,7 @@ int ConsumeSemi (void)
         NextToken ();
         return 1;
     } else {
-        Error ("';' expected");
+        Error ("`;' expected");
         if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
             NextToken ();
         }
@@ -1530,7 +1530,7 @@ int ConsumeComma (void)
         NextToken ();
         return 1;
     } else {
-        Error ("',' expected");
+        Error ("`,' expected");
         if (CurTok.Tok == TOK_SEMI) {
             NextToken ();
         }
@@ -1543,7 +1543,7 @@ int ConsumeComma (void)
 int ConsumeLParen (void)
 /* Check for a left parenthesis and skip it */
 {
-    return Consume (TOK_LPAREN, "'(' expected");
+    return Consume (TOK_LPAREN, "`(' expected");
 }
 
 
@@ -1551,7 +1551,7 @@ int ConsumeLParen (void)
 int ConsumeRParen (void)
 /* Check for a right parenthesis and skip it */
 {
-    return Consume (TOK_RPAREN, "')' expected");
+    return Consume (TOK_RPAREN, "`)' expected");
 }
 
 
@@ -1559,7 +1559,7 @@ int ConsumeRParen (void)
 int ConsumeLBrack (void)
 /* Check for a left bracket and skip it */
 {
-    return Consume (TOK_LBRACK, "'[' expected");
+    return Consume (TOK_LBRACK, "`[' expected");
 }
 
 
@@ -1567,7 +1567,7 @@ int ConsumeLBrack (void)
 int ConsumeRBrack (void)
 /* Check for a right bracket and skip it */
 {
-    return Consume (TOK_RBRACK, "']' expected");
+    return Consume (TOK_RBRACK, "`]' expected");
 }
 
 
@@ -1575,7 +1575,7 @@ int ConsumeRBrack (void)
 int ConsumeLCurly (void)
 /* Check for a left curly brace and skip it */
 {
-    return Consume (TOK_LCURLY, "'{' expected");
+    return Consume (TOK_LCURLY, "`{' expected");
 }
 
 
@@ -1583,5 +1583,5 @@ int ConsumeLCurly (void)
 int ConsumeRCurly (void)
 /* Check for a right curly brace and skip it */
 {
-    return Consume (TOK_RCURLY, "'}' expected");
+    return Consume (TOK_RCURLY, "`}' expected");
 }

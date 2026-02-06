@@ -174,7 +174,7 @@ unsigned CG_TypeOf (const Type* T)
         case T_VOID:
         case T_ENUM:
             /* Incomplete enum type */
-            Error ("Incomplete type '%s'", GetFullTypeName (T));
+            Error ("Incomplete type `%s'", GetFullTypeName (T));
             return CF_INT;
 
         default:
@@ -379,7 +379,7 @@ static unsigned ExprCheckedSizeOf (const Type* T)
     if (Size == 0) {
         SymEntry* TagSym = GetESUTagSym (T);
         if (TagSym == 0 || !SymIsDef (TagSym)) {
-            Error ("Cannot apply 'sizeof' to incomplete type '%s'", GetFullTypeName (T));
+            Error ("Cannot apply `sizeof' to incomplete type `%s'", GetFullTypeName (T));
         }
     }
     return Size;
@@ -1300,9 +1300,9 @@ static void Primary (ExprDesc* E)
                         ** address operation.
                         */
                         if (CurTok.Tok == TOK_LPAREN) {
-                            Error ("'main' must not be called recursively");
+                            Error ("`main' must not be called recursively");
                         } else {
-                            Error ("The address of 'main' cannot be taken");
+                            Error ("The address of `main' cannot be taken");
                         }
                     }
                     ED_AddrExpr (E);
@@ -1324,9 +1324,9 @@ static void Primary (ExprDesc* E)
                     ** list and returning int.
                     */
                     if (IS_Get (&Standard) >= STD_C99) {
-                        Error ("Call to undeclared function '%s'", Ident);
+                        Error ("Call to undeclared function `%s'", Ident);
                     } else {
-                        Warning ("Call to undeclared function '%s'", Ident);
+                        Warning ("Call to undeclared function `%s'", Ident);
                     }
                     Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_REF | SC_FUNC);
                     E->Type  = Sym->Type;
@@ -1334,7 +1334,7 @@ static void Primary (ExprDesc* E)
                     E->Name  = (uintptr_t) Sym->Name;
                 } else {
                     /* Undeclared Variable */
-                    Error ("Undeclared identifier '%s'", Ident);
+                    Error ("Undeclared identifier `%s'", Ident);
                     Sym = AddLocalSym (Ident, type_int, SC_AUTO | SC_REF, 0);
                     E->Flags = E_LOC_STACK | E_RTYPE_LVAL;
                     E->Type  = type_int;
@@ -1464,7 +1464,7 @@ static void StructRef (ExprDesc* Expr)
     NextToken ();
     const SymEntry Field = FindStructField (Expr->Type, CurTok.Ident);
     if (Field.Type == 0) {
-        Error ("No field named '%s' found in '%s'", CurTok.Ident, GetFullTypeName (Expr->Type));
+        Error ("No field named `%s' found in `%s'", CurTok.Ident, GetFullTypeName (Expr->Type));
         /* Make the expression an integer at address zero */
         ED_MakeConstAbs (Expr, 0, type_int);
         return;
@@ -1546,7 +1546,7 @@ static void StructRef (ExprDesc* Expr)
                 Flags = CF_LONG | CF_UNSIGNED | CF_CONST;
                 break;
             default:
-                Internal ("Invalid '%s' size: %u", GetFullTypeName (Expr->Type), StructSize);
+                Internal ("Invalid `%s' size: %u", GetFullTypeName (Expr->Type), StructSize);
                 break;
         }
 
@@ -2098,7 +2098,7 @@ void hie10 (ExprDesc* Expr)
                 ED_MarkForUneval (&Uneval);
                 hie10 (&Uneval);
                 if (IsTypeBitField (Uneval.Type)) {
-                    Error ("Cannot apply 'sizeof' to bit-field");
+                    Error ("Cannot apply `sizeof' to bit-field");
                     Size = 0;
                 } else {
                     /* Calculate the size */
@@ -2414,7 +2414,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
         if (!IsRelationType (Expr->Type) || !IsRelationType (Expr2.Type)) {
             /* Output only one message even if both sides are wrong */
             TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                "Comparing types '%s' with '%s' is invalid");
+                "Comparing types `%s' with `%s' is invalid");
             /* Avoid further errors */
             ED_MakeConstAbsInt (Expr, 0);
             ED_MakeConstAbsInt (&Expr2, 0);
@@ -2436,10 +2436,10 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             if (!IsClassInt (Expr2.Type) && !ED_IsNullPtr (Expr)) {
                 if (IsClassPtr (Expr2.Type)) {
                     TypeCompatibilityDiagnostic (Expr->Type, PtrConversion (Expr2.Type), 0,
-                        "Comparing integer '%s' with pointer '%s'");
+                        "Comparing integer `%s' with pointer `%s'");
                 } else {
                     TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                        "Comparing types '%s' with '%s' is invalid");
+                        "Comparing types `%s' with `%s' is invalid");
                 }
             }
         } else if (IsClassPtr (Expr->Type)) {
@@ -2448,15 +2448,15 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 if (TypeCmp (Expr->Type, Expr2.Type).C < TC_VOID_PTR) {
                     /* Warn about distinct pointer types */
                     TypeCompatibilityDiagnostic (PtrConversion (Expr->Type), PtrConversion (Expr2.Type), 0,
-                        "Distinct pointer types comparing '%s' with '%s'");
+                        "Distinct pointer types comparing `%s' with `%s'");
                 }
             } else if (!ED_IsNullPtr (&Expr2)) {
                 if (IsClassInt (Expr2.Type)) {
                     TypeCompatibilityDiagnostic (PtrConversion (Expr->Type), Expr2.Type, 0,
-                        "Comparing pointer type '%s' with integer type '%s'");
+                        "Comparing pointer type `%s' with integer type `%s'");
                 } else {
                     TypeCompatibilityDiagnostic (Expr->Type, Expr2.Type, 1,
-                        "Comparing types '%s' with '%s' is invalid");
+                        "Comparing types `%s' with `%s' is invalid");
                 }
             }
         }
@@ -3251,7 +3251,7 @@ static void parsesub (ExprDesc* Expr)
         /* We cannot scale by 0-size or unknown-size */
         if (rscale == 0 && (IsClassPtr (rhst) || IsClassInt (rhst))) {
             TypeCompatibilityDiagnostic (lhst, rhst,
-                1, "Invalid pointer types in subtraction: '%s' and '%s'");
+                1, "Invalid pointer types in subtraction: `%s' and `%s'");
             /* Avoid further errors */
             rscale = 1;
         }
@@ -3279,7 +3279,7 @@ static void parsesub (ExprDesc* Expr)
         typecmp_t Cmp = TypeCmp (lhst, rhst);
         if (Cmp.C < TC_STRICT_COMPATIBLE) {
             TypeCompatibilityDiagnostic (lhst, rhst,
-                1, "Incompatible pointer types in subtraction: '%s' and '%s'");
+                1, "Incompatible pointer types in subtraction: `%s' and `%s'");
         }
 
         /* Operate on pointers, result type is an integer */
@@ -4093,7 +4093,7 @@ static void hieQuest (ExprDesc* Expr)
                 /* Must point to compatible types */
                 if (TypeCmp (Expr2.Type, Expr3.Type).C < TC_VOID_PTR) {
                     TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type,
-                        1, "Incompatible pointer types in ternary: '%s' and '%s'");
+                        1, "Incompatible pointer types in ternary: `%s' and `%s'");
                     /* Avoid further errors */
                     ResultType = NewPointerTo (type_void);
                 } else {
@@ -4119,7 +4119,7 @@ static void hieQuest (ExprDesc* Expr)
                 ResultType = TypeDup (Expr2.Type);
             } else {
                 TypeCompatibilityDiagnostic (Expr2.Type, Expr3.Type, 1,
-                    "Incompatible types in ternary '%s' with '%s'");
+                    "Incompatible types in ternary `%s' with `%s'");
                 ResultType = TypeDup (Expr2.Type);      /* Doesn't matter here */
             }
         }

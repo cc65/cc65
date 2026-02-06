@@ -817,7 +817,7 @@ static void CheckForBadIdent (const char* Ident, int Std, const Macro* M)
         /* __VA_ARGS__ cannot be used as a macro parameter name in post-C89
         ** mode.
         */
-        PPWarning ("__VA_ARGS__ can only appear in the expansion of a C99 variadic macro");
+        PPWarning ("`__VA_ARGS__' can only appear in the expansion of a C99 variadic macro");
     }
 }
 
@@ -1339,7 +1339,7 @@ static int TryPastePPTok (StrBuf* Target,
         if ((C == '.' && N == '.') || (C == '/' && (N == '/' || N == '*'))) {
             SB_AppendChar (Target, ' ');
             SB_Append (Target, Appended);
-            PPWarning ("Pasting formed \"%c%c\", an invalid preprocessing token", C, N);
+            PPWarning ("Pasting formed `%c%c', an invalid preprocessing token", C, N);
 
             return 0;
         }
@@ -1382,7 +1382,7 @@ static int TryPastePPTok (StrBuf* Target,
             NextChar ();
         }
         SB_Terminate (&Buf);
-        PPWarning ("Pasting formed \"%s\", an invalid preprocessing token",
+        PPWarning ("Pasting formed `%s', an invalid preprocessing token",
                    SB_GetConstBuf (&Buf));
 
         /* Add a space between the tokens to avoid problems in rescanning */
@@ -1642,7 +1642,7 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
         } else if (CurC == '\0') {
 
             /* End of input inside macro argument list */
-            PPError ("Unterminated argument list invoking macro '%s'", M->Name);
+            PPError ("Unterminated argument list invoking macro `%s'", M->Name);
             Parens = -1;
             ClearLine ();
             E->Flags |= MES_ERROR;
@@ -1712,7 +1712,7 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
                 }
             } else {
                 /* Too few argument */
-                PPError ("Macro \"%s\" passed only %u arguments, but requires %u",
+                PPError ("Macro `%s' passed only %u arguments, but requires %u",
                          M->Name, CollCount (&E->Args), (unsigned) M->ParamCount);
             }
         }
@@ -1726,7 +1726,7 @@ static unsigned ReadMacroArgs (unsigned NameIdx, MacroExp* E, const Macro* M, in
         }
     } else if (Parens == 0 && CollCount (&E->Args) > (unsigned) M->ParamCount) {
         /* Too many arguments */
-        PPError ("Macro \"%s\" passed %u arguments, but takes just %u",
+        PPError ("Macro `%s' passed %u arguments, but takes just %u",
                  M->Name, CollCount (&E->Args), (unsigned) M->ParamCount);
     }
 
@@ -1968,7 +1968,7 @@ static unsigned SubstMacroArgs (unsigned NameIdx, StrBuf* Target, MacroExp* E, M
                 SkipWhitespace (0);
                 if (!IsSym (Ident) || (ParamIdx = FindMacroParam (M, Ident)) < 0) {
                     /* Should not happen, but still */
-                    Internal ("'#' is not followed by a macro parameter");
+                    Internal ("`#' is not followed by a macro parameter");
                 } else {
                     /* Make a valid string from Replacement */
                     MacroExp* A = ME_GetOriginalArg (E, ParamIdx);
@@ -2471,7 +2471,7 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
     /* Check for ## at start */
     if (CurC == '#' && NextC == '#') {
         /* Diagnose and bail out */
-        PPError ("'##' cannot appear at start of macro expansion");
+        PPError ("`##' cannot appear at start of macro expansion");
         goto Error_Handler;
     }
 
@@ -2493,7 +2493,7 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
 
                     /* Check next pp-token */
                     if (!IsSym (Ident) || FindMacroParam (M, Ident) < 0) {
-                        PPError ("'#' is not followed by a macro parameter");
+                        PPError ("`#' is not followed by a macro parameter");
                         goto Error_Handler;
                     }
 
@@ -2521,7 +2521,7 @@ static int ParseMacroReplacement (StrBuf* Source, Macro* M)
         if (SB_LookAt (&M->Replacement, Len - 1) == '#' &&
             SB_LookAt (&M->Replacement, Len - 2) == '#') {
             /* Diagnose and bail out */
-            PPError ("'##' cannot appear at end of macro expansion");
+            PPError ("`##' cannot appear at end of macro expansion");
             goto Error_Handler;
         }
     }
@@ -2565,7 +2565,7 @@ static void DoDefine (void)
 
     /* Check for forbidden macro names */
     if (strcmp (Ident, "defined") == 0) {
-        PPError ("'%s' cannot be used as a macro name", Ident);
+        PPError ("`%s' cannot be used as a macro name", Ident);
         goto Error_Handler;
     }
 
@@ -2637,7 +2637,7 @@ static void DoDefine (void)
 
         /* Check for a right paren and eat it if we find one */
         if (CurC != ')') {
-            PPError ("')' expected for macro definition");
+            PPError ("`)' expected for macro definition");
             goto Error_Handler;
         }
         NextChar ();
@@ -2704,7 +2704,7 @@ static int PushIf (int Skip, int Invert, int Cond, unsigned Flags)
 {
     /* Check for an overflow of the if stack */
     if (PPStack->Index >= MAX_PP_IFS-1) {
-        PPError ("Too many nested #if clauses");
+        PPError ("Too many nested `#if' clauses");
         return 1;
     }
 
@@ -2941,20 +2941,20 @@ static unsigned GetLineDirectiveNum (void)
     if (SB_GetLen (&Buf) > 0) {
         const char* Str = SB_GetConstBuf (&Buf);
         if (Str[0] == '\0') {
-            PPWarning ("#line directive interprets number as decimal, not octal");
+            PPWarning ("`#line' directive interprets number as decimal, not octal");
         } else {
             Num = strtoul (Str, 0, 10);
             if (Num > 2147483647) {
-                PPError ("#line directive requires an integer argument not greater than 2147483647");
+                PPError ("`#line' directive requires an integer argument not greater than 2147483647");
                 ClearLine ();
                 Num = 0;
             } else if (Num == 0) {
-                PPError ("#line directive requires a positive integer argument");
+                PPError ("`#line' directive requires a positive integer argument");
                 ClearLine ();
             }
         }
     } else {
-        PPError ("#line directive requires a decimal digit sequence");
+        PPError ("`#line' directive requires a decimal digit sequence");
         ClearLine ();
     }
     SkipWhitespace (0);
@@ -2990,7 +2990,7 @@ static void DoLine (void)
                 SB_Terminate (&Filename);
                 SetCurrentFileName (SB_GetConstBuf (&Filename));
             } else {
-                PPError ("Invalid filename for #line directive");
+                PPError ("Invalid filename for `#line' directive");
                 LineNum = 0;
             }
             SB_Done (&Filename);
@@ -3143,10 +3143,10 @@ static int ParseDirectives (unsigned ModeFlags)
                                 CurInput->GFlags &= ~IG_ISGUARDED;
                             }
                         } else {
-                            PPError ("Duplicate #else/#elif");
+                            PPError ("Unexpected `#elif'");
                         }
                     } else {
-                        PPError ("Unexpected #elif");
+                        PPError ("Unexpected `#elif'");
                     }
                     break;
 
@@ -3168,10 +3168,10 @@ static int ParseDirectives (unsigned ModeFlags)
                             /* Check for extra tokens */
                             CheckExtraTokens ("else");
                         } else {
-                            PPError ("Duplicate #else");
+                            PPError ("Duplicate `#else'");
                         }
                     } else {
-                        PPError ("Unexpected '#else'");
+                        PPError ("Unexpected `#else'");
                     }
                     break;
 
@@ -3199,7 +3199,7 @@ static int ParseDirectives (unsigned ModeFlags)
                         /* Check for extra tokens */
                         CheckExtraTokens ("endif");
                     } else {
-                        PPError ("Unexpected '#endif'");
+                        PPError ("Unexpected `#endif'");
                     }
                     break;
 
@@ -3246,7 +3246,7 @@ static int ParseDirectives (unsigned ModeFlags)
                             DoPragma ();
                             return Whitespace;
                         } else {
-                            PPError ("Embedded #pragma directive within macro arguments is unsupported");
+                            PPError ("Embedded `#pragma' directive within macro arguments is unsupported");
                         }
                     }
                     break;
@@ -3308,7 +3308,7 @@ void HandleSpecialMacro (Macro* M, const char* Name)
     if (strcmp (Name, "__COUNTER__") == 0) {
         /* Replace __COUNTER__ with the current counter number */
         if (IS_Get (&Standard) < STD_CC65) {
-            PPWarning ("__COUNTER__ is a cc65 extension");
+            PPWarning ("`__COUNTER__' is a cc65 extension");
         }
         SB_Printf (&M->Replacement, "%u", GetCurrentCounter ());
     } else if (strcmp (Name, "__LINE__") == 0) {
@@ -3506,7 +3506,7 @@ void PreprocessEnd (IFile* Input)
     /* Check for missing #endif */
     while (PPStack->Index >= 0) {
         if ((PPStack->Stack[PPStack->Index] & IFCOND_NEEDTERM) != 0) {
-            PPError ("#endif expected");
+            PPError ("`#endif' expected");
         }
         --PPStack->Index;
     }

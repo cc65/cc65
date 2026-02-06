@@ -431,7 +431,7 @@ void DefaultLabel (void)
     } else {
 
         /* case keyword outside a switch statement */
-        Error ("'default' label not within a switch statement");
+        Error ("`default' label not within a switch statement");
 
     }
 

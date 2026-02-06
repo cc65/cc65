@@ -223,7 +223,7 @@ static int ParseFuncSpecClass (DeclSpec* Spec)
 static void DuplicateQualifier (const char* Name)
 /* Print an error message */
 {
-    Warning ("Duplicate qualifier: '%s'", Name);
+    Warning ("Duplicate qualifier: `%s'", Name);
 }
 
 
@@ -682,7 +682,7 @@ static void ParseTypeSpec (DeclSpec* Spec, typespec_t TSFlags)
                     break;
                 } else if ((TSFlags & TS_MASK_DEFAULT_TYPE) == TS_DEFAULT_TYPE_NONE) {
                     /* Treat this identifier as an unknown type */
-                    Error ("Unknown type name '%s'", CurTok.Ident);
+                    Error ("Unknown type name `%s'", CurTok.Ident);
                     TypeCopy (Spec->Type, type_int);
                     NextToken ();
                     break;
@@ -730,7 +730,7 @@ static SymEntry* ForwardESU (const char* Name, unsigned Flags, unsigned* DSFlags
         }
     } else if ((TagEntry->Flags & SC_TYPEMASK) != (Flags & SC_TYPEMASK)) {
         /* Already defined, but not the same type class */
-        Error ("Symbol '%s' is already different kind", Name);
+        Error ("Symbol `%s' is already different kind", Name);
     }
     return TagEntry;
 }
@@ -841,7 +841,7 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
                 /* Error since the new value cannot be represented in the
                 ** largest unsigned integer type supported by cc65 for enum.
                 */
-                Error ("Enumerator '%s' overflows the range of '%s'",
+                Error ("Enumerator `%s' overflows the range of `%s'",
                        Ident,
                        GetBasicTypeName (type_ulong));
             }
@@ -881,7 +881,7 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
             (!IsSigned || EnumVal >= 0)     &&
             NewType->C != GetUnqualRawTypeCode (MemberType)) {
             /* The possible overflow here can only be when EnumVal > 0 */
-            Warning ("Enumerator '%s' (value = %lu) implies type '%s'",
+            Warning ("Enumerator `%s' (value = %lu) implies type `%s'",
                      Ident,
                      (unsigned long)EnumVal,
                      GetBasicTypeName (NewType));
@@ -890,13 +890,13 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
         /* Warn if the value exceeds range of 'int' in standard mode */
         if (IS_Get (&Standard) != STD_CC65 && NewType->C != T_INT) {
             if (!IsSigned || EnumVal >= 0) {
-                Warning ("ISO C restricts enumerator values to range of 'int'\n"
-                         "\tEnumerator '%s' (value = %lu) is too large",
+                Warning ("ISO C restricts enumerator values to range of `int'\n"
+                         "\tEnumerator `%s' (value = %lu) is too large",
                          Ident,
                          (unsigned long)EnumVal);
             } else {
-                Warning ("ISO C restricts enumerator values to range of 'int'\n"
-                         "\tEnumerator '%s' (value = %ld) is too small",
+                Warning ("ISO C restricts enumerator values to range of `int'\n"
+                         "\tEnumerator `%s' (value = %ld) is too small",
                          Ident,
                          EnumVal);
             }
@@ -925,7 +925,7 @@ static SymEntry* ParseEnumSpec (const char* Name, unsigned* DSFlags)
     MemberType = GetEnumeratorType (MinConstant, MaxConstant, 0);
     if (MemberType == 0) {
         /* It is very likely that the program is wrong */
-        Error ("Enumeration values cannot be represented all as 'long'\n"
+        Error ("Enumeration values cannot be represented all as `long'\n"
                "\tMin enumerator value = %ld, Max enumerator value = %lu",
                MinConstant, MaxConstant);
 
@@ -959,7 +959,7 @@ static int ParseFieldWidth (Declarator* D)
 
     if (!IsClassInt (D->Type)) {
         /* Only integer types may be used for bit-fields */
-        Error ("Bit-field has invalid type '%s', must be integral",
+        Error ("Bit-field has invalid type `%s', must be integral",
                GetBasicTypeName (D->Type));
 
         /* Avoid a diagnostic storm by giving the bit-field the widest valid
@@ -970,7 +970,7 @@ static int ParseFieldWidth (Declarator* D)
 
     if (IsTypeEnum (D->Type) && IsIncompleteESUType (D->Type)) {
         /* If the type is an enum, it must be complete */
-        Error ("Bit-field has incomplete type '%s'",
+        Error ("Bit-field has incomplete type `%s'",
                GetFullTypeName (D->Type));
 
         /* Avoid a diagnostic storm */
@@ -1190,7 +1190,7 @@ static SymEntry* ParseUnionSpec (const char* Name, unsigned* DSFlags)
                     AnonName (Decl.Ident, "bit-field");
                 }
             } else if (IsIncompleteType (Decl.Type)) {
-                Error ("Field '%s' has incomplete type '%s'",
+                Error ("Field `%s' has incomplete type `%s'",
                        Decl.Ident,
                        GetFullTypeName (Decl.Type));
             }
@@ -1444,7 +1444,7 @@ static SymEntry* ParseStructSpec (const char* Name, unsigned* DSFlags)
                 }
 
                 if (IsIncompleteType (Decl.Type)) {
-                    Error ("Field '%s' has incomplete type '%s'",
+                    Error ("Field `%s' has incomplete type `%s'",
                            Decl.Ident,
                            GetFullTypeName (Decl.Type));
                 }
@@ -1642,13 +1642,13 @@ static void FixQualifiers (Type* DataType)
                 if (IsTypeFunc (T + 1)) {
                     if (IsQualCConv (T + 1)) {
                         if ((T[1].C & T_QUAL_CCONV) == Q) {
-                            Warning ("Pointer duplicates function's calling convention");
+                            Warning ("Pointer duplicates functions calling convention");
                         } else {
-                            Error ("Function's and pointer's calling conventions are different");
+                            Error ("Functions and pointers calling conventions are different");
                         }
                     } else {
                         if (Q == T_QUAL_FASTCALL && IsVariadicFunc (T + 1)) {
-                            Error ("Variadic-function pointers cannot be __fastcall__");
+                            Error ("Variadic-function pointers cannot be `__fastcall__'");
                         } else {
                             /* Move the qualifier from the pointer to the function. */
                             T[1].C |= Q;
@@ -1703,19 +1703,19 @@ static void FixQualifiers (Type* DataType)
             Q = T[0].C;
 
             if (Q & T_QUAL_NEAR) {
-                Error ("Invalid '__near__' qualifier");
+                Error ("Invalid `__near__' qualifier");
                 Q &= ~T_QUAL_NEAR;
             }
             if (Q & T_QUAL_FAR) {
-                Error ("Invalid '__far__' qualifier");
+                Error ("Invalid `__far__' qualifier");
                 Q &= ~T_QUAL_FAR;
             }
             if (Q & T_QUAL_FASTCALL) {
-                Error ("Invalid '__fastcall__' qualifier");
+                Error ("Invalid `__fastcall__' qualifier");
                 Q &= ~T_QUAL_FASTCALL;
             }
             if (Q & T_QUAL_CDECL) {
-                Error ("Invalid '__cdecl__' qualifier");
+                Error ("Invalid `__cdecl__' qualifier");
                 Q &= ~T_QUAL_CDECL;
             }
 
@@ -1778,13 +1778,13 @@ static void CheckArrayElementType (const Type* T)
                 if (IsTypeArray (T) || IsIncompleteESUType (T)) {
                     /* We cannot have an array of incomplete elements */
                     if (!IsTypeArray (T) || GetElementCount (T) == UNSPECIFIED) {
-                        Error ("Array of incomplete element type '%s'",
+                        Error ("Array of incomplete element type `%s'",
                                GetFullTypeName (T));
                         return;
                     }
                 } else if (!IsTypeVoid (T) || IS_Get (&Standard) != STD_CC65) {
                     /* We could support certain 0-size element types as an extension */
-                    Error ("Array of 0-size element type '%s'",
+                    Error ("Array of 0-size element type `%s'",
                            GetFullTypeName (T));
                     return;
                 }
@@ -1899,7 +1899,7 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
 
             /* Warn about new local type declaration */
             if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0 && !IsAnonESUType (Spec.Type)) {
-                Warning ("'%s' will be invisible out of this function",
+                Warning ("`%s' will be invisible out of this function",
                          GetFullTypeName (Spec.Type));
             }
 
@@ -1918,15 +1918,15 @@ static void ParseOldStyleParamDeclList (FuncDesc* F attribute ((unused)))
                         Param->Flags &= ~SC_DEFTYPE;
                     } else {
                         /* Type has already been changed */
-                        Error ("Redefinition for parameter '%s'", Param->Name);
+                        Error ("Redefinition for parameter `%s'", Param->Name);
                     }
                 } else {
-                    Error ("Unknown parameter '%s'", Decl.Ident);
+                    Error ("Unknown parameter `%s'", Decl.Ident);
                 }
 
                 /* Initialization is not allowed */
                 if (CurTok.Tok == TOK_ASSIGN) {
-                    Error ("Parameter '%s' cannot be initialized", Decl.Ident);
+                    Error ("Parameter `%s' cannot be initialized", Decl.Ident);
 
                     /* Try some smart error recovery */
                     SmartErrorSkip (0);
@@ -1997,12 +1997,12 @@ static void ParseAnsiParamList (FuncDesc* F)
 
         /* Type must be specified */
         if ((Spec.Flags & DS_TYPE_MASK) == DS_NONE) {
-            Error ("Declaration specifier or '...' expected");
+            Error ("Declaration specifier or `...' expected");
         }
 
         /* Warn about new local type declaration */
         if ((Spec.Flags & DS_NEW_TYPE_DECL) != 0 && !IsAnonESUType (Spec.Type)) {
-            Warning ("'%s' will be invisible out of this function",
+            Warning ("`%s' will be invisible out of this function",
                      GetFullTypeName (Spec.Type));
         }
 
@@ -2034,7 +2034,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         /* If the parameter is a struct or union, emit a warning */
         if (IsClassStruct (Decl.Type)) {
             if (IS_Get (&WarnStructParam)) {
-                Warning ("Passing struct by value for parameter '%s'", Decl.Ident);
+                Warning ("Passing struct by value for parameter `%s'", Decl.Ident);
             }
         }
 
@@ -2269,7 +2269,7 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_
                 Spec->Flags |= DS_NO_EMPTY_DECL;
                 if (D->Ident[0] == '\0') {
                     if ((Spec->Flags & DS_TYPE_MASK) != DS_NONE) {
-                        Error ("Identifier or ';' expected after declaration specifiers");
+                        Error ("Identifier or `;' expected after declaration specifiers");
                     } else {
                         Error ("Identifier expected");
                     }
@@ -2290,7 +2290,7 @@ static void DirectDecl (DeclSpec* Spec, Declarator* D, TypeCode* RemQ, declmode_
                 ExprDesc Expr = NoCodeConstAbsIntExpr (hie1);
                 if (Expr.IVal <= 0) {
                     if (D->Ident[0] != '\0') {
-                        Error ("Size of array '%s' is invalid", D->Ident);
+                        Error ("Size of array `%s' is invalid", D->Ident);
                     } else {
                         Error ("Size of array is invalid");
                     }
@@ -2428,11 +2428,11 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
             */
             if (IS_Get (&Standard) >= STD_C99) {
                 if ((D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
-                    Warning ("Implicit 'int' type specifier is an obsolete feature");
+                    Warning ("Implicit `int' type specifier is an obsolete feature");
                 } else {
-                    Warning ("Type specifier defaults to 'int' in typedef of '%s'",
+                    Warning ("Type specifier defaults to `int' in typedef of `%s'",
                              D->Ident);
-                    Notification ("Implicit 'int' type specifier is an obsolete feature");
+                    Notification ("Implicit `int' type specifier is an obsolete feature");
                 }
             }
         }
@@ -2443,12 +2443,12 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
             if (strcmp (D->Ident, "main") == 0) {
                 /* main() cannot be a fastcall function */
                 if (IsQualFastcall (D->Type)) {
-                    Error ("'main' cannot be declared __fastcall__");
+                    Error ("`main' cannot be declared __fastcall__");
                 }
 
                 /* main() cannot be an inline function */
                 if ((D->StorageClass & SC_INLINE) == SC_INLINE) {
-                    Error ("'main' cannot be declared inline");
+                    Error ("`main' cannot be declared inline");
                     D->StorageClass &= ~SC_INLINE;
                 }
 
@@ -2458,14 +2458,14 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
                     ** that doesn't return an int.
                     */
                     if (IS_Get (&Standard) != STD_CC65) {
-                        Error ("'main' must always return an int");
+                        Error ("`main' must always return an int");
                     }
                 }
             }
         } else if (Mode != DM_ACCEPT_PARAM_IDENT &&
                    (D->StorageClass & SC_INLINE) == SC_INLINE) {
             /* 'inline' is only allowed on functions */
-            Error ("'inline' on non-function declaration");
+            Error ("`inline' on non-function declaration");
             D->StorageClass &= ~SC_INLINE;
         }
     }
@@ -2476,7 +2476,7 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
 
         if (Size >= 0x10000) {
             if (D->Ident[0] != '\0') {
-                Error ("Size of '%s' is too large (0x%06X)", D->Ident, Size);
+                Error ("Size of `%s' is too large (0x%06X)", D->Ident, Size);
             } else {
                 Error ("Size in declaration is too large (0x%06X)", Size);
             }
@@ -2489,7 +2489,7 @@ int ParseDecl (DeclSpec* Spec, Declarator* D, declmode_t Mode)
         D->Ident[0] == '\0' &&
         CurTok.Tok != TOK_SEMI &&
         ((Spec->Flags & DS_ALLOW_BITFIELD) == 0 || CurTok.Tok != TOK_COLON)) {
-        Error ("Identifier or ';' expected after declaration specifiers");
+        Error ("Identifier or `;' expected after declaration specifiers");
     }
 
     if (PrevErrorCount != ErrorCount) {
@@ -2564,7 +2564,7 @@ void CheckEmptyDecl (const DeclSpec* Spec)
 */
 {
     if ((Spec->StorageClass & SC_INLINE) == SC_INLINE) {
-        Error ("'inline' on empty declaration");
+        Error ("`inline' on empty declaration");
     } else if ((Spec->Flags & DS_TYPE_MASK) == DS_NONE) {
         /* No declaration at all */
     } else if ((Spec->Flags & DS_EXTRA_TYPE) == 0) {
@@ -2574,7 +2574,7 @@ void CheckEmptyDecl (const DeclSpec* Spec)
         /* This could be that the user made a wrong attempt to declare an
         ** anonymous struct/union field outside a struct/union.
         */
-        Warning ("Unnamed %s that defines no instances", GetBasicTypeName (Spec->Type));
+        Warning ("Unnamed `%s' that defines no instances", GetBasicTypeName (Spec->Type));
     } else if (GetLexicalLevel () == LEX_LEVEL_STRUCT) {
         /* This could be that the user made a wrong attempt to declare an
         ** anonymous struct/union field inside a struct/union. Perhaps just

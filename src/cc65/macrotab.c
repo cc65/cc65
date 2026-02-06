@@ -359,7 +359,7 @@ void AddMacroParam (Macro* M, const char* Param)
     for (I = 0; I < CollCount (&M->Params); ++I) {
         if (strcmp (CollAtUnchecked (&M->Params, I), Param) == 0) {
             /* Found */
-            PPError ("Duplicate macro parameter: '%s'", Param);
+            PPError ("Duplicate macro parameter: `%s'", Param);
             break;
         }
     }

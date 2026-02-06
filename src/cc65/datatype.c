@@ -319,9 +319,9 @@ unsigned CheckedSizeOf (const Type* T)
     unsigned Size = SizeOf (T);
     if (Size == 0) {
         if (HasUnknownSize (T)) {
-            Error ("Size of type '%s' is unknown", GetFullTypeName (T));
+            Error ("Size of type `%s' is unknown", GetFullTypeName (T));
         } else {
-            Error ("Size of type '%s' is 0", GetFullTypeName (T));
+            Error ("Size of type `%s' is 0", GetFullTypeName (T));
         }
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }
@@ -339,9 +339,9 @@ unsigned CheckedPSizeOf (const Type* T)
     unsigned Size = PSizeOf (T);
     if (Size == 0) {
         if (HasUnknownSize (T + 1)) {
-            Error ("Pointer to type '%s' of unknown size", GetFullTypeName (T + 1));
+            Error ("Pointer to type `%s' of unknown size", GetFullTypeName (T + 1));
         } else {
-            Error ("Pointer to type '%s' of 0 size", GetFullTypeName (T + 1));
+            Error ("Pointer to type `%s' of 0 size", GetFullTypeName (T + 1));
         }
         Size = SIZEOF_CHAR;     /* Don't return zero */
     }

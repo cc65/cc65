@@ -82,7 +82,7 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
     /* Check for equality of the structs/unions */
     if (TypeCmp (ltype, RExpr->Type).C < TC_STRICT_COMPATIBLE) {
         TypeCompatibilityDiagnostic (ltype, RExpr->Type, 1,
-            "Incompatible types in assignment to '%s' from '%s'");
+            "Incompatible types in assignment to `%s' from `%s'");
     } else if (SymHasConstMember (ltype->A.S)) {
         Error ("Assignment to read only variable");
     }
@@ -272,7 +272,7 @@ static void OpAssignBitField (const GenDesc* Gen, ExprDesc* Expr, const char* Op
 
     /* The rhs must be an integer (or a float, but we don't support that yet */
     if (!IsClassInt (Expr2.Type)) {
-        Error ("Invalid right operand for binary operator '%s'", Op);
+        Error ("Invalid right operand for binary operator `%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
         */
@@ -497,7 +497,7 @@ static void OpAssignArithmetic (const GenDesc* Gen, ExprDesc* Expr, const char* 
 
         /* The rhs must be an integer (or a float, but we don't support that yet */
         if (!IsClassInt (Expr2.Type)) {
-            Error ("Invalid right operand for binary operator '%s'", Op);
+            Error ("Invalid right operand for binary operator `%s'", Op);
             /* Continue. Wrong code will be generated, but the compiler won't
             ** break, so this is the best error recovery.
             */
@@ -617,20 +617,20 @@ void OpAssign (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 
     /* Only "=" accept struct/union */
     if (IsClassStruct (ltype) ? Gen != 0 : !IsScalarType (ltype)) {
-        Error ("Invalid left operand for binary operator '%s'", Op);
+        Error ("Invalid left operand for binary operator `%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
         */
     } else {
         /* Check for assignment to incomplete type */
         if (IsIncompleteESUType (ltype)) {
-            Error ("Assignment to incomplete type '%s'", GetFullTypeName (ltype));
+            Error ("Assignment to incomplete type `%s'", GetFullTypeName (ltype));
         } else if (ED_IsRVal (Expr)) {
             /* Assignment can only be used with lvalues */
             if (IsTypeArray (ltype)) {
-                Error ("Array type '%s' is not assignable", GetFullTypeName (ltype));
+                Error ("Array type `%s' is not assignable", GetFullTypeName (ltype));
             } else if (IsTypeFunc (ltype)) {
-                Error ("Function type '%s' is not assignable", GetFullTypeName (ltype));
+                Error ("Function type `%s' is not assignable", GetFullTypeName (ltype));
             } else {
                 Error ("Assignment to rvalue");
             }
@@ -685,7 +685,7 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
 
     /* There must be an integer or pointer on the left side */
     if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type)) {
-        Error ("Invalid left operand for binary operator '%s'", Op);
+        Error ("Invalid left operand for binary operator `%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
         */
@@ -717,7 +717,7 @@ void OpAddSubAssign (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
     */
     hie1 (&Expr2);
     if (!IsClassInt (Expr2.Type)) {
-        Error ("Invalid right operand for binary operator '%s'", Op);
+        Error ("Invalid right operand for binary operator `%s'", Op);
         /* Continue. Wrong code will be generated, but the compiler won't
         ** break, so this is the best error recovery.
         */

@@ -2600,7 +2600,7 @@ static void DoDefine (void)
                 /* Ellipsis */
                 NextChar ();
                 if (CurC != '.' || NextC != '.') {
-                    PPError ("'...' expected");
+                    PPError ("`...' expected");
                     goto Error_Handler;
                 }
                 NextChar ();

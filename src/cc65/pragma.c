@@ -373,7 +373,7 @@ static int IsBoolKeyword (StrBuf* Ident)
     }
 
     /* Error */
-    Error ("Pragma argument must be one of 'on', 'off', 'true' or 'false'");
+    Error ("Pragma argument must be one of `on', `off', `true' or `false'");
     return 0;
 }
 

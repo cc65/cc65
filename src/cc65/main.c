@@ -169,7 +169,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_MODULE:
-            AbEnd ("Cannot use 'module' as a target for the compiler");
+            Fatal ("Cannot use `module' as a target for the compiler");
             break;
 
         case TGT_ATARI2600:
@@ -435,7 +435,7 @@ static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
 {
     /* Cannot have the option twice */
     if (SB_NotEmpty (Name)) {
-        AbEnd ("Cannot use option '%s' twice", Opt);
+        Fatal ("Cannot use option '%s' twice", Opt);
     }
     /* A typo in OptTab[] might allow a NULL Arg */
     if (Arg == 0) {
@@ -497,7 +497,7 @@ static void CheckSegName (const char* Seg)
 {
     /* Print an error and abort if the name is not ok */
     if (!ValidSegName (Seg)) {
-        AbEnd ("Segment name '%s' is invalid", Seg);
+        Fatal ("Segment name `%s' is invalid", Seg);
     }
 }
 
@@ -563,7 +563,7 @@ static void OptCodeSize (const char* Opt, const char* Arg)
     /* Numeric argument expected */
     if (sscanf (Arg, "%u%c", &Factor, &BoundsCheck) != 1 ||
         Factor < 10 || Factor > 1000) {
-        AbEnd ("Argument for %s is invalid", Opt);
+        Fatal ("Argument for `%s' is invalid", Opt);
     }
     IS_Set (&CodeSizeFactor, Factor);
 }
@@ -575,7 +575,7 @@ static void OptColor(const char* Opt, const char* Arg)
 {
     ColorMode Mode = CP_Parse (Arg);
     if (Mode == CM_INVALID) {
-        AbEnd ("Invalid argument to %s: %s", Opt, Arg);
+        Fatal ("Invalid argument to `%s': %s", Opt, Arg);
     } else {
         CP_SetColorMode (Mode);
     }
@@ -610,7 +610,7 @@ static void OptCPU (const char* Opt, const char* Arg)
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
         CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280 &&
         CPU != CPU_6502DTV) {
-        AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
+        Fatal ("Invalid argument for `%s': '%s'", Opt, Arg);
     }
 }
 
@@ -659,7 +659,7 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
     /* Open the file */
     FILE* F = fopen (Arg, "r");
     if (F == 0) {
-        AbEnd ("Cannot open '%s': %s", Arg, strerror (errno));
+        Fatal ("Cannot open `%s': %s", Arg, strerror (errno));
     }
 
     /* Read line by line, ignore empty lines and switch optimization
@@ -830,15 +830,15 @@ static void OptMemoryModel (const char* Opt, const char* Arg)
 
     /* Check the current memory model */
     if (MemoryModel != MMODEL_UNKNOWN) {
-        AbEnd ("Cannot use option '%s' twice", Opt);
+        Fatal ("Cannot use option `%s' twice", Opt);
     }
 
     /* Translate the memory model name and check it */
     M = FindMemoryModel (Arg);
     if (M == MMODEL_UNKNOWN) {
-        AbEnd ("Unknown memory model: %s", Arg);
+        Fatal ("Unknown memory model `%s'", Arg);
     } else if (M == MMODEL_HUGE) {
-        AbEnd ("Unsupported memory model: %s", Arg);
+        Fatal ("Unsupported memory model `%s'", Arg);
     }
 
     /* Set the memory model */
@@ -856,12 +856,23 @@ static void OptNoUtf8 (const char* Opt attribute ((unused)),
 
 
 
+static void OptOutputName (const char* Opt, const char* Arg)
+/* Handle the --no-utf8 option */
+{
+    if (OutputFilename != 0) {
+        Fatal ("Cannot use option `%s' twice", Opt);
+    }
+    SetOutputName (Arg);
+}
+
+
+
 static void OptRegisterSpace (const char* Opt, const char* Arg)
 /* Handle the --register-space option */
 {
     /* Numeric argument expected */
     if (sscanf (Arg, "%u", &RegisterSpace) != 1 || RegisterSpace > 256) {
-        AbEnd ("Argument for option %s is invalid", Opt);
+        Fatal ("Argument for option `%s' is invalid", Opt);
     }
 }
 
@@ -903,9 +914,9 @@ static void OptStandard (const char* Opt, const char* Arg)
     /* Find the standard from the given name */
     standard_t Std = FindStandard (Arg);
     if (Std == STD_UNKNOWN) {
-        AbEnd ("Invalid argument for %s: '%s'", Opt, Arg);
+        Fatal ("Invalid argument for `%s': %s", Opt, Arg);
     } else if (IS_Get (&Standard) != STD_UNKNOWN) {
-        AbEnd ("Option %s given more than once", Opt);
+        Fatal ("Option `%s' given more than once", Opt);
     } else {
         IS_Set (&Standard, Std);
     }
@@ -1099,7 +1110,7 @@ int main (int argc, char* argv[])
                 case 'd':
                     P = Arg + 2;
                     if (*P == '\0') {
-                        OptDebug (Arg, 0);
+                        OptDebug ("-d", 0);
                     } else {
                         while (*P) {
                             switch (*P) {
@@ -1124,35 +1135,35 @@ int main (int argc, char* argv[])
                     break;
 
                 case 'g':
-                    OptDebugInfo (Arg, 0);
+                    OptDebugInfo ("-g", 0);
                     break;
 
                 case 'j':
-                    OptSignedChars (Arg, 0);
+                    OptSignedChars ("-j", 0);
                     break;
 
                 case 'm':
                     if (Arg[2] == 'm') {
-                        OptMemoryModel (Arg, GetArg (&I, 3));
+                        OptMemoryModel ("-mm", GetArg (&I, 3));
                     } else {
                         UnknownOption (Arg);
                     }
                     break;
 
                 case 'o':
-                    SetOutputName (GetArg (&I, 2));
+                    OptOutputName ("-o", GetArg (&I, 2));
                     break;
 
                 case 'r':
-                    OptRegisterVars (Arg, 0);
+                    OptRegisterVars ("-r", 0);
                     break;
 
                 case 't':
-                    OptTarget (Arg, GetArg (&I, 2));
+                    OptTarget ("-t", GetArg (&I, 2));
                     break;
 
                 case 'v':
-                    OptVerbose (Arg, 0);
+                    OptVerbose ("-v", 0);
                     break;
 
                 case 'C':
@@ -1160,7 +1171,7 @@ int main (int argc, char* argv[])
                     while (*P) {
                         switch (*P++) {
                             case 'l':
-                                OptStaticLocals (Arg, 0);
+                                OptStaticLocals ("-Cl", 0);
                                 break;
                             default:
                                 UnknownOption (Arg);
@@ -1178,7 +1189,7 @@ int main (int argc, char* argv[])
                     break;
 
                 case 'I':
-                    OptIncludeDir (Arg, GetArg (&I, 2));
+                    OptIncludeDir ("-I", GetArg (&I, 2));
                     break;
 
                 case 'O':
@@ -1203,15 +1214,15 @@ int main (int argc, char* argv[])
                     break;
 
                 case 'T':
-                    OptAddSource (Arg, 0);
+                    OptAddSource ("-T", 0);
                     break;
 
                 case 'V':
-                    OptVersion (Arg, 0);
+                    OptVersion ("-V", 0);
                     break;
 
                 case 'W':
-                    OptWarning (Arg, GetArg (&I, 2));
+                    OptWarning ("-W", GetArg (&I, 2));
                     break;
 
                 default:
@@ -1232,12 +1243,12 @@ int main (int argc, char* argv[])
 
     /* Did we have a file spec on the command line? */
     if (InputFile == 0) {
-        AbEnd ("No input files");
+        Fatal ("No input files");
     }
 
     /* The options to output macros can only be used with -E */
     if ((DumpPredefMacros || DumpUserMacros) && !PreprocessOnly) {
-        AbEnd ("Preprocessor macro output can only be used together with -E");
+        Fatal ("Preprocessor macro output can only be used together with `-E'");
     }
 
     /* Add the default include search paths. */

@@ -42,6 +42,7 @@
 #include "abend.h"
 #include "chartype.h"
 #include "cmdline.h"
+#include "consprop.h"
 #include "cpu.h"
 #include "debugflag.h"
 #include "fname.h"
@@ -1035,6 +1036,9 @@ int main (int argc, char* argv[])
 
     /* Initialize the input file name */
     const char* InputFile  = 0;
+
+    /* Initialize console output */
+    CP_Init ();
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "cc65");

@@ -91,9 +91,6 @@ struct StrBuf;
 
 
 
-void PrintFileInclusionInfo (const LineInfo* LI);
-/* Print hierarchy of file inclusion */
-
 LineInfo* GetDiagnosticLI (void);
 /* Get the line info where the diagnostic info refers to */
 
@@ -121,13 +118,13 @@ void PPWarning_ (const char* File, int Line, const char* Format, ...) attribute 
 #define PPWarning(...) PPWarning_(__FILE__, __LINE__, __VA_ARGS__)
 /* Print a warning message. For use within the preprocessor */
 
-void UnreachableCodeWarning (void);
-/* Print a warning about unreachable code at the current location if these
+void LIUnreachableCodeWarning (LineInfo* LI);
+/* Print a warning about unreachable code at the given location if these
 ** warnings are enabled.
 */
 
-void LIUnreachableCodeWarning (LineInfo* LI);
-/* Print a warning about unreachable code at the given location if these
+void UnreachableCodeWarning (void);
+/* Print a warning about unreachable code at the current location if these
 ** warnings are enabled.
 */
 

@@ -38,7 +38,9 @@
 #include <stdarg.h>
 
 /* common */
+#include "cmdline.h"
 #include "coll.h"
+#include "consprop.h"
 #include "debugflag.h"
 #include "print.h"
 #include "strbuf.h"
@@ -59,9 +61,17 @@
 
 
 
+/* Structure that contains a position in the source file */
+typedef struct SourcePos SourcePos;
+struct SourcePos {
+    const char* File;
+    unsigned    Line;
+};
+#define SOURCEPOS(File, Line) ((SourcePos){ (File), (unsigned)(Line) })
+
 /* Diagnostic category */
-typedef enum { 
-    DC_NOTE, DC_PPWARN, DC_WARN, DC_PPERR, DC_ERR, DC_FATAL, DC_COUNT 
+typedef enum {
+    DC_NOTE, DC_PPWARN, DC_WARN, DC_PPERR, DC_ERR, DC_FATAL, DC_COUNT
 } DiagCat;
 
 /* Descriptions for diagnostic categories */
@@ -70,10 +80,10 @@ static const char* DiagCatDesc[DC_COUNT] = {
 };
 
 /* Count of errors/warnings */
-unsigned PPErrorCount     = 0;  /* Pre-parser errors */
-unsigned PPWarningCount   = 0;  /* Pre-parser warnings */
-unsigned ErrorCount       = 0;  /* Errors occurred in parser and later translation phases */
-unsigned WarningCount     = 0;  /* Warnings occurred in parser and later translation phases */
+unsigned PPErrorCount       = 0; /* Pre-parser errors */
+unsigned PPWarningCount     = 0; /* Pre-parser warnings */
+unsigned ErrorCount         = 0; /* Errors occurred in parser and later translation phases */
+unsigned WarningCount       = 0; /* Warnings occurred in parser and later translation phases */
 
 /* Warning and error options */
 IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
@@ -127,7 +137,183 @@ static WarnMapEntry WarnMap[] = {
 
 
 
-void PrintFileInclusionInfo (const LineInfo* LI)
+static void ReplaceQuotes (StrBuf* Msg)
+/* Replace opening and closing single quotes in Msg by their typographically
+** correct UTF-8 counterparts for better readbility. A closing quote will
+** only get replaced if an opening quote has been seen before.
+** To handle some special cases, the function will also treat \xF0 as
+** opening and \xF1 as closing quote. These are replaced without the need for
+** correct ordering (open/close).
+** The function will change the quotes in place, so after the call Msg will
+** contain the changed string. If UTF-8 is not available, the function will
+** replace '`' by '\'' since that was the default behavior before. It will
+** also replace \xF0 and \xF1 by '\''.
+**/
+{
+    /* UTF-8 characters for single quotes */
+    static const char QuoteStart[] = "\xE2\x80\x98";
+    static const char QuoteEnd[]   = "\xE2\x80\x99";
+
+    /* ANSI color sequences */
+    const char* ColorStart = CP_BrightGreen ();
+    const char* ColorEnd   = CP_White ();
+
+    /* Remember a few things */
+    int IsUTF8 = CP_IsUTF8 ();
+
+    /* We create a new string in T and will later copy it back to Msg */
+    StrBuf T = AUTO_STRBUF_INITIALIZER;
+
+    /* Parse the string and create a modified copy */
+    SB_Reset (Msg);
+    int InQuote = 0;
+    while (1) {
+        char C = SB_Get (Msg);
+        switch (C) {
+            case '`':
+                if (!InQuote) {
+                    InQuote = 1;
+                    if (IsUTF8) {
+                        SB_AppendStr (&T, QuoteStart);
+                    } else {
+                        /* ca65 uses \' for opening and closing quotes */
+                        SB_AppendChar (&T, '\'');
+                    }
+                    SB_AppendStr (&T, ColorStart);
+                } else {
+                    /* Found two ` without closing quote - don't replace */
+                    SB_AppendChar (&T, '`');
+                }
+                break;
+            case '\'':
+                if (InQuote) {
+                    InQuote = 0;
+                    SB_AppendStr (&T, ColorEnd);
+                    if (IsUTF8) {
+                        SB_AppendStr (&T, QuoteEnd);
+                    } else {
+                        SB_AppendChar (&T, C);
+                    }
+                } else {
+                    SB_AppendChar (&T, C);
+                }
+                break;
+            case '\xF0':
+                if (IsUTF8) {
+                    SB_AppendStr (&T, QuoteStart);
+                } else {
+                    SB_AppendChar (&T, '\'');
+                }
+                break;
+            case '\xF1':
+                if (IsUTF8) {
+                    SB_AppendStr (&T, QuoteEnd);
+                } else {
+                    SB_AppendChar (&T, '\'');
+                }
+                break;
+            case '\0':
+                goto Done;
+            default:
+                SB_AppendChar (&T, C);
+                break;
+        }
+    }
+
+Done:
+    /* Copy the string back, then terminate it */
+    SB_Move (Msg, &T);
+    SB_Terminate (Msg);
+}
+
+
+
+static void VPrintMsg (SourcePos SP, const LineInfo* LI, DiagCat Cat,
+                       const char* Format, va_list ap)
+/* Format and output an error/warning message. */
+{
+    StrBuf S   = AUTO_STRBUF_INITIALIZER;
+    StrBuf Msg = AUTO_STRBUF_INITIALIZER;
+    StrBuf Loc = AUTO_STRBUF_INITIALIZER;
+
+    /* Determine the description for the category and its color */
+    const char* Desc = DiagCatDesc[Cat];
+    const char* Color;
+    switch (Cat) {
+        case DC_NOTE:   Color = CP_Cyan ();             break;
+        case DC_PPWARN:
+        case DC_WARN:   Color = CP_Yellow ();           break;
+        case DC_PPERR:
+        case DC_ERR:    Color = CP_BrightRed ();        break;
+        case DC_FATAL:  Color = CP_BrightRed ();        break;
+        default:        FAIL ("Unexpected Cat value");  break;
+    }
+
+    /* Format the actual message, then replace quotes */
+    SB_VPrintf (&Msg, Format, ap);
+    ReplaceQuotes (&Msg);
+
+    /* Format the location. */
+    if (LI == 0) {
+        SB_CopyStr (&Loc, ProgName);
+    } else {
+        SB_Printf (&Loc, "%s:%u", GetPresumedFileName (LI), GetPresumedLineNum (LI));
+    }
+    SB_Terminate (&Loc);
+
+    /* Format the full message. If debugging is enabled, we also output the
+    ** source position from which the output was generated - for whatever it's
+    ** worth.
+    */
+    if (Debug) {
+       	SB_Printf (&S, "%s[%s:%u] %s: %s%s:%s %s%s",
+	     	   CP_White (),
+                   SP.File,
+                   SP.Line,
+    	     	   SB_GetConstBuf (&Loc),
+	     	   Color,
+	     	   Desc,
+	     	   CP_White (),
+	     	   SB_GetConstBuf (&Msg),
+	     	   CP_Reset ());
+    } else {
+	SB_Printf (&S, "%s%s: %s%s:%s %s%s",
+	     	   CP_White (),
+	     	   SB_GetConstBuf (&Loc),
+	     	   Color,
+	     	   Desc,
+	     	   CP_White (),
+	     	   SB_GetConstBuf (&Msg),
+	     	   CP_Reset ());
+    }
+
+    /* Delete the formatted message and the location string */
+    SB_Done (&Loc);
+    SB_Done (&Msg);
+
+    /* Add a new line and terminate the generated full message */
+    SB_AppendChar (&S, '\n');
+    SB_Terminate (&S);
+
+    /* Output the full message */
+    fputs (SB_GetConstBuf (&S), stderr);
+
+    /* Delete the buffer for the full message */
+    SB_Done (&S);
+
+    /* Bump error counters */
+    switch (Cat) {
+        case DC_PPWARN:	++PPWarningCount;       break;
+        case DC_WARN:   ++WarningCount;         break;
+        case DC_PPERR:  ++PPErrorCount;         break;
+        case DC_ERR:    ++ErrorCount;           break;
+        default:                                break;
+    }
+}
+
+
+
+static void PrintFileInclusionInfo (const LineInfo* LI)
 /* Print hierarchy of file inclusion */
 {
     if (LI->IncFiles != 0) {
@@ -190,25 +376,16 @@ static unsigned GetDiagnosticLineNum (void)
 
 
 
-void Fatal_ (const char* File, int LineNo, const char* Format, ...)
+void Fatal_ (const char* File, int Line, const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
+    SourcePos SP = SOURCEPOS (File, Line);
+
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", File, LineNo);
-    }
-
-    fprintf (stderr, "%s:%u: Fatal: ", GetDiagnosticFileName (), GetDiagnosticLineNum ());
-
     va_start (ap, Format);
-    vfprintf (stderr, Format, ap);
+    VPrintMsg (SP, CurTok.LI, DC_FATAL, Format, ap);
     va_end (ap);
-    fprintf (stderr, "\n");
 
-    if (Line) {
-        Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-    }
     exit (EXIT_FAILURE);
 }
 
@@ -247,13 +424,14 @@ void Internal_ (const char* File, int LineNo, const char* Format, ...)
 
 
 
-static void IntError (DiagCat Cat, LineInfo* LI, const char* Msg, va_list ap)
+static void IntError (SourcePos SP, DiagCat Cat, LineInfo* LI,
+                      const char* Msg, va_list ap)
 /* Print an error message - internal function */
 {
     static unsigned RecentErrorCount = 0;
-    static unsigned RecentLineNo     = 0;
+    static unsigned RecentLine       = 0;
 
-    unsigned LineNo = GetPresumedLineNum (LI);
+    unsigned Line = GetPresumedLineNum (LI);
 
     /* Print file inclusion if appropriate */
     if (HasFileInclusionChanged (LI)) {
@@ -261,26 +439,16 @@ static void IntError (DiagCat Cat, LineInfo* LI, const char* Msg, va_list ap)
     }
     RememberCheckedLI (LI);
 
-    fprintf (stderr, "%s:%u: Error: ", GetPresumedFileName (LI), LineNo);
-    vfprintf (stderr, Msg, ap);
-    fprintf (stderr, "\n");
+    /* Output the formatted message */
+    VPrintMsg (SP, LI, Cat, Msg, ap);
 
-    if (Line) {
-        Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-    }
-
-    if (Cat != DC_PPERR) {		 
-        ++ErrorCount;
-    } else {
-        ++PPErrorCount;
-    }
-    if (RecentLineNo != LineNo) {
-        RecentLineNo = LineNo;
+    /* Limit total errors and total errors per line */
+    if (RecentLine != Line) {
+        RecentLine = Line;
         RecentErrorCount = 0;
     } else {
         ++RecentErrorCount;
     }
-
     if (RecentErrorCount > 20 || GetTotalErrors () > 200) {
         Fatal ("Too many errors");
     }
@@ -292,13 +460,8 @@ void Error_ (const char* File, int Line, const char* Format, ...)
 /* Print an error message */
 {
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", File, Line);
-    }
-
     va_start (ap, Format);
-    IntError (DC_ERR, GetDiagnosticLI (), Format, ap);
+    IntError (SOURCEPOS (File, Line), DC_ERR, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
@@ -308,13 +471,8 @@ void PPError_ (const char* File, int Line, const char* Format, ...)
 /* Print an error message. For use within the preprocessor */
 {
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", File, Line);
-    }
-
     va_start (ap, Format);
-    IntError (DC_PPERR, GetCurLineInfo (), Format, ap);
+    IntError (SOURCEPOS (File, Line), DC_PPERR, GetCurLineInfo (), Format, ap);
     va_end (ap);
 }
 
@@ -326,17 +484,16 @@ void PPError_ (const char* File, int Line, const char* Format, ...)
 
 
 
-static void IntWarning (DiagCat Cat, LineInfo* LI, const char* Msg, va_list ap)
+static void IntWarning (SourcePos SP, DiagCat Cat, LineInfo* LI,
+                        const char* Msg, va_list ap)
 /* Print a warning message - internal function */
 {
     if (IS_Get (&WarningsAreErrors)) {
 
         /* Treat the warning as an error */
-        IntError (Cat, LI, Msg, ap);
+        IntError (SP, Cat, LI, Msg, ap);
 
     } else if (IS_Get (&WarnEnable)) {
-
-        unsigned LineNo = GetPresumedLineNum (LI);
 
         /* Print file inclusion if appropriate */
         if (HasFileInclusionChanged (LI)) {
@@ -344,20 +501,8 @@ static void IntWarning (DiagCat Cat, LineInfo* LI, const char* Msg, va_list ap)
         }
         RememberCheckedLI (LI);
 
-        fprintf (stderr, "%s:%u: Warning: ", GetPresumedFileName (LI), LineNo);
-        vfprintf (stderr, Msg, ap);
-        fprintf (stderr, "\n");
-
-        if (Line) {
-            Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-        }
-
-        if (Cat != DC_PPWARN) {
-            ++WarningCount;
-        } else {
-            ++PPWarningCount;
-        }
-
+    	/* Output the formatted message */
+       	VPrintMsg (SP, LI, Cat, Msg, ap);
     }
 }
 
@@ -367,13 +512,8 @@ void Warning_ (const char* File, int Line, const char* Format, ...)
 /* Print a warning message */
 {
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", File, Line);
-    }
-
     va_start (ap, Format);
-    IntWarning (DC_WARN, GetDiagnosticLI (), Format, ap);
+    IntWarning (SOURCEPOS (File, Line), DC_WARN, GetDiagnosticLI (), Format, ap);
     va_end (ap);
 }
 
@@ -383,13 +523,19 @@ void PPWarning_ (const char* File, int Line, const char* Format, ...)
 /* Print a warning message. For use within the preprocessor */
 {
     va_list ap;
-
-    if (Debug) {
-        fprintf(stderr, "[%s:%d] ", File, Line);
-    }
-
     va_start (ap, Format);
-    IntWarning (DC_PPWARN, GetCurLineInfo (), Format, ap);
+    IntWarning (SOURCEPOS (File, Line), DC_PPWARN, GetCurLineInfo (), Format, ap);
+    va_end (ap);
+}
+
+
+
+static void LIWarning_ (const char* File, int Line, LineInfo* LI, const char* Format, ...)
+/* Print a warning message specifying an explicit line info */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntWarning (SOURCEPOS (File, Line), DC_WARN, LI, Format, ap);
     va_end (ap);
 }
 
@@ -401,10 +547,7 @@ void LIUnreachableCodeWarning (LineInfo* LI)
 */
 {
     if (IS_Get (&WarnUnreachableCode)) {
-        /* The error message contains no format specifiers, but we need a valid
-        ** va_list argument, so create one. ##########
-        */
-        IntWarning (DC_WARN, LI, "Unreachable code", 0);
+        LIWarning_ (__FILE__, __LINE__, LI, "Unreachable code");
     }
 }
 
@@ -422,21 +565,21 @@ void UnreachableCodeWarning (void)
     ** there's no better place.
     */
     if (CurTok.LI && NextTok.LI) {
-	if (CurTok.Tok == TOK_LCURLY) {
-	    /* Do not point to the compound statement but to the first
-	    ** statement within it. If the compound statement is empty
-	    ** do not even output a warning. This fails of course for
-	    ** nested compounds but will do the right thing in most cases.
-	    */
-	    if (NextTok.Tok == TOK_RCURLY) {
-		return;
-	    }
-	    LI = NextTok.LI;
-	} else {
-	    LI = CurTok.LI;
-	}
+        if (CurTok.Tok == TOK_LCURLY) {
+            /* Do not point to the compound statement but to the first
+            ** statement within it. If the compound statement is empty
+            ** do not even output a warning. This fails of course for
+            ** nested compounds but will do the right thing in most cases.
+            */
+            if (NextTok.Tok == TOK_RCURLY) {
+                return;
+            }
+            LI = NextTok.LI;
+        } else {
+            LI = CurTok.LI;
+        }
     } else {
-	LI = GetCurLineInfo ();
+        LI = GetCurLineInfo ();
     }
 
     /* Now output the warning */
@@ -480,30 +623,13 @@ void ListWarnings (FILE* F)
 
 
 
-static void IntNotification (const char* File, int Line, const LineInfo* LI,
-                             const char* Msg, va_list ap)
-/* Print a notification message - internal function */
-{
-    if (Debug) {
-        fprintf (stderr, "[%s:%d] %s:%u: Note: ", File, Line,
-                 GetPresumedFileName (LI), GetPresumedLineNum (LI));
-    } else {
-        fprintf (stderr, "%s:%u: Note: ", GetPresumedFileName (LI),
-                 GetPresumedLineNum (LI));
-    }
-    vfprintf (stderr, Msg, ap);
-    fprintf (stderr, "\n");
-}
-
-
-
 void LINotification_ (const char* File, int Line, const LineInfo* LI,
                       const char* Format, ...)
 /* Print a notification message with the line info given explicitly */
 {
     va_list ap;
     va_start (ap, Format);
-    IntNotification (File, Line, LI, Format, ap);
+    VPrintMsg (SOURCEPOS (File, Line), LI, DC_NOTE, Format, ap);
     va_end (ap);
 }
 
@@ -514,7 +640,7 @@ void Notification_ (const char* File, int Line, const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntNotification (File, Line, GetDiagnosticLI (), Format, ap);
+    VPrintMsg (SOURCEPOS (File, Line), GetDiagnosticLI (), DC_NOTE, Format, ap);
     va_end (ap);
 }
 
@@ -525,7 +651,7 @@ void PPNotification_ (const char* File, int Line, const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntNotification (File, Line, GetDiagnosticLI (), Format, ap);
+    VPrintMsg (SOURCEPOS (File, Line), GetDiagnosticLI (), DC_NOTE, Format, ap);
     va_end (ap);
 }
 

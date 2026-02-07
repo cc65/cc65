@@ -470,6 +470,7 @@ Literal* AddLiteral (const char* S)
 {
     StrBuf SB;
     SB_InitFromString(&SB, S);
+    SB_AppendChar(&SB, '\0');
     return AddLiteralStr(&SB);
 }
 

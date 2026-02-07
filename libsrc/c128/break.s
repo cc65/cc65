@@ -8,7 +8,6 @@
         .export         _set_brk, _reset_brk
         .destructor     _reset_brk
         .export         _brk_a, _brk_x, _brk_y, _brk_sr, _brk_pc
-        .importzp       ptr1
 
         .include        "c128.inc"
 
@@ -21,7 +20,7 @@ _brk_sr:        .res    1
 _brk_pc:        .res    2
 
 .data
-uservec:        jmp     $FFFF           ; Patched at runtime
+uservec:        jmp     $FFFF   ; Patched at runtime
 
 .code
 
@@ -115,9 +114,9 @@ uservec:        jmp     $FFFF           ; Patched at runtime
 .segment        "LOWCODE"
 
 .proc   brk_stub
-        pla                             ; Get original MMU_CR value
-        sta     MMU_CR                  ; And set it
-        jmp     brk_ind                 ; Jump indirect to break
+        pla                     ; Get original MMU_CR value
+        sta     MMU_CR          ; And set it
+        jmp     brk_ind         ; Jump indirect to break
 .endproc
 
 ; ------------------------------------------------------------------------

@@ -15,6 +15,8 @@ else
 endif
 
 CL65 := $(if $(wildcard ../../bin/cl65*),..$S..$Sbin$Scl65,cl65)
+CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
+CA65 := $(if $(wildcard ../../bin/ca65*),..$S..$Sbin$Sca65,ca65)
 
 WORKDIR = ../../testwrk/dbginfo
 
@@ -33,21 +35,27 @@ $(WORKDIR):
 
 # Compile C files
 $(WORKDIR)/%.dbg: %.c | $(WORKDIR)
-	$(CL65) -g -t sim6502 -o $(@:.dbg=.prg) -Wl --dbgfile,$@ $<
+	$(CC65) -g -t sim6502 -o $(WORKDIR)/$*.s $<
+	$(CA65) -g -t sim6502 -o $(WORKDIR)/$*.o $(WORKDIR)/$*.s
+	$(CL65) -g -t sim6502 -o $(@:.dbg=.prg) -Wl --dbgfile,$@ $(WORKDIR)/$*.o
 
 # Assemble ASM files
 $(WORKDIR)/%.dbg: %.s | $(WORKDIR)
-	$(CL65) -g -C test.cfg -o $(@:.dbg=.prg) -Wl --dbgfile,$@ $<
+	$(CA65) -g -o $(WORKDIR)/$*.o $<
+	$(CL65) -g -C test.cfg -o $(@:.dbg=.prg) -Wl --dbgfile,$@ $(WORKDIR)/$*.o
 
 # Verify against golden files
 compare: $(TESTS)
 	@for dbg in $(TESTS); do \
 		ref=$$(basename $$dbg .dbg).ref; \
 		if [ -f $$ref ]; then \
-			if ! diff -u $$dbg $$ref; then \
+			sed 's/mtime=0x[0-9a-fA-F]*/mtime=0x00000000/g' $$dbg > $$dbg.tmp; \
+			if ! diff -u $$dbg.tmp $$ref; then \
 				echo "Test failed: $$dbg does not match $$ref"; \
+				rm $$dbg.tmp; \
 				exit 1; \
-			fi \
+			fi; \
+			rm $$dbg.tmp; \
 		else \
 			echo "Warning: No golden file for $$dbg (run 'make update')"; \
 		fi \
@@ -59,7 +67,7 @@ update: $(TESTS)
 	@for dbg in $(TESTS); do \
 		ref=$$(basename $$dbg .dbg).ref; \
 		echo "Updating $$ref"; \
-		cp $$dbg $$ref; \
+		sed 's/mtime=0x[0-9a-fA-F]*/mtime=0x00000000/g' $$dbg > $$ref; \
 	done
 
 clean:

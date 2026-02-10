@@ -1,6 +1,6 @@
 version	major=2,minor=0
-info	csym=0,file=805,lib=0,line=14,mod=1,scope=1,seg=7,span=10,sym=36,type=2
-file	id=0,name="val_asm.s",size=447,mtime=0x6988F35C,mod=0
+info	csym=0,file=805,lib=0,line=14,mod=1,scope=1,seg=7,span=10,sym=34,type=2
+file	id=0,name="val_asm.s",size=447,mtime=0x00000000,mod=0
 line	id=0,file=0,line=25,span=6
 line	id=1,file=0,line=30
 line	id=2,file=0,line=0
@@ -15,7 +15,7 @@ line	id=10,file=0,line=13,span=2
 line	id=11,file=0,line=15,span=4
 line	id=12,file=0,line=3
 line	id=13,file=0,line=6,span=0
-mod	id=0,name="val_asm.s.46149.0.o",file=0
+mod	id=0,name="val_asm.o",file=0
 seg	id=0,name="CODE",start=0x000203,size=0x000A,addrsize=absolute,type=ro,oname="../../testwrk/dbginfo/val_asm.prg",ooffs=3
 seg	id=1,name="RODATA",start=0x00020D,size=0x0000,addrsize=absolute,type=ro,oname="../../testwrk/dbginfo/val_asm.prg",ooffs=13
 seg	id=2,name="BSS",start=0x00020D,size=0x0000,addrsize=absolute,type=rw
@@ -68,7 +68,5 @@ sym	id=30,name="CPU_ISET_6502DTV",addrsize=zeropage,scope=0,def=2,val=0x8,type=e
 sym	id=31,name="CPU_ISET_6502X",addrsize=zeropage,scope=0,def=2,val=0x4,type=equ
 sym	id=32,name="CPU_ISET_6502",addrsize=zeropage,scope=0,def=2,val=0x2,type=equ
 sym	id=33,name="CPU_ISET_NONE",addrsize=zeropage,scope=0,def=2,val=0x1,type=equ
-sym	id=34,name="__C64__",addrsize=zeropage,scope=0,def=2,val=0x1,type=equ
-sym	id=35,name="__CBM__",addrsize=zeropage,scope=0,def=2,val=0x1,type=equ
 type	id=0,val="800120"
 type	id=1,val="800121"

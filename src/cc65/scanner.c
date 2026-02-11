@@ -558,6 +558,7 @@ static void NumericConst (void)
     unsigned DigitVal;
     scan_t   IVal;              /* Scanned value. */
     int      Overflow;
+    unsigned SuffixStart;
 
     /* Get the pp-number first, then parse on it */
     CopyPPNumber (&Src);
@@ -641,6 +642,7 @@ static void NumericConst (void)
         ** possible to convert the data to unsigned long even if the IT_ULONG
         ** flag were not set, but we are not doing that.
         */
+        SuffixStart = SB_GetIndex (&Src);
         if (toupper (SB_Peek (&Src)) == 'U') {
             /* Unsigned type */
             SB_Skip (&Src);
@@ -661,11 +663,6 @@ static void NumericConst (void)
                 Types = IT_ULONG;
             }
         } else {
-            if (SB_Peek (&Src) != '\0') {
-                Error ("Invalid suffix \"%s\" on integer constant",
-                       SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
-            }
-
             if (Base == 10) {
                 /* Decimal constants are of any type but uint */
                 Types = IT_INT | IT_LONG | IT_ULONG;
@@ -674,6 +671,12 @@ static void NumericConst (void)
                 /* Binary, octal and hex constants can be of any type */
                 Types = IT_INT | IT_UINT | IT_LONG | IT_ULONG;
             }
+        }
+
+        /* Check for remaining suffix characters */
+        if (SB_Peek (&Src) != '\0') {
+            Error ("Invalid suffix \"%s\" on integer constant",
+                   SB_GetConstBuf (&Src) + SuffixStart);
         }
 
         /* Check the range to determine the type */
@@ -806,15 +809,16 @@ static void NumericConst (void)
         }
 
         /* Check for a suffix and determine the type of the constant */
+        SuffixStart = SB_GetIndex (&Src);
         if (toupper (SB_Peek (&Src)) == 'F') {
             SB_Skip (&Src);
             NextTok.Type = type_float;
         } else {
-            if (SB_Peek (&Src) != '\0') {
-                Error ("Invalid suffix \"%s\" on floating constant",
-                       SB_GetConstBuf (&Src) + SB_GetIndex (&Src));
-            }
             NextTok.Type = type_double;
+        }
+        if (SB_Peek (&Src) != '\0') {
+            Error ("Invalid suffix \"%s\" on floating constant",
+                   SB_GetConstBuf (&Src) + SuffixStart);
         }
 
         /* Set the value and the token */

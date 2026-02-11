@@ -33,12 +33,10 @@
 
 
 
-/* The following is a very basic vsnprintf like function called xvsnprintf. It
-** features only the basic format specifiers (especially the floating point
-** stuff is missing), but may be extended if required. Reason for supplying
-** my own implementation is that vsnprintf is standard but not implemented by
-** older compilers, and some that implement it, don't adhere to the standard
-** (for example Microsoft with its _vsnprintf).
+/* The snprintf style functions in this module are obsolete. They call just
+** snprintf under the hood. New code should call snprintf directly. 
+** The sprintf style functions are still useful. They do some checks and will
+** FAIL in case of errors (buffer too small or similar).
 */
 
 

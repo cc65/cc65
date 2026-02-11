@@ -779,7 +779,7 @@ static ExprNode* FuncAddrSize (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: `%s'", SB_GetConstBuf (&CurTok.SVal));
         } else {
             AddrSize = Sym->AddrSize;
         }
@@ -819,13 +819,17 @@ static ExprNode* FuncAddrSize (void)
         if (Sym) {
             AddrSize = Sym->AddrSize;
         } else {
-            Error ("Unknown symbol or scope: `%m%p%m%p'", &ScopeName, &Name);
+            Error ("Unknown symbol or scope: `%.*s%.*s'",
+                   (int)SB_GetLen (&ScopeName), SB_GetConstBuf (&ScopeName),
+                   (int)SB_GetLen (&Name), SB_GetConstBuf (&Name));
         }
 
     }
 
     if (AddrSize == 0) {
-        Warning (1, "Unknown address size: `%m%p%m%p'", &ScopeName, &Name);
+        Warning (1, "Unknown address size: `%.*s%.*s'",
+                 (int)SB_GetLen (&ScopeName), SB_GetConstBuf (&ScopeName),
+                 (int)SB_GetLen (&Name), SB_GetConstBuf (&Name));
     }
 
     /* Free the string buffers */
@@ -833,7 +837,6 @@ static ExprNode* FuncAddrSize (void)
     SB_Done (&Name);
 
     /* Return the size. */
-
     return GenLiteralExpr (AddrSize);
 }
 
@@ -860,7 +863,7 @@ static ExprNode* FuncSizeOf (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
+            Error ("Unknown symbol or scope: `%s'", SB_GetConstBuf (&CurTok.SVal));
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
@@ -912,15 +915,18 @@ static ExprNode* FuncSizeOf (void)
             if (Sym) {
                 SizeSym = GetSizeOfSymbol (Sym);
             } else {
-                Error ("Unknown symbol or scope: `%m%p%m%p'",
-                       &ScopeName, &Name);
+                Error ("Unknown symbol or scope: `%.*s%.*s'",
+                       (int)SB_GetLen (&ScopeName), SB_GetConstBuf (&ScopeName),
+                       (int)SB_GetLen (&Name), SB_GetConstBuf (&Name));
             }
         }
     }
 
     /* Check if we have a size */
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
-        Error ("Size of `%m%p%m%p' is unknown", &ScopeName, &Name);
+        Error ("Size of `%.*s%.*s' is unknown",
+               (int)SB_GetLen (&ScopeName), SB_GetConstBuf (&ScopeName),
+               (int)SB_GetLen (&Name), SB_GetConstBuf (&Name));
         Size = 0;
     }
 

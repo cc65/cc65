@@ -99,7 +99,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
             if (Scope == 0) {
                 SB_Terminate (FullName);
                 /* Scope not found */
-                Error ("Can't create scope: `%m%p'", FullName);
+                Error ("Can't create scope: `%s'", SB_GetConstBuf (FullName));
                 return 0;
             }
         }
@@ -143,7 +143,8 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
         Scope = SymFindScope (Scope, Name, SYM_ALLOC_NEW);
         if (Scope == 0) {
             /* Scope not found */
-            Error ("Can't create scope: `%m%p'", FullName);
+            Error ("Can't create scope: `%.*s'", (int)SB_GetLen (FullName),
+                   SB_GetConstBuf (FullName));
             return 0;
         }
 

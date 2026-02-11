@@ -1208,7 +1208,8 @@ Again:
                 /* Not found */
                 if (!LeadingDotInIdents) {
                     /* Invalid pseudo instruction */
-                    Error ("`%m%p' is not a recognized control command", &CurTok.SVal);
+                    Error ("`%s' is not a recognized control command",
+                           SB_GetConstBuf (&CurTok.SVal));
                     goto Again;
                 }
 

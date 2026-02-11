@@ -439,7 +439,8 @@ void MacDef (unsigned Style)
     Existing = HT_Find (&MacroTab, &CurTok.SVal);
     if (Existing != 0) {
         /* Macro is already defined */
-        Error ("A macro named `%m%p' is already defined", &CurTok.SVal);
+        Error ("A macro named `%s' is already defined",
+               SB_GetConstBuf (&CurTok.SVal));
         PNotification (&Existing->DefPos,
                        "Previous definition of macro `%s' was here",
                        SB_GetConstBuf (&Existing->Name));
@@ -483,7 +484,8 @@ void MacDef (unsigned Style)
 
                 while (1) {
                     if (SB_Compare (&List->Id, &CurTok.SVal) == 0) {
-                        Error ("Duplicate macro parameter `%m%p'", &CurTok.SVal);
+                        Error ("Duplicate macro parameter `%s'",
+                               SB_GetConstBuf (&CurTok.SVal));
                         M->HasError = 1;
                     }
                     if (List->Next == 0) {
@@ -650,7 +652,7 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
 
     /* Don't let the user kid with us */
     if (M == 0 || M->Style != Style) {
-        Error ("No such macro: `%m%p'", Name);
+        Error ("No such macro: `%s'", SB_GetConstBuf (Name));
         return;
     }
     if (M->Expansions > 0) {

@@ -943,7 +943,7 @@ static void DoError (void)
 /* User error */
 {
     if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
-        Error ("User error: %m%p", &CurTok.SVal);
+        Error ("User error: %s", SB_GetConstBuf (&CurTok.SVal));
         SkipUntilSep ();
     }
 }
@@ -1013,7 +1013,7 @@ static void DoFatal (void)
 /* Fatal user error */
 {
     if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
-        Fatal ("User error: %m%p", &CurTok.SVal);
+        Fatal ("User error: %s", SB_GetConstBuf (&CurTok.SVal));
         SkipUntilSep ();
     }
 }
@@ -1039,7 +1039,7 @@ static void DoFeature (void)
         Feature = FindFeature (&CurTok.SVal);
         if (Feature == FEAT_UNKNOWN) {
             /* Not found */
-            ErrorSkip ("Invalid feature: `%m%p'", &CurTok.SVal);
+            ErrorSkip ("Invalid feature: `%s'", SB_GetConstBuf (&CurTok.SVal));
             return;
         }
 
@@ -1271,7 +1271,8 @@ static void DoIncBin (void)
         char* PathName = SearchFile (BinSearchPath, SB_GetConstBuf (&Name));
         if (PathName == 0 || (F = fopen (PathName, "rb")) == 0) {
             /* Not found or cannot open, print an error and bail out */
-            ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
+            ErrorSkip ("Cannot open include file `%s': %s",
+                       SB_GetConstBuf (&Name), strerror (errno));
             xfree (PathName);
             goto ExitPoint;
         }
@@ -1297,7 +1298,8 @@ static void DoIncBin (void)
     */
     SB_Terminate (&Name);
     if (FileStat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
-        Fatal ("Cannot stat input file `%m%p': %s", &Name, strerror (errno));
+        Fatal ("Cannot stat input file `%s': %s", SB_GetConstBuf (&Name),
+               strerror (errno));
     }
 
     /* Add the file to the input file table */
@@ -1337,8 +1339,8 @@ static void DoIncBin (void)
         size_t BytesRead = fread (Buf, 1, BytesToRead, F);
         if (BytesToRead != BytesRead) {
             /* Some sort of error */
-            ErrorSkip ("Cannot read from include file `%m%p': %s",
-                       &Name, strerror (errno));
+            ErrorSkip ("Cannot read from include file `%s': %s",
+                       SB_GetConstBuf (&Name), strerror (errno));
             break;
         }
 
@@ -1405,7 +1407,7 @@ static void DoInvalid (void)
 ** an error in the assembler itself, while DoInvalid is.
 */
 {
-    Internal ("Unexpected token: %m%p", &Keyword);
+    Internal ("Unexpected token: %s", SB_GetConstBuf (&Keyword));
 }
 
 
@@ -2020,7 +2022,7 @@ static void DoUnDef (void)
 static void DoUnexpected (void)
 /* Got an unexpected keyword */
 {
-    Error ("Unexpected `%m%p'", &Keyword);
+    Error ("Unexpected `%s'", SB_GetConstBuf (&Keyword));
     SkipUntilSep ();
 }
 
@@ -2030,7 +2032,7 @@ static void DoWarning (void)
 /* User warning */
 {
     if (ExpectSkip (TOK_STRCON, "Expected a string constant")) {
-        Warning (0, "User warning: %m%p", &CurTok.SVal);
+        Warning (0, "User warning: %s", SB_GetConstBuf (&CurTok.SVal));
         SkipUntilSep ();
     }
 }
@@ -2292,6 +2294,7 @@ void HandlePseudo (void)
     /* Remember the instruction, then skip it if needed */
     if ((D->Flags & ccKeepToken) == 0) {
         SB_Copy (&Keyword, &CurTok.SVal);
+        SB_Terminate (&Keyword);
         NextTok ();
     }
 

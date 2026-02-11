@@ -211,7 +211,8 @@ unsigned GetFileIndex (const StrBuf* Name)
 
     /* If we don't have this index, print a diagnostic and use the main file */
     if (F == 0) {
-        Error ("File name `%m%p' not found in file table", Name);
+        Error ("File name `%.*s' not found in file table",
+               (int)SB_GetLen (Name), SB_GetConstBuf (Name));
         return 0;
     } else {
         return F->Index;

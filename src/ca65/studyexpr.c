@@ -593,8 +593,8 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
 
         if (SymHasUserMark (Sym)) {
             LIError (&Sym->DefLines,
-                     "Circular reference in definition of symbol `%m%p'",
-                     GetSymName (Sym));
+                     "Circular reference in definition of symbol `%s'",
+                     GetSymNameStr (Sym));
             ED_SetError (D);
         } else {
 

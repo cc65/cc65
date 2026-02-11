@@ -275,6 +275,12 @@ static inline const StrBuf* GetSymName (const SymEntry* S)
     return GetStrBuf (S->Name);
 }
 
+static inline const char* GetSymNameStr (const SymEntry* S)
+/* Return the name of the symbol as a const char* */
+{
+    return GetString (S->Name);
+}
+
 static inline unsigned char GetSymAddrSize (const SymEntry* S)
 /* Return the address size of the symbol. Beware: This function will just
 ** return the AddrSize member, it will not look at the expression!

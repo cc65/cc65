@@ -459,6 +459,11 @@ static void IntWarning (SourcePos SP, DiagCat Cat, LineInfo* LI,
     if (IS_Get (&WarningsAreErrors)) {
 
         /* Treat the warning as an error */
+        switch (Cat) {
+            case DC_WARN:   Cat = DC_ERR;       break;
+            case DC_PPWARN: Cat = DC_PPERR;     break;
+            default:        Internal ("Unexpected value for Cat");
+        }
         IntError (SP, Cat, LI, Msg, ap);
 
     } else if (IS_Get (&WarnEnable)) {

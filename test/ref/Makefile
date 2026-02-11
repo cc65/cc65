@@ -122,7 +122,7 @@ define PRG_template
 
 $(WORKDIR)/%.$1.$2.prg: %.c $(WORKDIR)/%.ref $(ISEQUAL)
 	$(if $(QUIET),echo ref/$$*.$1.$2.prg)
-	$(CC65) -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
+	$(CC65) --no-utf8 -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.prg=.s) $$< $(NULLERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$*.$1.$2.out
@@ -136,7 +136,7 @@ define PRG_custom_template
 
 $(WORKDIR)/%.$1.$2.custom.prg: %.c $(WORKDIR)/%.ref %.c $(WORKDIR)/%.cref $(ISEQUAL)
 	$(if $(QUIET),echo cref/$$*.$1.$2.custom.prg)
-	-$(CC65) -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.custom.prg=.s) $$< 2> $(WORKDIR)/$$*.$1.$2.cout
+	-$(CC65) --no-utf8 -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.custom.prg=.s) $$< 2> $(WORKDIR)/$$*.$1.$2.cout
 	$(CA65) -t sim$2 -o $$(@:.custom.prg=.o) $$(@:.custom.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.custom.prg=.o) sim$2.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$*.$1.$2.out
@@ -151,7 +151,7 @@ define PRG_error_template
 
 $(WORKDIR)/%.$1.$2.error.prg: %.c $(WORKDIR)/%.cref $(ISEQUAL)
 	$(if $(QUIET),echo cref/$$*.$1.$2.error.prg)
-	-$(CC65) -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.error.prg=.s) $$< 2> $(WORKDIR)/$$*.$1.$2.cout
+	-$(CC65) --no-utf8 -t sim$2 $$(CC65FLAGS) -$1 -o $$(@:.error.prg=.s) $$< 2> $(WORKDIR)/$$*.$1.$2.cout
 #	$(CA65) -t sim$2 -o $$(@:.error.prg=.o) $$(@:.error.prg=.s) $(NULLERR)
 #	$(LD65) -t sim$2 -o $$@ $$(@:.error.prg=.o) sim$2.lib $(NULLERR)
 #	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/$$*.$1.$2.out

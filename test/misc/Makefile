@@ -75,7 +75,7 @@ define PRG_template
 $(WORKDIR)/bug1209-ind-goto-rev.$1.$2.prg: bug1209-ind-goto-rev.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1209-ind-goto-rev.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(NOT) $(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 
@@ -83,7 +83,7 @@ $(WORKDIR)/bug1209-ind-goto-rev.$1.$2.prg: bug1209-ind-goto-rev.c | $(WORKDIR)
 $(WORKDIR)/bug1209-ind-goto-rev-2.$1.$2.prg: bug1209-ind-goto-rev-2.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1209-ind-goto-rev-2.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(NOT) $(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 
@@ -91,7 +91,7 @@ $(WORKDIR)/bug1209-ind-goto-rev-2.$1.$2.prg: bug1209-ind-goto-rev-2.c | $(WORKDI
 $(WORKDIR)/bug1209-ind-goto-rev-3.$1.$2.prg: bug1209-ind-goto-rev-3.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1209-ind-goto-rev-3.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(NOT) $(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 
@@ -99,18 +99,18 @@ $(WORKDIR)/bug1209-ind-goto-rev-3.$1.$2.prg: bug1209-ind-goto-rev-3.c | $(WORKDI
 $(WORKDIR)/pptest2.$1.$2.prg: pptest2.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/pptest2.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
+	$(NOT) $(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
 
 # should compile, but compiler exits with internal error
 $(WORKDIR)/bug1211-ice-move-refs-2.$1.$2.prg: bug1211-ice-move-refs-2.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/bug1211-ice-move-refs-2.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
+	$(NOT) $(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
 
 # this one requires --std=c89, it fails with --std=c99
 $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1265.$1.$2.prg)
-	$(CC65) --standard c89 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
+	$(CC65) --no-utf8 --standard c89 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
@@ -118,21 +118,21 @@ $(WORKDIR)/bug1265.$1.$2.prg: bug1265.c | $(WORKDIR)
 # should not compile, but gives different diagnostics in C99 mode than in others
 $(WORKDIR)/bug2515.$1.$2.prg: bug2515.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug2515.$1.$2.prg)
-	$(NOT) $(CC65) --standard c99 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) 2>$(WORKDIR)/bug2515.$1.$2.out
+	$(NOT) $(CC65) --no-utf8 --standard c99 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) 2>$(WORKDIR)/bug2515.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/bug2515.$1.$2.out bug2515.c99.ref
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) 2>$(WORKDIR)/bug2515.$1.$2.out
+	$(NOT) $(CC65) --no-utf8 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) 2>$(WORKDIR)/bug2515.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/bug2515.$1.$2.out bug2515.ref
 
 # should not issue any warnings in C99 mode
 $(WORKDIR)/bug2637.$1.$2.prg: bug2637.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug2637.$1.$2.prg)
-	$(CC65) --standard c99 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) 2>$(WORKDIR)/bug2637.$1.$2.out
+	$(CC65) --no-utf8 --standard c99 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) 2>$(WORKDIR)/bug2637.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/bug2637.$1.$2.out bug2637.ref
 
 # this one requires -Werror
 $(WORKDIR)/bug1768.$1.$2.prg: bug1768.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug1768.$1.$2.prg)
-	$(CC65) -Werror -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
+	$(CC65) --no-utf8 -Werror -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
@@ -140,7 +140,7 @@ $(WORKDIR)/bug1768.$1.$2.prg: bug1768.c | $(WORKDIR)
 # should compile, but then hangs in an endless loop
 $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/endless.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(NOT) $(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT) $(NULLERR)
@@ -149,52 +149,52 @@ $(WORKDIR)/endless.$1.$2.prg: endless.c | $(WORKDIR)
 # in a useful way
 $(WORKDIR)/bug2655.$1.$2.prg: bug2655.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug2655.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/bug2655.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/bug2655.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/bug2655.$1.$2.out bug2655.ref
 
 $(WORKDIR)/flow-do-01.$1.$2.prg: flow-do-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-do-01.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-do-01.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-do-01.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-do-01.$1.$2.out flow-do-01.ref
 
 $(WORKDIR)/flow-for-01.$1.$2.prg: flow-for-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-for-01.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-for-01.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-for-01.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-for-01.$1.$2.out flow-for-01.ref
 
 $(WORKDIR)/flow-if-01.$1.$2.prg: flow-if-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-if-01.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-if-01.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-if-01.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-if-01.$1.$2.out flow-if-01.ref
 
 $(WORKDIR)/flow-if-02.$1.$2.prg: flow-if-02.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-if-02.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-if-02.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-if-02.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-if-02.$1.$2.out flow-if-02.ref
 
 $(WORKDIR)/flow-switch-01.$1.$2.prg: flow-switch-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-switch-01.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-switch-01.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-switch-01.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-switch-01.$1.$2.out flow-switch-01.ref
 
 $(WORKDIR)/flow-switch-02.$1.$2.prg: flow-switch-02.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-switch-02.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-switch-02.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-switch-02.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-switch-02.$1.$2.out flow-switch-02.ref
 
 $(WORKDIR)/flow-while-01.$1.$2.prg: flow-while-01.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-while-01.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-while-01.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-while-01.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-while-01.$1.$2.out flow-while-01.ref
 
 $(WORKDIR)/flow-while-02.$1.$2.prg: flow-while-02.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/flow-while-02.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-while-02.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/flow-while-02.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/flow-while-02.$1.$2.out flow-while-02.ref
 
 $(WORKDIR)/limits.$1.$2.prg: limits.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/limits.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
 	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
 	$(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
 	$(SIM65) $(SIM65FLAGS) $$@ > $(WORKDIR)/limits.$1.$2.out
@@ -202,24 +202,24 @@ $(WORKDIR)/limits.$1.$2.prg: limits.c $(ISEQUAL) | $(WORKDIR)
 
 $(WORKDIR)/goto.$1.$2.prg: goto.c $(ISEQUAL) | $(WORKDIR)
 	$(if $(QUIET),echo misc/goto.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/goto.$1.$2.out
+	$(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) 2>$(WORKDIR)/goto.$1.$2.out
 	$(ISEQUAL) $(WORKDIR)/goto.$1.$2.out goto.ref
 
 # this one requires failure with --std=c89, it fails with --std=cc65 due to
 # stricter checks
 $(WORKDIR)/bug2304-implicit-func.$1.$2.prg: bug2304-implicit-func.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/bug2304-implicit-func.$1.$2.prg)
-	$(NOT) $(CC65) --standard c89 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
+	$(NOT) $(CC65) --no-utf8 --standard c89 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
 
 # should not compile until 3-byte struct by value tests are re-enabled
 $(WORKDIR)/struct-by-value.$1.$2.prg: struct-by-value.c | $(WORKDIR)
 	$(if $(QUIET),echo misc/struct-by-value.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
+	$(NOT) $(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
 
 # the rest are tests that fail currently for one reason or another
 $(WORKDIR)/sitest.$1.$2.prg: sitest.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
+	$(NOT) $(CC65) --no-utf8 -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
 #	$(SIM65) $(SIM65FLAGS) $$@ $(NULLOUT)
 
 endef # PRG_template

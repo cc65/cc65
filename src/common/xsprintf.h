@@ -34,7 +34,7 @@
 
 
 /* The snprintf style functions in this module are obsolete. They call just
-** snprintf under the hood. New code should call snprintf directly. 
+** snprintf under the hood. New code should call snprintf directly.
 ** The sprintf style functions are still useful. They do some checks and will
 ** FAIL in case of errors (buffer too small or similar).
 */

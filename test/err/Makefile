@@ -54,7 +54,7 @@ $(WORKDIR):
 
 $(WORKDIR)/%.s: %.c | $(WORKDIR)
 	$(if $(QUIET),echo err/$*.s)
-	$(NOT) $(CC65) -o $@ $< $(NULLOUT) $(CATERR)
+	$(NOT) $(CC65) --no-utf8 -o $@ $< $(NULLOUT) $(CATERR)
 
 clean:
 	@$(call RMDIR,$(WORKDIR))

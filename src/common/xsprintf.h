@@ -33,14 +33,12 @@
 
 
 
-/* We need a way to output a StrBuf, but on the other side, we don't want to
-** switch off gcc's printf format string checking. So we cheat as follows:
-** %m (which is a gcc extension and doesn't take an argument) switches %p
-** between outputting a pointer and a string buf. This works just one time,
-** so each StrBuf needs in fact a %m%p spec. There's no way to apply a width
-** and precision to such a StrBuf, but *not* using %p would bring up a warning
-** about a wrong argument type each time. Maybe gcc will one day allow custom
-** format specifiers and we can change this ...
+/* The following is a very basic vsnprintf like function called xvsnprintf. It
+** features only the basic format specifiers (especially the floating point
+** stuff is missing), but may be extended if required. Reason for supplying
+** my own implementation is that vsnprintf is standard but not implemented by
+** older compilers, and some that implement it, don't adhere to the standard
+** (for example Microsoft with its _vsnprintf).
 */
 
 

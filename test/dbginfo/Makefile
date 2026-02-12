@@ -17,6 +17,7 @@ endif
 CL65 := $(if $(wildcard ../../bin/cl65*),..$S..$Sbin$Scl65,cl65)
 CC65 := $(if $(wildcard ../../bin/cc65*),..$S..$Sbin$Scc65,cc65)
 CA65 := $(if $(wildcard ../../bin/ca65*),..$S..$Sbin$Sca65,ca65)
+LD65 := $(if $(wildcard ../../bin/ld65*),..$S..$Sbin$Sld65,ld65)
 
 WORKDIR = ../../testwrk/dbginfo
 
@@ -37,12 +38,12 @@ $(WORKDIR):
 $(WORKDIR)/%.dbg: %.c | $(WORKDIR)
 	$(CC65) -g -t sim6502 -o $(WORKDIR)/$*.s $<
 	$(CA65) -g -t sim6502 -o $(WORKDIR)/$*.o $(WORKDIR)/$*.s
-	$(CL65) -g -t sim6502 -o $(@:.dbg=.prg) -Wl --dbgfile,$@ $(WORKDIR)/$*.o
+	$(LD65) -t sim6502 -o $(@:.dbg=.prg) --dbgfile $@ $(WORKDIR)/$*.o sim6502.lib
 
 # Assemble ASM files
 $(WORKDIR)/%.dbg: %.s | $(WORKDIR)
 	$(CA65) -g -o $(WORKDIR)/$*.o $<
-	$(CL65) -g -C test.cfg -o $(@:.dbg=.prg) -Wl --dbgfile,$@ $(WORKDIR)/$*.o
+	$(LD65) -C test.cfg -o $(@:.dbg=.prg) --dbgfile $@ $(WORKDIR)/$*.o sim6502.lib
 
 # Verify against golden files
 compare: $(TESTS)

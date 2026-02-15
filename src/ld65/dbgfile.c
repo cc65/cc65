@@ -113,6 +113,9 @@ void CreateDbgFile (void)
     /* Output version information */
     fprintf (F, "version\tmajor=2,minor=0\n");
 
+    /* Assign the ids to the items: this must occur before info, as it removes unused items */
+    AssignIds ();
+
     /* Output a line with the item numbers so the debug info module is able
     ** to preallocate the required memory.
     */
@@ -130,9 +133,6 @@ void CreateDbgFile (void)
         DbgSymCount (),
         TypeCount ()
     );
-
-    /* Assign the ids to the items */
-    AssignIds ();
 
     /* Output high level language symbols */
     PrintHLLDbgSyms (F);

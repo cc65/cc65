@@ -2540,7 +2540,7 @@ See: <tt><ref id=".BYTE" name=".BYTE"></tt>,<tt><ref id=".CHARMAP" name=".CHARMA
 
   Please note that because <tt><ref id=".BANK" name=".BANK"></tt> is evaluated at link time,
   this command requires passing the --relax-checks switch on the command line.
-  
+
   Example:
 
   <tscreen><verb>

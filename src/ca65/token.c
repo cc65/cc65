@@ -131,6 +131,7 @@ static const TokDescEntry TokDesc[] = {
     { ".BANK"                           },
     { ".BANKBYTE"                       },
     { ".BANKBYTES"                      },
+    { ".BANKS"                          },
     { ".BLANK"                          },
     { ".BSS"                            },
     { ".BYTE"                           },

@@ -2528,7 +2528,41 @@ See: <tt><ref id=".BYTE" name=".BYTE"></tt>,<tt><ref id=".CHARMAP" name=".CHARMA
 
   See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
             <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>,
-            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>
+            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>,
+            <tt><ref id=".BANKS" name=".BANKS"></tt>
+
+
+<sect1><tt>.BANKS</tt><label id=".BANKS"><p>
+
+  Define byte sized data by extracting the low byte of the bank from
+  each expression.  This is equivalent to <tt><ref id=".BYTE" name=".BYTE"></tt> with
+  the <tt><ref id=".BANK" name=".BANK"></tt> function appied to each expression in its list.
+
+  Please note that because <tt><ref id=".BANK" name=".BANK"></tt> is evaluated at link time,
+  this command requires passing the --relax-checks switch on the command line.
+
+  Example:
+
+  <tscreen><verb>
+        .define MyTable TableItem0, TableItem1, TableItem2, TableItem3
+
+        TableLookupLo:   .lobytes   MyTable
+        TableLookupHi:   .hibytes   MyTable
+        TableLookupBank: .banks     MyTable
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        TableLookupLo:   .byte &lt;TableItem0, &lt;TableItem1, &lt;TableItem2, &lt;TableItem3
+        TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
+        TableLookupBank: .byte .bank(TableItem0), .bank(TableItem1), .bank(TableItem2), .bank(TableItem3)
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
+            <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>,
+            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>,
+            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
 
 
 <sect1><tt>.BSS</tt><label id=".BSS"><p>
@@ -3388,7 +3422,8 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
 
   See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
             <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>,
-            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
+            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>,
+            <tt><ref id=".BANKS" name=".BANKS"></tt>
 
 
 <sect1><tt>.I16</tt><label id=".I16"><p>
@@ -3800,7 +3835,8 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".BYTE" name=".BYTE"
 
   See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
             <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>,
-            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
+            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>,
+            <tt><ref id=".BANKS" name=".BANKS"></tt>
 
 
 <sect1><tt>.LOCAL</tt><label id=".LOCAL"><p>

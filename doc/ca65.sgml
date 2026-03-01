@@ -1167,7 +1167,7 @@ cause any errors.
 
 A nested procedure is created by use of <tt/<ref id=".PROC" name=".PROC">/. It
 differs from a <tt/<ref id=".SCOPE" name=".SCOPE">/ in that it must have a
-name, and a it will introduce a symbol with this name in the enclosing scope.
+name, and it will introduce a symbol with this name in the enclosing scope.
 So
 
 <tscreen><verb>

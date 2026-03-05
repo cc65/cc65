@@ -1213,20 +1213,23 @@ unsigned OptTosPushPop (CodeSeg* S)
         /* Get the next entry */
         const CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check for decspn, incspn, subysp or addysp */
+        /* Check for pushax/popax */
         if (CE_IsCallTo (E, "pushax")                              &&
             (N = CS_GetNextEntry (S, I)) != 0                      &&
             (CE_IsCallTo (N, "popax") || CE_IsJumpTo (N, "popax")) &&
             !CE_HasLabel (N)) {
 
-            /* Insert an rts if jmp popax */
             if (N->OPC == OP65_JMP) {
-              CodeEntry* X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->LI);
-              CS_InsertEntry (S, X, I);
+                /* If we jumped to popax instead of calling it as a subroutine,
+                ** add an RTS before removing the sequence.
+                */
+                CodeEntry* X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, I);
+                CS_DelEntries (S, I+1, 2);
+            } else {
+                /* Otherwise just remove the sequence */
+                CS_DelEntries (S, I, 2);
             }
-
-            /* Delete the old code */
-            CS_DelEntries (S, I+1, 2);
 
             /* Remember we had changes */
             ++Changes;

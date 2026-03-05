@@ -1,6 +1,6 @@
 /* Note: This test is rather fragile since it depends on how the compiler
 ** handles certain sequences and return codes. It checks for exactly one
-** optimizer problem introduced in #2937. If it fails in some future version,
+** optimizer problem introduced in #2811. If it fails in some future version,
 ** do not hesitate to remove it.
 */
 

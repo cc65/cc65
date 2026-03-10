@@ -1,0 +1,95 @@
+digraph dbginfo {
+    rankdir=LR;
+    compound=true;
+    splines=true;
+    nodesep=0.6;
+    ranksep=0.8;
+    
+    // Global Graph Attributes
+    fontname="Helvetica Neue";
+    fontsize=12;
+    labelloc="t";
+    label="cc65 Debug Info Format Structure";
+    
+    // Default Node Attributes
+    node [
+        shape=box, 
+        style="filled,rounded", 
+        fontname="Helvetica Neue", 
+        fontsize=10, 
+        penwidth=0, 
+        margin="0.2,0.1"
+    ];
+    
+    // Default Edge Attributes
+    edge [
+        fontname="Helvetica Neue", 
+        fontsize=9, 
+        color="#555555", 
+        penwidth=1.2, 
+        arrowsize=0.8
+    ];
+
+    subgraph cluster_source {
+        label = "Source Structure";
+        style="filled,rounded";
+        color="#e8eaf6"; // Indigo 50
+        fontcolor="#3f51b5"; // Indigo 500
+        node [fillcolor="#9fa8da", fontcolor="#ffffff"]; // Indigo 200
+        
+        file [label="file"];
+        line [label="line"];
+        mod [label="mod"];
+        lib [label="lib"];
+    }
+
+    subgraph cluster_memory {
+        label = "In-Memory Representation";
+        style="filled,rounded";
+        color="#e0f2f1"; // Teal 50
+        fontcolor="#009688"; // Teal 500
+        node [fillcolor="#80cbc4", fontcolor="#ffffff"]; // Teal 200
+        
+        seg [label="seg"];
+        span [label="span"];
+        sym [label="sym"];
+        scope [label="scope"];
+    }
+
+    subgraph cluster_c_lang {
+        label = "C Language Support";
+        style="filled,rounded";
+        color="#fce4ec"; // Pink 50
+        fontcolor="#e91e63"; // Pink 500
+        node [fillcolor="#f48fb1", fontcolor="#ffffff"]; // Pink 200
+        
+        csym [label="csym"];
+        type [label="type"];
+    }
+
+    // Edges
+    // style=dashed signifies an optional edge
+    
+    line -> file;
+    line -> span;
+
+    span -> seg;
+    span -> type [style=dashed];
+
+    mod -> file;
+    mod -> lib [style=dashed];
+
+    scope -> mod;
+    scope -> span;
+    scope -> sym;
+    scope -> scope [label="parent", style=dashed, constraint=false];
+
+    sym -> seg;
+    sym -> scope;
+    sym -> line [label="def/ref"];
+    sym -> sym [label="parent", style=dashed, constraint=false];
+
+    csym -> scope;
+    csym -> type;
+    csym -> sym;
+}

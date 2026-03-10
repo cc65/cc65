@@ -100,6 +100,15 @@ static int SameRegAValue (StackOpData* D)
     RegInfo* LRI = GetLastChangedRegInfo (D, &D->Lhs.A);
     RegInfo* RRI = GetLastChangedRegInfo (D, &D->Rhs.A);
 
+    /* ### Bug: The Rhs Reg A value used in the logic here can be from a return
+    **  value of the runtime call being optimized away (e.g. "jsr tosgtax"),
+    **  and *not* its operand. That happens when the call insn (JSR) has a label.
+    **  Then the RRI is that of the runtime call JSR, and the RRI->Out.RegA
+    **  compares here are not valid.
+    **  See OptStackOps(), case FoundPush: if (CE_HasLabel (E)) { ...
+    **  and usage in Opt_a_tosicmp().
+    */
+
     /* RHS can have a -1 ChgIndex only if it is carried over from LHS */
     if (RRI == 0                                    ||
         (D->Rhs.A.ChgIndex >= 0         &&
@@ -123,6 +132,16 @@ static int SameRegXValue (StackOpData* D)
 {
     RegInfo* LRI = GetLastChangedRegInfo (D, &D->Lhs.X);
     RegInfo* RRI = GetLastChangedRegInfo (D, &D->Rhs.X);
+
+    /* ### Bug: The Rhs Reg X value used in the logic here can be from a return
+    **  value of the runtime call being optimized away (e.g. "jsr tosgtax"),
+    **  and *not* its operand. That happens when the call insn (JSR) has a label.
+    **  Then the RRI is that of the runtime call JSR, and the RRI->Out.RegX
+    **  compares here are not valid.
+    **  See OptStackOps(), case FoundPush: if (CE_HasLabel (E)) { ...
+    **  RegAPreCondOk() has special armour code for this issue:
+    **    if (LhsHiVal != RhsHiVal) { /Cannot optimize/ break; }
+    */
 
     if (RRI == 0                                    ||
         (D->Rhs.X.ChgIndex >= 0         &&
@@ -338,6 +357,9 @@ static unsigned Opt___bzero (StackOpData* D)
     CodeLabel*  L;
 
     /* Check if we're using a register variable */
+    /* ### Caution: IsRegVar() has deterministic side effects over StackOpData,
+    **  overriding the ZP location set by PreCondOk().
+    */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
         AddStoreLhsX (D);
@@ -430,6 +452,9 @@ static unsigned Opt_staspidx (StackOpData* D)
     CodeEntry* X;
 
     /* Check if we're using a register variable */
+    /* ### Caution: IsRegVar() has deterministic side effects over StackOpData,
+    **  overriding the ZP location set by PreCondOk().
+    */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
         AddStoreLhsX (D);
@@ -456,11 +481,19 @@ static unsigned Opt_staxspidx (StackOpData* D)
     const char* Arg = 0;
 
     /* Check if we're using a register variable */
+    /* ### Caution: IsRegVar() has deterministic side effects over StackOpData,
+    **  overriding the ZP location set by PreCondOk().
+    */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
         AddStoreLhsX (D);
         AddStoreLhsA (D);
     }
+
+    /* Note: This subopt demands for REG_AX to not be used later.
+    ** X is unchanged by the code here, so only REG_A must not be used.
+    ** Note 2: Should be updated to common D->IP++ syntax.
+    */
 
     /* Inline the store */
 
@@ -477,6 +510,10 @@ static unsigned Opt_staxspidx (StackOpData* D)
     }
     InsertEntry (D, X, D->OpIndex+2);
 
+    /* ### TODO: We could do a PHA here to save A if it is used, and remove
+    ** the "A not used" precondition entirely.
+    */
+
     if (RegValIsKnown (D->OpEntry->RI->In.RegX)) {
         /* Value of X is known */
         Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
@@ -486,6 +523,10 @@ static unsigned Opt_staxspidx (StackOpData* D)
         X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     }
     InsertEntry (D, X, D->OpIndex+3);
+
+    /* ### TODO: We could do a PLA here to restore A if it is used, and remove
+    ** the "A not used" precondition entirely.
+    */
 
     /* sta (zp),y */
     X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
@@ -502,6 +543,9 @@ static unsigned Opt_staxspidx (StackOpData* D)
     }
     InsertEntry (D, X, D->OpIndex+5);
 
+    /* Note: We have not flagged any loads for removal. If any are unnecessary,
+    **  other optimizers will remove them.
+    */
     /* Remove the push and the call to the staxspidx function */
     RemoveRemainders (D);
 
@@ -1115,6 +1159,9 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
     D->IP = D->OpIndex+1;
 
     /* Backup lhs if necessary */
+    /* ### Note: This should be rearranged into a common form used in others:
+    **   if (Rhs) { } else if (Lhs) { } else { ZP }.
+    */
     if ((D->Rhs.A.Flags & LI_DIRECT) == 0) {
         if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
             /* Just reload lhs */
@@ -1137,6 +1184,13 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
         D->Rhs.A.Flags |= LI_REMOVE;
     }
 
+    /* ### Bug to come: there are dangerous Rhs X removal attempts here.
+    **  Runtime function calls can be "loads", and must be treated as a
+    **  single A/X unit, so removal of X load alone is not valid.
+    **  This can be solved with an additional "removable Rhs" test, or
+    **  by simply not forcing the LI_REMOVE flag and letting other optimizers
+    **  remove any unnecessary loads.
+    */
     /* Do high-byte operation only when its result is used */
     if ((GetRegInfo (D->Code, D->IP, REG_X) & REG_X) != 0) {
         /* Replace the high-byte load with 0 for EOR, or just leave it alone */
@@ -1256,6 +1310,11 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
     RegInfo*    RI;
     const char* Arg;
 
+    /* ### Bug to come: The Reg A value used in SameRegAValue() call here
+    **  can be from the wrong instruction in some cases, producing invalid
+    **  result. Any effects of this issue are currently suppressed because
+    **  other subopts eliminate this subopt's use cases.
+    */
     if (!SameRegAValue (D)) {
         /* Because of SameRegAValue */
         CHECK (D->Rhs.A.ChgIndex >= 0);
@@ -1280,6 +1339,12 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
             InsertEntry (D, X, D->IP++);
         } else {
             if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+                /* ### Bug to come: This CMP uses AM65_ZP addressing mode instead
+                **  of D->Rhs.A.LoadEntry->AM. It is subtle. Assembly formatter
+                **  will not care, but other optimizers can bug because the stated
+                **  mode is incorrect. Most likely, the line was copied from
+                **  above and addressing mode never fixed.
+                */
                 /* Cmp directly with RHS src */
                 X = NewCodeEntry (OP65_CMP, AM65_ZP, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
                 InsertEntry (D, X, D->IP++);
@@ -1462,6 +1527,10 @@ static unsigned Opt_a_tosxor (StackOpData* D)
 
 
 
+/* Note: A subopt MUST commit to every use case (precondition) that it
+**  advertises here. Unhandled advertised cases will result in stack corruption,
+**  because OptStackOps() is committed at the point of call and cannot back out.
+*/
 /* The first column of these two tables must be sorted in lexical order */
 
 /* CAUTION: table must be sorted for bsearch */
@@ -1941,6 +2010,9 @@ unsigned OptStackOps (CodeSeg* S)
                     ** Treat this as a change to all regs.
                     */
                     ClearLoadInfo (&Data.Rhs);
+                    /* ### Note: this causes the below SameRegXValue() to not
+                    **  work correctly in some cases.
+                    */
                     Data.Rhs.A.ChgIndex = I;
                     Data.Rhs.X.ChgIndex = I;
                     Data.Rhs.Y.ChgIndex = I;
@@ -1948,6 +2020,12 @@ unsigned OptStackOps (CodeSeg* S)
                 if (E->OPC == OP65_JSR) {
                     /* Subroutine call: Check if this is one of the functions,
                     ** we're going to replace.
+                    */
+                    /* ### Note: A-only subopts are greedy here. When an A-only
+                    **  subopt exists (by name), only its preconditions are ever
+                    **  checked. There is no fallback to the full A/X subopts.
+                    **  When the A-only preconditions fail, good A/X cases are
+                    **  left unoptimized.
                     */
                     if (SameRegXValue (&Data)) {
                         Data.OptFunc = FindFunc (FuncRegATable, FUNC_COUNT (FuncRegATable), E->Arg);
@@ -2070,6 +2148,9 @@ unsigned OptStackOps (CodeSeg* S)
                 ** pointer to the pushax and start over. We will lose part of
                 ** load tracking but at least a/x has probably lost between
                 ** pushax and here and will be tracked again when restarting.
+                */
+                /* ### Note: PreCondOk() and RegAPreCondOk() should be merged
+                **  into a single precondition system.
                 */
                 if (IsRegAOptFunc ? !RegAPreCondOk (&Data) : !PreCondOk (&Data)) {
                     /* Unflag entries that can't be removed */

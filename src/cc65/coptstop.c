@@ -160,6 +160,58 @@ static int SameRegXValue (StackOpData* D)
 
 
 
+static void UseLhsRegVarLoc (StackOpData* D)
+/* Prepare StackOpData to use the Lhs ZP location. */
+{
+    /* Trying to use a non-ZP var is fatal here. */
+    CHECK (IsRegVar (D));
+
+    /* Use the ZP location directly from Lhs */
+    D->ZPLo = D->Lhs.A.LoadEntry->Arg;
+    D->ZPHi = D->Lhs.X.LoadEntry->Arg;
+}
+
+
+
+static int HaveUnusedTempZPLoc (const StackOpData* D)
+/* Determine if an unused temp ZP location is available. */
+{
+    /* We've tracked the used ZP locations; see if any are unused.
+    ** Note: they must be checked as LO+HI pairs individually.
+    ** This must match the conditions used in ChooseTempZPLoc() exactly,
+    ** but it is a lesser evil than predicate side effects.
+    */
+    return (D->ZPUsage & REG_PTR1) == 0 || (D->ZPUsage & REG_SREG) == 0 ||
+            (D->ZPUsage & REG_PTR2) == 0;
+}
+
+
+
+static void ChooseTempZPLoc (StackOpData* D)
+/* Determine the temp ZP location to use from ZP usage flags.
+** Note: one not being available is a fatal condition here.
+*/
+{
+    /* Determine the zero page locations to use. We've tracked the used
+    ** ZP locations, so try to find some for us that are unused.
+    */
+    if ((D->ZPUsage & REG_PTR1) == 0) {
+        D->ZPLo = "ptr1";
+        D->ZPHi = "ptr1+1";
+    } else if ((D->ZPUsage & REG_SREG) == 0) {
+        D->ZPLo = "sreg";
+        D->ZPHi = "sreg+1";
+    } else if ((D->ZPUsage & REG_PTR2) == 0) {
+        D->ZPLo = "ptr2";
+        D->ZPHi = "ptr2+1";
+    } else {
+        /* No registers available */
+        Internal ("No temp ZP locations available. Was pre-check peformed?");
+    }
+}
+
+
+
 /*****************************************************************************/
 /*                       Actual optimization functions                       */
 /*****************************************************************************/
@@ -249,6 +301,10 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
 
     } else {
 
+        /* Implement the op via a temp ZP location */
+        /* HaveUnusedTempZPLoc precondition must have been met */
+        ChooseTempZPLoc (D);
+
         /* Save lhs into zeropage, then compare */
         AddStoreLhsX (D);
         AddStoreLhsA (D);
@@ -313,6 +369,10 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
 
     } else {
 
+        /* Implement the op via a temp ZP location */
+        /* HaveUnusedTempZPLoc precondition must have been met */
+        ChooseTempZPLoc (D);
+
         /* Save lhs into zeropage and reload later */
         AddStoreLhsX (D);
         AddStoreLhsA (D);
@@ -357,10 +417,13 @@ static unsigned Opt___bzero (StackOpData* D)
     CodeLabel*  L;
 
     /* Check if we're using a register variable */
-    /* ### Caution: IsRegVar() has deterministic side effects over StackOpData,
-    **  overriding the ZP location set by PreCondOk().
-    */
-    if (!IsRegVar (D)) {
+    if (IsRegVar (D)) {
+        /* Can use the Lhs ZP var directly here */
+        UseLhsRegVarLoc (D);
+    } else {
+        /* HaveUnusedTempZPLoc precondition must have been met */
+        ChooseTempZPLoc (D);
+
         /* Store the value into the zeropage instead of pushing it */
         AddStoreLhsX (D);
         AddStoreLhsA (D);
@@ -452,10 +515,13 @@ static unsigned Opt_staspidx (StackOpData* D)
     CodeEntry* X;
 
     /* Check if we're using a register variable */
-    /* ### Caution: IsRegVar() has deterministic side effects over StackOpData,
-    **  overriding the ZP location set by PreCondOk().
-    */
-    if (!IsRegVar (D)) {
+    if (IsRegVar (D)) {
+        /* Can use the Lhs ZP var directly here */
+        UseLhsRegVarLoc (D);
+    } else {
+        /* HaveUnusedTempZPLoc precondition must have been met */
+        ChooseTempZPLoc (D);
+
         /* Store the value into the zeropage instead of pushing it */
         AddStoreLhsX (D);
         AddStoreLhsA (D);
@@ -481,10 +547,13 @@ static unsigned Opt_staxspidx (StackOpData* D)
     const char* Arg = 0;
 
     /* Check if we're using a register variable */
-    /* ### Caution: IsRegVar() has deterministic side effects over StackOpData,
-    **  overriding the ZP location set by PreCondOk().
-    */
-    if (!IsRegVar (D)) {
+    if (IsRegVar (D)) {
+        /* Can use the Lhs ZP var directly here */
+        UseLhsRegVarLoc (D);
+    } else {
+        /* HaveUnusedTempZPLoc precondition must have been met */
+        ChooseTempZPLoc (D);
+
         /* Store the value into the zeropage instead of pushing it */
         AddStoreLhsX (D);
         AddStoreLhsA (D);
@@ -563,6 +632,9 @@ static unsigned Opt_tosaddax (StackOpData* D)
 
     /* We need the entry behind the add */
     CHECK (D->NextEntry != 0);
+
+    /* Because of HaveUnusedTempZPLoc precondition in all cases */
+    ChooseTempZPLoc (D);
 
     /* Check if the X register is known and zero when the add is done, and
     ** if the add is followed by
@@ -698,6 +770,9 @@ static unsigned Opt_tosaddax (StackOpData* D)
 static unsigned Opt_tosandax (StackOpData* D)
 /* Optimize the tosandax sequence */
 {
+    /* HaveUnusedTempZPLoc precondition must have been met */
+    ChooseTempZPLoc (D);
+
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
 
@@ -867,6 +942,9 @@ static unsigned Opt_tosneax (StackOpData* D)
 static unsigned Opt_tosorax (StackOpData* D)
 /* Optimize the tosorax sequence */
 {
+    /* HaveUnusedTempZPLoc precondition must have been met */
+    ChooseTempZPLoc (D);
+
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
 
@@ -1114,6 +1192,8 @@ static unsigned Opt_tosxorax (StackOpData* D)
 {
     CodeEntry*  X;
 
+    /* HaveUnusedTempZPLoc precondition must have been met */
+    ChooseTempZPLoc (D);
 
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
@@ -1168,9 +1248,14 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
             X = NewCodeEntry (OPC, D->Lhs.A.LoadEntry->AM, D->Lhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
         } else {
+            /* Implement the op via a temp ZP location */
+            /* HaveUnusedTempZPLoc precondition must have been met */
+            ChooseTempZPLoc (D);
+            
             /* Backup lhs */
             X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
             InsertEntry (D, X, D->PushIndex+1);
+            
             /* Add code for low operand */
             X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
@@ -1261,6 +1346,9 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
         /* This shouldn't fail */
         CHECK (BoolTransformer);
 
+        /* HaveUnusedTempZPLoc precondition must have been met */
+        ChooseTempZPLoc (D);
+
         /* Save lhs into zeropage */
         AddStoreLhsA (D);
         /* AddStoreLhsA may have moved the OpIndex, recalculate insertion point to prevent label migration. */
@@ -1318,6 +1406,9 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
     if (!SameRegAValue (D)) {
         /* Because of SameRegAValue */
         CHECK (D->Rhs.A.ChgIndex >= 0);
+
+        /* HaveUnusedTempZPLoc precondition must have been met */
+        ChooseTempZPLoc (D);
 
         /* Store LHS in ZP and reload it before op */
         X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
@@ -1729,19 +1820,8 @@ static int PreCondOk (StackOpData* D)
         return 0;
     }
 
-    /* Determine the zero page locations to use. We've tracked the used
-    ** ZP locations, so try to find some for us that are unused.
-    */
-    if ((D->ZPUsage & REG_PTR1) == REG_NONE) {
-        D->ZPLo = "ptr1";
-        D->ZPHi = "ptr1+1";
-    } else if ((D->ZPUsage & REG_SREG) == REG_NONE) {
-        D->ZPLo = "sreg";
-        D->ZPHi = "sreg+1";
-    } else if ((D->ZPUsage & REG_PTR2) == REG_NONE) {
-        D->ZPLo = "ptr2";
-        D->ZPHi = "ptr2+1";
-    } else {
+    /* Check if an unused temp ZP location is available */
+    if (!HaveUnusedTempZPLoc (D)) {
         /* No registers available */
         return 0;
     }
@@ -1884,19 +1964,8 @@ static int RegAPreCondOk (StackOpData* D)
         return 0;
     }
 
-    /* Determine the zero page locations to use. We've tracked the used
-    ** ZP locations, so try to find some for us that are unused.
-    */
-    if ((D->ZPUsage & REG_PTR1) == REG_NONE) {
-        D->ZPLo = "ptr1";
-        D->ZPHi = "ptr1+1";
-    } else if ((D->ZPUsage & REG_SREG) == REG_NONE) {
-        D->ZPLo = "sreg";
-        D->ZPHi = "sreg+1";
-    } else if ((D->ZPUsage & REG_PTR2) == REG_NONE) {
-        D->ZPLo = "ptr2";
-        D->ZPHi = "ptr2+1";
-    } else {
+    /* Check if an unused temp ZP location is available */
+    if (!HaveUnusedTempZPLoc (D)) {
         /* No registers available */
         return 0;
     }

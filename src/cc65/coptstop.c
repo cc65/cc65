@@ -94,68 +94,34 @@ struct OptFuncDesc {
 
 
 
-static int SameRegAValue (StackOpData* D)
-/* Check if Rhs Reg A == Lhs Reg A */
+static int SameRegAValueAtOp (const StackOpData* D, CodeEntry* OpEntry)
+/* Check if Rhs Reg A at OpIndex == Lhs Reg A at PushIndex */
 {
-    RegInfo* LRI = GetLastChangedRegInfo (D, &D->Lhs.A);
-    RegInfo* RRI = GetLastChangedRegInfo (D, &D->Rhs.A);
+    CodeEntry* PushEntry;
 
-    /* ### Bug: The Rhs Reg A value used in the logic here can be from a return
-    **  value of the runtime call being optimized away (e.g. "jsr tosgtax"),
-    **  and *not* its operand. That happens when the call insn (JSR) has a label.
-    **  Then the RRI is that of the runtime call JSR, and the RRI->Out.RegA
-    **  compares here are not valid.
-    **  See OptStackOps(), case FoundPush: if (CE_HasLabel (E)) { ...
-    **  and usage in Opt_a_tosicmp().
-    */
+    CHECK (D->PushIndex >= 0);
+    PushEntry = CS_GetEntry (D->Code, D->PushIndex);
 
-    /* RHS can have a -1 ChgIndex only if it is carried over from LHS */
-    if (RRI == 0                                    ||
-        (D->Rhs.A.ChgIndex >= 0         &&
-         D->Rhs.A.ChgIndex == D->Lhs.A.ChgIndex)    ||
-        (LRI != 0                       &&
-         RegValIsKnown (LRI->Out.RegA)  &&
-         RegValIsKnown (RRI->Out.RegA)  &&
-         (LRI->Out.RegA & 0xFF) == (RRI->Out.RegA & 0xFF))) {
-
-        return 1;
-    }
-
-    return 0;
-
+    return
+        RegValIsKnown (PushEntry->RI->In.RegA) &&
+        RegValIsKnown (OpEntry->RI->In.RegA) &&
+        PushEntry->RI->In.RegA == OpEntry->RI->In.RegA;
 }
 
 
 
-static int SameRegXValue (StackOpData* D)
-/* Check if Rhs Reg X == Lhs Reg X */
+static int SameRegXValueAtOp (const StackOpData* D, CodeEntry* OpEntry)
+/* Check if Rhs Reg X at OpIndex == Lhs Reg X at PushIndex */
 {
-    RegInfo* LRI = GetLastChangedRegInfo (D, &D->Lhs.X);
-    RegInfo* RRI = GetLastChangedRegInfo (D, &D->Rhs.X);
+    CodeEntry* PushEntry;
 
-    /* ### Bug: The Rhs Reg X value used in the logic here can be from a return
-    **  value of the runtime call being optimized away (e.g. "jsr tosgtax"),
-    **  and *not* its operand. That happens when the call insn (JSR) has a label.
-    **  Then the RRI is that of the runtime call JSR, and the RRI->Out.RegX
-    **  compares here are not valid.
-    **  See OptStackOps(), case FoundPush: if (CE_HasLabel (E)) { ...
-    **  RegAPreCondOk() has special armour code for this issue:
-    **    if (LhsHiVal != RhsHiVal) { /Cannot optimize/ break; }
-    */
+    CHECK (D->PushIndex >= 0);
+    PushEntry = CS_GetEntry (D->Code, D->PushIndex);
 
-    if (RRI == 0                                    ||
-        (D->Rhs.X.ChgIndex >= 0         &&
-         D->Rhs.X.ChgIndex == D->Lhs.X.ChgIndex)    ||
-        (LRI != 0                       &&
-         RegValIsKnown (LRI->Out.RegX)  &&
-         RegValIsKnown (RRI->Out.RegX)  &&
-         (LRI->Out.RegX & 0xFF) == (RRI->Out.RegX & 0xFF))) {
-
-        return 1;
-    }
-
-    return 0;
-
+    return
+        RegValIsKnown (PushEntry->RI->In.RegX) &&
+        RegValIsKnown (OpEntry->RI->In.RegX) &&
+        PushEntry->RI->In.RegX == OpEntry->RI->In.RegX;
 }
 
 
@@ -1251,11 +1217,11 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
             /* Implement the op via a temp ZP location */
             /* HaveUnusedTempZPLoc precondition must have been met */
             ChooseTempZPLoc (D);
-            
+
             /* Backup lhs */
             X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
             InsertEntry (D, X, D->PushIndex+1);
-            
+
             /* Add code for low operand */
             X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
@@ -1398,13 +1364,8 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
     RegInfo*    RI;
     const char* Arg;
 
-    /* ### Bug to come: The Reg A value used in SameRegAValue() call here
-    **  can be from the wrong instruction in some cases, producing invalid
-    **  result. Any effects of this issue are currently suppressed because
-    **  other subopts eliminate this subopt's use cases.
-    */
-    if (!SameRegAValue (D)) {
-        /* Because of SameRegAValue */
+    if (!SameRegAValueAtOp (D, D->OpEntry)) {
+        /* Because of SameRegAValueAtOp */
         CHECK (D->Rhs.A.ChgIndex >= 0);
 
         /* HaveUnusedTempZPLoc precondition must have been met */
@@ -2079,9 +2040,6 @@ unsigned OptStackOps (CodeSeg* S)
                     ** Treat this as a change to all regs.
                     */
                     ClearLoadInfo (&Data.Rhs);
-                    /* ### Note: this causes the below SameRegXValue() to not
-                    **  work correctly in some cases.
-                    */
                     Data.Rhs.A.ChgIndex = I;
                     Data.Rhs.X.ChgIndex = I;
                     Data.Rhs.Y.ChgIndex = I;
@@ -2096,7 +2054,7 @@ unsigned OptStackOps (CodeSeg* S)
                     **  When the A-only preconditions fail, good A/X cases are
                     **  left unoptimized.
                     */
-                    if (SameRegXValue (&Data)) {
+                    if (SameRegXValueAtOp (&Data, E)) {
                         Data.OptFunc = FindFunc (FuncRegATable, FUNC_COUNT (FuncRegATable), E->Arg);
                         IsRegAOptFunc = 1;
                     }

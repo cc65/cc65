@@ -1204,35 +1204,33 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
     /* Inline the bitwise operation */
     D->IP = D->OpIndex+1;
 
-    /* Backup lhs if necessary */
-    /* ### Note: This should be rearranged into a common form used in others:
-    **   if (Rhs) { } else if (Lhs) { } else { ZP }.
-    */
-    if ((D->Rhs.A.Flags & LI_DIRECT) == 0) {
-        if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
-            /* Just reload lhs */
-            X = NewCodeEntry (OPC, D->Lhs.A.LoadEntry->AM, D->Lhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->IP++);
-        } else {
-            /* Implement the op via a temp ZP location */
-            /* HaveUnusedTempZPLoc precondition must have been met */
-            ChooseTempZPLoc (D);
+    if ((D->Rhs.A.Flags & LI_DIRECT) != 0) {
 
-            /* Backup lhs */
-            X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
-            InsertEntry (D, X, D->PushIndex+1);
-
-            /* Add code for low operand */
-            X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->IP++);
-        }
-    } else {
-        /* Add code for low operand */
+        /* Add code for low operand using direct Rhs */
         X = NewCodeEntry (OPC, D->Rhs.A.LoadEntry->AM, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-        /* Rhs load entries may be removed */
+        /* Rhs load entries must be removed */
         D->Rhs.A.Flags |= LI_REMOVE;
+
+    } else if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+
+        /* Add code for low operand using direct Lhs */
+        X = NewCodeEntry (OPC, D->Lhs.A.LoadEntry->AM, D->Lhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    } else {
+        /* Implement the op via a temp ZP location */
+        /* HaveUnusedTempZPLoc precondition must have been met */
+        ChooseTempZPLoc (D);
+
+        /* Backup lhs */
+        X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
+        InsertEntry (D, X, D->PushIndex+1);
+
+        /* Add code for low operand */
+        X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
     }
 
     /* ### Bug to come: there are dangerous Rhs X removal attempts here.

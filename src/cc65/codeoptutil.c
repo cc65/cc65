@@ -756,6 +756,10 @@ void ResetStackOpData (StackOpData* Data)
 
     Data->PushIndex     = -1;
     Data->OpIndex       = -1;
+
+    /* Clear to prevent silent optimizer bugs */
+    Data->ZPLo          = 0;
+    Data->ZPHi          = 0;
 }
 
 
@@ -946,10 +950,9 @@ void AdjustStackOffset (StackOpData* D, unsigned Offs)
 
 
 
-int IsRegVar (StackOpData* D)
+int IsRegVar (const StackOpData* D)
 /* If the value pushed is that of a zeropage variable that is unchanged until Op,
-** replace ZPLo and ZPHi in the given StackOpData struct by the variable and return true.
-** Otherwise leave D untouched and return false.
+** return true.
 */
 {
     CodeEntry*  LoadA = D->Lhs.A.LoadEntry;
@@ -979,9 +982,7 @@ int IsRegVar (StackOpData* D)
         return 0;
     }
 
-    /* Use the zero page location directly */
-    D->ZPLo = LoadA->Arg;
-    D->ZPHi = LoadX->Arg;
+    /* ZP location can be used directly */
     return 1;
 }
 
@@ -990,6 +991,8 @@ int IsRegVar (StackOpData* D)
 void AddStoreLhsA (StackOpData* D)
 /* Add a store to zero page after the push insn */
 {
+    CHECK (D->ZPLo != 0);
+
     CodeEntry* X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
     InsertEntry (D, X, D->PushIndex+1);
 }
@@ -999,6 +1002,8 @@ void AddStoreLhsA (StackOpData* D)
 void AddStoreLhsX (StackOpData* D)
 /* Add a store to zero page after the push insn */
 {
+    CHECK (D->ZPHi != 0);
+
     CodeEntry* X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
     InsertEntry (D, X, D->PushIndex+1);
 }
@@ -1071,6 +1076,8 @@ void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 
     } else {
 
+        CHECK (D->ZPLo != 0);
+
         /* Op with temp storage */
         X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
@@ -1134,6 +1141,9 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
         }
 
     } else {
+
+        CHECK (D->ZPHi != 0);
+
         /* opc zphi */
         X = NewCodeEntry (OPC, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);

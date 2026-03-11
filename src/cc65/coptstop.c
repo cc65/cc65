@@ -271,67 +271,12 @@ static void ChooseTempZPLoc (StackOpData* D)
 
 
 
-static int CanUseAny (const StackOpData* D)
-/* Precondition: any operand will do when temp ZP location is available
-** as fallback.
-*/
-{
-    return HaveUnusedTempZPLoc (D);
-}
-
-
-
-static int CanUseDirectLhsOrTempZP (const StackOpData* D)
-/* Precondition: Either Lhs is direct-loaded, or temp ZP location
-** must be available. Used by subopts falling back on temp ZP with
-** AddStoreLhsX(), AddStoreLhsA(), ReplacePushByStore().
-*/
-{
-    return LhsIsDirectLoad (D) || HaveUnusedTempZPLoc (D);
-}
-
-
-
-static int CanUseNonStackLhsOrTempZP (const StackOpData* D)
-/* Precondition: Either Lhs is direct-loaded and not stack-relative,
-** or temp ZP location must be available. Used by subopts falling
-** back on temp ZP after testing !LI_RELOAD_Y.
-*/
-{
-    return LhsIsDirectNonStackLoad (D) || HaveUnusedTempZPLoc (D);
-}
-
-
-
-static int CanUseNonStackLhsOrAny (const StackOpData* D)
-/* Precondition: Either Lhs is direct-loaded and not stack-relative,
-** or Rhs is direct-loaded and removable (because Lhs A/X must be in force
-** at operation), or temp ZP location must be available.
-** Used by subopts falling back on temp ZP after testing !LI_RELOAD_Y.
-*/
-{
-    return LhsIsDirectNonStackLoad (D) || RhsIsRemovable (D) ||
-           HaveUnusedTempZPLoc (D);
-}
-
-
-
 static int CanUseRegVarOrTempZP (const StackOpData* D)
 /* Precondition: either the operand is a register (ZP) var, or a temp
 ** ZP location is available to store its value.
 */
 {
     return IsRegVar (D) || HaveUnusedTempZPLoc (D);
-}
-
-
-
-static int CanUseRemovableRhs (const StackOpData* D)
-/* Precondition: Rhs is direct-loaded and removable (because Lhs A/X must
-** be in force at operation).
-*/
-{
-    return RhsIsRemovable (D);
 }
 
 
@@ -350,16 +295,6 @@ static int CanUseRemovableRhsWithTempZP (const StackOpData* D)
 
 
 
-static int CanUseDirectLhsOrRemovableRhs (const StackOpData* D)
-/* Precondition: Either Lhs is direct-loaded, or Rhs is direct-loaded
-** and removable (because Lhs A/X must be in force at operation).
-*/
-{
-    return LhsIsDirectLoad (D) || RhsIsRemovable (D);
-}
-
-
-
 /* ### Note: This is a temporary, artificially-limited precondition reproducing
 ** the original (OP_LR_INTERCHANGE | OP_RHS_REMOVE_DIRECT) evaluation,
 ** but not useful otherwise.
@@ -371,41 +306,6 @@ static int CanUseDirectWithRemovableRhsAndTempZP (const StackOpData* D)
 {
     return (LhsIsDirectLoad (D) || RhsIsDirectLoad (D)) &&
            RhsIsRemovable (D) && HaveUnusedTempZPLoc (D);
-}
-
-
-
-static int CanUseAnyRemovableOrTempZP (const StackOpData* D)
-/* Precondition: Either Lhs is direct-loaded, or Rhs is direct-loaded
-** and removable (because Lhs A/X must be in force at operation), or
-** a temp ZP location is available to store the Lhs.
-*/
-{
-    return CanUseDirectLhsOrRemovableRhs (D) || HaveUnusedTempZPLoc (D);
-}
-
-
-
-static int CanUseRegADirectLhsOrRemovableRhs (const StackOpData* D)
-/* Precondition: Either Lhs reg A is direct-loaded, or entire Rhs is
-** direct-loaded and removable (because Lhs A/X must be in force
-** at operation).
-*/
-{
-    /* Note: the entire Rhs A/X must be removable, not just A. */
-    return RegIsDirectLoaded (&D->Lhs.A) || RhsIsRemovable (D);
-}
-
-
-
-static int CanUseRegANonStackLhsOrRemovableRhs (const StackOpData* D)
-/* Precondition: Either Lhs reg A is direct-loaded and not stack-relative,
-** or entire Rhs is direct-loaded removable (because Lhs A/X must be
-** in force at operation).
-*/
-{
-    /* Note: the entire Rhs A/X must be removable, not just A. */
-    return RegIsDirectNonStackLoaded (&D->Lhs.A) || RhsIsRemovable (D);
 }
 
 
@@ -456,17 +356,6 @@ static int WithSameXMustHaveTempZP (const StackOpData* D)
 
 
 
-static int WithSameXCanUseRemovableRhs (const StackOpData* D)
-/* Precondition: When Rhs X == Lhs X, Rhs must be direct-loaded and removable
-** (because Lhs A/X must be in force at operation).
-*/
-{
-    /* Note: the entire Rhs A/X must be removable, not just A. */
-    return SameRegXValueAtOp (D, 0) && RhsIsRemovable (D);
-}
-
-
-
 /* ### Note: This is a temporary, artificially-limited precondition reproducing
 ** the original (OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT) evaluation
 ** for A-only subopts, but not useful otherwise.
@@ -478,42 +367,6 @@ static int WithSameXCanUseRemovableRhsWithTempZP (const StackOpData* D)
 {
     return SameRegXValueAtOp (D, 0) && RhsIsDirectLoad (D) &&
            RhsIsRemovable (D) && HaveUnusedTempZPLoc (D);
-}
-
-
-
-static int WithSameXCanUseNonStackLhsOrRemovableRhs (const StackOpData* D)
-/* Precondition: When Rhs X == Lhs X, either Lhs reg A is direct-loaded and not
-** stack-relative, or Rhs must be direct-loaded and removable (because Lhs A/X
-** must be in force at operation).
-*/
-{
-    return SameRegXValueAtOp (D, 0) &&
-           CanUseRegANonStackLhsOrRemovableRhs (D);
-}
-
-
-
-static int WithSameXCanUseNonStackLhsOrAny (const StackOpData* D)
-/* Precondition: When Rhs X == Lhs X, either Lhs reg A is direct-loaded and not
-** stack-relative, or Rhs must be direct-loaded and removable (because Lhs A/X
-** must be in force at operation), or a temp ZP location is available.
-*/
-{
-    return SameRegXValueAtOp (D, 0) &&
-           (CanUseRegANonStackLhsOrRemovableRhs (D) || HaveUnusedTempZPLoc (D));
-}
-
-
-
-static int WithSameXCanUseAny (const StackOpData* D)
-/* Precondition: When Rhs X == Lhs X, either Lhs reg A is direct-loaded, or Rhs
-** is direct-loaded and removable (because Lhs A/X must be in force at
-** operation), or a temp ZP location is available to store the Lhs.
-*/
-{
-    return SameRegXValueAtOp (D, 0) &&
-           (CanUseRegADirectLhsOrRemovableRhs (D) || HaveUnusedTempZPLoc (D));
 }
 
 

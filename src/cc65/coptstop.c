@@ -53,37 +53,15 @@
 
 
 
-/* Flags for the functions */
-typedef enum {
-    OP_NONE              = 0x00,         /* Nothing special */
-    OP_A_KNOWN           = 0x01,         /* Value of A must be known */
-    OP_X_ZERO            = 0x02,         /* X must be zero */
-    OP_LHS_LOAD          = 0x04,         /* Must have load insns for LHS */
-    OP_LHS_SAME_BY_OP    = 0x08,         /* Load result of LHS must be the same if relocated to op */
-    OP_LHS_LOAD_DIRECT   = 0x0C,         /* Must have direct load insn for LHS */
-    OP_RHS_LOAD          = 0x10,         /* Must have load insns for RHS */
-    OP_RHS_SAME_BY_OP    = 0x20,         /* Load result of RHS must be the same if relocated to op */
-    OP_RHS_LOAD_DIRECT   = 0x30,         /* Must have direct load insn for RHS */
-    OP_AX_INTERCHANGE    = 0x40,         /* Preconditions of A/X may be interchanged */
-    OP_LR_INTERCHANGE    = 0x80,         /* Preconditions of LHS/RHS may be interchanged */
-    OP_LHS_SAME_BY_PUSH  = 0x0100,       /* LHS must load the same content if relocated to push */
-    OP_RHS_SAME_BY_PUSH  = 0x0200,       /* RHS must load the same content if relocated to push */
-    OP_LHS_SAME_BY_RHS   = 0x0400,       /* LHS must load the same content if relocated to RHS */
-    OP_RHS_SAME_BY_LHS   = 0x0800,       /* RHS must load the same content if relocated to LHS */
-    OP_LHS_REMOVE        = 0x1000,       /* LHS must be removable or RHS may use ZP store/load */
-    OP_LHS_REMOVE_DIRECT = 0x3000,       /* LHS must be directly removable */
-    OP_RHS_REMOVE        = 0x4000,       /* RHS must be removable or LHS may use ZP store/load */
-    OP_RHS_REMOVE_DIRECT = 0xC000,       /* RHS must be directly removable */
-} OP_FLAGS;
-
 /* Structure that describes an optimizer subfunction for a specific op */
 typedef unsigned (*OptFunc) (StackOpData* D);
+typedef int (*PreCondFunc) (const StackOpData* D);
+
 typedef struct OptFuncDesc OptFuncDesc;
 struct OptFuncDesc {
     const char*         Name;           /* Name of the replaced runtime function */
     OptFunc             Func;           /* Function pointer */
-    unsigned            UnusedRegs;     /* Regs that must not be used later */
-    OP_FLAGS            Flags;          /* Flags */
+    PreCondFunc         PreCond;        /* Precondition predicate pointer */
 };
 
 
@@ -118,10 +96,119 @@ static int SameRegXValueAtOp (const StackOpData* D, CodeEntry* OpEntry)
     CHECK (D->PushIndex >= 0);
     PushEntry = CS_GetEntry (D->Code, D->PushIndex);
 
+    /* ### This is a temporary workaround, removable in next phases. */
+    if (OpEntry == 0) {
+        /* Not provided; then OpIndex must be present */
+        CHECK (D->OpIndex >= 0);
+        OpEntry = CS_GetEntry (D->Code, D->OpIndex);
+    }
+
     return
         RegValIsKnown (PushEntry->RI->In.RegX) &&
         RegValIsKnown (OpEntry->RI->In.RegX) &&
         PushEntry->RI->In.RegX == OpEntry->RI->In.RegX;
+}
+
+
+
+static inline int RegIsDirectLoaded (const LoadRegInfo* LRI)
+/* Check if Reg specified by LoadRegInfo is direct-loaded. */
+{
+    /* Must have load insns for Reg, and must be direct */
+    return (LRI->Flags & LI_LOAD_INSN) != 0 &&
+           (LRI->Flags & LI_DIRECT) != 0;
+}
+
+
+
+static inline int RegIsDirectNonStackLoaded (const LoadRegInfo* LRI)
+/* Check if Reg specified by LoadRegInfo is direct-loaded without
+** stack-relative Y-indexing.
+*/
+{
+    /* Note: this is not a precise test. abs,y addressing would also
+    ** require reloading Y.
+    */
+    return (LRI->Flags & (LI_LOAD_INSN | LI_DIRECT | LI_RELOAD_Y)) ==
+           (LI_LOAD_INSN | LI_DIRECT /* no LI_RELOAD_Y */);
+}
+
+
+
+static inline int RegLoadIsRemovable (const LoadRegInfo* LRI)
+/* Check if Reg specified by LoadRegInfo is marked as non-removable. */
+{
+    /* Must have load entry for Reg, which is not marked */
+    return LRI->LoadEntry != 0 &&
+           (LRI->LoadEntry->Flags & CEF_DONT_REMOVE) == 0;
+}
+
+
+
+static inline int LhsIsDirectLoad (const StackOpData* D)
+/* Check if Lhs A/X is direct-loaded. */
+{
+    return RegIsDirectLoaded (&D->Lhs.A) && RegIsDirectLoaded (&D->Lhs.X);
+}
+
+
+
+static inline int RhsIsDirectLoad (const StackOpData* D)
+/* Check if Rhs A/X is direct-loaded. */
+{
+    return RegIsDirectLoaded (&D->Rhs.A) && RegIsDirectLoaded (&D->Rhs.X);
+}
+
+
+
+static inline int LhsIsDirectNonStackLoad (const StackOpData* D)
+/* Check if Lhs A/X is direct-loaded and not stack-relative. */
+{
+    /* Note: this is not a precise test. abs,y addressing would also
+    ** require reloading Y.
+    */
+    return RegIsDirectNonStackLoaded (&D->Lhs.A) &&
+           RegIsDirectNonStackLoaded (&D->Lhs.X);
+}
+
+
+
+static inline int RhsIsDirectNonStackLoad (const StackOpData* D)
+/* Check if Rhs A/X is direct-loaded and not stack-relative. */
+{
+    /* Note: this is not a precise test. abs,y addressing would also
+    ** require reloading Y.
+    */
+    return RegIsDirectNonStackLoaded (&D->Rhs.A) &&
+           RegIsDirectNonStackLoaded (&D->Rhs.X);
+}
+
+
+
+static int RhsIsRemovable (const StackOpData* D)
+/* Check if Rhs A/X is direct-loaded and removable (because Lhs A/X must
+** be in force at operation).
+*/
+{
+    /* Must have direct load insns for Rhs */
+    if (!RhsIsDirectLoad (D)) {
+        return 0; /* Fail */
+    }
+
+    /* Rhs loads must be removable */
+    if (!RegLoadIsRemovable (&D->Rhs.A) || !RegLoadIsRemovable (&D->Rhs.X)) {
+        return 0; /* Fail */
+    }
+
+    /* Special condition: for Rhs to be removable, it must be loaded
+    ** exactly *once*. When multiple loads exists, only the last one would
+    ** be removed, and the Lhs A/X will not be in force at op.
+    */
+    if (D->RhsMultiChg) {
+        return 0; /* Fail */
+    }
+
+    return 1; /* Pass */
 }
 
 
@@ -148,7 +235,7 @@ static int HaveUnusedTempZPLoc (const StackOpData* D)
     ** but it is a lesser evil than predicate side effects.
     */
     return (D->ZPUsage & REG_PTR1) == 0 || (D->ZPUsage & REG_SREG) == 0 ||
-            (D->ZPUsage & REG_PTR2) == 0;
+           (D->ZPUsage & REG_PTR2) == 0;
 }
 
 
@@ -179,6 +266,259 @@ static void ChooseTempZPLoc (StackOpData* D)
 
 
 /*****************************************************************************/
+/*                  Precondition Predicates                                  */
+/*****************************************************************************/
+
+
+
+static int CanUseAny (const StackOpData* D)
+/* Precondition: any operand will do when temp ZP location is available
+** as fallback.
+*/
+{
+    return HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int CanUseDirectLhsOrTempZP (const StackOpData* D)
+/* Precondition: Either Lhs is direct-loaded, or temp ZP location
+** must be available. Used by subopts falling back on temp ZP with
+** AddStoreLhsX(), AddStoreLhsA(), ReplacePushByStore().
+*/
+{
+    return LhsIsDirectLoad (D) || HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int CanUseNonStackLhsOrTempZP (const StackOpData* D)
+/* Precondition: Either Lhs is direct-loaded and not stack-relative,
+** or temp ZP location must be available. Used by subopts falling
+** back on temp ZP after testing !LI_RELOAD_Y.
+*/
+{
+    return LhsIsDirectNonStackLoad (D) || HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int CanUseNonStackLhsOrAny (const StackOpData* D)
+/* Precondition: Either Lhs is direct-loaded and not stack-relative,
+** or Rhs is direct-loaded and removable (because Lhs A/X must be in force
+** at operation), or temp ZP location must be available.
+** Used by subopts falling back on temp ZP after testing !LI_RELOAD_Y.
+*/
+{
+    return LhsIsDirectNonStackLoad (D) || RhsIsRemovable (D) ||
+           HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int CanUseRegVarOrTempZP (const StackOpData* D)
+/* Precondition: either the operand is a register (ZP) var, or a temp
+** ZP location is available to store its value.
+*/
+{
+    return IsRegVar (D) || HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int CanUseRemovableRhs (const StackOpData* D)
+/* Precondition: Rhs is direct-loaded and removable (because Lhs A/X must
+** be in force at operation).
+*/
+{
+    return RhsIsRemovable (D);
+}
+
+
+
+/* ### Note: This is a temporary, artificially-limited precondition reproducing
+** the original (OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT) evaluation,
+** but not useful otherwise.
+*/
+static int CanUseRemovableRhsWithTempZP (const StackOpData* D)
+/* Precondition: Rhs is direct-loaded and removable (because Lhs A/X must
+** be in force at operation), and a temp ZP location is available.
+*/
+{
+    return RhsIsDirectLoad (D) && RhsIsRemovable (D) && HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int CanUseDirectLhsOrRemovableRhs (const StackOpData* D)
+/* Precondition: Either Lhs is direct-loaded, or Rhs is direct-loaded
+** and removable (because Lhs A/X must be in force at operation).
+*/
+{
+    return LhsIsDirectLoad (D) || RhsIsRemovable (D);
+}
+
+
+
+/* ### Note: This is a temporary, artificially-limited precondition reproducing
+** the original (OP_LR_INTERCHANGE | OP_RHS_REMOVE_DIRECT) evaluation,
+** but not useful otherwise.
+*/
+static int CanUseDirectWithRemovableRhsAndTempZP (const StackOpData* D)
+/* Precondition: Lhs is direct-loaded, or Rhs is direct-loaded, and
+** Rhs is removable, and a temp ZP location is available.
+*/
+{
+    return (LhsIsDirectLoad (D) || RhsIsDirectLoad (D)) &&
+           RhsIsRemovable (D) && HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int CanUseAnyRemovableOrTempZP (const StackOpData* D)
+/* Precondition: Either Lhs is direct-loaded, or Rhs is direct-loaded
+** and removable (because Lhs A/X must be in force at operation), or
+** a temp ZP location is available to store the Lhs.
+*/
+{
+    return CanUseDirectLhsOrRemovableRhs (D) || HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int CanUseRegADirectLhsOrRemovableRhs (const StackOpData* D)
+/* Precondition: Either Lhs reg A is direct-loaded, or entire Rhs is
+** direct-loaded and removable (because Lhs A/X must be in force
+** at operation).
+*/
+{
+    /* Note: the entire Rhs A/X must be removable, not just A. */
+    return RegIsDirectLoaded (&D->Lhs.A) || RhsIsRemovable (D);
+}
+
+
+
+static int CanUseRegANonStackLhsOrRemovableRhs (const StackOpData* D)
+/* Precondition: Either Lhs reg A is direct-loaded and not stack-relative,
+** or entire Rhs is direct-loaded removable (because Lhs A/X must be
+** in force at operation).
+*/
+{
+    /* Note: the entire Rhs A/X must be removable, not just A. */
+    return RegIsDirectNonStackLoaded (&D->Lhs.A) || RhsIsRemovable (D);
+}
+
+
+
+static int MustHaveTempZP (const StackOpData* D)
+/* Precondition: a temp ZP location must be available in all cases */
+{
+    return HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int WithAXlt100CanUseRegVarOrTempZP (const StackOpData* D)
+/* Precondition: When X is 0 and A is known at op, either the operand is a
+** register (ZP) var, or a temp ZP location is available to store its value.
+*/
+{
+    CHECK (D->OpEntry != 0);
+
+    return CanUseRegVarOrTempZP (D) &&
+           /* X is 0 at op, and A is known at op */
+           (D->OpEntry->RI->In.RegX == 0) &&
+           RegValIsKnown (D->OpEntry->RI->In.RegA);
+}
+
+
+
+static int WithUnusedACanUseRegVarOrTempZP (const StackOpData* D)
+/* Precondition: either the operand is a register (ZP) var, or a temp ZP
+** location is available to store its value. Reg A must not be used later
+** (because it is changed).
+*/
+{
+    return (IsRegVar (D) || HaveUnusedTempZPLoc (D)) &&
+           !RegAUsed (D->Code, D->OpIndex + 1);
+}
+
+
+
+static int WithSameXMustHaveTempZP (const StackOpData* D)
+/* Precondition: When Rhs X == Lhs X, any operand will do because a temp
+** ZP location will be used. Used by subopts primarily targeting temp
+** ZP with AddStoreLhsA() or similar.
+*/
+{
+    return SameRegXValueAtOp (D, 0) && HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int WithSameXCanUseRemovableRhs (const StackOpData* D)
+/* Precondition: When Rhs X == Lhs X, Rhs must be direct-loaded and removable
+** (because Lhs A/X must be in force at operation).
+*/
+{
+    /* Note: the entire Rhs A/X must be removable, not just A. */
+    return SameRegXValueAtOp (D, 0) && RhsIsRemovable (D);
+}
+
+
+
+/* ### Note: This is a temporary, artificially-limited precondition reproducing
+** the original (OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT) evaluation
+** for A-only subopts, but not useful otherwise.
+*/
+static int WithSameXCanUseRemovableRhsWithTempZP (const StackOpData* D)
+/* Precondition: When Rhs X == Lhs X, Rhs is direct-loaded and removable,
+** and a temp ZP location is available.
+*/
+{
+    return SameRegXValueAtOp (D, 0) && RhsIsDirectLoad (D) &&
+           RhsIsRemovable (D) && HaveUnusedTempZPLoc (D);
+}
+
+
+
+static int WithSameXCanUseNonStackLhsOrRemovableRhs (const StackOpData* D)
+/* Precondition: When Rhs X == Lhs X, either Lhs reg A is direct-loaded and not
+** stack-relative, or Rhs must be direct-loaded and removable (because Lhs A/X
+** must be in force at operation).
+*/
+{
+    return SameRegXValueAtOp (D, 0) &&
+           CanUseRegANonStackLhsOrRemovableRhs (D);
+}
+
+
+
+static int WithSameXCanUseNonStackLhsOrAny (const StackOpData* D)
+/* Precondition: When Rhs X == Lhs X, either Lhs reg A is direct-loaded and not
+** stack-relative, or Rhs must be direct-loaded and removable (because Lhs A/X
+** must be in force at operation), or a temp ZP location is available.
+*/
+{
+    return SameRegXValueAtOp (D, 0) &&
+           (CanUseRegANonStackLhsOrRemovableRhs (D) || HaveUnusedTempZPLoc (D));
+}
+
+
+
+static int WithSameXCanUseAny (const StackOpData* D)
+/* Precondition: When Rhs X == Lhs X, either Lhs reg A is direct-loaded, or Rhs
+** is direct-loaded and removable (because Lhs A/X must be in force at
+** operation), or a temp ZP location is available to store the Lhs.
+*/
+{
+    return SameRegXValueAtOp (D, 0) &&
+           (CanUseRegADirectLhsOrRemovableRhs (D) || HaveUnusedTempZPLoc (D));
+}
+
+
+
+/*****************************************************************************/
 /*                       Actual optimization functions                       */
 /*****************************************************************************/
 
@@ -201,8 +541,7 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
     /* If the lhs is direct (but not stack relative), encode compares with lhs
     ** effectively reverting the order (which doesn't matter for ==).
     */
-    if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
-        (D->Lhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+    if (LhsIsDirectNonStackLoad (D)) {
 
         CodeEntry* LoadX = D->Lhs.X.LoadEntry;
         CodeEntry* LoadA = D->Lhs.A.LoadEntry;
@@ -225,9 +564,7 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         D->Lhs.X.Flags |= LI_REMOVE;
         D->Lhs.A.Flags |= LI_REMOVE;
 
-    } else if ((D->Rhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
-               (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
-               D->RhsMultiChg == 0) {
+    } else if (RhsIsDirectNonStackLoad (D) && RhsIsRemovable (D)) {
 
         CodeEntry* LoadX = D->Rhs.X.LoadEntry;
         CodeEntry* LoadA = D->Rhs.A.LoadEntry;
@@ -250,8 +587,7 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         D->Rhs.X.Flags |= LI_REMOVE;
         D->Rhs.A.Flags |= LI_REMOVE;
 
-    } else if ((D->Rhs.A.Flags & LI_DIRECT) != 0 &&
-               (D->Rhs.X.Flags & LI_DIRECT) != 0) {
+    } else if (RhsIsRemovable (D)) {
 
         D->IP = D->OpIndex+1;
 
@@ -308,8 +644,7 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
     /* If the lhs is direct (but not stack relative), we can just reload the
     ** data later.
     */
-    if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
-        (D->Lhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+    if (LhsIsDirectNonStackLoad (D)) {
 
         CodeEntry* LoadX = D->Lhs.X.LoadEntry;
         CodeEntry* LoadA = D->Lhs.A.LoadEntry;
@@ -497,6 +832,9 @@ static unsigned Opt_staspidx (StackOpData* D)
     X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+1);
 
+    /* Note: We have not flagged any loads for removal. If any are unnecessary,
+    **  other optimizers will remove them.
+    */
     /* Remove the push and the call to the staspidx function */
     RemoveRemainders (D);
 
@@ -525,7 +863,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
         AddStoreLhsA (D);
     }
 
-    /* Note: This subopt demands for REG_AX to not be used later.
+    /* Note: Earlier, this subopt demanded for REG_AX to not be used later.
     ** X is unchanged by the code here, so only REG_A must not be used.
     ** Note 2: Should be updated to common D->IP++ syntax.
     */
@@ -701,10 +1039,11 @@ static unsigned Opt_tosaddax (StackOpData* D)
                 /* Value of first op high byte is unknown. Load from ZP or
                 ** original storage.
                 */
-                if (D->Lhs.X.Flags & LI_DIRECT) {
+                if (RegIsDirectLoaded (&D->Lhs.X)) {
                     CodeEntry* LoadX = D->Lhs.X.LoadEntry;
                     X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
                 } else {
+                    CHECK (D->ZPHi != 0);
                     X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
                 }
             }
@@ -788,11 +1127,11 @@ static unsigned Opt_tosgeax (StackOpData* D)
     CodeEntry*  X;
     CodeLabel* L;
 
+    /* Because of CanUseRemovableRhs */
+    CHECK (RhsIsRemovable (D));
+
     /* Inline the sbc */
     D->IP = D->OpIndex+1;
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
     /* Add code for low operand */
     AddOpLow (D, OP65_CMP, &D->Rhs);
@@ -845,12 +1184,11 @@ static unsigned Opt_tosltax (StackOpData* D)
     CodeEntry*  X;
     CodeLabel* L;
 
+    /* Because of CanUseRemovableRhs */
+    CHECK (RhsIsRemovable (D));
 
     /* Inline the compare */
     D->IP = D->OpIndex+1;
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
     /* Add code for low operand */
     AddOpLow (D, OP65_CMP, &D->Rhs);
@@ -951,6 +1289,8 @@ static unsigned Opt_tossubax (StackOpData* D)
 {
     CodeEntry*  X;
 
+    /* Because of CanUseRemovableRhs */
+    CHECK (RhsIsRemovable (D));
 
     /* Inline the sbc */
     D->IP = D->OpIndex+1;
@@ -958,9 +1298,6 @@ static unsigned Opt_tossubax (StackOpData* D)
     /* sec */
     X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
     /* Add code for low operand */
     AddOpLow (D, OP65_SBC, &D->Rhs);
@@ -986,12 +1323,11 @@ static unsigned Opt_tosugeax (StackOpData* D)
 {
     CodeEntry*  X;
 
+    /* Because of CanUseRemovableRhs */
+    CHECK (RhsIsRemovable (D));
 
     /* Inline the sbc */
     D->IP = D->OpIndex+1;
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
     /* Add code for low operand */
     AddOpLow (D, OP65_CMP, &D->Rhs);
@@ -1029,12 +1365,11 @@ static unsigned Opt_tosugtax (StackOpData* D)
 {
     CodeEntry*  X;
 
+    /* Because of CanUseRemovableRhs */
+    CHECK (RhsIsRemovable (D));
 
     /* Inline the sbc */
     D->IP = D->OpIndex+1;
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
     /* sec */
     X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
@@ -1076,12 +1411,11 @@ static unsigned Opt_tosuleax (StackOpData* D)
 {
     CodeEntry*  X;
 
+    /* Because of CanUseRemovableRhs */
+    CHECK (RhsIsRemovable (D));
 
     /* Inline the sbc */
     D->IP = D->OpIndex+1;
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
     /* sec */
     X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
@@ -1123,12 +1457,11 @@ static unsigned Opt_tosultax (StackOpData* D)
 {
     CodeEntry*  X;
 
+    /* Because of CanUseRemovableRhs */
+    CHECK (RhsIsRemovable (D));
 
     /* Inline the sbc */
     D->IP = D->OpIndex+1;
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
     /* Add code for low operand */
     AddOpLow (D, OP65_CMP, &D->Rhs);
@@ -1204,7 +1537,7 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
     /* Inline the bitwise operation */
     D->IP = D->OpIndex+1;
 
-    if ((D->Rhs.A.Flags & LI_DIRECT) != 0) {
+    if (RhsIsRemovable (D)) {
 
         /* Add code for low operand using direct Rhs */
         X = NewCodeEntry (OPC, D->Rhs.A.LoadEntry->AM, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
@@ -1213,7 +1546,7 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
         /* Rhs load entries must be removed */
         D->Rhs.A.Flags |= LI_REMOVE;
 
-    } else if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+    } else if (RegIsDirectNonStackLoaded (&D->Lhs.A)) {
 
         /* Add code for low operand using direct Lhs */
         X = NewCodeEntry (OPC, D->Lhs.A.LoadEntry->AM, D->Lhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
@@ -1244,6 +1577,7 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
     if ((GetRegInfo (D->Code, D->IP, REG_X) & REG_X) != 0) {
         /* Replace the high-byte load with 0 for EOR, or just leave it alone */
         if (OPC == OP65_EOR) {
+            /* Since this is a "same X" EOR, the result is always 0. */
             X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (0), 0, D->Rhs.X.ChgEntry->LI);
             InsertEntry (D, X, D->IP++);
             D->Rhs.X.Flags |= LI_REMOVE;
@@ -1272,9 +1606,7 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 
     D->IP = D->OpIndex + 1;
 
-    if (!D->RhsMultiChg                     &&
-        (D->Rhs.A.Flags & LI_DIRECT) != 0   &&
-        (D->Rhs.A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
+    if (RhsIsRemovable (D)) {
 
         /* cmp */
         AddOpLow (D, OP65_CMP, &D->Rhs);
@@ -1283,7 +1615,7 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
         D->Rhs.X.Flags |= LI_REMOVE;
         D->Rhs.A.Flags |= LI_REMOVE;
 
-    } else if ((D->Lhs.A.Flags & LI_DIRECT) != 0) {
+    } else if (RegIsDirectLoaded (&D->Lhs.A)) {
         /* If the lhs is direct (but not stack relative), encode compares with lhs,
         ** effectively reversing the order (which doesn't matter for == and !=).
         */
@@ -1377,7 +1709,10 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
 
         D->IP = D->OpIndex + 1;
 
-        if ((D->Rhs.A.Flags & LI_DIRECT) == 0) {
+        /* ### Note: This should be updated to follow the common
+        **  if (Non-Stack) { } else if (Direct) { } else { } pattern.
+        */
+        if (!RegIsDirectLoaded (&D->Rhs.A)) {
             /* RHS src is not directly comparable */
             X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->Rhs.A.ChgIndex + 1);
@@ -1484,12 +1819,11 @@ static unsigned Opt_a_tossub (StackOpData* D)
 {
     CodeEntry*  X;
 
+    /* Because of CanUseRemovableRhs */
+    CHECK (RhsIsRemovable (D));
 
     /* Inline the sbc */
     D->IP = D->OpIndex+1;
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
     /* sec */
     X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
@@ -1586,47 +1920,47 @@ static unsigned Opt_a_tosxor (StackOpData* D)
 /* CAUTION: table must be sorted for bsearch */
 static const OptFuncDesc FuncTable[] = {
 /* BEGIN SORTED.SH */
-    { "___bzero",   Opt___bzero,   REG_NONE, OP_X_ZERO | OP_A_KNOWN                    },
-    { "staspidx",   Opt_staspidx,  REG_NONE, OP_NONE                                   },
-    { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                                   },
-    { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                                   },
-    { "tosandax",   Opt_tosandax,  REG_NONE, OP_NONE                                   },
-    { "tosaslax",   Opt_tosaslax,  REG_NONE, OP_NONE                                   },
-    { "tosasrax",   Opt_tosasrax,  REG_NONE, OP_NONE                                   },
-    { "toseqax",    Opt_toseqax,   REG_NONE, OP_LR_INTERCHANGE | OP_RHS_REMOVE_DIRECT  },
-    { "tosgeax",    Opt_tosgeax,   REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tosltax",    Opt_tosltax,   REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tosneax",    Opt_tosneax,   REG_NONE, OP_LR_INTERCHANGE | OP_RHS_REMOVE_DIRECT  },
-    { "tosorax",    Opt_tosorax,   REG_NONE, OP_NONE                                   },
-    { "tosshlax",   Opt_tosshlax,  REG_NONE, OP_NONE                                   },
-    { "tosshrax",   Opt_tosshrax,  REG_NONE, OP_NONE                                   },
-    { "tossubax",   Opt_tossubax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tosugeax",   Opt_tosugeax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tosugtax",   Opt_tosugtax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tosuleax",   Opt_tosuleax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tosultax",   Opt_tosultax,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                                   },
+    { "___bzero",   Opt___bzero,   WithAXlt100CanUseRegVarOrTempZP       },
+    { "staspidx",   Opt_staspidx,  CanUseRegVarOrTempZP                  },
+    { "staxspidx",  Opt_staxspidx, WithUnusedACanUseRegVarOrTempZP       },
+    { "tosaddax",   Opt_tosaddax,  MustHaveTempZP                        },
+    { "tosandax",   Opt_tosandax,  MustHaveTempZP                        },
+    { "tosaslax",   Opt_tosaslax,  MustHaveTempZP                        },
+    { "tosasrax",   Opt_tosasrax,  MustHaveTempZP                        },
+    { "toseqax",    Opt_toseqax,   CanUseDirectWithRemovableRhsAndTempZP },
+    { "tosgeax",    Opt_tosgeax,   CanUseRemovableRhsWithTempZP          },
+    { "tosltax",    Opt_tosltax,   CanUseRemovableRhsWithTempZP          },
+    { "tosneax",    Opt_tosneax,   CanUseDirectWithRemovableRhsAndTempZP },
+    { "tosorax",    Opt_tosorax,   MustHaveTempZP                        },
+    { "tosshlax",   Opt_tosshlax,  MustHaveTempZP                        },
+    { "tosshrax",   Opt_tosshrax,  MustHaveTempZP                        },
+    { "tossubax",   Opt_tossubax,  CanUseRemovableRhsWithTempZP          },
+    { "tosugeax",   Opt_tosugeax,  CanUseRemovableRhsWithTempZP          },
+    { "tosugtax",   Opt_tosugtax,  CanUseRemovableRhsWithTempZP          },
+    { "tosuleax",   Opt_tosuleax,  CanUseRemovableRhsWithTempZP          },
+    { "tosultax",   Opt_tosultax,  CanUseRemovableRhsWithTempZP          },
+    { "tosxorax",   Opt_tosxorax,  MustHaveTempZP                        },
 /* END SORTED.SH */
 };
 
 /* CAUTION: table must be sorted for bsearch */
 static const OptFuncDesc FuncRegATable[] = {
 /* BEGIN SORTED.SH */
-    { "tosandax",   Opt_a_tosand,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "toseqax",    Opt_a_toseq,   REG_NONE, OP_NONE                                   },
-    { "tosgeax",    Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
-    { "tosgtax",    Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
-    { "tosicmp",    Opt_a_tosicmp, REG_NONE, OP_NONE                                   },
-    { "tosleax",    Opt_a_tosule,  REG_NONE, OP_NONE                                   },
-    { "tosltax",    Opt_a_tosult,  REG_NONE, OP_NONE                                   },
-    { "tosneax",    Opt_a_tosne,   REG_NONE, OP_NONE                                   },
-    { "tosorax",    Opt_a_tosor,   REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tossubax",   Opt_a_tossub,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
-    { "tosugeax",   Opt_a_tosuge,  REG_NONE, OP_NONE                                   },
-    { "tosugtax",   Opt_a_tosugt,  REG_NONE, OP_NONE                                   },
-    { "tosuleax",   Opt_a_tosule,  REG_NONE, OP_NONE                                   },
-    { "tosultax",   Opt_a_tosult,  REG_NONE, OP_NONE                                   },
-    { "tosxorax",   Opt_a_tosxor,  REG_NONE, OP_RHS_REMOVE_DIRECT | OP_RHS_LOAD_DIRECT },
+    { "tosandax",   Opt_a_tosand,  WithSameXCanUseRemovableRhsWithTempZP },
+    { "toseqax",    Opt_a_toseq,   WithSameXMustHaveTempZP               },
+    { "tosgeax",    Opt_a_tosuge,  WithSameXMustHaveTempZP               },
+    { "tosgtax",    Opt_a_tosugt,  WithSameXMustHaveTempZP               },
+    { "tosicmp",    Opt_a_tosicmp, WithSameXMustHaveTempZP               },
+    { "tosleax",    Opt_a_tosule,  WithSameXMustHaveTempZP               },
+    { "tosltax",    Opt_a_tosult,  WithSameXMustHaveTempZP               },
+    { "tosneax",    Opt_a_tosne,   WithSameXMustHaveTempZP               },
+    { "tosorax",    Opt_a_tosor,   WithSameXCanUseRemovableRhsWithTempZP },
+    { "tossubax",   Opt_a_tossub,  WithSameXCanUseRemovableRhsWithTempZP },
+    { "tosugeax",   Opt_a_tosuge,  WithSameXMustHaveTempZP               },
+    { "tosugtax",   Opt_a_tosugt,  WithSameXMustHaveTempZP               },
+    { "tosuleax",   Opt_a_tosule,  WithSameXMustHaveTempZP               },
+    { "tosultax",   Opt_a_tosult,  WithSameXMustHaveTempZP               },
+    { "tosxorax",   Opt_a_tosxor,  WithSameXCanUseRemovableRhsWithTempZP },
 /* END SORTED.SH */
 };
 
@@ -1654,283 +1988,23 @@ static const OptFuncDesc* FindFunc (const OptFuncDesc FuncTable[], size_t Count,
 
 static int PreCondOk (StackOpData* D)
 /* Check if the preconditions for a call to the optimizer subfunction are
-** satisfied. As a side effect, this function will also choose the zero page
-** register to use for temporary storage.
+** satisfied.
 */
 {
-    LoadInfo* Lhs;
-    LoadInfo* Rhs;
-    LoadRegInfo* LhsLo;
-    LoadRegInfo* LhsHi;
-    LoadRegInfo* RhsLo;
-    LoadRegInfo* RhsHi;
-    short LoVal;
-    short HiVal;
-    int I;
-    int Passed = 0;
-
-    /* Check the flags */
     const OptFuncDesc* Desc = D->OptFunc;
-    unsigned UnusedRegs = Desc->UnusedRegs;
-    if (UnusedRegs != REG_NONE &&
-        (GetRegInfo (D->Code, D->OpIndex+1, UnusedRegs) & UnusedRegs) != 0) {
-        /* Cannot optimize */
-        return 0;
+
+    /* Common to all: must have a basic block */
+    if (!CS_IsBasicBlock (D->Code, D->PushIndex, D->OpIndex)) {
+        return 0; /* Fail */
     }
 
-    Passed = 0;
-    LoVal = D->OpEntry->RI->In.RegA;
-    HiVal = D->OpEntry->RI->In.RegX;
-    /* Check normally first, then interchange A/X and check again if necessary */
-    for (I = (Desc->Flags & OP_AX_INTERCHANGE ? 0 : 1); !Passed && I < 2; ++I) {
-
-        do {
-            if ((Desc->Flags & OP_A_KNOWN) != 0 &&
-                RegValIsUnknown (LoVal)) {
-                /* Cannot optimize */
-                break;
-            }
-            if ((Desc->Flags & OP_X_ZERO) != 0 &&
-                HiVal != 0) {
-                /* Cannot optimize */
-                break;
-            }
-            Passed = 1;
-        } while (0);
-
-        /* Interchange A/X */
-        LoVal = D->OpEntry->RI->In.RegX;
-        HiVal = D->OpEntry->RI->In.RegA;
-    }
-    if (!Passed) {
-        /* Cannot optimize */
-        return 0;
+    /* Call the pre-cond predicate if one was provided. */
+    if (Desc->PreCond == 0 || Desc->PreCond (D)) {
+        /* Preconditions passed (even if they were null). */
+        return 1;
     }
 
-    Passed = 0;
-    Lhs = &D->Lhs;
-    Rhs = &D->Rhs;
-    /* Check normally first, then interchange LHS/RHS and check again if necessary */
-    for (I = (Desc->Flags & OP_LR_INTERCHANGE ? 0 : 1); !Passed && I < 2; ++I) {
-
-        do {
-            LhsLo = &Lhs->A;
-            LhsHi = &Lhs->X;
-            RhsLo = &Rhs->A;
-            RhsHi = &Rhs->X;
-            /* Currently we have only LHS/RHS checks with identical requirements for A/X,
-            ** so we don't need to check twice for now.
-            */
-
-            if ((Desc->Flags & OP_LHS_LOAD) != 0) {
-                if ((LhsLo->Flags & LhsHi->Flags & LI_LOAD_INSN) == 0) {
-                    /* Cannot optimize */
-                    break;
-                } else if ((Desc->Flags & OP_LHS_LOAD_DIRECT) != 0) {
-                    if ((LhsLo->Flags & LhsHi->Flags & LI_DIRECT) == 0) {
-                        /* Cannot optimize */
-                        break;
-                    }
-                }
-            }
-            if ((Desc->Flags & OP_RHS_LOAD) != 0) {
-                if ((RhsLo->Flags & RhsHi->Flags & LI_LOAD_INSN) == 0) {
-                    /* Cannot optimize */
-                    break;
-                } else if ((Desc->Flags & OP_RHS_LOAD_DIRECT) != 0) {
-                    if ((RhsLo->Flags & RhsHi->Flags & LI_DIRECT) == 0) {
-                        /* Cannot optimize */
-                        break;
-                    }
-                }
-            }
-            if ((Desc->Flags & OP_LHS_REMOVE) != 0) {
-                /* Check if the load entries cannot be removed */
-                if ((LhsLo->LoadEntry != 0 && (LhsLo->LoadEntry->Flags & CEF_DONT_REMOVE) != 0) ||
-                    (LhsHi->LoadEntry != 0 && (LhsHi->LoadEntry->Flags & CEF_DONT_REMOVE) != 0)) {
-                    if ((Desc->Flags & OP_LHS_REMOVE_DIRECT) != 0) {
-                        /* Cannot optimize */
-                        break;
-                    }
-                }
-            }
-            if ((Desc->Flags & OP_RHS_REMOVE) != 0) {
-                if ((RhsLo->LoadEntry != 0 && (RhsLo->LoadEntry->Flags & CEF_DONT_REMOVE) != 0) ||
-                    (RhsHi->LoadEntry != 0 && (RhsHi->LoadEntry->Flags & CEF_DONT_REMOVE) != 0)) {
-                    if ((Desc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
-                        /* Cannot optimize */
-                        break;
-                    }
-                }
-            }
-            if (D->RhsMultiChg && (Desc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
-                /* Cannot optimize */
-                break;
-            }
-            Passed = 1;
-        } while (0);
-
-        /* Interchange LHS/RHS for next round */
-        Lhs = &D->Rhs;
-        Rhs = &D->Lhs;
-    }
-    if (!Passed) {
-        /* Cannot optimize */
-        return 0;
-    }
-
-    /* Check if an unused temp ZP location is available */
-    if (!HaveUnusedTempZPLoc (D)) {
-        /* No registers available */
-        return 0;
-    }
-
-    /* Determine if we have a basic block */
-    return CS_IsBasicBlock (D->Code, D->PushIndex, D->OpIndex);
-}
-
-
-
-static int RegAPreCondOk (StackOpData* D)
-/* Check if the preconditions for a call to the RegA-only optimizer subfunction
-** are satisfied. As a side effect, this function will also choose the zero page
-** register to use for temporary storage.
-*/
-{
-    LoadInfo* Lhs;
-    LoadInfo* Rhs;
-    LoadRegInfo* LhsLo;
-    LoadRegInfo* RhsLo;
-    short LhsLoVal, LhsHiVal;
-    short RhsLoVal, RhsHiVal;
-    int I;
-    int Passed = 0;
-
-    /* Check the flags */
-    const OptFuncDesc* Desc = D->OptFunc;
-    unsigned UnusedRegs = Desc->UnusedRegs;
-    if (UnusedRegs != REG_NONE &&
-        (GetRegInfo (D->Code, D->OpIndex+1, UnusedRegs) & UnusedRegs) != 0) {
-        /* Cannot optimize */
-        return 0;
-    }
-
-    Passed = 0;
-    LhsLoVal = D->PushEntry->RI->In.RegA;
-    LhsHiVal = D->PushEntry->RI->In.RegX;
-    RhsLoVal = D->OpEntry->RI->In.RegA;
-    RhsHiVal = D->OpEntry->RI->In.RegX;
-    /* Check normally first, then interchange A/X and check again if necessary */
-    for (I = (Desc->Flags & OP_AX_INTERCHANGE ? 0 : 1); !Passed && I < 2; ++I) {
-
-        do {
-            if (LhsHiVal != RhsHiVal) {
-                /* Cannot optimize */
-                break;
-            }
-            if ((Desc->Flags & OP_A_KNOWN) != 0 &&
-                RegValIsUnknown (LhsLoVal)) {
-                /* Cannot optimize */
-                break;
-            }
-            if ((Desc->Flags & OP_X_ZERO) != 0 &&
-                LhsHiVal != 0) {
-                /* Cannot optimize */
-                break;
-            }
-            Passed = 1;
-        } while (0);
-
-        /* Suppress warning about unused assignment in GCC */
-        (void)RhsLoVal;
-
-        /* Interchange A/X */
-        LhsLoVal = D->PushEntry->RI->In.RegX;
-        LhsHiVal = D->PushEntry->RI->In.RegA;
-        RhsLoVal = D->OpEntry->RI->In.RegX;
-        RhsHiVal = D->OpEntry->RI->In.RegA;
-    }
-    if (!Passed) {
-        /* Cannot optimize */
-        return 0;
-    }
-
-    Passed = 0;
-    Lhs = &D->Lhs;
-    Rhs = &D->Rhs;
-    /* Check normally first, then interchange LHS/RHS and check again if necessary */
-    for (I = (Desc->Flags & OP_LR_INTERCHANGE ? 0 : 1); !Passed && I < 2; ++I) {
-
-        do {
-            LhsLo = &Lhs->A;
-            RhsLo = &Rhs->A;
-            /* Currently we have only LHS/RHS checks with identical requirements for A/X,
-            ** so we don't need to check twice for now.
-            */
-
-            if ((Desc->Flags & OP_LHS_LOAD) != 0) {
-                if ((LhsLo->Flags & LI_LOAD_INSN) == 0) {
-                    /* Cannot optimize */
-                    break;
-                } else if ((Desc->Flags & OP_LHS_LOAD_DIRECT) != 0) {
-                    if ((LhsLo->Flags & LI_DIRECT) == 0) {
-                        /* Cannot optimize */
-                        break;
-                    }
-                }
-            }
-            if ((Desc->Flags & OP_RHS_LOAD) != 0) {
-                if ((RhsLo->Flags & LI_LOAD_INSN) == 0) {
-                    /* Cannot optimize */
-                    break;
-                } else if ((Desc->Flags & OP_RHS_LOAD_DIRECT) != 0) {
-                    if ((RhsLo->Flags & LI_DIRECT) == 0) {
-                        /* Cannot optimize */
-                        break;
-                    }
-                }
-            }
-            if ((Desc->Flags & OP_LHS_REMOVE) != 0) {
-                /* Check if the load entries cannot be removed */
-                if ((LhsLo->LoadEntry != 0 && (LhsLo->LoadEntry->Flags & CEF_DONT_REMOVE) != 0)) {
-                    if ((Desc->Flags & OP_LHS_REMOVE_DIRECT) != 0) {
-                        /* Cannot optimize */
-                        break;
-                    }
-                }
-            }
-            if ((Desc->Flags & OP_RHS_REMOVE) != 0) {
-                if ((RhsLo->LoadEntry != 0 && (RhsLo->LoadEntry->Flags & CEF_DONT_REMOVE) != 0)) {
-                    if ((Desc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
-                        /* Cannot optimize */
-                        break;
-                    }
-                }
-            }
-            if (D->RhsMultiChg && (Desc->Flags & OP_RHS_REMOVE_DIRECT) != 0) {
-                /* Cannot optimize */
-                break;
-            }
-            Passed = 1;
-        } while (0);
-
-        /* Interchange LHS/RHS for next round */
-        Lhs = &D->Rhs;
-        Rhs = &D->Lhs;
-    }
-    if (!Passed) {
-        /* Cannot optimize */
-        return 0;
-    }
-
-    /* Check if an unused temp ZP location is available */
-    if (!HaveUnusedTempZPLoc (D)) {
-        /* No registers available */
-        return 0;
-    }
-
-    /* Determine if we have a basic block */
-    return CS_IsBasicBlock (D->Code, D->PushIndex, D->OpIndex);
+    return 0; /* Preconditions failed */
 }
 
 
@@ -2051,6 +2125,8 @@ unsigned OptStackOps (CodeSeg* S)
                     **  checked. There is no fallback to the full A/X subopts.
                     **  When the A-only preconditions fail, good A/X cases are
                     **  left unoptimized.
+                    **  The FuncTables should be merged into a single precondition
+                    **  system.
                     */
                     if (SameRegXValueAtOp (&Data, E)) {
                         Data.OptFunc = FindFunc (FuncRegATable, FUNC_COUNT (FuncRegATable), E->Arg);
@@ -2174,10 +2250,7 @@ unsigned OptStackOps (CodeSeg* S)
                 ** load tracking but at least a/x has probably lost between
                 ** pushax and here and will be tracked again when restarting.
                 */
-                /* ### Note: PreCondOk() and RegAPreCondOk() should be merged
-                **  into a single precondition system.
-                */
-                if (IsRegAOptFunc ? !RegAPreCondOk (&Data) : !PreCondOk (&Data)) {
+                if (!PreCondOk (&Data)) {
                     /* Unflag entries that can't be removed */
                     ResetDontRemoveEntryFlags (&Data);
                     I = Data.PushIndex;

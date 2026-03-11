@@ -2026,8 +2026,7 @@ unsigned OptStackOps (CodeSeg* S)
     unsigned        PushedRegs = 0;     /* Track if the same regs are used after the push */
     int             RhsAChgIndex;       /* Track if rhs is changed more than once */
     int             RhsXChgIndex;       /* Track if rhs is changed more than once */
-    int             IsRegAOptFunc = 0;  /* Whether to use the RegA-only optimizations */
-
+    
     enum {
         Initialize,
         Search,
@@ -2130,11 +2129,9 @@ unsigned OptStackOps (CodeSeg* S)
                     */
                     if (SameRegXValueAtOp (&Data, E)) {
                         Data.OptFunc = FindFunc (FuncRegATable, FUNC_COUNT (FuncRegATable), E->Arg);
-                        IsRegAOptFunc = 1;
                     }
                     if (Data.OptFunc == 0) {
                         Data.OptFunc = FindFunc (FuncTable, FUNC_COUNT (FuncTable), E->Arg);
-                        IsRegAOptFunc = 0;
                     }
                     if (Data.OptFunc) {
                         /* Disallow removing Rhs loads if the registers are used */

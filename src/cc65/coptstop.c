@@ -1879,7 +1879,7 @@ unsigned OptStackOps (CodeSeg* S)
     unsigned        PushedRegs = 0;     /* Track if the same regs are used after the push */
     int             RhsAChgIndex;       /* Track if rhs is changed more than once */
     int             RhsXChgIndex;       /* Track if rhs is changed more than once */
-    
+
     enum {
         Initialize,
         Search,

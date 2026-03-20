@@ -8,6 +8,7 @@
 unsigned char a, b;
 unsigned char c = 199;
 unsigned char d = 100;
+int i = 50;
 
 int main(void) {
     int fails = 0;
@@ -38,6 +39,117 @@ int main(void) {
       printf("AND error: a %d instead of %d\n", a, b);
       fails++;
     }
+
+    a = c + (d != 0);
+    b = c + 1;
+
+    printf("%u ^ (%u != 0) => %u\n", c, d, a);
+    if (a != b) {
+      printf("ADD error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c - (d != 0);
+    b = c - 1;
+
+    printf("%u ^ (%u != 0) => %u\n", c, d, a);
+    if (a != b) {
+      printf("SUB error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c ^ (d >= 0);
+    b = c ^ 1;
+
+    printf("%u ^ (%u >= 0) => %u\n", c, d, a);
+    if (a != b) {
+      printf("XOR error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c | (d >= 0);
+    b = c | 1;
+
+    printf("%u | (%u >= 0) => %u\n", c, d, a);
+    if (a != b) {
+      printf("OR error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c & (d >= 0);
+    b = c & 1;
+
+    printf("%u & (%u >= 0) => %u\n", c, d, a);
+    if (a != b) {
+      printf("AND error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c + (d >= 0);
+    b = c + 1;
+
+    printf("%u ^ (%u >= 0) => %u\n", c, d, a);
+    if (a != b) {
+      printf("ADD error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c - (d >= 0);
+    b = c - 1;
+
+    printf("%u ^ (%u >= 0) => %u\n", c, d, a);
+    if (a != b) {
+      printf("SUB error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    printf("%d errors\n", fails);
+
+    a = c ^ (i >= 0);
+    b = c ^ 1;
+
+    printf("%u ^ (%d >= 0) => %u\n", c, d, a);
+    if (a != b) {
+      printf("XOR int cmp error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c | (i >= 0);
+    b = c | 1;
+
+    printf("%u | (%d >= 0) => %u\n", c, i, a);
+    if (a != b) {
+      printf("OR int cmp error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c & (i >= 0);
+    b = c & 1;
+
+    printf("%u & (%d >= 0) => %u\n", c, i, a);
+    if (a != b) {
+      printf("AND int cmp error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c + (i >= 0);
+    b = c + 1;
+
+    printf("%u ^ (%d >= 0) => %u\n", c, i, a);
+    if (a != b) {
+      printf("ADD int cmp error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
+    a = c - (i >= 0);
+    b = c - 1;
+
+    printf("%u ^ (%d >= 0) => %u\n", c, i, a);
+    if (a != b) {
+      printf("SUB int cmp error: a %d instead of %d\n", a, b);
+      fails++;
+    }
+
     printf("%d errors\n", fails);
 
     return fails;

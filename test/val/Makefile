@@ -21,7 +21,7 @@ else
   NULLDEV = /dev/null
   MKDIR = mkdir -p $1
   RMDIR = $(RM) -r $1
-  CATRES = > $(WORKDIR)/$$@.out 2> $(WORKDIR)/$$@.out || (cat $(WORKDIR)/$$@.out && false)
+  CATRES = > $(WORKDIR)/$$@.out 2>&1 || (cat $(WORKDIR)/$$@.out && false)
 endif
 
 ifeq ($(SILENT),s)

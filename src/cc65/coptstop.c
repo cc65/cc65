@@ -1434,8 +1434,6 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
             X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (0), 0, D->Rhs.X.ChgEntry->LI);
             InsertEntry (D, X, D->IP++);
             D->Rhs.X.Flags |= LI_REMOVE;
-        } else {
-            D->Rhs.X.Flags |= LI_DONT_REMOVE;
         }
     } else {
         /* Rhs load entries may be removed */

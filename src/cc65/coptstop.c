@@ -2090,6 +2090,12 @@ unsigned OptStackOps (CodeSeg* S)
                     }
                 }
 
+                /* Lhs and Rhs may shared some of the load insns; or due to how
+                ** the labels are processed, "change" insns may refer to the
+                ** others' loads. In either case, it is unsafe to remove them.
+                */
+                SetUnremovableIfUsedByOther (&Data.Lhs, &Data.Rhs);
+
                 /* Flag entries that can't be removed */
                 SetDontRemoveEntryFlags (&Data);
 

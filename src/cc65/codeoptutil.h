@@ -180,6 +180,11 @@ void SetIfOperandSrcAffected (LoadInfo* LLI, CodeEntry* E);
 void SetIfOperandLoadUnremovable (LoadInfo* LI, unsigned Used);
 /* Check and flag operand load that may be unremovable */
 
+void SetUnremovableIfUsedByOther (LoadInfo* LI, const LoadInfo* OtherLI);
+/* Check and flag operand loads unremovable if the other side (Rhs or Lhs)
+** uses the same load insn (checked by index).
+*/
+
 unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I);
 /* Track loads for a code entry.
 ** Return used registers.

@@ -1229,7 +1229,6 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
         if (LI->A.LoadIndex >= 0 &&
             (LI->A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->A.LoadIndex);
-            LI->A.LoadEntry = 0;
         }
         if (LI->A.LoadYIndex >= 0 &&
             (LI->A.LoadYEntry->Flags & CEF_DONT_REMOVE) == 0) {
@@ -1252,7 +1251,6 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
         if (LI->X.LoadIndex >= 0 &&
             (LI->X.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->X.LoadIndex);
-            LI->X.LoadEntry = 0;
         }
         if (LI->X.LoadYIndex >= 0 &&
             (LI->X.LoadYEntry->Flags & CEF_DONT_REMOVE) == 0) {

@@ -1434,8 +1434,6 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
             X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (0), 0, D->Rhs.X.ChgEntry->LI);
             InsertEntry (D, X, D->IP++);
             D->Rhs.X.Flags |= LI_REMOVE;
-        } else {
-            D->Rhs.X.Flags |= LI_DONT_REMOVE;
         }
     } else {
         /* Rhs load entries may be removed */
@@ -2091,6 +2089,12 @@ unsigned OptStackOps (CodeSeg* S)
                         Data.Lhs.X.Flags &= ~(LI_DIRECT | LI_RELOAD_Y);
                     }
                 }
+
+                /* Lhs and Rhs may shared some of the load insns; or due to how
+                ** the labels are processed, "change" insns may refer to the
+                ** others' loads. In either case, it is unsafe to remove them.
+                */
+                SetUnremovableIfUsedByOther (&Data.Lhs, &Data.Rhs);
 
                 /* Flag entries that can't be removed */
                 SetDontRemoveEntryFlags (&Data);

@@ -43,7 +43,7 @@ int main(void) {
     a = c + (d != 0);
     b = c + 1;
 
-    printf("%u ^ (%u != 0) => %u\n", c, d, a);
+    printf("%u + (%u != 0) => %u\n", c, d, a);
     if (a != b) {
       printf("ADD error: a %d instead of %d\n", a, b);
       fails++;
@@ -52,7 +52,7 @@ int main(void) {
     a = c - (d != 0);
     b = c - 1;
 
-    printf("%u ^ (%u != 0) => %u\n", c, d, a);
+    printf("%u - (%u != 0) => %u\n", c, d, a);
     if (a != b) {
       printf("SUB error: a %d instead of %d\n", a, b);
       fails++;
@@ -88,7 +88,7 @@ int main(void) {
     a = c + (d >= 0);
     b = c + 1;
 
-    printf("%u ^ (%u >= 0) => %u\n", c, d, a);
+    printf("%u + (%u >= 0) => %u\n", c, d, a);
     if (a != b) {
       printf("ADD error: a %d instead of %d\n", a, b);
       fails++;
@@ -97,13 +97,11 @@ int main(void) {
     a = c - (d >= 0);
     b = c - 1;
 
-    printf("%u ^ (%u >= 0) => %u\n", c, d, a);
+    printf("%u - (%u >= 0) => %u\n", c, d, a);
     if (a != b) {
       printf("SUB error: a %d instead of %d\n", a, b);
       fails++;
     }
-
-    printf("%d errors\n", fails);
 
     a = c ^ (i >= 0);
     b = c ^ 1;
@@ -135,7 +133,7 @@ int main(void) {
     a = c + (i >= 0);
     b = c + 1;
 
-    printf("%u ^ (%d >= 0) => %u\n", c, i, a);
+    printf("%u + (%d >= 0) => %u\n", c, i, a);
     if (a != b) {
       printf("ADD int cmp error: a %d instead of %d\n", a, b);
       fails++;
@@ -144,7 +142,7 @@ int main(void) {
     a = c - (i >= 0);
     b = c - 1;
 
-    printf("%u ^ (%d >= 0) => %u\n", c, i, a);
+    printf("%u - (%d >= 0) => %u\n", c, i, a);
     if (a != b) {
       printf("SUB int cmp error: a %d instead of %d\n", a, b);
       fails++;

@@ -509,6 +509,68 @@ void SetIfOperandLoadUnremovable (LoadInfo* LI, unsigned Used)
 
 
 
+static int IsRegInsnSameAsOtherAX (int InsnIndex, const LoadInfo* OtherLI)
+/* Helper: Return true if the other side (Rhs or Lhs) refers to the same insn */
+{
+    if (InsnIndex < 0) {
+        /* No, do not have an insn */
+        return 0;
+    }
+
+    /* Check if this insn matches any load/change on the other side */
+    return InsnIndex == OtherLI->A.LoadIndex ||
+           InsnIndex == OtherLI->A.ChgIndex ||
+           InsnIndex == OtherLI->X.LoadIndex ||
+           InsnIndex == OtherLI->X.ChgIndex;
+}
+
+
+
+static int IsRegInsnSameAsOtherY (int InsnIndex, const LoadInfo* OtherLI)
+/* Helper: Return true if the other side (Rhs or Lhs) refers to the same insn */
+{
+    if (InsnIndex < 0) {
+        /* No, do not have an insn */
+        return 0;
+    }
+
+    /* Check if this insn matches any load/change on the other side */
+    return InsnIndex == OtherLI->Y.LoadIndex ||
+           InsnIndex == OtherLI->Y.ChgIndex;
+}
+
+
+
+void SetUnremovableIfUsedByOther (LoadInfo* LI, const LoadInfo* OtherLI)
+/* Check and flag operand loads unremovable if the other side (Rhs or Lhs)
+** uses the same load insn (checked by index).
+*/
+{
+    /* Disallow removing the loads if they are shared between Lhs and Rhs.
+    ** Note: For safety, we check the ChgIndex as well, which accounts for
+    ** conditions where a label is encountered in the block.
+    */
+    if (IsRegInsnSameAsOtherAX (LI->A.LoadIndex, OtherLI) ||
+        IsRegInsnSameAsOtherAX (LI->A.ChgIndex, OtherLI)) {
+        /* Parts of A load are used by other and cannot be removed */
+        LI->A.Flags |= LI_DONT_REMOVE;
+    }
+
+    if (IsRegInsnSameAsOtherAX (LI->X.LoadIndex, OtherLI) ||
+        IsRegInsnSameAsOtherAX (LI->X.ChgIndex, OtherLI)) {
+        /* Parts of X load are used by other and cannot be removed */
+        LI->X.Flags |= LI_DONT_REMOVE;
+    }
+
+    if (IsRegInsnSameAsOtherY (LI->Y.LoadIndex, OtherLI) ||
+        IsRegInsnSameAsOtherY (LI->Y.ChgIndex, OtherLI)) {
+        /* Parts of Y load are used by other and cannot be removed */
+        LI->Y.Flags |= LI_DONT_REMOVE;
+    }
+}
+
+
+
 unsigned int TrackLoads (LoadInfo* LI, CodeSeg* S, int I)
 /* Track loads for a code entry.
 ** Return used registers.

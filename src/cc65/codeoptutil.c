@@ -1197,10 +1197,8 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
             InsertEntry (D, X, D->IP++);
         }
 
-        /* If this is the right hand side, we can remove the load. */
-        if (LI == &D->Rhs) {
-            LI->X.Flags |= LI_REMOVE;
-        }
+        /* In both cases, we can remove the load */
+        LI->X.Flags |= LI_REMOVE;
 
     } else {
 

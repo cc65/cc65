@@ -1270,6 +1270,12 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
         CanRemoveX = 0;
     }
 
+    /* A load removal demand which cannot be satisifed is a fatal condition */
+    if (((LI->A.Flags & LI_MUST_REMOVE) != 0 && !CanRemoveA) ||
+        ((LI->X.Flags & LI_MUST_REMOVE) != 0 && !CanRemoveX)) {
+        Internal ("Cannot remove a load instruction which must be removed");
+    }
+
     /* A request to remove a "change" insn (ChgIndex) when there is no
     ** corresponing load insn (LoadIndex) is never valid.
     */

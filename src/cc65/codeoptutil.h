@@ -70,6 +70,7 @@ typedef enum {
     LI_USED_BY_Y    = 0x4000,       /* Content used by RegY */
     LI_SP           = 0x8000,       /* Content on stack */
     LI_LOAD_INSN    = 0x010000,     /* Is a load insn */
+    LI_MUST_REMOVE  = 0x020000,     /* Load must be removed */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */

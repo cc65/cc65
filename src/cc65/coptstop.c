@@ -436,9 +436,9 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-        /* Rhs load entries must be removed */
-        D->Rhs.X.Flags |= LI_REMOVE;
-        D->Rhs.A.Flags |= LI_REMOVE;
+        /* Rhs load entries must be removed because Lhs must be in effect */
+        D->Rhs.X.Flags |= (LI_REMOVE | LI_MUST_REMOVE);
+        D->Rhs.A.Flags |= (LI_REMOVE | LI_MUST_REMOVE);
 
     } else if (RhsIsRemovable (D)) {
 
@@ -453,6 +453,10 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
 
         /* Add operand for high byte */
         AddOpHigh (D, OP65_CMP, &D->Rhs, 0);
+
+        /* Rhs load entries must be removed because Lhs must be in effect */
+        D->Rhs.X.Flags |= LI_MUST_REMOVE;
+        D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     } else {
 
@@ -1018,9 +1022,9 @@ static unsigned Opt_tosgeax (StackOpData* D)
     X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    /* Rhs load entries must be removed */
-    D->Rhs.X.Flags |= LI_REMOVE;
-    D->Rhs.A.Flags |= LI_REMOVE;
+    /* Rhs load entries must be removed because Lhs must be in effect */
+    D->Rhs.X.Flags |= LI_MUST_REMOVE;
+    D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     /* Remove the push and the call to the tosgeax function */
     RemoveRemainders (D);
@@ -1075,9 +1079,9 @@ static unsigned Opt_tosltax (StackOpData* D)
     X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    /* Rhs load entries must be removed */
-    D->Rhs.X.Flags |= LI_REMOVE;
-    D->Rhs.A.Flags |= LI_REMOVE;
+    /* Rhs load entries must be removed because Lhs must be in effect */
+    D->Rhs.X.Flags |= LI_MUST_REMOVE;
+    D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     /* Remove the push and the call to the tosltax function */
     RemoveRemainders (D);
@@ -1158,9 +1162,9 @@ static unsigned Opt_tossubax (StackOpData* D)
     /* Add code for high operand */
     AddOpHigh (D, OP65_SBC, &D->Rhs, 1);
 
-    /* Rhs load entries must be removed */
-    D->Rhs.X.Flags |= LI_REMOVE;
-    D->Rhs.A.Flags |= LI_REMOVE;
+    /* Rhs load entries must be removed because Lhs must be in effect */
+    D->Rhs.X.Flags |= LI_MUST_REMOVE;
+    D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     /* Remove the push and the call to the tossubax function */
     RemoveRemainders (D);
@@ -1200,9 +1204,9 @@ static unsigned Opt_tosugeax (StackOpData* D)
     X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    /* Rhs load entries must be removed */
-    D->Rhs.X.Flags |= LI_REMOVE;
-    D->Rhs.A.Flags |= LI_REMOVE;
+    /* Rhs load entries must be removed because Lhs must be in effect */
+    D->Rhs.X.Flags |= LI_MUST_REMOVE;
+    D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     /* Remove the push and the call to the tosugeax function */
     RemoveRemainders (D);
@@ -1246,9 +1250,9 @@ static unsigned Opt_tosugtax (StackOpData* D)
     X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolugt", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    /* Rhs load entries must be removed */
-    D->Rhs.X.Flags |= LI_REMOVE;
-    D->Rhs.A.Flags |= LI_REMOVE;
+    /* Rhs load entries must be removed because Lhs must be in effect */
+    D->Rhs.X.Flags |= LI_MUST_REMOVE;
+    D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     /* Remove the push and the call to the operator function */
     RemoveRemainders (D);
@@ -1292,9 +1296,9 @@ static unsigned Opt_tosuleax (StackOpData* D)
     X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolule", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    /* Rhs load entries must be removed */
-    D->Rhs.X.Flags |= LI_REMOVE;
-    D->Rhs.A.Flags |= LI_REMOVE;
+    /* Rhs load entries must be removed because Lhs must be in effect */
+    D->Rhs.X.Flags |= LI_MUST_REMOVE;
+    D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     /* Remove the push and the call to the operator function */
     RemoveRemainders (D);
@@ -1326,9 +1330,9 @@ static unsigned Opt_tosultax (StackOpData* D)
     X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolult", 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    /* Rhs load entries must be removed */
-    D->Rhs.X.Flags |= LI_REMOVE;
-    D->Rhs.A.Flags |= LI_REMOVE;
+    /* Rhs load entries must be removed because Lhs must be in effect */
+    D->Rhs.X.Flags |= LI_MUST_REMOVE;
+    D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     /* Remove the push and the call to the operator function */
     RemoveRemainders (D);
@@ -1396,8 +1400,8 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
         X = NewCodeEntry (OPC, D->Rhs.A.LoadEntry->AM, D->Rhs.A.LoadEntry->Arg, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-        /* Rhs load entries must be removed */
-        D->Rhs.A.Flags |= LI_REMOVE;
+        /* Rhs A load must be removed because Lhs must be in effect */
+        D->Rhs.A.Flags |= (LI_REMOVE | LI_MUST_REMOVE);
 
     } else if (RegIsDirectNonStackLoaded (&D->Lhs.A)) {
 
@@ -1433,10 +1437,12 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
             /* Since this is a "same X" EOR, the result is always 0. */
             X = NewCodeEntry (OP65_LDX, AM65_IMM, MakeHexArg (0), 0, D->Rhs.X.ChgEntry->LI);
             InsertEntry (D, X, D->IP++);
+
+            /* Rhs X load may be removed (but this is not a demand) */
             D->Rhs.X.Flags |= LI_REMOVE;
         }
     } else {
-        /* Rhs load entries may be removed */
+        /* Rhs X load may be removed (but this is not a demand) */
         D->Rhs.X.Flags |= LI_REMOVE;
     }
 
@@ -1464,7 +1470,7 @@ static unsigned Opt_a_toscmpbool (StackOpData* D, const char* BoolTransformer)
 
         /* Rhs low-byte load must be removed and hi-byte load may be removed */
         D->Rhs.X.Flags |= LI_REMOVE;
-        D->Rhs.A.Flags |= LI_REMOVE;
+        D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     } else if (RegIsDirectLoaded (&D->Lhs.A)) {
         /* If the lhs is direct (but not stack relative), encode compares with lhs,
@@ -1604,7 +1610,9 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
                 InsertEntry (D, X, D->IP++);
             }
 
-            /* RHS may be removed */
+            /* RHS may be removed, but it is not a demand because Lhs was
+            ** reloaded at Op and is in effect.
+            */
             D->Rhs.A.Flags |= LI_REMOVE;
             D->Rhs.X.Flags |= LI_REMOVE;
         }
@@ -1703,9 +1711,11 @@ static unsigned Opt_a_tossub (StackOpData* D)
         InsertEntry (D, X, D->IP++);
     }
 
-    /* Rhs load entries must be removed */
+    /* Rhs low-byte load must be removed (because Lhs must be in effect)
+    ** and hi-byte load may be removed.
+    */
     D->Rhs.X.Flags |= LI_REMOVE;
-    D->Rhs.A.Flags |= LI_REMOVE;
+    D->Rhs.A.Flags |= LI_MUST_REMOVE;
 
     /* Remove the push and the call to the tossubax function */
     RemoveRemainders (D);

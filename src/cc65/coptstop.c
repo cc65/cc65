@@ -1423,12 +1423,10 @@ static unsigned Opt_a_tosbitwise (StackOpData* D, opc_t OPC)
         InsertEntry (D, X, D->IP++);
     }
 
-    /* ### Bug to come: there are dangerous Rhs X removal attempts here.
-    **  Runtime function calls can be "loads", and must be treated as a
-    **  single A/X unit, so removal of X load alone is not valid.
-    **  This can be solved with an additional "removable Rhs" test, or
-    **  by simply not forcing the LI_REMOVE flag and letting other optimizers
-    **  remove any unnecessary loads.
+    /* Note: Eager Rhs X removals here can sometimes produce slightly worse
+    **  code after all other optimizers have run. This may need a general
+    **  study of which is better: eager removal, or letting other optimizers
+    **  take care of unneeded loads.
     */
     /* Do high-byte operation only when its result is used */
     if ((GetRegInfo (D->Code, D->IP, REG_X) & REG_X) != 0) {

@@ -1252,19 +1252,19 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
     CHECK (!CanRemoveX || LI->X.LoadEntry->OPC != OP65_JSR ||
            CE_IsCallTo (LI->X.LoadEntry, "ldaxysp"));
 
-    /* When the A load is a runtime call and the X load cannot be removed,
-    ** we cannot remove the A load either.
+    /* When the A load insn affects X reg (e.g. ldaxysp runtime), and the X
+    ** load cannot be removed, we cannot remove the A load either.
     */
-    if (CanRemoveA && LI->A.LoadEntry->OPC == OP65_JSR && !CanRemoveX) {
+    if (CanRemoveA && (LI->A.LoadEntry->Chg & REG_X) != 0 && !CanRemoveX) {
         /* A load is not removable */
         LI->A.LoadEntry->Flags |= CEF_DONT_REMOVE;
         CanRemoveA = 0;
     }
 
-    /* When the X load is a runtime call and the A load cannot be removed,
-    ** we cannot remove the X load either.
+    /* When the X load insn affects A reg (e.g. ldaxysp runtime), and the A
+    ** load cannot be removed, we cannot remove the X load either.
     */
-    if (CanRemoveX && LI->X.LoadEntry->OPC == OP65_JSR && !CanRemoveA) {
+    if (CanRemoveX && (LI->X.LoadEntry->Chg & REG_A) != 0 && !CanRemoveA) {
         /* X load is not removable */
         LI->X.LoadEntry->Flags |= CEF_DONT_REMOVE;
         CanRemoveX = 0;

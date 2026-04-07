@@ -24,6 +24,15 @@ int test1b(void)
     return (z == 0x89ab) ? 0 : 1;
 }
 
+int test1c(void)
+{
+    uint8_t x = 0x95;
+    uint8_t y = 0xab;
+    uint16_t z = (x * 0) | y;
+    printf("%x\n", z);
+    return (z == 0x00ab) ? 0 : 1;
+}
+
 int test2(void)
 {
     uint16_t x = 0x8900;
@@ -31,6 +40,15 @@ int test2(void)
     uint16_t z = x | y;
     printf("%x\n", z);
     return (z == 0x89ab) ? 0 : 1;
+}
+
+int test2c(void)
+{
+    uint16_t x = 0x6795;
+    uint8_t y = 0xab;
+    uint16_t z = (x * 0) | y;
+    printf("%x\n", z);
+    return (z == 0x00ab) ? 0 : 1;
 }
 
 int test3(void)
@@ -69,6 +87,15 @@ int test4b(void)
     return (z == 0x89ab) ? 0 : 1;
 }
 
+int test4c(void)
+{
+    uint8_t x = 0x95;
+    uint16_t y = 0xabcd;
+    uint16_t z = (x * 0) | y;
+    printf("%x\n", z);
+    return (z == 0xabcd) ? 0 : 1;
+}
+
 int main(void)
 {
     res |= test1();
@@ -78,6 +105,9 @@ int main(void)
     res |= test1b();
     res |= test3b();
     res |= test4b();
+    res |= test1c();
+    res |= test2c();
+    res |= test4c();
     printf("res: %d\n", res);
     return res;
 }

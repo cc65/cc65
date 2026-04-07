@@ -1123,6 +1123,8 @@ void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
             InsertEntry (D, X, D->IP++);
 
             if (LI->A.LoadEntry->OPC == OP65_JSR) {
+                /* This should only happen in one known ldaxysp case. */
+                CHECK (CE_IsCallTo (LI->A.LoadEntry, "ldaxysp"));
                 /* opc (c_sp),y */
                 X = NewCodeEntry (OPC, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
             } else {
@@ -1133,7 +1135,7 @@ void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 
         }
 
-        /* In both cases, we can remove the load */
+        /* In both cases, we may try removing the load */
         LI->A.Flags |= LI_REMOVE;
 
     } else {
@@ -1188,6 +1190,8 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
             InsertEntry (D, X, D->IP++);
 
             if (LI->X.LoadEntry->OPC == OP65_JSR) {
+                /* This should only happen in one known ldaxysp case. */
+                CHECK (CE_IsCallTo (LI->X.LoadEntry, "ldaxysp"));
                 /* opc (c_sp),y */
                 X = NewCodeEntry (OPC, AM65_ZP_INDY, "c_sp", 0, D->OpEntry->LI);
             } else {
@@ -1197,10 +1201,8 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
             InsertEntry (D, X, D->IP++);
         }
 
-        /* If this is the right hand side, we can remove the load. */
-        if (LI == &D->Rhs) {
-            LI->X.Flags |= LI_REMOVE;
-        }
+        /* In both cases, we may try removing the load */
+        LI->X.Flags |= LI_REMOVE;
 
     } else {
 
@@ -1227,13 +1229,71 @@ void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
 /* Remove register load insns */
 {
-    if ((LI->A.Flags & LI_REMOVE) == LI_REMOVE) {
-        if (LI->A.LoadIndex >= 0 &&
-            (LI->A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
-            DelEntry (D, LI->A.LoadIndex);
-            LI->A.LoadEntry = 0;
-        }
+    int CanRemoveA;
+    int CanRemoveX;
+
+    /* When either A or X load insn is a call to ldaxysp runtime, the load
+    ** affects both and must be treated as a single A/X unit. A request to
+    ** remove the runtime call for just one (A or X) load is not valid in that
+    ** case. Either both must be removable+removed, or the other load is
+    ** independent, or ldaxysp runtime call must remain.
+    */
+    CanRemoveA = (LI->A.Flags & LI_REMOVE) == LI_REMOVE &&
+                 LI->A.LoadEntry != 0 &&
+                 (LI->A.LoadEntry->Flags & CEF_DONT_REMOVE) == 0;
+
+    CanRemoveX = (LI->X.Flags & LI_REMOVE) == LI_REMOVE &&
+                 LI->X.LoadEntry != 0 &&
+                 (LI->X.LoadEntry->Flags & CEF_DONT_REMOVE) == 0;
+
+    /* The only runtime calls removable as load insns are calls to ldaxysp. */
+    CHECK (!CanRemoveA || LI->A.LoadEntry->OPC != OP65_JSR ||
+           CE_IsCallTo (LI->A.LoadEntry, "ldaxysp"));
+    CHECK (!CanRemoveX || LI->X.LoadEntry->OPC != OP65_JSR ||
+           CE_IsCallTo (LI->X.LoadEntry, "ldaxysp"));
+
+    /* When the A load insn affects X reg (e.g. ldaxysp runtime), and the X
+    ** load cannot be removed, we cannot remove the A load either.
+    */
+    if (CanRemoveA && (LI->A.LoadEntry->Chg & REG_X) != 0 && !CanRemoveX) {
+        /* A load is not removable */
+        LI->A.LoadEntry->Flags |= CEF_DONT_REMOVE;
+        CanRemoveA = 0;
+    }
+
+    /* When the X load insn affects A reg (e.g. ldaxysp runtime), and the A
+    ** load cannot be removed, we cannot remove the X load either.
+    */
+    if (CanRemoveX && (LI->X.LoadEntry->Chg & REG_A) != 0 && !CanRemoveA) {
+        /* X load is not removable */
+        LI->X.LoadEntry->Flags |= CEF_DONT_REMOVE;
+        CanRemoveX = 0;
+    }
+
+    /* A load removal demand which cannot be satisifed is a fatal condition */
+    if (((LI->A.Flags & LI_MUST_REMOVE) != 0 && !CanRemoveA) ||
+        ((LI->X.Flags & LI_MUST_REMOVE) != 0 && !CanRemoveX)) {
+        Internal ("Cannot remove a load instruction which must be removed");
+    }
+
+    /* A request to remove a "change" insn (ChgIndex) when there is no
+    ** corresponing load insn (LoadIndex) is never valid.
+    */
+    CHECK ((LI->A.Flags & LI_REMOVE) == 0 || LI->A.ChgIndex < 0 ||
+            LI->A.LoadIndex >= 0);
+    CHECK ((LI->X.Flags & LI_REMOVE) == 0 || LI->X.ChgIndex < 0 ||
+            LI->X.LoadIndex >= 0);
+
+    if (CanRemoveA) {
+
+        CHECK (LI->A.LoadIndex >= 0);
+        DelEntry (D, LI->A.LoadIndex);
+
+        /* Only remove the Y load if it is not shared with a non-removable
+        ** X load. A shared load will be removed here otherwise.
+        */
         if (LI->A.LoadYIndex >= 0 &&
+            (LI->A.LoadYIndex != LI->X.LoadYIndex || CanRemoveX) &&
             (LI->A.LoadYEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->A.LoadYIndex);
         }
@@ -1250,12 +1310,16 @@ void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
         LI->A.LoadYEntry->Flags |= CEF_DONT_REMOVE;
     }
 
-    if ((LI->X.Flags & LI_REMOVE) == LI_REMOVE) {
-        if (LI->X.LoadIndex >= 0 &&
-            (LI->X.LoadEntry->Flags & CEF_DONT_REMOVE) == 0) {
-            DelEntry (D, LI->X.LoadIndex);
-            LI->X.LoadEntry = 0;
-        }
+    /* The X load may have already been removed above if it were a runtime
+    ** call (i.e. "jsr ldaxysp"), so need to check again.
+    */
+    if (CanRemoveX && LI->X.LoadIndex >= 0) {
+
+        DelEntry (D, LI->X.LoadIndex);
+
+        /* Only remove the Y load if it is not shared with non-removable A load.
+        ** If it is shared and still needed, it was flaged non-removable above.
+        */
         if (LI->X.LoadYIndex >= 0 &&
             (LI->X.LoadYEntry->Flags & CEF_DONT_REMOVE) == 0) {
             DelEntry (D, LI->X.LoadYIndex);

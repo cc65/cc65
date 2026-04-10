@@ -122,6 +122,7 @@ static OptFunc DOptBNegAX1      = { OptBNegAX1,      "OptBNegAX1",      100, 0, 
 static OptFunc DOptBNegAX2      = { OptBNegAX2,      "OptBNegAX2",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBZero        = { OptBZero,        "OptBZero",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBinOps1      = { OptBinOps1,      "OptBinOps1",        0, 0, 0, 0, 0, 0 };
 static OptFunc DOptBinOps2      = { OptBinOps2,      "OptBinOps2",        0, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolCmp      = { OptBoolCmp,      "OptBoolCmp",      100, 0, 0, 0, 0, 0 };
@@ -187,6 +188,7 @@ static OptFunc DOptPtrLoad7     = { OptPtrLoad7,     "OptPtrLoad7",     140, 0, 
 static OptFunc DOptPtrStore1    = { OptPtrStore1,    "OptPtrStore1",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2    = { OptPtrStore2,    "OptPtrStore2",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore3    = { OptPtrStore3,    "OptPtrStore3",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrStore4    = { OptPtrStore4,    "OptPtrStore4",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1        = { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush2        = { OptPush2,        "OptPush2",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptPushPop1     = { OptPushPop1,     "OptPushPop1",       0, 0, 0, 0, 0, 0 };
@@ -205,8 +207,17 @@ static OptFunc DOptShiftBack    = { OptShiftBack,    "OptShiftBack",      0, 0, 
 static OptFunc DOptSignExtended = { OptSignExtended, "OptSignExtended",   0, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
-static OptFunc DOptStackOps     = { OptStackOps,     "OptStackOps",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStackPtrOps  = { OptStackPtrOps,  "OptStackPtrOps",   50, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkArith1    = { OptStkArith1,    "OptStkArith1",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkArith2    = { OptStkArith2,    "OptStkArith2",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkBitwise1  = { OptStkBitwise1,  "OptStkBitwise1",  100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkBitwise2  = { OptStkBitwise2,  "OptStkBitwise2",  100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkCmpOps1   = { OptStkCmpOps1,   "OptStkCmpOps1",   100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkCmpOps2   = { OptStkCmpOps2,   "OptStkCmpOps2",   100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkEqOps1    = { OptStkEqOps1,    "OptStkEqOps1",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkEqOps2    = { OptStkEqOps2,    "OptStkEqOps2",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkICmp1     = { OptStkICmp1,     "OptStkICmp1",     100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStkShifts    = { OptStkShifts,    "OptStkShifts",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore1       = { OptStore1,       "OptStore1",        70, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore2       = { OptStore2,       "OptStore2",       115, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore3       = { OptStore3,       "OptStore3",       120, 0, 0, 0, 0, 0 };
@@ -251,6 +262,7 @@ static OptFunc* OptFuncs[] = {
     &DOptBNegAX2,
     &DOptBNegAX3,
     &DOptBNegAX4,
+    &DOptBZero,
     &DOptBinOps1,
     &DOptBinOps2,
     &DOptBoolCmp,
@@ -316,6 +328,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptPtrStore3,
+    &DOptPtrStore4,
     &DOptPush1,
     &DOptPush2,
     &DOptPushPop1,
@@ -334,8 +347,17 @@ static OptFunc* OptFuncs[] = {
     &DOptSignExtended,
     &DOptSize1,
     &DOptSize2,
-    &DOptStackOps,
     &DOptStackPtrOps,
+    &DOptStkArith1,
+    &DOptStkArith2,
+    &DOptStkBitwise1,
+    &DOptStkBitwise2,
+    &DOptStkCmpOps1,
+    &DOptStkCmpOps2,
+    &DOptStkEqOps1,
+    &DOptStkEqOps2,
+    &DOptStkICmp1,
+    &DOptStkShifts,
     &DOptStore1,
     &DOptStore2,
     &DOptStore3,
@@ -713,6 +735,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 */
 {
     unsigned Changes, C;
+    unsigned I;
 
     Changes = 0;
     do {
@@ -720,7 +743,29 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
         C += RunOptFunc (S, &DOptNegAX1, 1);
         C += RunOptFunc (S, &DOptNegAX2, 1);
-        C += RunOptFunc (S, &DOptStackOps, 3);      /* Before OptBoolUnary1 */
+        C += RunOptFunc (S, &DOptBZero, 1);
+        C += RunOptFunc (S, &DOptPtrStore4, 1);
+
+        /* Run the subgroup up to twice for complex expressions */
+        for (I = 0; I < 2; ++I) {
+            unsigned SubC = 0;
+
+            SubC += RunOptFunc (S, &DOptStkArith1, 1);
+            SubC += RunOptFunc (S, &DOptStkArith2, 1);
+            SubC += RunOptFunc (S, &DOptStkBitwise1, 1);
+            SubC += RunOptFunc (S, &DOptStkBitwise2, 1);
+            SubC += RunOptFunc (S, &DOptStkShifts, 1);
+
+            C += SubC;
+            if (!SubC) {
+                break;  /* No changes; skip the rest */
+            }
+        }
+
+        C += RunOptFunc (S, &DOptStkCmpOps1, 1);
+        C += RunOptFunc (S, &DOptStkCmpOps2, 1);
+        C += RunOptFunc (S, &DOptStkEqOps1, 1);
+        C += RunOptFunc (S, &DOptStkEqOps2, 1);
         C += RunOptFunc (S, &DOptCmp8, 1);          /* Before OptBoolUnary1 */
         C += RunOptFunc (S, &DOptBoolUnary1, 3);
         C += RunOptFunc (S, &DOptBoolUnary2, 3);
@@ -747,6 +792,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptRTSJumps1, 1);
         C += RunOptFunc (S, &DOptCmp6, 1);          /* After OptRTSJumps1 */
         C += RunOptFunc (S, &DOptBoolCmp, 1);
+        C += RunOptFunc (S, &DOptStkICmp1, 1);      /* After OptBoolCmp */
         C += RunOptFunc (S, &DOptBoolTrans, 1);
         C += RunOptFunc (S, &DOptBNegA2, 1);        /* After OptCondBranch's */
         C += RunOptFunc (S, &DOptBNegAX2, 1);       /* After OptCondBranch's */

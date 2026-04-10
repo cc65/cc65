@@ -64,6 +64,9 @@ struct OptFuncDesc {
     PreCondFunc         PreCond;        /* Precondition predicate pointer */
 };
 
+/* Termination for OptFuncDesc tables */
+#define OPTFUNCDESC_SENTINEL    { 0, 0, 0 }
+
 
 
 /*****************************************************************************/
@@ -72,41 +75,28 @@ struct OptFuncDesc {
 
 
 
-static int SameRegAValueAtOp (const StackOpData* D, CodeEntry* OpEntry)
+static int SameRegAValueAtOp (const StackOpData* D)
 /* Check if Rhs Reg A at OpIndex == Lhs Reg A at PushIndex */
 {
-    CodeEntry* PushEntry;
-
-    CHECK (D->PushIndex >= 0);
-    PushEntry = CS_GetEntry (D->Code, D->PushIndex);
+    CHECK (D->PushEntry != 0 && D->OpEntry != 0);
 
     return
-        RegValIsKnown (PushEntry->RI->In.RegA) &&
-        RegValIsKnown (OpEntry->RI->In.RegA) &&
-        PushEntry->RI->In.RegA == OpEntry->RI->In.RegA;
+        RegValIsKnown (D->PushEntry->RI->In.RegA) &&
+        RegValIsKnown (D->OpEntry->RI->In.RegA) &&
+        D->PushEntry->RI->In.RegA == D->OpEntry->RI->In.RegA;
 }
 
 
 
-static int SameRegXValueAtOp (const StackOpData* D, CodeEntry* OpEntry)
+static int SameRegXValueAtOp (const StackOpData* D)
 /* Check if Rhs Reg X at OpIndex == Lhs Reg X at PushIndex */
 {
-    CodeEntry* PushEntry;
-
-    CHECK (D->PushIndex >= 0);
-    PushEntry = CS_GetEntry (D->Code, D->PushIndex);
-
-    /* ### This is a temporary workaround, removable in next phases. */
-    if (OpEntry == 0) {
-        /* Not provided; then OpIndex must be present */
-        CHECK (D->OpIndex >= 0);
-        OpEntry = CS_GetEntry (D->Code, D->OpIndex);
-    }
+    CHECK (D->PushEntry != 0 && D->OpEntry != 0);
 
     return
-        RegValIsKnown (PushEntry->RI->In.RegX) &&
-        RegValIsKnown (OpEntry->RI->In.RegX) &&
-        PushEntry->RI->In.RegX == OpEntry->RI->In.RegX;
+        RegValIsKnown (D->PushEntry->RI->In.RegX) &&
+        RegValIsKnown (D->OpEntry->RI->In.RegX) &&
+        D->PushEntry->RI->In.RegX == D->OpEntry->RI->In.RegX;
 }
 
 
@@ -351,7 +341,7 @@ static int WithSameXMustHaveTempZP (const StackOpData* D)
 ** ZP with AddStoreLhsA() or similar.
 */
 {
-    return SameRegXValueAtOp (D, 0) && HaveUnusedTempZPLoc (D);
+    return SameRegXValueAtOp (D) && HaveUnusedTempZPLoc (D);
 }
 
 
@@ -365,7 +355,7 @@ static int WithSameXCanUseRemovableRhsWithTempZP (const StackOpData* D)
 ** and a temp ZP location is available.
 */
 {
-    return SameRegXValueAtOp (D, 0) && RhsIsDirectLoad (D) &&
+    return SameRegXValueAtOp (D) && RhsIsDirectLoad (D) &&
            RhsIsRemovable (D) && HaveUnusedTempZPLoc (D);
 }
 
@@ -1549,7 +1539,7 @@ static unsigned Opt_a_tosicmp (StackOpData* D)
     RegInfo*    RI;
     const char* Arg;
 
-    if (!SameRegAValueAtOp (D, D->OpEntry)) {
+    if (!SameRegAValueAtOp (D)) {
         /* Because of SameRegAValueAtOp */
         CHECK (D->Rhs.A.ChgIndex >= 0);
 
@@ -1770,77 +1760,23 @@ static unsigned Opt_a_tosxor (StackOpData* D)
 
 
 
-/* Note: A subopt MUST commit to every use case (precondition) that it
-**  advertises here. Unhandled advertised cases will result in stack corruption,
-**  because OptStackOps() is committed at the point of call and cannot back out.
-*/
-/* The first column of these two tables must be sorted in lexical order */
-
-/* CAUTION: table must be sorted for bsearch */
-static const OptFuncDesc FuncTable[] = {
-/* BEGIN SORTED.SH */
-    { "___bzero",   Opt___bzero,   WithAXlt100CanUseRegVarOrTempZP       },
-    { "staspidx",   Opt_staspidx,  CanUseRegVarOrTempZP                  },
-    { "staxspidx",  Opt_staxspidx, WithUnusedACanUseRegVarOrTempZP       },
-    { "tosaddax",   Opt_tosaddax,  MustHaveTempZP                        },
-    { "tosandax",   Opt_tosandax,  MustHaveTempZP                        },
-    { "tosaslax",   Opt_tosaslax,  MustHaveTempZP                        },
-    { "tosasrax",   Opt_tosasrax,  MustHaveTempZP                        },
-    { "toseqax",    Opt_toseqax,   CanUseDirectWithRemovableRhsAndTempZP },
-    { "tosgeax",    Opt_tosgeax,   CanUseRemovableRhsWithTempZP          },
-    { "tosltax",    Opt_tosltax,   CanUseRemovableRhsWithTempZP          },
-    { "tosneax",    Opt_tosneax,   CanUseDirectWithRemovableRhsAndTempZP },
-    { "tosorax",    Opt_tosorax,   MustHaveTempZP                        },
-    { "tosshlax",   Opt_tosshlax,  MustHaveTempZP                        },
-    { "tosshrax",   Opt_tosshrax,  MustHaveTempZP                        },
-    { "tossubax",   Opt_tossubax,  CanUseRemovableRhsWithTempZP          },
-    { "tosugeax",   Opt_tosugeax,  CanUseRemovableRhsWithTempZP          },
-    { "tosugtax",   Opt_tosugtax,  CanUseRemovableRhsWithTempZP          },
-    { "tosuleax",   Opt_tosuleax,  CanUseRemovableRhsWithTempZP          },
-    { "tosultax",   Opt_tosultax,  CanUseRemovableRhsWithTempZP          },
-    { "tosxorax",   Opt_tosxorax,  MustHaveTempZP                        },
-/* END SORTED.SH */
-};
-
-/* CAUTION: table must be sorted for bsearch */
-static const OptFuncDesc FuncRegATable[] = {
-/* BEGIN SORTED.SH */
-    { "tosandax",   Opt_a_tosand,  WithSameXCanUseRemovableRhsWithTempZP },
-    { "toseqax",    Opt_a_toseq,   WithSameXMustHaveTempZP               },
-    { "tosgeax",    Opt_a_tosuge,  WithSameXMustHaveTempZP               },
-    { "tosgtax",    Opt_a_tosugt,  WithSameXMustHaveTempZP               },
-    { "tosicmp",    Opt_a_tosicmp, WithSameXMustHaveTempZP               },
-    { "tosleax",    Opt_a_tosule,  WithSameXMustHaveTempZP               },
-    { "tosltax",    Opt_a_tosult,  WithSameXMustHaveTempZP               },
-    { "tosneax",    Opt_a_tosne,   WithSameXMustHaveTempZP               },
-    { "tosorax",    Opt_a_tosor,   WithSameXCanUseRemovableRhsWithTempZP },
-    { "tossubax",   Opt_a_tossub,  WithSameXCanUseRemovableRhsWithTempZP },
-    { "tosugeax",   Opt_a_tosuge,  WithSameXMustHaveTempZP               },
-    { "tosugtax",   Opt_a_tosugt,  WithSameXMustHaveTempZP               },
-    { "tosuleax",   Opt_a_tosule,  WithSameXMustHaveTempZP               },
-    { "tosultax",   Opt_a_tosult,  WithSameXMustHaveTempZP               },
-    { "tosxorax",   Opt_a_tosxor,  WithSameXCanUseRemovableRhsWithTempZP },
-/* END SORTED.SH */
-};
-
-#define FUNC_COUNT(Table) (sizeof(Table) / sizeof(Table[0]))
-
-
-
-static int CmpFunc (const void* Key, const void* Func)
-/* Compare function for bsearch */
-{
-    return strcmp (Key, ((const OptFuncDesc*) Func)->Name);
-}
-
-
-
-static const OptFuncDesc* FindFunc (const OptFuncDesc FuncTable[], size_t Count, const char* Name)
+static const OptFuncDesc* FindFunc (const OptFuncDesc FuncTable[], const char* Name)
 /* Find the function with the given name. Return a pointer to the table entry
 ** or NULL if the function was not found.
 */
 {
-    return bsearch (Name, FuncTable, Count, sizeof(OptFuncDesc), CmpFunc);
+    const OptFuncDesc* Desc;
+
+    /* Scan through table and find OptFuncDesc matching the Name */
+    for (Desc = FuncTable; Desc->Name != 0; ++Desc) {
+        if (strcmp (Name, Desc->Name) == 0) {
+            /* Found a match */
+            return Desc;
+        }
+    }
+
+    /* Not found */
+    return 0;
 }
 
 
@@ -1868,13 +1804,13 @@ static int PreCondOk (StackOpData* D)
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
+/* Note: A subopt MUST commit to every use case (precondition) that it
+**  advertises in its FuncTable. Unhandled advertised cases will result in
+**  stack corruption, because OptStackOps() is committed at the point of call
+**  and cannot back out.
+*/
 
-
-
-unsigned OptStackOps (CodeSeg* S)
+static unsigned OptStackOps (CodeSeg* S, const OptFuncDesc FuncTable[])
 /* Optimize operations that take operands via the stack */
 {
     unsigned        Changes = 0;        /* Number of changes in one run */
@@ -1978,20 +1914,7 @@ unsigned OptStackOps (CodeSeg* S)
                     /* Subroutine call: Check if this is one of the functions,
                     ** we're going to replace.
                     */
-                    /* ### Note: A-only subopts are greedy here. When an A-only
-                    **  subopt exists (by name), only its preconditions are ever
-                    **  checked. There is no fallback to the full A/X subopts.
-                    **  When the A-only preconditions fail, good A/X cases are
-                    **  left unoptimized.
-                    **  The FuncTables should be merged into a single precondition
-                    **  system.
-                    */
-                    if (SameRegXValueAtOp (&Data, E)) {
-                        Data.OptFunc = FindFunc (FuncRegATable, FUNC_COUNT (FuncRegATable), E->Arg);
-                    }
-                    if (Data.OptFunc == 0) {
-                        Data.OptFunc = FindFunc (FuncTable, FUNC_COUNT (FuncTable), E->Arg);
-                    }
+                    Data.OptFunc = FindFunc (FuncTable, E->Arg);
                     if (Data.OptFunc) {
                         /* Disallow removing Rhs loads if the registers are used */
                         SetIfOperandLoadUnremovable (&Data.Rhs, Data.UsedRegs);
@@ -2165,4 +2088,196 @@ unsigned OptStackOps (CodeSeg* S)
 
     /* Return the number of changes made */
     return Changes;
+}
+
+
+
+unsigned OptBZero (CodeSeg* S)
+/* Optimize __bzero operations that take operands via the stack */
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "___bzero",   Opt___bzero,   WithAXlt100CanUseRegVarOrTempZP       },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptPtrStore4 (CodeSeg* S)
+/* Optimize staspidx/staxspidx operations that take operands via the stack */
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "staspidx",   Opt_staspidx,  CanUseRegVarOrTempZP                  },
+        { "staxspidx",  Opt_staxspidx, WithUnusedACanUseRegVarOrTempZP       },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkArith1 (CodeSeg* S)
+/* Optimize arithmetic operations that take operands via the stack
+** where X reg has the same value on left and right sides.
+*/
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "tossubax",   Opt_a_tossub,  WithSameXCanUseRemovableRhsWithTempZP },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkArith2 (CodeSeg* S)
+/* Optimize arithmetic operations (add/sub) that take operands via the stack */
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "tosaddax",   Opt_tosaddax,  MustHaveTempZP                        },
+        { "tossubax",   Opt_tossubax,  CanUseRemovableRhsWithTempZP          },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkBitwise1 (CodeSeg* S)
+/* Optimize bitwise operations that take operands via the stack
+** where X reg has the same value on left and right sides.
+*/
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "tosandax",   Opt_a_tosand,  WithSameXCanUseRemovableRhsWithTempZP },
+        { "tosorax",    Opt_a_tosor,   WithSameXCanUseRemovableRhsWithTempZP },
+        { "tosxorax",   Opt_a_tosxor,  WithSameXCanUseRemovableRhsWithTempZP },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkBitwise2 (CodeSeg* S)
+/* Optimize bitwise operations (and/or/xor) that take operands via the stack */
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "tosandax",   Opt_tosandax,  MustHaveTempZP                        },
+        { "tosorax",    Opt_tosorax,   MustHaveTempZP                        },
+        { "tosxorax",   Opt_tosxorax,  MustHaveTempZP                        },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkEqOps1 (CodeSeg* S)
+/* Optimize ==/!= operators that take operands via the stack
+** where X reg has the same value on left and right sides.
+*/
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "toseqax",    Opt_a_toseq,   WithSameXMustHaveTempZP               },
+        { "tosneax",    Opt_a_tosne,   WithSameXMustHaveTempZP               },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkEqOps2 (CodeSeg* S)
+/* Optimize ==/!= operators that take operands via the stack */
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "toseqax",    Opt_toseqax,   CanUseDirectWithRemovableRhsAndTempZP },
+        { "tosneax",    Opt_tosneax,   CanUseDirectWithRemovableRhsAndTempZP },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkCmpOps1 (CodeSeg* S)
+/* Optimize compare operators that take operands via the stack
+** where X reg has the same value on left and right sides.
+*/
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "tosgeax",    Opt_a_tosuge,  WithSameXMustHaveTempZP               },
+        { "tosgtax",    Opt_a_tosugt,  WithSameXMustHaveTempZP               },
+        { "tosleax",    Opt_a_tosule,  WithSameXMustHaveTempZP               },
+        { "tosltax",    Opt_a_tosult,  WithSameXMustHaveTempZP               },
+        { "tosugeax",   Opt_a_tosuge,  WithSameXMustHaveTempZP               },
+        { "tosugtax",   Opt_a_tosugt,  WithSameXMustHaveTempZP               },
+        { "tosuleax",   Opt_a_tosule,  WithSameXMustHaveTempZP               },
+        { "tosultax",   Opt_a_tosult,  WithSameXMustHaveTempZP               },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkCmpOps2 (CodeSeg* S)
+/* Optimize compare operators that take operands via the stack */
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "tosgeax",    Opt_tosgeax,   CanUseRemovableRhsWithTempZP          },
+        { "tosltax",    Opt_tosltax,   CanUseRemovableRhsWithTempZP          },
+        { "tosugeax",   Opt_tosugeax,  CanUseRemovableRhsWithTempZP          },
+        { "tosugtax",   Opt_tosugtax,  CanUseRemovableRhsWithTempZP          },
+        { "tosuleax",   Opt_tosuleax,  CanUseRemovableRhsWithTempZP          },
+        { "tosultax",   Opt_tosultax,  CanUseRemovableRhsWithTempZP          },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+unsigned OptStkShifts (CodeSeg* S)
+/* Optimize shift operations that take operands via the stack */
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "tosaslax",   Opt_tosaslax,  MustHaveTempZP                        },
+        { "tosasrax",   Opt_tosasrax,  MustHaveTempZP                        },
+        { "tosshlax",   Opt_tosshlax,  MustHaveTempZP                        },
+        { "tosshrax",   Opt_tosshrax,  MustHaveTempZP                        },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
+}
+
+
+
+/* ### Note: this optimizer is not well-tested and not currently included
+**  in codeopt.c because of that.
+*/
+unsigned OptStkICmp1 (CodeSeg* S)
+/* Optimize tosicmp operations where X reg has the same value on
+** left and right sides.
+*/
+{
+    static const OptFuncDesc FuncTable[] = {
+        { "tosicmp",    Opt_a_tosicmp, WithSameXMustHaveTempZP               },
+        OPTFUNCDESC_SENTINEL    /* Null-terminated list */
+    };
+
+    return OptStackOps (S, FuncTable);
 }

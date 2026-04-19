@@ -216,7 +216,7 @@ SMC AdaptUnderlineWidth, { NOP }
 
 <sect1>Accessing arguments<p>
 
-These marcos are determined to get, set and change arguments of instructions:
+These macros are determined to get, set and change arguments of instructions:
 
 <descrip>
 
@@ -458,7 +458,7 @@ SMC GetData, { LDA SMC_AbsAdr }
 
 <sect1>Operational macros<p>
 
-These marcos are determined to let read/modify/write opcodes work on parts of
+These macros are determined to let read/modify/write opcodes work on parts of
 SMC instructions.
 
 <descrip>
@@ -504,7 +504,7 @@ SMC GetPageData, { LDA SourceData, X }
 
 <sect1>Scope macros<p>
 
-These marcos are determined to export and import SMC labels out of the current
+These macros are determined to export and import SMC labels out of the current
 file scope. Please handle with care! If you cannot abstain from leaving the
 file scope, you should at least document the exported SMC lines very well. On
 import side no checking is available if the SMC line is correct accessed (e.g.

@@ -14,7 +14,7 @@ function checkarray
     END="\\/\\* END DECL SORTED_CODEOPT.SH \\*\\/"
 
     awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {printf("%04d##%s\n", count, $0)}' "$CHECK_FILE" | \
-        sed -e 's:\(.*##\).*"\(.*\)",.*:\1\2:g' > .a.tmp
+        sed -e 's:\(.*##\)[^/]*[(] *\(.*\),.*:\1\2:g' > .a.tmp
 
     if [[ -z $(grep '[^[:space:]]' .a.tmp) ]] ; then
         echo "error: "$1" table is empty"
@@ -34,7 +34,7 @@ function checkarray
     END="\\/\\* END SORTED_CODEOPT.SH \\*\\/"
 
     awk '/'"$START"'/{flag=1; count++; next} /'"$END"'/{flag=0;} flag {printf("%04d##%s\n", count, $0)}' "$CHECK_FILE" | \
-        sed -e 's:\(.*##\).*&D\(.*\),.*:\1\2:g' > .b.tmp
+        sed -e 's:\(.*##\)[^/]*&D\(.*\),.*:\1\2:g' > .b.tmp
 
     if [[ -z $(grep '[^[:space:]]' .b.tmp) ]] ; then
         echo "error: "$1" table is empty"

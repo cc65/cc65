@@ -381,24 +381,15 @@ Bitmap* ReadPCXFile (const Collection* A)
 
         /* This is either monochrome or indexed */
         if (P->BPP == 1) {
-            /* Monochrome */
+            /* Monochrome (ReadPlane already expands bits to bytes) */
             for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
-
-                unsigned I;
-                unsigned char Mask;
 
                 /* Read the plane */
                 ReadPlane (F, P, L);
 
                 /* Create pixels */
-                for (X = 0, I = 0, Mask = 0x01; X < P->Width; ++Px) {
-                    Px->Index = (L[I] & Mask) != 0;
-                    if (Mask == 0x80) {
-                        Mask = 0x01;
-                        ++I;
-                    } else {
-                        Mask <<= 1;
-                    }
+                for (X = 0; X < P->Width; ++X, ++Px) {
+                    Px->Index = L[X];
                 }
 
             }

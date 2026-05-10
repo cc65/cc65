@@ -17,7 +17,7 @@ int main (void)
    printf ("\nHello World!\n\n");
    printf ("Type a line and press ENTER, please.\n\n");
 
-   gets( str );
+   fgets( str, sizeof(str), stdin );
 
    printf ("\n\nThanks: %s\n\n", str);
    return 0;

@@ -261,6 +261,7 @@ static char *nextWord (void)
 static void setLen (char *name, unsigned len)
 {
     if (strlen (name) > len) {
+        fprintf (stderr, "Warning: string truncated to %u characters\n", len);
         name[len] = '\0';
     }
 }

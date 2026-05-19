@@ -140,7 +140,7 @@ sd_ok:  .include "xlmemchk.inc" ; calculate lowest address we will use when we m
         cmp     MEMLO
         lda     lowadr+1
         sbc     MEMLO+1
-        bcc     memlo_ok
+        bcs     memlo_ok
 
 ; load address was too low
         print_string2 lmemerrxl_txt, lmemerrxl_txt_len

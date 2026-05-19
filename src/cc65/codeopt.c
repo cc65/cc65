@@ -97,6 +97,9 @@ struct OptFunc {
 #define OPTFUNCDEF(name, codesize)      \
     static OptFunc D##name = { name, #name, codesize, 0, 0, 0, 0, 0 }
 
+/* Optimizer list terminator for RunOptFuncList() */
+#define OPTFUNC_LIST_END    ((OptFunc*)0)
+
 
 
 /*****************************************************************************/
@@ -126,6 +129,7 @@ OPTFUNCDEF ( OptBNegAX1,                 100 );
 OPTFUNCDEF ( OptBNegAX2,                 100 );
 OPTFUNCDEF ( OptBNegAX3,                 100 );
 OPTFUNCDEF ( OptBNegAX4,                 100 );
+OPTFUNCDEF ( OptBZero,                   100 );
 OPTFUNCDEF ( OptBinOps1,                   0 );
 OPTFUNCDEF ( OptBinOps2,                   0 );
 OPTFUNCDEF ( OptBoolCmp,                 100 );
@@ -191,6 +195,7 @@ OPTFUNCDEF ( OptPtrLoad7,                140 );
 OPTFUNCDEF ( OptPtrStore1,                65 );
 OPTFUNCDEF ( OptPtrStore2,                65 );
 OPTFUNCDEF ( OptPtrStore3,               100 );
+OPTFUNCDEF ( OptPtrStore4,               100 );
 OPTFUNCDEF ( OptPush1,                    65 );
 OPTFUNCDEF ( OptPush2,                    50 );
 OPTFUNCDEF ( OptPushPop1,                  0 );
@@ -209,8 +214,17 @@ OPTFUNCDEF ( OptShiftBack,                 0 );
 OPTFUNCDEF ( OptSignExtended,              0 );
 OPTFUNCDEF ( OptSize1,                   100 );
 OPTFUNCDEF ( OptSize2,                   100 );
-OPTFUNCDEF ( OptStackOps,                100 );
+OPTFUNCDEF ( OptStackArith1,             100 );
+OPTFUNCDEF ( OptStackArith2,             100 );
+OPTFUNCDEF ( OptStackBitwise1,           100 );
+OPTFUNCDEF ( OptStackBitwise2,           100 );
+OPTFUNCDEF ( OptStackCmpOps1,            100 );
+OPTFUNCDEF ( OptStackCmpOps2,            100 );
+OPTFUNCDEF ( OptStackEqOps1,             100 );
+OPTFUNCDEF ( OptStackEqOps2,             100 );
+OPTFUNCDEF ( OptStackICmp1,              100 );
 OPTFUNCDEF ( OptStackPtrOps,              50 );
+OPTFUNCDEF ( OptStackShifts,             100 );
 OPTFUNCDEF ( OptStore1,                   70 );
 OPTFUNCDEF ( OptStore2,                  115 );
 OPTFUNCDEF ( OptStore3,                  120 );
@@ -255,6 +269,7 @@ static OptFunc* OptFuncs[] = {
     &DOptBNegAX2,
     &DOptBNegAX3,
     &DOptBNegAX4,
+    &DOptBZero,
     &DOptBinOps1,
     &DOptBinOps2,
     &DOptBoolCmp,
@@ -320,6 +335,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptPtrStore3,
+    &DOptPtrStore4,
     &DOptPush1,
     &DOptPush2,
     &DOptPushPop1,
@@ -338,8 +354,17 @@ static OptFunc* OptFuncs[] = {
     &DOptSignExtended,
     &DOptSize1,
     &DOptSize2,
-    &DOptStackOps,
+    &DOptStackArith1,
+    &DOptStackArith2,
+    &DOptStackBitwise1,
+    &DOptStackBitwise2,
+    &DOptStackCmpOps1,
+    &DOptStackCmpOps2,
+    &DOptStackEqOps1,
+    &DOptStackEqOps2,
+    &DOptStackICmp1,
     &DOptStackPtrOps,
+    &DOptStackShifts,
     &DOptStore1,
     &DOptStore2,
     &DOptStore3,
@@ -634,6 +659,58 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 
 
 
+static unsigned RunOptFuncVList (CodeSeg* S, unsigned Max, va_list List)
+/* Run optimizer function list Max times or until there are no more changes */
+{
+    unsigned Changes, C;
+
+    /* Run this until there are no more changes */
+    Changes = 0;
+    do {
+        va_list ap;
+
+        /* Make a copy of List ap and iterate over the copy */
+        va_copy (ap, List);
+        C = 0;
+
+        while (1) {
+            /* Get the next OptFunc in the list */
+            OptFunc* F = va_arg (ap, OptFunc*);
+
+            if (F == OPTFUNC_LIST_END) {
+                break; /* Done with the list */
+            }
+
+            C += RunOptFunc (S, F, 1);
+        }
+
+        va_end (ap);
+        Changes += C;
+
+    } while (--Max && C > 0);
+
+    /* Return the number of changes */
+    return Changes;
+}
+
+
+
+static unsigned RunOptFuncList (CodeSeg* S, unsigned Max, ...)
+/* Run optimizer function list Max times or until there are no more changes */
+{
+    unsigned Changes;
+    va_list List;
+
+    va_start (List, Max);
+    Changes = RunOptFuncVList (S, Max, List);
+    va_end (List);
+
+    /* Return the number of changes */
+    return Changes;
+}
+
+
+
 static unsigned RunOptGroup1 (CodeSeg* S)
 /* Run the first group of optimization steps. These steps translate known
 ** patterns emitted by the code generator into more optimal patterns. Order
@@ -724,7 +801,19 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
         C += RunOptFunc (S, &DOptNegAX1, 1);
         C += RunOptFunc (S, &DOptNegAX2, 1);
-        C += RunOptFunc (S, &DOptStackOps, 3);      /* Before OptBoolUnary1 */
+        C += RunOptFunc (S, &DOptBZero, 1);
+        C += RunOptFunc (S, &DOptPtrStore4, 1);
+        C += RunOptFuncList (S, 2, /* twice for complex expressions */
+                &DOptStackArith1,
+                &DOptStackArith2,
+                &DOptStackBitwise1,
+                &DOptStackBitwise2,
+                &DOptStackShifts,
+                OPTFUNC_LIST_END);
+        C += RunOptFunc (S, &DOptStackCmpOps1, 1);
+        C += RunOptFunc (S, &DOptStackCmpOps2, 1);
+        C += RunOptFunc (S, &DOptStackEqOps1, 1);
+        C += RunOptFunc (S, &DOptStackEqOps2, 1);
         C += RunOptFunc (S, &DOptCmp8, 1);          /* Before OptBoolUnary1 */
         C += RunOptFunc (S, &DOptBoolUnary1, 3);
         C += RunOptFunc (S, &DOptBoolUnary2, 3);
@@ -751,6 +840,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptRTSJumps1, 1);
         C += RunOptFunc (S, &DOptCmp6, 1);          /* After OptRTSJumps1 */
         C += RunOptFunc (S, &DOptBoolCmp, 1);
+        C += RunOptFunc (S, &DOptStackICmp1, 1);    /* After OptBoolCmp */
         C += RunOptFunc (S, &DOptBoolTrans, 1);
         C += RunOptFunc (S, &DOptBNegA2, 1);        /* After OptCondBranch's */
         C += RunOptFunc (S, &DOptBNegAX2, 1);       /* After OptCondBranch's */

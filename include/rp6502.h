@@ -145,6 +145,8 @@ long __fastcall__ ria_call_long (unsigned char op);
 #define RIA_ATTR_EXIT_CODE 0x07
 #define RIA_ATTR_SIGINT 0x08
 #define RIA_ATTR_RLN_CAPS 0x09
+#define RIA_ATTR_RLN_WIDTH 0x0A
+#define RIA_ATTR_RLN_HEIGHT 0x0B
 
 /* C API for the operating system. */
 
@@ -189,9 +191,9 @@ int __fastcall__ f_getcwd (char* name, int size);
 int __fastcall__ f_setlabel (const char* name);
 int __fastcall__ f_getlabel (const char* path, char* label);
 int __fastcall__ f_getfree (const char* name, unsigned long* free, unsigned long* total);
-int __fastcall__ ria_readline_lastkey (char* key, int size);
-int __fastcall__ ria_readline_peek (char* peek, int size);
-int __fastcall__ ria_readline_poke (const char* poke);
+int __fastcall__ ria_rln_lastkey (char* key, unsigned char* action);
+int __fastcall__ ria_rln_peek (char* peek, unsigned char* pos);
+int __fastcall__ ria_rln_poke (const char* poke);
 
 /* XREG location helpers */
 

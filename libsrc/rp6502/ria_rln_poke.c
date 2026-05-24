@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <string.h>
 
-int __fastcall__ ria_readline_poke (const char* poke)
+int __fastcall__ ria_rln_poke (const char* poke)
 {
     int i;
     size_t pokelen = strlen (poke);

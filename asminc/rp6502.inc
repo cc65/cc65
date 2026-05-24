@@ -87,6 +87,8 @@ RIA_ATTR_LAUNCHER         := $06
 RIA_ATTR_EXIT_CODE        := $07
 RIA_ATTR_SIGINT           := $08
 RIA_ATTR_RLN_CAPS         := $09
+RIA_ATTR_RLN_WIDTH        := $0A
+RIA_ATTR_RLN_HEIGHT       := $0B
 
 ; 6522 VIA
 VIA             := $FFD0        ; VIA base address

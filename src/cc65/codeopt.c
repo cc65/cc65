@@ -93,6 +93,13 @@ struct OptFunc {
     char           Disabled;            /* True if function disabled */
 };
 
+/* Optimizer step definition ("D" name prefix). */
+#define OPTFUNCDEF(name, codesize)      \
+    static OptFunc D##name = { name, #name, codesize, 0, 0, 0, 0, 0 }
+
+/* Optimizer list terminator for RunOptFuncList() */
+#define OPTFUNC_LIST_END    ((OptFunc*)0)
+
 
 
 /*****************************************************************************/
@@ -104,128 +111,139 @@ struct OptFunc {
 /* A list of all the function descriptions */
 /* CAUTION: should be sorted by "name" */
 /* BEGIN DECL SORTED_CODEOPT.SH */
-static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
-static OptFunc DOpt65C02Ind     = { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOpt65C02Stores  = { Opt65C02Stores,  "Opt65C02Stores",  100, 0, 0, 0, 0, 0 };
-static OptFunc DOptAXLoad       = { OptAXLoad,       "OptAXLoad",        50, 0, 0, 0, 0, 0 };
-static OptFunc DOptAXLoad2      = { OptAXLoad2,      "OptAXLoad2",       66, 0, 0, 0, 0, 0 };
-static OptFunc DOptAXOps        = { OptAXOps,        "OptAXOps",         50, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd1         = { OptAdd1,         "OptAdd1",         125, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd2         = { OptAdd2,         "OptAdd2",         200, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd3         = { OptAdd3,         "OptAdd3",          65, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd4         = { OptAdd4,         "OptAdd4",          90, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd5         = { OptAdd5,         "OptAdd5",         100, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd6         = { OptAdd6,         "OptAdd6",          40, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegA1       = { OptBNegA1,       "OptBNegA1",       100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegA2       = { OptBNegA2,       "OptBNegA2",       100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegAX1      = { OptBNegAX1,      "OptBNegAX1",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegAX2      = { OptBNegAX2,      "OptBNegAX2",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBinOps1      = { OptBinOps1,      "OptBinOps1",        0, 0, 0, 0, 0, 0 };
-static OptFunc DOptBinOps2      = { OptBinOps2,      "OptBinOps2",        0, 0, 0, 0, 0, 0 };
-static OptFunc DOptBoolCmp      = { OptBoolCmp,      "OptBoolCmp",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBoolUnary1   = { OptBoolUnary1,   "OptBoolUnary1",    40, 0, 0, 0, 0, 0 };
-static OptFunc DOptBoolUnary2   = { OptBoolUnary2,   "OptBoolUnary2",    40, 0, 0, 0, 0, 0 };
-static OptFunc DOptBoolUnary3   = { OptBoolUnary3,   "OptBoolUnary3",    40, 0, 0, 0, 0, 0 };
-static OptFunc DOptBranchDist   = { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
-static OptFunc DOptBranchDist2  = { OptBranchDist2,  "OptBranchDist2",    0, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp1         = { OptCmp1,         "OptCmp1",          42, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp2         = { OptCmp2,         "OptCmp2",          85, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp3         = { OptCmp3,         "OptCmp3",          75, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp4         = { OptCmp4,         "OptCmp4",          75, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp5         = { OptCmp5,         "OptCmp5",         100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp6         = { OptCmp6,         "OptCmp6",          33, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp7         = { OptCmp7,         "OptCmp7",          85, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp8         = { OptCmp8,         "OptCmp8",          50, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp9         = { OptCmp9,         "OptCmp9",          85, 0, 0, 0, 0, 0 };
-static OptFunc DOptComplAX1     = { OptComplAX1,     "OptComplAX1",      65, 0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranch1  = { OptCondBranch1,  "OptCondBranch1",   80, 0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranch2  = { OptCondBranch2,  "OptCondBranch2",   40, 0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranch3  = { OptCondBranch3,  "OptCondBranch3",   40, 0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranchC  = { OptCondBranchC,  "OptCondBranchC",    0, 0, 0, 0, 0, 0 };
-static OptFunc DOptDeadCode     = { OptDeadCode,     "OptDeadCode",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptDeadJumps    = { OptDeadJumps,    "OptDeadJumps",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",       0, 0, 0, 0, 0, 0 };
-static OptFunc DOptGotoSPAdj    = { OptGotoSPAdj,    "OptGotoSPAdj",      0, 0, 0, 0, 0, 0 };
-static OptFunc DOptIndLoads1    = { OptIndLoads1,    "OptIndLoads1",      0, 0, 0, 0, 0, 0 };
-static OptFunc DOptIndLoads2    = { OptIndLoads2,    "OptIndLoads2",      0, 0, 0, 0, 0, 0 };
-static OptFunc DOptJumpCascades = { OptJumpCascades, "OptJumpCascades", 100, 0, 0, 0, 0, 0 };
-static OptFunc DOptJumpTarget1  = { OptJumpTarget1,  "OptJumpTarget1",  100, 0, 0, 0, 0, 0 };
-static OptFunc DOptJumpTarget2  = { OptJumpTarget2,  "OptJumpTarget2",  100, 0, 0, 0, 0, 0 };
-static OptFunc DOptJumpTarget3  = { OptJumpTarget3,  "OptJumpTarget3",  100, 0, 0, 0, 0, 0 };
-static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
-static OptFunc DOptLoad2        = { OptLoad2,        "OptLoad2",        200, 0, 0, 0, 0, 0 };
-static OptFunc DOptLoad3        = { OptLoad3,        "OptLoad3",          0, 0, 0, 0, 0, 0 };
-static OptFunc DOptLoadStore1   = { OptLoadStore1,   "OptLoadStore1",     0, 0, 0, 0, 0, 0 };
-static OptFunc DOptLoadStore2   = { OptLoadStore2,   "OptLoadStore2",     0, 0, 0, 0, 0, 0 };
-static OptFunc DOptLoadStoreLoad= { OptLoadStoreLoad,"OptLoadStoreLoad",  0, 0, 0, 0, 0, 0 };
-static OptFunc DOptLongAssign   = { OptLongAssign,   "OptLongAssign",   100, 0, 0, 0, 0, 0 };
-static OptFunc DOptLongCopy     = { OptLongCopy,     "OptLongCopy",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptNegAX1       = { OptNegAX1,       "OptNegAX1",       165, 0, 0, 0, 0, 0 };
-static OptFunc DOptNegAX2       = { OptNegAX2,       "OptNegAX2",       200, 0, 0, 0, 0, 0 };
-static OptFunc DOptPrecalc      = { OptPrecalc,      "OptPrecalc",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad1     = { OptPtrLoad1,     "OptPtrLoad1",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad11    = { OptPtrLoad11,    "OptPtrLoad11",     92, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad12    = { OptPtrLoad12,    "OptPtrLoad12",     50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad13    = { OptPtrLoad13,    "OptPtrLoad13",     65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad14    = { OptPtrLoad14,    "OptPtrLoad14",    108, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad15    = { OptPtrLoad15,    "OptPtrLoad15",     86, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad16    = { OptPtrLoad16,    "OptPtrLoad16",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad17    = { OptPtrLoad17,    "OptPtrLoad17",    190, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad18    = { OptPtrLoad18,    "OptPtrLoad18",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad19    = { OptPtrLoad19,    "OptPtrLoad19",     65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad2     = { OptPtrLoad2,     "OptPtrLoad2",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad20    = { OptPtrLoad20,    "OptPtrLoad20",     90, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad3     = { OptPtrLoad3,     "OptPtrLoad3",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad4     = { OptPtrLoad4,     "OptPtrLoad4",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad5     = { OptPtrLoad5,     "OptPtrLoad5",      50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad6     = { OptPtrLoad6,     "OptPtrLoad6",      60, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad7     = { OptPtrLoad7,     "OptPtrLoad7",     140, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore1    = { OptPtrStore1,    "OptPtrStore1",     65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore2    = { OptPtrStore2,    "OptPtrStore2",     65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore3    = { OptPtrStore3,    "OptPtrStore3",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPush1        = { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPush2        = { OptPush2,        "OptPush2",         50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPushPop1     = { OptPushPop1,     "OptPushPop1",       0, 0, 0, 0, 0, 0 };
-static OptFunc DOptPushPop2     = { OptPushPop2,     "OptPushPop2",       0, 0, 0, 0, 0, 0 };
-static OptFunc DOptPushPop3     = { OptPushPop3,     "OptPushPop3",       0, 0, 0, 0, 0, 0 };
-static OptFunc DOptRTS          = { OptRTS,          "OptRTS",          100, 0, 0, 0, 0, 0 };
-static OptFunc DOptRTSJumps1    = { OptRTSJumps1,    "OptRTSJumps1",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptRTSJumps2    = { OptRTSJumps2,    "OptRTSJumps2",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptShift1       = { OptShift1,       "OptShift1",       100, 0, 0, 0, 0, 0 };
-static OptFunc DOptShift2       = { OptShift2,       "OptShift2",       100, 0, 0, 0, 0, 0 };
-static OptFunc DOptShift3       = { OptShift3,       "OptShift3",        17, 0, 0, 0, 0, 0 };
-static OptFunc DOptShift4       = { OptShift4,       "OptShift4",       100, 0, 0, 0, 0, 0 };
-static OptFunc DOptShift5       = { OptShift5,       "OptShift5",       110, 0, 0, 0, 0, 0 };
-static OptFunc DOptShift6       = { OptShift6,       "OptShift6",       200, 0, 0, 0, 0, 0 };
-static OptFunc DOptShiftBack    = { OptShiftBack,    "OptShiftBack",      0, 0, 0, 0, 0, 0 };
-static OptFunc DOptSignExtended = { OptSignExtended, "OptSignExtended",   0, 0, 0, 0, 0, 0 };
-static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };
-static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
-static OptFunc DOptStackOps     = { OptStackOps,     "OptStackOps",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptStackPtrOps  = { OptStackPtrOps,  "OptStackPtrOps",   50, 0, 0, 0, 0, 0 };
-static OptFunc DOptStore1       = { OptStore1,       "OptStore1",        70, 0, 0, 0, 0, 0 };
-static OptFunc DOptStore2       = { OptStore2,       "OptStore2",       115, 0, 0, 0, 0, 0 };
-static OptFunc DOptStore3       = { OptStore3,       "OptStore3",       120, 0, 0, 0, 0, 0 };
-static OptFunc DOptStore4       = { OptStore4,       "OptStore4",        50, 0, 0, 0, 0, 0 };
-static OptFunc DOptStore5       = { OptStore5,       "OptStore5",       100, 0, 0, 0, 0, 0 };
-static OptFunc DOptStoreLoad    = { OptStoreLoad,    "OptStoreLoad",      0, 0, 0, 0, 0, 0 };
-static OptFunc DOptSub1         = { OptSub1,         "OptSub1",         100, 0, 0, 0, 0, 0 };
-static OptFunc DOptSub2         = { OptSub2,         "OptSub2",         100, 0, 0, 0, 0, 0 };
-static OptFunc DOptSub3         = { OptSub3,         "OptSub3",         100, 0, 0, 0, 0, 0 };
-static OptFunc DOptTest1        = { OptTest1,        "OptTest1",         65, 0, 0, 0, 0, 0 };
-static OptFunc DOptTest2        = { OptTest2,        "OptTest2",         50, 0, 0, 0, 0, 0 };
-static OptFunc DOptTosLoadPop   = { OptTosLoadPop,   "OptTosLoadPop",    50, 0, 0, 0, 0, 0 };
-static OptFunc DOptTosPushPop   = { OptTosPushPop,   "OptTosPushPop",    33, 0, 0, 0, 0, 0 };
-static OptFunc DOptTransfers1   = { OptTransfers1,   "OptTransfers1",     0, 0, 0, 0, 0, 0 };
-static OptFunc DOptTransfers2   = { OptTransfers2,   "OptTransfers2",    60, 0, 0, 0, 0, 0 };
-static OptFunc DOptTransfers3   = { OptTransfers3,   "OptTransfers3",    65, 0, 0, 0, 0, 0 };
-static OptFunc DOptTransfers4   = { OptTransfers4,   "OptTransfers4",    65, 0, 0, 0, 0, 0 };
-static OptFunc DOptUnusedLoads  = { OptUnusedLoads,  "OptUnusedLoads",    0, 0, 0, 0, 0, 0 };
-static OptFunc DOptUnusedStores = { OptUnusedStores, "OptUnusedStores",   0, 0, 0, 0, 0, 0 };
+OPTFUNCDEF ( Opt65C02BitOps,              66 );
+OPTFUNCDEF ( Opt65C02Ind,                100 );
+OPTFUNCDEF ( Opt65C02Stores,             100 );
+OPTFUNCDEF ( OptAXLoad,                   50 );
+OPTFUNCDEF ( OptAXLoad2,                  66 );
+OPTFUNCDEF ( OptAXOps,                    50 );
+OPTFUNCDEF ( OptAdd1,                    125 );
+OPTFUNCDEF ( OptAdd2,                    200 );
+OPTFUNCDEF ( OptAdd3,                     65 );
+OPTFUNCDEF ( OptAdd4,                     90 );
+OPTFUNCDEF ( OptAdd5,                    100 );
+OPTFUNCDEF ( OptAdd6,                     40 );
+OPTFUNCDEF ( OptBNegA1,                  100 );
+OPTFUNCDEF ( OptBNegA2,                  100 );
+OPTFUNCDEF ( OptBNegAX1,                 100 );
+OPTFUNCDEF ( OptBNegAX2,                 100 );
+OPTFUNCDEF ( OptBNegAX3,                 100 );
+OPTFUNCDEF ( OptBNegAX4,                 100 );
+OPTFUNCDEF ( OptBZero,                   100 );
+OPTFUNCDEF ( OptBinOps1,                   0 );
+OPTFUNCDEF ( OptBinOps2,                   0 );
+OPTFUNCDEF ( OptBoolCmp,                 100 );
+OPTFUNCDEF ( OptBoolTrans,               100 );
+OPTFUNCDEF ( OptBoolUnary1,               40 );
+OPTFUNCDEF ( OptBoolUnary2,               40 );
+OPTFUNCDEF ( OptBoolUnary3,               40 );
+OPTFUNCDEF ( OptBranchDist,                0 );
+OPTFUNCDEF ( OptBranchDist2,               0 );
+OPTFUNCDEF ( OptCmp1,                     42 );
+OPTFUNCDEF ( OptCmp2,                     85 );
+OPTFUNCDEF ( OptCmp3,                     75 );
+OPTFUNCDEF ( OptCmp4,                     75 );
+OPTFUNCDEF ( OptCmp5,                    100 );
+OPTFUNCDEF ( OptCmp6,                     33 );
+OPTFUNCDEF ( OptCmp7,                     85 );
+OPTFUNCDEF ( OptCmp8,                     50 );
+OPTFUNCDEF ( OptCmp9,                     85 );
+OPTFUNCDEF ( OptComplAX1,                 65 );
+OPTFUNCDEF ( OptCondBranch1,              80 );
+OPTFUNCDEF ( OptCondBranch2,              40 );
+OPTFUNCDEF ( OptCondBranch3,              40 );
+OPTFUNCDEF ( OptCondBranchC,               0 );
+OPTFUNCDEF ( OptDeadCode,                100 );
+OPTFUNCDEF ( OptDeadJumps,               100 );
+OPTFUNCDEF ( OptDecouple,                100 );
+OPTFUNCDEF ( OptDupLoads,                  0 );
+OPTFUNCDEF ( OptGotoSPAdj,                 0 );
+OPTFUNCDEF ( OptIndLoads1,                 0 );
+OPTFUNCDEF ( OptIndLoads2,                 0 );
+OPTFUNCDEF ( OptJumpCascades,            100 );
+OPTFUNCDEF ( OptJumpTarget1,             100 );
+OPTFUNCDEF ( OptJumpTarget2,             100 );
+OPTFUNCDEF ( OptJumpTarget3,             100 );
+OPTFUNCDEF ( OptLoad1,                   100 );
+OPTFUNCDEF ( OptLoad2,                   200 );
+OPTFUNCDEF ( OptLoad3,                     0 );
+OPTFUNCDEF ( OptLoadStore1,                0 );
+OPTFUNCDEF ( OptLoadStore2,                0 );
+OPTFUNCDEF ( OptLoadStoreLoad,             0 );
+OPTFUNCDEF ( OptLongAssign,              100 );
+OPTFUNCDEF ( OptLongCopy,                100 );
+OPTFUNCDEF ( OptNegAX1,                  165 );
+OPTFUNCDEF ( OptNegAX2,                  200 );
+OPTFUNCDEF ( OptPrecalc,                 100 );
+OPTFUNCDEF ( OptPtrLoad1,                100 );
+OPTFUNCDEF ( OptPtrLoad11,                92 );
+OPTFUNCDEF ( OptPtrLoad12,                50 );
+OPTFUNCDEF ( OptPtrLoad13,                65 );
+OPTFUNCDEF ( OptPtrLoad14,               108 );
+OPTFUNCDEF ( OptPtrLoad15,                86 );
+OPTFUNCDEF ( OptPtrLoad16,               100 );
+OPTFUNCDEF ( OptPtrLoad17,               190 );
+OPTFUNCDEF ( OptPtrLoad18,               100 );
+OPTFUNCDEF ( OptPtrLoad19,                65 );
+OPTFUNCDEF ( OptPtrLoad2,                100 );
+OPTFUNCDEF ( OptPtrLoad20,                90 );
+OPTFUNCDEF ( OptPtrLoad3,                100 );
+OPTFUNCDEF ( OptPtrLoad4,                100 );
+OPTFUNCDEF ( OptPtrLoad5,                 50 );
+OPTFUNCDEF ( OptPtrLoad6,                 60 );
+OPTFUNCDEF ( OptPtrLoad7,                140 );
+OPTFUNCDEF ( OptPtrStore1,                65 );
+OPTFUNCDEF ( OptPtrStore2,                65 );
+OPTFUNCDEF ( OptPtrStore3,               100 );
+OPTFUNCDEF ( OptPtrStore4,               100 );
+OPTFUNCDEF ( OptPush1,                    65 );
+OPTFUNCDEF ( OptPush2,                    50 );
+OPTFUNCDEF ( OptPushPop1,                  0 );
+OPTFUNCDEF ( OptPushPop2,                  0 );
+OPTFUNCDEF ( OptPushPop3,                  0 );
+OPTFUNCDEF ( OptRTS,                     100 );
+OPTFUNCDEF ( OptRTSJumps1,               100 );
+OPTFUNCDEF ( OptRTSJumps2,               100 );
+OPTFUNCDEF ( OptShift1,                  100 );
+OPTFUNCDEF ( OptShift2,                  100 );
+OPTFUNCDEF ( OptShift3,                   17 );
+OPTFUNCDEF ( OptShift4,                  100 );
+OPTFUNCDEF ( OptShift5,                  110 );
+OPTFUNCDEF ( OptShift6,                  200 );
+OPTFUNCDEF ( OptShiftBack,                 0 );
+OPTFUNCDEF ( OptSignExtended,              0 );
+OPTFUNCDEF ( OptSize1,                   100 );
+OPTFUNCDEF ( OptSize2,                   100 );
+OPTFUNCDEF ( OptStackArith1,             100 );
+OPTFUNCDEF ( OptStackArith2,             100 );
+OPTFUNCDEF ( OptStackBitwise1,           100 );
+OPTFUNCDEF ( OptStackBitwise2,           100 );
+OPTFUNCDEF ( OptStackCmpOps1,            100 );
+OPTFUNCDEF ( OptStackCmpOps2,            100 );
+OPTFUNCDEF ( OptStackEqOps1,             100 );
+OPTFUNCDEF ( OptStackEqOps2,             100 );
+OPTFUNCDEF ( OptStackICmp1,              100 );
+OPTFUNCDEF ( OptStackPtrOps,              50 );
+OPTFUNCDEF ( OptStackShifts,             100 );
+OPTFUNCDEF ( OptStore1,                   70 );
+OPTFUNCDEF ( OptStore2,                  115 );
+OPTFUNCDEF ( OptStore3,                  120 );
+OPTFUNCDEF ( OptStore4,                   50 );
+OPTFUNCDEF ( OptStore5,                  100 );
+OPTFUNCDEF ( OptStoreLoad,                 0 );
+OPTFUNCDEF ( OptSub1,                    100 );
+OPTFUNCDEF ( OptSub2,                    100 );
+OPTFUNCDEF ( OptSub3,                    100 );
+OPTFUNCDEF ( OptTest1,                    65 );
+OPTFUNCDEF ( OptTest2,                    50 );
+OPTFUNCDEF ( OptTosLoadPop,               50 );
+OPTFUNCDEF ( OptTosPushPop,               33 );
+OPTFUNCDEF ( OptTransfers1,                0 );
+OPTFUNCDEF ( OptTransfers2,               60 );
+OPTFUNCDEF ( OptTransfers3,               65 );
+OPTFUNCDEF ( OptTransfers4,               65 );
+OPTFUNCDEF ( OptUnusedLoads,               0 );
+OPTFUNCDEF ( OptUnusedStores,              0 );
 /* END DECL SORTED_CODEOPT.SH */
 
 
@@ -251,6 +269,7 @@ static OptFunc* OptFuncs[] = {
     &DOptBNegAX2,
     &DOptBNegAX3,
     &DOptBNegAX4,
+    &DOptBZero,
     &DOptBinOps1,
     &DOptBinOps2,
     &DOptBoolCmp,
@@ -316,6 +335,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptPtrStore3,
+    &DOptPtrStore4,
     &DOptPush1,
     &DOptPush2,
     &DOptPushPop1,
@@ -334,8 +354,17 @@ static OptFunc* OptFuncs[] = {
     &DOptSignExtended,
     &DOptSize1,
     &DOptSize2,
-    &DOptStackOps,
+    &DOptStackArith1,
+    &DOptStackArith2,
+    &DOptStackBitwise1,
+    &DOptStackBitwise2,
+    &DOptStackCmpOps1,
+    &DOptStackCmpOps2,
+    &DOptStackEqOps1,
+    &DOptStackEqOps2,
+    &DOptStackICmp1,
     &DOptStackPtrOps,
+    &DOptStackShifts,
     &DOptStore1,
     &DOptStore2,
     &DOptStore3,
@@ -630,6 +659,58 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 
 
 
+static unsigned RunOptFuncVList (CodeSeg* S, unsigned Max, va_list List)
+/* Run optimizer function list Max times or until there are no more changes */
+{
+    unsigned Changes, C;
+
+    /* Run this until there are no more changes */
+    Changes = 0;
+    do {
+        va_list ap;
+
+        /* Make a copy of List ap and iterate over the copy */
+        va_copy (ap, List);
+        C = 0;
+
+        while (1) {
+            /* Get the next OptFunc in the list */
+            OptFunc* F = va_arg (ap, OptFunc*);
+
+            if (F == OPTFUNC_LIST_END) {
+                break; /* Done with the list */
+            }
+
+            C += RunOptFunc (S, F, 1);
+        }
+
+        va_end (ap);
+        Changes += C;
+
+    } while (--Max && C > 0);
+
+    /* Return the number of changes */
+    return Changes;
+}
+
+
+
+static unsigned RunOptFuncList (CodeSeg* S, unsigned Max, ...)
+/* Run optimizer function list Max times or until there are no more changes */
+{
+    unsigned Changes;
+    va_list List;
+
+    va_start (List, Max);
+    Changes = RunOptFuncVList (S, Max, List);
+    va_end (List);
+
+    /* Return the number of changes */
+    return Changes;
+}
+
+
+
 static unsigned RunOptGroup1 (CodeSeg* S)
 /* Run the first group of optimization steps. These steps translate known
 ** patterns emitted by the code generator into more optimal patterns. Order
@@ -720,7 +801,19 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
         C += RunOptFunc (S, &DOptNegAX1, 1);
         C += RunOptFunc (S, &DOptNegAX2, 1);
-        C += RunOptFunc (S, &DOptStackOps, 3);      /* Before OptBoolUnary1 */
+        C += RunOptFunc (S, &DOptBZero, 1);
+        C += RunOptFunc (S, &DOptPtrStore4, 1);
+        C += RunOptFuncList (S, 2, /* twice for complex expressions */
+                &DOptStackArith1,
+                &DOptStackArith2,
+                &DOptStackBitwise1,
+                &DOptStackBitwise2,
+                &DOptStackShifts,
+                OPTFUNC_LIST_END);
+        C += RunOptFunc (S, &DOptStackCmpOps1, 1);
+        C += RunOptFunc (S, &DOptStackCmpOps2, 1);
+        C += RunOptFunc (S, &DOptStackEqOps1, 1);
+        C += RunOptFunc (S, &DOptStackEqOps2, 1);
         C += RunOptFunc (S, &DOptCmp8, 1);          /* Before OptBoolUnary1 */
         C += RunOptFunc (S, &DOptBoolUnary1, 3);
         C += RunOptFunc (S, &DOptBoolUnary2, 3);
@@ -747,6 +840,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptRTSJumps1, 1);
         C += RunOptFunc (S, &DOptCmp6, 1);          /* After OptRTSJumps1 */
         C += RunOptFunc (S, &DOptBoolCmp, 1);
+        C += RunOptFunc (S, &DOptStackICmp1, 1);    /* After OptBoolCmp */
         C += RunOptFunc (S, &DOptBoolTrans, 1);
         C += RunOptFunc (S, &DOptBNegA2, 1);        /* After OptCondBranch's */
         C += RunOptFunc (S, &DOptBNegAX2, 1);       /* After OptCondBranch's */

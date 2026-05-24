@@ -109,16 +109,14 @@ newline:
 :       jmp     VTABZ
 
 putchar:
-        .ifdef  __APPLE2ENH__
-        ldy     INVFLG
-        cpy     #$FF            ; Normal character display mode?
-        beq     putchardirect
         cmp     #$E0            ; Lowercase?
-        bcc     mask
-        and     #$7F            ; Inverse lowercase
-        bra     putchardirect
+        and     INVFLG          ; Apply normal, inverse, flash
+        bcc     putchardirect   ; Not lowercase, no special handling
+        .ifndef __APPLE2ENH__
+        bit     machinetype
+        bpl     putchardirect   ; Mask normally for ][/+ ; done
         .endif
-mask:   and     INVFLG          ; Apply normal, inverse, flash
+        ora     #$40            ; Restore lowercase bit for //e and up
 
 putchardirect:
         tax

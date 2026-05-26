@@ -49,8 +49,72 @@
 
 
 
-unsigned OptStackOps (CodeSeg* S);
-/* Optimize operations that take operands via the stack */
+unsigned OptBZero (CodeSeg* S);
+/* Optimize __bzero operations that take operands via the stack */
+
+
+
+unsigned OptPtrStore4 (CodeSeg* S);
+/* Optimize staspidx/staxspidx operations that take operands via the stack */
+
+
+
+unsigned OptStackArith1 (CodeSeg* S);
+/* Optimize arithmetic operations that take operands via the stack
+** where X reg has the same value on left and right sides.
+*/
+
+
+unsigned OptStackArith2 (CodeSeg* S);
+/* Optimize arithmetic operations (add/sub) that take operands via the stack */
+
+
+
+unsigned OptStackBitwise1 (CodeSeg* S);
+/* Optimize bitwise operations that take operands via the stack
+** where X reg has the same value on left and right sides.
+*/
+
+
+
+unsigned OptStackBitwise2 (CodeSeg* S);
+/* Optimize bitwise operations (and/or/xor) that take operands via the stack */
+
+
+
+unsigned OptStackCmpOps1 (CodeSeg* S);
+/* Optimize compare operators that take operands via the stack
+** where X reg has the same value on left and right sides.
+*/
+
+
+
+unsigned OptStackCmpOps2 (CodeSeg* S);
+/* Optimize compare operators that take operands via the stack */
+
+
+
+unsigned OptStackEqOps1 (CodeSeg* S);
+/* Optimize ==/!= operators that take operands via the stack
+** where X reg has the same value on left and right sides.
+*/
+
+
+
+unsigned OptStackEqOps2 (CodeSeg* S);
+/* Optimize ==/!= operators that take operands via the stack */
+
+
+
+unsigned OptStackShifts (CodeSeg* S);
+/* Optimize shift operations that take operands via the stack */
+
+
+
+unsigned OptStackICmp1 (CodeSeg* S);
+/* Optimize tosicmp operations where X reg has the same value on
+** left and right sides.
+*/
 
 
 

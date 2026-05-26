@@ -136,11 +136,11 @@ sys_ok: jsr     sdcheck         ; check for SpartaDOS-X, and if found, whether i
 
 sd_ok:  .include "xlmemchk.inc" ; calculate lowest address we will use when we move the screen buffer down
 
-        lda     MEMLO
-        cmp     lowadr
-        lda     MEMLO+1
-        sbc     lowadr+1
-        bcc     memlo_ok
+        ;lda     lowadr         ; already loaded in xlmemchk.inc
+        cmp     MEMLO
+        lda     lowadr+1
+        sbc     MEMLO+1
+        bcs     memlo_ok
 
 ; load address was too low
         print_string2 lmemerrxl_txt, lmemerrxl_txt_len
@@ -184,11 +184,11 @@ syschk:
 
         bcc     mem_err         ; program doesn't fit into memory
 
-        lda     MEMLO
-        cmp     #<__STARTADDRESS__
-        lda     MEMLO+1
-        sbc     #>__STARTADDRESS__
-        bcc     memlo_ok
+        lda     #<__STARTADDRESS__
+        cmp     MEMLO
+        lda     #>__STARTADDRESS__
+        sbc     MEMLO+1
+        bcs     memlo_ok
 
 ; load address was too low
         print_string2 lmemerr_txt, lmemerr_txt_len

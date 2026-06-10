@@ -95,12 +95,7 @@ long __fastcall__ ria_call_long (unsigned char op);
 #define RIA_OP_EXEC 0x09
 #define RIA_OP_ATTR_GET 0x0A
 #define RIA_OP_ATTR_SET 0x0B
-#define RIA_OP_TZSET 0x0D
-#define RIA_OP_TZQUERY 0x0E
 #define RIA_OP_CLOCK 0x0F
-#define RIA_OP_CLOCK_GETRES 0x10
-#define RIA_OP_CLOCK_GETTIME 0x11
-#define RIA_OP_CLOCK_SETTIME 0x12
 #define RIA_OP_OPEN 0x14
 #define RIA_OP_CLOSE 0x15
 #define RIA_OP_READ_XSTACK 0x16
@@ -132,6 +127,12 @@ long __fastcall__ ria_call_long (unsigned char op);
 #define RIA_OP_RLN_LASTKEY 0x30
 #define RIA_OP_RLN_PEEK 0x31
 #define RIA_OP_RLN_POKE 0x32
+#define RIA_OP_TIME_GET 0x38
+#define RIA_OP_TIME_SET 0x39
+#define RIA_OP_GMTIME 0x3A
+#define RIA_OP_LOCALTIME 0x3B
+#define RIA_OP_MKTIME 0x3C
+#define RIA_OP_STRFTIME 0x3D
 
 /* RIA attribute IDs */
 
@@ -147,6 +148,7 @@ long __fastcall__ ria_call_long (unsigned char op);
 #define RIA_ATTR_RLN_CAPS 0x09
 #define RIA_ATTR_RLN_WIDTH 0x0A
 #define RIA_ATTR_RLN_HEIGHT 0x0B
+#define RIA_ATTR_RLN_SUPPRESS_NL 0x0C
 
 /* C API for the operating system. */
 
@@ -194,6 +196,7 @@ int __fastcall__ f_getfree (const char* name, unsigned long* free, unsigned long
 int __fastcall__ ria_rln_lastkey (char* key, unsigned char* action);
 int __fastcall__ ria_rln_peek (char* peek, unsigned char* pos);
 int __fastcall__ ria_rln_poke (const char* poke);
+int __fastcall__ time_set (unsigned long time);
 
 /* XREG location helpers */
 

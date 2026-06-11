@@ -37,7 +37,6 @@ RIA_OP_ARGV               := $08
 RIA_OP_EXEC               := $09
 RIA_OP_ATTR_GET           := $0A
 RIA_OP_ATTR_SET           := $0B
-RIA_OP_CLOCK              := $0F
 RIA_OP_OPEN               := $14
 RIA_OP_CLOSE              := $15
 RIA_OP_READ_XSTACK        := $16
@@ -69,12 +68,12 @@ RIA_OP_GETFREE            := $2E
 RIA_OP_RLN_LASTKEY        := $30
 RIA_OP_RLN_PEEK           := $31
 RIA_OP_RLN_POKE           := $32
-RIA_OP_TIME_GET           := $38
-RIA_OP_TIME_SET           := $39
 RIA_OP_GMTIME             := $3A
 RIA_OP_LOCALTIME          := $3B
 RIA_OP_MKTIME             := $3C
 RIA_OP_STRFTIME           := $3D
+RIA_OP_TIME_SET           := $3E
+RIA_OP_TIME_GET           := $3F
 
 ; RIA attribute IDs
 RIA_ATTR_ERRNO_OPT        := $00
@@ -90,6 +89,10 @@ RIA_ATTR_RLN_CAPS         := $09
 RIA_ATTR_RLN_WIDTH        := $0A
 RIA_ATTR_RLN_HEIGHT       := $0B
 RIA_ATTR_RLN_SUPPRESS_NL  := $0C
+RIA_ATTR_CLK_RUN_MS       := $10
+RIA_ATTR_CLK_RUN_CS       := $11
+RIA_ATTR_CLK_RUN_DS       := $12
+RIA_ATTR_CLK_RUN_S        := $13
 
 ; 6522 VIA
 VIA             := $FFD0        ; VIA base address

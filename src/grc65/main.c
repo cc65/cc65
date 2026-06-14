@@ -111,6 +111,9 @@ int apple = 0;
 char outputCMode[2] = "w";
 char outputSMode[2] = "w";
 
+static const char *ParsePos;
+static unsigned LineNum = 1;
+
 
 static void Usage (void)
 {
@@ -160,7 +163,6 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
         default:
             /* Target is known but unsupported */
             AbEnd ("Unsupported target system '%s'", Arg);
-            break;
     }
 }
 
@@ -246,22 +248,52 @@ static int findToken (const char * const *tokenTbl, const char *token)
 }
 
 
+static void ParseInit (char *buf)
+{
+    ParsePos = buf;
+    LineNum = 1;
+}
+
+static char *ParseTok (const char *delim)
+{
+    while (*ParsePos && strchr (delim, *ParsePos)) {
+        if (*ParsePos == '\n') {
+            ++LineNum;
+        }
+        ++ParsePos;
+    }
+    if (!*ParsePos) return 0;
+
+    char *start = (char *) ParsePos;
+    while (*ParsePos && !strchr (delim, *ParsePos)) {
+        ++ParsePos;
+    }
+
+    if (*ParsePos) {
+        *(char *) ParsePos = '\0';
+        ++ParsePos;
+    }
+
+    return start;
+}
+
+
 static char *nextPhrase (void)
 {
-    return strtok (NULL, "\"");
+    return ParseTok ("\"");
 }
 
 
 static char *nextWord (void)
 {
-    return strtok (NULL, " ");
+    return ParseTok (" \n\r");
 }
 
 
 static void setLen (char *name, unsigned len)
 {
     if (strlen (name) > len) {
-        fprintf (stderr, "Warning: string truncated to %u characters\n", len);
+        fprintf (stderr, "Warning: String %lu characters too long (line %u)\n", strlen (name) - len, LineNum);
         name[len] = '\0';
     }
 }
@@ -895,8 +927,7 @@ static char *filterInput (FILE *F, char *tbl)
         if (i >= BLOODY_BIG_BUFFER) {
             AbEnd ("File too large for internal parsing buffer (%d bytes)",BLOODY_BIG_BUFFER);
         }
-        if (((a == '\n') || (a == '\015')) ||
-            (a == ',' && quote)) {
+        if (a == ',' && quote) {
             a = ' ';
         }
         if (a == '\042') {
@@ -915,7 +946,10 @@ static char *filterInput (FILE *F, char *tbl)
             tbl = xrealloc (tbl, i + 1);
             break;
         }
-        if (IsSpace (a)) {
+        if (a == '\n' || a == '\r') {
+            tbl[i++] = a;
+            prevchar = a;
+        } else if (IsSpace (a)) {
             if ((prevchar != ' ') && (prevchar != -1)) {
                 tbl[i++] = ' ';
                 prevchar = ' ';
@@ -925,10 +959,9 @@ static char *filterInput (FILE *F, char *tbl)
                 do {
                     a = getc (F);
                 } while (a != '\n' && a != EOF);
-                /* Don't discard this newline/EOF, continue to next loop.
-                ** A previous implementation used fseek(F,-1,SEEK_CUR),
-                ** which is invalid for text mode files, and was unreliable across platforms.
-                */
+                if (a == '\n') {
+                    ungetc (a, F);
+                }
                 continue;
             } else {
                 tbl[i++] = a;
@@ -960,7 +993,8 @@ static void processFile (const char *filename)
 
     str = filterInput (F, xmalloc (BLOODY_BIG_BUFFER));
 
-    token = strtok (str, " ");
+    ParseInit (str);
+    token = ParseTok (" \n\r");
 
     do {
         if (str != NULL) {

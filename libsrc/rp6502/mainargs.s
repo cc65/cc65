@@ -32,9 +32,9 @@
     pha
     phx
     jsr     _argv_mem
-    ply             
+    ply
     sty     ptr2+1
-    ply             
+    ply
     sty     ptr2
 
     ; Bail if no memory.

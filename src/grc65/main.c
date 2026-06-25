@@ -293,7 +293,7 @@ static char *nextWord (void)
 static void setLen (char *name, unsigned len)
 {
     if (strlen (name) > len) {
-        fprintf (stderr, "Warning: String %lu characters too long (line %u)\n", strlen (name) - len, LineNum);
+        fprintf (stderr, "Warning: String %zu characters too long (line %u)\n", strlen (name) - len, LineNum);
         name[len] = '\0';
     }
 }

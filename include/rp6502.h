@@ -206,6 +206,7 @@ int __fastcall__ time_set (unsigned long time);
 #define xreg_ria_keyboard(...) xreg(0, 0, 0, __VA_ARGS__)
 #define xreg_ria_mouse(...) xreg(0, 0, 1, __VA_ARGS__)
 #define xreg_ria_gamepad(...) xreg(0, 0, 2, __VA_ARGS__)
+#define xreg_ria_tablet(...) xreg(0, 0, 3, __VA_ARGS__)
 #define xreg_vga_canvas(...) xreg(1, 0, 0, __VA_ARGS__)
 #define xreg_vga_mode(...) xreg(1, 0, 1, __VA_ARGS__)
 

@@ -2,5 +2,5 @@
 
 int __fastcall__ phi2 (void)
 {
-    return ria_call_int (RIA_OP_PHI2);
+    return ria_attr_get (RIA_ATTR_PHI2_KHZ);
 }

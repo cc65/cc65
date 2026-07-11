@@ -19,7 +19,9 @@ ___errno        := RIA_ERRNO
 
 ; Request the RIA use cc65 values for RIA_ERRNO
 _errno_opt_constructor:
-        lda #$01 ; 1 = cc65
+        lda #RIA_ATTR_ERRNO_OPT
         sta RIA_A
-        lda #RIA_OP_ERRNO_OPT
+        lda #$01 ; 1 = cc65
+        sta RIA_XSTACK
+        lda #RIA_OP_ATTR_SET
         jmp _ria_call_int

@@ -3,5 +3,5 @@
 
 clock_t __fastcall__ clock (void)
 {
-    return ria_call_long (RIA_OP_CLOCK);
+    return ria_attr_get (RIA_ATTR_CLK_RUN_MS);
 }

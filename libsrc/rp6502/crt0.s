@@ -4,7 +4,7 @@
 ; crt0.s
 
 .export _init, _exit
-.import _main
+.import callmain
 
 .export __STARTUP__ : absolute = 1
 .import __RAM_START__, __RAM_SIZE__
@@ -34,7 +34,7 @@ _init:
     jsr initlib   ; Run constructors
 
 ; Call main()
-    jsr _main
+    jsr callmain
 
 ; Back from main() also the _exit entry
 ; Stack the exit value in case destructors call OS

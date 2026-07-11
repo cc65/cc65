@@ -2,6 +2,6 @@
 
 int __fastcall__ code_page (int cp)
 {
-    ria_set_ax (cp);
-    return ria_call_int (RIA_OP_CODE_PAGE);
+    ria_attr_set (cp, RIA_ATTR_CODE_PAGE);
+    return ria_attr_get (RIA_ATTR_CODE_PAGE);
 }

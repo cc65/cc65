@@ -87,7 +87,7 @@ struct tm {
 #elif defined(__GEOS__)
 #  define CLOCKS_PER_SEC        1
 #elif defined (__RP6502__)
-#  define CLOCKS_PER_SEC        100
+#  define CLOCKS_PER_SEC        1000
 #elif defined(__TELESTRAT__)
 #  define CLOCKS_PER_SEC        10
 #elif defined(__ATARI__) || defined (__LYNX__)

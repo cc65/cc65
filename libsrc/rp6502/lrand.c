@@ -2,5 +2,5 @@
 
 long __fastcall__ lrand (void)
 {
-    return ria_call_long (RIA_OP_LRAND);
+    return ria_attr_get (RIA_ATTR_LRAND);
 }

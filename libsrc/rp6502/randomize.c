@@ -3,5 +3,5 @@
 
 void _randomize (void)
 {
-    srand (ria_call_int (RIA_OP_LRAND));
+    srand (ria_attr_get (RIA_ATTR_LRAND));
 }

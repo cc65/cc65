@@ -121,6 +121,12 @@ SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, SymFindAction Acti
 ** created, or - in case Action is SYM_FIND_EXISTING - return 0.
 */
 
+SymEntry* SymFindInChildren (SymTable* Scope, const StrBuf* Name);
+/* Find a symbol in children scopes of given scope (if they exist). The
+** function will never create a new symbol, since this can only be done in one
+** specific scope.
+*/
+
 SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action);
 /* Find a new symbol table entry in the given table. If Action contains
 ** SYM_ALLOC_NEW and the entry is not found, create a new one. Return the

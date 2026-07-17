@@ -9,11 +9,17 @@ int __fastcall__ ria_execv (const char* path, char* const argv[])
     int argc;
     unsigned int total_str;
     unsigned int offset;
+    size_t len;
     int i, j;
 
     /* path becomes argv[0] */
     ptrs[0] = path;
-    lens[0] = (unsigned int)strlen (path) + 1U;
+    len = strlen (path);
+    if (len >= 512U) {
+        errno = EINVAL;
+        return -1;
+    }
+    lens[0] = (unsigned int)len + 1U;
     argc = 1;
     total_str = lens[0];
 
@@ -25,12 +31,14 @@ int __fastcall__ ria_execv (const char* path, char* const argv[])
             return -1;
         }
         ptrs[argc] = argv[i];
-        lens[argc] = (unsigned int)strlen (argv[i]) + 1U;
-        total_str += lens[argc];
-        if (total_str > 512U) {
+        len = strlen (argv[i]);
+        if (len >= 512U ||
+            (unsigned int)len + 1U > 512U - total_str) {
             errno = EINVAL;
             return -1;
         }
+        lens[argc] = (unsigned int)len + 1U;
+        total_str += lens[argc];
         argc++;
         i++;
     }

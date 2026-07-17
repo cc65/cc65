@@ -1389,15 +1389,13 @@ CharAgain:
 
         case '/':
             NextChar ();
-            if (C != '*') {
-                CurTok.Tok = TOK_DIV;
-            } else if (CComments) {
+            if (C == '*' && CComments) {
                 /* Remember the position, then skip the '*' */
                 Collection LineInfos = STATIC_COLLECTION_INITIALIZER;
                 GetFullLineInfo (&LineInfos);
                 NextChar ();
                 do {
-                    while (C !=  '*') {
+                    while (C != '*') {
                         if (C == EOF) {
                             LIError (&LineInfos, "Unterminated comment");
                             ReleaseFullLineInfo (&LineInfos);
@@ -1412,6 +1410,8 @@ CharAgain:
                 ReleaseFullLineInfo (&LineInfos);
                 DoneCollection (&LineInfos);
                 goto Again;
+            } else {
+                CurTok.Tok = TOK_DIV;
             }
             return;
 

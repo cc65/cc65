@@ -105,6 +105,9 @@
   Describes the o65 file format that is used for dynamically loadable modules
   and LUnix programs.
 
+  <tag><htmlurl url="dbginfo.html" name="dbginfo.html"></tag>
+  Describes the debug info file format.
+
 </descrip>
 
 

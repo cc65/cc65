@@ -11,12 +11,18 @@ int __cdecl__ ria_execl (const char* path, ...)
     int argc;
     unsigned int total_str;
     unsigned int offset;
+    size_t len;
     int i, j;
     const char* s;
 
     /* path becomes argv[0] */
     ptrs[0] = path;
-    lens[0] = (unsigned int)strlen (path) + 1U;
+    len = strlen (path);
+    if (len >= 512U) {
+        errno = EINVAL;
+        return -1;
+    }
+    lens[0] = (unsigned int)len + 1U;
     argc = 1;
     total_str = lens[0];
 
@@ -33,13 +39,15 @@ int __cdecl__ ria_execl (const char* path, ...)
             return -1;
         }
         ptrs[argc] = s;
-        lens[argc] = (unsigned int)strlen (s) + 1U;
-        total_str += lens[argc];
-        if (total_str > 512U) {
+        len = strlen (s);
+        if (len >= 512U ||
+            (unsigned int)len + 1U > 512U - total_str) {
             va_end (ap);
             errno = EINVAL;
             return -1;
         }
+        lens[argc] = (unsigned int)len + 1U;
+        total_str += lens[argc];
         argc++;
     }
     va_end (ap);

@@ -828,6 +828,8 @@ static void ReadStringConst (int StringTerm)
     /* Read the string */
     while (1) {
         int Cooked = 1;
+        int HaveLookahead = 0;
+        int Lookahead = 0;
         NeedNext = 1;
 
         if (StringTerm == 0 && SB_GetLen (&CurTok.SVal) == 1) {
@@ -920,8 +922,12 @@ static void ReadStringConst (int StringTerm)
                            Final = (Final << 3) | DigitVal (C);
                            NextChar ();
                         }
-                        if (C >= 256)
+                        Lookahead = C;
+                        HaveLookahead = 1;
+                        C = Final;
+                        if (Final >= 256) {
                             Error ("Octal character constant out of range");
+                        }
                     }
                     break;
                 case 'X':
@@ -946,7 +952,9 @@ static void ReadStringConst (int StringTerm)
         /* Append the char to the string */
         SB_AppendCharCooked (&CurTok.SVal, C, Cooked);
 
-        if (NeedNext) {
+        if (HaveLookahead) {
+            C = Lookahead;
+        } else if (NeedNext) {
             /* Skip the character */
             NextChar ();
             NeedNext = 1;

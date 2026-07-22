@@ -2,9 +2,9 @@
 ; mainargs.s
 ;
 
-; Lower priority than initheap so argv_mem() can use malloc().
+; Lower priority than initheap so __argv_mem() can use malloc().
 .constructor initmainargs, 23
-.import __argc, __argv, _argv_mem
+.import __argc, __argv, ___argv_mem
 .import incax2
 .importzp ptr1, ptr2
 .include "rp6502.inc"
@@ -26,12 +26,12 @@
     ora     ptr2
     beq     zxstack    ; count == 0
 
-    ; Request memory; _argv_mem may clobber.
+    ; Request memory; __argv_mem may clobber.
     lda     ptr2
     ldx     ptr2+1
     pha
     phx
-    jsr     _argv_mem
+    jsr     ___argv_mem
     ply
     sty     ptr2+1
     ply

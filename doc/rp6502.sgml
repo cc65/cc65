@@ -2,7 +2,7 @@
 
 <article>
 <title>Picocomputer 6502 - specific information for cc65
-<author><url url="mailto:uz@cc65.org" name="Ullrich von Bassewitz">
+<author><url url="https://github.com/rumbledethumps" name="Rumbledethumps">
 
 <abstract>
 An overview over the Picocomputer 6502 and its interfaces to the cc65 C

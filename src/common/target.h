@@ -72,6 +72,7 @@ typedef enum {
     TGT_BBC,
     TGT_APPLE2,
     TGT_APPLE2ENH,
+    TGT_APPLE3,
     TGT_GEOS_CBM,
     TGT_CREATIVISION,
     TGT_GEOS_APPLE,

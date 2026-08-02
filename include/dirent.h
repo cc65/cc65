@@ -45,7 +45,7 @@
 
 typedef struct DIR DIR;
 
-#if defined(__APPLE2__)
+#if defined(__APPLE2__) || defined(__APPLE3__)
 
 struct dirent {
     char            d_name[16];

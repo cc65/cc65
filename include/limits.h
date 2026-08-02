@@ -65,7 +65,7 @@
 #if __CC65_STD__ >= __CC65_STD_CC65__
 /* These defines that are platform dependent */
 /* FILENAME_MAX in stdlib.h is defined as the same value as PATH_MAX */
-#if defined(__APPLE2__)
+#if defined(__APPLE2__) || defined(__APPLE3__)
 #  define PATH_MAX      (64+1)
 #elif defined(__ATARI__)
 #  define PATH_MAX      (63+1)

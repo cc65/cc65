@@ -36,6 +36,7 @@ GEOS = geos-apple \
 TARGETS = agat         \
           apple2       \
           apple2enh    \
+          apple3       \
           atari        \
           atarixl      \
           atari2600    \

@@ -41,7 +41,7 @@ _IOLBF          = 1
 _IONBF          = 2
 BUFSIZ          = 256
 EOF             = -1
-.if .defined(__APPLE2__)
+.if .defined(__APPLE2__) || .defined(__APPLE3__)
 FILENAME_MAX    = 64+1
 .elseif .defined(__ATARI__)
 FILENAME_MAX    = 63+1

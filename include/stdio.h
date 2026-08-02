@@ -76,7 +76,7 @@ extern FILE* stderr;
 /* These defines that are platform dependent */
 /* FILENAME_MAX is defined as the same value as PATH_MAX in limits.h, but we
    are not allowed to include limits.h here */
-#if defined(__APPLE2__)
+#if defined(__APPLE2__) || defined(__APPLE3__)
 #  define FILENAME_MAX      (64+1)
 #elif defined(__ATARI__)
 #  define FILENAME_MAX      (63+1)

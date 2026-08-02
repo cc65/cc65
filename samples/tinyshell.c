@@ -14,6 +14,10 @@
 #define HAVE_SUBDIRS
 #endif
 
+#ifdef __APPLE3__
+#define HAVE_SUBDIRS
+#endif
+
 #ifdef __CC65__
 #define CHECK_SP
 #endif

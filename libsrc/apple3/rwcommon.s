@@ -29,8 +29,8 @@ rwcommon:
         sta     sosparam + SOS::RW::REF_NUM
 
         ; Set buf and count
-        ; buf (ptr1) goes to mliparam + MLI::RW::DATA_BUFFER,
-        ; count (ptr2) goes to mliparam + MLI::RW::REQUEST_COUNT
+        ; buf (ptr1) goes to sosparam + SOS::RW::DATA_BUFFER,
+        ; count (ptr2) goes to sosparam + SOS::RW::REQUEST_COUNT
         ; Make sure both are at expected offset so we can copy them
         ; in a small loop.
         .assert ptr2 = ptr1 + 2, error

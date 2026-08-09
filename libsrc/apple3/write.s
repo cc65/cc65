@@ -7,7 +7,7 @@
 
         .export         _write
         .import         rwprolog, rwcommon, writeepilog
-        .import         _cputc
+        .import         _cputc, consref
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -63,49 +63,6 @@ write2: ldy     #WRITE_CALL
         jmp     rwcommon
 
 
-        ; Save count for epilog
-device: ldx     ptr2
-        lda     ptr2+1
-        stx     sosparam + SOS::RW::TRANS_COUNT
-        sta     sosparam + SOS::RW::TRANS_COUNT+1
-
-        ; Check for zero count
-        ora     ptr2
-        beq     done
-
-        ; Get char from buf
-        ldy     #$00
-next:   tya                     ; save Y and X
-        pha
-        txa
-        pha
-        lda     (ptr1),y
-        cmp     #$0A            ; test for \n = line feed
-        bne     :+
-        jsr     _cputc
-        lda     #$0D            ; send carriage return
-:       jsr     _cputc
-        pla
-        tax
-        pla
-        tay
-
-        ; Increment pointer
-        iny
-        bne     :+
-        inc     ptr1+1
-
-        ; Decrement count
-:       dex
-        bne     next
-        dec     ptr2+1
-        bpl     next
-
-        ; Return success
-done:   lda     #$00
-        jmp     writeepilog
-
-
         ; Load errno code
 einval: lda     #EINVAL
 
@@ -114,4 +71,115 @@ errno:  jmp     ___directerrno
 
         ; Set ___oserror
 oserr:  jmp     ___mappederrno
+        
 
+        ; Save request count for return
+device: ldx     ptr2
+        stx     tmp3
+        stx     ptr3
+        lda     ptr2+1
+        sta     tmp4
+        sta     ptr3+1
+
+        ; Set console ref
+        ldy     consref
+        sty     sosparam + SOS::RW::REF_NUM
+
+        ; Check for zero count
+        ora     ptr2
+        beq     done
+
+        ; check for zero low byte with non zero high byte
+        txa
+        bne     :+
+        dec     ptr3+1
+
+        ; Copy ptr1 to ptr4 to use for scan pos
+:       lda     ptr1
+        sta     ptr4
+        lda     ptr1+1
+        sta     ptr4+1
+
+        ; Check char from buf
+        ldy     #$00            ; y = chunk size low byte
+        sty     ptr2+1          ; zero chunk size high byte
+next:   lda     (ptr4),y
+        cmp     #$0A            ; test for \n = line feed
+        beq     havelf
+
+        ; Increment pointer
+        iny
+        bne     :+
+        inc     ptr4+1
+        inc     ptr2+1
+
+        ; Decrement count
+:       dex
+        bne     next
+        lda     ptr3+1
+        beq     outdone
+        dec     ptr3+1
+        ldx     #$00
+        beq     next
+
+        ; Output when we get a lf
+havelf: iny
+        jsr     output
+        lda     #$0D            ; send carriage return
+        jsr     _cputc
+
+        ; Update ptr1
+        lda     ptr1
+        clc
+        adc     ptr2
+        sta     ptr1
+        lda     ptr1+1
+        adc     ptr2+1
+        sta     ptr1+1
+
+        ; ptr4 = new chunk start
+        lda     ptr1
+        sta     ptr4
+        lda     ptr1+1
+        sta     ptr4+1
+
+        ; Restore X, Y
+        ldx     ptr3
+        ldy     #0
+        sty     ptr2+1
+
+        ; Dec count for lf, and exit if done
+        dex
+        bne     next
+        lda     ptr3+1
+        beq     done
+        dec     ptr3+1
+        ldx     #$00
+        beq     next
+
+        ; Output whatever is left
+outdone:
+        jsr     output
+
+
+        ; Return success
+done:   lda     #$00
+        sta     ___oserror      ; A = 0
+        lda     tmp3            ; original requested bytes
+        ldx     tmp4
+        rts
+
+        ; output to console
+output: sty     ptr2           ; save Y
+        stx     ptr3           ; save X
+
+        ldx     #$03
+:       lda     ptr1,x
+        sta     sosparam + SOS::RW::DATA_BUFFER,x
+        dex
+        bpl     :-
+
+        lda     #WRITE_CALL
+        ldx     #WRITE_COUNT
+        jsr     callsos
+        rts

@@ -4,13 +4,12 @@
 ; signed char __fastcall__ videomode (unsigned mode);
 ;
         .export  _videomode
-        .import  _cputc, consvpwidth, consvpheight
+        .import  putcdirect, consvpwidth, consvpheight
 
         .include        "apple3.inc"
 
 _videomode:
-        pha                             ; save mode
-
+        pha                         ; Save mode
         ldy     #80
         cmp     #VIDEOMODE_80x24
         beq     :+
@@ -18,9 +17,8 @@ _videomode:
 :       sty     consvpwidth
         ldy     #24
         sty     consvpheight
-
         lda     #CONSOLE_TEXT_MODE
-        jsr     _cputc
+        jsr     putcdirect
         pla
-        jsr     _cputc
+        jsr     putcdirect
         rts

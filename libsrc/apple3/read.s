@@ -7,7 +7,7 @@
 
         .export         _read
         .import         rwprolog, rwcommon
-        .import         getchar, _cputc
+        .import         getchar, _cputc, putcdirect
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -52,7 +52,7 @@ device: lda     #$00
 
         ; Turn cursor on
         lda     #CONSOLE_CURSOR_ON
-        jsr     _cputc
+        jsr     putcdirect
 
         ; Read from device
 next:   jsr     getchar

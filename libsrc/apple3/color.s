@@ -14,12 +14,20 @@
 
 _textcolor:
         sta     colbuf+1
+        ldx     consforecolor
+        sta     consforecolor
+        txa
+        pha
         lda     #CONSOLE_FORE_COLOR
         sta     colbuf
         bne     :+
 
 _bgcolor:
         sta     colbuf+1
+        ldx     consforecolor
+        ldx     consforecolor
+        txa
+        pha
         lda     #CONSOLE_BACK_COLOR
         sta     colbuf
         bne     :+
@@ -32,6 +40,7 @@ _bordercolor    := return0
         brk
         .byte   WRITE_CALL
         .addr   collist
+        pla
         rts
 
         .data
@@ -44,3 +53,9 @@ colref:   .byte   0
 
 colbuf:   .byte   00
           .byte   00
+
+consforecolor:
+        .byte   15
+consbackcolor:
+        .byte   0
+

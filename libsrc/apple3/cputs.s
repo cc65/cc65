@@ -9,8 +9,8 @@
 ; Output in one SOS call to improve console speed
 ;
 
-        .export         _cputsxy, _cputs, wrconss
-        .import         gotoxy, consref
+        .export         _cputsxy, _cputs
+        .import         gotoxy, wrconss
         .importzp       ptr1
 
         .include        "sos.inc"
@@ -40,11 +40,5 @@ _cputs: sta     ptr1
 :       sty     sosparam + SOS::RW::REQUEST_COUNT
 
         ; write it out        
-wrconss:
-        lda     consref
-        sta     sosparam + SOS::RW::REF_NUM
+        jmp     wrconss
 
-        lda     #WRITE_CALL
-        ldx     #WRITE_COUNT
-        jsr     callsos
-        rts

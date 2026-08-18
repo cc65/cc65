@@ -140,6 +140,7 @@ void peektest(void)
 // TODO: cpeeks() implementation missing for those:
 #if !defined(__APPLE2__) && \
     !defined(__APPLE2ENH__) && \
+    !defined(__APPLE3__) && \
     !defined(__ATARI__) && \
     !defined(__CX16__) && \
     !defined(__NES__) && \

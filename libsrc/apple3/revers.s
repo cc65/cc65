@@ -6,7 +6,7 @@
 ;
 
         .export         _revers
-        .import         _cputc, consinvflg
+        .import         putcdirect, consinvflg
 
         .include        "apple3.inc"
 
@@ -16,7 +16,7 @@ _revers:
         lda     #CONSOLE_INVERSE
         bne     :+
 normal: lda     #CONSOLE_NORMAL
-:       jsr     _cputc
+:       jsr     putcdirect
         lda     #$00            ; Preload return code for "normal"
         ldy     consinvflg      ; Load current flag value
         stx     consinvflg      ; Save new flag value

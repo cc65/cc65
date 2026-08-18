@@ -8,7 +8,8 @@
 ;
 
         .export         _cputcxy, _gotoxy, _gotox, _gotoy, gotoxy
-        .import         consref, popa ;, newline, putchar, putchardirect
+        .import         consref, popa
+        .import         setconioscr, consscrflg
 
         .include        "apple3.inc"
         .include        "sos.inc"
@@ -24,6 +25,11 @@ _cputcxy:
         sta     xybuf+1
         lda     consref
         sta     putcxyref     
+
+        bit     consscrflg    ; check if scroll is off
+        beq     :+
+        jsr     setconioscr
+:
         brk
         .byte   WRITE_CALL
         .word   putcxycon

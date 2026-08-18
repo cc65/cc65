@@ -7,7 +7,7 @@
 
         .export         _write
         .import         rwprolog, rwcommon, writeepilog
-        .import         _cputc, consref
+        .import         putcdirect, consref, setstdioscr, consscrflg
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -126,7 +126,7 @@ next:   lda     (ptr4),y
 havelf: iny
         jsr     output
         lda     #$0D            ; send carriage return
-        jsr     _cputc
+        jsr     putcdirect
 
         ; Update ptr1
         lda     ptr1
@@ -179,6 +179,10 @@ output: sty     ptr2           ; save Y
         dex
         bpl     :-
 
+        bit     consscrflg    ; check if scroll is on
+        bne     :+
+        jsr     setstdioscr
+:
         lda     #WRITE_CALL
         ldx     #WRITE_COUNT
         jsr     callsos

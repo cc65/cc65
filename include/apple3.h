@@ -93,17 +93,48 @@
 #define CH_F10  0xB0
 
 
-#define CH_HLINE        0x5F
-#define CH_VLINE        0x1F
+/* Functions that we'll use to go with either Normal or MouseText font to draw boxes and lines */
+void dyn_chline (unsigned char h, unsigned char length);
+void dyn_cvline (unsigned char v, unsigned char length);
+void dyn_chlinexy (unsigned char h, unsigned char x, unsigned char y, unsigned char length);
+void dyn_cvlinexy (unsigned char v, unsigned char x, unsigned char y, unsigned char length);
+
+#if defined(DYN_BOX_DRAW)
+/* When the user defines DYN_BOX_DRAW, we'll assume they have the mousetext font loaded in the first 32 chars */
+
+#define CH_HLINE        '_'
+#define CH_VLINE        0x9F
+#define CH_ULCORNER     '_'
+#define CH_URCORNER     0x20
+#define CH_LLCORNER     0x94
+#define CH_LRCORNER     0x9F
+#define CH_TTEE         '_'
+#define CH_BTEE         0x94
+#define CH_LTEE         0x94
+#define CH_RTEE         0x9F
+#define CH_CROSS        0x94
+
+#else
+/* Otherwise, fallback to safety and don't use MouseText at all. */
+
+#define CH_HLINE        '-'
+#define CH_VLINE        '|'
 #define CH_ULCORNER     '+'
 #define CH_URCORNER     '+'
 #define CH_LLCORNER     '+'
 #define CH_LRCORNER     '+'
-#define CH_TTEE         0x5F
-#define CH_BTEE         0x14
-#define CH_LTEE         0x14
-#define CH_RTEE         0x1F
-#define CH_CROSS        0x14
+#define CH_TTEE         '+'
+#define CH_BTEE         '+'
+#define CH_LTEE         '+'
+#define CH_RTEE         '+'
+#define CH_CROSS        '+'
+
+#endif /* DYN_BOX_DRAW */
+
+#define _chline(length)         dyn_chline(CH_HLINE, length)
+#define _chlinexy(x, y, length) dyn_chlinexy(CH_HLINE, x ,y, length)
+#define _cvline(length)         dyn_cvline(CH_VLINE, length)
+#define _cvlinexy(x, y, length) dyn_cvlinexy(CH_VLINE, x, y, length)
 
 
 /* Masks for joy_read */

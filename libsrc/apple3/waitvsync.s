@@ -4,10 +4,10 @@
 ; void waitvsync (void);
 ;
         .export         _waitvsync
-        .import         _cputc
+        .import         putcdirect
 
         .include        "apple3.inc"
 
 _waitvsync:
         lda     #CONSOLE_SCREEN_SYNC
-        jmp     _cputc  
+        jmp     putcdirect  

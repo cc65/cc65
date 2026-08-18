@@ -5,11 +5,11 @@
 ;
 
         .export         _clrscr
-        .import         _cputc
+        .import         putcdirect
 
         .include        "apple3.inc"
 
 _clrscr:
         lda     #CONSOLE_CLR_VIEWPORT
-        jmp     _cputc  
+        jmp     putcdirect  
 

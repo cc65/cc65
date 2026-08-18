@@ -5,9 +5,10 @@
 ;
 
         .constructor    initconio
-        .export         _cputc
+        .export         _cputc, putcdirect
         .export         consref, consdev, consinvflg
         .export         consvpwidth, consvpheight
+        .export         setconioscr, setstdioscr, consscrflg
         .import         cursor
 
         .include        "apple3.inc"
@@ -49,8 +50,9 @@ initconio:
         .byte   D_CONTROL_CALL
         .addr   setecho
 
-        lda     #0               ; init inverse flag = off
-        sta     consinvflg
+        lda     #0
+        sta     consinvflg       ; init inverse flag = off
+        sta     consscrflg       ; init scroll flag = off
 
         lda     #1               ; init cursor enabled
         sta     cursor
@@ -74,14 +76,14 @@ initconw:
 initconref:
         .byte   0
         .addr   initscr
-        .word   3
+        .word   5
 		
 initscr: 
-        .byte   16            ;set text mode
-        .byte   3             ;80x24
-        .byte   28            ;clear viewport
-      ;  .byte   21            ;cursor movement control
-      ;  .byte   9
+        .byte   16            ; set text mode
+        .byte   3             ; 80x24
+        .byte   28            ; clear viewport
+        .byte   21            ; cursor movement control
+        .byte   5             ; Scroll off
 
 ;get dev num param list
 getconsdev:
@@ -106,11 +108,41 @@ setechooff:
 ; Plot a character - also used as internal function
 ;  inline the call & param list to keep the code short
 _cputc:
+        cmp     #$0A
+        beq     :+
+        cmp     #$0D
+        beq     :+
+        ora     #$80
+:       bit     consscrflg    ; check if wrap is off
+        beq     putcdirect
+        pha
+        jsr     setconioscr
+        pla
+putcdirect:
         sta     charbuf
         brk
         .byte   WRITE_CALL
         .addr   writecon
         rts
+
+; Set the console scroll off for conio
+setconioscr:
+        inc     consscrflg
+        lda     #CONSOLE_CURSOR_MCTL
+        jsr     putcdirect
+        lda     #$05         ; Scroll off
+        jsr     putcdirect
+        rts
+
+; Set the console wrap on for stdio
+setstdioscr:
+        dec     consscrflg
+        lda     #CONSOLE_CURSOR_MCTL
+        jsr     putcdirect
+        lda     #$0D         ; Scroll on
+        jsr     putcdirect
+        rts
+
 
         .data
 
@@ -128,8 +160,9 @@ consref:
         .byte   0
 consdev:
         .byte   0
-
 consinvflg:
+        .byte   0
+consscrflg:                   ; wrap/scroll flag on/off for conio/stdio
         .byte   0
 consvpwidth:
         .byte   80

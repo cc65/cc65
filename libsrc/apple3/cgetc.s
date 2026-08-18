@@ -5,7 +5,7 @@
 ;
 
         .export         _cgetc, getchar
-        .import         cursor, _cputc, consref
+        .import         cursor, putcdirect, consref
 
         .include        "apple3.inc"
         .include        "sos.inc"
@@ -17,7 +17,7 @@ _cgetc:
 
 
         lda     #CONSOLE_CURSOR_ON
-        jsr     _cputc
+        jsr     putcdirect
 :
         jsr     getchar
         
@@ -27,7 +27,7 @@ _cgetc:
 
         pha
         lda     #CONSOLE_CURSOR_OFF
-        jsr     _cputc
+        jsr     putcdirect
         pla
 :       
         ldx     #>$0000
@@ -38,6 +38,9 @@ _cgetc:
 getchar:
         lda     consref
         sta     read_chref
+        lda     #0
+        sta     read_chref+5
+        sta     read_chref+6
         brk
         .byte   READ_CALL
         .addr   read_char

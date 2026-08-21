@@ -7,7 +7,8 @@
 
         .export         _read
         .import         rwprolog, rwcommon
-        .import         getchar, _cputc, putcdirect
+        .import         getchar, putcdirect
+        .import         setstdioscr, consscrflg
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -57,13 +58,20 @@ device: lda     #$00
         ; Read from device
 next:   jsr     getchar
 
+        ; Check scroll mode
+        bit     consscrflg    ; check if scroll is on
+        bne     :+
+        pha
+        jsr     setstdioscr
+        pla
+:
         ; We'll need Y=0 in both branches below
-        ldy     #$00
+        ldy     #$00        
 
         ; Check for '\r'
         cmp     #$0D
         bne     :+
-        jsr     _cputc     ; echo \r
+        jsr     putcdirect   ; echo \r
 
         ldy     #$00
         ; Replace with '\n' and set count to zero
@@ -75,7 +83,7 @@ next:   jsr     getchar
 :       sta     (ptr1),y
 
         pha                 ; echo here after cr->lf conversion
-        jsr     _cputc
+        jsr     putcdirect
         pla
 
         ; Increment pointer

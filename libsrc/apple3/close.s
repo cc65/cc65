@@ -11,6 +11,7 @@
 
         .include        "errno.inc"
         .include        "filedes.inc"
+        .include        "zeropage.inc"
 
 _close:
         ; Process fd
@@ -22,8 +23,10 @@ _close:
         beq     zerofd
 
         ; Close file
-        jsr     closedirect     ; Preserves Y
+        sty     tmp3            ; Save Y
+        jsr     closedirect
         bne     oserr
+        ldy     tmp3
 
         ; Mark fdtab slot as free
 zerofd: lda     #$00

@@ -34,20 +34,28 @@ _exec:
         jsr     sos_file_info_direct
         bne     soserr
 
-        ; Copy the path to top 64 bytes of interp space below stack
-        ; We can't call SOS from any sneaky memory
-        ; possible alternative would be to patch SOS
+        ; Patch SOS 1.3 to allow call from high memory
+        lda     E_REG
+        tax
+        and     #$F7             ; remove ram write protect 
+        sta     E_REG
+        lda     #$B9
+        sta     $F294
+        sta     $F2b3
+        stx     E_REG            ; restore
+
+        ; Copy the path to 64 bytes above interp space
         ldy     #$00
         lda     (c_sp),y
         tay
 :       lda     (c_sp),y
-        sta     $AFC0,y
+        sta     $B8C0,y
         dey
         bpl     :-
 
         ; If we get here the program file at least exists so we copy
         ; the loader stub right now and patch it later to set params
-        ; copy the load stub to just below the path, ie top of interp space
+        ; copy the load stub to just below the path
         ldx     #size - 1
 :       lda     source,x
         sta     target,x
@@ -79,7 +87,7 @@ _exec:
 source:
         ; Open program file
         ; PATHNAME parameter is already set (we reuse
-        ; the copy at $B7C0)
+        ; the copy at $B8C0)
         brk
         .byte   OPEN_CALL
         .word   open_param
@@ -129,7 +137,7 @@ jump:   jmp     (data_buffer)
 
 open_param      = * - source + target
         .byte   $04             ; PARAM_COUNT
-        .addr   $AFC0           ; PATHNAME
+        .addr   $B8C0           ; PATHNAME
 open_ref        = * - source + target  
         .byte   $00             ; refnum
         .word   $0              ; no option list
@@ -174,6 +182,4 @@ error:  brk
 
 size            = * - source
 
-target          = $AFC0 - size  ; Use $AF00-$AFC0 below C stack
-
-
+target          = $B8C0 - size  ; Use $B800-$B8C0

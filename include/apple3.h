@@ -243,5 +243,8 @@ void waitvsync (void);
 unsigned char xpeek (unsigned char xbyte, unsigned int addr);
 void xpoke (unsigned char xbyte, unsigned int addr, unsigned char val);
 
+/* get sos device driver name for device number */
+char* __fastcall__ getdevicename (unsigned char device, char* buf, size_t size);
+
 /* End of apple3.h */
 #endif

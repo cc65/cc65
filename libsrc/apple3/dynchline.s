@@ -49,7 +49,7 @@ chlinedirect:
 done:   rts
 
 
-        .data
+        .bss
 
 chlinbuf:
-        .res    80,0
+        .res    80

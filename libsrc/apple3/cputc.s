@@ -9,7 +9,7 @@
         .export         consref, consdev, consinvflg
         .export         consvpwidth, consvpheight
         .export         setconioscr, setstdioscr, consscrflg
-        .import         cursor
+        .import         cursor, xyref, yref
 
         .include        "apple3.inc"
         .include        "sos.inc"
@@ -28,6 +28,8 @@ initconio:
         sta     consref
         sta     initconref
         sta     writeref
+        sta     xyref     
+        sta     yref     
 
         ; Init console to 80x24
         brk

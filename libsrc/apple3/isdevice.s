@@ -38,7 +38,7 @@ isdevice:
         rts
 
 
-        .data
+        .bss
 
 devname: 
-        .res   16,0
+        .res   16

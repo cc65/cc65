@@ -8,6 +8,7 @@
 ;
 
         .export         _cputcxy, _gotoxy, _gotox, _gotoy, gotoxy
+        .export         xyref, yref
         .import         consref, popa
         .import         setconioscr, consscrflg
 
@@ -23,17 +24,13 @@ _cputcxy:
         sta     xybuf+3
         jsr     popa            ; Get X
         sta     xybuf+1
-        lda     consref
-        sta     putcxyref     
 
         bit     consscrflg    ; check if scroll is off
         beq     :+
         jsr     setconioscr
 :
-        brk
-        .byte   WRITE_CALL
-        .word   putcxycon
-        rts
+        lda     #5
+        bne     dowrite         ; bra
 
 gotoxy:
         jsr     popa            ; Get Y
@@ -42,65 +39,41 @@ _gotoxy:
         sta     xybuf+3
         jsr     popa            ; Get X
         sta     xybuf+1
-        lda     consref
-        sta     gotoxyref     
-        brk
-        .byte   WRITE_CALL
-        .word   gotoxycon
-        rts
+        lda     #4
+        bne     dowrite         ; bra
 
 _gotox:
         sta     xybuf+1
-        lda     consref
-        sta     gotoxref     
+        lda     #2
+
+dowrite:
+        sta     xycnt
         brk
         .byte   WRITE_CALL
-        .word   gotoxcon
+        .word   xycon
         rts
 
 _gotoy:
         sta     ybuf+1
-        lda     consref
-        sta     gotoyref     
         brk
         .byte   WRITE_CALL
-        .word   gotoycon
+        .word   ycon
         rts
+
 
         .data
 
-; cputcxy param list
-putcxycon:
-        .byte   3
-putcxyref:
-        .byte   0
+; xy param list
+xycon:  .byte   3
+xyref:  .byte   0
         .word   xybuf
-        .word   5
-
-; gotoxy param list
-gotoxycon:
-        .byte   3
-gotoxyref:
-        .byte   0
-        .word   xybuf
-        .word   4
-
-; gotox param list
-gotoxcon:
-        .byte   3
-gotoxref:
-        .byte   0
-        .word   xybuf
-        .word   2
+xycnt:  .word   0
 
 ; gotoy param list
-gotoycon:
-        .byte   3
-gotoyref:
-        .byte   0
+ycon:   .byte   3
+yref:   .byte   0
         .word   ybuf
         .word   2
-
 
 xybuf:  .byte   24  ; horizontal pso
         .byte   00

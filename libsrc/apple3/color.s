@@ -30,10 +30,6 @@ _bgcolor:
         pha
         lda     #CONSOLE_BACK_COLOR
         sta     colbuf
-        bne     :+
-
-_bordercolor    := return0
-
 
 :       lda     consref
         sta     colref
@@ -42,6 +38,9 @@ _bordercolor    := return0
         .addr   collist
         pla
         rts
+
+_bordercolor    := return0
+
 
         .data
 

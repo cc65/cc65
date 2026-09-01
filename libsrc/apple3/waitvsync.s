@@ -10,4 +10,4 @@
 
 _waitvsync:
         lda     #CONSOLE_SCREEN_SYNC
-        jmp     putcdirect  
+        jmp     putcdirect

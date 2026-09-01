@@ -39,6 +39,6 @@ _cputs: sta     ptr1
 
 :       sty     sosparam + SOS::RW::REQUEST_COUNT
 
-        ; write it out        
+        ; write it out
         jmp     wrconss
 

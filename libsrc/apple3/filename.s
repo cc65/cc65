@@ -28,9 +28,9 @@ pushname:
         lda     (ptr1),y
         cmp     #'/'
         beq     copy
-        
+
         ; Check for device pathname
-        cmp     #'.'  
+        cmp     #'.'
         beq     copy
 
         ; Check for system prefix

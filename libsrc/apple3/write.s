@@ -71,7 +71,7 @@ errno:  jmp     ___directerrno
 
         ; Set ___oserror
 oserr:  jmp     ___mappederrno
-        
+
 
         ; Save request count for return
 device: ldx     ptr2

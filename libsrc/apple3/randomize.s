@@ -12,6 +12,6 @@
 
 ___randomize:
         ldx     D_TIMER2C_L     ; Use VIA timer values
-        lda     E_TIMER2C_L 
+        lda     E_TIMER2C_L
         jmp     _srand          ; Initialize generator
 

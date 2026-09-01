@@ -22,7 +22,7 @@ next:   inc     tmp1
         lda     tmp1
         cmp     #$19            ; MAX DEVICE
         bcc     :+
-        
+
         lda     #$FF            ; INVALID_DEVICE
         bne     done
 

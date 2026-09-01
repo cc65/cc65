@@ -40,5 +40,5 @@ isdevice:
 
         .bss
 
-devname: 
+devname:
         .res   16

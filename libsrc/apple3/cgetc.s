@@ -20,7 +20,7 @@ _cgetc:
         jsr     putcdirect
 :
         jsr     getchar
-        
+
         ; Cursor on ?
         ldy     cursor
         beq     :+
@@ -29,7 +29,7 @@ _cgetc:
         lda     #CONSOLE_CURSOR_OFF
         jsr     putcdirect
         pla
-:       
+:
         ldx     #>$0000
         rts
 

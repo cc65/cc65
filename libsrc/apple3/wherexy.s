@@ -39,6 +39,6 @@ getpos: lda     consdev
 
         .data
 
-curspos: 
+curspos:
 cursorx:  .byte   00            ; horiz
 cursory:  .byte   00            ; vert

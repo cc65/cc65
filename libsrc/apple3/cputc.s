@@ -28,8 +28,8 @@ initconio:
         sta     consref
         sta     initconref
         sta     writeref
-        sta     xyref     
-        sta     yref     
+        sta     xyref
+        sta     yref
 
         ; Init console to 80x24
         brk
@@ -80,7 +80,7 @@ initconref:
         .addr   initscr
         .word   5
 
-initscr: 
+initscr:
         .byte   16            ; set text mode
         .byte   3             ; 80x24
         .byte   28            ; clear viewport
@@ -100,7 +100,7 @@ setecho:
         .byte   0
         .addr   setechooff    ; ctrl list
 
-setechooff: 
+setechooff:
         .byte   01            ; ctrl list length
         .byte   00            ; no echo
 

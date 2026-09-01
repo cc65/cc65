@@ -13,7 +13,7 @@
         .include        "joy-error.inc"
         .include        "apple3.inc"
         .include        "../sos.inc"
-        
+
         .macpack        module
 
 ; ------------------------------------------------------------------------

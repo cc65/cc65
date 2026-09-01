@@ -239,7 +239,7 @@ signed char __fastcall__ videomode (unsigned mode);
 void waitvsync (void);
 /* Wait for start of next frame */
 
-/* peep/poke supporting extended addressing to access full Apple /// memory */ 
+/* peep/poke supporting extended addressing to access full Apple /// memory */
 unsigned char xpeek (unsigned char xbyte, unsigned int addr);
 void xpoke (unsigned char xbyte, unsigned int addr, unsigned char val);
 

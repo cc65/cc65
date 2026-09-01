@@ -46,7 +46,7 @@ _dio_query_sectcount:
         ; Get total blocks and return
         lda     sosoption + OPTION::DINFO::TOTAL_BLOCKS
         ldx     sosoption + OPTION::DINFO::TOTAL_BLOCKS+1
-    
+
         rts
 
 

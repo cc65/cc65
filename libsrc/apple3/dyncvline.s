@@ -30,7 +30,7 @@ _dyn_cvline:
         beq     done            ; Jump if done
 
         jsr     getpos
-        lda     cursory         ; Set Y pos        
+        lda     cursory         ; Set Y pos
         sta     cvlinbuf+2
         lda     cursorx         ; Set X pos
         sta     cvlinbuf+4

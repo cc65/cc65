@@ -28,7 +28,7 @@ raisefilelevel:
         lda     #GET_LEVEL_CALL
         ldx     #GET_LEVEL_COUNT
         jsr     callsos
-        
+
         ldx     sosparam + SOS::LEVEL::LEVEL
         stx     LEVEL
         inx

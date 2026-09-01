@@ -31,7 +31,7 @@ callmain:
         jsr     _main
 
         ; Avoid a re-entrance of donelib. This is also the exit() entry.
-_exit: 
+_exit:
         ; Call the module destructors.
         jsr     donelib
 

@@ -50,7 +50,7 @@ callsos:
 :
 
 
-gosos:  
+gosos:
         ; Call SOS
         brk
 call:   .byte   $00

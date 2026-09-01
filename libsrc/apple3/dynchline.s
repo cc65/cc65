@@ -30,7 +30,7 @@ chlinedirect:
         beq     done            ; Jump if done
 
         sta     sosparam + SOS::RW::REQUEST_COUNT
-        tax     
+        tax
         lda     tmp1            ; Screen code
 :       sta     chlinbuf,x
         dex

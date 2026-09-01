@@ -11,5 +11,5 @@
 
 _clrscr:
         lda     #CONSOLE_CLR_VIEWPORT
-        jmp     putcdirect  
+        jmp     putcdirect
 

@@ -8,11 +8,11 @@
 
         .include        "sos.inc"
 
-        ; write chunk out to console        
+        ; write chunk out to console
 wrconss:
         lda     consref
         sta     sosparam + SOS::RW::REF_NUM
-        
+
         bit     consscrflg    ; check if scroll is off
         beq     :+
         jsr     setconioscr

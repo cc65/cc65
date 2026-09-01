@@ -198,7 +198,7 @@ GET_LEVEL_COUNT = 1
                                 PARAM_COUNT     .byte
                                 JOY_MODE        .byte
                                 JOY_STATUS      .byte 4
-                        .endstruct         
+                        .endstruct
                 .endunion
         .endstruct
 

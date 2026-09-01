@@ -87,7 +87,7 @@ seek_common:
         lda     #0
         sta     sosparam + SOS::SET_MARK::POSITION+3
         sta     sosparam + SOS::SET_MARK::BASE
-        
+
 
         ; Set file pointer
         lda     #SET_MARK_CALL

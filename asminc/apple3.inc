@@ -21,7 +21,7 @@ SPKRIII     :=  $C040   ; RW beeps speaker (Apple /// type)
 
 ;-----------------------------------------------------------------------------
 ; Video
-; 
+;
 ; Mode                             HIRES  MIX    TEXTGR
 ; 40 Char                (B/W)     0      0      0
 ; 40 Char                (Color    0      0      1
@@ -56,23 +56,23 @@ READSW2     :=  $C062   ; Read SW2
 READSW3     :=  $C063   ; Read SW3/SCO
 JOYRDY      :=  $C066   ; Read PDLOT (A/D Ramp Stop)
 CLOCK       :=  $C070   ; clock
-PHASOFF     :=  $C080   ; 
-PHASON      :=  $C081   ; 
-MOTOROFF    :=  $C088   ; 
-MOTORON     :=  $C089   ; 
-DRV0EN      :=  $C08A   ; 
-DRV1EN      :=  $C08B   ; 
-Q6L         :=  $C08C   ; 
-Q6H         :=  $C08D   ; 
-Q7L         :=  $C08E   ; 
+PHASOFF     :=  $C080   ;
+PHASON      :=  $C081   ;
+MOTOROFF    :=  $C088   ;
+MOTORON     :=  $C089   ;
+DRV0EN      :=  $C08A   ;
+DRV1EN      :=  $C08B   ;
+Q6L         :=  $C08C   ;
+Q6H         :=  $C08D   ;
+Q7L         :=  $C08E   ;
 DSA0CLR     :=  $C0D0   ; Clear Drive Select A0
 DSA0SET     :=  $C0D1   ; Set Drive Select A0
 DSA1CLR     :=  $C0D2   ; Clear Drive Select A1
 DSA1SET     :=  $C0D3   ; Set Drive Select A1
-EN1INTCLR   :=  $C0D4   ; 
-EN1INTSET   :=  $C0D5   ; 
-SIDE2CLR    :=  $C0D6   ; 
-SIDE2SET    :=  $C0D7   ; 
+EN1INTCLR   :=  $C0D4   ;
+EN1INTSET   :=  $C0D5   ;
+SIDE2CLR    :=  $C0D6   ;
+SIDE2SET    :=  $C0D7   ;
 SCRCLR      :=  $C0D8   ; Clear Smooth Scroll  (to turn smooth scroll off)
 SCRSET      :=  $C0D9   ; Set Smooth Scroll  (to turn smooth scroll on)
 ENCWRTCLR   :=  $C0DA   ; Clear Char Set writing

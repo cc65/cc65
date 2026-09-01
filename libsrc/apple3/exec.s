@@ -37,7 +37,7 @@ _exec:
         ; Patch SOS 1.3 to allow call from high memory
         lda     E_REG
         tax
-        and     #$F7             ; remove ram write protect 
+        and     #$F7             ; remove ram write protect
         sta     E_REG
         lda     #$B9
         sta     $F294
@@ -138,23 +138,23 @@ jump:   jmp     (data_buffer)
 open_param      = * - source + target
         .byte   $04             ; PARAM_COUNT
         .addr   $B8C0           ; PATHNAME
-open_ref        = * - source + target  
+open_ref        = * - source + target
         .byte   $00             ; refnum
         .word   $0              ; no option list
         .byte   $0
 
-readh_param     = * - source + target  
+readh_param     = * - source + target
         .byte   $04             ; PARAM_COUNT
-readh_ref       = * - source + target  
+readh_ref       = * - source + target
         .byte   $00             ; REF_NUM
         .addr   header          ; interp header buffer
         .word   14              ; REQUEST_COUNT
         .word   0               ; TRANS_COUNT
 
-interp_h        = * - source + target 
+interp_h        = * - source + target
         .byte   "SOS NTRP"
 
-header          = * - source + target   
+header          = * - source + target
         .res    8
         .word   0
 load_addr       = * - source + target

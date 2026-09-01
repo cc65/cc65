@@ -16,17 +16,17 @@ _getdevicename:
         stx     ptr2+1
 
         ; Save buf
-        jsr     popptr1        
+        jsr     popptr1
 
         ; Set buf
         sta     sosparam + SOS::DINFO::DEV_NAME
         ldx     ptr1+1
         stx     sosparam + SOS::DINFO::DEV_NAME+1
-        
+
         ; Set device
         jsr     popa
         sta     sosparam + SOS::DINFO::DEV_NUM
-        
+
         ; Get device name
         lda     #D_INFO_CALL
         ldx     #D_INFO_COUNT

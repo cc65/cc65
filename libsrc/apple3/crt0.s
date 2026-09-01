@@ -73,7 +73,7 @@ return: rts
 quit:   brk                     ; SOS Terminate
         .byte   $65             ; Quit
         .word   quit            ; points to param count of zero
-		
+
 ; ------------------------------------------------------------------------
 
         .data

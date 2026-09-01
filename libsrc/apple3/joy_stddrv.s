@@ -13,4 +13,3 @@
 
 _joy_stddrv:
         .asciiz "A3.STDJOY.JOY"
-

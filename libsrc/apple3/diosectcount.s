@@ -62,5 +62,3 @@ oserr:  sta     ___oserror
         lda     #$00
         ldx     #$00
         rts
-
-

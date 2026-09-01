@@ -79,7 +79,7 @@ initconref:
         .byte   0
         .addr   initscr
         .word   5
-		
+
 initscr: 
         .byte   16            ; set text mode
         .byte   3             ; 80x24

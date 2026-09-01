@@ -5,7 +5,6 @@
 ;
 
         .export         _getdevicename
-  ;      .import         isdevice
         .import         popptr1, popa
 
         .include        "zeropage.inc"

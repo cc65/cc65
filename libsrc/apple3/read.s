@@ -66,7 +66,7 @@ next:   jsr     getchar
         pla
 :
         ; We'll need Y=0 in both branches below
-        ldy     #$00        
+        ldy     #$00
 
         ; Check for '\r'
         cmp     #$0D

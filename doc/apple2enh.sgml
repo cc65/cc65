@@ -115,7 +115,8 @@ Parameters:
   Default: &dollar;803. Use <tt/-S &lt;addr&gt;/ to set a different start address.
 
   <tag><tt/__EXEHDR__:/ AppleSingle executable file header</tag>
-  Default: Yes. Use <tt/-D __EXEHDR__=0/ to omit the AppleSingle header.
+  Default: Yes. Use ld65 <tt/-D__EXEHDR__=0/ to omit the AppleSingle header, or
+  cl65's <tt/--ld-args "-D__EXEHDR__=0"/.
 
   <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
   Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
@@ -146,7 +147,8 @@ Parameters:
 <descrip>
 
   <tag><tt/__EXEHDR__:/ AppleSingle executable file header</tag>
-  Default: Yes. Use <tt/-D __EXEHDR__=0/ to omit the AppleSingle header.
+  Default: Yes. Use ld65 <tt/-D__EXEHDR__=0/ to omit the AppleSingle header, or
+  cl65's <tt/--ld-args "-D__EXEHDR__=0"/.
 
   <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
   Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
@@ -176,7 +178,8 @@ Parameters:
   Default: &dollar;803. Use <tt/-S &lt;addr&gt;/ to set a different start address.
 
   <tag><tt/__EXEHDR__:/ AppleSingle executable file header</tag>
-  Default: Yes. Use <tt/-D __EXEHDR__=0/ to omit the AppleSingle header.
+  Default: Yes. Use ld65 <tt/-D__EXEHDR__=0/ to omit the AppleSingle header, or
+  cl65's <tt/--ld-args "-D__EXEHDR__=0"/.
 
   <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
   Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
@@ -211,7 +214,8 @@ Parameters:
   Default: &dollar;803. Use <tt/-S &lt;addr&gt;/ to set a different start address.
 
   <tag><tt/__EXEHDR__:/ AppleSingle executable file header</tag>
-  Default: Yes. Use <tt/-D __EXEHDR__=0/ to omit the AppleSingle header.
+  Default: Yes. Use ld65 <tt/-D__EXEHDR__=0/ to omit the AppleSingle header, or
+  cl65's <tt/--ld-args "-D__EXEHDR__=0"/.
 
   <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
   Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
@@ -262,19 +266,80 @@ by default unused. There are however several options to make use of that memory
 range.
 
 
-<sect1>LOADER.SYSTEM<p>
+<sect1>LOADER.SYSTEM<label id="loader-system"><p>
 
 The easiest (and for really large programs in fact the only) way to have a cc65
 program use the memory from &dollar;800 to &dollar;2000 is to link it as binary
 (as opposed to system) program using the default linker configuration
-<ref id="apple-def-cfg" name="apple2enh.cfg"> with <tt/__HIMEM__/set to &dollar;BF00
+<ref id="apple-def-cfg" name="apple2.cfg"> with <tt/__HIMEM__/ set to &dollar;BF00
 and load it with the LOADER.SYSTEM utility. The program then works like a system
 program (i.e. quits to the ProDOS dispatcher).
 
 Using LOADER.SYSTEM is as simple as copying it to the ProDOS 8 directory of the
 program to load under name &lt;program&gt;.SYSTEM as a system program. For
 example the program <tt/MYPROG/ is loaded by <tt/MYPROG.SYSTEM/. The right
-AppleCommander option to put LOADER.SYSTEM on a ProDOS 8 disk image is <tt/-p/.
+AppleCommander option to put LOADER.SYSTEM on a ProDOS 8 disk image is <tt/-p/ :
+<tscreen><verb>
+java -jar ac.jar -p FLOPPY.IMG MYPROG.SYSTEM SYS &lt; /share/cc65/target/apple2/util/loader.system
+</verb></tscreen>
+
+
+<sect1>ZXLOADER.SYSTEM<p>
+
+ZXLOADER.SYSTEM works in the same way as <ref id="loader-system"
+name="LOADER.SYSTEM">, but includes a ZX02 decompressor.
+
+<bf/ZX02/ (available at <url url="https://github.com/dmsc/zx02/">) is a
+compression algorithm and program targetting the 6502 processor: it compresses
+well (and slowly), and decompresses very fast.
+
+ZXLOADER.SYSTEM allows one to store compressed binaries on the filesystem,
+making more room on it for more resources. It does not allow running larger
+programs.
+
+It is up to the user to compress their programs before putting them on a ProDOS
+8 volume. Such binaries should not include the default AppleSingle header
+(use ld65's <tt/-D__EXEHDR__=0/ flag to skip including it, or cl65's
+<tt/--ld-args "-D__EXEHDR__=0"/). The binary should be put on the filesystem
+using AppleCommander's <tt/-p/ option, specifying the program's start address
+as it appears in the .cfg file or in the compiler's <tt/--start-addr/ option:
+
+<tscreen><verb>
+cl65 -t apple2 --ld-args "-D__EXEHDR__=0" -o myprog.bin myprog.c
+zx02 -f myprog.bin myprog.zx02
+java -jar ac.jar -p FLOPPY.IMG MYPROG.SYSTEM SYS &lt; /share/cc65/target/apple2/util/zxloader.system
+java -jar ac.jar -p FLOPPY.IMG MYPROG BIN 0x803 &lt; myprog.zx02
+</verb></tscreen>
+
+
+<sect1>LOADER and ZXLOADER.SYSTEM's parameters handling<p>
+
+Both LOADER and ZXLOADER.SYSTEM handle receiving and passing parameters, like
+normal binaries. From a cold boot, or when the SYSTEM file is launched via
+BASIC's <tt/-MYPROG.SYSTEM/, there is no parameter, and the renamed LOADER
+will load and execute the matching file (for example, MYPROG.SYSTEM will execute
+MYPROG).
+From a cc65 program, it is possible to <tt/exec()/ a SYSTEM file in the same
+way as a BIN file, so you can use:
+<tscreen><verb>
+exec("MYPROG.SYSTEM", "parameterA parameterB");
+</verb></tscreen>
+MYPROG will have "parameterA" in argv[1] and "parameterB" in argv[2].
+
+When using ZXLOADER, your project might include multiple binaries, some of them
+exec()'ing other ones. In order to avoid duplicating the decompressor code on
+the floppy, you can use the same LOADER to execute different binaries, by passing
+the desired binary name as first argument to LOADER, prefixed with a dash:
+<tscreen><verb>
+// decompress HELPER and run it.
+exec("MAIN.SYSTEM", "-HELPER");
+// decompress HELPER and run it with two parameters.
+exec("MAIN.SYSTEM", "-HELPER paramA paramB");
+</verb></tscreen>
+
+Parameter handling works in the same way with LOADER.SYSTEM, but there is no
+practical use for it - it is better to directly <tt/exec("HELPER", "paramA paramB")/
+if you are not working with compressed binaries.
 
 
 <sect1>Heap<p>

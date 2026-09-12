@@ -195,6 +195,12 @@ CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E);
 ** create a new label, attach it to E and return it.
 */
 
+void CS_RegIndJumpLabel (CodeSeg* S, const char* Name);
+/* Mark the label with the given name as a possible target of an indirect
+** jump. The label is created if it doesn't exist yet, since the address of
+** a label may be taken before the label is defined.
+*/
+
 void CS_DelLabel (CodeSeg* S, CodeLabel* L);
 /* Remove references from this label and delete it. */
 

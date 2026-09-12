@@ -1202,7 +1202,6 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
         /* Set a new label number */
         Entry->V.L.Label = GetLocalLabel ();
-        Entry->V.L.IndJumpFrom = NULL;
 
         /* Create Collection for label definition and references */
         Entry->V.L.DefsOrRefs = NewCollection ();

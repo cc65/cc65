@@ -60,6 +60,7 @@ CodeLabel* NewCodeLabel (const char* Name, unsigned Hash)
     L->Next  = 0;
     L->Name  = xstrdup (Name);
     L->Hash  = Hash;
+    L->Flags = 0;
     L->Owner = 0;
     InitCollection (&L->JumpFrom);
 
@@ -108,8 +109,15 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
 ** more references on return.
 */
 {
+    unsigned Count;
+
+    /* References to indirect jump target labels for computed goto are not
+    ** tracked and cannot be moved.
+    */
+    CHECK (!CL_IsIndJumpTarget (OldLabel));
+
     /* Walk through all instructions referencing the old label */
-    unsigned Count = CL_GetRefCount (OldLabel);
+    Count = CL_GetRefCount (OldLabel);
     while (Count--) {
 
         /* Get the instruction that references the old label */
@@ -128,12 +136,14 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
 
 
 
-void CL_Output (const CodeLabel* L)
-/* Output the code label to the output file */
+void CL_Output (const CodeLabel* L, int ForceLF)
+/* Output the code label to the output file. A linefeed is written after the
+** label if ForceLF is true, or if the label is too long to share the line
+** with the instruction that follows.
+*/
 {
     WriteOutput ("%s:", L->Name);
-    if (strlen (L->Name) > 6) {
-        /* Label is too long, add a linefeed */
+    if (ForceLF || strlen (L->Name) > 6) {
         WriteOutput ("\n");
     }
 }

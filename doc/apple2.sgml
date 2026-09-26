@@ -139,20 +139,20 @@ Parameters:
   cl65's <tt/--ld-args "-D__EXEHDR__=0"/.
 
   <tag><tt/__STACKSIZE__:/ C runtime stack size</tag>
-  Default: &dollar;800. Use <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
-  stack size.
+  Default: &dollar;800. Use ld65 <tt/-D __STACKSIZE__=&lt;size&gt;/ to set a different
+  stack size, or cl65's <tt/--ld-args "-D __STACKSIZE__=&lt;size&gt;"/.
 
   <tag><tt/__HIMEM__:/ Highest usable memory address presumed at link time</tag>
-  Default: &dollar;9600. Use <tt/-D __HIMEM__=&lt;addr&gt;/ to set a different
-  highest usable address.
+  Default: &dollar;9600. Use ld65 <tt/-D __HIMEM__=&lt;addr&gt;/ to set a different
+  highest usable address, or cl65's <tt/--ld-args "-D __HIMEM__=&lt;addr&gt;"/.
 
   <tag><tt/__LCADDR__:/ Address of code in the Language Card</tag>
-  Default: &dollar;D400. Use <tt/-D __LCADDR__=&lt;addr&gt;/ to set a different
-  code address.
+  Default: &dollar;D400. Use ld65 <tt/-D __LCADDR__=&lt;addr&gt;/ to set a different
+  code address, or cl65's <tt/--ld-args "-D __LCADDR__=&lt;addr&gt;"/.
 
   <tag><tt/__LCSIZE__:/ Size of code in the Language Card</tag>
   Default: &dollar;C00. Use <tt/-D __LCSIZE__=&lt;size&gt;/ to set a different
-  code size.
+  code size, or cl65's <tt/--ld-args "-D __LCSIZE__=&lt;size&gt;"/.
 
 </descrip><p>
 
@@ -335,10 +335,10 @@ java -jar ac.jar -p FLOPPY.IMG MYPROG BIN 0x803 &lt; myprog.zx02
 <sect1>LOADER and ZXLOADER.SYSTEM's parameters handling<p>
 
 Both LOADER and ZXLOADER.SYSTEM handle receiving and passing parameters, like
-normal binaries. From a cold boot, or when the SYSTEM file is launched via
-BASIC's <tt/-MYPROG.SYSTEM/, there is no parameter, and the renamed LOADER
-will load and execute the matching file (for example, MYPROG.SYSTEM will execute
-MYPROG).
+normal cc65 binaries. Outside of cc65's "world", (when a SYSTEM file is launched via
+a ProDOS selector like Bitsy Bye or BASIC's <tt/-MYPROG.SYSTEM/), there is no
+parameter, and the renamed LOADER will load and execute the matching file
+(for example, MYPROG.SYSTEM will execute MYPROG).
 From a cc65 program, it is possible to <tt/exec()/ a SYSTEM file in the same
 way as a BIN file, so you can use:
 <tscreen><verb>
@@ -351,10 +351,10 @@ exec()'ing other ones. In order to avoid duplicating the decompressor code on
 the floppy, you can use the same LOADER to execute different binaries, by passing
 the desired binary name as first argument to LOADER, prefixed with a dash:
 <tscreen><verb>
-// decompress HELPER and run it.
-exec("MAIN.SYSTEM", "-HELPER");
+// decompress MYPROG and run it.
+exec("ZXLOADER.SYSTEM", "-MYPROG");
 // decompress HELPER and run it with two parameters.
-exec("MAIN.SYSTEM", "-HELPER paramA paramB");
+exec("ZXLOADER.SYSTEM", "-MYPROG paramA paramB");
 </verb></tscreen>
 
 Parameter handling works in the same way with LOADER.SYSTEM, but there is no

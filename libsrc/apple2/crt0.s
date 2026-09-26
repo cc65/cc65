@@ -148,8 +148,8 @@ basic:  lda     HIMEM
         .code
 
 clear_params_and_exit:
-        ; Reset this program's potential paramters in order to avoid passing
-        ; them to the next program executed via Bitsy Bye
+        ; Reset this program's potential parameters in order to avoid passing
+        ; them to the next program executed via ProDOS quit code
         lda     #$00
         sta     $0100
         jmp     _exit

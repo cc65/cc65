@@ -18,14 +18,14 @@ RDKEY           := $FD0C
 PRBYTE          := $FDDA
 COUT            := $FDED
 
-.ifndef ENABLE_DECOMPRESSOR
-; We want the ProDOS IO buffer as high as possible, as we'll read from start
-; address and up.
-PRODOS_BUF      := MLI - 1024
-.else
+.ifdef ENABLE_DECOMPRESSOR
 ; We want to ProDOS IO buffer as low as possible, so we can put the compressed
 ; data as high as possible in order to decompress in-place without overwriting.
 PRODOS_BUF      := $800
+.else
+; We want the ProDOS IO buffer as high as possible, as we'll read from start
+; address and up.
+PRODOS_BUF      := MLI - 1024
 .endif
 
 QUIT_CALL          = $65
@@ -122,7 +122,7 @@ PRESS_ANY_KEY:
         .byte   $EE
         .byte   $EE
         .byte   $7F
-PARAMS: .res    $7F
+STARTUP:.res    $7F
 
         ; Reset stack
 :       ldx     #$FF
@@ -146,16 +146,16 @@ PARAMS: .res    $7F
         ; - any parameters, starting with '-': use the first parameter as binary
         ;   file to load, and the rest as actual parameters
 
-        ldx     PARAMS
+        ldx     STARTUP
         beq     load_file
 
         ldx     #$00            ; Does the first arg start with -?
-        lda     PARAMS+1
+        lda     STARTUP+1
         cmp     #'-'
         bne     copy_parameters
 
 copy_pathname:
-        lda     PARAMS+2,x      ; Yes, so start copying it (minus the dash) to PATHNAME
+        lda     STARTUP+2,x     ; Yes, so start copying it (minus the dash) to PATHNAME
         beq     execname_copied ; We're done on NULL or space.
         cmp     #' '
         beq     execname_copied
@@ -172,7 +172,7 @@ execname_copied:                ; Terminate PATNAME again and store its length
         inx                     ; increment to avoid doubling the argument separator
 copy_parameters:
         ldy     #$00            ; And copy the rest to STACK.
-:       lda     PARAMS+1,x
+:       lda     STARTUP+1,x
         sta     STACK,y
         beq     load_file
         inx

@@ -1,8 +1,8 @@
 ; ZX02 decompressor code, in its own file for inclusion in various users
 ; (zx02.s provides void __fastcall__ decompress_zx02(const void *src, void *dest),
-;  and the Apple II system loader calls _decompress_zx02_direct directly).
+;  and the Apple II system loader calls decompress_zx02_direct directly).
 
-_decompress_zx02_direct:
+decompress_zx02_direct:
         ; Init values
         lda     #$80
         sta     bitr
@@ -24,19 +24,9 @@ cop0:
         bne     :+
         inc     ZX0_src+1
 
-; Optionally, show decompression progress by animating a character on screen.
-.ifdef ZX02_DECOMPRESSOR_SHOW_PROGRESS
-indicator = *+1
-        lda     #'-'|$80
-        eor     #%00001100    ; switch between '!' (00100001) and '-' (00101101)
-        sta     indicator
-
-; Call the relevant platform's character output function
-.ifdef __APPLE2__
-        jsr     COUT
-        dec     CH
-.endif
-.endif
+; Patched by caller, defaults to rts
+decompress_callback = *+1
+        jsr     return
 
 :       inc     ZX0_dst
         bne     :+
@@ -80,7 +70,7 @@ dzx0s_new_offset:
         ; Read elias code for high part of offset
         inx
         jsr     get_elias
-        beq     exit  ; Read a 0, signals the end
+        beq     return  ; Read a 0, signals the end
 
         ; Decrease and divide by 2
         dex
@@ -134,5 +124,5 @@ elias_skip1:
         bcs     elias_get
 
         ; Got ending bit, stop reading
-exit:
+return:
         rts

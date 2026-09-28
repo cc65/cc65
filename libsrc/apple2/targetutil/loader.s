@@ -2,7 +2,6 @@
 ;                                                                               ;
 ; LOADER.SYSTEM - an Apple][ ProDOS 8 loader for cc65 programs (Oliver Schmidt) ;
 ; Use ENABLE_DECOMPRESSOR for ZX-compressed binary handling (Colin Leroy-Mira)  ;
-; Use ZX02_DECOMPRESSOR_SHOW_PROGRESS for a decompression progress indicator.   ;
 ;                                                                               ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -299,8 +298,13 @@ relocate_done:
         bne     :--
 
 .ifdef ENABLE_DECOMPRESSOR
+        ; Store progress callback
+        lda     #<progress_cb
+        ldx     #>progress_cb
+        sta     decompress_callback
+        stx     decompress_callback+1
         ; We've loaded our compressed program, decompress it now.
-        jsr     _decompress_zx02_direct
+        jsr     decompress_zx02_direct
 .endif
 
         ; Clear two lines
@@ -360,4 +364,15 @@ ERROR:
 
 .ifdef ENABLE_DECOMPRESSOR
         .include "../../common/zx02_direct.inc"
+
+progress_cb:
+; Show decompression progress by animating a character on screen.
+indicator = *+1
+        lda     #'-'|$80
+        eor     #%00001100    ; switch between '!' (00100001) and '-' (00101101)
+        sta     indicator
+
+        jsr     COUT
+        dec     CH
+        rts
 .endif

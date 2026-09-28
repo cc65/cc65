@@ -8,7 +8,6 @@ DEPS += ../libwrk/$(TARGET)/convert.d \
 	$(ASSEMBLE_recipe)
 
 ../libwrk/$(TARGET)/zxloader.o: CA65FLAGS += "-DENABLE_DECOMPRESSOR"
-../libwrk/$(TARGET)/zxloader.o: CA65FLAGS += "-DZX02_DECOMPRESSOR_SHOW_PROGRESS"
 ../libwrk/$(TARGET)/zxloader.o: $(SRCDIR)/targetutil/loader.s | ../libwrk/$(TARGET)
 	$(ASSEMBLE_recipe)
 

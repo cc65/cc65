@@ -89,8 +89,8 @@ basic:  lda     HIMEM
         ; ProDOS TechRefMan, chapter 5.3.5:
         ; "Your system program should place in the RESET vector the
         ;  address of a routine that ... closes the files."
-        ldx     #<clear_params_and_exit
-        lda     #>clear_params_and_exit
+        ldx     #<_exit
+        lda     #>_exit
         jsr     reset           ; Setup RESET vector
 
         ; Call the module constructors.
@@ -146,13 +146,6 @@ basic:  lda     HIMEM
 ; ------------------------------------------------------------------------
 
         .code
-
-clear_params_and_exit:
-        ; Reset this program's potential parameters in order to avoid passing
-        ; them to the next program executed via ProDOS quit code
-        lda     #$00
-        sta     $0100
-        jmp     _exit
 
         ; Set up the RESET vector.
 reset:  stx     SOFTEV

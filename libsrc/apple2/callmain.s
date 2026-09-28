@@ -6,6 +6,7 @@
 
 
         .export         callmain, _exit
+        .export         exit_with_params
         .export         __argc, __argv
 
         .import         _main, pushax, done, donelib
@@ -30,8 +31,24 @@ callmain:
         ldy     #4              ; Argument size
         jsr     _main
 
-        ; Avoid a re-entrance of donelib. This is also the exit() entry.
-_exit:  ldx     #<exit
+_exit:
+        ; If we reach that point (rts from main or direct exit() call),
+        ; we're not exec()ing anything. Clear this program's possibly
+        ; left-over parameters, in order to avoid passing them to the
+        ; next program executed via ProDOS quit code.
+        ; We do that before _exit as _exec calls _exit, and in
+        ; this case, we want to keep the parameters that the user
+        ; possibly just set.
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        stz     $0100
+.else
+        lda     #$00
+        sta     $0100
+.endif
+
+        ; Avoid a re-entrance of donelib.
+exit_with_params:
+        ldx     #<exit
         lda     #>exit
         jsr     reset           ; Setup RESET vector
 

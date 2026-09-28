@@ -7,7 +7,7 @@
         .export         _exec
         .import         mli_file_info_direct
         .import         aux80col
-        .import         pushname_tos, popname, popax, done, _exit
+        .import         pushname_tos, popname, popax, done, exit_with_params
 
         .include        "zeropage.inc"
         .include        "errno.inc"
@@ -156,7 +156,7 @@ setbuf: lda     #$00            ; Low byte
         stx     done+2
 
         ; Initiate C library shutdown
-        jmp     _exit
+        jmp     exit_with_params
 
         .rodata
 

@@ -122,6 +122,7 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --expand-macros\t\tExpand macros in the listing\n"
+            "  --expanded-source name\tWrite macro-expanded, reassemblable source\n"
             "  --feature name\t\tSet an emulation feature\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --ignore-case\t\t\tIgnore case of symbols\n"
@@ -779,6 +780,14 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
 
 
 
+static void OptExpandedSource (const char* Opt attribute ((unused)), const char* Arg)
+/* Write the macro-expanded source to the given file */
+{
+    ExpandedOutOpen (Arg);
+}
+
+
+
 static void OptExpandMacros (const char* Opt attribute ((unused)),
     const char* Arg attribute ((unused)))
     /* Expand macros in listing
@@ -967,6 +976,7 @@ static void OneLine (void)
         HandlePseudo ();
     } else if (Mac != 0) {
         /* A macro expansion */
+        ExpandedOutMacroCall ();
         MacExpandStart (Mac);
     } else if (Instr >= 0) {
         /* A mnemonic - assemble one instruction */
@@ -1092,6 +1102,7 @@ int main (int argc, char* argv [])
         { "--debug",               0,      OptDebug                },
         { "--debug-info",          0,      OptDebugInfo            },
         { "--expand-macros",       0,      OptExpandMacros         },
+        { "--expanded-source",     1,      OptExpandedSource       },
         { "--feature",             1,      OptFeature              },
         { "--help",                0,      OptHelp                 },
         { "--ignore-case",         0,      OptIgnoreCase           },
@@ -1349,6 +1360,7 @@ int main (int argc, char* argv [])
 
     /* Close the input file */
     DoneScanner ();
+    ExpandedOutClose ();
 
     /* Return an apropriate exit code */
     return (ErrorCount == 0)? EXIT_SUCCESS : EXIT_FAILURE;

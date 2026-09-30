@@ -94,4 +94,24 @@ void LeaveRawTokenMode (void);
 
 /* End of nexttok.h */
 
+void ExpandedOutOpen (const char* Name);
+/* Open the file that receives the macro-expanded source */
+
+void ExpandedOutClose (void);
+/* Close the macro-expanded source file */
+
+void ExpandedOutToken (void);
+/* Called for each token delivered to the parser */
+
+void ExpandedOutMarkJsr (void);
+/* The JSR just assembled may be merged with a following RTS */
+
+void ExpandedOutTailCall (void);
+/* The JSR before the RTS was turned into a JMP */
+
+void ExpandedOutMacroCall (void);
+/* Called when a macro invocation is about to be expanded */
+
+
+
 #endif

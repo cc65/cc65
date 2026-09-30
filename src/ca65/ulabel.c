@@ -41,6 +41,7 @@
 /* ca65 */
 #include "error.h"
 #include "expr.h"
+#include "global.h"
 #include "lineinfo.h"
 #include "scanner.h"
 #include "ulabel.h"
@@ -174,6 +175,7 @@ void ULabDef (void)
 
     /* We have one more defined label */
     ++ULabDefCount;
+    ++LabelDefCount;
 }
 
 

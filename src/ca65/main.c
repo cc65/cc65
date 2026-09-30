@@ -44,6 +44,7 @@
 #include "cmdline.h"
 #include "consprop.h"
 #include "debugflag.h"
+#include "fname.h"
 #include "mmodel.h"
 #include "print.h"
 #include "scopedefs.h"
@@ -51,6 +52,7 @@
 #include "target.h"
 #include "tgttrans.h"
 #include "version.h"
+#include "xmalloc.h"
 
 /* ca65 */
 #include "abend.h"
@@ -95,6 +97,7 @@ static void Usage (void)
     printf ("Usage: %s [options] file\n"
             "Short options:\n"
             "  -D name[=value]\t\tDefine a symbol\n"
+            "  -E\t\t\t\tStop after macro expansion, write <input>.i\n"
             "  -I dir\t\t\tSet an include directory search path\n"
             "  -U\t\t\t\tMark unresolved symbols as import\n"
             "  -V\t\t\t\tPrint the assembler version\n"
@@ -122,6 +125,7 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --expand-macros\t\tExpand macros in the listing\n"
+            "  --expand-only\t\tStop after macro expansion (same as -E)\n"
             "  --expanded-source name\tWrite macro-expanded, reassemblable source\n"
             "  --feature name\t\tSet an emulation feature\n"
             "  --help\t\t\tHelp (this text)\n"
@@ -780,6 +784,17 @@ static void OptWarningsAsErrors (const char* Opt attribute ((unused)),
 
 
 
+static void OptExpandOnly (const char* Opt attribute ((unused)),
+                           const char* Arg attribute ((unused)))
+/* Stop after the macro expansion stage and write the expanded source to
+** <input>.i (or to the file given with -o).
+*/
+{
+    ExpandOnly = 1;
+}
+
+
+
 static void OptExpandedSource (const char* Opt attribute ((unused)), const char* Arg)
 /* Write the macro-expanded source to the given file */
 {
@@ -1102,6 +1117,7 @@ int main (int argc, char* argv [])
         { "--debug",               0,      OptDebug                },
         { "--debug-info",          0,      OptDebugInfo            },
         { "--expand-macros",       0,      OptExpandMacros         },
+        { "--expand-only",         0,      OptExpandOnly           },
         { "--expanded-source",     1,      OptExpandedSource       },
         { "--feature",             1,      OptFeature              },
         { "--help",                0,      OptHelp                 },
@@ -1171,6 +1187,10 @@ int main (int argc, char* argv [])
 
                 case 'd':
                     OptDebug (Arg, 0);
+                    break;
+
+                case 'E':
+                    OptExpandOnly (Arg, 0);
                     break;
 
                 case 'g':
@@ -1267,6 +1287,18 @@ int main (int argc, char* argv [])
         exit (EXIT_FAILURE);
     }
 
+    /* -E: write the expanded source to <input>.i or the file given by -o */
+    if (ExpandOnly && !ExpandedOutIsOpen ()) {
+        char* ExpName = 0;
+        if (OutFile) {
+            ExpandedOutOpen (OutFile);
+        } else {
+            ExpName = MakeFilename (InFile, ".i");
+            ExpandedOutOpen (ExpName);
+            xfree (ExpName);
+        }
+    }
+
     /* Add the default include search paths. */
     FinishIncludePaths ();
 
@@ -1350,7 +1382,7 @@ int main (int argc, char* argv [])
     /* If we didn't have any errors, create the object, listing and
     ** dependency files
     */
-    if (ErrorCount == 0) {
+    if (ErrorCount == 0 && !ExpandOnly) {
         CreateObjFile ();
         if (SB_GetLen (&ListingName) > 0) {
             CreateListing ();

@@ -68,6 +68,7 @@ unsigned char LargeAlignment     = 0;   /* Don't warn about large alignments */
 unsigned char MergeScopes        = 0;   /* Allow reopening named .SCOPEs */
 unsigned char RelaxChecks        = 0;   /* Relax a few assembler checks */
 unsigned char StringEscapes      = 0;   /* Allow C-style escapes in strings */
+unsigned char ExpandOnly         = 0;   /* Stop after macro expansion (-E) */
 unsigned char TailCallOpt        = 0;   /* Turn JSR followed by RTS into JMP */
 unsigned long LabelDefCount      = 0;   /* Number of labels defined so far */
 unsigned char LongJsrJmpRts      = 0;   /* Allow JSR/JMP/RTS as alias for JSL/JML/RTL */

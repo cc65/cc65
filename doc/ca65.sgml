@@ -220,6 +220,29 @@ Here is a description of all the command line options:
   you may have to quote the expression.
 
 
+  <label id="option-E">
+  <tag><tt>-E, --expand-only</tt></tag>
+
+  Stop after the macro expansion stage. The source is processed as usual
+  (macros are expanded, <tt/.IF/ and friends are evaluated, <tt/.REPEAT/ is
+  unrolled, included files are read), but instead of an object file the
+  resulting source is written to a file with the suffix ".i" added to the
+  base name of the input file, or to the file given with <tt><ref
+  id="option-o" name="-o"></tt>. The result can be assembled again and gives
+  the same code as the original. Comments and macro definitions are not
+  part of the output. Macro local symbols are renamed to
+  <tt/LOCAL_MACRO_SYMBOL_nnnn/, and symbols that do not have a value yet are
+  left as they are.
+
+
+  <label id="option--expanded-source">
+  <tag><tt>--expanded-source name</tt></tag>
+
+  Like <tt/-E/, but the expanded source is written to the given file while
+  the assembler runs normally and creates the object file (and the listing,
+  if requested).
+
+
   <label id="option--feature">
   <tag><tt>--feature name</tt></tag>
 
@@ -3191,6 +3214,29 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
     This permits compatibility with the old behavior of this assembler, or other
     assemblers which similarly allowed <tt>jsr</tt> and <tt>jmp</tt> to be used
     this way.
+
+  <tag><tt>tail_call_opt, tco</tt><label id="tail_call_opt"></tag>
+
+    Turn a <tt>jsr</tt> that is directly followed by an <tt>rts</tt> into a
+    <tt>jmp</tt> and omit the <tt>rts</tt>. This saves one byte, nine cycles
+    and two bytes of stack space for each such pair. The optimization is only
+    done for the plain <tt>jsr</tt> and <tt>rts</tt> instructions of the 6502
+    family (it does not apply to <tt>jsl</tt>/<tt>rtl</tt> and a few other
+    CPUs), and only if nothing is emitted between the two instructions and no
+    label is defined in front of the <tt>rts</tt>. A label of any kind (also
+    a cheap local label or an unnamed label) in front of the <tt>rts</tt>
+    prevents the optimization, so this is the way to keep the original code
+    where it is needed, for example in cycle exact code:
+    <tscreen><verb>
+        jsr     delay_31_cycles
+  @no_opt:
+        rts
+    </verb></tscreen>
+    <em/Note:/ Code that reaches the <tt>rts</tt> without a label, for
+    example with <tt>bne *+5</tt>, is not detected. The feature is off by
+    default. It can also be switched on and off in a region of the source
+    with <tt>.FEATURE tail_call_opt +</tt> and <tt>.FEATURE tail_call_opt
+    -</tt>.
 
   <tag><tt>merge_scopes</tt><label id="merge_scopes"></tag>
 

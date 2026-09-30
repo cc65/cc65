@@ -97,6 +97,9 @@ void LeaveRawTokenMode (void);
 void ExpandedOutOpen (const char* Name);
 /* Open the file that receives the macro-expanded source */
 
+int ExpandedOutIsOpen (void);
+/* Return true if the macro-expanded source file is open */
+
 void ExpandedOutClose (void);
 /* Close the macro-expanded source file */
 

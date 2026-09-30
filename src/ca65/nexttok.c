@@ -867,6 +867,14 @@ void ExpandedOutOpen (const char* Name)
 
 
 
+int ExpandedOutIsOpen (void)
+/* Return true if the macro-expanded source file is open */
+{
+    return ExpOut != 0;
+}
+
+
+
 void ExpandedOutClose (void)
 /* Close the macro-expanded source file */
 {

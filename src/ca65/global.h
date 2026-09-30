@@ -70,6 +70,7 @@ extern unsigned char    LargeAlignment;     /* Don't warn about large alignments
 extern unsigned char    MergeScopes;        /* Allow reopening named .SCOPEs */
 extern unsigned char    RelaxChecks;        /* Relax a few assembler checks */
 extern unsigned char    StringEscapes;      /* Allow C-style escapes in strings */
+extern unsigned char    ExpandOnly;         /* Stop after macro expansion (-E) */
 extern unsigned char    TailCallOpt;        /* Turn JSR followed by RTS into JMP */
 extern unsigned long    LabelDefCount;      /* Number of labels defined so far */
 extern unsigned char    LongJsrJmpRts;      /* Allow JSR/JMP/RTS as alias for JSL/JML/RTL */

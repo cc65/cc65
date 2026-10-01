@@ -75,6 +75,7 @@ extern unsigned char    WarnAlignWaste;     /* Warn about "wasted" bytes when al
 extern unsigned char    WarningsAsErrors;   /* Error if any warnings */
 extern unsigned char    SegList;            /* Show segments in listing */
 extern unsigned char    ExpandMacros;       /* Expand macros in listing */
+extern unsigned char    ExpandOnly;         /* Stop after macro expansion (-E) */
 
 /* Emulation features */
 extern unsigned char    DollarIsPC;         /* Allow the $ symbol as current PC */

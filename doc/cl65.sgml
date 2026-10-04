@@ -139,12 +139,15 @@ There are a few remaining options that control the behaviour of cl65:
 
   <tag><tt>-E</tt></tag>
 
-  This option is passed to the cc65 compiler; and, it forces cl65 to stop
-  before the assembly step. That means that C-level preprocessor directives
-  are obeyed; and, macros are expanded.  But, the C source isn't compiled.
-  If the <tt/-o/ option isn't used, then the C code results are written into
-  files with a ".i" suffix on their base names.  Assembler files, object
-  files, and libraries given on the command line are ignored.
+  This option is passed to the cc65 compiler and to the ca65 assembler; and,
+  it forces cl65 to stop before the compile and assembly steps. That means
+  that C-level preprocessor directives are obeyed; and, macros are expanded,
+  both in C files and in assembler files. But, the C source isn't compiled and
+  the assembler source isn't assembled. Each input file is processed on its
+  own, and the results are written into files with a ".i" suffix on their
+  base names. If the <tt/-o/ option is used, there may only be one input file,
+  since the output of several files cannot be written to the same file. Object
+  files and libraries given on the command line are ignored.
 
 
   <tag><tt>-S</tt></tag>

@@ -71,6 +71,10 @@ typedef struct Macro Macro;
 
 
 void MacDef (unsigned Style);
+
+char* GetTokenString (Token* T);
+/* Return the text of a punctuation/operator token, or NULL */
+
 /* Parse a macro definition */
 
 void MacUndef (const struct StrBuf* Name, unsigned char Style);

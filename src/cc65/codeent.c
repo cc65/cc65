@@ -2530,6 +2530,9 @@ void CE_Output (const CodeEntry* E)
     unsigned I;
     for (I = 0; I < LabelCount; ++I) {
         CL_Output (CollConstAt (&E->Labels, I));
+        if (I + 1 < LabelCount) {
+            WriteOutput ("\n");
+        }
     }
 
     /* Get the opcode description */

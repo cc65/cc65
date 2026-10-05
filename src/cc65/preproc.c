@@ -254,7 +254,7 @@ static ppdirective_t FindPPDirectiveType (const char* Ident)
 ** identifier is not a valid preprocessor directive token.
 */
 {
-    struct PPDType* P;
+    const struct PPDType* P;
     P = bsearch (Ident, PPDTypes, PPDTOKEN_COUNT, sizeof (PPDTypes[0]), CmpToken);
     return P? P->Type : PPD_ILLEGAL;
 }

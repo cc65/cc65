@@ -137,6 +137,7 @@ typedef enum token_t {
     TOK_BANK,
     TOK_BANKBYTE,
     TOK_BANKBYTES,
+    TOK_BANKS,
     TOK_BLANK,
     TOK_BSS,
     TOK_BYTE,

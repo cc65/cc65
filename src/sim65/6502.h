@@ -101,6 +101,17 @@ unsigned ExecuteInsn (void);
 ** executed instruction.
 */
 
+unsigned long GetCycles (void);
+/* Return the total number of clock cycles executed */
+
+extern int PrintCycles;
+/* flag to print cycles at program termination */
+
+extern unsigned ProfileSamples[64 * 1024];
+extern const char *ProfileFile;
+
+void ProfileInit (void);
+void ProfileSave (void);
 
 /* End of 6502.h */
 

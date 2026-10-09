@@ -86,6 +86,7 @@ EXELIST_geos-cbm = \
 	hello1.cvt \
 	hello2.cvt \
 	overlay-demo.cvt \
+	printdrv.cvt \
 	vector-demo.cvt \
 	yesno.cvt
 
@@ -176,6 +177,10 @@ yesno.cvt: yesnores.grc yesno.c
 deskacc.cvt: deskaccres.grc deskacc.c
 	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t geos-c-da -O -o $@ -m deskacc.map deskaccres.grc deskacc.c
+
+printdrv.cvt: printdrv.grc printdrv.s
+	$(if $(QUIET),echo $(SYS):$@)
+	$(CL) -t geos-c-prn -O -o $@ -m printdrv.map --asm-include-dir ../../libsrc/$(SYS) --asm-include-dir ../../libsrc/geos-common printdrv.grc printdrv.s
 
 
 clean:

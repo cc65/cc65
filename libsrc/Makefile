@@ -32,7 +32,8 @@ CBMS = c128   \
 
 GEOS = geos-apple \
        geos-cbm   \
-       geos-c-da
+       geos-c-da  \
+       geos-c-prn
 
 TARGETS = agat         \
           apple2       \
@@ -193,6 +194,8 @@ else ifeq ($(TARGET),atarixl)
 else ifeq ($(TARGET),sim65c02)
   SRCDIR = sim6502
 else ifeq ($(TARGET),geos-c-da)
+  SRCDIR = geos-cbm
+else ifeq ($(TARGET),geos-c-prn)
   SRCDIR = geos-cbm
 else
   SRCDIR = $(TARGET)

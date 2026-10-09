@@ -1219,6 +1219,78 @@ video mode (PAL or NTSC) how many jiffies there are per second (50 or 60, respec
 If you don't want to worry about it and need only full second resolution, call the standard
 <tt/sleep/ function from <tt/unistd.h/.
 
+<sect1>Printing
+
+<p>
+GEOS supports different printers through its printer driver system, making it easy to add printing
+support to your application.  Before using the printer, the driver must be loaded into memory.  This is done using GetFile().  Use <tt/PrntFileName/ (defined in gsym.h) to load the default driver.
+After that, the printing API is availble for use.
+
+The following API is only available on C64/C128.
+
+<sect2>InitForPrint
+
+<p>
+<tt/void InitForPrint(void)/
+<p>
+Call this to initialize the driver.
+
+<sect2>StartPrint
+
+<p>
+<tt/char __fastcall__ StartPrint(char *workBuf)/
+<p>
+Call this before printing each page.  Give a 1920 byte work buffer for the driver to use, which must
+stay untouched by the application while the page is printing.
+
+Do not use this if you want to print text only, then you use startASCII instead.
+
+<sect2>PrintBuffer
+
+<p>
+<tt/void __fastcall__ PrintBuffer(char *printData, char *workBuf, char *colorData)/
+<p>
+Print one row (640x8 pixels) of data (in card format), given in printData, 640 bytes.  workBuf is
+the same pointer as for StartPrint. colorData must be set to NULL or be a pointer to 80 bytes of
+color data.
+
+<sect2>StopPrint
+
+<p>
+<tt/char __fastcall__ StopPrint(char *tempBuf, char *workBuf)/
+<p>
+Call this when you have sent the entire page. tmpBuf is a 640 byte scratchBuffer, workBuf is the
+same as for StartPrint.
+
+<sect2>GetDimensions
+
+<p>
+<tt/void __fastcall__ GetDimensions(char *width, char *height, char *mode)/
+<p>
+Returns the page size (in cards), together with a mode (00 = printer can print text and graphics, ff
+= printer can only print text).
+
+<sect2>StartASCII
+
+<p>
+<tt/char __fastcall__ StartASCII(char *workBuf)/
+<p>
+Call this before printing each page of ASCII text.  workBuf is a 640 byte buffer which must be untouched by the application while the page is printing.
+
+<sect2>PrintASCII
+
+<p>
+<tt/void __fastcall__ PrintASCII(const char *printData, char *workBuf)/
+<p>
+Print an ASCII line of text, given in printData.  workBuf is the same as for StartASCII.
+
+<sect2>SetNLQ
+
+<p>
+<tt/void __fastcall__ SetNLQ(char *workBuf)/
+<p>
+Set up the printer for NearLetterQuality (NLQ) mode.  Used only for ASCII printing, to get higher quality output.
+
 <sect1>System Functions
 
 <sect2>FirstInit

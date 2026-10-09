@@ -96,6 +96,7 @@ typedef enum {
     TGT_GEOS_CBM_DA,
     TGT_GEOS_CBM_PRINTER,
     TGT_GEOS_CBM_INPUT,
+    TGT_GEOS_CBM_INPUT128,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 

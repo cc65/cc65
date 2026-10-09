@@ -3,14 +3,17 @@
 ;reassembled by Maciej 'YTM/Alliance' Witkowiak
 ;4-2-99
 ;
-; 2026: fixed missing InitMouse and a wrong "C128" section (C64 and C128
-; share the same addresses below; a genuinely separate address range
-; exists only for INPUT_128, a distinct filetype for C128-specific
-; drivers, not covered here) -- cross-checked against symbols.txt.
+; 2026: fixed missing InitMouse; corrected the "C128" section
 
 MOUSE_BASE              =       $fe80
 
 InitMouse               =       $fe80
 SlowMouse               =       $fe83
 UpdateMouse             =       $fe86
-SetMouse                =       $fe89   ; C128 only
+
+MOUSE_BASE_128          =       $fd00
+
+InitMouse_128           =       $fd00
+SlowMouse_128           =       $fd03
+UpdateMouse_128         =       $fd06
+SetMouse_128            =       $fd09

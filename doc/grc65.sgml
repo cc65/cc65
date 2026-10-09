@@ -25,8 +25,8 @@ files of an app.), dialog definitions, etc.  Without an application's header,
 GEOS is unable to load and start it.
 
 Currently, <bf/grc65/ supports menus, the required header definition,
-driver/accessory headers (desk accessories, printer drivers), and building
-applications with VLIR-structured overlays.
+driver/accessory headers (desk accessories, printer drivers, input drivers),
+and building applications with VLIR-structured overlays.
 
 <bf/grc65/ generates output in two formats: C header and <bf/ca65/ source (.s).
 That is because the application header data must be in assembly format, while
@@ -117,7 +117,7 @@ HEADER <GEOS_TYPE> "dosname" "classname" "version" {
 The header definition describes the GEOS header sector which is unique to
 each file.  The definition starts with the keyword <tt/HEADER/, then goes the
 GEOS file-type.  It can be <tt/APPLICATION/, <tt/AUTO_EXEC/, <tt/DESK_ACC/,
-or <tt/PRINTER/. Then,
+<tt/PRINTER/, or <tt/INPUT/. Then,
 there are (each one in quotes) the DOS file-name (up to 16 characters), the GEOS
 Class name (up to 12 characters), and the version info (up to 4 characters).
 The version should be written as &dquot;<tt/V/x.y&dquot;, where <em/x/ is the
@@ -279,6 +279,14 @@ See <tt>samples/geos</tt> for a working example.
 
 Printer drivers have to fit in 1600 bytes, so they are assembly only to avoid the C overhead.  See
 <tt>samples/geos</tt> for a working example.
+
+
+<sect>Building input drivers for C64<label id="building-in">
+<p>Input drivers for C64 GEOS (<tt/INPUT/) must be built using the following target: <tt/geos-c-in/
+
+Input drivers are always assembly-only: their main routine
+(<tt/UpdateMouse/) runs at GEOS Kernal Interrupt Level, where cc65's C
+runtime isn't safe to use. See <tt>samples/geos</tt> for a working example.
 
 
 <sect>Building a GEOS VLIR overlay application<label id="building-vlir">

@@ -72,7 +72,7 @@ const char *mainToken[] = {"MENU", "HEADER", "ICON", "DIALOG", "MEMORY", ""};
 const char *toggle[] = {"off", "no", "0", "on", "yes", "1", ""};
 
 const char *hdrFTypes[] = {"APPLICATION", "AUTO_EXEC", "DESK_ACC", "ASSEMBLY",
-                           "DISK_DEVICE", "PRINTER", "SYSTEM", ""};
+                           "DISK_DEVICE", "PRINTER", "SYSTEM", "INPUT", ""};
 
 const char *hdrFields[] = {"author", "info", "date", "dostype", "mode", "structure", "icon", ""};
 
@@ -150,6 +150,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
         case TGT_GEOS_CBM_DA:
         case TGT_GEOS_CBM_PRINTER:
+        case TGT_GEOS_CBM_INPUT:
         case TGT_GEOS_CBM:
             apple = 0;
             break;
@@ -466,6 +467,7 @@ static void DoHeader (void)
     int i;
     int isDeskAcc = 0;
     int isPrinter = 0;
+    int isInputDevice = 0;
 
     openSFile ();
 
@@ -504,6 +506,10 @@ static void DoHeader (void)
             case 5: /* PRINTER */
                 myHead.geostype = 9;
                 isPrinter = 1;
+                break;
+            case 7: /* INPUT */
+                myHead.geostype = 10;
+                isInputDevice = 1;
                 break;
             default:
                 AbEnd ("Filetype '%s' is not supported yet", token);
@@ -756,7 +762,7 @@ static void DoHeader (void)
         ** meaningful for them).
         */
         isDeskAcc ? "__HIMEM__" : "__VLIR0_START__ - 1",
-        isPrinter ? "0" : "__STARTUP_RUN__");
+        (isPrinter || isInputDevice) ? "0" : "__STARTUP_RUN__");
 
     fillOut (myHead.classname, 12, "$20");
 

@@ -148,6 +148,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 {
     switch (FindTarget (Arg)) {
 
+        case TGT_GEOS_CBM_DA:
         case TGT_GEOS_CBM:
             apple = 0;
             break;
@@ -462,6 +463,7 @@ static void DoHeader (void)
     char *token;
     char i1[9], i2[9], i3[9];
     int i;
+    int isDeskAcc = 0;
 
     openSFile ();
 
@@ -471,19 +473,27 @@ static void DoHeader (void)
 
     if (apple == 1) {
         switch (i) {
-            case 0:
+            case 0: /* APPLICATION */
                 myHead.geostype = 0x82;
+                break;
+            case 2: /* DESK_ACC */
+                myHead.geostype = 0x81;
+                isDeskAcc = 1;
                 break;
             default:
                 AbEnd ("Filetype '%s' is not supported yet", token);
         }
     } else {
         switch (i) {
-            case 0:
+            case 0: /* APPLICATION */
                 myHead.geostype = 6;
                 break;
-            case 1:
+            case 1: /* AUTO_EXEC */
                 myHead.geostype = 14;
+                break;
+            case 2: /* DESK_ACC */
+                myHead.geostype = 5;
+                isDeskAcc = 1;
                 break;
             default:
                 AbEnd ("Filetype '%s' is not supported yet", token);
@@ -597,30 +607,45 @@ static void DoHeader (void)
 
     /* OK, all information is gathered, do flushout */
 
+    if (isDeskAcc) {
+        /* The end address for a desk accessory must cover the whole memory
+        ** range GEOS has to save and restore.  __HIMEM__ is used for this
+        */
+        fprintf (outputSFile,
+            "    .import __HIMEM__\n");
+    }
+
     fprintf (outputSFile,
         "    .import __BSS_SIZE__, __STARTUP_RUN__\n"
         "    .import __VLIR0_START__, __VLIR0_LAST__\n"
         "    .import __VLIR0_BLOCKS__\n"
-        "    .import __VLIR1_BLOCKS__\n"
-        "    .import __VLIR2_BLOCKS__\n"
-        "    .import __VLIR3_BLOCKS__\n"
-        "    .import __VLIR4_BLOCKS__\n"
-        "    .import __VLIR5_BLOCKS__\n"
-        "    .import __VLIR6_BLOCKS__\n"
-        "    .import __VLIR7_BLOCKS__\n"
-        "    .import __VLIR8_BLOCKS__\n"
-        "    .import __VLIR9_BLOCKS__\n"
-        "    .import __VLIR10_BLOCKS__\n"
-        "    .import __VLIR11_BLOCKS__\n"
-        "    .import __VLIR12_BLOCKS__\n"
-        "    .import __VLIR13_BLOCKS__\n"
-        "    .import __VLIR14_BLOCKS__\n"
-        "    .import __VLIR15_BLOCKS__\n"
-        "    .import __VLIR16_BLOCKS__\n"
-        "    .import __VLIR17_BLOCKS__\n"
-        "    .import __VLIR18_BLOCKS__\n"
-        "    .import __VLIR19_BLOCKS__\n\n"
     );
+
+    if (myHead.structure == APPHEADER_STRUCTURE_VLIR) {
+        fprintf (outputSFile,
+            "    .import __VLIR1_BLOCKS__\n"
+            "    .import __VLIR2_BLOCKS__\n"
+            "    .import __VLIR3_BLOCKS__\n"
+            "    .import __VLIR4_BLOCKS__\n"
+            "    .import __VLIR5_BLOCKS__\n"
+            "    .import __VLIR6_BLOCKS__\n"
+            "    .import __VLIR7_BLOCKS__\n"
+            "    .import __VLIR8_BLOCKS__\n"
+            "    .import __VLIR9_BLOCKS__\n"
+            "    .import __VLIR10_BLOCKS__\n"
+            "    .import __VLIR11_BLOCKS__\n"
+            "    .import __VLIR12_BLOCKS__\n"
+            "    .import __VLIR13_BLOCKS__\n"
+            "    .import __VLIR14_BLOCKS__\n"
+            "    .import __VLIR15_BLOCKS__\n"
+            "    .import __VLIR16_BLOCKS__\n"
+            "    .import __VLIR17_BLOCKS__\n"
+            "    .import __VLIR18_BLOCKS__\n"
+            "    .import __VLIR19_BLOCKS__\n"
+        );
+    }
+
+    fprintf (outputSFile, "\n");
 
     fprintf (outputSFile,
         "    .segment \"DIRENTRY\"\n\n");
@@ -674,12 +699,22 @@ static void DoHeader (void)
              * add size of each VLIR segment, plus 1 block for the info block (icon),
              * plus another block for the VLIR RECORDS table (VLIR structure only)
              */
-            "    .word %d + __VLIR0_BLOCKS__ + __VLIR1_BLOCKS__ + __VLIR2_BLOCKS__ + __VLIR3_BLOCKS__ + __VLIR4_BLOCKS__ + __VLIR5_BLOCKS__ + __VLIR6_BLOCKS__ + __VLIR7_BLOCKS__ + __VLIR8_BLOCKS__ + __VLIR9_BLOCKS__ + __VLIR10_BLOCKS__ + __VLIR11_BLOCKS__ + __VLIR12_BLOCKS__ + __VLIR13_BLOCKS__ + __VLIR14_BLOCKS__ + __VLIR15_BLOCKS__ + __VLIR16_BLOCKS__ + __VLIR17_BLOCKS__ + __VLIR18_BLOCKS__ + __VLIR19_BLOCKS__\n"
-            /* PRG formatted or SEQ formatted */
-            "    .byte \"%s formatted GEOS file V1.0\"\n\n",
+            "    .word %d + __VLIR0_BLOCKS__",
             myHead.structure, myHead.geostype,
             myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min,
-            (myHead.structure == APPHEADER_STRUCTURE_SEQ) ? 1 : 2,
+            (myHead.structure == APPHEADER_STRUCTURE_SEQ) ? 1 : 2
+        );
+
+        if (myHead.structure == APPHEADER_STRUCTURE_VLIR) {
+            fprintf (outputSFile,
+                " + __VLIR1_BLOCKS__ + __VLIR2_BLOCKS__ + __VLIR3_BLOCKS__ + __VLIR4_BLOCKS__ + __VLIR5_BLOCKS__ + __VLIR6_BLOCKS__ + __VLIR7_BLOCKS__ + __VLIR8_BLOCKS__ + __VLIR9_BLOCKS__ + __VLIR10_BLOCKS__ + __VLIR11_BLOCKS__ + __VLIR12_BLOCKS__ + __VLIR13_BLOCKS__ + __VLIR14_BLOCKS__ + __VLIR15_BLOCKS__ + __VLIR16_BLOCKS__ + __VLIR17_BLOCKS__ + __VLIR18_BLOCKS__ + __VLIR19_BLOCKS__"
+            );
+        }
+
+        fprintf (outputSFile,
+            "\n"
+            /* PRG formatted or SEQ formatted */
+            "    .byte \"%s formatted GEOS file V1.0\"\n\n",
             (myHead.structure == APPHEADER_STRUCTURE_SEQ) ? "SEQ" : "PRG"
         );
     }
@@ -702,8 +737,15 @@ static void DoHeader (void)
 
     fprintf (outputSFile,
         "    .byte %i, %i, %i\n"
-        "    .word __VLIR0_START__, __VLIR0_START__ - 1, __STARTUP_RUN__\n\n",
-        myHead.dostype, myHead.geostype, myHead.structure);
+        "    .word __VLIR0_START__, %s, __STARTUP_RUN__\n\n",
+        myHead.dostype, myHead.geostype, myHead.structure,
+        /* For desk accessories, GEOS computes the memory range to back up
+        ** and restore as (end address - start address), i.e. end address
+        ** is exclusive. Every other file type uses the documented
+        ** "start address - 1" dummy convention instead (this field isn't
+        ** meaningful for them).
+        */
+        isDeskAcc ? "__HIMEM__" : "__VLIR0_START__ - 1");
 
     fillOut (myHead.classname, 12, "$20");
 

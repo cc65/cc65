@@ -185,6 +185,7 @@ static const TargetEntry TargetMap[] = {
     {   "gamate",       TGT_GAMATE       },
     {   "geos",         TGT_GEOS_CBM     },
     {   "geos-apple",   TGT_GEOS_APPLE   },
+    {   "geos-c-da",    TGT_GEOS_CBM_DA  },
     {   "geos-cbm",     TGT_GEOS_CBM     },
     {   "kim1",         TGT_KIM1         },
     {   "lunix",        TGT_LUNIX        },
@@ -251,6 +252,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "rp6502",         CPU_W65C02,     BINFMT_BINARY,      CTNone  },
     { "agat",           CPU_6502,       BINFMT_BINARY,      CTAgat  },
+    { "geos-c-da",      CPU_6502,       BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

@@ -1787,12 +1787,15 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                 if (RegValIsKnown (In->RegX)) {
                     Out->RegX = (In->RegX ^ 0xFF);
                 }
-            } else if (strncmp (E->Arg, "asrax", 5) == 0 ||
-                       strncmp (E->Arg, "shrax", 5) == 0) {
+            } else if (strncmp (E->Arg, "asrax", 5) == 0) {
                 if (RegValIsKnown (In->RegX)) {
                     if (In->RegX == 0x00 || In->RegX == 0xFF) {
                         Out->RegX = In->RegX;
                     }
+                }
+            } else if (strncmp (E->Arg, "shrax", 5) == 0) {
+                if (RegValIsKnown (In->RegX) && In->RegX == 0) {
+                    Out->RegX = 0;
                 }
             } else if (strcmp (E->Arg, "tosandax") == 0) {
                 if (RegValIsKnown (In->RegA) && In->RegA == 0) {

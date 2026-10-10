@@ -43,6 +43,7 @@ continue:
 	@$(MAKE) $(PD) -C standard_err all $(PQ)
 	@$(MAKE) $(PD) -C misc all $(PQ)
 	@$(MAKE) $(PD) -C todo all $(PQ)
+	@$(MAKE) $(PD) -C dbginfo all $(PQ)
 	@$(MAKE) success_message
 
 success_message:
@@ -60,6 +61,7 @@ mostlyclean:
 	@$(MAKE) $(PD) -C standard_err clean $(PQ)
 	@$(MAKE) $(PD) -C misc clean $(PQ)
 	@$(MAKE) $(PD) -C todo clean $(PQ)
+	@$(MAKE) $(PD) -C dbginfo clean $(PQ)
 
 clean: mostlyclean
 	@$(call RMDIR,$(WORKDIR))

@@ -12,6 +12,7 @@ void InitForIO(void);
 void DoneWithIO(void);
 void MainLoop(void);
 void EnterDeskTop(void);
+void RstrAppl(void);
 void ToBASIC(void);
 void Panic(void);
 

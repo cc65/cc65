@@ -93,6 +93,7 @@ typedef enum {
     TGT_KIM1,
     TGT_RP6502,
     TGT_AGAT,
+    TGT_GEOS_CBM_DA,
     TGT_COUNT                   /* Number of target systems */
 } target_t;
 

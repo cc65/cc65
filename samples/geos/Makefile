@@ -79,6 +79,7 @@ endef # SUBDIR_recipe
 
 EXELIST_geos-cbm = \
 	bitmap-demo.cvt \
+	deskacc.cvt \
 	filesel.cvt \
 	geosver.cvt \
 	getid.cvt \
@@ -172,9 +173,14 @@ yesno.cvt: yesnores.grc yesno.c
 	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m yesno.map yesnores.grc yesno.c
 
+deskacc.cvt: deskaccres.grc deskacc.c
+	$(if $(QUIET),echo $(SYS):$@)
+	$(CL) -t geos-c-da -O -o $@ -m deskacc.map deskaccres.grc deskacc.c
+
 
 clean:
 	@$(DEL) overlay-demores.h 2>$(NULLDEV)
+	@$(DEL) deskaccres.h 2>$(NULLDEV)
 	@$(DEL) bitmap.c 2>$(NULLDEV)
 	@$(DEL) *.cvt 2>$(NULLDEV)
 	@$(DEL) *.map 2>$(NULLDEV)

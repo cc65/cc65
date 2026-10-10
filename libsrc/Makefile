@@ -31,7 +31,8 @@ CBMS = c128   \
        vic20
 
 GEOS = geos-apple \
-       geos-cbm
+       geos-cbm   \
+       geos-c-da
 
 TARGETS = agat         \
           apple2       \
@@ -191,18 +192,24 @@ else ifeq ($(TARGET),atarixl)
   DRVPFX = atrx
 else ifeq ($(TARGET),sim65c02)
   SRCDIR = sim6502
+else ifeq ($(TARGET),geos-c-da)
+  SRCDIR = geos-cbm
 else
   SRCDIR = $(TARGET)
 endif
 
 SRCDIRS = $(SRCDIR)
 
+ifeq ($(TARGET),geos-c-da)
+  SRCDIRS := geos-c-da $(SRCDIRS)
+endif
+
 ifeq ($(TARGET),$(filter $(TARGET),$(CBMS)))
   SRCDIRS += cbm
 endif
 
 ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
-  SRCDIRS += $(addprefix $(TARGET)/,  $(GEOSDIRS))
+  SRCDIRS += $(addprefix $(SRCDIR)/,  $(GEOSDIRS))
   SRCDIRS += $(addprefix geos-common/,$(GEOSDIRS))
 endif
 

@@ -211,7 +211,6 @@ struct SymEntry {
         struct {
             unsigned            Label;
             Collection          *DefsOrRefs;
-            struct CodeEntry    *IndJumpFrom;
         } L;
 
         /* Value of SP adjustment needed after forward 'goto' */

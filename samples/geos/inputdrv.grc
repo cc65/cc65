@@ -1,0 +1,5 @@
+HEADER INPUT "inputdrv" "InputDrv" "V1.2" {
+    dostype USR
+    info "Minimal GEOS input driver skeleton."
+    mode any
+}

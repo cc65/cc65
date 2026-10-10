@@ -51,10 +51,12 @@
 #include "easw16.h"
 #include "error.h"
 #include "expr.h"
+#include "fragment.h"
 #include "global.h"
 #include "instr.h"
 #include "nexttok.h"
 #include "objcode.h"
+#include "segment.h"
 #include "spool.h"
 #include "studyexpr.h"
 #include "symtab.h"
@@ -2674,15 +2676,80 @@ int FindInstruction (const StrBuf* Ident)
 
 
 
+/* State for the tail call optimization (JSR abs followed by RTS -> JMP abs).
+** The JSR is remembered together with the state of the segment right after
+** it was emitted. If the RTS follows with nothing emitted and no label
+** defined in between, the opcode of the JSR is patched to JMP and the RTS is
+** not emitted.
+*/
+static Fragment*       TcoJsr      = 0;     /* Fragment with the JSR opcode */
+static Segment*        TcoSeg      = 0;     /* Segment of the JSR */
+static Fragment*       TcoLast     = 0;     /* Last fragment after the JSR */
+static unsigned long   TcoFrags    = 0;     /* Fragment count after the JSR */
+static unsigned long   TcoLabels   = 0;     /* Label count after the JSR */
+
+
+
+static int IsPlainOp (const InsDesc* Ins, const char* Mnemo, unsigned char Code)
+/* Return true if Ins is the simple (PutAll) instruction Mnemo with the given
+** opcode. This excludes the 65816 long variants and other CPU specific
+** handlers.
+*/
+{
+    return Ins->Emit == PutAll &&
+           Ins->BaseCode == Code &&
+           strcmp (Ins->Mnemonic, Mnemo) == 0;
+}
+
+
+
 void HandleInstruction (unsigned Index)
 /* Handle the mnemonic with the given index */
 {
+    const InsDesc* Ins;
+    Fragment*      Before;
+    int            IsJsr;
+
     /* Safety check */
     PRECONDITION (Index < InsTab->Count);
+
+    Ins = &InsTab->Ins[Index];
 
     /* Skip the mnemonic token */
     NextTok ();
 
+    if (TailCallOpt) {
+
+        /* RTS directly behind a JSR? */
+        if (IsPlainOp (Ins, "RTS", 0x60) && TcoJsr != 0 &&
+            TcoSeg == ActiveSeg && TcoLast == ActiveSeg->Last &&
+            TcoFrags == ActiveSeg->FragCount && TcoLabels == LabelDefCount) {
+
+            /* Turn the JSR into a JMP and drop the RTS */
+            TcoJsr->V.Data[0] = 0x4C;
+            TcoJsr = 0;
+            return;
+        }
+
+        /* Remember a JSR, so a following RTS can be merged with it */
+        IsJsr  = IsPlainOp (Ins, "JSR", 0x20);
+        Before = ActiveSeg->Last;
+        TcoJsr = 0;
+        Ins->Emit (Ins);
+        if (IsJsr) {
+            /* The opcode is in the first fragment created by the JSR */
+            Fragment* F = Before? Before->Next : ActiveSeg->Root;
+            if (F != 0 && F->Type == FRAG_LITERAL && F->V.Data[0] == 0x20) {
+                TcoJsr    = F;
+                TcoSeg    = ActiveSeg;
+                TcoLast   = ActiveSeg->Last;
+                TcoFrags  = ActiveSeg->FragCount;
+                TcoLabels = LabelDefCount;
+            }
+        }
+        return;
+    }
+
     /* Call the handler */
-    InsTab->Ins[Index].Emit (&InsTab->Ins[Index]);
+    Ins->Emit (Ins);
 }

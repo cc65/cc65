@@ -90,6 +90,7 @@
     <ClInclude Include="cc65\casenode.h" />
     <ClInclude Include="cc65\codeent.h" />
     <ClInclude Include="cc65\codegen.h" />
+    <ClInclude Include="cc65\codegentypes.h" />
     <ClInclude Include="cc65\codeinfo.h" />
     <ClInclude Include="cc65\codelab.h" />
     <ClInclude Include="cc65\codeopt.h" />

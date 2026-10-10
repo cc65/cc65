@@ -191,7 +191,7 @@ static token_t FindKey (const char* Key)
 ** keyword.
 */
 {
-    struct Keyword* K;
+    const struct Keyword* K;
     K = bsearch (Key, Keywords, KEY_COUNT, sizeof (Keywords [0]), CmpKey);
     if (K && (K->Std & (0x01 << IS_Get (&Standard))) != 0) {
         return K->Tok;

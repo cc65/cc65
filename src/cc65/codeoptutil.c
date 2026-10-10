@@ -1394,7 +1394,7 @@ int HarmlessCall (const CodeEntry* E, int PushedBytes)
         }
         return 1;
     } else {
-        void* R = bsearch (E->Arg,
+        const void* R = bsearch (E->Arg,
                             Tab,
                             sizeof (Tab) / sizeof (Tab[0]),
                             sizeof (Tab[0]),

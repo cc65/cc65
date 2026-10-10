@@ -149,6 +149,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     switch (FindTarget (Arg)) {
 
         case TGT_GEOS_CBM_DA:
+        case TGT_GEOS_CBM_PRINTER:
         case TGT_GEOS_CBM:
             apple = 0;
             break;
@@ -464,6 +465,7 @@ static void DoHeader (void)
     char i1[9], i2[9], i3[9];
     int i;
     int isDeskAcc = 0;
+    int isPrinter = 0;
 
     openSFile ();
 
@@ -480,6 +482,10 @@ static void DoHeader (void)
                 myHead.geostype = 0x81;
                 isDeskAcc = 1;
                 break;
+            case 5: /* PRINTER */
+                myHead.geostype = 0x85;
+                isPrinter = 1;
+                break;
             default:
                 AbEnd ("Filetype '%s' is not supported yet", token);
         }
@@ -494,6 +500,10 @@ static void DoHeader (void)
             case 2: /* DESK_ACC */
                 myHead.geostype = 5;
                 isDeskAcc = 1;
+                break;
+            case 5: /* PRINTER */
+                myHead.geostype = 9;
+                isPrinter = 1;
                 break;
             default:
                 AbEnd ("Filetype '%s' is not supported yet", token);
@@ -737,7 +747,7 @@ static void DoHeader (void)
 
     fprintf (outputSFile,
         "    .byte %i, %i, %i\n"
-        "    .word __VLIR0_START__, %s, __STARTUP_RUN__\n\n",
+        "    .word __VLIR0_START__, %s, %s\n\n",
         myHead.dostype, myHead.geostype, myHead.structure,
         /* For desk accessories, GEOS computes the memory range to back up
         ** and restore as (end address - start address), i.e. end address
@@ -745,7 +755,8 @@ static void DoHeader (void)
         ** "start address - 1" dummy convention instead (this field isn't
         ** meaningful for them).
         */
-        isDeskAcc ? "__HIMEM__" : "__VLIR0_START__ - 1");
+        isDeskAcc ? "__HIMEM__" : "__VLIR0_START__ - 1",
+        isPrinter ? "0" : "__STARTUP_RUN__");
 
     fillOut (myHead.classname, 12, "$20");
 

@@ -244,6 +244,7 @@ static void SetSys (const char* Sys)
             break;
 
         case TGT_GEOS_CBM_DA:
+        case TGT_GEOS_CBM_PRINTER:
         case TGT_GEOS_CBM:
             /* Do not handle as a CBM system */
             DefineNumericMacro ("__GEOS__", 1);

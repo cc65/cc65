@@ -4,6 +4,7 @@
 ;
 ; Ullrich von Bassewitz, 2003-05-02
 ; Stefan Haubenthal, 2004-10-05
+; Brandon Woodward, 2026-09-13
 ;
 
         .include        "zeropage.inc"
@@ -83,19 +84,18 @@ READJOY:
         and     #$01            ; Fix joystick number
         tay                     ; Joystick number (0,1) into Y
 
-        lda     #1
-        sta     APU_PAD1
-        lda     #0
-        sta     APU_PAD1
+        ldx     #1
+        stx     tmp1            ; Setup joystick read ring counter
+        stx     APU_PAD1        ; Strobe joystick port
+        dex
+        stx     APU_PAD1
 
 ; Read joystick
 
-        ldx     #8
 @Loop:  lda     APU_PAD1,y
         ror     a
-        ror     tmp1
-        dex
-        bne     @Loop
+        rol     tmp1
+        bcc     @Loop
 
         lda     tmp1
 ;       ldx     #$00            ; X implicitly fixed

@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 08.08.1998
+; 1 byte saved by Brandon Woodward, 2026-09-14
 ;
 ; void cvlinexy (unsigned char x, unsigned char y, unsigned char length);
 ; void cvline (unsigned char length);
@@ -17,7 +18,7 @@ _cvlinexy:
         pla                     ; Restore the length and run into _cvline
 
 _cvline:
-        cmp     #0              ; Is the length zero?
+        tax                     ; Is the length zero?
         beq     L9              ; Jump if done
         sta     tmp1
 L1:     lda     #CH_VLINE       ; Vertical bar

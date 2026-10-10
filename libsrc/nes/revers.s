@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 07.08.1998
+; Rewritten by Brandon Woodward, 16.9.2026
 ;
 ; unsigned char revers (unsigned char onoff);
 ;
@@ -9,19 +10,13 @@
         .include        "nes.inc"
 
 .proc   _revers
-
-        ldx     #$00            ; Assume revers off
-        tay                     ; Test onoff
-        beq     L1              ; Jump if off
-        ldx     #$80            ; Load on value
-        ldy     #$00            ; Assume old value is zero
-L1:     lda     RVS             ; Load old value
-        stx     RVS             ; Set new value
-        beq     L2              ; Jump if old value zero
-        iny                     ; Make old value = 1
-L2:     ldx     #$00            ; Load high byte of result
-        tya                     ; Load low byte, set CC
+        ldx     RVS
+        cpx     #$80            ; Old revers in carry
+        tax
+        beq     @z
+        lda     #$80
+@z:     sta     RVS
+        rol     a               ; Load old revers
         rts
 
 .endproc
-

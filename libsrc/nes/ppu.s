@@ -1,10 +1,10 @@
 ;
 ; Written by Groepaz/Hitmen <groepaz@gmx.net>
 ; Cleanup by Ullrich von Bassewitz <uz@cc65.org>
+; Optimizations & color fixing by Brandon Woodward
 ;
 
-        .export ppuinit
-        .export paletteinit, paldata
+        .export paletteinit, colors
 
         .include "nes.inc"
 
@@ -70,61 +70,21 @@
 
 .segment        "ONCE"
 
-.proc   ppuinit
-
-        lda     #%10101000
-        sta     PPU_CTRL1
-
-        lda     #%00011110
-        sta     PPU_CTRL2
-
-; Wait for vblank
-
-@wait:  lda     PPU_STATUS
-        bpl     @wait
-
-; reset scrolling
-
-        lda     #0
-        sta     PPU_VRAM_ADDR1
-        sta     PPU_VRAM_ADDR1
-
-; Make all sprites invisible
-
-        lda     #$00
-        ldy     #$f0
-        sta     PPU_SPR_ADDR
-        ldx     #$40
-@loop:  sty     PPU_SPR_IO
-        sta     PPU_SPR_IO
-        sta     PPU_SPR_IO
-        sty     PPU_SPR_IO
-        dex
-        bne     @loop
-
-        rts
-
-.endproc
-
-;-----------------------------------------------------------------------------
-
 .proc   paletteinit
 
-; Wait for v-blank
-@wait:  lda     PPU_STATUS
-        bpl     @wait
-
-        lda     #$3F
+        lda     #>$3F00
         sta     PPU_VRAM_ADDR2
-        lda     #$00
-        sta     PPU_VRAM_ADDR2
+        ldx     #<$3F00
+        stx     PPU_VRAM_ADDR2
 
-        ldx     #0
-@loop:  lda     paldata,x
-        sta     PPU_VRAM_IO
+; Copy the colors table
+@l1:    ldx     #$F0
+@l2:    ldy     colors-$F0,x
+        sty     PPU_VRAM_IO
         inx
-        cpx     #(16*2)
-        bne     @loop
+        bne     @l2
+        asl     a
+        bpl     @l1
 
         rts
 
@@ -134,25 +94,19 @@
 
 .rodata
 
-paldata:
-        .repeat 2
-        .byte   $0f     ; 0 black
-        .byte   $14     ; 4 violet
-        .byte   $3b     ; 3 cyan
-        .byte   $3d     ; 1 white
-
-        .byte   $38     ; 7 yellow
-        .byte   $2d     ; b dark grey
-        .byte   $22     ; e light blue
-        .byte   $04     ; 2 red
-
-        .byte   $18     ; 8 orange
-        .byte   $08     ; 9 brown
-        .byte   $35     ; a light red
-        .byte   $01     ; 6 blue
-
-        .byte   $10     ; c middle grey
-        .byte   $2b     ; d light green
-        .byte   $3d     ; f light gray
-        .byte   $1a     ; 5 green
-        .endrepeat
+colors: .byte $0f       ; 0 black
+        .byte $20       ; 1 white
+        .byte $06       ; 2 red
+        .byte $2C       ; 3 cyan
+        .byte $13       ; 4 violet
+        .byte $1a       ; 5 green
+        .byte $01       ; 6 blue
+        .byte $38       ; 7 yellow
+        .byte $17       ; 8 orange
+        .byte $07       ; 9 brown
+        .byte $26       ; a light red
+        .byte $2d       ; b dark grey
+        .byte $00       ; c middle grey
+        .byte $2a       ; d light green
+        .byte $21       ; e light blue
+        .byte $3d       ; f light gray

@@ -17,18 +17,22 @@ tickcount       = $6b           ;2
 
 VBLANK_FLAG     = $70
 
-ringbuff        = $0200
-ringwrite       = $71
-ringread        = $72
-ringcount       = $73
+ppust_buff      = $0300
 
-ppuhi           = $74
-ppulo           = $75
-ppuval          = $76
+ppust_count     = $71
+sprdma_en       = $72
+
+ppuld_hi        = $74
+ppuld_lo        = $75
+ppuld_val       = $76
+
+ppuctrl2_buf    = $77
 
 screenrows      = (30-1)
 charsperline    = 32
 xsize           = charsperline
+
+oambuff        = $0200
 
 ;; PPU defines
 
@@ -41,6 +45,8 @@ PPU_VRAM_ADDR1  = $2005
 PPU_VRAM_ADDR2  = $2006
 PPU_VRAM_IO     = $2007
 
+PPU_RENDER_EN   = %00011110     ; Enable background and sprite rendering (PPU_CTRL2)
+
 ;; APU defines
 
 APU_PULSE1CTRL  = $4000         ; Pulse #1 Control Register (W)
@@ -51,12 +57,12 @@ APU_PULSE2CTRL  = $4004         ; Pulse #2 Control Register (W)
 APU_PULSE2RAMP  = $4005         ; Pulse #2 Ramp Control Register (W)
 APU_PULSE2FTUNE = $4006         ; Pulse #2 Fine Tune Register (W)
 APU_PULSE2STUNE = $4007         ; Pulse #2 Coarse Tune Register (W)
-APU_TRICTRL1    = $4008         ; Triangle Control Register #1 (W)
-APU_TRICTRL2    = $4009         ; Triangle Control Register #2 (?)
+APU_TRICTRL1    = $4008         ; Triangle Control Register (W)
+;APU_TRIUNUSED  = $4009         ; Unused
 APU_TRIFREQ1    = $400A         ; Triangle Frequency Register #1 (W)
 APU_TRIFREQ2    = $400B         ; Triangle Frequency Register #2 (W)
 APU_NOISECTRL   = $400C         ; Noise Control Register #1 (W)
-;;APU_ = $400D  ; Unused (???)
+;APU_NOIUNUSED  = $400D         ; Unused
 APU_NOISEFREQ1  = $400E         ; Noise Frequency Register #1 (W)
 APU_NOISEFREQ2  = $400F         ; Noise Frequency Register #2 (W)
 APU_MODCTRL     = $4010         ; Delta Modulation Control Register (W)
@@ -90,4 +96,3 @@ CH_INS          = 148
 CH_ENTER        = 10
 CH_STOP         = 3
 CH_ESC          = 27
-

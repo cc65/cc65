@@ -86,6 +86,7 @@ EXELIST_geos-cbm = \
 	hello1.cvt \
 	hello2.cvt \
 	inputdrv.cvt \
+	inputdrv128.cvt \
 	overlay-demo.cvt \
 	printdrv.cvt \
 	vector-demo.cvt \
@@ -186,6 +187,10 @@ printdrv.cvt: printdrv.grc printdrv.s
 inputdrv.cvt: inputdrv.grc inputdrv.s
 	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t geos-c-in -O -o $@ -m inputdrv.map --asm-include-dir ../../libsrc/$(SYS) --asm-include-dir ../../libsrc/geos-common inputdrv.grc inputdrv.s
+
+inputdrv128.cvt: inputdrv128.grc inputdrv128.s
+	$(if $(QUIET),echo $(SYS):$@)
+	$(CL) -t geos-c-in128 -O -o $@ -m inputdrv128.map --asm-include-dir ../../libsrc/$(SYS) --asm-include-dir ../../libsrc/geos-common inputdrv128.grc inputdrv128.s
 
 
 clean:

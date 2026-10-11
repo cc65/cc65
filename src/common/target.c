@@ -187,6 +187,7 @@ static const TargetEntry TargetMap[] = {
     {   "geos-apple",   TGT_GEOS_APPLE   },
     {   "geos-c-da",    TGT_GEOS_CBM_DA      },
     {   "geos-c-in",    TGT_GEOS_CBM_INPUT   },
+    {   "geos-c-in128", TGT_GEOS_CBM_INPUT128},
     {   "geos-c-prn",   TGT_GEOS_CBM_PRINTER },
     {   "geos-cbm",     TGT_GEOS_CBM         },
     {   "kim1",         TGT_KIM1         },
@@ -257,6 +258,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "geos-c-da",      CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "geos-c-prn",     CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "geos-c-in",      CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "geos-c-in128",   CPU_6502,       BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

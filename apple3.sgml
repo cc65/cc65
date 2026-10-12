@@ -243,9 +243,8 @@ After a program has started the console defaults to 80 columns.
   <tag>Explanation of File Types</tag>
 
   SOS associates a file type and an auxiliary type with each file. These
-  type specifications are separate from the file's name, unlike Unix which
-  uses the file name's suffix (a.k.a. extension) to specify the file type.
-  For example, <tt/.exe/, <tt/.doc/, or <tt/.bat/.
+  type specifications are separate from the file's name; the file name's
+  suffix (a.k.a. extension) does not specify the file type.
   The SOS function for creating a file requires these types to be specified.
 
   In contrast, the ISO C function <tt/fopen()/ and the POSIX function
@@ -327,8 +326,8 @@ After a program has started the console defaults to 80 columns.
 <sect1>Command line arguments<p>
 
 The Apple&nbsp;/// does not have any command line support. A program started
-from an interpreter will always get <tt/argc = 0/ and <tt/argv = 0/.
-
+from an interpreter will always get <tt/argc = 0/ and <tt/argv = NULL/, so
+there is not even an <tt/argv[0]/.
 
 <sect1>Direct console I/O<p>
 

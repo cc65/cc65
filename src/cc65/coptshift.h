@@ -63,7 +63,7 @@ unsigned OptShift1 (CodeSeg* S);
 unsigned OptShift2 (CodeSeg* S);
 /* The sequence
 **
-**      bpl     L
+**      bpl/bcc L
 **      dex
 ** L:   jsr     asraxN
 **
@@ -72,7 +72,7 @@ unsigned OptShift2 (CodeSeg* S);
 **      cmp     #$80
 **      ror     a
 **
-** if X is not used later (X is assumed to be zero on entry).
+** if X is zero on entry and not used later.
 */
 
 unsigned OptShift3 (CodeSeg* S);

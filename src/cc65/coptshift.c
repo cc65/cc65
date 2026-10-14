@@ -310,7 +310,7 @@ NextEntry:
 unsigned OptShift2 (CodeSeg* S)
 /* The sequence
 **
-**      bpl     L
+**      bpl/bcc L
 **      dex
 ** L:   jsr     asraxN
 **
@@ -319,7 +319,7 @@ unsigned OptShift2 (CodeSeg* S)
 **      cmp     #$80
 **      ror     a
 **
-** if X is not used later (X is assumed to be zero on entry).
+** if X is zero on entry and not used later.
 ** If the sequence is followed immediately by another
 **
 **      jsr     asraxN
@@ -346,6 +346,7 @@ unsigned OptShift2 (CodeSeg* S)
              L[0]->OPC == OP65_JPL  ||
              L[0]->OPC == OP65_JCC)                                     &&
             L[0]->JumpTo != 0                                           &&
+            L[0]->RI->In.RegX == 0                                      &&
             CS_GetEntries (S, L+1, I+1, 3)                              &&
             L[1]->OPC == OP65_DEX                                       &&
             L[0]->JumpTo->Owner == L[2]                                 &&

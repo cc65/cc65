@@ -76,7 +76,7 @@ static int HT_Compare (const void* Key1, const void* Key2);
 ** than zero if Key1 is greater then Key2.
 */
 
-static char* GetTokenString (Token* T);
+char* GetTokenString (Token* T);
 /* decompile a token back to a string */
 
 /*****************************************************************************/
@@ -1181,7 +1181,7 @@ StrBuf MakeLineFromTokens (TokNode* first)
     return S;
 }
 
-static char* GetTokenString (Token* T)
+char* GetTokenString (Token* T)
 {
     switch (T->Tok) {
 

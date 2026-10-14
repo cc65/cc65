@@ -1,0 +1,23 @@
+start:
+ nop
+ nop
+ lda #0
+ lda #< 4660
+ ldx #> 4660
+ bne LOCAL_MACRO_SYMBOL_0000
+ inx
+LOCAL_MACRO_SYMBOL_0000:
+ bne LOCAL_MACRO_SYMBOL_0001
+ inx
+LOCAL_MACRO_SYMBOL_0001:
+ ldy #0
+ ldy #1
+ ldy #2
+ jsr sub
+@cheap:
+ bne @cheap
+ .BYTE "hello", 0
+ .BYTE .sprintf("a%cb",34), 0
+ rts
+sub:
+ rts

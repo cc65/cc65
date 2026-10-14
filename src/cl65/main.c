@@ -119,6 +119,8 @@ static CmdDesc RM   = { 0, 0, 0, 0, 0, 0, 0 };
 /* Variables controlling the steps we're doing */
 static int DoLink       = 1;
 static int DoAssemble   = 1;
+static int ExpandOnly   = 0;    /* -E: stop after preprocessing/macro expansion */
+static unsigned ExpandFiles = 0;/* Number of files processed with -E */
 
 /* The name of the output file, NULL if none given */
 static const char* OutputName = 0;
@@ -645,6 +647,51 @@ static void Assemble (const char* File)
 
 
 
+static void CheckExpandOutput (void)
+/* With -E every input file gets its own output file. A single output name
+** given with -o cannot be used for more than one of them.
+*/
+{
+    if (ExpandOnly && OutputName && ++ExpandFiles > 1) {
+        Error ("Cannot specify -o with -E and multiple input files");
+    }
+}
+
+
+
+static void ExpandAsm (const char* File)
+/* Run the assembler on File in expand-only mode (-E): macros are expanded
+** and the result is written to <File>.i or the file given with -o.
+*/
+{
+    /* Remember the current assembler argument count */
+    unsigned ArgCount = CA65.ArgCount;
+
+    CheckExpandOutput ();
+
+    /* Set the target system */
+    CmdSetTarget (&CA65, Target);
+
+    /* Name the output file if requested */
+    if (OutputName) {
+        CmdSetOutput (&CA65, OutputName);
+    }
+
+    /* Add the file as argument for the assembler */
+    CmdAddArg (&CA65, File);
+
+    /* Add a NULL pointer to terminate the argument list */
+    CmdAddArg (&CA65, 0);
+
+    /* Run the assembler */
+    ExecProgram (&CA65);
+
+    /* Remove the excess arguments */
+    CmdDelArgs (&CA65, ArgCount);
+}
+
+
+
 static void Compile (const char* File)
 /* Compile the given file */
 {
@@ -684,6 +731,9 @@ static void Compile (const char* File)
             CmdSetOutput (&CC65, OutputName);
         }
     }
+
+    /* With -E each file gets its own output */
+    CheckExpandOutput ();
 
     /* Add the file as argument for the compiler */
     CmdAddArg (&CC65, File);
@@ -828,7 +878,7 @@ static void Usage (void)
             "  -C name\t\t\tUse linker config file\n"
             "  -Cl\t\t\t\tMake local variables static\n"
             "  -D sym[=defn]\t\t\tDefine a preprocessor symbol\n"
-            "  -E\t\t\t\tStop after the preprocessing stage\n"
+            "  -E\t\t\t\tStop after preprocessing (macro expansion for .s files)\n"
             "  -I dir\t\t\tSet a compiler include directory path\n"
             "  -L path\t\t\tSpecify a library search path\n"
             "  -Ln name\t\t\tCreate a VICE label file\n"
@@ -1620,8 +1670,10 @@ int main (int argc, char* argv [])
                     break;
 
                 case 'E':
-                    /* Forward -E to compiler */
+                    /* Forward -E to compiler and assembler */
                     CmdAddArg (&CC65, Arg);
+                    CmdAddArg (&CA65, Arg);
+                    ExpandOnly = 1;
                     DisableAssemblingAndLinking ();
                     break;
 
@@ -1731,6 +1783,8 @@ int main (int argc, char* argv [])
                     /* Assemble the file */
                     if (DoAssemble) {
                         Assemble (Arg);
+                    } else if (ExpandOnly) {
+                        ExpandAsm (Arg);
                     }
                     break;
 

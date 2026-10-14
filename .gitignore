@@ -10,3 +10,6 @@
 /util/atari/*.exe
 /util/gamate/*.exe
 
+# Clangd
+/.cache
+/compile_commands.json

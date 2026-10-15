@@ -103,6 +103,16 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
 ** more references on return.
 */
 
+int CL_HasUntrackedRef (const CodeLabel* L);
+/* Check if L has at least one untracked reference, that is, an entry in its
+** JumpFrom list whose JumpTo does not point back to L. This happens for
+** labels that are only reachable through a data segment (for example a
+** computed goto jump table), since g_defdata emits ".addr LabelName" as raw
+** text with no link back to this CodeLabel. Such a label must never be
+** merged away or deleted, because the raw text already committed to its
+** exact name and has no way of being updated afterward.
+*/
+
 void CL_Output (const CodeLabel* L);
 /* Output the code label to the output file */
 

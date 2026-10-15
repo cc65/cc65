@@ -115,15 +115,43 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
         /* Get the instruction that references the old label */
         CodeEntry* E = CL_GetRef (OldLabel, Count);
 
-        /* Change the reference to the new label */
-        CHECK (E->JumpTo != NULL);
-        CHECK (E->JumpTo == OldLabel);
-        CL_AddRef (NewLabel, E);
+        if (E->JumpTo == OldLabel) {
+            CL_AddRef (NewLabel, E);
+        } else {
+            /* JumpTo == NULL: data-segment ref, not a tracked jump and
+            ** will always not be an external label
+            */
+            CHECK (E->JumpTo == NULL);
+            CHECK (E->ArgOff == 0);
+            if (CE_HasArgBase (E)) {
+                CE_SetArgBase (E, NewLabel->Name);
+            } else {
+                CE_SetArgBaseAndOff (E, NewLabel->Name, 0);
+            }
+            CollAppend (&NewLabel->JumpFrom, E);
+        }
 
     }
 
     /* There are no more references to the old label */
     CollDeleteAll (&OldLabel->JumpFrom);
+}
+
+
+
+int CL_HasUntrackedRef (const CodeLabel* L)
+/* Check if L has at least one untracked reference, that is, an entry in its
+** JumpFrom list whose JumpTo does not point back to L. See codelab.h for
+** why this matters.
+*/
+{
+    unsigned Count = CL_GetRefCount (L);
+    while (Count--) {
+        if (CL_GetRef ((CodeLabel*) L, Count)->JumpTo != L) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 

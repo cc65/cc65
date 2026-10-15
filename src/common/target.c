@@ -185,7 +185,11 @@ static const TargetEntry TargetMap[] = {
     {   "gamate",       TGT_GAMATE       },
     {   "geos",         TGT_GEOS_CBM     },
     {   "geos-apple",   TGT_GEOS_APPLE   },
-    {   "geos-cbm",     TGT_GEOS_CBM     },
+    {   "geos-c-da",    TGT_GEOS_CBM_DA      },
+    {   "geos-c-in",    TGT_GEOS_CBM_INPUT   },
+    {   "geos-c-in128", TGT_GEOS_CBM_INPUT128},
+    {   "geos-c-prn",   TGT_GEOS_CBM_PRINTER },
+    {   "geos-cbm",     TGT_GEOS_CBM         },
     {   "kim1",         TGT_KIM1         },
     {   "lunix",        TGT_LUNIX        },
     {   "lynx",         TGT_LYNX         },
@@ -251,6 +255,10 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "kim1",           CPU_6502,       BINFMT_BINARY,      CTNone  },
     { "rp6502",         CPU_W65C02,     BINFMT_BINARY,      CTNone  },
     { "agat",           CPU_6502,       BINFMT_BINARY,      CTAgat  },
+    { "geos-c-da",      CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "geos-c-prn",     CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "geos-c-in",      CPU_6502,       BINFMT_BINARY,      CTNone  },
+    { "geos-c-in128",   CPU_6502,       BINFMT_BINARY,      CTNone  },
 };
 
 /* Target system */

@@ -9,6 +9,6 @@ StartPrint              =       $7903
 PrintBuffer             =       $7906
 StopPrint               =       $7909
 GetDimensions           =       $790c
-PrinsASCII              =       $790f
+PrintASCII              =       $790f
 StartASCII              =       $7912
 SetNLQ                  =       $7915

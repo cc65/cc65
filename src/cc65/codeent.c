@@ -348,7 +348,6 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
     int             Parentheses = 0;
     unsigned long   NumVal = 0;
     long long       AccOffset = 0;
-    char*           End;            /* Used for checking errors */
 
     if (ArgInfo != 0) {
         *ArgInfo = 0;
@@ -361,7 +360,11 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
         SB_Clear (Name);
         SB_Terminate (Name);
         OffsetPart = Arg;
+
     } else {
+
+        const char* End;            /* Used for checking errors */
+
         /* <, >, ^ */
         if (Arg[0] == '<') {
             Flags |= AIF_LOBYTE;
@@ -483,6 +486,9 @@ int ParseOpcArgStr (const char* Arg, unsigned short* ArgInfo, struct StrBuf* Nam
     while (OffsetPart != 0       &&
            OffsetPart[0] != '\0' &&
            OffsetPart[0] != ')') {
+
+        char* End;              /* Used for checking errors */
+
         /* Skip spaces */
         while (OffsetPart[0] == ' ') {
             ++OffsetPart;
@@ -1781,12 +1787,15 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
                 if (RegValIsKnown (In->RegX)) {
                     Out->RegX = (In->RegX ^ 0xFF);
                 }
-            } else if (strncmp (E->Arg, "asrax", 5) == 0 ||
-                       strncmp (E->Arg, "shrax", 5) == 0) {
+            } else if (strncmp (E->Arg, "asrax", 5) == 0) {
                 if (RegValIsKnown (In->RegX)) {
                     if (In->RegX == 0x00 || In->RegX == 0xFF) {
                         Out->RegX = In->RegX;
                     }
+                }
+            } else if (strncmp (E->Arg, "shrax", 5) == 0) {
+                if (RegValIsKnown (In->RegX) && In->RegX == 0) {
+                    Out->RegX = 0;
                 }
             } else if (strcmp (E->Arg, "tosandax") == 0) {
                 if (RegValIsKnown (In->RegA) && In->RegA == 0) {

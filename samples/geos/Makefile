@@ -79,12 +79,16 @@ endef # SUBDIR_recipe
 
 EXELIST_geos-cbm = \
 	bitmap-demo.cvt \
+	deskacc.cvt \
 	filesel.cvt \
 	geosver.cvt \
 	getid.cvt \
 	hello1.cvt \
 	hello2.cvt \
+	inputdrv.cvt \
+	inputdrv128.cvt \
 	overlay-demo.cvt \
+	printdrv.cvt \
 	vector-demo.cvt \
 	yesno.cvt
 
@@ -172,9 +176,26 @@ yesno.cvt: yesnores.grc yesno.c
 	$(if $(QUIET),echo $(SYS):$@)
 	$(CL) -t $(SYS) -O -o $@ -m yesno.map yesnores.grc yesno.c
 
+deskacc.cvt: deskaccres.grc deskacc.c
+	$(if $(QUIET),echo $(SYS):$@)
+	$(CL) -t geos-c-da -O -o $@ -m deskacc.map deskaccres.grc deskacc.c
+
+printdrv.cvt: printdrv.grc printdrv.s
+	$(if $(QUIET),echo $(SYS):$@)
+	$(CL) -t geos-c-prn -O -o $@ -m printdrv.map --asm-include-dir ../../libsrc/$(SYS) --asm-include-dir ../../libsrc/geos-common printdrv.grc printdrv.s
+
+inputdrv.cvt: inputdrv.grc inputdrv.s
+	$(if $(QUIET),echo $(SYS):$@)
+	$(CL) -t geos-c-in -O -o $@ -m inputdrv.map --asm-include-dir ../../libsrc/$(SYS) --asm-include-dir ../../libsrc/geos-common inputdrv.grc inputdrv.s
+
+inputdrv128.cvt: inputdrv128.grc inputdrv128.s
+	$(if $(QUIET),echo $(SYS):$@)
+	$(CL) -t geos-c-in128 -O -o $@ -m inputdrv128.map --asm-include-dir ../../libsrc/$(SYS) --asm-include-dir ../../libsrc/geos-common inputdrv128.grc inputdrv128.s
+
 
 clean:
 	@$(DEL) overlay-demores.h 2>$(NULLDEV)
+	@$(DEL) deskaccres.h 2>$(NULLDEV)
 	@$(DEL) bitmap.c 2>$(NULLDEV)
 	@$(DEL) *.cvt 2>$(NULLDEV)
 	@$(DEL) *.map 2>$(NULLDEV)

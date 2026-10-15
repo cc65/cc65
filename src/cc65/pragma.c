@@ -189,7 +189,7 @@ static pragma_t FindPragma (const StrBuf* Key)
 ** not a valid pragma.
 */
 {
-    struct Pragma* P;
+    const struct Pragma* P;
     P = bsearch (SB_GetConstBuf (Key), Pragmas, PRAGMA_COUNT, sizeof (Pragmas[0]), CmpKey);
     return P? P->Tok : PRAGMA_ILLEGAL;
 }

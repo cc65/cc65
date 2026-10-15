@@ -188,27 +188,32 @@ static CodeLabel* PickRefLab (CodeEntry* E)
 {
     unsigned I;
     unsigned LabelCount = CE_GetLabelCount (E);
+    CodeLabel* L0;
+
     CHECK (LabelCount > 0);
-    /* Use either the first one as reference label, or a label with a Ref that has no JumpTo.
-    ** This is a hack to partially work around #1211.  Refs with no JumpTo are labels used
-    ** in data segments.  (They are not tracked.)  If a data segment is the only reference,
-    ** the label will be pruned away, but the data reference will remain, causing linking to fail.
+
+    /* Use either the first one as reference label, or an indirect jump target label.
+    ** This is a work around for computed goto labels referenced from data segments.
+    ** These references are not tracked. We pick an indirect jump target label
+    ** because it must remain, and this increases the chances of merging the labels.
     */
-    CodeLabel* L0 = CE_GetLabel (E, 0);
+    L0 = CE_GetLabel (E, 0);
+    if (CL_IsIndJumpTarget (L0)) {
+        /* The first label is already an indirect jump target; done. */
+        return L0;
+    }
+
     for (I = 1; I < LabelCount; ++I) {
-        unsigned J;
         CodeLabel* L = CE_GetLabel (E, I);
-        unsigned RefCount = CL_GetRefCount (L);
-        for (J = 0; J < RefCount; ++J) {
-            CodeEntry* EJ = CL_GetRef (L, J);
-            if (EJ->JumpTo == NULL) {
-                /* Move it to the beginning since it's simpler to handle the removal this way. */
-                CE_ReplaceLabel (E, L, 0);
-                CE_ReplaceLabel (E, L0, I);
-                return L;
-            }
+
+        if (CL_IsIndJumpTarget (L)) {
+            /* Move it to the beginning since it's simpler to handle the removal this way. */
+            CE_ReplaceLabel (E, L, 0);
+            CE_ReplaceLabel (E, L0, I);
+            return L;
         }
     }
+
     return L0;
 }
 
@@ -887,6 +892,27 @@ CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E)
 
 
 
+void CS_RegIndJumpLabel (CodeSeg* S, const char* Name)
+/* Mark the label with the given name as a possible target of an indirect
+** jump. The label is created if it doesn't exist yet, since the address of
+** a label may be taken before the label is defined.
+*/
+{
+    /* Generate the hash over the name, then search for the label */
+    unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
+    CodeLabel* L = CS_FindLabel (S, Name, Hash);
+
+    /* If we don't have the label, it's a forward ref - create it */
+    if (L == 0) {
+        L = CS_NewCodeLabel (S, Name, Hash);
+    }
+
+    /* Remember that the label may be reached indirectly */
+    CL_SetIndJumpTarget (L);
+}
+
+
+
 void CS_DelLabel (CodeSeg* S, CodeLabel* L)
 /* Remove references from this label and delete it. */
 {
@@ -998,6 +1024,13 @@ void CS_MergeLabels (CodeSeg* S)
             /* Get the next label */
             CodeLabel* L = CE_GetLabel (E, J);
 
+            /* A label that may be the target of an indirect jump has to keep
+            ** its name, because it is referenced from a data segment.
+            */
+            if (CL_IsIndJumpTarget (L)) {
+                continue;
+            }
+
             /* Move all references from this label to the reference label */
             CL_MoveRefs (L, RefLab);
 
@@ -1005,11 +1038,11 @@ void CS_MergeLabels (CodeSeg* S)
             CS_DelLabel (S, L);
         }
 
-        /* The reference label is the only remaining label. Check if there
-        ** are any references to this label, and delete it if this is not
-        ** the case.
+        /* Check if there are any references to the reference label, and
+        ** delete it if this is not the case. A label that may be the target
+        ** of an indirect jump is always kept.
         */
-        if (CollCount (&RefLab->JumpFrom) == 0) {
+        if (CollCount (&RefLab->JumpFrom) == 0 && !CL_IsIndJumpTarget (RefLab)) {
             /* Delete the label */
             CS_DelLabel (S, RefLab);
         }
@@ -1037,6 +1070,15 @@ void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 
             /* Get the next label */
             CodeLabel* OldLabel = CE_GetLabel (Old, OldLabelCount);
+
+            /* A label that may be the target of an indirect jump has to keep
+            ** its name, because it is referenced from a data segment. Move
+            ** the label itself instead of its references.
+            */
+            if (CL_IsIndJumpTarget (OldLabel)) {
+                CE_MoveLabel (OldLabel, New);
+                continue;
+            }
 
             /* Move references */
             CL_MoveRefs (OldLabel, NewLabel);
@@ -1078,8 +1120,10 @@ void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E)
     /* The entry jumps no longer to L */
     CE_ClearJumpTo (E);
 
-    /* If there are no more references, delete the label */
-    if (CollCount (&L->JumpFrom) == 0) {
+    /* If there are no more references, delete the label. A label that may be
+    ** the target of an indirect jump is always kept.
+    */
+    if (CollCount (&L->JumpFrom) == 0 && !CL_IsIndJumpTarget (L)) {
         CS_DelLabel (S, L);
     }
 }
@@ -1101,8 +1145,10 @@ void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
     /* Delete the entry from the label */
     CollDeleteItem (&OldLabel->JumpFrom, E);
 
-    /* If there are no more references, delete the label */
-    if (CollCount (&OldLabel->JumpFrom) == 0) {
+    /* If there are no more references, delete the label. A label that may be
+    ** the target of an indirect jump is always kept.
+    */
+    if (CollCount (&OldLabel->JumpFrom) == 0 && !CL_IsIndJumpTarget (OldLabel)) {
         CS_DelLabel (S, OldLabel);
     }
 
@@ -1295,6 +1341,14 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
 
             /* Get this label */
             CodeLabel* L = CE_GetLabel (E, LabelIndex);
+
+            /* An indirect jump may enter the range here, and we cannot tell
+            ** from where, so the range is not a basic block.
+            */
+            if (CL_IsIndJumpTarget (L)) {
+                CS_ResetMarks (S, First, Last);
+                return 0;
+            }
 
             /* Walk over all entries that jump to this label. Check for each
             ** of the entries if it is out of the range.
@@ -1551,7 +1605,21 @@ void CS_GenRegInfo (CodeSeg* S)
                 */
                 CodeLabel* Label = CE_GetLabel (E, 0);
                 unsigned Entry;
-                if (WasJump) {
+                if (CE_GetLabelCount (E) > 1                    ||
+                    CL_IsIndJumpTarget (Label)                  ||
+                    (WasJump && CL_GetRefCount (Label) == 0)) {
+                    /* We don't know all entry points of this insn: it may be
+                    ** the target of an indirect jump, it may have more than
+                    ** one label of which we look at just the first one, or
+                    ** the preceeding insn was an unconditional branch and no
+                    ** insn jumps here. Assume unknown register contents and
+                    ** skip the loop over the entry points below.
+                    */
+                    RC_Invalidate (&Regs);
+                    RC_InvalidatePS (&Regs);
+                    /* Skip the rest of the entries. */
+                    Entry = CL_GetRefCount (Label);
+                } else if (WasJump) {
                     /* Preceeding insn was an unconditional branch */
                     CodeEntry* J = CL_GetRef(Label, 0);
                     if (J->RI) {

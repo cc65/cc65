@@ -71,6 +71,7 @@ typedef enum {
     FEAT_LONG_JSR_JMP_RTS,
     FEAT_LINE_CONTINUATIONS,
     FEAT_MERGE_SCOPES,
+    FEAT_TAIL_CALL_OPT,
 
     /* Special value: Number of features available */
     FEAT_COUNT

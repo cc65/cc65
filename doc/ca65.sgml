@@ -3192,6 +3192,29 @@ See: <tt><ref id=".ASCIIZ" name=".ASCIIZ"></tt>,<tt><ref id=".CHARMAP" name=".CH
     assemblers which similarly allowed <tt>jsr</tt> and <tt>jmp</tt> to be used
     this way.
 
+  <tag><tt>tail_call_opt, tco</tt><label id="tail_call_opt"></tag>
+
+    Turn a <tt>jsr</tt> that is directly followed by an <tt>rts</tt> into a
+    <tt>jmp</tt> and omit the <tt>rts</tt>. This saves one byte, nine cycles
+    and two bytes of stack space for each such pair. The optimization is only
+    done for the plain <tt>jsr</tt> and <tt>rts</tt> instructions of the 6502
+    family (it does not apply to <tt>jsl</tt>/<tt>rtl</tt> and a few other
+    CPUs), and only if nothing is emitted between the two instructions and no
+    label is defined in front of the <tt>rts</tt>. A label of any kind (also
+    a cheap local label or an unnamed label) in front of the <tt>rts</tt>
+    prevents the optimization, so this is the way to keep the original code
+    where it is needed, for example in cycle exact code:
+    <tscreen><verb>
+        jsr     delay_31_cycles
+  @no_opt:
+        rts
+    </verb></tscreen>
+    <em/Note:/ Code that reaches the <tt>rts</tt> without a label, for
+    example with <tt>bne *+5</tt>, is not detected. The feature is off by
+    default. It can also be switched on and off in a region of the source
+    with <tt>.FEATURE tail_call_opt +</tt> and <tt>.FEATURE tail_call_opt
+    -</tt>.
+
   <tag><tt>merge_scopes</tt><label id="merge_scopes"></tag>
 
     Allow named <tt/.SCOPE/ blocks with the same enclosing scope to be

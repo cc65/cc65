@@ -162,6 +162,9 @@ void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize);
 ** and mark these symbols accordingly.
 */
 
+ExprNode* FuncBank (void);
+/* Handle the .BANK builtin function */
+
 ExprNode* FuncBankByte (void);
 /* Handle the .BANKBYTE builtin function */
 

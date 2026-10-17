@@ -2,14 +2,14 @@
 ; mainargs.s
 ;
 
-; Lower priority than initheap so __argv_mem() can use malloc().
-.constructor initmainargs, 23
+; Runs after crt0 clears BSS, so __argv_mem() may return static or heap
+; memory over the reclaimed ONCE.
+.constructor initmainargs, 5
 .import __argc, __argv, ___argv_mem
-.import incax2
 .importzp ptr1, ptr2
 .include "rp6502.inc"
 
-.segment "ONCE"
+.code
 
 .proc initmainargs
 
@@ -18,58 +18,41 @@
     sta     RIA_OP
     jsr     RIA_SPIN
 
-    ; Bail if argv size <= 0.
-    sta     ptr2
-    txa
-    bmi     zxstack    ; count < 0
-    sta     ptr2+1
-    ora     ptr2
-    beq     zxstack    ; count == 0
-
     ; Request memory; __argv_mem may clobber.
-    lda     ptr2
-    ldx     ptr2+1
-    pha
     phx
+    pha
     jsr     ___argv_mem
-    ply
-    sty     ptr2+1
-    ply
-    sty     ptr2
-
-    ; Bail if no memory.
-    sta     ptr1
-    stx     ptr1+1
     sta     __argv
     stx     __argv+1
-    ora     ptr1+1
-    beq     zxstack
+    sta     ptr1
+    stx     ptr1+1
+    sta     ptr2
+    stx     ptr2+1
+    ply
+    plx
 
-    ; Pop ptr2 bytes from RIA_XSTACK into memory.
-    ldy     #0
+    ; Bail if no memory.
+    ora     ptr1+1
+    beq     bail
+
+    ; Pop X:Y bytes from RIA_XSTACK into memory.
+    tya
+    beq     fillloop
+    inx
 fillloop:
     lda     RIA_XSTACK
-    sta     (ptr1),y
-    inc     ptr1
+    sta     (ptr2)
+    inc     ptr2
     bne     :+
-    inc     ptr1+1
-:   lda     ptr2
-    bne     :+
-    dec     ptr2+1
-:   dec     ptr2
-    lda     ptr2
-    ora     ptr2+1
+    inc     ptr2+1
+:   dey
+    bne     fillloop
+    dex
     bne     fillloop
 
     ; Walk the pointer table: relocate each offset to an absolute address
     ; and count argc. The RIA stores offsets relative to the buffer start;
     ; adding __argv turns them into usable pointers.
-relocate:
-    lda     __argv
-    sta     ptr1
-    lda     __argv+1
-    sta     ptr1+1
-
 walkloop:
     lda     (ptr1)          ; 65C02 ZP-indirect: low byte of entry
     ldy     #1
@@ -86,18 +69,15 @@ walkloop:
     sta     (ptr1),y
 
     inc     __argc
-    bne     :+
-    inc     __argc+1
-:
-    lda     ptr1
-    ldx     ptr1+1
-    jsr     incax2
+    lda     ptr1            ; carry is clear, the buffer ends below $10000
+    adc     #2
     sta     ptr1
-    stx     ptr1+1
+    bcc     walkloop
+    inc     ptr1+1
     bra     walkloop
 
-zxstack:
-    lda     #RIA_OP_ZXSTACK
+bail:
+    lda     #RIA_OP_DROP_XSTACK
     sta     RIA_OP
 
 done:

@@ -41,10 +41,10 @@ struct __RP6502
     const unsigned char rx;
     const unsigned char vsync;
     unsigned char rw0;
-    unsigned char step0;
+    signed char step0;
     unsigned int addr0;
     unsigned char rw1;
-    unsigned char step1;
+    signed char step1;
     unsigned int addr1;
     unsigned char xstack;
     unsigned int errno_;
@@ -61,35 +61,10 @@ struct __RP6502
 };
 #define RIA (*(volatile struct __RP6502 *)0xFFE0)
 
-#define RIA_READY_TX_BIT 0x80
-#define RIA_READY_RX_BIT 0x40
-#define RIA_BUSY_BIT 0x80
-
-/* XSTACK helpers */
-
-void __fastcall__ ria_push_long (unsigned long val);
-void __fastcall__ ria_push_int (unsigned int val);
-#define ria_push_char(v) RIA.xstack = v
-
-long ria_pop_long (void);
-int ria_pop_int (void);
-#define ria_pop_char() RIA.xstack
-
-/* Set the RIA fastcall register */
-
-void __fastcall__ ria_set_axsreg (unsigned long axsreg);
-void __fastcall__ ria_set_ax (unsigned int ax);
-#define ria_set_a(v) RIA.a = v
-
-/* Run an OS operation */
-
-int __fastcall__ ria_call_int (unsigned char op);
-long __fastcall__ ria_call_long (unsigned char op);
-
 /* OS operation numbers */
 
 #define RIA_OP_EXIT 0xFF
-#define RIA_OP_ZXSTACK 0x00
+#define RIA_OP_DROP_XSTACK 0x00
 #define RIA_OP_XREG 0x01
 #define RIA_OP_ARGV 0x08
 #define RIA_OP_EXEC 0x09
@@ -153,7 +128,7 @@ long __fastcall__ ria_call_long (unsigned char op);
 #define RIA_ATTR_CLK_RUN_DS 0x12
 #define RIA_ATTR_CLK_RUN_S 0x13
 
-/* C API for the operating system. */
+/* C API for the RIA. */
 
 typedef struct {
     unsigned long fsize;
@@ -166,14 +141,13 @@ typedef struct {
     char fname[255 + 1];
 } f_stat_t;
 
-int __cdecl__ xregn (char device, char channel, unsigned char address, unsigned count,
-    ...);
-int __cdecl__ xreg (char device, char channel, unsigned char address, ...);
-int __fastcall__ phi2 (void); // deprecated, use ria_attr_*
-int __fastcall__ code_page (int); // deprecated, use ria_attr_*
-long __fastcall__ lrand (void); // deprecated, use ria_attr_*
+int ria_spin (void);
+void ria_drop (void);
+unsigned char ria_vsync (void);
+unsigned char ria_irq_read (void);
+void __fastcall__ ria_irq_write (unsigned char mask);
 int __fastcall__ ria_execv (const char* path, char* const argv[]);
-int __cdecl__ ria_execl (const char* path, ...);
+int ria_execl (const char* path, ...);
 long __fastcall__ ria_attr_get (unsigned char id);
 int __fastcall__ ria_attr_set (long val, unsigned char id);
 int __fastcall__ read_xstack (void* buf, unsigned count, int fildes);
@@ -201,121 +175,31 @@ int __fastcall__ ria_rln_peek (char* peek, unsigned char* pos);
 int __fastcall__ ria_rln_poke (const char* poke);
 int __fastcall__ time_set (unsigned long time);
 
-/* XREG location helpers */
+/* Extended memory */
 
-#define xreg_ria_keyboard(...) xreg(0, 0, 0, __VA_ARGS__)
-#define xreg_ria_mouse(...) xreg(0, 0, 1, __VA_ARGS__)
-#define xreg_ria_gamepad(...) xreg(0, 0, 2, __VA_ARGS__)
-#define xreg_ria_tablet(...) xreg(0, 0, 3, __VA_ARGS__)
-#define xreg_vga_canvas(...) xreg(1, 0, 0, __VA_ARGS__)
-#define xreg_vga_mode(...) xreg(1, 0, 1, __VA_ARGS__)
+int xreg (char device, char channel, unsigned char address, ...);
+int xregn (char device, char channel, unsigned char address, unsigned count,
+    ...);
 
-/* XRAM structure helpers */
+void __fastcall__ xram0_read (void* dest, unsigned src, unsigned count);
+void __fastcall__ xram1_read (void* dest, unsigned src, unsigned count);
+void __fastcall__ xram0_write (unsigned dest, const void* src, unsigned count);
+void __fastcall__ xram1_write (unsigned dest, const void* src, unsigned count);
+void __fastcall__ xram0_set (unsigned dest, unsigned char val, unsigned count);
+void __fastcall__ xram1_set (unsigned dest, unsigned char val, unsigned count);
+void __fastcall__ xram_move (unsigned dest, unsigned src, unsigned count);
 
-#define xram0_struct_set(addr, type, member, val)                  \
-    RIA.addr0 = (unsigned)(&((type *)0)->member) + (unsigned)addr; \
-    switch (sizeof(((type *)0)->member))                           \
-    {                                                              \
-    case 1:                                                        \
-        RIA.rw0 = val;                                             \
-        break;                                                     \
-    case 2:                                                        \
-        RIA.step0 = 1;                                             \
-        RIA.rw0 = val & 0xff;                                      \
-        RIA.rw0 = (val >> 8) & 0xff;                               \
-        break;                                                     \
-    case 4:                                                        \
-        RIA.step0 = 1;                                             \
-        RIA.rw0 = (unsigned long)val & 0xff;                       \
-        RIA.rw0 = ((unsigned long)val >> 8) & 0xff;                \
-        RIA.rw0 = ((unsigned long)val >> 16) & 0xff;               \
-        RIA.rw0 = ((unsigned long)val >> 24) & 0xff;               \
-        break;                                                     \
-    }
-
-#define xram1_struct_set(addr, type, member, val)                  \
-    RIA.addr1 = (unsigned)(&((type *)0)->member) + (unsigned)addr; \
-    switch (sizeof(((type *)0)->member))                           \
-    {                                                              \
-    case 1:                                                        \
-        RIA.rw1 = val;                                             \
-        break;                                                     \
-    case 2:                                                        \
-        RIA.step1 = 1;                                             \
-        RIA.rw1 = val & 0xff;                                      \
-        RIA.rw1 = (val >> 8) & 0xff;                               \
-        break;                                                     \
-    case 4:                                                        \
-        RIA.step1 = 1;                                             \
-        RIA.rw1 = (unsigned long)val & 0xff;                       \
-        RIA.rw1 = ((unsigned long)val >> 8) & 0xff;                \
-        RIA.rw1 = ((unsigned long)val >> 16) & 0xff;               \
-        RIA.rw1 = ((unsigned long)val >> 24) & 0xff;               \
-        break;                                                     \
-    }
-
-typedef struct
-{
-    unsigned char x_wrap; // bool
-    unsigned char y_wrap; // bool
-    int x_pos_px;
-    int y_pos_px;
-    int width_chars;
-    int height_chars;
-    unsigned xram_data_ptr;
-    unsigned xram_palette_ptr;
-    unsigned xram_font_ptr;
-} vga_mode1_config_t;
-
-typedef struct
-{
-    unsigned char x_wrap; // bool
-    unsigned char y_wrap; // bool
-    int x_pos_px;
-    int y_pos_px;
-    int width_tiles;
-    int height_tiles;
-    unsigned xram_data_ptr;
-    unsigned xram_palette_ptr;
-    unsigned xram_tile_ptr;
-} vga_mode2_config_t;
-
-typedef struct
-{
-    unsigned char x_wrap; // bool
-    unsigned char y_wrap; // bool
-    int x_pos_px;
-    int y_pos_px;
-    int width_px;
-    int height_px;
-    unsigned xram_data_ptr;
-    unsigned xram_palette_ptr;
-} vga_mode3_config_t;
-
-typedef struct
-{
-    int x_pos_px;
-    int y_pos_px;
-    unsigned xram_sprite_ptr;
-    unsigned char log_size;
-    unsigned char has_opacity_metadata; // bool
-} vga_mode4_sprite_t;
-
-typedef struct
-{
-    int transform[6];
-    int x_pos_px;
-    int y_pos_px;
-    unsigned xram_sprite_ptr;
-    unsigned char log_size;
-    unsigned char has_opacity_metadata; // bool
-} vga_mode4_asprite_t;
-
-typedef struct {
-    int x_pos_px;
-    int y_pos_px;
-    unsigned xram_sprite_ptr;
-    unsigned palette_ptr;
-} vga_mode5_sprite_t;
+unsigned char __fastcall__ xram0_peek8 (unsigned addr);
+unsigned char __fastcall__ xram1_peek8 (unsigned addr);
+unsigned __fastcall__ xram0_peek16 (unsigned addr);
+unsigned __fastcall__ xram1_peek16 (unsigned addr);
+void __fastcall__ _xram0_poke8 (unsigned char val, unsigned addr);
+#define xram0_poke8(addr, val) _xram0_poke8 (val, addr)
+void __fastcall__ _xram1_poke8 (unsigned char val, unsigned addr);
+#define xram1_poke8(addr, val) _xram1_poke8 (val, addr)
+void __fastcall__ _xram0_poke16 (unsigned val, unsigned addr);
+#define xram0_poke16(addr, val) _xram0_poke16 (val, addr)
+void __fastcall__ _xram1_poke16 (unsigned val, unsigned addr);
+#define xram1_poke16(addr, val) _xram1_poke16 (val, addr)
 
 #endif /* _RP6502_H */

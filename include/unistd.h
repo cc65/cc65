@@ -78,6 +78,7 @@ int __fastcall__ write (int fd, const void* buf, unsigned count);
 int __fastcall__ read (int fd, void* buf, unsigned count);
 off_t __fastcall__ lseek (int fd, off_t offset, int whence);
 int __fastcall__ syncfs (int fd);
+int __fastcall__ isatty (int fd);
 int __fastcall__ unlink (const char* name);     /* Same as remove() */
 
 /* Directories */

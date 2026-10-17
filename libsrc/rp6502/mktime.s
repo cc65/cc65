@@ -4,20 +4,16 @@
 
         .export         _mktime
 
-        .import         __ria_call_time, __ria_time_fail
-        .import         _ria_call_int, _ria_push_long
+        .import         __ria_call_time
 
-        .importzp       ptr1, ptr2, sreg, tmp1
+        .importzp       ptr1, sreg, tmp1
 
         .include        "rp6502.inc"
 
 _mktime:
         sta     ptr1
         stx     ptr1+1          ; Save timep
-        ora     ptr1+1
-        bne     @push
-        jmp     __ria_time_fail ; NULL returns -1 without an OS call
-@push:  ldy     #17             ; sizeof(struct tm)-1, pushed in reverse
+        ldy     #17             ; sizeof(struct tm)-1, pushed in reverse
 @loop:  lda     (ptr1),y
         sta     RIA_XSTACK
         dey
@@ -25,11 +21,17 @@ _mktime:
         lda     #RIA_OP_MKTIME
         jsr     __ria_call_time ; A:X:sreg = time_t (or -1)
         bcs     @ret            ; error/overflow -> return -1, errno set
-        sta     tmp1
-        stx     ptr2            ; X survives in ptr2 across the call
-        jsr     _ria_push_long  ; normalized write-back via LOCALTIME
+        phx                     ; X survives on the stack across the call
+        stz     RIA_XSTACK      ; zero on top keeps the unsigned time_t positive
+        ldy     sreg+1          ; normalized write-back via LOCALTIME
+        sty     RIA_XSTACK
+        ldy     sreg
+        sty     RIA_XSTACK
+        stx     RIA_XSTACK
+        sta     RIA_XSTACK
         lda     #RIA_OP_LOCALTIME
-        jsr     _ria_call_int   ; N = sign of int result
+        sta     RIA_OP
+        jsr     RIA_SPIN        ; N = sign of int result
         bmi     @load
         ldy     #0
 @pop:   lda     RIA_XSTACK
@@ -38,5 +40,5 @@ _mktime:
         cpy     #18             ; sizeof(struct tm)
         bne     @pop
 @load:  lda     tmp1
-        ldx     ptr2
+        plx
 @ret:   rts

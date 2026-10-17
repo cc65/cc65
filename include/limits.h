@@ -73,6 +73,8 @@
 #  define PATH_MAX      (255)  /* should be 256+1, see libsrc/common/_cmd.s why it's not */
 #elif defined(__LUNIX__)
 #  define PATH_MAX      (80+1)
+#elif defined(__RP6502__)
+#  define PATH_MAX      (255+1)
 #elif defined(__TELESTRAT__)
 #  define PATH_MAX      (50+1)
 #else

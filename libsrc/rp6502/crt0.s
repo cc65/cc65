@@ -7,9 +7,14 @@
 .import callmain
 
 .export __STARTUP__ : absolute = 1
-.import __RAM_START__, __RAM_SIZE__
+.import __RAM_START__, __RAM_SIZE__, __STACKSIZE__
 
-.import copydata, zerobss, initlib, donelib
+.import zerobss, initlib, donelib
+
+; BSS overlays ONCE, so it is cleared after the constructors in ONCE have run.
+; cc65 libraries use priority 7 and up.
+.constructor clearbss, 6
+clearbss := zerobss
 
 .include "rp6502.inc"
 .include "zeropage.inc"
@@ -17,21 +22,10 @@
 .segment  "STARTUP"
 
 ; Essential 6502 startup the CPU doesn't do
-init:
     ldx #$FF
     txs
-    cld
 
-; Set cc65 argument stack pointer
-    lda #<(__RAM_START__ + __RAM_SIZE__)
-    sta c_sp
-    lda #>(__RAM_START__ + __RAM_SIZE__)
-    sta c_sp+1
-
-; Initialize memory storage
-    jsr zerobss   ; Clear BSS segment
-    jsr copydata  ; Initialize DATA segment
-    jsr initlib   ; Run constructors
+    jsr init
 
 ; Call main()
     jsr callmain
@@ -48,4 +42,15 @@ _exit:
     stx RIA_X
     lda #RIA_OP_EXIT
     sta RIA_OP
-    stp
+
+.segment  "ONCE"
+
+; Set cc65 argument stack pointer
+init:
+    lda #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+    sta c_sp
+    lda #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+    sta c_sp+1
+
+; Run constructors
+    jmp initlib

@@ -5,11 +5,6 @@
 ;
 
 .export ___argv_mem
+.import return0
 
-.proc ___argv_mem
-
-        lda     #0
-        tax
-        rts
-
-.endproc
+___argv_mem = return0

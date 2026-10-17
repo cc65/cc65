@@ -30,69 +30,93 @@ RIA_X           := $FFF6
 RIA_SREG        := $FFF8
 
 ; RIA OS operation numbers
-RIA_OP_EXIT               := $FF
-RIA_OP_ZXSTACK            := $00
-RIA_OP_XREG               := $01
-RIA_OP_ARGV               := $08
-RIA_OP_EXEC               := $09
-RIA_OP_ATTR_GET           := $0A
-RIA_OP_ATTR_SET           := $0B
-RIA_OP_OPEN               := $14
-RIA_OP_CLOSE              := $15
-RIA_OP_READ_XSTACK        := $16
-RIA_OP_READ_XRAM          := $17
-RIA_OP_WRITE_XSTACK       := $18
-RIA_OP_WRITE_XRAM         := $19
-RIA_OP_LSEEK              := $1A
-RIA_OP_LSEEK_CC65         := $1A
-RIA_OP_UNLINK             := $1B
-RIA_OP_RENAME             := $1C
-RIA_OP_LSEEK_LLVM         := $1D
-RIA_OP_SYNCFS             := $1E
-RIA_OP_STAT               := $1F
-RIA_OP_OPENDIR            := $20
-RIA_OP_READDIR            := $21
-RIA_OP_CLOSEDIR           := $22
-RIA_OP_TELLDIR            := $23
-RIA_OP_SEEKDIR            := $24
-RIA_OP_REWINDDIR          := $25
-RIA_OP_CHMOD              := $26
-RIA_OP_UTIME              := $27
-RIA_OP_MKDIR              := $28
-RIA_OP_CHDIR              := $29
-RIA_OP_CHDRIVE            := $2A
-RIA_OP_GETCWD             := $2B
-RIA_OP_SETLABEL           := $2C
-RIA_OP_GETLABEL           := $2D
-RIA_OP_GETFREE            := $2E
-RIA_OP_RLN_LASTKEY        := $30
-RIA_OP_RLN_PEEK           := $31
-RIA_OP_RLN_POKE           := $32
-RIA_OP_GMTIME             := $3A
-RIA_OP_LOCALTIME          := $3B
-RIA_OP_MKTIME             := $3C
-RIA_OP_STRFTIME           := $3D
-RIA_OP_TIME_SET           := $3E
-RIA_OP_TIME_GET           := $3F
+RIA_OP_EXIT               = $FF
+RIA_OP_DROP_XSTACK        = $00
+RIA_OP_XREG               = $01
+RIA_OP_ARGV               = $08
+RIA_OP_EXEC               = $09
+RIA_OP_ATTR_GET           = $0A
+RIA_OP_ATTR_SET           = $0B
+RIA_OP_OPEN               = $14
+RIA_OP_CLOSE              = $15
+RIA_OP_READ_XSTACK        = $16
+RIA_OP_READ_XRAM          = $17
+RIA_OP_WRITE_XSTACK       = $18
+RIA_OP_WRITE_XRAM         = $19
+RIA_OP_LSEEK              = $1A
+RIA_OP_LSEEK_CC65         = $1A
+RIA_OP_UNLINK             = $1B
+RIA_OP_RENAME             = $1C
+RIA_OP_LSEEK_LLVM         = $1D
+RIA_OP_SYNCFS             = $1E
+RIA_OP_STAT               = $1F
+RIA_OP_OPENDIR            = $20
+RIA_OP_READDIR            = $21
+RIA_OP_CLOSEDIR           = $22
+RIA_OP_TELLDIR            = $23
+RIA_OP_SEEKDIR            = $24
+RIA_OP_REWINDDIR          = $25
+RIA_OP_CHMOD              = $26
+RIA_OP_UTIME              = $27
+RIA_OP_MKDIR              = $28
+RIA_OP_CHDIR              = $29
+RIA_OP_CHDRIVE            = $2A
+RIA_OP_GETCWD             = $2B
+RIA_OP_SETLABEL           = $2C
+RIA_OP_GETLABEL           = $2D
+RIA_OP_GETFREE            = $2E
+RIA_OP_RLN_LASTKEY        = $30
+RIA_OP_RLN_PEEK           = $31
+RIA_OP_RLN_POKE           = $32
+RIA_OP_GMTIME             = $3A
+RIA_OP_LOCALTIME          = $3B
+RIA_OP_MKTIME             = $3C
+RIA_OP_STRFTIME           = $3D
+RIA_OP_TIME_SET           = $3E
+RIA_OP_TIME_GET           = $3F
 
 ; RIA attribute IDs
-RIA_ATTR_ERRNO_OPT        := $00
-RIA_ATTR_PHI2_KHZ         := $01
-RIA_ATTR_CODE_PAGE        := $02
-RIA_ATTR_RLN_LENGTH       := $03
-RIA_ATTR_LRAND            := $04
-RIA_ATTR_BEL              := $05
-RIA_ATTR_LAUNCHER         := $06
-RIA_ATTR_EXIT_CODE        := $07
-RIA_ATTR_SIGINT           := $08
-RIA_ATTR_RLN_CAPS         := $09
-RIA_ATTR_RLN_WIDTH        := $0A
-RIA_ATTR_RLN_HEIGHT       := $0B
-RIA_ATTR_RLN_SUPPRESS_NL  := $0C
-RIA_ATTR_CLK_RUN_MS       := $10
-RIA_ATTR_CLK_RUN_CS       := $11
-RIA_ATTR_CLK_RUN_DS       := $12
-RIA_ATTR_CLK_RUN_S        := $13
+RIA_ATTR_ERRNO_OPT        = $00
+RIA_ATTR_PHI2_KHZ         = $01
+RIA_ATTR_CODE_PAGE        = $02
+RIA_ATTR_RLN_LENGTH       = $03
+RIA_ATTR_LRAND            = $04
+RIA_ATTR_BEL              = $05
+RIA_ATTR_LAUNCHER         = $06
+RIA_ATTR_EXIT_CODE        = $07
+RIA_ATTR_SIGINT           = $08
+RIA_ATTR_RLN_CAPS         = $09
+RIA_ATTR_RLN_WIDTH        = $0A
+RIA_ATTR_RLN_HEIGHT       = $0B
+RIA_ATTR_RLN_SUPPRESS_NL  = $0C
+RIA_ATTR_CLK_RUN_MS       = $10
+RIA_ATTR_CLK_RUN_CS       = $11
+RIA_ATTR_CLK_RUN_DS       = $12
+RIA_ATTR_CLK_RUN_S        = $13
+
+; PIX extended registers, the assembly form of xreg()
+.macro xreg_values v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15
+  .ifnblank v0
+    lda #>(v0)
+    sta RIA_XSTACK
+    lda #<(v0)
+    sta RIA_XSTACK
+    xreg_values v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15
+  .endif
+.endmacro
+
+.macro xreg device, channel, address, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15
+    lda #(device)
+    sta RIA_XSTACK
+    lda #(channel)
+    sta RIA_XSTACK
+    lda #(address)
+    sta RIA_XSTACK
+    xreg_values v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15
+    lda #RIA_OP_XREG
+    sta RIA_OP
+    jsr RIA_SPIN
+.endmacro
 
 ; 6522 VIA
 VIA             := $FFD0        ; VIA base address

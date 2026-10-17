@@ -102,8 +102,8 @@ got_eof:
 
 done:
         jsr     terminate_ptr
-        ldx     #>buf
-        lda     #<buf
+        ldx     buf+1
+        lda     buf
         rts
 
 stopped_at_first_char:

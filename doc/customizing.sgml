@@ -545,8 +545,8 @@ sample.
 Calling sequence:
 
 <tscreen><verb>
-        lda     #&lt;(L0001)  ;  Load A with the high order byte
-        ldx     #&gt;(L0001)  ;  Load X with the low order byte
+        lda     #&lt;(L0001)  ;  Load A with the low order byte
+        ldx     #&gt;(L0001)  ;  Load X with the high order byte
         jsr     pushax     ;  Push A and X onto the stack
         jsr     _foo       ;  Call foo, i.e., foo (arg)
 </verb></tscreen>
@@ -572,8 +572,8 @@ shown in the following code sample.
 Calling sequence:
 
 <tscreen><verb>
-        lda     #&lt;(L0001)  ;  Load A with the high order byte
-        ldx     #&gt;(L0001)  ;  Load X with the low order byte
+        lda     #&lt;(L0001)  ;  Load A with the low order byte
+        ldx     #&gt;(L0001)  ;  Load X with the high order byte
         jsr     _foo       ;  Call foo, i.e., foo (arg)
 </verb></tscreen>
 

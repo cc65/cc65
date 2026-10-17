@@ -2,11 +2,11 @@
 ; 2023, Rumbledethumps
 ;
 ; CC65 will promote variadic char arguments to int. It will not demote longs.
-; int __cdecl__ xreg(char device, char channel, unsigned char address, ...);
+; int xreg(char device, char channel, unsigned char address, ...);
 
 .export _xreg
 .importzp c_sp
-.import addysp, _ria_call_int
+.import addysp
 
 .include "rp6502.inc"
 
@@ -32,6 +32,7 @@
 
     ; run RIA operation
     lda #RIA_OP_XREG
-    jmp _ria_call_int
+    sta RIA_OP
+    jmp RIA_SPIN
 
 .endproc

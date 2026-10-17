@@ -13,7 +13,6 @@
 initirq:
     lda #<handler
     ldx #>handler
-    sei
     sta $FFFE
     stx $FFFF
     cli
@@ -25,16 +24,11 @@ doneirq:
     sei
     rts
 
-.segment "LOWCODE"
-
 handler:
-    cld
     phx
     tsx
     pha
-    inx
-    inx
-    lda $100,X
+    lda $0102,X
     and #$10
     bne break
     phy
@@ -46,5 +40,5 @@ handler:
 
 break:
     lda #$FF
-    sta RIA_A
+    ldx #0
     jmp _exit

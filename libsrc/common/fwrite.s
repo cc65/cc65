@@ -8,7 +8,7 @@
         .export         _fwrite
 
         .import         _write
-        .import         pushax, pusha0, incsp6, addysp, ldaxysp, pushwysp, return0
+        .import         pushax, pusha0, incsp6, addysp, ldaxysp, pushwysp
         .import         tosumulax, tosudivax
 
         .importzp       ptr1
@@ -43,7 +43,7 @@
 
 @L1:    lda     #EBADF
         jsr     ___seterrno             ; Returns with A = 0
-        tax                             ; A = X = 0
+@L0:    tax                             ; A = X = 0
         jmp     incsp6
 
 ; Check if the stream is in an error state
@@ -108,7 +108,8 @@
         lda     (ptr1),y
         ora     #_FERROR
         sta     (ptr1),y
-        bne     @L1                     ; Return zero
+        lda     #0
+        beq     @L0                     ; Return zero
 
 ; Write was ok. Return the number of items successfully written. Since we've
 ; checked for bytes == 0 above, size cannot be zero here, so the division is

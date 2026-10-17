@@ -6,18 +6,19 @@
 
         .import         __rp6502_tm_call
         .import         ldeaxi
-        .import         _ria_push_long
+
+        .importzp       sreg
 
         .include        "rp6502.inc"
 
 _gmtime:
-        cpx     #$00
-        bne     @notnull
-        cmp     #$00
-        beq     @null           ; A/X already 0, return NULL
-@notnull:
         jsr     ldeaxi          ; A:X:sreg = *timep (32-bit load)
-        jsr     _ria_push_long  ; short stack, OS zero-fills to 64 bits
+        stz     RIA_XSTACK      ; zero on top keeps the unsigned time_t positive
+        ldy     sreg+1
+        sty     RIA_XSTACK
+        ldy     sreg
+        sty     RIA_XSTACK
+        stx     RIA_XSTACK
+        sta     RIA_XSTACK
         lda     #RIA_OP_GMTIME
         jmp     __rp6502_tm_call
-@null:  rts

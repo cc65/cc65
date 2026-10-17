@@ -4,8 +4,6 @@
 
         .export         __rp6502_tm_call
 
-        .import         _ria_call_int
-
         .include        "rp6502.inc"
 
 ;--------------------------------------------------------------------------
@@ -13,7 +11,8 @@
 ; Returns A/X = &__rp6502_tm, or NULL on error.
 
 __rp6502_tm_call:
-        jsr     _ria_call_int   ; A/X = result int, N = its sign
+        sta     RIA_OP
+        jsr     RIA_SPIN        ; A/X = result int, N = its sign
         bmi     @fail           ; negative = error, errno set by OS
         ldy     #0
 @loop:  lda     RIA_XSTACK

@@ -11,8 +11,9 @@
         .include        "tgi-error.inc"
         .include        "nes.inc"
         .include        "get_tv.inc"
-        .import         _clrscr, setcursor, putchar
-        .import         paldata
+        .import         _waitvsync
+        .import         _clrscr, setcursor_screenptr, putchar
+        .import         ppubuf_put, colors
 
         .macpack        generic
         .macpack        module
@@ -246,28 +247,18 @@ SETDRAWPAGE:
 ;
 
 SETPALETTE:
-; Wait for v-blank
-@wait:  lda     PPU_STATUS
-        bpl     @wait
-
-        lda     #$3F
-        sta     PPU_VRAM_ADDR2
-        lda     #$00
-        sta     PPU_VRAM_ADDR2
-
-        ldy     #0
+        LDY     #1
+        sty     TEMP
+@loop:  ldy     TEMP
         lda     (ptr1),y
-        sta     PALETTE
+        sta     PALETTE, y
         tax
-        lda     paldata,x
-;       sta     PPU_VRAM_IO
-
-        iny
-        lda     (ptr1),y
-        sta     PALETTE+1
-        tax
-        lda     paldata,x
-        sta     PPU_VRAM_IO
+        lda     colors,x
+        ldy     TEMP
+        ldx     #$3F
+        jsr     ppubuf_put
+        DEC     TEMP
+        bpl     @loop
 
         lda     #TGI_ERR_OK
         sta     ERROR
@@ -327,7 +318,7 @@ SETPIXEL:
         lsr
         tax
         clc
-        jsr     setcursor
+        jsr     setcursor_screenptr
         jsr     CALC
         ldx     COLOR
         bne     @set2
@@ -392,7 +383,7 @@ BAR:
         lda     Y2
         cmp     Y1
         bne     @L1
-        rts
+;       rts
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y
@@ -420,7 +411,7 @@ OUTTEXT:
         lsr
         tax
         clc
-        jsr     setcursor
+        jsr     setcursor_screenptr
         ldy     #0
 @L1:    lda     (ptr3),y
         jsr     putchar

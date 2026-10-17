@@ -1,11 +1,12 @@
 ;
 ; Ullrich von Bassewitz, 06.08.1998
+; Brandon Woodward, 2026-09-14
 ;
 ; void gotoxy (unsigned char x, unsigned char y);
 ;
 
         .export         gotoxy, _gotoxy
-        .import         setcursor
+        .import         setcursor_posx
         .import         popa
 
         .include        "nes.inc"
@@ -16,7 +17,6 @@ gotoxy:
 _gotoxy:
         sta     CURS_Y          ; Set Y
         jsr     popa            ; Get X
-        sta     CURS_X          ; Set X
         tay
         ldx     CURS_Y
-        jmp     setcursor       ; Set the cursor position
+        jmp     setcursor_posx  ; Set X

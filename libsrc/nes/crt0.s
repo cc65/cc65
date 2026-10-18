@@ -16,7 +16,7 @@
 
         ; Linker-generated symbols
         .import         __RAM_START__, __RAM_SIZE__
-        .import         __SRAM_START__, __SRAM_SIZE__
+        .import         __STACK_START__, __STACK_SIZE__
         .import         __ROM0_START__, __ROM0_SIZE__
         .import         __STARTUP_LOAD__,__STARTUP_RUN__, __STARTUP_SIZE__
         .import         __CODE_LOAD__,__CODE_RUN__, __CODE_SIZE__
@@ -126,8 +126,8 @@ start:
 
 ; Set up the stack.
 
-        lda     #<(__SRAM_START__ + __SRAM_SIZE__)
-        ldx     #>(__SRAM_START__ + __SRAM_SIZE__)
+        lda     #<(__STACK_START__ + __STACK_SIZE__)
+        ldx     #>(__STACK_START__ + __STACK_SIZE__)
         sta     c_sp
         stx     c_sp+1          ; Set argument stack ptr
 

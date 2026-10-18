@@ -39,7 +39,7 @@ config.
 
 <sect>Memory layout<p>
 
-cc65 generated programs with the default setup use the NROM mapping, which gives 
+cc65 generated programs with the default setup use the NROM mapping, which gives
 a usable memory range of &dollar;8000 - &dollar;FFF9. There is also extra WRAM
 specified in the header in the memory range &dollar;6000 - &dollar;7FFF.
 All boot ROM entry points may be called directly without additional code.

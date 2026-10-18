@@ -858,6 +858,16 @@ unsigned OptJumpTarget3 (CodeSeg* S)
                     /* Get the entry that jumps here */
                     CodeEntry* Jump = CL_GetRef (L, K);
 
+                    /* This entry may be a data-segment-only reference to L
+                    ** rather than a real tracked jump (JumpTo == NULL, see
+                    ** the #1211 workaround in PickRefLab). Such an entry
+                    ** isn't a branch we can redirect, so skip it.
+                    */
+                    if (Jump->JumpTo == 0) {
+                        continue;
+                    }
+                    CHECK (Jump->JumpTo == L);
+
                     /* Get the register info from this insn */
                     short Val = RegVal (E->Chg, &Jump->RI->Out2);
 

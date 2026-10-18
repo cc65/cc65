@@ -434,6 +434,7 @@ unsigned OptDeadCode (CodeSeg* S)
              ((N->Info & OF_UBRA) != 0          &&              /* Uncond branch */
               (LN = N->JumpTo) != 0             &&              /* Jumps to known label */
               LN->Owner == N                    &&              /* Attached to insn */
+              !CL_IsIndJumpTarget (LN)          &&              /* Not reached indirectly */
               CL_GetRefCount (LN) == 1))) {                     /* Only reference */
 
             /* Delete the next entry */

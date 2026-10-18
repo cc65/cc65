@@ -79,7 +79,7 @@ struct tm {
 #    define CLOCKS_PER_SEC      60
 #  endif
 #elif defined(__NES__)
-#  define CLOCKS_PER_SEC        50
+#  define CLOCKS_PER_SEC        60
 #elif defined(__PCE__)
 #  define CLOCKS_PER_SEC        60
 #elif defined(__GAMATE__)

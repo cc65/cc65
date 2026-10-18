@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 08.08.1998
+; 1 byte saved by Brandon Woodward, 2026-09-14
 ;
 ; void cclearxy (unsigned char x, unsigned char y, unsigned char length);
 ; void cclear (unsigned char length);
@@ -15,15 +16,11 @@ _cclearxy:
         pla                     ; Restore the length and run into _cclear
 
 _cclear:
-        cmp     #0              ; Is the length zero?
+        tax                     ; Is the length zero?
         beq     L9              ; Jump if done
         sta     tmp1
-L1:     lda     #$20            ; Blank - screen code
+L1:     lda     #' '
         jsr     cputdirect      ; Direct output
         dec     tmp1
         bne     L1
 L9:     rts
-
-
-
-

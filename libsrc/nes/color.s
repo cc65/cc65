@@ -1,68 +1,36 @@
 ;
 ; Written by Groepaz/Hitmen <groepaz@gmx.net>
 ; Cleanup by Ullrich von Bassewitz <uz@cc65.org>
+; Optimized by Brandon Woodward
 ;
 ; unsigned char __fastcall__ textcolor (unsigned char color);
 ; unsigned char __fastcall__ bgcolor (unsigned char color);
 ; unsigned char __fastcall__ bordercolor (unsigned char color);
 ;
 
-
+        .import         return0, return1, ppubuf_put, colors
         .export         _textcolor, _bgcolor, _bordercolor
-        .import         return0, return1, ppubuf_put
 
         .include        "nes.inc"
 
-_textcolor      = return1
 _bordercolor    = return0
 
-.proc   _bgcolor
+_bgcolor:
+        ldy     #0
+        beq     L1
 
-        tax
-        lda     BGCOLOR         ; get old value
-        stx     BGCOLOR         ; set new value
+_textcolor:
+        ldy     #1
+
+L1:     tax
+        lda     BGCOLOR,y       ; get old value
         pha
+        txa
+        sta     BGCOLOR,y       ; set new value
 
         lda     colors,x
-        pha
-        ldy     #$3F
-        ldx     #0
-        jsr     ppubuf_put
-        pla
-        pha
-        ldy     #$3F
-        ldx     #4
-        jsr     ppubuf_put
-        pla
-        pha
-        ldy     #$3F
-        ldx     #8
-        jsr     ppubuf_put
-        pla
-        ldy     #$3F
-        ldx     #12
+        ldx     #>$3F00         ; Y already has low byte of ptr
         jsr     ppubuf_put
 
         pla
         rts
-
-.endproc
-
-.rodata
-
-colors: .byte $0f       ; 0 black
-        .byte $3d       ; 1 white
-        .byte $04       ; 2 red
-        .byte $3b       ; 3 cyan
-        .byte $14       ; 4 violet
-        .byte $1a       ; 5 green
-        .byte $01       ; 6 blue
-        .byte $38       ; 7 yellow
-        .byte $18       ; 8 orange
-        .byte $08       ; 9 brown
-        .byte $35       ; a light red
-        .byte $2d       ; b dark grey
-        .byte $10       ; c middle grey
-        .byte $2b       ; d light green
-        .byte $22       ; e light blue
-        .byte $3d       ; f light gray

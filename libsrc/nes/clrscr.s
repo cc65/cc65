@@ -1,72 +1,61 @@
 ;
 ; Written by Groepaz/Hitmen <groepaz@gmx.net>
 ; Cleanup by Ullrich von Bassewitz <uz@cc65.org>
+; Some optimizations by Brandon Woodward
 ;
 ; void clrscr (void);
 ;
 
-        .export         _clrscr
-        .import         ppubuf_waitempty
+        .export         _clrscr, clrscr_skipvsync
 
         .include        "nes.inc"
+        .import         _waitvsync
 
 
 .proc   _clrscr
 
-; wait until all console data has been written
-
-        jsr     ppubuf_waitempty
-
 ; wait for vblank
 
-        lda     #0
-        sta     VBLANK_FLAG
-@w2:    lda     VBLANK_FLAG
-        beq     @w2
+        jsr     _waitvsync
+
+.endproc
+.proc   clrscr_skipvsync
 
 ; switch screen off
 
-        lda     #%00000000
-        sta     PPU_CTRL2
+;       ldx     #%00000000      ; X already 0
+        stx     PPU_CTRL2
 
-; Set start address to Name Table #1
+; Set VRAM address to Nametable #1
 
-        lda     #$20
+        lda     #>$2000
         sta     PPU_VRAM_ADDR2
-        lda     #$00
-        sta     PPU_VRAM_ADDR2
+;       ldx     #<$0000         ; X already 0
+        stx     PPU_VRAM_ADDR2
 
-; Clear Name Table #1
+; Clear Nametable & Attribute table #1 (TODO test)
 
-        lda     #' '
-        ldx     #$f0            ; 4*$f0=$03c0
-
-beg:    sta     PPU_VRAM_IO
+;       ldx     #$00            ; X already 0
+.assert ' ' = >$2000, error, "' ' is not $20"
+;       lda     #' '            ;Coincidentally, A already happens to have the right value
+ntloop: dex
+        sta     PPU_VRAM_IO     ;write $3C0 chars to the nametable
         sta     PPU_VRAM_IO
         sta     PPU_VRAM_IO
         sta     PPU_VRAM_IO
+        cpx     #$11
+        bcs     ntloop
+        lda     #0              ; For the last 64 bytes, write 0 to the attribute table
         dex
-        bne     beg
+        bpl     ntloop+1        ; Skip the dex since we just did one
 
-        lda     #$23            ;
-        sta     PPU_VRAM_ADDR2  ; Set start address to PPU address $23C0
-        lda     #$C0            ; (1st attribute table)
-        sta     PPU_VRAM_ADDR2
+        lda     #$80
+        sta     sprdma_en       ;OAM contents have decayed by now so it needs to be refreshed
 
-        ldx     #$00
+; switch screen on again during VBLANK
 
-lll:    lda     #$00            ; Write attribute table value and auto increment
-        sta     PPU_VRAM_IO     ; to next address
-        inx
-        cpx     #$40
-        bne     lll
-
-; switch screen on again
-
-        lda     #%00011110
-        sta     PPU_CTRL2
+        lda     #PPU_RENDER_EN
+        sta     ppuctrl2_buf
         rts
 
 .endproc
-
-

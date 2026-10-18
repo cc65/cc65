@@ -64,7 +64,7 @@ Special locations:
 </descrip><p>
 
 Note that the 8KB of extra WRAM is flagged as battery-backed in the default
-NES2.0 header. This non-volatile functionality can be used by adding an 
+NES2.0 header. This non-volatile functionality can be used by adding an
 extra BSS segment in the linker configuration file.
 
 

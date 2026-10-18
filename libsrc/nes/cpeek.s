@@ -16,7 +16,6 @@
         .import         return1
         .export         _cpeekcolor := return1  ; always COLOR_WHITE
 
-        .forceimport    initconio
         .import         _waitvsync
         .export         _cpeekc, _cpeekrevers
 

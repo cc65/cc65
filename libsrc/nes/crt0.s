@@ -219,7 +219,7 @@ nmi:    pha
         sta     PPU_CTRL2
 
         stx     ppust_count
-        sty     VBLANK_FLAG     ; X != 0
+        sty     VBLANK_FLAG     ; Y != 0
 
         inc     tickcount
         bne     @s3

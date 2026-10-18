@@ -10,6 +10,8 @@
 
         .include        "nes.inc"
 
+; The fact that this does not touch Y and clears X is used by other subroutines
+
 .proc   _waitvsync
 
         ldx     #0

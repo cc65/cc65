@@ -827,7 +827,12 @@ static void StudyDiv (ExprNode* Expr, ExprDesc* D)
             Error ("Division by zero");
             ED_SetError (D);
         } else {
-            D->Val /= D->Right;
+            /* LONG_MIN / -1 overflows (and traps on x86) */
+            if (D->Right == -1) {
+                D->Val = (long) (0UL - (unsigned long) D->Val);
+            } else {
+                D->Val /= D->Right;
+            }
         }
     }
 }
@@ -846,7 +851,7 @@ static void StudyMod (ExprNode* Expr, ExprDesc* D)
             Error ("Modulo operation with zero");
             ED_SetError (D);
         } else {
-            D->Val %= D->Right;
+            D->Val = (D->Right == -1)? 0 : D->Val % D->Right;
         }
     }
 }

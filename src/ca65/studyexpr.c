@@ -433,7 +433,7 @@ static void ED_NegRefs (ExprDesc* D)
 static void ED_Add (ExprDesc* ED, const ExprDesc* Right)
 /* Calculate ED = ED + Right, update address size in ED */
 {
-    ED->Val += Right->Val;
+    ED->Val = (long) ((unsigned long) ED->Val + (unsigned long) Right->Val);
     ED_MergeRefs (ED, Right);
     ED_MergeAddrSize (ED, Right);
 }
@@ -446,7 +446,7 @@ static void ED_Sub (ExprDesc* ED, const ExprDesc* Right)
     ExprDesc D = *Right;        /* Temporary */
     ED_NegRefs (&D);
 
-    ED->Val -= Right->Val;
+    ED->Val = (long) ((unsigned long) ED->Val - (unsigned long) Right->Val);
     ED_MergeRefs (ED, &D);      /* Merge negatives */
     ED_MergeAddrSize (ED, Right);
 }
@@ -458,7 +458,7 @@ static void ED_Mul (ExprDesc* ED, const ExprDesc* Right)
 {
     unsigned I;
 
-    ED->Val *= Right->Val;
+    ED->Val = (long) ((unsigned long) ED->Val * (unsigned long) Right->Val);
     for (I = 0; I < ED->SymCount; ++I) {
         ED->SymRef[I].Count *= Right->Val;
     }
@@ -473,7 +473,7 @@ static void ED_Mul (ExprDesc* ED, const ExprDesc* Right)
 static void ED_Neg (ExprDesc* D)
 /* Negate an expression */
 {
-    D->Val = -D->Val;
+    D->Val = (long) (0UL - (unsigned long) D->Val);
     ED_NegRefs (D);
 }
 

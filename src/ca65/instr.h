@@ -79,8 +79,8 @@
 #define AM65_REL_LONG           0x00040000UL /* LONGREL */
 #define AM65_STACK_REL          0x00080000UL /* adr,s */
 #define AM65_STACK_REL_IND_Y    0x00100000UL /* (rel,s),y */
-#define AM65_IMM_ACCU           0x00200000UL
-#define AM65_IMM_INDEX          0x00400000UL
+#define AM65_IMM_ACCU           0x00200000UL /* IMM (per .ASIZE on 65816) */
+#define AM65_IMM_INDEX          0x00400000UL /* IMM (per .ISIZE on 65816) */
 #define AM65_IMM_IMPLICIT       0x00800000UL /* IMM */
 #define AM65_BLOCKMOVE          0x01000000UL
 #define AM65_BLOCKXFER          0x02000000UL

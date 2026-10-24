@@ -105,7 +105,7 @@ struct pixel {                  /* describes point              */
 
 struct fontdesc {               /* describes font               */
         char baseline;
-        char width;
+        unsigned width;
         char height;
         char *index_tbl;
         char *data_ptr;

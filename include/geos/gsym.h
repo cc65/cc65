@@ -61,17 +61,50 @@
 
 #ifdef __GEOS_CBM__
 
-#define nameBuf         char[17]
-#define blockBuf        char[256]
-
 #define CPU_DDR         (*(char*)0x00)
 #define CPU_DATA        (*(char*)0x01)
 
 #define R_BASE          0x02
 
+#define a0              (*(unsigned*)0xfb)
+#define a0L             (*(char*)0xfb)
+#define a0H             (*(char*)0xfc)
+#define a1              (*(unsigned*)0xfd)
+#define a1L             (*(char*)0xfd)
+#define a1H             (*(char*)0xfe)
+#define a2              (*(unsigned*)0x70)
+#define a2L             (*(char*)0x70)
+#define a2H             (*(char*)0x71)
+#define a3              (*(unsigned*)0x72)
+#define a3L             (*(char*)0x72)
+#define a3H             (*(char*)0x73)
+#define a4              (*(unsigned*)0x74)
+#define a4L             (*(char*)0x74)
+#define a4H             (*(char*)0x75)
+#define a5              (*(unsigned*)0x76)
+#define a5L             (*(char*)0x76)
+#define a5H             (*(char*)0x77)
+#define a6              (*(unsigned*)0x78)
+#define a6L             (*(char*)0x78)
+#define a6H             (*(char*)0x79)
+#define a7              (*(unsigned*)0x7a)
+#define a7L             (*(char*)0x7a)
+#define a7H             (*(char*)0x7b)
+#define a8              (*(unsigned*)0x7c)
+#define a8L             (*(char*)0x7c)
+#define a8H             (*(char*)0x7d)
+#define a9              (*(unsigned*)0x7e)
+#define a9L             (*(char*)0x7e)
+#define a9H             (*(char*)0x7f)
+
 #define curPattern      (*(unsigned*)0x22)
 #define string          (*(unsigned*)0x24)
 #define curFontDesc     (*(struct fontdesc*)0x26)
+#define baselineOffset  (*(char*)0x26)
+#define curSetWidth     (*(unsigned*)0x27)
+#define curHeight       (*(char*)0x29)
+#define curIndexTable   (*(char**)0x2a)
+#define cardDataPntr    (*(char**)0x2c)
 #define currentMode     (*(char*)0x2e)
 #define dispBufferOn    (*(char*)0x2f)
 #define mouseOn         (*(char*)0x30)
@@ -93,18 +126,18 @@
 #define PRINTBASE       ((char*)0x7900)
 #define OS_VARS         ((char*)0x8000)
 
-#define diskBlkBuf      ((blockBuf)0x8000)
+#define diskBlkBuf      ((char*)0x8000)
 #define fileHeader      (*(struct fileheader*)0x8100)
-#define curDirHead      ((blockBuf)0x8200)
-#define fileTrScTab     ((struct tr_se[128])0x8300)
+#define curDirHead      ((char*)0x8200)
+#define fileTrScTab     ((struct tr_se*)0x8300)
 #define dirEntryBuf     (*(struct filehandle*)0x8400)
 
-#define DrACurDkNm      ((nameBuf)0x841e)
-#define DrBCurDkNm      ((nameBuf)0x8430)
-#define dataFileName    ((nameBuf)0x8442)
-#define dataDiskName    ((nameBuf)0x8453)
-#define PrntFileName    ((nameBuf)0x8465)
-#define PrntDiskName    ((nameBuf)0x8476)
+#define DrACurDkNm      ((char*)0x841e)
+#define DrBCurDkNm      ((char*)0x8430)
+#define dataFileName    ((char*)0x8442)
+#define dataDiskName    ((char*)0x8453)
+#define PrntFilename    ((char*)0x8465)
+#define PrntDiskName    ((char*)0x8476)
 
 #define curDrive        (*(char*)0x8489)
 #define diskOpenFlg     (*(char*)0x848a)
@@ -112,8 +145,8 @@
 #define interleave      (*(char*)0x848c)
 #define NUMDRV          (*(char*)0x848d)
 
-#define driveType       ((char[4])0x848e)
-#define turboFlags      ((char[4])0x8492)
+#define driveType       ((char*)0x848e)
+#define turboFlags      ((char*)0x8492)
 
 #define VLIRInfo        (*(struct VLIR_info*)0x8496)
 
@@ -160,20 +193,20 @@
 #define scr80polar      (*(char*)0x88bc)
 #define scr80colors     (*(char*)0x88bd)
 #define vdcClrMode      (*(char*)0x88be)
-#define driveData       ((char[4])0x88bf)
+#define driveData       ((char*)0x88bf)
 #define ramExpSize      (*(char*)0x88c3)
 #define sysRAMFlg       (*(char*)0x88c4)
 #define firstBoot       (*(char*)0x88c5)
 #define curType         (*(char*)0x88c6)
 #define ramBase         (*(char*)0x88c7)
-#define inputDevName    ((nameBuf)0x88cb)
-#define DrCCurDkNm      ((nameBuf)0x88dc)
-#define DrDCurDkNm      ((nameBuf)0x88ee)
-#define dir2Head        ((blockBuf)0x8900)
+#define inputDevName    ((char*)0x88cb)
+#define DrCCurDkNm      ((char*)0x88dc)
+#define DrDCurDkNm      ((char*)0x88ee)
+#define dir2Head        ((char*)0x8900)
 #define SPRITE_PICS     ((char*)0x8a00)
-#define sprpic          ((char[8][64])0x8a00)
-#define COLOR_MATRIX    ((char[1000])0x8c00)
-#define objPointer      ((char[8])0x8ff8)
+#define sprpic          ((char(*)[64])0x8a00)
+#define COLOR_MATRIX    ((char*)0x8c00)
+#define objPointer      ((char*)0x8ff8)
 
 #define DISK_BASE       ((char*)0x9000)
 #define SCREEN_BASE     ((char*)0xa000)
@@ -256,14 +289,16 @@
 
 #else /* #ifdef __GEOS_CBM__ */
 
-#define nameBuf         char[16]
-#define blockBuf        char[512]
-
 #define R_BASE          0x00
 
 #define curPattern      (*(unsigned*)0x022c)
 #define string          (*(unsigned*)0x53)
 #define curFontDesc     (*(struct fontdesc*)0x0218)
+#define baselineOffset  (*(char*)0x0218)
+#define curSetWidth     (*(unsigned*)0x0219)
+#define curHeight       (*(char*)0x021b)
+#define curIndexTable   (*(char**)0x5e)
+#define cardDataPntr    (*(char**)0x60)
 #define currentMode     (*(char*)0x021c)
 #define dispBufferOn    (*(char*)0x021d)
 #define mouseOn         (*(char*)0x5d)
@@ -272,22 +307,22 @@
 #define mousePos        (*(struct pixel*)0x0241)
 #define returnAddress   (*(unsigned*)0x64)
 
-#define diskBlkBuf      ((blockBuf)0xf659)
+#define diskBlkBuf      ((char*)0xf659)
 #define fileHeader      (*(struct fileheader*)0xf859)
-#define curDirHead      ((char[39])0xfa80)
+#define curDirHead      ((char*)0xfa80)
 #define dirEntryBuf     (*(struct filehandle*)0xfa59)
 
-#define DrACurDkNm      ((nameBuf)0xfaa7)
-#define DrBCurDkNm      ((nameBuf)0xfab7)
-#define dataFileName    ((nameBuf)0x02a4)
-#define dataDiskName    ((nameBuf)0x02b4)
-#define PrntFileName    ((nameBuf)0x08ac)
+#define DrACurDkNm      ((char*)0xfaa7)
+#define DrBCurDkNm      ((char*)0xfab7)
+#define dataFileName    ((char*)0x02a4)
+#define dataDiskName    ((char*)0x02b4)
+#define PrntFilename    ((char*)0x08ac)
 
 #define curDrive        (*(char*)0xf60d)
 #define diskOpenFlg     (*(char*)0xf617)
 #define NUMDRV          (*(char*)0xf60e)
 
-#define driveType       ((char[4])0xfaf3)
+#define driveType       ((char*)0xfaf3)
 
 #define VLIRInfo        (*(struct VLIR_info*)0xf618)
 
@@ -327,9 +362,9 @@
 #define dlgBoxRamBuf    (*(char*)0xf381)
 
 #define firstBoot       (*(char*)0x0281)
-#define inputDevName    ((nameBuf)0x08cc)
-#define DrCCurDkNm      ((nameBuf)0xfac7)
-#define DrDCurDkNm      ((nameBuf)0xfad7)
+#define inputDevName    ((char*)0x08cc)
+#define DrCCurDkNm      ((char*)0xfac7)
+#define DrDCurDkNm      ((char*)0xfad7)
 
 #define mobenble        (*(char*)0x0818)
 #define moby2           (*(char*)0x081a)

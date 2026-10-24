@@ -920,8 +920,8 @@ void OH_AccumulatorBitBranch (const OpcDesc* D)
 {
     int8_t BranchOffs = GetCodeByte (PC+1);
 
-    /* Calculate the target address for the branch */
-    uint32_t BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
+    /* Calculate the target address for the branch (2 byte instruction) */
+    uint32_t BranchAddr = (((int) PC+2) + BranchOffs) & 0xFFFF;
 
     /* Generate labels in pass 1 */
     GenerateLabel (flLabel, BranchAddr);

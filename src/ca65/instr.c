@@ -1954,15 +1954,23 @@ static void EmitCode (EffAddr* A)
 static void PutLDM_m740 (const InsDesc* Ins)
 {
     EffAddr A;
+    ExprNode* Imm;
+
     /* Evaluate the addressing mode */
     if (EvalEA (Ins, &A) == 0) {
         /* An error occurred */
         return;
     }
+
+    /* Read all operands before emitting anything, so that '*' in an
+    ** operand refers to the start of the instruction.
+    */
+    Consume (TOK_HASH, "`#' expected");
+    Imm = Expression ();
+
     Emit0 (Ins->BaseCode);
     EmitByte (A.Expr);
-    Consume (TOK_HASH, "`#' expected");
-    EmitByte (Expression ());
+    EmitByte (Imm);
 }
 
 
@@ -2066,12 +2074,23 @@ static void PutBlockMove (const InsDesc* Ins)
 static void PutBlockTransfer (const InsDesc* Ins)
 /* Handle the block transfer instructions (HuC6280) */
 {
+    ExprNode* Src;
+    ExprNode* Dst;
+    ExprNode* Len;
+
+    /* Read all operands before emitting anything, so that '*' in an
+    ** operand refers to the start of the instruction.
+    */
+    Src = Expression ();
+    ConsumeComma ();
+    Dst = Expression ();
+    ConsumeComma ();
+    Len = Expression ();
+
     Emit0 (Ins->BaseCode);
-    EmitWord (Expression ());
-    ConsumeComma ();
-    EmitWord (Expression ());
-    ConsumeComma ();
-    EmitWord (Expression ());
+    EmitWord (Src);
+    EmitWord (Dst);
+    EmitWord (Len);
 }
 
 
@@ -2079,10 +2098,20 @@ static void PutBlockTransfer (const InsDesc* Ins)
 static void PutBitBranch (const InsDesc* Ins)
 /* Handle 65C02 branch on bit condition */
 {
-    Emit0 (Ins->BaseCode);
-    EmitByte (Expression ());
+    ExprNode* Zp;
+    ExprNode* Target;
+
+    /* Read both operands before emitting anything, so that '*' in the
+    ** branch target refers to the start of the instruction. The branch
+    ** offset is relative to the end of the 3 byte instruction.
+    */
+    Zp = Expression ();
     ConsumeComma ();
-    EmitSigned (GenBranchExpr (1), 1);
+    Target = GenBranchExpr (3);
+
+    Emit0 (Ins->BaseCode);
+    EmitByte (Zp);
+    EmitSigned (Target, 1);
 }
 
 static void PutBitBranch_m740 (const InsDesc* Ins)
@@ -2108,17 +2137,20 @@ static void PutBitBranch_m740 (const InsDesc* Ins)
     A.Opcode = Ins->BaseCode;
 
     if (A.AddrMode == AM65I_ACCU) {
-        /* Accu */
-        Emit0 (A.Opcode);
+        /* Accu: 2 byte instruction, offset relative to its end */
+        ExprNode* Target;
         ConsumeComma ();
-        EmitSigned (GenBranchExpr (2), 1);
+        Target = GenBranchExpr (2);
+        Emit0 (A.Opcode);
+        EmitSigned (Target, 1);
     } else if (A.AddrMode == AM65I_ZP_REL) {
         /* FIXME: hacky, the comma was already consumed here */
         A.Opcode += 0x04;
-        /* Zeropage */
+        /* Zeropage: 3 byte instruction, offset relative to its end */
+        ExprNode* Target = GenBranchExpr (3);
         Emit0 (A.Opcode);
         EmitByte (A.Expr);
-        EmitSigned (GenBranchExpr (1), 1);
+        EmitSigned (Target, 1);
     }
 }
 

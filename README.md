@@ -11,6 +11,7 @@ the [cc65 web site](https://cc65.github.io):
 |-------------------------|-------------------------------------|
 | Apple                   | Apple II                            |
 |                         | Apple IIe enhanced                  |
+|                         | Apple III                           |
 | Atari                   | Atari 400/800                       |
 |                         | Atari 2600                          |
 |                         | Atari 5200                          |

@@ -315,7 +315,7 @@ on the screen.
 <p>
 This function tests if the given pixel is set and returns <tt/true/ (non-zero) or <tt/false/ (zero).
 
-<sect2>Character and string output
+<sect2>Character and string input and output
 
 <sect3>PutChar
 <p>
@@ -339,6 +339,25 @@ This function converts <tt/value/ to its decimal representation and outputs it t
 The <tt/parameter/ is the field width in pixels (range 1-31) and the mode bits. Depending on them
 the string can be filled with zeroes (the string is always 5 characters long) or not and left or right
 justified to the given pixel. See <tt/ggraph.h/ for predefined values for <tt/parameter/.
+
+<sect3>GetString
+<p>
+<tt/void GetString (char *buffer, char maxLen, char y, unsigned x, void (*doneHandler)(void), void (*faultHandler)(void))/
+<p>
+This function sets up string input at the given screen position and stores the string in the given
+<tt/buffer/.  String input is handled by the mainloop, this routine returns immediately just like
+DoMenu.  <tt/doneHandler/ is the handler that will be called when the user presses return.  If
+<tt/faultHandler/ is non-zero it is used instead of the system fault handler and will be called when
+the cursor lands outside the current window.
+
+<p>
+You can put a default string in <tt/buffer/, but in that case the faultHandler will not be installed
+correctly.  If you need both a default and a fault handler, reinstall the fault handler after the
+GetString call, like this:
+<p>
+<tt/GetString(buf, maxLen, y, x, doneHandler, NULL);/
+<p>
+<tt/StringFaultVec = faultHandler;/
 
 <sect2>Font Handling
 

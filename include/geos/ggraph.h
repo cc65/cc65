@@ -31,6 +31,8 @@ char __fastcall__ TestPoint(struct pixel *myPixel);
 void __fastcall__ PutChar(char character, char y, unsigned x);
 void __fastcall__ PutString(char *myString, char y, unsigned x);
 void __fastcall__ PutDecimal(char style, unsigned value, char y, unsigned x);
+void __fastcall__ GetString(char *buffer, char maxLen, char y, unsigned x,
+                             void_func doneHandler, void_func faultHandler);
 
 char __fastcall__ GetCharWidth(char character);
 void __fastcall__ LoadCharSet(struct fontdesc *myFont);

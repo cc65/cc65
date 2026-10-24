@@ -286,8 +286,10 @@ static inline void SB_Append (StrBuf* Target, const StrBuf* Source)
     if (NewLen > Target->Allocated) {
         SB_Realloc (Target, NewLen);
     }
-    memcpy (Target->Buf + Target->Len, Source->Buf, Source->Len);
-    memcpy (Target->Cooked + Target->Len, Source->Cooked, Source->Len);
+    if (Source->Len) {
+        memcpy (Target->Buf + Target->Len, Source->Buf, Source->Len);
+        memcpy (Target->Cooked + Target->Len, Source->Cooked, Source->Len);
+    }
     Target->Len = NewLen;
 }
 

@@ -2999,13 +2999,13 @@ static void parseadd (ExprDesc* Expr, int DoArrayRef)
                 if (ED_IsLocQuasiConst (&Expr2)  &&
                     !IsTypeBitField (Expr2.Type) &&
                     rscale == 1                  &&
-                    CheckedSizeOf (rhst) == SIZEOF_CHAR) {
+                    IsRankChar (Expr2.Type)) {
                     /* Change the order back */
                     RemoveCode (&Mark);
                     /* Load lhs */
                     LoadExpr (CF_NONE, Expr);
                     /* Use new flags */
-                    flags = CF_CHAR | CG_AddrModeFlags (&Expr2);
+                    flags = CG_TypeOf (Expr2.Type) | CG_AddrModeFlags (&Expr2);
                     /* Add the variable */
                     if (ED_IsLocStack (&Expr2)) {
                         g_addlocal (flags, Expr2.IVal);

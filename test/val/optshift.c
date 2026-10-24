@@ -21,15 +21,22 @@ int shift2_c_no(signed char x)
     return (((x < 0) ? (-16384 - x * 4) : x) >> 1) & 0x00ff;
 }
 
-int shift2_c_x01(signed char x)
+int shift2_c_x01_loc(signed char x)
 {
-    /* TODO: Currently, invalid code is produced due to #3010. */
     /*   & 0x00ff discards X reg and makes it "unused". */
     return ((0x100 + x) >> 2) & 0x00ff;
 }
 
+int shift2_c_x01_stat(signed char x)
+{
+    static signed char sx;
+    sx = x;
+    /*   & 0x00ff discards X reg and makes it "unused". */
+    return ((0x100 + sx) >> 2) & 0x00ff;
+}
+
 /* OptShift2 pattern, signed char addition with promotion (X != 0) */
-int shift2_asm_x01(signed char x)
+int shift2_asm_x01_stat(signed char x)
 {
     static signed char sx;
     sx = x;
@@ -87,15 +94,17 @@ int main(void)
     /* TODO: Currently fails in HEAD with -O due to unchecked label refs. */
     /* CHECK(shift2_c_no(-42), 84); */
 
-    CHECK(shift2_c_x01(80), 84);
-    /* TODO: Currently fails in HEAD due to #3010. */
-    /* CHECK(shift2_c_x01(-88), 42); */
+    CHECK(shift2_c_x01_loc(80), 84);
+    CHECK(shift2_c_x01_loc(-88), 42);
+    CHECK(shift2_c_x01_stat(80), 84);
+    CHECK(shift2_c_x01_stat(-88), 42);
 
-    CHECK(shift2_asm_x01(-88), 42);
-    CHECK(shift2_asm_x01(80), 84);
+    CHECK(shift2_asm_x01_stat(-88), 42);
+    CHECK(shift2_asm_x01_stat(80), 84);
 
     CHECK(shift3_c_ok(137), 42);
     CHECK(shift3_c_no(137), 42);
+    /* TODO: This will fail in HEAD with -Oi if Opt moved to Group1 */
     CHECK(shift3_c_no(210), -420);
 
     printf("failures: %d\n", failures);

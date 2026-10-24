@@ -1622,13 +1622,23 @@ void g_addlocal (unsigned flags, int offs)
     switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
-            L = GetLocalLabel();
-            AddCodeLine ("ldy #$%02X", NewOff & 0xFF);
-            AddCodeLine ("clc");
-            AddCodeLine ("adc (c_sp),y");
-            AddCodeLine ("bcc %s", LocalLabelName (L));
-            AddCodeLine ("inx");
-            g_defcodelabel (L);
+            if (flags & CF_UNSIGNED) {
+                /* Short unsigned addition inline */
+                L = GetLocalLabel();
+                AddCodeLine ("ldy #$%02X", NewOff & 0xFF);
+                AddCodeLine ("clc");
+                AddCodeLine ("adc (c_sp),y");
+                AddCodeLine ("bcc %s", LocalLabelName (L));
+                AddCodeLine ("inx");
+                g_defcodelabel (L);
+            } else {
+                /* Needs sign extension handling, but inline code is too long.
+                ** These are rare, so go the long way around the stack for now.
+                */
+                g_push (flags, 0);
+                g_getlocal (flags, offs);
+                g_add (flags, 0);
+            }
             break;
 
         case CF_INT:
@@ -1675,6 +1685,15 @@ void g_addstatic (unsigned flags, uintptr_t label, long offs)
             AddCodeLine ("bcc %s", LocalLabelName (L));
             AddCodeLine ("inx");
             g_defcodelabel (L);
+            if ((flags & CF_UNSIGNED) == 0) {
+                /* Needs sign extension handling */
+                unsigned L2 = GetLocalLabel();
+                /* Note: This can produce torn reads. */
+                AddCodeLine ("bit %s", lbuf);
+                AddCodeLine ("bpl %s", LocalLabelName (L2));
+                AddCodeLine ("dex");
+                g_defcodelabel (L2);
+            }
             break;
 
         case CF_INT:

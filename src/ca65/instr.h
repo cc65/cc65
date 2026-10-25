@@ -70,7 +70,7 @@
 #define AM65_ABS_Y              0x00000200UL /* ABS, Y */
 #define AM65_DIR_IND            0x00000400UL /* (ZP) or (ZP),z (4510 / 45GS02) */
 #define AM65_ABS_IND            0x00000800UL /* (ABS) */
-#define AM65_DIR_IND_LONG       0x00001000UL /* [ABS] (65816) */
+#define AM65_DIR_IND_LONG       0x00001000UL /* [dir] (65816 / 45GS02) */
 #define AM65_DIR_IND_Y          0x00002000UL /* (ZP),y */
 #define AM65_DIR_IND_LONG_Y     0x00004000UL /* [adr],y (not 45GS02) */
 #define AM65_DIR_X_IND          0x00008000UL /* (ZP,x) */
@@ -84,7 +84,7 @@
 #define AM65_IMM_IMPLICIT       0x00800000UL /* IMM */
 #define AM65_BLOCKMOVE          0x01000000UL
 #define AM65_BLOCKXFER          0x02000000UL
-#define AM65_ABS_IND_LONG       0x04000000UL /* (adr) [dir] */
+#define AM65_ABS_IND_LONG       0x04000000UL /* [ABS] (adr @ ABS, 65816) */
 #define AM65_IMM_IMPLICIT_WORD  0x08000000UL /* PHW #$1234 (4510 only) */
 #define AM65_ZP_REL             0x10000000UL /* ZP, REL (m740) */
 #define AM65_SPECIAL_PAGE       0x20000000UL /* $FFxx (m740) */

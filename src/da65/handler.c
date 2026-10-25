@@ -352,6 +352,13 @@ void OH_Direct (const OpcDesc* D)
 
 
 
+void OH_Implicit_Q (const OpcDesc* D)
+{
+    OneLine (D, "q");
+}
+
+
+
 void OH_Direct_Q (const OpcDesc* D)
 {
     /* Get the operand */

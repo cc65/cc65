@@ -395,6 +395,14 @@ void g_defcodelabel (unsigned label)
 
 
 
+void g_regindcodelabel (unsigned label)
+/* Register an indirect jump target local code label */
+{
+    CS_RegIndJumpLabel (CS->Code, LocalLabelName (label));
+}
+
+
+
 void g_defdatalabel (unsigned label)
 /* Define a local data label */
 {

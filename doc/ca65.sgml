@@ -537,6 +537,23 @@ byte. If omitted, the assembler will only produce only 1 byte.
 In 6502 mode (which is the default) the assembler accepts all regular "legal"
 6502 mnemonics and addressing modes.
 
+Note that an operand starting with an opening parenthesis is always parsed as
+an indirect address, even if the parentheses are only meant to group an
+expression. In 6502 mode this gives an "Illegal addressing mode" error:
+
+<tscreen><verb>
+        sta     (1 << 3)        ; error: parsed as indirect, not as sta $08
+        sta     1 << 3          ; ok: sta $08
+        sta     0+(1 << 3)      ; ok: the operand no longer starts with "("
+</verb></tscreen>
+
+On CPUs that have zero page indirect addressing (65SC02, 65C02 and later), the
+same line assembles without any diagnostic, but as indirect: <tt/lda (1 << 3)/
+gives <tt/$B2 $08/ (<tt/LDA ($08)/) rather than <tt/$A5 $08/ (<tt/LDA $08/).
+To write a plain address, drop the outer parentheses or start the operand with
+another token. See also the <tt><ref id="bracket_as_indirect"
+name="bracket_as_indirect"></tt> feature.
+
 <sect2>6502X mode<label id="6502X-mode"><p>
 
 6502X mode is an extension to the normal 6502 mode. In this mode, several

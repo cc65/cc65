@@ -33,6 +33,7 @@ the [cc65 web site](https://cc65.github.io):
 | Bit Corporation         | Gamate                              |
 | Berkeley Softworks      | GEOS (Apple/CBM)                    |
 | LUnix Team              | LUnix (C64)                         |
+| MEGA                    | MEGA65                              |
 | Nintendo                | Nintendo Entertainment System (NES) |
 | Ohio Scientific         | OSI C1P                             |
 | MOS Technology, Inc.    | KIM-1                               |

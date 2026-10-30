@@ -1128,7 +1128,7 @@ static ExprNode* Factor (void)
             L = Factor ();
             if (IsEasyConst (L, &Val)) {
                 FreeExpr (L);
-                N = GenLiteralExpr (-Val);
+                N = GenLiteralExpr ((long) (0UL - (unsigned long) Val));
             } else {
                 N = NewExprNode (EXPR_UNARY_MINUS);
                 N->Left = L;
@@ -1341,7 +1341,8 @@ static ExprNode* Term (void)
 
             switch (T) {
                 case TOK_MUL:
-                    Val = LVal * RVal;
+                    /* Wrap around on overflow, like the linker */
+                    Val = (long) ((unsigned long) LVal * (unsigned long) RVal);
                     break;
 
                 case TOK_DIV:
@@ -1443,8 +1444,8 @@ static ExprNode* SimpleExpr (void)
         if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
 
             switch (T) {
-                case TOK_PLUS:  Val = LVal + RVal;      break;
-                case TOK_MINUS: Val = LVal - RVal;      break;
+                case TOK_PLUS:  Val = (long) ((unsigned long) LVal + (unsigned long) RVal); break;
+                case TOK_MINUS: Val = (long) ((unsigned long) LVal - (unsigned long) RVal); break;
                 case TOK_OR:    Val = LVal | RVal;      break;
                 default:        Internal ("Invalid token");
             }

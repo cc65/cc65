@@ -958,7 +958,7 @@ static ExprNode* FuncStrAt (void)
     Index = ConstExpression ();
 
     /* Must be a valid index */
-    if (Index >= (long) SB_GetLen (&Str)) {
+    if (Index < 0 || Index >= (long) SB_GetLen (&Str)) {
         Error ("Range error");
         goto ExitPoint;
     }
@@ -1349,7 +1349,9 @@ static ExprNode* Term (void)
                         Error ("Division by zero");
                         Val = 1;
                     } else {
-                        Val = LVal / RVal;
+                        /* LONG_MIN / -1 overflows (and traps on x86) */
+                        Val = (RVal == -1)? (long) (0UL - (unsigned long) LVal)
+                                          : LVal / RVal;
                     }
                     break;
 
@@ -1358,7 +1360,7 @@ static ExprNode* Term (void)
                         Error ("Modulo operation with zero");
                         Val = 1;
                     } else {
-                        Val = LVal % RVal;
+                        Val = (RVal == -1)? 0 : LVal % RVal;
                     }
                     break;
 

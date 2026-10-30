@@ -57,7 +57,7 @@ const OpcDesc OpcTable_45GS02_extended[256] = {
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $07 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $08 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $09 */
-    {   "aslq", 1+2,  flNone,                   OH_Accumulator               }, /* $0a */
+    {   "aslq", 1+2,  flNone,                   OH_Implicit_Q                }, /* $0a */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $0b */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $0c */
     {   "orq",  3+2,  flUseLabel|flAbsOverride, OH_Absolute_Q                }, /* $0d */
@@ -73,7 +73,7 @@ const OpcDesc OpcTable_45GS02_extended[256] = {
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $17 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $18 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $19 */
-    {   "inq",  1+2,  flNone,                   OH_Accumulator               }, /* $1a */
+    {   "inq",  1+2,  flNone,                   OH_Implicit_Q                }, /* $1a */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $1b */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $1c */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $1d */
@@ -89,7 +89,7 @@ const OpcDesc OpcTable_45GS02_extended[256] = {
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $27 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $28 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $29 */
-    {   "rolq", 1+2,  flNone,                   OH_Accumulator               }, /* $2a */
+    {   "rolq", 1+2,  flNone,                   OH_Implicit_Q                }, /* $2a */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $2b */
     {   "bitq", 3+2,  flUseLabel|flAbsOverride, OH_Absolute_Q                }, /* $2c */
     {   "andq", 3+2,  flUseLabel|flAbsOverride, OH_Absolute_Q                }, /* $2d */
@@ -105,7 +105,7 @@ const OpcDesc OpcTable_45GS02_extended[256] = {
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $37 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $38 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $39 */
-    {   "deq",  1+2,  flNone,                   OH_Accumulator               }, /* $3a */
+    {   "deq",  1+2,  flNone,                   OH_Implicit_Q                }, /* $3a */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $3b */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $3c */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $3d */
@@ -114,14 +114,14 @@ const OpcDesc OpcTable_45GS02_extended[256] = {
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $40 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $41 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $42 */
-    {   "asrq", 1+2,  flNone,                   OH_Accumulator               }, /* $43 */
+    {   "asrq", 1+2,  flNone,                   OH_Implicit_Q                }, /* $43 */
     {   "asrq", 2+2,  flUseLabel,               OH_Direct_Q                  }, /* $44 */
     {   "eorq", 2+2,  flUseLabel,               OH_Direct_Q                  }, /* $45 */
     {   "lsrq", 2+2,  flUseLabel,               OH_Direct_Q                  }, /* $46 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $47 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $48 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $49 */
-    {   "lsrq", 1+2,  flNone,                   OH_Accumulator               }, /* $4a */
+    {   "lsrq", 1+2,  flNone,                   OH_Implicit_Q                }, /* $4a */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $4b */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $4c */
     {   "eorq", 3+2,  flUseLabel|flAbsOverride, OH_Absolute_Q                }, /* $4d */
@@ -153,7 +153,7 @@ const OpcDesc OpcTable_45GS02_extended[256] = {
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $67 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $68 */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $69 */
-    {   "rorq", 1+2,  flNone,                   OH_Accumulator               }, /* $6a */
+    {   "rorq", 1+2,  flNone,                   OH_Implicit_Q                }, /* $6a */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $6b */
     {   "",     1+2,  flIllegal,                OH_Illegal,                  }, /* $6c */
     {   "adcq", 3+2,  flUseLabel|flAbsOverride, OH_Absolute_Q                }, /* $6d */

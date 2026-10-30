@@ -106,6 +106,7 @@ void OH_JmpDirectIndirect (const OpcDesc* D);
 void OH_SpecialPage (const OpcDesc*);
 
 /* 45GS02 */
+void OH_Implicit_Q (const OpcDesc*);
 void OH_Direct_Q (const OpcDesc*);
 void OH_DirectIndirectZ_Q (const OpcDesc* D);
 void OH_Absolute_Q (const OpcDesc* D);

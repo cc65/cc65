@@ -1036,7 +1036,7 @@ static const struct {
         { "AND",  0x4080A66C, 0x20, 0, Put45GS02 },
         { "ANDQ", 0x0000140C, 0x20, 13, Put45GS02_Q },
         { "ASL",  0x0000006e, 0x02, 1, PutAll },
-        { "ASLQ", 0x800000ee, 0x00, 14, Put45GS02_Q },
+        { "ASLQ", 0x8000006e, 0x00, 14, Put45GS02_Q },
         { "ASR",  0x00000026, 0x43, 0, Put4510 },
         { "ASRQ", 0x80000026, 0x40, 15, Put45GS02_Q },
         { "ASW",  0x00000008, 0xcb, 6, PutAll },
@@ -1081,7 +1081,7 @@ static const struct {
         { "CPZ",  0x0080000C, 0xd0, 1, Put4510 },
         { "DEA",  0x00000001, 0x00, 3, PutAll },   /* == DEC */
         { "DEC",  0x0000006F, 0x00, 3, PutAll },
-        { "DEQ",  0x800000ee, 0xc0, 14, Put45GS02_Q },
+        { "DEQ",  0x8000006e, 0xc0, 14, Put45GS02_Q },
         { "DEW",  0x00000004, 0xc3, 9, PutAll },
         { "DEX",  0x00000001, 0xca, 0, PutAll },
         { "DEY",  0x00000001, 0x88, 0, PutAll },
@@ -1091,7 +1091,7 @@ static const struct {
         { "EORQ", 0x0000140C, 0x40, 13, Put45GS02_Q },
         { "INA",  0x00000001, 0x00, 4, PutAll },   /* == INC */
         { "INC",  0x0000006f, 0x00, 4, PutAll },
-        { "INQ",  0x800000ee, 0xe0, 14, Put45GS02_Q },
+        { "INQ",  0x8000006e, 0xe0, 14, Put45GS02_Q },
         { "INW",  0x00000004, 0xe3, 9, PutAll },
         { "INX",  0x00000001, 0xe8, 0, PutAll },
         { "INY",  0x00000001, 0xc8, 0, PutAll },
@@ -1113,7 +1113,7 @@ static const struct {
         { "LDY",  0x0080006C, 0xa0, 1, PutAll },
         { "LDZ",  0x00800048, 0xa3, 1, Put4510 },
         { "LSR",  0x0000006F, 0x42, 1, PutAll },
-        { "LSRQ", 0x800000ee, 0x40, 14, Put45GS02_Q },
+        { "LSRQ", 0x8000006e, 0x40, 14, Put45GS02_Q },
         { "MAP",  0x00000001, 0x5C, 0, PutAll },
         { "NEG",  0x00000001, 0x42, 0, PutAll },
         { "NOP",  0x00000001, 0xea, 0, PutAll }, /* == EOM */
@@ -1140,9 +1140,9 @@ static const struct {
         { "RMB6", 0x00000004, 0x67, 1, PutAll },
         { "RMB7", 0x00000004, 0x77, 1, PutAll },
         { "ROL",  0x0000006F, 0x22, 1, PutAll },
-        { "ROLQ", 0x800000ee, 0x20, 14, Put45GS02_Q },
+        { "ROLQ", 0x8000006e, 0x20, 14, Put45GS02_Q },
         { "ROR",  0x0000006F, 0x62, 1, PutAll },
-        { "RORQ", 0x800000ee, 0x60, 14, Put45GS02_Q },
+        { "RORQ", 0x8000006e, 0x60, 14, Put45GS02_Q },
         { "ROW",  0x00000008, 0xeb, 6, PutAll },
         { "RTI",  0x00000001, 0x40, 0, PutAll },
         { "RTN",  0x00800000, 0x62, 1, PutAll },
@@ -2543,6 +2543,7 @@ static void Put45GS02_Q (const InsDesc* Ins)
     EffAddr A;
 
     if (EvalEA (Ins, &A)) {
+        /* The special NEG-NEG prefix for Q opcodes */
         Emit0 (0x42);
         Emit0 (0x42);
         if ((A.AddrModeBit == AM65_DIR_IND_LONG) ||
@@ -2550,9 +2551,11 @@ static void Put45GS02_Q (const InsDesc* Ins)
             Emit0 (0xEA); /* NOP prefix */
         }
         if (A.Opcode == 0xea) {
+            /* Fix the INQ opcode because the base was 0xE0 */
             A.Opcode = 0x1a;
         }
         else if (A.Opcode == 0xca) {
+            /* Fix the DEQ opcode because the base was 0xC0 */
             A.Opcode = 0x3a;
         }
         EmitCode (&A);

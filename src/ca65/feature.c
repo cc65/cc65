@@ -69,6 +69,15 @@ static const char* const FeatureKeys[FEAT_COUNT] = {
     "long_jsr_jmp_rts",
     "line_continuations",
     "merge_scopes",
+    "tail_call_opt",
+};
+
+/* Alternative names for features */
+static const struct {
+    const char* Name;
+    feature_t   Feature;
+} FeatureAliases[] = {
+    { "tco",    FEAT_TAIL_CALL_OPT },
 };
 
 
@@ -85,12 +94,20 @@ feature_t FindFeature (const StrBuf* Key)
 */
 {
     feature_t F;
+    unsigned  I;
 
     /* This is not time critical, so do a linear search */
     for (F = (feature_t) 0; F < FEAT_COUNT; ++F) {
         if (SB_CompareStr (Key, FeatureKeys[F]) == 0) {
             /* Found, index is enum value */
             return F;
+        }
+    }
+
+    /* Try the aliases */
+    for (I = 0; I < sizeof (FeatureAliases) / sizeof (FeatureAliases[0]); ++I) {
+        if (SB_CompareStr (Key, FeatureAliases[I].Name) == 0) {
+            return FeatureAliases[I].Feature;
         }
     }
 
@@ -125,6 +142,7 @@ void SetFeature (feature_t Feature, unsigned char On)
         case FEAT_LONG_JSR_JMP_RTS:           LongJsrJmpRts     = On;    break;
         case FEAT_LINE_CONTINUATIONS:         LineCont          = On;    break;
         case FEAT_MERGE_SCOPES:               MergeScopes       = On;    break;
+        case FEAT_TAIL_CALL_OPT:              TailCallOpt       = On;    break;
         default:                                                         break;
     }
 }

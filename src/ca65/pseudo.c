@@ -558,6 +558,21 @@ static void DoBankBytes (void)
 
 
 
+static void DoBanks (void)
+/* Define bytes, extracting the low byte of the bank of each expression in the list */
+{
+    while (1) {
+        EmitByte (BoundedExpr (FuncBank, 1));
+        if (CurTok.Tok != TOK_COMMA) {
+            break;
+        } else {
+            NextTok ();
+        }
+    }
+}
+
+
+
 static void DoBss (void)
 /* Switch to the BSS segment */
 {
@@ -2111,6 +2126,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoUnexpected    },      /* .BANK */
     { ccNone,           DoUnexpected    },      /* .BANKBYTE */
     { ccNone,           DoBankBytes     },      /* .BANKBYTES */
+    { ccNone,           DoBanks         },      /* .BANKS */
     { ccNone,           DoUnexpected    },      /* .BLANK */
     { ccNone,           DoBss           },      /* .BSS */
     { ccNone,           DoByte          },      /* .BYT, .BYTE */

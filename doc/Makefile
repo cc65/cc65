@@ -39,6 +39,14 @@ info: $(addprefix ../info/,$(SGMLS:.sgml=.info))
 ../html ../info:
 	@mkdir $@
 
+../html/dbginfo.png: dbginfo.dot | ../html
+	dot -Tpng $< -o $@
+
+../html/dbginfo.eps: dbginfo.dot | ../html
+	dot -Teps $< -o $@
+
+../html/dbginfo.html: ../html/dbginfo.png
+
 ../html/%.html: %.sgml header.html | ../html
 	@cd ../html && linuxdoc -B html -s 0 -T $(TOC_LEVEL) -H ../doc/header.html ../doc/$<
 

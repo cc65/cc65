@@ -205,7 +205,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
     if (SYM_IS_EXPR (D->Type)) {
         D->Expr = ReadExpr (F, O);
     } else {
-        D->Expr = LiteralExpr (Read32 (F), O);
+        D->Expr = LiteralExpr (Read32Signed (F), O);
     }
 
     /* Read the size */

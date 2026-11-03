@@ -1201,6 +1201,13 @@ static void Primary (ExprDesc* E)
                 SymEntry* Entry;
                 NextToken ();
                 Entry = AddLabelSym (CurTok.Ident, SC_REF | SC_GOTO_IND);
+                /* Taking the address of a label means that it may be the
+                ** target of an indirect jump, and that it is referenced from
+                ** a data segment. Tell the code segment about it, so the
+                ** optimizer keeps the label and doesn't assume that it knows
+                ** all entry points of the code that follows it.
+                */
+                g_regindcodelabel (Entry->V.L.Label);
                 /* output its label */
                 E->Flags = E_RTYPE_RVAL | E_LOC_CODE | E_ADDRESS_OF;
                 E->Name = Entry->V.L.Label;

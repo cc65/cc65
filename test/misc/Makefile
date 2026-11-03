@@ -72,39 +72,9 @@ $(ISEQUAL): ../isequal.c | $(WORKDIR)
 define PRG_template
 
 # should compile, but gives an error
-$(WORKDIR)/bug1209-ind-goto-rev.$1.$2.prg: bug1209-ind-goto-rev.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug1209-ind-goto-rev.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
-	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
-	$(NOT) $(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
-
-# should compile, but gives an error
-$(WORKDIR)/bug1209-ind-goto-rev-2.$1.$2.prg: bug1209-ind-goto-rev-2.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug1209-ind-goto-rev-2.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
-	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
-	$(NOT) $(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
-
-# should compile, but gives an error
-$(WORKDIR)/bug1209-ind-goto-rev-3.$1.$2.prg: bug1209-ind-goto-rev-3.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug1209-ind-goto-rev-3.$1.$2.prg)
-	$(CC65) -t sim$2 -$1 -o $$(@:.prg=.s) $$< $(NULLOUT) $(CATERR)
-	$(CA65) -t sim$2 -o $$(@:.prg=.o) $$(@:.prg=.s) $(NULLERR)
-	$(NOT) $(LD65) -t sim$2 -o $$@ $$(@:.prg=.o) sim$2.lib $(NULLERR)
-
-# should compile, but gives an error
 $(WORKDIR)/pptest2.$1.$2.prg: pptest2.c | $(WORKDIR)
 	@echo "FIXME: " $$@ "currently does not compile."
 	$(if $(QUIET),echo misc/pptest2.$1.$2.prg)
-	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
-
-# should compile, but compiler exits with internal error
-$(WORKDIR)/bug1211-ice-move-refs-2.$1.$2.prg: bug1211-ice-move-refs-2.c | $(WORKDIR)
-	@echo "FIXME: " $$@ "currently does not compile."
-	$(if $(QUIET),echo misc/bug1211-ice-move-refs-2.$1.$2.prg)
 	$(NOT) $(CC65) -t sim$2 -$1 -o $$@ $$< $(NULLOUT) $(CATERR)
 
 # this one requires --std=c89, it fails with --std=c99

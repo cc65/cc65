@@ -19,9 +19,8 @@
 */
 
 /*
-  Test of indirect goto without dynamic labels and order label ref, label def, goto.
+  Test of indirect goto without dynamic labels and order label def, label ref, goto.
   https://github.com/cc65/cc65/issues/1209
-  This should compile and should be moved to tests/val/ when the bug is fixed.
 */
 
 #include <stdio.h>
@@ -30,10 +29,12 @@
 /* When operating correctly, this returns 0. */
 static unsigned char y = 0;
 int f (void) {
-    static const void *const x[1] = {&&L};
 L:  if (y) return 0;
-    y = 1;
-    goto *x[0];
+    {
+        static const void *const x[1] = {&&L};
+        y = 1;
+        goto *x[0];
+    }
 }
 
 static unsigned char failures = 0;

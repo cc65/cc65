@@ -4057,16 +4057,26 @@ static void hieQuest (ExprDesc* Expr)
 
             CodeMark    CvtCodeStart;
             CodeMark    CvtCodeEnd;
+            CodeMark    Expr3CvtCodeStart;
 
 
             /* Get common type */
             ResultType = TypeDup (ArithmeticConvert (Expr2.Type, Expr3.Type));
 
-            /* Convert the third expression to this type if needed */
+            /* Convert the third expression to this type if needed. Remember
+            ** where the conversion code starts, since it has to be removed
+            ** again if a constant condition eliminated the third expression.
+            */
+            GetCodePos (&Expr3CvtCodeStart);
             TypeConversion (&Expr3, ResultType);
 
+            if (ConstantCond && Expr->IVal != 0) {
+                /* Expr3 is dead, remove its conversion code */
+                RemoveCode (&Expr3CvtCodeStart);
+            }
+
             /* Emit conversion code for the second expression, but remember
-            ** where it starts end ends.
+            ** where it starts and ends.
             */
             GetCodePos (&CvtCodeStart);
             TypeConversion (&Expr2, ResultType);
@@ -4077,6 +4087,9 @@ static void hieQuest (ExprDesc* Expr)
                 if (!CodeRangeIsEmpty (&CvtCodeStart, &CvtCodeEnd)) {
                     MoveCode (&CvtCodeStart, &CvtCodeEnd, &TrueCodeEnd);
                 }
+            } else if (Expr->IVal == 0) {
+                /* Expr2 is dead, remove its conversion code */
+                RemoveCode (&CvtCodeStart);
             }
 
         } else if (IsClassPtr (Expr2.Type) && IsClassPtr (Expr3.Type)) {

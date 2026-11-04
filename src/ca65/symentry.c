@@ -213,6 +213,13 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
 {
     int Redef = 0;      /* Flag for symbol redefinition */
 
+    /* Count label definitions. The tail call optimization must not remove an
+    ** RTS that has a label in front of it.
+    */
+    if (Flags & SF_LABEL) {
+        ++LabelDefCount;
+    }
+
     if (S->Flags & SF_IMPORT) {
         /* Defined symbol is marked as imported external symbol */
         Error ("Symbol `%m%p' is already an import", GetSymName (S));

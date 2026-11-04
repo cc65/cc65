@@ -140,9 +140,17 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
         B->Buf    = xrealloc (B->Buf, NewAllocated);
         B->Cooked = xrealloc (B->Cooked, NewAllocated);
     } else {
-        /* Allocate a new block and copy */
-        B->Buf    = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
-        B->Cooked = memcpy (xmalloc (NewAllocated), B->Cooked, B->Len);
+        /* Allocate a new block and copy. Buf may be NULL if Len is zero,
+        ** and memcpy must not be called with a NULL pointer.
+        */
+        char* NewBuf    = xmalloc (NewAllocated);
+        char* NewCooked = xmalloc (NewAllocated);
+        if (B->Len > 0) {
+            memcpy (NewBuf, B->Buf, B->Len);
+            memcpy (NewCooked, B->Cooked, B->Len);
+        }
+        B->Buf    = NewBuf;
+        B->Cooked = NewCooked;
     }
 
     /* Remember the new block size */
@@ -276,8 +284,10 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
     if (NewLen > B->Allocated) {
         SB_Realloc (B, NewLen);
     }
-    memcpy (B->Buf + B->Len, S, Size);
-    memcpy (B->Cooked + B->Len, S, Size);
+    if (Size) {
+        memcpy (B->Buf + B->Len, S, Size);
+        memcpy (B->Cooked + B->Len, S, Size);
+    }
     B->Len = NewLen;
 }
 
@@ -362,21 +372,20 @@ void SB_ToUpper (StrBuf* S)
 int SB_Compare (const StrBuf* S1, const StrBuf* S2)
 /* Do a lexical compare of S1 and S2. See strcmp for result codes. */
 {
-    int Result;
-    if (S1->Len < S2->Len) {
-        Result = memcmp (S1->Buf, S2->Buf, S1->Len);
-        if (Result == 0) {
-            /* S1 considered lesser because it's shorter */
+    int Result = 0;
+    unsigned MinLen = (S1->Len < S2->Len)? S1->Len : S2->Len;
+
+    /* An empty buffer may have a NULL Buf, which memcmp must not get */
+    if (MinLen > 0) {
+        Result = memcmp (S1->Buf, S2->Buf, MinLen);
+    }
+    if (Result == 0) {
+        /* Equal so far: the shorter one is considered lesser */
+        if (S1->Len < S2->Len) {
             Result = -1;
-        }
-    } else if (S1->Len > S2->Len) {
-        Result = memcmp (S1->Buf, S2->Buf, S2->Len);
-        if (Result == 0) {
-            /* S2 considered lesser because it's shorter */
+        } else if (S1->Len > S2->Len) {
             Result = 1;
         }
-    } else {
-        Result = memcmp (S1->Buf, S2->Buf, S1->Len);
     }
     return Result;
 }

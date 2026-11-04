@@ -851,6 +851,8 @@ static void ReadStringConst (int StringTerm)
 
         if (C == '\n' || C == EOF) {
             Error ("Newline in string constant");
+            /* Leave the newline alone, it ends the current line */
+            NeedNext = 0;
             break;
         }
 
@@ -1735,5 +1737,9 @@ void InitScanner (const char* InFile)
 void DoneScanner (void)
 /* Release scanner resources */
 {
+    /* .END inside a macro or .REPEAT leaves their input on the stack */
+    while (HavePushedInput ()) {
+        PopInput ();
+    }
     DoneCharSource ();
 }

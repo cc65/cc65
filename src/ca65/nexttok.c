@@ -295,7 +295,13 @@ static void FuncLeft (void)
     ** will never be empty), push the token list, and then skip the current
     ** token. This will replace the current token by the first token from the
     ** list (which will be the old current token in case the list was empty).
+    ** If the input ended inside the function call (an error was already
+    ** reported), don't push a list that would replay the end of file.
     */
+    if (CurTok.Tok == TOK_EOF) {
+        FreeTokList (List);
+        return;
+    }
     AddCurTok (List);
 
     /* Insert it into the scanner feed */
@@ -347,7 +353,13 @@ static void FuncMid (void)
     ** will never be empty), push the token list, and then skip the current
     ** token. This will replace the current token by the first token from the
     ** list (which will be the old current token in case the list was empty).
+    ** If the input ended inside the function call (an error was already
+    ** reported), don't push a list that would replay the end of file.
     */
+    if (CurTok.Tok == TOK_EOF) {
+        FreeTokList (List);
+        return;
+    }
     AddCurTok (List);
 
     /* Insert it into the scanner feed */
@@ -402,7 +414,13 @@ static void FuncRight (void)
     ** will never be empty), push the token list, and then skip the current
     ** token. This will replace the current token by the first token from the
     ** list (which will be the old current token in case the list was empty).
+    ** If the input ended inside the function call (an error was already
+    ** reported), don't push a list that would replay the end of file.
     */
+    if (CurTok.Tok == TOK_EOF) {
+        FreeTokList (List);
+        return;
+    }
     AddCurTok (List);
 
     /* Insert it into the scanner feed */
@@ -419,6 +437,37 @@ static void InvalidFormatString (void)
 {
     Error ("Invalid format string");
     SkipUntilSep ();
+}
+
+
+
+/* Largest width or precision accepted in a .SPRINTF format specifier */
+#define MAX_FORMAT_NUMBER       1024U
+
+
+
+static void CopyFormatNumber (StrBuf* F, StrBuf* Format)
+/* Copy a width or precision from Format to F. Values larger than
+** MAX_FORMAT_NUMBER are rejected, because they would make the formatted
+** result overflow (or need gigabytes of memory).
+*/
+{
+    unsigned Val = 0;
+    unsigned Start = SB_GetLen (F);
+
+    while (IsDigit (SB_Peek (Format))) {
+        char C = SB_Get (Format);
+        if (Val <= MAX_FORMAT_NUMBER) {
+            Val = Val * 10 + (C - '0');
+        }
+        SB_AppendChar (F, C);
+    }
+    if (Val > MAX_FORMAT_NUMBER) {
+        Error ("Width or precision in format string too large (maximum is %u)",
+               MAX_FORMAT_NUMBER);
+        /* Drop the number, so the default is used */
+        SB_Cut (F, Start);
+    }
 }
 
 
@@ -501,16 +550,12 @@ static void FuncSPrintF (void)
         }
 
         /* We do only support a numerical width field */
-        while (IsDigit (SB_Peek (&Format))) {
-            SB_AppendChar (&F1, SB_Get (&Format));
-        }
+        CopyFormatNumber (&F1, &Format);
 
         /* Precision - only positive numerical fields supported */
         if (SB_Peek (&Format) == '.') {
             SB_AppendChar (&F1, SB_Get (&Format));
-            while (IsDigit (SB_Peek (&Format))) {
-                SB_AppendChar (&F1, SB_Get (&Format));
-            }
+            CopyFormatNumber (&F1, &Format);
         }
 
         /* Length modifiers aren't supported, so read the conversion specs */
@@ -549,6 +594,7 @@ static void FuncSPrintF (void)
                 if (!LookAtStrCon ()) {
                     /* Make it one */
                     SB_CopyStr (&CurTok.SVal, "**undefined**");
+                    SB_Terminate (&CurTok.SVal);
                 }
 
                 /* Format this argument according to the spec */

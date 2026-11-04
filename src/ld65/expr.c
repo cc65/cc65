@@ -325,14 +325,18 @@ long GetExprVal (ExprNode* Expr)
             if (Right == 0) {
                 Error ("Division by zero");
             }
-            return GetExprVal (Expr->Left) / Right;
+            Left = GetExprVal (Expr->Left);
+            /* LONG_MIN / -1 overflows (and traps on x86) */
+            return (Right == -1)? (long) (0UL - (unsigned long) Left)
+                                : Left / Right;
 
         case EXPR_MOD:
             Right = GetExprVal (Expr->Right);
             if (Right == 0) {
                 Error ("Modulo operation with zero");
             }
-            return GetExprVal (Expr->Left) % Right;
+            Left = GetExprVal (Expr->Left);
+            return (Right == -1)? 0 : Left % Right;
 
         case EXPR_OR:
             return GetExprVal (Expr->Left) | GetExprVal (Expr->Right);

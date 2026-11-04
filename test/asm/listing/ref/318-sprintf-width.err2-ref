@@ -1,0 +1,2 @@
+318-sprintf-width.s:3: Error: Width or precision in format string too large (maximum is 1024)
+318-sprintf-width.s:4: Error: Width or precision in format string too large (maximum is 1024)

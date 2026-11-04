@@ -40,6 +40,7 @@
 #include "chartype.h"
 #include "check.h"
 #include "strbuf.h"
+#include "xsprintf.h"
 
 /* ca65 */
 #include "condasm.h"
@@ -47,6 +48,7 @@
 #include "expect.h"
 #include "expr.h"
 #include "global.h"
+#include "macro.h"
 #include "scanner.h"
 #include "toklist.h"
 #include "nexttok.h"
@@ -60,6 +62,14 @@
 
 
 static unsigned RawMode = 0;            /* Raw token mode flag/counter */
+
+/* State for the macro-expanded source output (--expanded-source) */
+static FILE*    ExpOut      = 0;        /* Output file or NULL */
+static StrBuf   ExpLine     = STATIC_STRBUF_INITIALIZER;    /* Current line */
+static token_t  ExpFirst    = TOK_NONE; /* First token of the current line */
+static unsigned ExpLastPos  = 0;        /* Start of last token in ExpLine */
+static int      ExpSkip     = 0;        /* Drop the rest of the current line */
+static unsigned ExpDepth    = 0;        /* >0 while token functions run */
 
 
 
@@ -685,6 +695,9 @@ void NextTok (void)
     */
     if (RawMode == 0 && IfCond) {
 
+        /* Tokens consumed by token functions are not part of the output */
+        ++ExpDepth;
+
         /* Execute token handling functions */
         switch (CurTok.Tok) {
 
@@ -721,6 +734,13 @@ void NextTok (void)
                 break;
 
         }
+
+        --ExpDepth;
+    }
+
+    /* Feed the token to the expanded-source writer */
+    if (ExpDepth == 0) {
+        ExpandedOutToken ();
     }
 }
 
@@ -817,4 +837,274 @@ void LeaveRawTokenMode (void)
 {
     PRECONDITION (RawMode > 0);
     --RawMode;
+}
+
+
+
+/*****************************************************************************/
+/*                       Macro-expanded source output                        */
+/*****************************************************************************/
+
+
+
+void ExpandedOutOpen (const char* Name)
+/* Open the file that receives the macro-expanded source */
+{
+    ExpOut = fopen (Name, "w");
+    if (ExpOut == 0) {
+        Fatal ("Cannot open expanded source file '%s'", Name);
+    }
+}
+
+
+
+int ExpandedOutIsOpen (void)
+/* Return true if the macro-expanded source file is open */
+{
+    return ExpOut != 0;
+}
+
+
+
+void ExpandedOutClose (void)
+/* Close the macro-expanded source file */
+{
+    if (ExpOut) {
+        fclose (ExpOut);
+        ExpOut = 0;
+    }
+}
+
+
+
+static void ExpTokenText (const Token* T, StrBuf* Out)
+/* Convert one token to text */
+{
+    const char* S;
+    char        Buf[32];
+    long        I, N;
+
+    switch (T->Tok) {
+
+        case TOK_SEP:
+            SB_AppendChar (Out, '\n');
+            return;
+
+        case TOK_STRCON:
+            /* Strings built at assembly time (.SPRINTF, .CONCAT, ...) may
+            ** contain characters that cannot be written inside a string in
+            ** source: the quote, the backslash (escape character with
+            ** string_escapes), and control characters. These are written as
+            ** .SPRINTF ("...%c...", code), which is valid wherever a string
+            ** constant is.
+            */
+            N = 0;
+            for (I = 0; I < (long) SB_GetLen (&T->SVal); ++I) {
+                unsigned char C = SB_AtUnchecked (&T->SVal, I);
+                if (C == '"' || C == '\\' || C < 32) {
+                    ++N;
+                }
+            }
+            if (N == 0) {
+                SB_AppendChar (Out, '"');
+                SB_Append (Out, &T->SVal);
+                SB_AppendChar (Out, '"');
+            } else {
+                StrBuf Args = STATIC_STRBUF_INITIALIZER;
+                SB_AppendStr (Out, ".sprintf(\"");
+                for (I = 0; I < (long) SB_GetLen (&T->SVal); ++I) {
+                    unsigned char C = SB_AtUnchecked (&T->SVal, I);
+                    if (C == '"' || C == '\\' || C < 32) {
+                        SB_AppendStr (Out, "%c");
+                        xsprintf (Buf, sizeof (Buf), ",%u", (unsigned) C);
+                        SB_AppendStr (&Args, Buf);
+                    } else if (C == '%') {
+                        SB_AppendStr (Out, "%%");
+                    } else {
+                        SB_AppendChar (Out, C);
+                    }
+                }
+                SB_AppendChar (Out, '"');
+                SB_Append (Out, &Args);
+                SB_AppendChar (Out, ')');
+                SB_Done (&Args);
+            }
+            return;
+
+        case TOK_INTCON:
+        case TOK_CHARCON:
+            xsprintf (Buf, sizeof (Buf), "%ld", T->IVal);
+            SB_AppendStr (Out, Buf);
+            return;
+
+        case TOK_ULABEL:
+            /* Anonymous label reference: :+, :--, ... */
+            SB_AppendChar (Out, ':');
+            N = (T->IVal < 0)? -T->IVal : T->IVal;
+            for (I = 0; I < N; ++I) {
+                SB_AppendChar (Out, T->IVal < 0 ? '-' : '+');
+            }
+            return;
+
+        default:
+            break;
+    }
+
+    if (T->Tok == TOK_IDENT && SB_GetLen (&T->SVal) > 0) {
+        /* Macro-local symbols are named LOCAL-MACRO_SYMBOL-nnnn internally,
+        ** which is not a valid identifier in source.
+        */
+        for (I = 0; I < (long) SB_GetLen (&T->SVal); ++I) {
+            char C = SB_AtUnchecked (&T->SVal, I);
+            SB_AppendChar (Out, C == '-'? '_' : C);
+        }
+    } else if (SB_GetLen (&T->SVal) > 0) {
+        SB_Append (Out, &T->SVal);
+    } else if ((S = GetTokenString ((Token*) T)) != 0) {
+        SB_AppendStr (Out, S);
+    }
+}
+
+
+
+static int ExpIsWordChar (int C)
+/* Return true if C can be part of a word (identifier, number, keyword) */
+{
+    return IsAlNum (C) || C == '_' || C == '@' || C == '$' || C == '.';
+}
+
+
+
+static void ExpAppendToken (const Token* T)
+/* Append the text of one token to the current line */
+{
+    StrBuf   Text = STATIC_STRBUF_INITIALIZER;
+    unsigned Len  = SB_GetLen (&ExpLine);
+
+    ExpLastPos = Len;
+
+    ExpTokenText (T, &Text);
+
+    /* Tokens that were glued together by macro expansion (for example the
+    ** result of .IDENT) carry no whitespace flag, but need a separator.
+    */
+    if (T->WS ||
+        (Len > 0 && SB_GetLen (&Text) > 0 &&
+         ExpIsWordChar (SB_AtUnchecked (&ExpLine, Len - 1)) &&
+         ExpIsWordChar (SB_AtUnchecked (&Text, 0)))) {
+        SB_AppendChar (&ExpLine, ' ');
+    }
+    SB_Append (&ExpLine, &Text);
+    SB_Done (&Text);
+}
+
+
+
+static int ExpIsDropped (token_t Tok)
+/* Return true for lines that are consumed by the assembler and must not
+** appear in the expanded source (conditionals, macro/repeat handling,
+** includes).
+*/
+{
+    switch (Tok) {
+        case TOK_IF:      case TOK_IFBLANK:  case TOK_IFCONST:   case TOK_IFDEF:
+        case TOK_IFNBLANK:case TOK_IFNCONST: case TOK_IFNDEF:    case TOK_IFNREF:
+        case TOK_IFP02:   case TOK_IFP02X:   case TOK_IFP4510:   case TOK_IFP45GS02:
+        case TOK_IFP6280: case TOK_IFP816:   case TOK_IFPC02:    case TOK_IFPCE02:
+        case TOK_IFPDTV:  case TOK_IFPM740:  case TOK_IFPSC02:   case TOK_IFPSWEET16:
+        case TOK_IFPWC02: case TOK_IFREF:
+        case TOK_ELSE:    case TOK_ELSEIF:   case TOK_ENDIF:
+        case TOK_MACRO:   case TOK_ENDMACRO: case TOK_EXITMACRO: case TOK_DELMAC:
+        case TOK_DEFINE:  case TOK_UNDEF:    case TOK_LOCAL:
+        case TOK_REPEAT:  case TOK_ENDREP:
+        case TOK_INCLUDE: case TOK_MACPACK:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+
+
+static void ExpFlush (void)
+/* Write the current line if it is a real statement, then start a new one */
+{
+    if (SB_GetLen (&ExpLine) > 0 && !ExpIsDropped (ExpFirst) &&
+        ExpFirst != TOK_SEP && ExpFirst != TOK_NONE) {
+        fwrite (SB_GetConstBuf (&ExpLine), 1, SB_GetLen (&ExpLine), ExpOut);
+    }
+    SB_Clear (&ExpLine);
+    ExpFirst   = TOK_NONE;
+    ExpLastPos = 0;
+}
+
+
+
+void ExpandedOutToken (void)
+/* Called for each token delivered to the parser (CurTok) */
+{
+    if (ExpOut == 0) {
+        return;
+    }
+
+    /* Nothing is emitted for inactive conditional code or while macro and
+    ** repeat bodies are only being recorded. A partly collected line is
+    ** discarded.
+    */
+    if (RawMode > 0 || !IfCond) {
+        SB_Clear (&ExpLine);
+        ExpFirst   = TOK_NONE;
+        ExpLastPos = 0;
+        /* The rest of this line is dropped even if a conditional directive
+        ** on it switches the code active again.
+        */
+        ExpSkip    = (CurTok.Tok != TOK_SEP);
+        return;
+    }
+
+    if (CurTok.Tok == TOK_EOF) {
+        ExpFlush ();
+        return;
+    }
+
+    if (ExpSkip) {
+        if (CurTok.Tok == TOK_SEP) {
+            ExpSkip = 0;
+        }
+        return;
+    }
+
+    if (ExpFirst == TOK_NONE) {
+        ExpFirst = CurTok.Tok;
+    }
+    ExpAppendToken (&CurTok);
+
+    if (CurTok.Tok == TOK_SEP) {
+        ExpFlush ();
+    }
+}
+
+
+
+void ExpandedOutMacroCall (void)
+/* Called when a macro invocation is about to be expanded. The macro name is
+** the current token and has already been appended to the line. Remove it (a
+** label in front of it is kept), and drop the argument tokens.
+*/
+{
+    if (ExpOut == 0) {
+        return;
+    }
+
+    /* Cut the macro name off the line */
+    SB_Cut (&ExpLine, ExpLastPos);
+    if (SB_GetLen (&ExpLine) > 0) {
+        /* A label preceded the macro call */
+        SB_AppendChar (&ExpLine, '\n');
+        ExpFlush ();
+    } else {
+        ExpFirst = TOK_NONE;
+    }
+    ExpLastPos = 0;
+    ExpSkip    = 1;
 }

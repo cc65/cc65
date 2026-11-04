@@ -998,6 +998,21 @@ void CS_MergeLabels (CodeSeg* S)
             /* Get the next label */
             CodeLabel* L = CE_GetLabel (E, J);
 
+            /* If this label carries an untracked reference, it is named
+            ** directly from a data segment (for example a computed goto
+            ** jump table) that has no way of being updated. Merging it
+            ** away and deleting it would leave that raw text pointing at
+            ** a label that no longer exists, causing an unresolved
+            ** external at link time. Such a label must keep its own
+            ** identity, so leave it attached to this entry instead of
+            ** merging it into RefLab. CE_Output already prints all labels
+            ** attached to an entry, so more than one label surviving here
+            ** is not a problem.
+            */
+            if (CL_HasUntrackedRef (L)) {
+                continue;
+            }
+
             /* Move all references from this label to the reference label */
             CL_MoveRefs (L, RefLab);
 
@@ -1007,7 +1022,9 @@ void CS_MergeLabels (CodeSeg* S)
 
         /* The reference label is the only remaining label. Check if there
         ** are any references to this label, and delete it if this is not
-        ** the case.
+        ** the case. Note that an untracked reference is itself an entry in
+        ** JumpFrom, so if RefLab has one, CollCount will not be zero here
+        ** and this will not delete it.
         */
         if (CollCount (&RefLab->JumpFrom) == 0) {
             /* Delete the label */
@@ -1037,6 +1054,20 @@ void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 
             /* Get the next label */
             CodeLabel* OldLabel = CE_GetLabel (Old, OldLabelCount);
+
+            /* A label with an untracked reference is named directly from
+            ** somewhere outside the tracked reference system, for example
+            ** a computed goto jump table in the data segment (see
+            ** CL_HasUntrackedRef). It must keep its own identity rather
+            ** than being merged into NewLabel and deleted, since that
+            ** external text has no way of being updated. Move the label
+            ** itself onto New instead, the same way we would if New had
+            ** no label of its own.
+            */
+            if (CL_HasUntrackedRef (OldLabel)) {
+                CE_MoveLabel (OldLabel, New);
+                continue;
+            }
 
             /* Move references */
             CL_MoveRefs (OldLabel, NewLabel);

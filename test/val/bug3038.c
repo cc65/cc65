@@ -76,6 +76,13 @@ int ternary_1_const(void)
     return 1 ? 3 : 4;
 }
 
+#define CHECK(expr, expect) \
+    res = (expr); \
+    if (res != (expect)) { \
+        ++failures; \
+        printf("%s: Got %d, expected %d\n", #expr, res, (expect)); \
+    }
+
 #define CHECK_L(expr, expect) \
     if ((expr) != (expect)) { \
         ++failures; \
@@ -84,6 +91,7 @@ int ternary_1_const(void)
 
 int main(void)
 {
+    int res;
     long sum;
 
     CHECK_L(ternary_0_u_x(-42L), -42L);
@@ -94,29 +102,29 @@ int main(void)
     CHECK_L(ternary_1_u_x(-42L), 42000L);
     CHECK_L(ternary_0_i_ul(0x12345678UL), 0x12345678UL);
     CHECK_L(ternary_1_ul_i(0x12345678UL), 0x12345678UL);
-    CHECK_L(ternary_0_ul_i(0x12345678UL), 0xFFFFFFFFUL);
+    CHECK_L(ternary_0_ul_i(0x12345678UL), (unsigned long)-1);
 
-    CHECK_L(0 ? ia : ib, 5678L);
-    CHECK_L(1 ? ia : ib, -1234L);
-    CHECK_L(0 ? ua : ub, 0x1234L);
-    CHECK_L(1 ? ua : ub, 0xFFFEL);
-    CHECK_L(0 ? sca : scb, 100L);
-    CHECK_L(1 ? sca : scb, -5L);
-    CHECK_L(0 ? uca : ucb, 7L);
-    CHECK_L(1 ? uca : ucb, 200L);
+    CHECK(0 ? ia : ib, 5678);
+    CHECK(1 ? ia : ib, -1234);
+    CHECK(0 ? ua : ub, 0x1234);
+    CHECK(1 ? ua : ub, 0xFFFE);
+    CHECK(0 ? sca : scb, 100);
+    CHECK(1 ? sca : scb, -5);
+    CHECK(0 ? uca : ucb, 7);
+    CHECK(1 ? uca : ucb, 200);
     CHECK_L(0 ? la : lb, 0x12345678L);
     CHECK_L(1 ? la : lb, -100000L);
     CHECK_L(0 ? ula : ulb, 0x00010002UL);
     CHECK_L(1 ? ula : ulb, 0xFEDCBA98UL);
-    CHECK_L(ternary_0_const(), 4L);
-    CHECK_L(ternary_1_const(), 3L);
+    CHECK(ternary_0_const(), 4);
+    CHECK(ternary_1_const(), 3);
 
-    CHECK_L(0 ? ia : ub, 0x1234L);
-    CHECK_L(1 ? ia : ub, 0xFB2EL);
+    CHECK(0 ? ia : ub, 0x1234);
+    CHECK(1 ? ia : ub, -1234);
     CHECK_L(0 ? la : ulb, 0x00010002UL);
-    CHECK_L(1 ? la : ulb, 0xFFFE7960UL);
-    CHECK_L(0 ? sca : uca, 200L);
-    CHECK_L(1 ? sca : uca, -5L);
+    CHECK_L(1 ? la : ulb, (unsigned long)-100000L);
+    CHECK(0 ? sca : uca, 200);
+    CHECK(1 ? sca : uca, -5);
 
     /* With code for another operand already emitted before the ?: */
     sum = (0 ? la : lb) + (1 ? la : lb);

@@ -124,7 +124,10 @@ void CollGrow (Collection* C, unsigned Size)
     /* Grow the collection */
     C->Size = Size;
     NewItems = xmalloc (C->Size * sizeof (void*));
-    memcpy (NewItems, C->Items, C->Count * sizeof (void*));
+    if (C->Count > 0) {
+        /* Items may be NULL if the collection is empty */
+        memcpy (NewItems, C->Items, C->Count * sizeof (void*));
+    }
     xfree (C->Items);
     C->Items = NewItems;
 }
@@ -382,10 +385,12 @@ void CollTransfer (Collection* Dest, const Collection* Source)
     /* Be sure there's enough room in Dest */
     CollGrow (Dest, Dest->Count + Source->Count);
 
-    /* Copy the items */
-    memcpy (Dest->Items + Dest->Count,
-            Source->Items,
-            Source->Count * sizeof (Source->Items[0]));
+    /* Copy the items. Items may be NULL if a collection is empty. */
+    if (Source->Count > 0) {
+        memcpy (Dest->Items + Dest->Count,
+                Source->Items,
+                Source->Count * sizeof (Source->Items[0]));
+    }
 
     /* Bump the counter */
     Dest->Count += Source->Count;

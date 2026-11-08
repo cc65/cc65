@@ -838,8 +838,10 @@ static void CreateExportPool (void)
         }
     }
 
-    /* Sort them by name */
-    qsort (ExpPool, ExpCount, sizeof (Export*), CmpExpName);
+    /* Sort them by name (ExpPool may be NULL if there are no exports) */
+    if (ExpCount > 0) {
+        qsort (ExpPool, ExpCount, sizeof (Export*), CmpExpName);
+    }
 }
 
 

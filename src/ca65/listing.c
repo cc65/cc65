@@ -111,7 +111,10 @@ void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth
         L->Depth        = Depth;
         L->Output       = (ListingEnabled > 0);
         L->ListBytes    = (unsigned char) ListBytes;
-        memcpy (L->Line, SB_GetConstBuf (Line), Len);
+        if (Len > 0) {
+            /* An empty line may have no buffer at all */
+            memcpy (L->Line, SB_GetConstBuf (Line), Len);
+        }
         L->Line[Len] = '\0';
 
         /* Insert the line into the list of lines */

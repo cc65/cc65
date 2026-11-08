@@ -36,6 +36,7 @@
 /* common */
 #include "check.h"
 #include "exprdefs.h"
+#include "shift.h"
 #include "xmalloc.h"
 
 /* ld65 */
@@ -312,13 +313,17 @@ long GetExprVal (ExprNode* Expr)
             return Expr->V.Mem->Start;
 
         case EXPR_PLUS:
-            return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
+            /* Arithmetic wraps around, like in the assembler */
+            return (long) ((unsigned long) GetExprVal (Expr->Left) +
+                           (unsigned long) GetExprVal (Expr->Right));
 
         case EXPR_MINUS:
-            return GetExprVal (Expr->Left) - GetExprVal (Expr->Right);
+            return (long) ((unsigned long) GetExprVal (Expr->Left) -
+                           (unsigned long) GetExprVal (Expr->Right));
 
         case EXPR_MUL:
-            return GetExprVal (Expr->Left) * GetExprVal (Expr->Right);
+            return (long) ((unsigned long) GetExprVal (Expr->Left) *
+                           (unsigned long) GetExprVal (Expr->Right));
 
         case EXPR_DIV:
             Right = GetExprVal (Expr->Right);
@@ -344,10 +349,13 @@ long GetExprVal (ExprNode* Expr)
             return GetExprVal (Expr->Left) & GetExprVal (Expr->Right);
 
         case EXPR_SHL:
-            return GetExprVal (Expr->Left) << GetExprVal (Expr->Right);
+            /* Same shift semantics as the assembler (see common/shift.c) */
+            Left = GetExprVal (Expr->Left);
+            return (long) shl_l (Left, GetExprVal (Expr->Right));
 
         case EXPR_SHR:
-            return GetExprVal (Expr->Left) >> GetExprVal (Expr->Right);
+            Left = GetExprVal (Expr->Left);
+            return (long) shr_l (Left, GetExprVal (Expr->Right));
 
         case EXPR_EQ:
             return (GetExprVal (Expr->Left) == GetExprVal (Expr->Right));
@@ -387,7 +395,7 @@ long GetExprVal (ExprNode* Expr)
             return (Left < Right)? Left : Right;
 
         case EXPR_UNARY_MINUS:
-            return -GetExprVal (Expr->Left);
+            return (long) (0UL - (unsigned long) GetExprVal (Expr->Left));
 
         case EXPR_NOT:
             return ~GetExprVal (Expr->Left);

@@ -383,7 +383,8 @@ Export* ReadExport (FILE* F, ObjData* O)
     if (SYM_IS_EXPR (Type)) {
         E->Expr = ReadExpr (F, O);
     } else {
-        E->Expr = LiteralExpr (Read32 (F), O);
+        /* Same as literals in expressions, see ReadExpr */
+        E->Expr = LiteralExpr (Read32Signed (F), O);
     }
 
     /* Read the size */

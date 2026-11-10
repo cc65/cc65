@@ -86,7 +86,6 @@ static ExprNode*        FreeExprNodes = 0;
 static unsigned         FreeNodeCount = 0;
 
 
-
 /*****************************************************************************/
 /*                                  Helpers                                  */
 /*****************************************************************************/
@@ -1682,8 +1681,10 @@ long ConstExpression (void)
 {
     long Val;
 
+    ProcessingConst = 1;
     /* Read the expression */
     ExprNode* Expr = Expression ();
+    ProcessingConst = 0;
 
     /* Study the expression */
     ExprDesc D;

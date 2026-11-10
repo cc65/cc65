@@ -40,12 +40,11 @@
 
 /* ca65 */
 #include "error.h"
+#include "global.h"
 #include "expect.h"
 #include "nexttok.h"
 #include "scanner.h"
 #include "symbol.h"
-
-
 
 /*****************************************************************************/
 /*                                   Code                                    */
@@ -163,7 +162,7 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
     StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
     StrBuf    Ident = STATIC_STRBUF_INITIALIZER;
     int       NoScope;
-    SymEntry* Sym;
+    SymEntry* Sym = 0;
 
     /* Parse the scoped symbol name */
     SymTable* Scope = ParseScopedIdent (&Ident, &ScopeName);
@@ -183,8 +182,32 @@ SymEntry* ParseScopedSymName (SymFindAction Action)
         */
         if (NoScope && (Action & SYM_ALLOC_NEW) == 0) {
             Sym = SymFindAny (Scope, &Ident);
+
+            if (Sym == 0) {
+                Sym = SymFindInChildren (Scope, &Ident);
+            }
         } else {
-            Sym = SymFind (Scope, &Ident, Action);
+            /* If we are processing a symbol within an expression, which the
+            ** parser expects to be constant, that symbol had to be defined
+            ** already for the expression to resolve correctly. Search for it
+            ** in the current scope first, and if not found, retry in all
+            ** enclosing scopes.
+            */
+
+            if ((Action & SYM_ALLOC_NEW) && ProcessingConst) {
+                Sym = SymFind (Scope, &Ident, SYM_FIND_EXISTING);
+
+                if (Sym == 0) {
+                    Sym = SymFindAny (Scope, &Ident);
+                }
+            }
+
+            /* If still not found, or if in non-const expression, it will just
+            ** get added to the current scope.
+            */
+            if (Sym == 0) {
+                Sym = SymFind (Scope, &Ident, Action);
+            }
         }
     } else {
         /* No scope ==> no symbol. To avoid errors in the calling routine that

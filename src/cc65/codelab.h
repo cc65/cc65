@@ -59,12 +59,16 @@ struct CodeEntry;
 
 
 
+/* Flags used */
+#define CLF_INDJUMP     0x0001U         /* Label may be reached by an indirect jump */
+
 /* Label structure */
 typedef struct CodeLabel CodeLabel;
 struct CodeLabel {
     CodeLabel*          Next;           /* Next in hash list */
     char*               Name;           /* Label name */
     unsigned            Hash;           /* Hash over the name */
+    unsigned            Flags;          /* Flags */
     struct CodeEntry*   Owner;          /* Owner entry */
     Collection          JumpFrom;       /* Entries that jump here */
 };
@@ -82,6 +86,18 @@ CodeLabel* NewCodeLabel (const char* Name, unsigned Hash);
 
 void FreeCodeLabel (CodeLabel* L);
 /* Free the given code label */
+
+static inline int CL_IsIndJumpTarget (const CodeLabel* L)
+/* Return true if the label may be reached by an indirect jump */
+{
+    return (L->Flags & CLF_INDJUMP) != 0;
+}
+
+static inline void CL_SetIndJumpTarget (CodeLabel* L)
+/* Mark the label as a possible target of an indirect jump */
+{
+    L->Flags |= CLF_INDJUMP;
+}
 
 static inline unsigned CL_GetRefCount (const CodeLabel* L)
 /* Get the number of references for this label */
@@ -103,8 +119,11 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
 ** more references on return.
 */
 
-void CL_Output (const CodeLabel* L);
-/* Output the code label to the output file */
+void CL_Output (const CodeLabel* L, int ForceLF);
+/* Output the code label to the output file. A linefeed is written after the
+** label if ForceLF is true, or if the label is too long to share the line
+** with the instruction that follows.
+*/
 
 
 

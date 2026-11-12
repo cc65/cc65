@@ -33,15 +33,11 @@
 
 
 
-#include "asmlabel.h"
-#include "codeent.h"
 #include "codegen.h"
-#include "codeseg.h"
 #include "cpu.h"
 #include "error.h"
 #include "exprdesc.h"
 #include "expr.h"
-#include "function.h"
 #include "loadexpr.h"
 #include "scanner.h"
 #include "seqpoint.h"
@@ -77,10 +73,8 @@ int GotoStatement (void)
         NextToken ();
 
     } else if (CurTok.Tok == TOK_STAR && IS_Get (&Standard) >= STD_CC65) {
-        SymEntry *arr, *idx, *cur;
-        SymTable *tab;
+        SymEntry *arr, *idx;
         ExprDesc desc;
-        CodeEntry *E;
         unsigned char val;
 
         ED_Init (&desc);
@@ -144,22 +138,6 @@ int GotoStatement (void)
             }
 
             ConsumeRBrack ();
-
-            /* Loop over all target labels, specifying this as a jump point.
-            ** It's not exact -- if there's multiple gotos, the last will be used;
-            ** but, it's needed only so the optimizer does not remove the labels.
-            */
-            E = CS_GetEntry (CS->Code, CS_GetEntryCount (CS->Code) - 1);
-            tab = GetLabelSymTab ();
-            if (tab) {
-                cur = tab->SymHead;
-                while (cur) {
-                    if ((cur->Flags & SC_GOTO_IND) != 0) {
-                        cur->V.L.IndJumpFrom = E;
-                    }
-                    cur = cur->NextSym;
-                }
-            }
         } else {
             /* It was not TOK_IDENT, or we couldn't find the symbol */
             Error ("Array name expected");
@@ -180,11 +158,7 @@ void DoLabel (void)
     SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_DEF);
 
     /* Emit the jump label */
-    CodeLabel* L = CS_AddLabel (CS->Code, LocalLabelName (Entry->V.L.Label));
-
-    if (Entry->V.L.IndJumpFrom) {
-        CollAppend (&L->JumpFrom, Entry->V.L.IndJumpFrom);
-    }
+    g_defcodelabel (Entry->V.L.Label);
 
     /* Eat the ident and colon */
     NextToken ();

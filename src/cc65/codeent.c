@@ -2534,11 +2534,13 @@ void CE_Output (const CodeEntry* E)
     int Space;
     const char* Target;
 
-    /* If we have a label, print that */
+    /* If we have labels, print them. All but the last one go onto a line of
+    ** their own, the last one may share the line with the instruction.
+    */
     unsigned LabelCount = CollCount (&E->Labels);
     unsigned I;
     for (I = 0; I < LabelCount; ++I) {
-        CL_Output (CollConstAt (&E->Labels, I));
+        CL_Output (CollConstAt (&E->Labels, I), I + 1 < LabelCount);
     }
 
     /* Get the opcode description */

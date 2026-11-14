@@ -35,6 +35,7 @@ void __fastcall__ GetString(char *buffer, char maxLen, char y, unsigned x,
                              void_func doneHandler, void_func faultHandler);
 
 char __fastcall__ GetCharWidth(char character);
+char __fastcall__ GetRealSize(char character, char mode, char *height, char *baseline);
 void __fastcall__ LoadCharSet(struct fontdesc *myFont);
 void UseSystemFont(void);
 

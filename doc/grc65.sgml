@@ -91,8 +91,10 @@ orientation.  It means that the menu box always will be as large as it should
 be.  Then, there's the orientation keyword; it can be either <tt/HORIZONTAL/ or
 <tt/VERTICAL/, optionally combined (no spaces) with <tt/EIGHTY_COL/, e.g.
 <tt/HORIZONTAL|EIGHTY_COL/, to size the menu using the 80-column system font
-instead of the 40-column one.  Between <tt/&lcub;/ and <tt/&rcub;/, there's
-the menu's
+instead of the 40-column one; and/or with <tt/CELL_ALIGN/, e.g.
+<tt/HORIZONTAL|CELL_ALIGN/, to expand the menu box outward to whole 8x8 pixel
+cells, for color applications.  Between
+<tt/&lcub;/ and <tt/&rcub;/, there's the menu's
 content.  It consists of item definitions.  First is an item name -- it has to
 be in quotes.  Next is a menu-type bit.  It can be <tt/MENU_ACTION/ or
 <tt/SUB_MENU/; either of them can be combined with the <tt/DYN_SUB_MENU/ bit

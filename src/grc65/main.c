@@ -364,20 +364,40 @@ static int getNameSize (const char *word, const int *table)
 }
 
 
-static void stripEightyCol (char *type)
+static void stripFlag (char *type, const char *flag)
 {
-    /* EIGHTY_COL is a grc65-only sizing hint, not a real GEOS menu-type
-       bit -- remove it (and an adjacent '|') so it never reaches the
-       emitted struct literal */
+    /* FLAG is a grc65-only layout hint, not a real GEOS menu-type bit --
+       remove it (and an adjacent '|') so it never reaches the emitted
+       struct literal */
     char *p;
+    size_t len = strlen (flag);
+    char pattern[32];
 
-    if ((p = strstr (type, "|EIGHTY_COL")) != NULL) {
-        memmove (p, p + 11, strlen (p + 11) + 1);
-    } else if ((p = strstr (type, "EIGHTY_COL|")) != NULL) {
-        memmove (p, p + 11, strlen (p + 11) + 1);
-    } else if ((p = strstr (type, "EIGHTY_COL")) != NULL) {
-        memmove (p, p + 10, strlen (p + 10) + 1);
+    sprintf (pattern, "|%s", flag);
+    if ((p = strstr (type, pattern)) != NULL) {
+        memmove (p, p + len + 1, strlen (p + len + 1) + 1);
+        return;
     }
+    sprintf (pattern, "%s|", flag);
+    if ((p = strstr (type, pattern)) != NULL) {
+        memmove (p, p + len + 1, strlen (p + len + 1) + 1);
+        return;
+    }
+    if ((p = strstr (type, flag)) != NULL) {
+        memmove (p, p + len, strlen (p + len) + 1);
+    }
+}
+
+
+static void cellAlign (struct menu *m)
+{
+    /* CELL_ALIGN: snap left/right/bottom to whole 8x8 pixel cells, always
+       moving right/down and never left/up -- moving left could overlap
+       whatever is to the left, and the top must stay exactly where it was
+       (e.g. flush below a parent menu), so it is left untouched */
+    m->left = (m->left + 7) & ~7;
+    m->right = (m->right & ~7) + 7;
+    m->bot = (m->bot & ~7) + 7;
 }
 
 
@@ -509,7 +529,12 @@ static void DoMenu (void)
     }
     myMenu.right = myMenu.left + size - 1;
 
-    stripEightyCol (myMenu.type);
+    if (strstr (myMenu.type, "CELL_ALIGN") != NULL) {
+        cellAlign (&myMenu);
+    }
+
+    stripFlag (myMenu.type, "EIGHTY_COL");
+    stripFlag (myMenu.type, "CELL_ALIGN");
 
     /* remember this menu so later MENU definitions can anchor to it */
     savedMenu = xmalloc (sizeof (struct menu));

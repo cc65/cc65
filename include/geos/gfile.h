@@ -68,5 +68,6 @@ char UpdateRecordFile(void);
 #define USR             3
 #define REL             4
 #define CBM             5
+#define FILE_CLOSED     0x80
 
 #endif

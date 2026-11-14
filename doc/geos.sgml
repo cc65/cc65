@@ -980,6 +980,11 @@ pointer to the DOS filename of the file.
 <p>
 When saving sequential files the two most important fields in <tt/struct fileheader/ are <tt/fileheader.load_address/
 and <tt/fileheader.end_address/.
+<p>
+<tt/SaveFile/ writes <tt/fileheader.dostype/ through to the directory entry as given, so you must
+OR in <tt/FILE_CLOSED/ (the CBM DOS "closed" bit) yourself, e.g. <tt/myHeader.dostype = SEQ |
+FILE_CLOSED;/. Omitting it leaves the file marked unclosed ("splat") in the directory; GEOS can
+still read it, but standard disk tools will refuse to.
 
 <sect3>FreeFile
 <p>

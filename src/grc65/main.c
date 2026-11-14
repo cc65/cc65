@@ -102,6 +102,17 @@ const int BSWTab[] = {0, 0x005, 0x007, 0x00b, 0x011, 0x017, 0x01d, 0x023,
     0x177, 0x17c, 0x182, 0x187, 0x18c, 0x18f, 0x193, 0x196, 0x19b, 0x1a1,
     0x1a9, 0x1af, 0x1b4, 0x1ba, 0x1be, 0x1c0, 0x1c4, 0x1ca, 0x1d2, 0x1dd};
 
+const int BSWTab80[] = {0, 0x006, 0x009, 0x00f, 0x017, 0x01f, 0x026, 0x02e,
+    0x031, 0x036, 0x03b, 0x043, 0x04a, 0x04e, 0x054, 0x057, 0x05f, 0x066,
+    0x06b, 0x071, 0x077, 0x07e, 0x084, 0x08b, 0x092, 0x099, 0x0a0, 0x0a3,
+    0x0a7, 0x0ac, 0x0b1, 0x0b6, 0x0bd, 0x0c5, 0x0cd, 0x0d4, 0x0db, 0x0e2,
+    0x0e8, 0x0ee, 0x0f5, 0x0fd, 0x100, 0x105, 0x10d, 0x112, 0x11c, 0x124,
+    0x12c, 0x133, 0x13b, 0x142, 0x148, 0x14f, 0x156, 0x15e, 0x168, 0x170,
+    0x177, 0x17e, 0x183, 0x18c, 0x191, 0x199, 0x1a2, 0x1a7, 0x1ae, 0x1b5,
+    0x1bc, 0x1c3, 0x1ca, 0x1cf, 0x1d6, 0x1dd, 0x1e0, 0x1e3, 0x1ea, 0x1ed,
+    0x1f8, 0x1ff, 0x207, 0x20e, 0x215, 0x21a, 0x220, 0x225, 0x22c, 0x234,
+    0x23f, 0x247, 0x24e, 0x255, 0x25b, 0x25e, 0x264, 0x26c, 0x271, 0x27c};
+
 const unsigned char icon1[] = {255, 255, 255, 128,   0,   1, 128,   0,   1,
                                128,   0,   1, 128,   0,   1, 128,   0,   1,
                                128,   0,   1, 128,   0,   1, 128,   0,   1,
@@ -338,17 +349,35 @@ static char *bintos (unsigned char a, char out[7])
 }
 
 
-static int getNameSize (const char *word)
+static int getNameSize (const char *word, const int *table)
 {
-    /* count length of a word using BSW 9 font table */
-    int a = 0, i = 0;
+    /* count length of a word (without surrounding quotes) using BSW 9
+       font table */
+    int a = 0, i = 1;
 
-    while (word[i] != '\0') {
-        a += (BSWTab[word[i] - 31] - BSWTab[word[i] - 32]);
+    while (word[i] != '"') {
+        a += (table[word[i] - 31] - table[word[i] - 32]);
         i++;
     }
 
     return a;
+}
+
+
+static void stripEightyCol (char *type)
+{
+    /* EIGHTY_COL is a grc65-only sizing hint, not a real GEOS menu-type
+       bit -- remove it (and an adjacent '|') so it never reaches the
+       emitted struct literal */
+    char *p;
+
+    if ((p = strstr (type, "|EIGHTY_COL")) != NULL) {
+        memmove (p, p + 11, strlen (p + 11) + 1);
+    } else if ((p = strstr (type, "EIGHTY_COL|")) != NULL) {
+        memmove (p, p + 11, strlen (p + 11) + 1);
+    } else if ((p = strstr (type, "EIGHTY_COL")) != NULL) {
+        memmove (p, p + 10, strlen (p + 10) + 1);
+    }
 }
 
 
@@ -388,6 +417,7 @@ static void DoMenu (void)
     int a, size, tmpsize, item = 0;
     char *token, *itemName;
     char namebuff[255] = "";
+    const int *table;
     struct menu myMenu, *savedMenu, *anchorMenu;
     struct menuitem *curItem, *newItem, *anchorItem;
 
@@ -455,25 +485,31 @@ static void DoMenu (void)
     /* count menu sizes */
     size = 0;
     curItem = myMenu.item;
+    table = (strstr (myMenu.type, "EIGHTY_COL") != NULL) ? BSWTab80 : BSWTab;
     if (strstr (myMenu.type, "HORIZONTAL") != NULL) {
-        /* menu is HORIZONTAL, ysize=15, sum xsize of all items +~8?*/
+        /* menu is HORIZONTAL, ysize=15, sum xsize of all items, each
+           followed by an 8px gap */
         myMenu.bot = myMenu.top + 15;
         for (a = 0; a != item; a++) {
             curItem->offset = size;
-            size += getNameSize (curItem->name);
+            size += getNameSize (curItem->name, table) + 8;
             curItem = curItem->next;
         }
     } else {
-        /* menu is VERTICAL, ysize=item*15, count largest xsize of all items +~8? */
+        /* menu is VERTICAL, ysize=item*15, count largest xsize of all
+           items, plus the same 8px gap */
         myMenu.bot = myMenu.top + (14 * item);
         for (a = 0; a != item; a++) {
             curItem->offset = a * 14;
-            tmpsize = getNameSize (curItem->name);
+            tmpsize = getNameSize (curItem->name, table);
             size = (size > tmpsize) ? size : tmpsize;
             curItem = curItem->next;
         }
+        size += 8;
     }
     myMenu.right = myMenu.left + size - 1;
+
+    stripEightyCol (myMenu.type);
 
     /* remember this menu so later MENU definitions can anchor to it */
     savedMenu = xmalloc (sizeof (struct menu));
@@ -492,7 +528,7 @@ static void DoMenu (void)
             /* forward-declare submenu structs so a parent and its submenus
                may be defined in either order */
             fprintf (outputCFile,
-                "extern const struct menu %s;\n",
+                "extern struct menu %s;\n",
                 curItem->target);
         }
         curItem=curItem->next;
@@ -500,7 +536,7 @@ static void DoMenu (void)
 
     fprintf (outputCFile,
         "\n"
-        "const struct menu %s = {\n"
+        "struct menu %s = {\n"
         "    { %i, %i, %i, %i },\n"
         "    (char)(%i | %s),\n"
         "    {\n",

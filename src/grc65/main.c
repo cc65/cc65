@@ -39,6 +39,7 @@ struct menuitem {
     char *name;
     char *type;
     char *target;
+    int offset;
     struct menuitem *next;
 };
 
@@ -48,7 +49,12 @@ struct menu {
     int bot, right;
     char *type;
     struct menuitem *item;
+    struct menu *next;
 };
+
+/* registry of already-defined menus, so a later MENU definition can anchor
+   its position to "parentMenu:item" */
+static struct menu *menuList = NULL;
 
 struct appheader {
     int year, month, day, hour, min;
@@ -346,19 +352,71 @@ static int getNameSize (const char *word)
 }
 
 
+static struct menu *findMenu (const char *name)
+{
+    /* look up an already-defined menu by name, for anchor resolution */
+    struct menu *m;
+
+    for (m = menuList; m != NULL; m = m->next) {
+        if (strcmp (m->name, name) == 0) {
+            return m;
+        }
+    }
+
+    return NULL;
+}
+
+
+static struct menuitem *findMenuItem (const struct menu *m, const char *name)
+{
+    /* look up an item by name (without surrounding quotes) within a menu */
+    struct menuitem *it;
+    size_t len = strlen (name);
+
+    for (it = m->item; it != NULL; it = it->next) {
+        if ((strncmp (it->name + 1, name, len) == 0) && (it->name[len + 1] == '"')) {
+            return it;
+        }
+    }
+
+    return NULL;
+}
+
+
 static void DoMenu (void)
 {
     int a, size, tmpsize, item = 0;
-    char *token;
+    char *token, *itemName;
     char namebuff[255] = "";
-    struct menu myMenu;
-    struct menuitem *curItem, *newItem;
+    struct menu myMenu, *savedMenu, *anchorMenu;
+    struct menuitem *curItem, *newItem, *anchorItem;
 
     openCFile ();
 
     myMenu.name = nextWord ();
-    myMenu.left = atoi (nextWord ());
-    myMenu.top = atoi (nextWord ());
+    myMenu.next = NULL;
+
+    token = nextWord ();
+    if ((itemName = strchr (token, ':')) != NULL) {
+        *itemName++ = '\0';
+        if ((anchorMenu = findMenu (token)) == NULL) {
+            AbEnd ("Menu '%s' anchors to unknown menu '%s'", myMenu.name, token);
+        }
+        if ((anchorItem = findMenuItem (anchorMenu, itemName)) == NULL) {
+            AbEnd ("Menu '%s' anchors to unknown item '%s' in menu '%s'", myMenu.name, itemName, token);
+        }
+        if (strstr (anchorMenu->type, "HORIZONTAL") != NULL) {
+            myMenu.left = anchorMenu->left + anchorItem->offset;
+            myMenu.top = anchorMenu->bot;
+        } else {
+            myMenu.left = anchorMenu->right + 1;
+            myMenu.top = anchorMenu->top + anchorItem->offset;
+        }
+    } else {
+        myMenu.left = atoi (token);
+        myMenu.top = atoi (nextWord ());
+    }
+
     myMenu.type = nextWord ();
 
     if (strcmp (nextWord (), "{") != 0) {
@@ -401,6 +459,7 @@ static void DoMenu (void)
         /* menu is HORIZONTAL, ysize=15, sum xsize of all items +~8?*/
         myMenu.bot = myMenu.top + 15;
         for (a = 0; a != item; a++) {
+            curItem->offset = size;
             size += getNameSize (curItem->name);
             curItem = curItem->next;
         }
@@ -408,6 +467,7 @@ static void DoMenu (void)
         /* menu is VERTICAL, ysize=item*15, count largest xsize of all items +~8? */
         myMenu.bot = myMenu.top + (14 * item);
         for (a = 0; a != item; a++) {
+            curItem->offset = a * 14;
             tmpsize = getNameSize (curItem->name);
             size = (size > tmpsize) ? size : tmpsize;
             curItem = curItem->next;
@@ -415,12 +475,24 @@ static void DoMenu (void)
     }
     myMenu.right = myMenu.left + size - 1;
 
+    /* remember this menu so later MENU definitions can anchor to it */
+    savedMenu = xmalloc (sizeof (struct menu));
+    *savedMenu = myMenu;
+    savedMenu->next = menuList;
+    menuList = savedMenu;
+
     curItem = myMenu.item;
     for (a = 0; a != item; a++) {
         /* print prototype only if MENU_ACTION or DYN_SUB_MENU are present in type */
         if ((strstr (curItem->type, "MENU_ACTION") != NULL) || (strstr (curItem->type, "DYN_SUB_MENU") != NULL)) {
             fprintf (outputCFile,
                 "void %s (void);\n",
+                curItem->target);
+        } else if (strstr (curItem->type, "SUB_MENU") != NULL) {
+            /* forward-declare submenu structs so a parent and its submenus
+               may be defined in either order */
+            fprintf (outputCFile,
+                "extern const struct menu %s;\n",
                 curItem->target);
         }
         curItem=curItem->next;

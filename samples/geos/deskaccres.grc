@@ -1,20 +1,20 @@
-MENU fileSubMenu 80,79 VERTICAL
+MENU mainMenu 80,64 HORIZONTAL
+{
+    "file" SUB_MENU fileSubMenu
+    "edit" SUB_MENU editSubMenu
+}
+
+MENU fileSubMenu mainMenu:file VERTICAL
 {
     "close" MENU_ACTION DoClose
     "quit" MENU_ACTION DoQuit
 }
 
-MENU editSubMenu 100,79 VERTICAL
+MENU editSubMenu mainMenu:edit VERTICAL
 {
     "cut" MENU_ACTION DoCut
     "copy" MENU_ACTION DoCopy
     "paste" MENU_ACTION DoPaste
-}
-
-MENU mainMenu 80,64 HORIZONTAL
-{
-    "file" SUB_MENU fileSubMenu
-    "edit" SUB_MENU editSubMenu
 }
 
 HEADER DESK_ACC "deskacc" "DeskAcc Demo" "V1.0" {

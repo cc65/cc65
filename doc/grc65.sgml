@@ -93,7 +93,18 @@ be.  Then, there's the orientation keyword; it can be either <tt/HORIZONTAL/ or
 <tt/HORIZONTAL|EIGHTY_COL/, to size the menu using the 80-column system font
 instead of the 40-column one; and/or with <tt/CELL_ALIGN/, e.g.
 <tt/HORIZONTAL|CELL_ALIGN/, to expand the menu box outward to whole 8x8 pixel
-cells, for color applications.  Between
+cells, for color applications.  <tt/CELL_ALIGN/ only affects the 40-column
+box; it has no meaning in 80-column mode, so the 80-column box is never
+cell-aligned.
+
+Both box sizes are always calculated and made available, regardless of
+<tt/EIGHTY_COL/, as two macros, <tt/MENUNAME_SIZE40/ and
+<tt/MENUNAME_SIZE80/ (menu name upper-cased), each expanding to
+<tt/&lcub; top, bot, left, right &rcub;/.  The generated <tt/struct menu/ is
+initialized with whichever of the two matches the menu's own
+<tt/EIGHTY_COL/ setting, but an application that switches between 40- and
+80-column mode at runtime can assign either macro to the menu's box
+afterwards.  Between
 <tt/&lcub;/ and <tt/&rcub;/, there's the menu's
 content.  It consists of item definitions.  First is an item name -- it has to
 be in quotes.  Next is a menu-type bit.  It can be <tt/MENU_ACTION/ or

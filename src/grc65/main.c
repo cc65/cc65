@@ -20,6 +20,7 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#include <ctype.h>
 
 /* common stuff */
 #include "abend.h"
@@ -39,14 +40,14 @@ struct menuitem {
     char *name;
     char *type;
     char *target;
-    int offset;
+    int offset40, offset80;
     struct menuitem *next;
 };
 
 struct menu {
     char *name;
-    int top, left;
-    int bot, right;
+    int top40, left40, bot40, right40;
+    int top80, left80, bot80, right80;
     char *type;
     struct menuitem *item;
     struct menu *next;
@@ -389,15 +390,18 @@ static void stripFlag (char *type, const char *flag)
 }
 
 
-static void cellAlign (struct menu *m)
+static void cellAlign (int *left, int *right, int *bot)
 {
     /* CELL_ALIGN: snap left/right/bottom to whole 8x8 pixel cells, always
        moving right/down and never left/up -- moving left could overlap
        whatever is to the left, and the top must stay exactly where it was
-       (e.g. flush below a parent menu), so it is left untouched */
-    m->left = (m->left + 7) & ~7;
-    m->right = (m->right & ~7) + 7;
-    m->bot = (m->bot & ~7) + 7;
+       (e.g. flush below a parent menu), so it is left untouched. Only
+       meaningful for the 40-column size, since it exists to make GEOS
+       color/pattern operations (tied to the 40-column screen) line up;
+       the 80-column size is never cell-aligned. */
+    *left = (*left + 7) & ~7;
+    *right = (*right & ~7) + 7;
+    *bot = (*bot & ~7) + 7;
 }
 
 
@@ -435,9 +439,10 @@ static struct menuitem *findMenuItem (const struct menu *m, const char *name)
 static void DoMenu (void)
 {
     int a, size, tmpsize, item = 0;
+    int isHorizontal, isEightyCol;
     char *token, *itemName;
     char namebuff[255] = "";
-    const int *table;
+    char upperName[256];
     struct menu myMenu, *savedMenu, *anchorMenu;
     struct menuitem *curItem, *newItem, *anchorItem;
 
@@ -456,15 +461,19 @@ static void DoMenu (void)
             AbEnd ("Menu '%s' anchors to unknown item '%s' in menu '%s'", myMenu.name, itemName, token);
         }
         if (strstr (anchorMenu->type, "HORIZONTAL") != NULL) {
-            myMenu.left = anchorMenu->left + anchorItem->offset;
-            myMenu.top = anchorMenu->bot;
+            myMenu.left40 = anchorMenu->left40 + anchorItem->offset40;
+            myMenu.top40 = anchorMenu->bot40;
+            myMenu.left80 = anchorMenu->left80 + anchorItem->offset80;
+            myMenu.top80 = anchorMenu->bot80;
         } else {
-            myMenu.left = anchorMenu->right + 1;
-            myMenu.top = anchorMenu->top + anchorItem->offset;
+            myMenu.left40 = anchorMenu->right40 + 1;
+            myMenu.top40 = anchorMenu->top40 + anchorItem->offset40;
+            myMenu.left80 = anchorMenu->right80 + 1;
+            myMenu.top80 = anchorMenu->top80 + anchorItem->offset80;
         }
     } else {
-        myMenu.left = atoi (token);
-        myMenu.top = atoi (nextWord ());
+        myMenu.left40 = myMenu.left80 = atoi (token);
+        myMenu.top40 = myMenu.top80 = atoi (nextWord ());
     }
 
     myMenu.type = nextWord ();
@@ -502,36 +511,61 @@ static void DoMenu (void)
 
     curItem->next = NULL;
 
-    /* count menu sizes */
+    /* count menu sizes, once for the 40-column system font and once for
+       the 80-column one, so both sizes can be made available to the
+       application for switching at runtime */
+    isHorizontal = (strstr (myMenu.type, "HORIZONTAL") != NULL);
+    isEightyCol = (strstr (myMenu.type, "EIGHTY_COL") != NULL);
+
     size = 0;
     curItem = myMenu.item;
-    table = (strstr (myMenu.type, "EIGHTY_COL") != NULL) ? BSWTab80 : BSWTab;
-    if (strstr (myMenu.type, "HORIZONTAL") != NULL) {
+    if (isHorizontal) {
         /* menu is HORIZONTAL, ysize=15, sum xsize of all items, each
            followed by an 8px gap */
-        myMenu.bot = myMenu.top + 15;
+        myMenu.bot40 = myMenu.top40 + 15;
         for (a = 0; a != item; a++) {
-            curItem->offset = size;
-            size += getNameSize (curItem->name, table) + 8;
+            curItem->offset40 = size;
+            size += getNameSize (curItem->name, BSWTab) + 8;
             curItem = curItem->next;
         }
     } else {
         /* menu is VERTICAL, ysize=item*15, count largest xsize of all
            items, plus the same 8px gap */
-        myMenu.bot = myMenu.top + (14 * item);
+        myMenu.bot40 = myMenu.top40 + (14 * item);
         for (a = 0; a != item; a++) {
-            curItem->offset = a * 14;
-            tmpsize = getNameSize (curItem->name, table);
+            curItem->offset40 = a * 14;
+            tmpsize = getNameSize (curItem->name, BSWTab);
             size = (size > tmpsize) ? size : tmpsize;
             curItem = curItem->next;
         }
         size += 8;
     }
-    myMenu.right = myMenu.left + size - 1;
+    myMenu.right40 = myMenu.left40 + size - 1;
 
     if (strstr (myMenu.type, "CELL_ALIGN") != NULL) {
-        cellAlign (&myMenu);
+        cellAlign (&myMenu.left40, &myMenu.right40, &myMenu.bot40);
     }
+
+    size = 0;
+    curItem = myMenu.item;
+    if (isHorizontal) {
+        myMenu.bot80 = myMenu.top80 + 15;
+        for (a = 0; a != item; a++) {
+            curItem->offset80 = size;
+            size += getNameSize (curItem->name, BSWTab80) + 8;
+            curItem = curItem->next;
+        }
+    } else {
+        myMenu.bot80 = myMenu.top80 + (14 * item);
+        for (a = 0; a != item; a++) {
+            curItem->offset80 = a * 14;
+            tmpsize = getNameSize (curItem->name, BSWTab80);
+            size = (size > tmpsize) ? size : tmpsize;
+            curItem = curItem->next;
+        }
+        size += 8;
+    }
+    myMenu.right80 = myMenu.left80 + size - 1;
 
     stripFlag (myMenu.type, "EIGHTY_COL");
     stripFlag (myMenu.type, "CELL_ALIGN");
@@ -559,13 +593,24 @@ static void DoMenu (void)
         curItem=curItem->next;
     }
 
+    for (a = 0; myMenu.name[a] != '\0'; a++) {
+        upperName[a] = toupper ((unsigned char) myMenu.name[a]);
+    }
+    upperName[a] = '\0';
+
     fprintf (outputCFile,
         "\n"
+        "#define %s_SIZE40 { %i, %i, %i, %i }\n"
+        "#define %s_SIZE80 { %i, %i, %i, %i }\n"
         "struct menu %s = {\n"
-        "    { %i, %i, %i, %i },\n"
+        "    %s_SIZE%s,\n"
         "    (char)(%i | %s),\n"
         "    {\n",
-        myMenu.name, myMenu.top, myMenu.bot, myMenu.left, myMenu.right, item, myMenu.type);
+        upperName, myMenu.top40, myMenu.bot40, myMenu.left40, myMenu.right40,
+        upperName, myMenu.top80, myMenu.bot80, myMenu.left80, myMenu.right80,
+        myMenu.name,
+        upperName, isEightyCol ? "80" : "40",
+        item, myMenu.type);
 
     curItem = myMenu.item;
     for (a = 0; a != item; a++) {

@@ -367,6 +367,17 @@ GetString call, like this:
 <p>
 This function returns the real width (in pixels) of the given character with the current font. It can be used
 for counting the length of a string on the screen, allowing for indentation or justification.
+Style attributes are not taken into account.
+
+<sect3>GetRealSize
+<p>
+<tt/char GetRealSize (char character, char mode, char *height, char *baseline)/
+<p>
+This function, like GetCharWidth, returns the real width (in pixels) of the given character with the
+current font, but will also take style attributes in <tt/mode/ (e.g. <tt/SET_BOLD/ or
+<tt/SET_OUTLINE/, the same values as <tt/currentMode/) into account. The character's height and
+baseline offset in that style are stored at <tt/height/ and <tt/baseline/. Both pointers must be
+valid.
 
 <sect3>LoadCharSet
 <p>

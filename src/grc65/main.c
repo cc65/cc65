@@ -428,28 +428,29 @@ static void DoMenu (void)
 
     fprintf (outputCFile,
         "\n"
-        "const void %s = {\n"
-        "    (char)%i, (char)%i,\n"
-        "    (int)%i, (int)%i,\n"
-        "    (char)(%i | %s),\n",
+        "const struct menu %s = {\n"
+        "    { %i, %i, %i, %i },\n"
+        "    (char)(%i | %s),\n"
+        "    {\n",
         myMenu.name, myMenu.top, myMenu.bot, myMenu.left, myMenu.right, item, myMenu.type);
 
     curItem = myMenu.item;
     for (a = 0; a != item; a++) {
         fprintf (outputCFile,
-            "    %s, (char)%s, (int)",
+            "        { %s, (char)%s, (void*)",
             curItem->name, curItem->type);
         if ((strstr (curItem->type, "SUB_MENU") != NULL) && (strstr (curItem->type, "DYN_SUB_MENU") == NULL)) {
             fprintf (outputCFile,
                 "&");
         }
         fprintf (outputCFile,
-            "%s,\n",
+            "%s },\n",
             curItem->target);
         curItem = curItem->next;
     }
 
     fprintf (outputCFile,
+        "    }\n"
         "};\n\n");
 
     if (fclose (outputCFile) != 0) {

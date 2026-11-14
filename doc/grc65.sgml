@@ -80,12 +80,32 @@ MENU menuName leftx,topy <ORIENTATION> {
     "item name x" <MENU_TYPE> pointer
 }</verb></tscreen>
 The definition starts with the keyword <tt/MENU/, then comes the menu's name,
-which will be represented in C as <tt/const void/.  Then are the co-ordinates
-of the top left corner of the menu box.  The position of the bottom right
+which will be represented in C as <tt/struct menu/.  Then are the
+co-ordinates of the top left corner of the menu box; instead of
+<tt/leftx,topy/, <tt/parentMenu:itemName/ positions the menu automatically
+relative to an already-defined menu's item -- directly below it for a
+<tt/HORIZONTAL/ parent, to its right for a <tt/VERTICAL/ one (such a menu must
+be defined after the one it refers to).  The position of the bottom right
 corner is estimated, based on the length of item names and the menu's
 orientation.  It means that the menu box always will be as large as it should
 be.  Then, there's the orientation keyword; it can be either <tt/HORIZONTAL/ or
-<tt/VERTICAL/.  Between <tt/&lcub;/ and <tt/&rcub;/, there's the menu's
+<tt/VERTICAL/, optionally combined (no spaces) with <tt/EIGHTY_COL/, e.g.
+<tt/HORIZONTAL|EIGHTY_COL/, to size the menu using the 80-column system font
+instead of the 40-column one; and/or with <tt/CELL_ALIGN/, e.g.
+<tt/HORIZONTAL|CELL_ALIGN/, to expand the menu box outward to whole 8x8 pixel
+cells, for color applications.  <tt/CELL_ALIGN/ only affects the 40-column
+box; it has no meaning in 80-column mode, so the 80-column box is never
+cell-aligned.
+
+Both box sizes are always calculated and made available, regardless of
+<tt/EIGHTY_COL/, as two macros, <tt/MENUNAME_SIZE40/ and
+<tt/MENUNAME_SIZE80/ (menu name upper-cased), each expanding to
+<tt/&lcub; top, bot, left, right &rcub;/.  The generated <tt/struct menu/ is
+initialized with whichever of the two matches the menu's own
+<tt/EIGHTY_COL/ setting, but an application that switches between 40- and
+80-column mode at runtime can assign either macro to the menu's box
+afterwards.  Between
+<tt/&lcub;/ and <tt/&rcub;/, there's the menu's
 content.  It consists of item definitions.  First is an item name -- it has to
 be in quotes.  Next is a menu-type bit.  It can be <tt/MENU_ACTION/ or
 <tt/SUB_MENU/; either of them can be combined with the <tt/DYN_SUB_MENU/ bit
@@ -98,9 +118,9 @@ The last part of the item definition is a pointer which can be any name that is
 present in the C source code that includes the generated header.  It can point
 to a function or to another menu definition.
 
-If you are doing sub(sub)menu definitions, remember to place the lowest level
-definition first, and the top-level menu as the last one.  That way the C
-compiler won't complain about unknown names.
+Sub(sub)menu definitions may appear in any order relative to their parent,
+except a menu positioned with <tt/parentMenu:itemName/ (see above), which must
+come after that parent.
 
 
 <sect1>Header definition

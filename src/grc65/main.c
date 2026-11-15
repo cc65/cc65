@@ -34,20 +34,20 @@
 /* I hope that no one will be able to create a .grc bigger than this... */
 #define BLOODY_BIG_BUFFER 65000
 
-
+#define COL40 0
+#define COL80 1
 
 struct menuitem {
     char *name;
     char *type;
     char *target;
-    int offset40, offset80;
+    int offset[2];
     struct menuitem *next;
 };
 
 struct menu {
     char *name;
-    int top40, left40, bot40, right40;
-    int top80, left80, bot80, right80;
+    int top[2], left[2], bot[2], right[2];
     char *type;
     struct menuitem *item;
     struct menu *next;
@@ -390,16 +390,19 @@ static void stripFlag (char *type, const char *flag)
 }
 
 
-static void cellAlign (int *left, int *right, int *bot)
+static void cellAlign (int *left, int *top, int *right, int *bot, int alignLeft, int alignTop)
 {
-    /* CELL_ALIGN: snap left/right/bottom to whole 8x8 pixel cells, always
-       moving right/down and never left/up -- moving left could overlap
-       whatever is to the left, and the top must stay exactly where it was
-       (e.g. flush below a parent menu), so it is left untouched. Only
-       meaningful for the 40-column size, since it exists to make GEOS
-       color/pattern operations (tied to the 40-column screen) line up;
-       the 80-column size is never cell-aligned. */
-    *left = (*left + 7) & ~7;
+    /* CELL_ALIGN: snap the free edges to whole 8x8 pixel cells, always moving
+       right/down and never left/up. An anchored submenu must stay flush against
+       its parent on one of left/top (flush below a HORIZONTAL parent, or flush
+       right of a VERTICAL one), so that edge is left untouched; a non-anchored
+       menu has no such constraint, so both are aligned. */
+    if (alignLeft) {
+        *left = (*left + 7) & ~7;
+    }
+    if (alignTop) {
+        *top = (*top + 7) & ~7;
+    }
     *right = (*right & ~7) + 7;
     *bot = (*bot & ~7) + 7;
 }
@@ -436,10 +439,52 @@ static struct menuitem *findMenuItem (const struct menu *m, const char *name)
 }
 
 
+static void countMenuSize (struct menu *myMenu, const int *tab, int isHorizontal, int item, int screenMode)
+{
+    /* compute a menu's box and item offsets for one screen mode (COL40/COL80) */
+    int size = 0;
+    int tmpsize;
+    int a;
+
+    struct menuitem *curItem = myMenu->item;
+    if (isHorizontal) {
+        /* menu is HORIZONTAL, ysize=15, sum xsize of all items, each
+           followed by an 8px gap */
+        myMenu->bot[screenMode] = myMenu->top[screenMode] + 15;
+        for (a = 0; a != item; a++) {
+            curItem->offset[screenMode] = size;
+            size += getNameSize (curItem->name, tab) + 8;
+            curItem = curItem->next;
+        }
+    } else {
+        /* menu is VERTICAL, ysize=item*15, count largest xsize of all
+           items, plus the same 8px gap */
+        myMenu->bot[screenMode] = myMenu->top[screenMode] + (14 * item);
+        for (a = 0; a != item; a++) {
+            curItem->offset[screenMode] = a * 14;
+            tmpsize = getNameSize (curItem->name, tab);
+            size = (size > tmpsize) ? size : tmpsize;
+            curItem = curItem->next;
+        }
+        size += 8;
+    }
+    myMenu->right[screenMode] = myMenu->left[screenMode] + size - 1;
+
+    if (isHorizontal) {
+        /* empirically, a HORIZONTAL menu box needs 2px more trailing
+           margin past its last item than the 8px gap between items
+           provides -- confirmed on-device against both the deskacc
+           sample and geobrot */
+        myMenu->right[screenMode] += 2;
+    }
+}
+
+
 static void DoMenu (void)
 {
-    int a, size, tmpsize, item = 0;
+    int a, item = 0;
     int isHorizontal, isEightyCol;
+    int alignLeft = 1, alignTop = 1;
     char *token, *itemName;
     char namebuff[255] = "";
     char upperName[256];
@@ -461,19 +506,21 @@ static void DoMenu (void)
             AbEnd ("Menu '%s' anchors to unknown item '%s' in menu '%s'", myMenu.name, itemName, token);
         }
         if (strstr (anchorMenu->type, "HORIZONTAL") != NULL) {
-            myMenu.left40 = anchorMenu->left40 + anchorItem->offset40;
-            myMenu.top40 = anchorMenu->bot40;
-            myMenu.left80 = anchorMenu->left80 + anchorItem->offset80;
-            myMenu.top80 = anchorMenu->bot80;
+            myMenu.left[COL40] = anchorMenu->left[COL40] + anchorItem->offset[COL40];
+            myMenu.top[COL40] = anchorMenu->bot[COL40];
+            myMenu.left[COL80] = anchorMenu->left[COL80] + anchorItem->offset[COL80];
+            myMenu.top[COL80] = anchorMenu->bot[COL80];
+            alignTop = 0;
         } else {
-            myMenu.left40 = anchorMenu->right40 + 1;
-            myMenu.top40 = anchorMenu->top40 + anchorItem->offset40;
-            myMenu.left80 = anchorMenu->right80 + 1;
-            myMenu.top80 = anchorMenu->top80 + anchorItem->offset80;
+            myMenu.left[COL40] = anchorMenu->right[COL40] + 1;
+            myMenu.top[COL40] = anchorMenu->top[COL40] + anchorItem->offset[COL40];
+            myMenu.left[COL80] = anchorMenu->right[COL80] + 1;
+            myMenu.top[COL80] = anchorMenu->top[COL80] + anchorItem->offset[COL80];
+            alignLeft = 0;
         }
     } else {
-        myMenu.left40 = myMenu.left80 = atoi (token);
-        myMenu.top40 = myMenu.top80 = atoi (nextWord ());
+        myMenu.left[COL40] = myMenu.left[COL80] = atoi (token);
+        myMenu.top[COL40] = myMenu.top[COL80] = atoi (nextWord ());
     }
 
     myMenu.type = nextWord ();
@@ -517,55 +564,13 @@ static void DoMenu (void)
     isHorizontal = (strstr (myMenu.type, "HORIZONTAL") != NULL);
     isEightyCol = (strstr (myMenu.type, "EIGHTY_COL") != NULL);
 
-    size = 0;
-    curItem = myMenu.item;
-    if (isHorizontal) {
-        /* menu is HORIZONTAL, ysize=15, sum xsize of all items, each
-           followed by an 8px gap */
-        myMenu.bot40 = myMenu.top40 + 15;
-        for (a = 0; a != item; a++) {
-            curItem->offset40 = size;
-            size += getNameSize (curItem->name, BSWTab) + 8;
-            curItem = curItem->next;
-        }
-    } else {
-        /* menu is VERTICAL, ysize=item*15, count largest xsize of all
-           items, plus the same 8px gap */
-        myMenu.bot40 = myMenu.top40 + (14 * item);
-        for (a = 0; a != item; a++) {
-            curItem->offset40 = a * 14;
-            tmpsize = getNameSize (curItem->name, BSWTab);
-            size = (size > tmpsize) ? size : tmpsize;
-            curItem = curItem->next;
-        }
-        size += 8;
-    }
-    myMenu.right40 = myMenu.left40 + size - 1;
+    countMenuSize(&myMenu, BSWTab, isHorizontal, item, COL40);
 
     if (strstr (myMenu.type, "CELL_ALIGN") != NULL) {
-        cellAlign (&myMenu.left40, &myMenu.right40, &myMenu.bot40);
+        cellAlign (&myMenu.left[COL40], &myMenu.top[COL40], &myMenu.right[COL40], &myMenu.bot[COL40], alignLeft, alignTop);
     }
 
-    size = 0;
-    curItem = myMenu.item;
-    if (isHorizontal) {
-        myMenu.bot80 = myMenu.top80 + 15;
-        for (a = 0; a != item; a++) {
-            curItem->offset80 = size;
-            size += getNameSize (curItem->name, BSWTab80) + 8;
-            curItem = curItem->next;
-        }
-    } else {
-        myMenu.bot80 = myMenu.top80 + (14 * item);
-        for (a = 0; a != item; a++) {
-            curItem->offset80 = a * 14;
-            tmpsize = getNameSize (curItem->name, BSWTab80);
-            size = (size > tmpsize) ? size : tmpsize;
-            curItem = curItem->next;
-        }
-        size += 8;
-    }
-    myMenu.right80 = myMenu.left80 + size - 1;
+    countMenuSize(&myMenu, BSWTab80, isHorizontal, item, COL80);
 
     stripFlag (myMenu.type, "EIGHTY_COL");
     stripFlag (myMenu.type, "CELL_ALIGN");
@@ -606,8 +611,8 @@ static void DoMenu (void)
         "    %s_SIZE%s,\n"
         "    (char)(%i | %s),\n"
         "    {\n",
-        upperName, myMenu.top40, myMenu.bot40, myMenu.left40, myMenu.right40,
-        upperName, myMenu.top80, myMenu.bot80, myMenu.left80, myMenu.right80,
+        upperName, myMenu.top[COL40], myMenu.bot[COL40], myMenu.left[COL40], myMenu.right[COL40],
+        upperName, myMenu.top[COL80], myMenu.bot[COL80], myMenu.left[COL80], myMenu.right[COL80],
         myMenu.name,
         upperName, isEightyCol ? "80" : "40",
         item, myMenu.type);

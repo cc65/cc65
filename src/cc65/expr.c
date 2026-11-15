@@ -1839,7 +1839,10 @@ static void PostInc (ExprDesc* Expr)
             /* Defer the increment until after the value of this expression is used */
             DeferInc (Expr);
 
-            /* Just return */
+            /* The result is always an rvalue */
+            ED_MarkExprAsRVal (Expr);
+
+            /* Return the resulting expression otherwise unchanged */
             return;
         }
     }
@@ -1895,7 +1898,10 @@ static void PostDec (ExprDesc* Expr)
             /* Defer the decrement until after the value of this expression is used */
             DeferDec (Expr);
 
-            /* Just return */
+            /* The result is always an rvalue */
+            ED_MarkExprAsRVal (Expr);
+
+            /* Return the resulting expression otherwise unchanged */
             return;
         }
     }

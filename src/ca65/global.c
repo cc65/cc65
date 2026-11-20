@@ -73,6 +73,7 @@ unsigned char WarnAlignWaste     = 0;   /* Warn about "wasted" bytes when aligni
 unsigned char WarningsAsErrors   = 0;   /* Error if any warnings */
 unsigned char SegList            = 0;   /* Show segments in listing */
 unsigned char ExpandMacros       = 0;   /* Expand macros in listing */
+unsigned char ExpandOnly         = 0;   /* Stop after macro expansion (-E) */
 
 /* Emulation features */
 unsigned char DollarIsPC         = 0;   /* Allow the $ symbol as current PC */

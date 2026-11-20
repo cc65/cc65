@@ -94,4 +94,21 @@ void LeaveRawTokenMode (void);
 
 /* End of nexttok.h */
 
+void ExpandedOutOpen (const char* Name);
+/* Open the file that receives the macro-expanded source */
+
+int ExpandedOutIsOpen (void);
+/* Return true if the macro-expanded source file is open */
+
+void ExpandedOutClose (void);
+/* Close the macro-expanded source file */
+
+void ExpandedOutToken (void);
+/* Called for each token delivered to the parser */
+
+void ExpandedOutMacroCall (void);
+/* Called when a macro invocation is about to be expanded */
+
+
+
 #endif

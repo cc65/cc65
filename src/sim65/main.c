@@ -93,6 +93,7 @@ static void Usage (void)
             "Short options:\n"
             "  -h\t\t\tHelp (this text)\n"
             "  -c\t\t\tPrint amount of executed CPU cycles\n"
+            "  -p <file>\t\tSave profiling information (appended)\n"
             "  -v\t\t\tIncrease verbosity\n"
             "  -V\t\t\tPrint the simulator version number\n"
             "  -x <num>\t\tExit simulator after <num> cycles\n"
@@ -101,6 +102,7 @@ static void Usage (void)
             "  --help\t\tHelp (this text)\n"
             "  --cycles\t\tPrint amount of executed CPU cycles\n"
             "  --cpu <type>\t\tOverride CPU type (6502, 65C02, 6502X)\n"
+            "  --profile <file>\tSave profiling information (appended)\n"
             "  --trace\t\tEnable CPU trace\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the simulator version number\n",
@@ -183,7 +185,12 @@ static void OptQuitXIns (const char* Opt attribute ((unused)),
     MaxCycles = strtoull(Arg, NULL, 0);
 }
 
-
+static void OptProfile (const char* Opt attribute ((unused)),
+                        const char* Arg attribute ((unused)))
+/* save profiling info */
+{
+    ProfileFile = Arg;
+}
 
 static unsigned char ReadProgramFile (void)
 /* Load program into memory */
@@ -284,6 +291,7 @@ int main (int argc, char* argv[])
         { "--help",             0,      OptHelp      },
         { "--cycles",           0,      OptCycles    },
         { "--cpu",              1,      OptCPU       },
+        { "--profile",          1,      OptProfile   },
         { "--trace",            0,      OptTrace     },
         { "--verbose",          0,      OptVerbose   },
         { "--version",          0,      OptVersion   },
@@ -325,6 +333,10 @@ int main (int argc, char* argv[])
                     OptCycles (Arg, 0);
                     break;
 
+                case 'p':
+                    OptProfile (Arg, GetArg (&I, 2));
+                    break;
+
                 case 'v':
                     OptVerbose (Arg, 0);
                     break;
@@ -353,6 +365,10 @@ int main (int argc, char* argv[])
     /* Do we have a program file? */
     if (ProgramFile == NULL) {
         AbEnd ("No program file");
+    }
+
+    if (ProfileFile) {
+        ProfileInit ();
     }
 
     /* Reset memory */

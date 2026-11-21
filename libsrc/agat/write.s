@@ -12,13 +12,16 @@
 
 _write:
         sta     ptr2
+        sta     ptr3
         stx     ptr2+1
+        stx     ptr3+1
         jsr     popptr1
         jsr     popax
 
-        ; Check for zero count
-        ora     ptr2
-        beq     done
+        ; Fix count to ease counting down
+        inc     ptr2
+        inc     ptr2+1
+        bne     check_loop      ; branch always - check if we have anything to write
 
         ; Get char from buf
 next:   ldy     #$00
@@ -35,16 +38,17 @@ output:
 
         ; Increment pointer
         inc     ptr1
-        bne     :+
+        bne     check_loop
         inc     ptr1+1
 
         ; Decrement count
-:       dec     ptr2
+check_loop:
+        dec     ptr2
         bne     next
         dec     ptr2+1
-        bpl     next
+        bne     next
 
         ; Return success
-done:   lda     #$00
+done:   lda     ptr3
+        ldx     ptr3+1
         rts
-

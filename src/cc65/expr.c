@@ -114,7 +114,6 @@ static unsigned CG_TypeOfBySize (unsigned Size)
     switch (Size) {
         case 1:     CG_Type = CF_CHAR;  break;
         case 2:     CG_Type = CF_INT;   break;
-        case 3:     /* FALLTHROUGH */
         case 4:     CG_Type = CF_LONG;  break;
         default:    CG_Type = CF_NONE;  break;
     }

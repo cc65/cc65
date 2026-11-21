@@ -69,13 +69,14 @@ device: ldx     ptr2
         stx     mliparam + MLI::RW::TRANS_COUNT
         sta     mliparam + MLI::RW::TRANS_COUNT+1
 
-        ; Check for zero count
-        ora     ptr2
-        beq     done
+        ; Fix count to ease counting down
+        inc     ptr2+1
+        inx
 
-        ; Get char from buf
         ldy     #$00
-next:   lda     (ptr1),y
+        beq     check_loop      ; check if we have anything to write
+next:   ; Get char from buf
+        lda     (ptr1),y
 
         ; Replace '\n' with '\r'
         cmp     #$0A
@@ -93,14 +94,15 @@ output: jsr     COUT            ; Preserves X and Y
 
         ; Increment pointer
         iny
-        bne     :+
+        bne     check_loop
         inc     ptr1+1
 
         ; Decrement count
-:       dex
+check_loop:
+        dex
         bne     next
         dec     ptr2+1
-        bpl     next
+        bne     next
 
         ; Return success
 done:   lda     #$00
@@ -114,4 +116,3 @@ errno:  jmp     ___directerrno
 
         ; Set ___oserror
 oserr:  jmp     ___mappederrno
-

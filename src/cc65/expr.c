@@ -1164,8 +1164,7 @@ static void FunctionCall (ExprDesc* Expr)
         /* If there is no replacement type, then it is just the address */
         if (ReturnType == GetStructReplacementType (ReturnType)) {
             /* Dereference it */
-            ED_IndExpr (Expr);
-            ED_MarkExprAsRVal (Expr);
+            ED_MakeRValStructRef (Expr);
         }
     }
 
@@ -1480,7 +1479,7 @@ static void StructRef (ExprDesc* Expr)
             ED_FinalizeRValLoad (Expr);
         }
         /* Dereference the address expression */
-        ED_IndExpr (Expr);
+        ED_MakeLValStructRef (Expr);
 
     } else if (ED_IsRVal (Expr)       &&
                ED_IsLocPrimary (Expr) &&
@@ -1494,7 +1493,7 @@ static void StructRef (ExprDesc* Expr)
         ** on the check upon function returns to catch the unsupported cases and
         ** dereference the rvalue address of the struct/union here all the time.
         */
-        ED_IndExpr (Expr);
+        ED_MakeRValStructRef (Expr);
 
     } else if (!ED_IsLocQuasiConst (Expr) && !ED_IsLocPrimaryOrExpr (Expr)) {
         /* Load the base address into the primary (and use it as a reference

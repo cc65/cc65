@@ -38,6 +38,7 @@ continue: mostlyclean
 	@$(MAKE) $(PD) -C scope-merge all $(PQ)
 	@$(MAKE) $(PD) -C val all $(PQ)
 	@$(MAKE) $(PD) -C err all $(PQ)
+	@$(MAKE) $(PD) -C o65format all $(PQ)
 	@$(MAKE) $(PD) -C misc all $(PQ)
 
 mostlyclean:
@@ -47,6 +48,7 @@ mostlyclean:
 	@$(MAKE) $(PD) -C scope-merge clean $(PQ)
 	@$(MAKE) $(PD) -C val clean $(PQ)
 	@$(MAKE) $(PD) -C err clean $(PQ)
+	@$(MAKE) $(PD) -C o65format clean $(PQ)
 	@$(MAKE) $(PD) -C misc clean $(PQ)
 
 clean: mostlyclean

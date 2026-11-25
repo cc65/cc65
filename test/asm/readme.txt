@@ -46,6 +46,11 @@ they pass. If they fail the exit code should be either -1, or a number
 indicating what part of the test failed.
 
 
+o65format:
+----------
+Test cases to check if the O65 file format is correctly created
+
+
 misc:
 -----
 

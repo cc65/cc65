@@ -151,6 +151,7 @@ struct DotKeyword {
     { ".BANK",          TOK_BANK                },
     { ".BANKBYTE",      TOK_BANKBYTE            },
     { ".BANKBYTES",     TOK_BANKBYTES           },
+    { ".BANKS",         TOK_BANKS               },
     { ".BITAND",        TOK_AND                 },
     { ".BITNOT",        TOK_NOT                 },
     { ".BITOR",         TOK_OR                  },

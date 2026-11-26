@@ -5,25 +5,13 @@
 
 ; void * FillRam         (char *dest, char what, int length);
 
-            .import popa, popax
+            .import popa, ___memset_common
             .export _FillRam
 
-            .include "jumptab.inc"
             .include "geossym.inc"
 
 _FillRam:
         sta r0L
         stx r0H
-        jsr popa
-        sta r2L
-        jsr popax
-        sta r1L
-        stx r1H
-        pha
-        txa
-        pha
-        jsr FillRam
-        pla
-        tax
-        pla
-        rts
+        jsr popa                ; pop 'char what'
+        jmp ___memset_common

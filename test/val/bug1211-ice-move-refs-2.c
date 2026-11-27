@@ -19,9 +19,8 @@
 */
 
 /*
-  Test of indirect goto with label merge ICE.
+  Test of indirect goto with two labels on the same instruction.
   https://github.com/cc65/cc65/issues/1211
-  This should compile and should be moved to tests/val/ when the bug is fixed.
 */
 
 #include <stdio.h>

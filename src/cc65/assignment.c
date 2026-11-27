@@ -67,9 +67,12 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
     int         UseReg = (stype != ltype);
 
     if (UseReg) {
-        /* Back up the address of lhs only if it is in the primary */
+        /* Get the address on stack for the store, if indirect */
         PushAddr (LExpr);
     } else {
+        /* By-ref structs cannot have their value loaded into the primary */
+        CHECK (!ED_IsLocPrimary (LExpr));
+
         /* Push the address of lhs as the destination of memcpy */
         ED_AddrExpr (LExpr);
         LoadExpr (CF_NONE, LExpr);
@@ -104,17 +107,12 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 
     } else {
 
+        /* By-ref structs cannot have their value loaded into the primary */
+        CHECK (!ED_IsLocPrimary (RExpr));
+
         /* Load the address of rhs into the primary */
-        if (!ED_IsLocExpr (RExpr)) {
-            ED_AddrExpr (RExpr);
-            LoadExpr (CF_NONE, RExpr);
-        } else if (RExpr->IVal != 0) {
-            /* We have an expression in the primary plus a constant
-            ** offset. Adjust the value in the primary accordingly.
-            */
-            g_inc (CF_PTR | CF_CONST, RExpr->IVal);
-            RExpr->IVal = 0;
-        }
+        ED_AddrExpr (RExpr);
+        LoadExpr (CF_NONE, RExpr);
 
         /* Push the address of the rhs as the source of memcpy */
         g_push (CF_PTR | CF_UNSIGNED, 0);
@@ -127,9 +125,7 @@ static void CopyStruct (ExprDesc* LExpr, ExprDesc* RExpr)
 
         /* The result is an rvalue referenced in the primary */
         ED_FinalizeRValLoad (LExpr);
-
-        /* Restore the indirection level of lhs */
-        ED_IndExpr (LExpr);
+        ED_MakeRValStructRef (LExpr);
     }
 
     /* Clear the tested flag set during loading. This is not neccessary

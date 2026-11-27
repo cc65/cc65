@@ -535,6 +535,30 @@ void ED_AddrExpr (ExprDesc* Expr);
 void ED_IndExpr (ExprDesc* Expr);
 /* Dereference Expr */
 
+static inline void ED_MakeLValStructRef (ExprDesc* Expr)
+/* Make the expression a struct/union ref-load lvalue, possibly with
+** a member offset.
+*/
+{
+    /* Note: There is no good way of marking the Expr as a ref-load.
+    ** Currently, just take an indirect reference as E_LOC_EXPR.
+    */
+    ED_IndExpr (Expr);
+}
+
+static inline void ED_MakeRValStructRef (ExprDesc* Expr)
+/* Make the expression a struct/union ref-load rvalue, possibly with
+** a member offset.
+*/
+{
+    /* Note: There is no good way of marking the Expr as a ref-load.
+    ** Currently, just take an indirect reference as E_LOC_EXPR,
+    ** and make it an rvalue.
+    */
+    ED_IndExpr (Expr);
+    ED_MarkExprAsRVal (Expr);
+}
+
 static inline void ED_RequireTest (ExprDesc* Expr)
 /* Mark the expression for a test. */
 {

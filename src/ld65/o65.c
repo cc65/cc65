@@ -739,16 +739,6 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
         RelocType |= O65SegType (Seg);
         O65RelocPutByte (D->CurReloc, RelocType);
 
-        /* Output additional data if needed */
-        switch (RelocType & O65RELOC_MASK) {
-            case O65RELOC_HIGH:
-                O65RelocPutByte (D->CurReloc, ED.Val & 0xFF);
-                break;
-            case O65RELOC_SEG:
-                O65RelocPutWord (D->CurReloc, ED.Val & 0xFFFF);
-                break;
-        }
-
     } else if (ED.ExtRef) {
         /* Imported symbol */
         RelocType |= O65SEG_UNDEF;
@@ -762,6 +752,17 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
         Internal ("External reference not handled");
 
     }
+
+    /* Output additional data if needed */
+    switch (RelocType & O65RELOC_MASK) {
+        case O65RELOC_HIGH:
+            O65RelocPutByte (D->CurReloc, ED.Val & 0xFF);
+            break;
+        case O65RELOC_SEG:
+            O65RelocPutWord (D->CurReloc, ED.Val & 0xFFFF);
+            break;
+    }
+
 
     /* Success */
     return SEG_EXPR_OK;
